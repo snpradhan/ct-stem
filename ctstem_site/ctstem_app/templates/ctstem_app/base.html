@@ -1,0 +1,71 @@
+<html>
+  <head>
+    <title> {% block title %} {%endblock %} CT-STEM  </title>
+    {% block media %}
+      <!-- Latest compiled and minified CSS -->
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+      <!-- Optional theme -->
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+      <!-- Latest compiled and minified JavaScript -->
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+      <link rel="stylesheet" href="/static/css/ctstem.css" media="screen"/>
+    {% endblock %}
+  </head>
+
+  <body id="Page">
+    {% block header %}
+      <div id="Header">
+        <div class="innerWrap">
+          <div id="Logo">
+            <a href="http://ct-stem.northwestern.edu/">
+              <img class="logo" src="/static/img/logo.png" alt="logo" width="191" height="115">
+            </a>
+          </div>
+          <div id="Banner">
+            <h1 id="Title">
+              <a href="http://ct-stem.northwestern.edu/">
+                Computational Thinking in STEM
+              </a>
+            </h1>
+            <h3> Bringing CT enhanced activities into STEM classrooms</h3>
+          </div>
+        </div>
+      </div>
+      <div id="Nav">
+        <div class="innerWrap">
+          <ul>
+            <li><a href="/" title="Go to the Home page" class="link">Home</a></li>
+            <li><a href="{% url 'ctstem:about_us' %}" title="Go to the About Us page" class="link">About Us</a></li>
+            <li><a href="/" title="Go to the Partners page" class="link">Partners</a></li>
+            <li><a href="{% url 'ctstem:lessons' %}">Lesson Plans</a></li>
+            <li><a href="/" title="Go to the  page" class="link">Assessments</a></li>
+            <li><a href="/" title="Go to the Teacher Training Workshops page" class="link">Teacher Workshops</a></li>
+            <li><a href="/" title="Go to the Teacher Training Workshops page" class="link">Publications</a></li>
+          </ul>
+        </div>
+      </div>
+    {% endblock %}
+
+    {% block content %}
+    {% endblock %}
+
+    {% block footer %}
+      <div id="Footer">
+        <div class="innerWrap">
+          <p></p>
+          <div class="captionImage left" style="width: 100px;">
+            <img class="left" src="/static/img/NSFLogo.png" alt="NSF Logo" title="NSF Logo" width="100" height="100">
+          </div>
+          This work is supported in part National Science Foundation under NSF grant CNS-1138461. However, any opinions, findings, conclusions, and/or recommendations are those of the investigators and do not necessarily reflect the views of&nbsp; the Foundation.
+          <p>&nbsp;</p>
+        </div>
+        <div id="Copyright">
+          <div class="innerWrap">
+            <p style="text-align:center">Copyright © 2015 Northwestern University</p>
+          </div>
+        </div>
+      </div>
+    {% endblock %}
+
+  </body>
+</html>

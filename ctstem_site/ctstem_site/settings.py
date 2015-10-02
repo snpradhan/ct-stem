@@ -38,6 +38,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'ctstem_app',
+    'django-dia',
 )
 
 MIDDLEWARE_CLASSES = (

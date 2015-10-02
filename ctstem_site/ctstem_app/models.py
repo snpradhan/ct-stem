@@ -42,6 +42,17 @@ SUBJECT_CHOICES = (
     (u'GENERAL SCIENCE', u'GENERAL SCIENCE'),
 )
 
+def upload_image_to(instance, filename):
+  import os
+  from django.utils.timezone import now
+  filename_base, filename_ext = os.path.splitext(filename)
+  print filename
+  if isinstance(instance, Lesson):
+      return 'lesson/%s%s' % (instance.title, filename_ext.lower(),)
+  elif isinstance(instance, Assessment):
+      return 'assessment/%s%s' % (instance.name, filename_ext.lower(),)
+  return 'misc/%s%s' % (instance.id,filename_ext.lower(),)
+
 # Create your models here.
 
 # Lesson model
@@ -52,15 +63,15 @@ class Lesson (models.Model):
   overview = models.TextField(null=False)
   content = models.TextField(null=False)
   status = models.CharField(max_length=1, default='D', choices=LESSON_STATUS_CHOICES)
-  subject = models.ManyToManyField(Subject, null=False, related_name="lesson")
-  image = models.ImageField(upload_to=upload_image_to, null=True, blank=True)
-  questions = models.ManyToManyField(Question, through='LessonQuestion')
-  ngss_standards = models.ManyToManyField(NGSSStandard)
-  ct_stem_practices = models.ManyToManyField(CTStemPractice)
-  author = models.ForeignKey(User, null=False, related_name='lesson')
-  modified_by = models.ForeignKey(User, null=False)
+  subject = models.ManyToManyField('Subject', null=False)
+  #image = models.ImageField(upload_to=upload_image_to, null=True, blank=True)
+  questions = models.ManyToManyField('Question', through='LessonQuestion')
+  ngss_standards = models.ManyToManyField('NGSSStandard')
+  ct_stem_practices = models.ManyToManyField('CTStemPractice')
+  author = models.ForeignKey(User, null=False, related_name='lesson_author')
+  modified_by = models.ForeignKey(User, null=False, related_name='lesson_modifier')
   created_date = models.DateTimeField(auto_now_add=True)
-  modified_date = models.DateTimeField(auto_now_add=True, auto_now=True)
+  modified_date = models.DateTimeField(auto_now=True)
 
   class Meta:
       ordering = ['-id']
@@ -74,14 +85,14 @@ class Assessment (models.Model):
   time = models.CharField(null=True, max_length=256)
   overview = models.TextField(null=False)
   status = models.CharField(max_length=1, default='D', choices=LESSON_STATUS_CHOICES)
-  subject = models.ManyToManyField(Subject, null=False, related_name="lesson")
-  image = models.ImageField(upload_to=upload_image_to, null=True, blank=True)
-  ngss_standards = models.ManyToManyField(NGSSStandard)
-  ct_stem_practices = models.ManyToManyField(CTStemPractice)
-  author = models.ForeignKey(User, null=False, related_name='lesson')
-  modified_by = models.ForeignKey(User, null=False)
+  subject = models.ManyToManyField('Subject', null=False)
+  #image = models.ImageField(upload_to=upload_image_to, null=True, blank=True)
+  ngss_standards = models.ManyToManyField('NGSSStandard')
+  ct_stem_practices = models.ManyToManyField('CTStemPractice')
+  author = models.ForeignKey(User, null=False, related_name='assessment_author')
+  modified_by = models.ForeignKey(User, null=False, related_name='assessment_modifier')
   created_date = models.DateTimeField(auto_now_add=True)
-  modified_date = models.DateTimeField(auto_now_add=True, auto_now=True)
+  modified_date = models.DateTimeField(auto_now=True)
 
   class Meta:
       ordering = ['-id']
@@ -96,7 +107,7 @@ class AssessmentStep(models.Model):
   title = models.CharField(null=True, max_length=256)
   order = models.IntegerField(null=True)
   content = models.TextField(null=False)
-  questions = models.ManyToManyField(Question, through='AssessmentQuestion')
+  questions = models.ManyToManyField('Question', through='AssessmentQuestion')
 
 # Question model
 # A bank of questions that can be resued across assessments and lessons
@@ -138,10 +149,19 @@ class CTStemPractice(models.Model):
   overview = models.TextField(null=False)
   order = models.IntegerField(null=True)
 
+# School model
+class School(models.Model):
+  name = models.CharField(null=False, max_length=256)
+  city = models.CharField(null=False, max_length=256)
+
+# Student model
+class Student(models.Model):
+  user = models.OneToOneField(User, unique=True, null=False)
+
 # Teacher models
 # This is a user class model
 class Teacher(models.Model):
-  user = models.OneToOneField(User, unique=True, null=False, related_name='teacher')
+  user = models.OneToOneField(User, unique=True, null=False)
   school = models.ForeignKey(School)
   students = models.ManyToManyField(Student)
 
@@ -153,23 +173,15 @@ class Section(models.Model):
   time = models.CharField(null=False, max_length=256)
   students = models.ManyToManyField(Student)
 
-# Student model
-class Student(models.Model):
-  user = models.OneToOneField(User, unique=True, null=False, related_name='student')
-
-# School model
-class School(models.Model):
-  name = models.CharField(null=False, max_length=256)
-  city = models.CharField(null=False, max_length=256)
-
 # Researcher model
 # This model represents researchers, school admins and school principals
 class Researcher(models.Model):
-  user = models.OneToOneField(User, unique=True, null=False, related_name='researcher')
+  user = models.OneToOneField(User, unique=True, null=False)
   school = models.ForeignKey(School)
   teachers = models.ManyToManyField(Teacher)
 
 # Administrator models
 # This model represents a super user
 class Administrator(models.Model):
-  user = models.OneToOneField(User, unique=True, null=False, related_name='researcher')
+  user = models.OneToOneField(User, unique=True, null=False)
+
