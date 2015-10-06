@@ -7,12 +7,14 @@
       <!-- Optional theme -->
       <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
       <!-- Latest compiled and minified JavaScript -->
+      <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
       <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
       <link rel="stylesheet" href="/static/css/ctstem.css" media="screen"/>
     {% endblock %}
   </head>
 
-  <body id="Page">
+  <body>
     {% block header %}
       <div id="Header">
         <div class="innerWrap">
@@ -22,31 +24,70 @@
             </a>
           </div>
           <div id="Banner">
-            <h1 id="Title">
+            <h2 id="Title">
               <a href="http://ct-stem.northwestern.edu/">
                 Computational Thinking in STEM
               </a>
-            </h1>
-            <h3> Bringing CT enhanced activities into STEM classrooms</h3>
+            </h2>
           </div>
         </div>
       </div>
-      <div id="Nav">
-        <div class="innerWrap">
-          <ul>
-            <li><a href="/" title="Go to the Home page" class="link">Home</a></li>
-            <li><a href="{% url 'ctstem:about_us' %}" title="Go to the About Us page" class="link">About Us</a></li>
-            <li><a href="/" title="Go to the Partners page" class="link">Partners</a></li>
-            <li><a href="{% url 'ctstem:lessons' %}">Lesson Plans</a></li>
-            <li><a href="/" title="Go to the  page" class="link">Assessments</a></li>
-            <li><a href="/" title="Go to the Teacher Training Workshops page" class="link">Teacher Workshops</a></li>
-            <li><a href="/" title="Go to the Teacher Training Workshops page" class="link">Publications</a></li>
-          </ul>
-        </div>
-      </div>
+
+      <nav class="navbar navbar-default navbar-static-top">
+        <div class="container-fluid">
+          <!-- Collect the nav links, forms, and other content for toggling -->
+          <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-center">
+              <li class="active"><a href="/">Home <span class="sr-only">(current)</span></a></li>
+              <li><a href="{% url 'ctstem:about_us' %}" title="Go to the About Us page" class="link">About Us</a></li>
+              <li><a href="/" title="Go to the Partners page" class="link">Partners</a></li>
+              <li><a href="{% url 'ctstem:lessons' %}">Lesson Plans</a></li>
+              <li><a href="/" title="Go to the  page" class="link">Assessments</a></li>
+              <li><a href="/" title="Go to the Teacher Training Workshops page" class="link">Teacher Workshops</a></li>
+              <li><a href="/" title="Go to the Teacher Training Workshops page" class="link">Publications</a></li>
+            </ul>
+            {% block profile %}
+              {% if user.is_authenticated %}
+                <ul class="nav pull-right">
+                  <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown" id="welcome">Welcome, {{ user.first_name }}  <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                      <li><a href="{% url 'ctstem:userProfile' user.id %}"><i class="icon-user"></i> Edit Profile</a></li>
+                      <li><a href=""><i class="icon-cog"></i> Account Settings</a></li>
+                      <li class="divider"></li>
+                      <li><a href="{% url 'ctstem:logout' %}"><i class="icon-off"></i> Logout</a></li>
+                    </ul>
+                  </li>
+                </ul>
+              {% else %}
+                <ul class="nav pull-right">
+                  <li class="dropdown" id="menuLogin">
+                    <a class="dropdown-toggle" href="#" data-toggle="dropdown" id="navLogin">Login</a>
+                    <div class="dropdown-menu" style="padding:17px;">
+                      <form class="form" id="formLogin" action="/login/" method="post">
+                        {% csrf_token %}
+                        <input name="username" id="username" type="text" placeholder="Username">
+                        <input name="password" id="password" type="password" placeholder="Password"><br>
+                        <button type="submit" id="btnLogin" class="btn"> Login</button>
+                        <a href="{% url 'ctstem:register' %}">Register</a>
+                      </form>
+                    </div>
+                  </li>
+                </ul>
+              {% endif %}
+            {% endblock %}
+          </div><!-- /.navbar-collapse -->
+        </div><!-- /.container-fluid -->
+      </nav>
     {% endblock %}
 
     {% block content %}
+      {% if messages %}
+        <ul class="messages">
+          {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
     {% endblock %}
 
     {% block footer %}

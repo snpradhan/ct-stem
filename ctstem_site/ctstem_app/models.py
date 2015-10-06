@@ -42,6 +42,14 @@ SUBJECT_CHOICES = (
     (u'GENERAL SCIENCE', u'GENERAL SCIENCE'),
 )
 
+USER_ROLE_CHOICES = (
+    (u'T', u'Teacher'),
+    (u'R', u'Researcher/School Admin'),
+    (u'S', u'Student'),
+    (u'A', u'Site Administrator'),
+
+)
+
 def upload_image_to(instance, filename):
   import os
   from django.utils.timezone import now
@@ -154,17 +162,51 @@ class School(models.Model):
   name = models.CharField(null=False, max_length=256)
   city = models.CharField(null=False, max_length=256)
 
+  def __unicode__(self):
+      return u'%s' % (self.name)
+
+###############################
+# USER CLASSES
+##############################
 # Student model
 class Student(models.Model):
-  user = models.OneToOneField(User, unique=True, null=False)
+  user = models.OneToOneField(User, unique=True, null=False, related_name="student")
+  school = models.ForeignKey(School)
+
+  def __unicode__(self):
+      return u'%s' % (self.user.get_full_name())
 
 # Teacher models
 # This is a user class model
 class Teacher(models.Model):
-  user = models.OneToOneField(User, unique=True, null=False)
+  user = models.OneToOneField(User, unique=True, null=False, related_name="teacher")
   school = models.ForeignKey(School)
-  students = models.ManyToManyField(Student)
+  students = models.ManyToManyField(Student, blank=True)
+  permission_code = models.CharField(null=False, max_length=256, unique=True)
 
+  def __unicode__(self):
+      return u'%s' % (self.user.get_full_name())
+
+# Researcher model
+# This model represents researchers, school admins and school principals
+class Researcher(models.Model):
+  user = models.OneToOneField(User, unique=True, null=False, related_name="researcher")
+  school = models.ForeignKey(School)
+  teachers = models.ManyToManyField(Teacher, blank=True)
+  permission_code = models.CharField(null=False, max_length=256, unique=True)
+
+  def __unicode__(self):
+      return u'%s' % (self.user.get_full_name())
+
+# Administrator models
+# This model represents a super user
+class Administrator(models.Model):
+  user = models.OneToOneField(User, unique=True, null=False, related_name="administrator")
+
+  def __unicode__(self):
+      return u'%s' % (self.user.get_full_name())
+
+######################################################
 # Section models
 # This models represents a class, group or a section of a teacher that has one or more students
 class Section(models.Model):
@@ -172,16 +214,3 @@ class Section(models.Model):
   subject = models.ForeignKey(Subject)
   time = models.CharField(null=False, max_length=256)
   students = models.ManyToManyField(Student)
-
-# Researcher model
-# This model represents researchers, school admins and school principals
-class Researcher(models.Model):
-  user = models.OneToOneField(User, unique=True, null=False)
-  school = models.ForeignKey(School)
-  teachers = models.ManyToManyField(Teacher)
-
-# Administrator models
-# This model represents a super user
-class Administrator(models.Model):
-  user = models.OneToOneField(User, unique=True, null=False)
-

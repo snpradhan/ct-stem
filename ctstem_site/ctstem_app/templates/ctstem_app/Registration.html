@@ -1,0 +1,93 @@
+{% extends "ctstem_app/base.html" %}
+
+
+{% block title %}Registration |{% endblock %}
+
+
+{% block styles %}
+  #sidebar {
+    display: none;
+  }
+{% endblock %}
+
+{% block content %}
+  {{block.super}}
+  <div class="content">
+    <h2>Sign Up</h2>
+    <form class="form-horizontal" method="post">
+      {% csrf_token %}
+      <div class="table" id="register">
+        <fieldset>
+          {{form.management_form}}
+          {% for field in form %}
+            <div class="input-group" id="div_{{field.name}}">
+              <span class="input-group-addon" id="{{ field.label }}">{{ field.label }} </span>
+              {{field}}
+              <div class="error">{{ field.errors }}</div>
+            </div>
+          {% endfor %}
+        </fieldset>
+        <div class="control-group">
+          <div class="controls">
+            <label class="checkbox">
+              <input type="checkbox" id="agree" /> I agree all your <a href="#" rel="popover" id="signupTerms">Terms of Use</a>
+            </label>
+            <input type="submit" class="btn fb-blue" id="submit" value="Sign Up" disabled/>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <script type="text/javascript">
+      $('#id_account_type').change(function() {
+        if($(this).val() === 'A'){
+          $('#div_school').hide();
+          $('#div_permission_code').hide();
+          $('#div_user_code').hide();
+        }
+        else if($(this).val() === 'R'){
+          $('#div_permission_code').hide();
+          $('#div_user_code').show();
+        }
+        else if($(this).val() === 'T'){
+          $('#div_school').show();
+          $('#div_permission_code').show();
+          $('#div_user_code').show();
+        }
+        else {
+          $('#div_permission_code').show();
+          $('#div_user_code').hide();
+        }
+      });
+
+      $("#signupTerms").popover({
+          placement: 'right',
+          title: 'Terms of Use',
+          html: true ,
+          content: ''
+       });
+
+      // popoverPropogationEvent(){
+      $("#signupTerms").click(function (e) {
+          e.stopPropagation();
+      });
+      /**************************/
+
+      // closePopoverEvent(){
+      $(document).click(function (e) {
+        if (($('.popover').has(e.target).length == 0) || $(e.target).is('.close')) {
+          $("#signupTerms").popover('hide');
+        }
+      });
+
+      $('#agree').change(function(){
+          if( $(this).is(':checked') ){
+            $('#submit').removeAttr('disabled');
+          } else {
+            $('#submit').attr("disabled","disabled");
+          }
+      });
+      /**************************/
+    </script>
+  </div>
+{% endblock %}
