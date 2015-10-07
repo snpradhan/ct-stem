@@ -6,21 +6,63 @@ from django.contrib.auth import authenticate, login, logout
 from django import http, shortcuts, template
 from django.shortcuts import render
 from django.contrib import auth, messages
+from django.forms.models import inlineformset_factory
 
 # Create your views here.
+def about_us(request):
+  return render(request, 'ctstem_app/About_us.html')
 
 def index(request):
   lessons = models.Lesson.objects.order_by('id')
   context = {'lessons': lessons}
   return render(request, 'ctstem_app/base.html', context)
 
+# Get a list of lesson objects to display as a table
 def lessons(request):
   lessons = models.Lesson.objects.order_by('id')
   context = {'lessons': lessons}
   return render(request, 'ctstem_app/Lessons.html', context)
 
-def about_us(request):
-  return render(request, 'ctstem_app/About_us.html')
+# create or modify a lesson identified by the id
+def lesson(request, id=''):
+  try:
+    # check if the lesson exists
+    if '' != id:
+      lesson = models.Lesson.objects.get(id=id)
+    else:
+      lesson = models.Lesson()
+
+    if request.method == 'GET':
+      form = forms.LessonForm(instance=lesson, prefix='lesson')
+      QuestionFormSet = inlineformset_factory(models.Lesson, models.LessonQuestion, fields=('question', 'order'), extra=1)
+      formset = QuestionFormSet(instance=lesson)
+      context = {'form': form, 'formset':formset}
+      return render(request, 'ctstem_app/Lesson.html', context)
+
+    elif request.method == 'POST':
+      data = request.POST.copy()
+      form = forms.LessonForm(data, request.FILES, instance=lesson, prefix="lesson")
+      if form.is_valid():
+        savedLesson = form.save(commit=False)
+        if '' == id:
+            savedLesson.author = request.user
+        print request.user
+        savedLesson.modified_by = request.user
+        savedLesson.save()
+        form.save_m2m()
+        messages.success(request, "Lesson Saved.")
+        return shortcuts.redirect('ctstem:lesson', id=savedLesson.id)
+      else:
+        print form.errors
+        context = {'form': form}
+        return render(request, 'ctstem_app/Lesson.html', context)
+
+    return http.HttpResponseNotAllowed(['GET', 'POST'])
+
+  except models.Lesson.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested lesson not found</h1>')
+
+
 
 def register(request):
   if request.method == 'POST':
@@ -139,23 +181,19 @@ def userProfile(request, id=''):
 
     if request.method == 'GET':
       userform = forms.UserProfileForm(instance=user, prefix='user')
-      if role == 'S':
-        studentform = forms.StudentForm(instance=student, prefix='student')
-        context = {'profileform': studentform, 'userform': userform, }
-        return render(request, 'ctstem_app/UserProfile.html', context)
+      if role in ['S', 'T', 'A', 'R']:
+        if role == 'S':
+          profileform = forms.StudentForm(instance=student, prefix='student')
+        elif role == 'T':
+          profileform = forms.TeacherForm(instance=teacher, prefix='teacher')
+        elif role == 'A':
+          profileform = None
+        elif role == 'R':
+          profileform = forms.ResearcherForm(instance=researcher, prefix='researcher')
+        else:
+          return http.HttpResponseNotFound('<h1>Requested user does not have a role</h1>')
 
-      elif role == 'T':
-        teacherform = forms.TeacherForm(instance=teacher, prefix='teacher')
-        context = {'profileform': teacherform, 'userform': userform, }
-        return render(request, 'ctstem_app/UserProfile.html', context)
-
-      elif role == 'A':
-        context = {'userform': userform, }
-        return render(request, 'ctstem_app/UserProfile.html', context)
-
-      elif role == 'R':
-        researcherform = forms.ResearcherForm(instance=researcher, prefix='researcher')
-        context = {'profileform': researcherform, 'userform': userform, }
+        context = {'profileform': profileform, 'userform': userform, }
         return render(request, 'ctstem_app/UserProfile.html', context)
 
     elif request.method == 'POST':
@@ -186,21 +224,21 @@ def userProfile(request, id=''):
         if profileform is None:
           userform.save()
           messages.success(request, "User profile saved successfully")
-          return shortcuts.redirect('ctstem:lessons')
+          context = {'userform': userform, }
         elif profileform.is_valid():
           userform.save()
           profileform.save()
           messages.success(request, "User profile saved successfully")
-          return shortcuts.redirect('ctstem:lessons')
+          context = {'profileform': profileform, 'userform': userform, }
         else:
           print profileform.errors
           context = {'profileform': profileform, 'userform': userform, }
-          return render(request, 'ctstem_app/UserProfile.html', context)
       else:
-          print profileform.errors
-          print userform.errors
-          context = {'profileform': profileform, 'userform': userform, }
-          return render(request, 'ctstem_app/UserProfile.html', context)
+        print profileform.errors
+        print userform.errors
+        context = {'profileform': profileform, 'userform': userform, }
+
+      return render(request, 'ctstem_app/UserProfile.html', context)
 
     return http.HttpResponseNotAllowed(['GET', 'POST'])
 

@@ -1,0 +1,31 @@
+{% extends "ctstem_app/base.html" %}
+{% block title %}Lesson |{% endblock %}
+
+{% block content %}
+  {{block.super}}
+  <div class="content">
+    <h2>Lesson</h2>
+    <form method="post">
+      {% csrf_token %}
+      <div class="table" id="lesson">
+        {{form.management_form}}
+        {% for field in form %}
+          <div class="form-group">
+            <label for="id_{{field.name}}">{{ field.label|title }}</label>
+            {% if field.name == 'questions' %}
+            <div class="clearfix">
+            {% else %}
+            <div>
+            {% endif %}
+              {{field}}
+            </div>
+            <div class="error">{{ field.errors }}</div>
+          </div>
+        {% endfor %}
+        <div class="form-group">
+          <input type="submit" class="btn btn-success" id="submit" value="Save Lesson"/>
+        </div>
+      </div>
+    </form>
+  </div>
+{% endblock %}

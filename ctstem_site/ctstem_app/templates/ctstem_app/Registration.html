@@ -14,27 +14,25 @@
   {{block.super}}
   <div class="content">
     <h2>Sign Up</h2>
-    <form class="form-horizontal" method="post">
+    <form method="post">
       {% csrf_token %}
       <div class="table" id="register">
         <fieldset>
           {{form.management_form}}
           {% for field in form %}
-            <div class="input-group" id="div_{{field.name}}">
-              <span class="input-group-addon" id="{{ field.label }}">{{ field.label }} </span>
+            <div class="form-group">
+              <label for="id_{{field.name}}">{{ field.label|title }}</label>
               {{field}}
               <div class="error">{{ field.errors }}</div>
             </div>
           {% endfor %}
-        </fieldset>
-        <div class="control-group">
-          <div class="controls">
-            <label class="checkbox">
+          <div class="checkbox">
+            <label>
               <input type="checkbox" id="agree" /> I agree all your <a href="#" rel="popover" id="signupTerms">Terms of Use</a>
             </label>
-            <input type="submit" class="btn fb-blue" id="submit" value="Sign Up" disabled/>
           </div>
-        </div>
+          <input type="submit" class="btn btn-success" id="submit" value="Sign Up" disabled/>
+        </fieldset>
       </div>
     </form>
 

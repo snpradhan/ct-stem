@@ -73,7 +73,7 @@ class Lesson (models.Model):
   status = models.CharField(max_length=1, default='D', choices=LESSON_STATUS_CHOICES)
   subject = models.ManyToManyField('Subject', null=False)
   #image = models.ImageField(upload_to=upload_image_to, null=True, blank=True)
-  questions = models.ManyToManyField('Question', through='LessonQuestion')
+  questions = models.ManyToManyField('Question', through='LessonQuestion', blank=True)
   ngss_standards = models.ManyToManyField('NGSSStandard')
   ct_stem_practices = models.ManyToManyField('CTStemPractice')
   author = models.ForeignKey(User, null=False, related_name='lesson_author')
@@ -126,11 +126,17 @@ class Question(models.Model):
   options = models.TextField(null=True, blank=True)
   answer = models.TextField(null=True, blank=True)
 
+  def __unicode__(self):
+      return u'%s' % (self.question_text)
+
 # A relation between Lesson and Question models
 class LessonQuestion(models.Model):
   question = models.ForeignKey(Question)
   lesson = models.ForeignKey(Lesson)
   order = models.IntegerField(null=True)
+
+  def __unicode__(self):
+      return u'%s' % (self.question.question_text)
 
 # A relation between Assessment Step and Question models
 class AssessmentQuestion(models.Model):
@@ -140,7 +146,10 @@ class AssessmentQuestion(models.Model):
 
 # Subject model
 class Subject(models.Model):
-    name = models.CharField(null=False, max_length=256, choices=SUBJECT_CHOICES)
+  name = models.CharField(null=False, max_length=256, choices=SUBJECT_CHOICES)
+
+  def __unicode__(self):
+      return u'%s' % (self.name)
 
 # NGSS Standard model
 # This model will be populated from an external source
@@ -149,6 +158,9 @@ class NGSSStandard(models.Model):
   title = models.CharField(null=False, max_length=256)
   description = models.TextField(null=True, blank=True)
 
+  def __unicode__(self):
+      return u'%s' % (self.title)
+
 # CT Stem Practice model
 # This model has many to many relation with Lesson and Assessment models
 class CTStemPractice(models.Model):
@@ -156,6 +168,9 @@ class CTStemPractice(models.Model):
   title = models.CharField(null=True, max_length=256)
   overview = models.TextField(null=False)
   order = models.IntegerField(null=True)
+
+  def __unicode__(self):
+      return u'%s-%s' % (self.category, self.title)
 
 # School model
 class School(models.Model):

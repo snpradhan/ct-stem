@@ -5,28 +5,26 @@
   {{block.super}}
   <div class="content">
     <h2>User Profile</h2>
-    <form class="form-horizontal" method="post">
+    <form method="post">
       {% csrf_token %}
       <div class="table" id="userProfile">
-        <fieldset>
-          {{userform.management_form}}
-          {% for field in userform %}
-            <div class="input-group" id="div_{{field.name}}">
-              <span class="input-group-addon" id="{{ field.label }}">{{ field.label }} </span>
-              {{field}}
-              <div class="error">{{ field.errors }}</div>
-            </div>
-          {% endfor %}
-          {{profileform.management_form}}
-          {% for field in profileform %}
-            <div class="input-group" id="div_{{field.name}}">
-              <span class="input-group-addon" id="{{ field.label }}">{{ field.label }} </span>
-              {{field}}
-              <div class="error">{{ field.errors }}</div>
-            </div>
-          {% endfor %}
-        </fieldset>
-        <input type="submit" class="btn fb-blue" id="submit" value="Save Profile"/>
+        {{userform.management_form}}
+        {{profileform.management_form}}
+        {% for field in userform %}
+          <div class="form-group">
+            <label for="id_{{field.name}}">{{ field.label|title }}</label>
+            {{field}}
+            <div class="error">{{ field.errors }}</div>
+          </div>
+        {% endfor %}
+        {% for field in profileform %}
+          <div class="form-group">
+            <label for="id_{{field.name}}">{{ field.label }}</label>
+            {{field}}
+            <div class="error">{{ field.errors }}</div>
+          </div>
+        {% endfor %}
+        <input type="submit" class="btn btn-success" id="submit" value="Save Profile"/>
       </div>
 
     </form>

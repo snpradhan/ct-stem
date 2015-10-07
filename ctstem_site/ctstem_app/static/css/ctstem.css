@@ -1,7 +1,7 @@
 /* Page Element Styles */
 body {
   color:#434547;
-  font-family:Verdana,Helvetica,Arial,sans-serif;
+  font-family:Verdana,helvetica,Arial,sans-serif;
   font-size:1em;
   font-size-adjust:none;
   font-stretch:normal;
@@ -9,95 +9,185 @@ body {
   font-variant:normal;
   font-weight:normal;
   line-height:1.5em;
-  text-align:center;
 }
 
-
-
-/* Basic Layout Styles */
+/* basic layout Styles */
 .innerWrap{
   width: 80em;
   margin: 0 auto;
   text-align: left;
 }
 
-#Header {background: #273138 url(../images/header.gif) repeat-x scroll left top; }
+#header {background: #273138 url(../images/header.gif) repeat-x scroll left top; }
 #Footer { background: #273138 url(../images/footer-bg.gif) repeat-x scroll left top; color: #A3A5A7; padding: 30px 0; float:left; width: 100%; }
 
-/* Header Styles */
+/* header Styles */
 
-#Header {
+#header {
   color:#9752A5;
   line-height:1em;
   height:148px;
   background-color:white;
 }
-#Header .innerWrap{
+#header .innerWrap{
   text-align:center;
 }
-#Header a{
+#header a{
   color:#520063;
 }
-#Header a:hover, #Header a:visited {
+#header a:hover, #header a:visited {
   text-decoration: none;
 }
-#Header #Logo{
+#header #logo{
   float:left;
   width: 15em;
   padding-top: 14px;
 }
-#Header #Banner {
+#header #banner {
   float:left;
   width: 60em;
   padding: 1em 8em;
   text-align: left;
 }
-#Header #Banner #Title {
+#header #banner #title {
   line-height:1em;
   font-size: 3.3em;
   padding: 0.25em 0 0.35em 0.5em;
   text-align: center;
 }
-#Header #Banner h3 {
+#header #banner h3 {
   line-height:1em;
   margin-left:1em;
   font-size: 1.5em;
 }
 
+/*
+ * NAVBAR  START
+ */
 .navbar {
   line-height: 1em;
   font-size: 1.5em;
   padding-left: 8em;
   padding-right: 10em;
-  min-height:32px !important
+  min-height:20px !important
 }
 .navbar-nav > li > a {
-  padding-top: 0px;
-  padding-bottom: 0px;
+  padding-top: 10px;
+  padding-bottom: 5px;
 }
+/* NAVBAR  END  */
 
+/*
+ * CONTENT DIV START
+ */
 div.table {
-    border: solid #ccc 1px;
-    padding: 30px 10px 10px 20px;
-    margin: auto;
-    width: 60%;
-    border-radius: 10px;
-    background-color: white;
-    box-shadow: 10px 10px 10px rgba(204,204,204, 1);
+  border: solid #ccc 1px;
+  padding: 30px 10px 10px 20px;
+  margin: auto;
+  width: 60%;
+  border-radius: 10px;
+  background-color: white;
+  box-shadow: 10px 10px 10px rgba(204,204,204, 1);
 }
+/* CONTENT DIV END */
 
-div.table#register {
-  width: 30%;
+/*
+ * TABLE VIEW
+ */
+table.table {
+  width: 80%;
+  margin: auto;
 }
-div.table#userProfile {
+div.table#register, div.table#userProfile {
   width: 50%;
+  padding: 3em 4em;
+}
+div.table#lesson {
+  width: 60%;
+  padding: 3em 4em;
 }
 
-.input-group {
+/*
+ * FORM GROUP
+ */
+div.form-group label{
+  font-size: 1.3em;
+}
+
+div.content {
+  margin-bottom: 40px;
+}
+
+div.btn-group {
+  margin-left: 10%;
   margin-bottom: 10px;
 }
-.input-group div.error {
-  color: red;
+
+/*
+ * HEADINGS
+ */
+.h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
+  text-align: center;
 }
 
+/*
+ * MESSAGES AND COLORS
+ */
+ul.messages {
+  list-style-type: none;
+  text-align: center;
+  font-size: 1.5em;
+}
+.error {
+  color: red;
+}
+.success {
+  color: green;
+}
+.warning {
+  color: orange;
+}
+.info {
+  color: blue;
+}
+/* MESSAGES END */
 
+/*
+ * MULTISELECT WIDGET STYLING
+ */
+.selector-available , .selector-chosen {
+  border: solid #ccc 1.5px;
+  border-radius: 5px;
+}
+.selector-available select, .selector-chosen select{
+  border: 0px;
+  float: left;
+  width: 100%;
+  text-align: left;
+  margin-bottom: 5px;
+  padding: 10px;
+}
+.selector .selector-available input, .selector .selector-chosen input{
+  width: 90%;
+}
+.selector-available h5, .selector-chosen h5 {
+  font-weight: 700;
+  font-size: 1em;
+}
+
+a.selector-chooseall, a.selector-clearall {
+  display: inline;
+}
+.clearfix:after {
+  content: " ";
+  display: block;
+  height: 0;
+  clear: both;
+}
+/* MULTISELECT WIDGET END */
+
+/*
+ * INPUT FIELDS STYLING
+ */
+
+/* INPUT FIELDS END */
