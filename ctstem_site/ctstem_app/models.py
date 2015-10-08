@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from tinymce.models import HTMLField
 
 LESSON_STATUS_CHOICES = (
     (u'D', u'Draft'),
@@ -67,9 +68,10 @@ def upload_image_to(instance, filename):
 class Lesson (models.Model):
   title = models.CharField(null=False, max_length=256, unique=True)
   time = models.CharField(null=True, max_length=256)
+  level = models.TextField(null=False)
   purpose = models.TextField(null=False)
   overview = models.TextField(null=False)
-  content = models.TextField(null=False)
+  content = HTMLField(null=False)
   status = models.CharField(max_length=1, default='D', choices=LESSON_STATUS_CHOICES)
   subject = models.ManyToManyField('Subject', null=False)
   #image = models.ImageField(upload_to=upload_image_to, null=True, blank=True)

@@ -39,6 +39,8 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'ctstem_app',
     'django-dia',
+    'tinymce',
+    'django_wysiwyg',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -51,6 +53,8 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
 )
+
+DJANGO_WYSIWYG_FLAVOR =  "tinymce_advanced" #"tinymce"
 
 ROOT_URLCONF = 'ctstem_site.urls'
 

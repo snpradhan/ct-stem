@@ -3,19 +3,24 @@
   <head>
     <title> {% block title %} {%endblock %} CT-STEM  </title>
     {% block media %}
-      <!-- Latest compiled and minified CSS -->
+      <!-- Bootstrap CSS -->
       <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
       <!-- Optional theme -->
       <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
-      <!-- Latest compiled and minified JavaScript -->
-      <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
-      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.23.5/js/jquery.tablesorter.js"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.23.5/js/jquery.tablesorter.widgets.js"></script>
-      <script type="text/javascript" src="/static/js/ctstem.js"></script>
+      <!-- admin widget for multi select -->
       <link rel="stylesheet" href="/static/css/django-admin-widgets.css"/>
+      <!-- jQuery library -->
+      <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+      <!-- DataTables library -->
+      <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/r/ju/dt-1.10.9/datatables.min.css"/>
+      <script type="text/javascript" src="https://cdn.datatables.net/r/ju/dt-1.10.9/datatables.min.js"></script>
+
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
       <script type="text/javascript" src="/static/js/django-admin.multiselect.js"></script>
+      <script type="text/javascript" src="/static/js/ctstem.js"></script>
       <link rel="stylesheet" href="/static/css/ctstem.css" media="screen"/>
+
     {% endblock %}
   </head>
 

@@ -8,7 +8,9 @@ from django.shortcuts import render
 from django.contrib import auth, messages
 from django.forms.models import inlineformset_factory
 
-# Create your views here.
+####################################
+# ABOUT US
+####################################
 def about_us(request):
   return render(request, 'ctstem_app/About_us.html')
 
@@ -17,15 +19,22 @@ def index(request):
   context = {'lessons': lessons}
   return render(request, 'ctstem_app/base.html', context)
 
-# Get a list of lesson objects to display as a table
+####################################
+# LESSONS TABLE VIEW
+####################################
 def lessons(request):
   lessons = models.Lesson.objects.order_by('id')
   context = {'lessons': lessons}
   return render(request, 'ctstem_app/Lessons.html', context)
 
-# create or modify a lesson identified by the id
+####################################
+# CREATE MODIFY A LESSON
+####################################
 def lesson(request, id=''):
   try:
+    # check if the user has permission to create or modify a lesson
+    if hasattr(request.user, 'administrator') == False:
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to modify this lesson</h1>')
     # check if the lesson exists
     if '' != id:
       lesson = models.Lesson.objects.get(id=id)
@@ -46,10 +55,9 @@ def lesson(request, id=''):
         savedLesson = form.save(commit=False)
         if '' == id:
             savedLesson.author = request.user
-        print request.user
         savedLesson.modified_by = request.user
         savedLesson.save()
-        form.save_m2m()
+        form.save()
         messages.success(request, "Lesson Saved.")
         return shortcuts.redirect('ctstem:lesson', id=savedLesson.id)
       else:
@@ -62,8 +70,32 @@ def lesson(request, id=''):
   except models.Lesson.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested lesson not found</h1>')
 
+####################################
+# PREVIEW A LESSON
+####################################
+def lessonPreview(request, id=''):
+  try:
+    # check if the lesson exists
+    if '' != id:
+      lesson = models.Lesson.objects.get(id=id)
+    else:
+      lesson = models.Lesson()
 
+    if request.method == 'GET':
+      form = forms.LessonForm(instance=lesson, prefix='lesson')
+      QuestionFormSet = inlineformset_factory(models.Lesson, models.LessonQuestion, fields=('question', 'order'), extra=1)
+      formset = QuestionFormSet(instance=lesson)
+      context = {'form': form, 'formset':formset}
+      return render(request, 'ctstem_app/LessonPreview.html', context)
 
+    return http.HttpResponseNotAllowed(['GET'])
+
+  except models.Lesson.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested lesson not found</h1>')
+
+####################################
+# REGISTER
+####################################
 def register(request):
   if request.method == 'POST':
     print request.POST
@@ -131,6 +163,9 @@ def register(request):
     context = {'form': form}
     return render(request, 'ctstem_app/Registration.html', context)
 
+####################################
+# USER LOGIN
+####################################
 def user_login(request):
   username = password = ''
 
@@ -149,12 +184,17 @@ def user_login(request):
     context = {'lessons': lessons}
     return render(request, 'ctstem_app/Lessons.html', context)
 
-
+####################################
+# USER LOGOUT
+####################################
 @login_required
 def user_logout(request):
   logout(request)
   return shortcuts.redirect('ctstem:login')
 
+####################################
+# USER PROFILE
+####################################
 @login_required
 def userProfile(request, id=''):
   try:

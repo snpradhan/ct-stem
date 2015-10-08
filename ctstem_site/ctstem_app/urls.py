@@ -12,5 +12,6 @@ urlpatterns = [
     url(r'^user/(?P<id>[\d]+)/$', views.userProfile, name='userProfile'),
     url(r'^lesson/(?P<id>[\d]+)/$', views.lesson, name='lesson'),
     url(r'^lesson/new/$', views.lesson, name='newLesson'),
+    url(r'^lesson/preview/(?P<id>[\d]+)/$', views.lessonPreview, name='lessonPreview'),
 
 ]

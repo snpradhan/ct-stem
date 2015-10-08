@@ -1,4 +1,7 @@
 Django==1.8.4
+django-dia==0.2
+django-tinymce==2.0.5
+django-wysiwyg==0.7.1
 pbr==1.8.0
 psycopg2==2.6.1
 six==1.9.0

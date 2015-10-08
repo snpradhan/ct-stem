@@ -1,0 +1,68 @@
+{% extends "ctstem_app/base.html" %}
+{% load ctstem_extras %}
+
+{% block title %}Lesson Preview |{% endblock %}
+
+{% block media %}
+  {{block.super}}
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('#dataTable3').dataTable({
+        "ajax": '/static/data/warbler_table_data_with_errs.json'
+      });
+    });
+  </script>
+{% endblock %}
+
+{% block content %}
+  {{block.super}}
+  <div class="content">
+    <h2>Lesson Preview</h2>
+    <form>
+      {% csrf_token %}
+      <div class="table" id="lessonPreview">
+        {{form.management_form}}
+        <h3>{{form.title.value}}</h3>
+        <hr>
+        <div class="lesson-row">
+          <label>{{form.time.label}}</label>
+          <div>{{form.time.value}}</div>
+        </div>
+        <div class="lesson-row">
+          <label>{{form.level.label}}</label>
+          <div>{{form.level.value}}</div>
+        </div>
+        <div class="lesson-row">
+          <label>{{form.purpose.label}}</label>
+          <div>{{form.purpose.value}}</div>
+        </div>
+        <div class="lesson-row">
+          <label>{{form.overview.label}}</label>
+          <div>{{form.overview.value}}</div>
+        </div>
+        <div class="lesson-row">
+          <label>{{form.ngss_standards.label}}</label>
+          <div>
+            {% for ngss in form|selected_labels:"ngss_standards" %}
+              {{ngss}}
+            {% endfor %}
+          </div>
+        </div>
+        <div class="lesson-row">
+          <label>{{form.ct_stem_practices.label}}</label>
+          <div>
+            {% for ct_stem in form|selected_labels:"ct_stem_practices" %}
+              {{ct_stem}}
+            {% endfor %}</div>
+        </div>
+        <hr>
+        <div class="lesson-row">
+          <div>{{form.content.value|safe}}</div>
+        </div>
+      </div>
+
+    </form>
+  </div>
+
+{% endblock %}
+

@@ -13,8 +13,12 @@ from django.contrib.admin.widgets import FilteredSelectMultiple
 from django.forms.widgets import RadioSelect
 from django.utils.safestring import mark_safe
 from django.core.exceptions import ObjectDoesNotExist
+from tinymce.widgets import TinyMCE
 
 
+####################################
+# Registration Form
+####################################
 class RegistrationForm (forms.Form):
   username = forms.RegexField(required=True, regex=r'^\w+$', max_length=30, label=u'Username',
                               error_messages={'invalid': 'Usernames may only contain letters, numbers, and underscores (_)'})
@@ -81,6 +85,9 @@ class RegistrationForm (forms.Form):
 
     return clean
 
+####################################
+# UserProfile Form
+####################################
 class UserProfileForm(ModelForm):
   password1 = forms.CharField(widget=forms.PasswordInput, required=False, label=u'Password', help_text="Leave this field blank to retain old password")
   password2 = forms.CharField(widget=forms.PasswordInput, required=False, label=u'Confirm Password')
@@ -118,7 +125,9 @@ class UserProfileForm(ModelForm):
 
     return True
 
-
+####################################
+# Student Form
+####################################
 class StudentForm (ModelForm):
   class Meta:
     model = models.Student
@@ -131,10 +140,14 @@ class StudentForm (ModelForm):
       field.widget.attrs['aria-describedby'] = field.label
       field.widget.attrs['placeholder'] = field.help_text
 
+####################################
+# Teacher Form
+####################################
 class TeacherForm (ModelForm):
   class Meta:
     model = models.Teacher
     fields = ['school','students', 'permission_code']
+
   def __init__(self, *args, **kwargs):
     super(TeacherForm, self).__init__(*args, **kwargs)
     for field_name, field in self.fields.items():
@@ -142,6 +155,9 @@ class TeacherForm (ModelForm):
       field.widget.attrs['aria-describedby'] = field.label
       field.widget.attrs['placeholder'] = field.help_text
 
+####################################
+# Researcher Form
+####################################
 class ResearcherForm (ModelForm):
   class Meta:
     model = models.Researcher
@@ -153,15 +169,19 @@ class ResearcherForm (ModelForm):
       field.widget.attrs['aria-describedby'] = field.label
       field.widget.attrs['placeholder'] = field.help_text
 
+####################################
+# Lesson Form
+####################################
 class LessonForm(ModelForm):
   questions = forms.ModelMultipleChoiceField(required=False, queryset=models.Question.objects.all(), widget=FilteredSelectMultiple(('Questions'), False, attrs={'size':15}))
 
   class Meta:
     model = models.Lesson
-    fields = ['title', 'time', 'purpose', 'overview', 'status', 'subject', 'ngss_standards', 'ct_stem_practices', 'content']
+    fields = ['title', 'time', 'level', 'purpose', 'overview', 'status', 'subject', 'ngss_standards', 'ct_stem_practices', 'content']
     widgets = {
       'title': forms.TextInput(attrs={'placeholder': 'Lesson Title'}),
       'time': forms.TextInput(attrs={'rows':0, 'cols':60}),
+      'level': forms.Textarea(attrs={'rows':0, 'cols':60}),
       'purpose': forms.Textarea(attrs={'rows':0, 'cols':60}),
       'overview': forms.Textarea(attrs={'rows':0, 'cols':60}),
       'content': forms.Textarea(attrs={'rows':0, 'cols':60}),
@@ -172,28 +192,27 @@ class LessonForm(ModelForm):
 
   def __init__(self, *args, **kwargs):
     super(LessonForm, self).__init__(*args, **kwargs)
-
-    if 'instance' in kwargs:
-      print kwargs['instance'].questions.all()
-      initial = kwargs.setdefault('initial', {})
-      initial['questions'] = [t.pk for t in kwargs['instance'].questions.all()]
-
+    if self.instance.id:
+      if 'instance' in kwargs:
+        initial = kwargs.setdefault('initial', {})
+        initial['questions'] = [t.pk for t in kwargs['instance'].questions.all()]
     forms.ModelForm.__init__(self, *args, **kwargs)
     if 'instance' in kwargs:
       self.fields['questions'].queryset = models.Question.objects.all()
+
+    self.fields['ngss_standards'].label = "NGSS Standards"
+    self.fields['ct_stem_practices'].label = "CT-STEM Practices"
 
     for field_name, field in self.fields.items():
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['placeholder'] = field.help_text
 
-
   def save(self, commit=True):
     instance = forms.ModelForm.save(self, False)
-    lesson = models.Lesson.objects.get(id=instance.id)
-    #old_save_m2m = self.save_m2m
+    old_save_m2m = self.save_m2m
 
     def save_m2m():
-      #old_save_m2m()
+      old_save_m2m()
       old_questions = models.LessonQuestion.objects.filter(lesson=instance)
       for old_question in old_questions:
         changed = True

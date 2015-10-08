@@ -1,5 +1,13 @@
 {% extends "ctstem_app/base.html" %}
+
 {% block title %}Lesson |{% endblock %}
+{% block media %}
+  {{block.super}}
+  {% load wysiwyg %}
+  {% wysiwyg_setup %}
+
+
+{% endblock %}
 
 {% block content %}
   {{block.super}}
@@ -11,18 +19,25 @@
         {{form.management_form}}
         {% for field in form %}
           <div class="form-group">
-            <label for="id_{{field.name}}">{{ field.label|title }}</label>
+            <label for="id_{{field.name}}">{{ field.label }}</label>
             {% if field.name == 'questions' %}
-            <div class="clearfix">
+              <div class="clearfix">
+                {{field}}
+              </div>
+            {% elif field.name == 'content' %}
+              <div>
+                {{field}}
+                {% wysiwyg_editor "id_lesson-content" %}
+              </div>
             {% else %}
-            <div>
+              <div>
+                {{field}}
+              </div>
             {% endif %}
-              {{field}}
-            </div>
             <div class="error">{{ field.errors }}</div>
           </div>
         {% endfor %}
-        <div class="form-group">
+        <div class="form-group button-group">
           <input type="submit" class="btn btn-success" id="submit" value="Save Lesson"/>
         </div>
       </div>

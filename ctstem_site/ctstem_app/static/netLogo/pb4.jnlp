@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jnlp spec="1.0+" codebase="http://modelsim.tech.northwestern.edu:9001/assets" href="gen/d37894ec-a46f-41c7-82c1-a65f0e42578f.jnlp">
+    <information>
+        <title>NetLogo</title>
+        <vendor>CCL</vendor>
+        <description>A NetLogo WebStart app</description>
+        <description kind="short">NetLogo (WebStart)</description>
+        <offline-allowed />
+    </information>
+    <security> <all-permissions/> </security>
+    <resources>
+
+        <property name="jnlp.packEnabled" value="true"/>
+
+        <!-- Application Resources -->
+        <j2se version="1.6+ 1.7+" java-vm-args="" href="http://java.sun.com/products/autodl/j2se"/>
+        <jar href="deps/NetLogo.jar" main="true" />
+        <jar href="deps/commons-codec-1.6.jar" download="lazy" />
+        <jar href="deps/commons-logging-1.1.1.jar" download="lazy" />
+        <jar href="deps/httpclient-4.2.jar" download="lazy" />
+        <jar href="deps/httpcore-4.2.jar" download="lazy" />
+        <jar href="deps/asm-all-3.3.1.jar" />
+        <jar href="deps/gluegen-rt-1.1.1.jar" />
+        <jar href="deps/jhotdraw-6.0b1.jar" />
+        <jar href="deps/jmf-2.1.1e.jar" />
+        <jar href="deps/jogl-1.1.1.jar" />
+        <jar href="deps/logging.jar" />
+        <jar href="deps/log4j-1.2.16.jar" />
+        <jar href="deps/mrjadapter-1.2.jar" />
+        <jar href="deps/knockoff_2.9.2-0.8.1.jar" />
+        <jar href="deps/picocontainer-2.13.6.jar" />
+        <jar href="deps/quaqua-7.3.4.jar" />
+        <jar href="deps/scala-library.jar" />
+        <jar href="deps/swing-layout-7.3.4.jar" />
+
+        <!-- System Properties -->
+
+
+    </resources>
+    <application-desc name="NetLogo" main-class="org.nlogo.app.App">
+        <argument>--url</argument>
+        <argument>http://ct-stem.northwestern.edu/assess/pb/pb4.nlogo</argument>
+    </application-desc>
+    <update check="timeout" policy="always"/>
+</jnlp>
