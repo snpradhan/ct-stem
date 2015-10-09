@@ -83,11 +83,11 @@ WSGI_APPLICATION = 'ctstem_site.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'ct_stem_db',
-        'USER': 'ct_stem_user',
-        'PASSWORD': 'Dyh5>UtAJ3@Rz+un',
-        'HOST': 'localhost',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
-        'PORT': '5432',
+        'NAME': os.environ.get("CTSTEM_DB", ''),
+        'USER': os.environ.get("CTSTEM_DB_USER", ''),
+        'PASSWORD': os.environ.get("CTSTEM_DB_PSSWD", ''),
+        'HOST': os.environ.get("CTSTEM_DB_HOST", ''),                     # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
+        'PORT': os.environ.get("CTSTEM_DB_PORT", ''),
     }
 }
 

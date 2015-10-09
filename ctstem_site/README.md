@@ -29,3 +29,13 @@ Set the tinymce config to the following in /python2.7/site-packages/django_wysiw
         extended_valid_elements :  'iframe[src|width|height|name|align]',
     };
 {% endblock %}
+
+
+Database settings in environment variable
+> vi ~/.profile
+
+export CTSTEM_DB=
+export CTSTEM_DB_USER=
+export CTSTEM_DB_PSSWD=
+export CTSTEM_DB_HOST=
+export CTSTEM_DB_PORT=
