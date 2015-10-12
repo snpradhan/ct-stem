@@ -15,11 +15,6 @@ from nested_formset import nestedformset_factory
 def about_us(request):
   return render(request, 'ctstem_app/About_us.html')
 
-def index(request):
-  lessons = models.Lesson.objects.order_by('id')
-  context = {'lessons': lessons}
-  return render(request, 'ctstem_app/base.html', context)
-
 ####################################
 # ASSESSMENTS TABLE VIEW
 ####################################
@@ -353,3 +348,6 @@ def userProfile(request, id=''):
 
   except User.DoesNotExist:
       return http.HttpResponseNotFound('<h1>Requested user not found</h1>')
+
+def notimplemented(request):
+  return render(request, 'ctstem_app/NotImplemented.html')

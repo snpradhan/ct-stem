@@ -1,3 +1,4 @@
+/* clone questions in assessment steps */
 function cloneSomeMore(selector, outerType, innerType) {
   var parent = $(selector).parent();
   var newElement = $(selector).clone(true);
@@ -59,46 +60,12 @@ function cloneMore(selector, type) {
     $(selector).after(newElement);
 }
 
+$(function (){
+  $('#navLogin').click(function(){
+    $('div#login').show();
+  });
 
-//extension of cloneMore function for question div
-function cloneType(selector, type) {
-    var newElement = $(selector).clone(true);
-    var group_id='';
-
-    newElement.find(':input').each(function() {
-      if ($(this).attr('name').indexOf('form') != -1){
-        group_id = $(this).val();
-      }
-
-      if (group_id == '' && $(this).attr('name').indexOf('form') == -1){
-        group_id = $(this).attr('name').replace(type + '-', '');
-        idx = group_id.indexOf('-');
-        group_id = group_id.substr(0, idx);
-      }
-    });
-    var total = $('#id_' + type +'-'+group_id+ '-TOTAL_FORMS').val();
-
-    newElement.find(':input').each(function() {
-      if ($(this).attr('name').indexOf('form') == -1){
-        var name = $(this).attr('name').replace('-' + (total-1) + '-','-' +total + '-');
-        var id = 'id_' + name;
-        if ($(this).attr('type') != 'hidden') {
-            $(this).val('');
-        }
-        $(this).attr({'name': name, 'id': id}).val('');
-
-        if($(this).attr('type') == 'checkbox'){
-            $(this).removeAttr('value').removeAttr('checked');
-        }
-      }
-    });
-
-    newElement.find('label').each(function() {
-      var newFor = $(this).attr('for').replace('-' + (total-1) + '-','-' + total + '-');
-      $(this).attr('for', newFor);
-    });
-    total++;
-    $('#id_' + type + '-'+group_id+'-TOTAL_FORMS').val(total);
-
-    $(selector).after(newElement);
-}
+  $('#closeLogin').click(function(){
+    $('div#login').hide();
+  });
+});

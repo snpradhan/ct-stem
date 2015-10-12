@@ -79,14 +79,36 @@ body {
 .navbar {
   line-height: 1em;
   font-size: 1.5em;
-  padding-left: 8em;
+  padding-left: 20em;
   padding-right: 10em;
-  min-height:20px !important
+  min-height:20px !important;
+  background-color: #520063;
 }
-.navbar-nav > li > a {
+
+.navbar-default {
+  background-image: none !important;
+}
+
+.navbar-default .navbar-nav > li > a, .navbar-default .pull-right > li > a {
   padding-top: 10px;
   padding-bottom: 5px;
+  color: white;
 }
+
+.navbar-default .navbar-nav > li > a:hover, .navbar-default .pull-right > li > a:hover{
+  background-color: #c097c9;
+  color: black;
+}
+
+.navbar-default .navbar-nav > li.active > a, .navbar-default .navbar-nav > li.active > a:hover{
+  background-color: #9752a5;
+  background-image: none;
+  color: white;
+  text-shadow: none;
+}
+
+
+
 /***********   NAVBAR END   ************/
 
 
@@ -108,16 +130,22 @@ div.table {
             *   TABLE VIEW   *
  ***************************************/
 table.table {
-  width: 80%;
   margin: auto;
 }
 div.table#register, div.table#userProfile {
   width: 50%;
   padding: 3em 4em;
 }
-div.table#lesson, div.table#lessonPreview{
-  width: 60%;
+div.table#lesson, div.table#lessonPreview, div.table#assessment, div.table.step{
+  width: 90%;
   padding: 3em 4em;
+}
+div.table.step {
+  margin-top: 3em;
+}
+
+div.table.step div.row.question {
+  margin-bottom: 1em;
 }
 
 div.table#lessonPreview{
@@ -126,6 +154,29 @@ div.table#lessonPreview{
 
 div.table#lessonPreview div.lesson-row{
   margin-bottom: 2em;
+}
+
+div.table#login {
+  width: 300px;
+  height: auto;
+  display: none;
+  position: fixed;
+  border: 1px solid #ccc;
+  top: 30%;
+  left: 40%;
+  padding: 20px;
+}
+
+div.table#login label {
+  font-size: 1em;
+}
+
+div.table#login .glyphicon {
+  font-size: 1.5em;
+}
+
+div.table#login #closeLogin {
+  margin-left: 95%;
 }
 
 /***********   TABLE VIEW END   ************/
@@ -138,12 +189,21 @@ div.form-group label{
 }
 
 div.content {
+  width: 80%;
+  margin-left: auto;
+  margin-right: auto;
   margin-bottom: 40px;
 }
 
 div.btn-group {
-  margin-left: 10%;
   margin-bottom: 10px;
+}
+
+div.button-group-fixed {
+  position: fixed;
+  top: 30%;
+  left: 87%;
+
 }
 /***********   FORM GROUP END   ************/
 
