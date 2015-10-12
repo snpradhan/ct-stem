@@ -41,6 +41,7 @@ INSTALLED_APPS = (
     'django-dia',
     'tinymce',
     'django_wysiwyg',
+    'nested_formset',
 )
 
 MIDDLEWARE_CLASSES = (

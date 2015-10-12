@@ -1,0 +1,94 @@
+{% extends "ctstem_app/base.html" %}
+
+{% block title %}Assessment |{% endblock %}
+{% block media %}
+  {{block.super}}
+  {% load wysiwyg %}
+  {% wysiwyg_setup %}
+{% endblock %}
+
+{% block content %}
+  {{block.super}}
+  <div class="content">
+    <h2>Assessment</h2>
+    <form method="post">
+      {% csrf_token %}
+      <div class="table" id="assessment">
+        {{form.management_form}}
+        {% for field in form %}
+          <div class="form-group">
+            <label for="id_{{field.name}}">{{ field.label }}</label>
+            <div>{{field}}</div>
+            <div class="error">{{ field.errors }}</div>
+          </div>
+        {% endfor %}
+      </div>
+      {{formset.management_form}}
+      {% for step in formset %}
+        <div class="table step">
+          {{ step.management_form }}
+          {{step.id}}
+
+          <div class="form-group">
+            <label for="id_{{step.title.name}}">{{ step.title.label }}</label>
+            <div>{{step.title}}</div>
+            <div class="error">{{ step.title.errors }}</div>
+          </div>
+          <div class="form-group">
+            <label for="id_{{step.content.name}}">{{ step.content.label }}</label>
+            <div>{{step.content}}</div>
+            <div class="error">{{ step.content.errors }}</div>
+          </div>
+
+          <div class="form-group">
+            {{step.nested.management_form}}
+            {{step.nested.id}}
+            <label for="id_{{step.questions.name}}">Questions</label>
+            <div class="question row">
+              <div class="col-md-2">Order</div>
+              <div class="col-md-8">Question</div>
+              <div class="col-md-2">Delete?</div>
+            </div>
+            {% for question in step.nested %}
+              <div class="question row">
+                {{step.id}}
+                {{question.management_form}}
+                {{question.id}}
+                <div class="col-md-2">{{question.ORDER}}</div>
+                <div class="col-md-8">{{question.question}}</div>
+                <div class="col-md-2">{{question.DELETE}}</div>
+              </div>
+            {% endfor %}
+            <button type="button" class="btn btn-primary addQuestion" name="add_question"> Add Question</button>
+          </div>
+          <div class="form-group">
+            <label for="id_{{step.ORDER.name}}">{{ step.ORDER.label }}</label>
+            <div>{{step.ORDER}}</div>
+            <div class="error">{{ step.ORDER.errors }}</div>
+          </div>
+          <div class="form-group">
+            <label for="id_{{step.DELETE.name}}">{{ step.DELETE.label }}</label>
+            <div>{{step.DELETE}}</div>
+            <div class="error">{{ step.DELETE.errors }}</div>
+          </div>
+        </div>
+      {% endfor %}
+      <div class="form-group button-group-fixed">
+        <input type="submit" class="btn btn-success" id="submit" value="Save Lesson"/>
+        <input type="button" class="btn btn-primary" id="addStep" value="Add Step"/>
+      </div>
+    </form>
+  </div>
+  <script type="text/javascript">
+    $('#addStep').click(function() {
+      //alert('clicked');
+      cloneMore('div.table:last', 'form');
+    });
+
+    $('.addQuestion').click(function() {
+      //alert('clicked');
+      cloneSomeMore($(this).prev(), 'form', 'assessmentquestion_set');
+    });
+  </script>
+
+{% endblock %}

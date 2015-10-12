@@ -113,11 +113,11 @@ class Assessment (models.Model):
 # Assessment Step model
 # An assessment has one or more assessment steps
 class AssessmentStep(models.Model):
-  assessment_id = models.ForeignKey(Assessment, null=False)
+  assessment = models.ForeignKey(Assessment, null=False)
   title = models.CharField(null=True, max_length=256)
   order = models.IntegerField(null=True)
   content = models.TextField(null=False)
-  questions = models.ManyToManyField('Question', through='AssessmentQuestion')
+  questions = models.ManyToManyField('Question', through='AssessmentQuestion', blank=True)
 
 # Question model
 # A bank of questions that can be resued across assessments and lessons

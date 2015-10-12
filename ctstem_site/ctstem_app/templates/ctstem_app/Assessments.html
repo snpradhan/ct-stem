@@ -1,0 +1,68 @@
+{% extends "ctstem_app/base.html" %}
+
+{% block media %}
+  {{ block.super }}
+  {{ form.media }}
+{% endblock %}
+
+{% block content %}
+  {{block.super}}
+  <div class="content">
+    <h2> Assessments </h2>
+    <div class="btn-group">
+      <a type="button" class="btn btn-primary" href="{% url 'ctstem:newAssessment' %}" title="Create new assessment plan">Create Assessment</a>
+    </div>
+    {% if assessments %}
+      <table class="table" id="assessments">
+        <thead>
+          <tr>
+            <th> Assessment Title </th>
+            <th> Subject </th>
+            <th> CT-STEM Practices </th>
+            <th> NGSS Practices </th>
+            <th> Notes </th>
+          </tr>
+        </thead>
+        <tfoot>
+          <tr>
+            <th> Assessment Title </th>
+            <th> Subject </th>
+            <th> CT-STEM Practices </th>
+            <th> NGSS Practices </th>
+            <th> Notes </th>
+          </tr>
+        </tfoot>
+        <tbody>
+          {% for assessment in assessments %}
+            <tr>
+              <td>{{assessment.title}}
+                {% if user.administrator %}
+                  <a type="button" class="btn btn-default" aria-label="Edit assessment" href="{% url 'ctstem:assessment' assessment.id %}">
+                    <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+                  </a>
+                {% endif %}
+
+              </td>
+              <td>{{assessment.subject.all|join:", "}}</td>
+              <td>{{assessment.ct_stem_practices.all|join:", "}}</td>
+              <td>{{assessment.ngss_standards.all|join:", "}}</td>
+              <td></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p>No assessments have been published.</p>
+    {% endif %}
+
+
+  </div>
+  <script type="text/javascript">
+    $(document).ready(function() {
+        // DataTable
+       $('#assessments').DataTable();
+    });
+  </script>
+{% endblock %}
+
+

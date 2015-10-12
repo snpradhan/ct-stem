@@ -235,4 +235,82 @@ class LessonForm(ModelForm):
       self.save_m2m()
     return instance
 
+####################################
+# Assessment Form
+####################################
+class AssessmentForm(ModelForm):
 
+  class Meta:
+    model = models.Assessment
+    fields = ['title', 'time', 'overview', 'status', 'subject', 'ngss_standards', 'ct_stem_practices']
+    widgets = {
+      'title': forms.TextInput(attrs={'placeholder': 'Lesson Title'}),
+      'time': forms.TextInput(attrs={'rows':0, 'cols':60}),
+      'overview': forms.Textarea(attrs={'rows':0, 'cols':60}),
+      'ngss_standards': forms.SelectMultiple(attrs={'size':5}),
+      'ct_stem_practices': forms.SelectMultiple(attrs={'size':5}),
+      'subject': forms.SelectMultiple(attrs={'size':4}),
+    }
+
+  def __init__(self, *args, **kwargs):
+    super(AssessmentForm, self).__init__(*args, **kwargs)
+    self.fields['ngss_standards'].label = "NGSS Standards"
+    self.fields['ct_stem_practices'].label = "CT-STEM Practices"
+
+    for field_name, field in self.fields.items():
+      field.widget.attrs['class'] = 'form-control'
+      field.widget.attrs['placeholder'] = field.help_text
+
+####################################
+# Assessment Form
+####################################
+class AssessmentStepForm(ModelForm):
+
+  class Meta:
+    model = models.AssessmentStep
+    exclude = ('order',)
+    widgets = {
+      'title': forms.TextInput(attrs={'placeholder': 'Step Title'}),
+      'content': forms.Textarea(attrs={'rows':0, 'cols':60}),
+    }
+
+  def __init__(self, *args, **kwargs):
+    super(AssessmentStepForm, self).__init__(*args, **kwargs)
+    for field_name, field in self.fields.items():
+      field.widget.attrs['class'] = 'form-control'
+      field.widget.attrs['placeholder'] = field.help_text
+
+  '''def save(self, commit=True):
+    instance = forms.ModelForm.save(self, False)
+    old_save_m2m = self.save_m2m
+
+    def save_m2m():
+
+      old_save_m2m()
+      old_questions = models.AssessmentQuestion.objects.filter(assessment_step=instance)
+      for old_question in old_questions:
+        changed = True
+        for curr_question in self.cleaned_data['assessmentquestion_set']:
+          if old_question.question == curr_question:
+            changed = False
+        if changed:
+          old_question.delete()
+
+      for question in self.cleaned_data['assessmentquestion_set']:
+        try:
+          models.AssessmentQuestion.objects.get(assessment_step=instance, question=question)
+        except models.AssessmentQuestion.DoesNotExist:
+          q = models.AssessmentQuestion(assessment_step=instance, question=question)
+          q.save()
+
+    self.save_m2m = save_m2m
+    if commit:
+      instance.save()
+      self.save_m2m()
+    return instance'''
+
+class AssessmentQuestionForm(ModelForm):
+
+  class Meta:
+    model = models.AssessmentQuestion
+    exclude = ('order',)

@@ -7,6 +7,7 @@ from django import http, shortcuts, template
 from django.shortcuts import render
 from django.contrib import auth, messages
 from django.forms.models import inlineformset_factory
+from nested_formset import nestedformset_factory
 
 ####################################
 # ABOUT US
@@ -18,6 +19,74 @@ def index(request):
   lessons = models.Lesson.objects.order_by('id')
   context = {'lessons': lessons}
   return render(request, 'ctstem_app/base.html', context)
+
+####################################
+# ASSESSMENTS TABLE VIEW
+####################################
+def assessments(request):
+  assessments = models.Assessment.objects.order_by('id')
+  context = {'assessments': assessments}
+  return render(request, 'ctstem_app/Assessments.html', context)
+
+
+####################################
+# CREATE MODIFY AN ASSESSMENT
+####################################
+def assessment(request, id=''):
+  try:
+    # check if the user has permission to create or modify a lesson
+    if hasattr(request.user, 'administrator') == False:
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to modify this assessment</h1>')
+    # check if the lesson exists
+    if '' != id:
+      assessment = models.Assessment.objects.get(id=id)
+    else:
+      assessment = models.Assessment()
+
+    if request.method == 'GET':
+      form = forms.AssessmentForm(instance=assessment, prefix='assessment')
+      #AssessmentStepFormSet = inlineformset_factory(models.Assessment, models.AssessmentStep, form=forms.AssessmentStepForm,can_delete=True, can_order=True, extra=1)
+
+      AssessmentStepFormSet = nestedformset_factory(models.Assessment, models.AssessmentStep, form=forms.AssessmentStepForm,
+                                                    nested_formset=inlineformset_factory(models.AssessmentStep, models.AssessmentQuestion, form=forms.AssessmentQuestionForm, can_delete=True, can_order=True, extra=1),
+                                                    can_delete=True, can_order=True, extra=1)
+      formset = AssessmentStepFormSet(instance=assessment, prefix='form')
+      context = {'form': form, 'formset':formset}
+      return render(request, 'ctstem_app/Assessment.html', context)
+
+    elif request.method == 'POST':
+      data = request.POST.copy()
+      print data
+      form = forms.AssessmentForm(data, request.FILES, instance=assessment, prefix="assessment")
+      #AssessmentStepFormSet = inlineformset_factory(models.Assessment, models.AssessmentStep, form=forms.AssessmentStepForm,
+                                                    #can_delete=True, can_order=True, extra=0)
+      AssessmentStepFormSet = nestedformset_factory(models.Assessment, models.AssessmentStep, form=forms.AssessmentStepForm,
+                                                    nested_formset=inlineformset_factory(models.AssessmentStep, models.AssessmentQuestion, form=forms.AssessmentQuestionForm),
+                                                    can_delete=True, can_order=True, extra=0)
+      formset = AssessmentStepFormSet(data, instance=assessment, prefix='form')
+      print form.is_valid()
+      print formset.is_valid()
+      if form.is_valid() and formset.is_valid():
+        savedAssessment = form.save(commit=False)
+        if '' == id:
+            savedAssessment.author = request.user
+        savedAssessment.modified_by = request.user
+        savedAssessment.save()
+        form.save()
+        formset.save()
+        messages.success(request, "Assessment Saved.")
+        return shortcuts.redirect('ctstem:assessment', id=savedAssessment.id)
+      else:
+        print form.errors
+        print formset.errors
+        context = {'form': form, 'formset':formset}
+        return render(request, 'ctstem_app/assessment.html', context)
+
+    return http.HttpResponseNotAllowed(['GET', 'POST'])
+
+  except models.Assessment.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested assessment not found</h1>')
+
 
 ####################################
 # LESSONS TABLE VIEW
