@@ -117,7 +117,7 @@ body {
  ***************************************/
 div.table {
   border: solid #ccc 1px;
-  padding: 30px 10px 10px 20px;
+  padding: 30px 10px 10px 10px;
   margin: auto;
   width: 60%;
   border-radius: 10px;
@@ -156,27 +156,18 @@ div.table#lessonPreview div.lesson-row{
   margin-bottom: 2em;
 }
 
-div.table#login {
-  width: 300px;
-  height: auto;
-  display: none;
-  position: fixed;
-  border: 1px solid #ccc;
-  top: 30%;
-  left: 40%;
-  padding: 20px;
+/******************
+ * ABOUT US
+*******************/
+div.row.portfolio {
+  text-align: center;
 }
-
-div.table#login label {
-  font-size: 1em;
-}
-
-div.table#login .glyphicon {
-  font-size: 1.5em;
-}
-
-div.table#login #closeLogin {
-  margin-left: 95%;
+div.table.portfolio-item {
+  width: 16%;
+  text-align: center;
+  margin: 2em;
+  display: inline-block;
+  height: 40%;
 }
 
 /***********   TABLE VIEW END   ************/
