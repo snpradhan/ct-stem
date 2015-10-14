@@ -18,7 +18,7 @@ FIELD_TYPE_CHOICES = (
 CT_STEW_PRACTICE_CATEGORY = (
     (u'DA', u'Data Analysis'),
     (u'MS', u'Modeling & Simulation'),
-    (u'CPS', u'Computational Problem Solving'),
+    (u'CP', u'Computational Problem Solving'),
     (u'ST', u'Systems Thinking'),
 )
 
@@ -71,7 +71,7 @@ class Lesson (models.Model):
   level = models.TextField(null=False)
   purpose = models.TextField(null=False)
   overview = models.TextField(null=False)
-  content = HTMLField(null=False)
+  content = models.TextField(null=False)
   status = models.CharField(max_length=1, default='D', choices=LESSON_STATUS_CHOICES)
   subject = models.ManyToManyField('Subject', null=False)
   #image = models.ImageField(upload_to=upload_image_to, null=True, blank=True)

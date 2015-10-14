@@ -14,10 +14,8 @@ Set the tinymce config to the following in /python2.7/site-packages/django_wysiw
         relative_urls: false,
         custom_undo_redo_levels: 10,
         plugins: 'paste,autoresize,inlinepopups,preview,media,table',
-        strict_loading_mode: true,  // for pre 3.4 releases
-
+        strict_loading_mode: true,
         width: '610px',
-
         theme: "advanced",
         theme_advanced_toolbar_location: 'top',
         theme_advanced_toolbar_align: 'left',
@@ -39,3 +37,5 @@ export CTSTEM_DB_USER=
 export CTSTEM_DB_PSSWD=
 export CTSTEM_DB_HOST=
 export CTSTEM_DB_PORT=
+
+

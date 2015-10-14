@@ -4,9 +4,9 @@
 {% block media %}
   {{block.super}}
   {% load wysiwyg %}
+
   {% wysiwyg_setup %}
-
-
+  {% include "ctstem_app/django_wysiwyg_includes.html" %}
 {% endblock %}
 
 {% block content %}
