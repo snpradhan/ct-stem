@@ -9,9 +9,11 @@
   {{block.super}}
   <div class="content">
     <h2> Lessons </h2>
-    <div class="btn-group">
-      <a type="button" class="btn btn-primary" href="{% url 'ctstem:newLesson' %}" title="Create new lesson plan">Create Lesson</a>
-    </div>
+    {% if user.administrator %}
+      <div class="btn-group">
+        <a type="button" class="btn btn-primary" href="{% url 'ctstem:newLesson' %}" title="Create new lesson plan">Create Lesson</a>
+      </div>
+    {% endif %}
     {% if lessons %}
       <table class="table" id="lessons">
         <thead>

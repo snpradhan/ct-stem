@@ -136,11 +136,11 @@ div.table#register, div.table#userProfile {
   width: 50%;
   padding: 3em 4em;
 }
-div.table#lesson, div.table#lessonPreview, div.table#assessment, div.table.step{
+div.table#lesson, div.table#lessonPreview, div.table#assessment, div.table#assessmentPreview, div.table.step{
   width: 90%;
   padding: 3em 4em;
 }
-div.table.step {
+div.table.step, div.table#assessmentPreview {
   margin-top: 3em;
 }
 
@@ -148,11 +148,11 @@ div.table.step div.row.question {
   margin-bottom: 1em;
 }
 
-div.table#lessonPreview{
+div.table#lessonPreview, div.table#assessmentPreview{
   font-size: 1.4em;
 }
 
-div.table#lessonPreview div.lesson-row{
+div.table#lessonPreview div.lesson-row, div.table#assessmentPreview div.assessment-row{
   margin-bottom: 2em;
 }
 

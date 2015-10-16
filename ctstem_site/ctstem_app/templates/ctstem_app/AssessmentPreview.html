@@ -1,0 +1,71 @@
+{% extends "ctstem_app/base.html" %}
+{% load ctstem_extras %}
+
+{% block title %}Assessment Preview |{% endblock %}
+
+{% block media %}
+  {{block.super}}
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('#dataTable3').dataTable({
+        "ajax": '/static/data/warbler_table_data_with_errs.json'
+      });
+    });
+  </script>
+{% endblock %}
+
+{% block content %}
+  {{block.super}}
+  <div class="content">
+    <h2>Assessment Preview</h2>
+    <form>
+      {% csrf_token %}
+      <div class="table" id="assessmentPreview">
+        {{form.management_form}}
+        <h3>{{form.title.value}}</h3>
+        <hr>
+        <div class="assessment-row">
+          <label>{{form.time.label}}</label>
+          <div>{{form.time.value}}</div>
+        </div>
+        <div class="assessment-row">
+          <label>{{form.overview.label}}</label>
+          <div>{{form.overview.value}}</div>
+        </div>
+        <div class="assessment-row">
+          <label>{{form.ngss_standards.label}}</label>
+          <div>
+            {% for ngss in form|selected_labels:"ngss_standards" %}
+              {{ngss}}
+            {% endfor %}
+          </div>
+        </div>
+        <div class="assessment-row">
+          <label>{{form.ct_stem_practices.label}}</label>
+          <div>
+            {% for ct_stem in form|selected_labels:"ct_stem_practices" %}
+              {{ct_stem}}
+            {% endfor %}</div>
+        </div>
+        <hr>
+      </div>
+      {% for step in formset %}
+        <div class="table" id="assessmentPreview">
+          <h3>{{step.title.value}}</h3>
+          <hr>
+          <div class="assessment-row">
+            <div>{{step.content.value|safe}}</div>
+          </div>
+          {% for quest in step.nested %}
+            <div class="assessment-row">
+              <div>{{quest.question}}</div>
+            </div>
+          {% endfor %}
+        </div>
+      {% endfor %}
+
+    </form>
+  </div>
+
+{% endblock %}
+

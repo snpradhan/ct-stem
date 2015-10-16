@@ -82,6 +82,32 @@ def assessment(request, id=''):
   except models.Assessment.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested assessment not found</h1>')
 
+####################################
+# PREVIEW A LESSON
+####################################
+def assessmentPreview(request, id=''):
+  try:
+    # check if the lesson exists
+    if '' != id:
+      assessment = models.Assessment.objects.get(id=id)
+    else:
+      assessment = models.Assessment()
+
+    if request.method == 'GET':
+      form = forms.AssessmentForm(instance=assessment, prefix='assessment')
+      #AssessmentStepFormSet = inlineformset_factory(models.Assessment, models.AssessmentStep, form=forms.AssessmentStepForm,can_delete=True, can_order=True, extra=1)
+
+      AssessmentStepFormSet = nestedformset_factory(models.Assessment, models.AssessmentStep, form=forms.AssessmentStepForm,
+                                                    nested_formset=inlineformset_factory(models.AssessmentStep, models.AssessmentQuestion, form=forms.AssessmentQuestionForm, can_delete=True, can_order=True, extra=1),
+                                                    can_delete=True, can_order=True, extra=1)
+      formset = AssessmentStepFormSet(instance=assessment, prefix='form')
+      context = {'form': form, 'formset':formset}
+      return render(request, 'ctstem_app/AssessmentPreview.html', context)
+
+    return http.HttpResponseNotAllowed(['GET'])
+
+  except models.Lesson.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested lesson not found</h1>')
 
 ####################################
 # LESSONS TABLE VIEW

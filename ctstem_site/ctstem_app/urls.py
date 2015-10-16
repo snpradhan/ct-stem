@@ -19,5 +19,6 @@ urlpatterns = [
     url(r'^lesson/(?P<id>[\d]+)/$', views.lesson, name='lesson'),
     url(r'^lesson/new/$', views.lesson, name='newLesson'),
     url(r'^lesson/preview/(?P<id>[\d]+)/$', views.lessonPreview, name='lessonPreview'),
+    url(r'^assessment/preview/(?P<id>[\d]+)/$', views.assessmentPreview, name='assessmentPreview'),
 
 ]
