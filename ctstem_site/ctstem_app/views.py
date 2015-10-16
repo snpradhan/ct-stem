@@ -75,7 +75,7 @@ def assessment(request, id=''):
         print form.errors
         print formset.errors
         context = {'form': form, 'formset':formset}
-        return render(request, 'ctstem_app/assessment.html', context)
+        return render(request, 'ctstem_app/Assessment.html', context)
 
     return http.HttpResponseNotAllowed(['GET', 'POST'])
 
