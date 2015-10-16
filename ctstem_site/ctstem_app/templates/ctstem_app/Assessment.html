@@ -5,6 +5,7 @@
   {{block.super}}
   {% load wysiwyg %}
   {% wysiwyg_setup %}
+  {% include "ctstem_app/django_wysiwyg_includes.html" %}
 {% endblock %}
 
 {% block content %}
@@ -36,7 +37,10 @@
           </div>
           <div class="form-group">
             <label for="id_{{step.content.name}}">{{ step.content.label }}</label>
-            <div>{{step.content}}</div>
+            <div>
+              {{step.content}}
+              {% wysiwyg_editor step.content.auto_id %}
+            </div>
             <div class="error">{{ step.content.errors }}</div>
           </div>
 
