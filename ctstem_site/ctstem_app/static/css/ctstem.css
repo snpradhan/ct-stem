@@ -166,8 +166,8 @@ div.table.portfolio-item {
   width: 16%;
   text-align: center;
   margin: 2em;
-  display: inline-block;
-  height: 40%;
+  display: inline-table;
+  height: 41%;
 }
 
 /***********   TABLE VIEW END   ************/
