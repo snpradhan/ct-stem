@@ -43,7 +43,14 @@
             </div>
             <div class="error">{{ step.content.errors }}</div>
           </div>
-
+          <div class="form-group">
+            <label for="id_{{step.teacher_notes.name}}">{{ step.teacher_notes.label|title }}</label>
+            <div>
+              {{step.teacher_notes}}
+              {% wysiwyg_editor step.teacher_notes.auto_id %}
+            </div>
+            <div class="error">{{ step.teacher_notes.errors }}</div>
+          </div>
           <div class="form-group">
             {{step.nested.management_form}}
             {{step.nested.id}}
@@ -85,14 +92,27 @@
   </div>
   <script type="text/javascript">
     $('#addStep').click(function() {
-      //alert('clicked');
       cloneMore('div.table:last', 'form');
+      //alert('after clone');
+      bindWysiwyg();
+      //rebind question clone
     });
 
     $('.addQuestion').click(function() {
       //alert('clicked');
       cloneSomeMore($(this).prev(), 'form', 'assessmentquestion_set');
     });
+
+    function bindWysiwyg(){
+      //alert($(step).attr('class'));
+      $('div.table:last').find('textarea').each(function(){
+        var id = $(this).attr('id');
+        var editor = $(this).attr('id')+'_editor';
+        var config = null;
+        django_wysiwyg.enable(editor, id, config);
+        $(this).next().show();
+      });
+    }
   </script>
 
 {% endblock %}

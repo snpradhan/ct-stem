@@ -51,6 +51,18 @@ function cloneMore(selector, type) {
         $(this).removeAttr('value');
     });
 
+    newElement.find('span[role="application"]').each(function(){
+      $(this).remove();
+    });
+    newElement.find('script').each(function(){
+      $(this).remove();
+    });
+
+    /*var newHTML = newElement[0].outerHTML;
+    var regex = new RegExp('id_'+type+'-'+(total-1), 'g');
+    newHTML = newHTML.replace(regex, 'id_'+type+'-'+(total));
+    newElement = $.parseHTML(newHTML);*/
+
     total++;
     $('#id_' + type + '-TOTAL_FORMS').val(total);
     $(newElement).find("input[id*='-TOTAL_FORMS']").val(1);
@@ -58,6 +70,7 @@ function cloneMore(selector, type) {
     $(newElement).find("input[id*='-MIN_NUM_FORMS']").val(0);
     $(newElement).find("input[id*='-MAX_NUM_FORMS']").val(1000);
     $(selector).after(newElement);
+
 }
 
 $(function (){
