@@ -335,18 +335,21 @@ This simply says, “Use the environment variable settings if present, otherwise
 
 #### Handling database migrations
 
-With our database setup, we still need to make sure that migrations are ran so that the database table structure is correct. We can do that by modifying _.ebextensions/02_python.config_ and adding the following lines at the top of the file:
+With our database setup, we still need to make sure that migrations are run so that the database table structure is correct. First make sure the migration files are created locally and committed.  On your local machine run:
+```
+./manage.py makemigrations
+```
+This command will create migration files under /ctstem_site/ctstem_app/migrations.  Make sure the created migration files are committed.
+
+Then modify _.ebextensions/02_python.config_ and add the following lines at the top of the file:
 
 ```
 container_commands:
-  01_makemigrations:
-    command: "source /opt/python/run/venv/bin/activate && python ctstem_site/manage.py makemigrations --noinput"
-    leader_only: true
-
-  02_migrate:
+  01_migrate:
     command: "source /opt/python/run/venv/bin/activate && python ctstem_site/manage.py migrate --noinput"
     leader_only: true
 ```
+
 **container_commands** allow you to run arbitrary commands after the application has been deployed on the EC2 instance. Because the EC2 instance is set up using a virtual environment, we must first activate that virtual environment before running our migrate command. Also the **leader_only: true** setting means, “Only run this command on the first instance when deploying to multiple instances”.
 
 Don’t forget that our application makes use of Django’s admin, so we are going to need a superuser…
