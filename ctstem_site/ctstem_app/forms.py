@@ -177,7 +177,7 @@ class LessonForm(ModelForm):
 
   class Meta:
     model = models.Lesson
-    fields = ['title', 'time', 'level', 'purpose', 'overview', 'status', 'subject', 'ngss_standards', 'ct_stem_practices', 'content']
+    fields = ['title', 'time', 'level', 'purpose', 'overview', 'status', 'subject', 'ngss_standards', 'ct_stem_practices', 'content', 'teacher_notes']
     widgets = {
       'title': forms.TextInput(attrs={'placeholder': 'Lesson Title'}),
       'time': forms.TextInput(attrs={'rows':0, 'cols':60}),
@@ -185,6 +185,7 @@ class LessonForm(ModelForm):
       'purpose': forms.Textarea(attrs={'rows':0, 'cols':60}),
       'overview': forms.Textarea(attrs={'rows':0, 'cols':60}),
       'content': forms.Textarea(attrs={'rows':0, 'cols':60}),
+      'teacher_notes': forms.Textarea(attrs={'rows':0, 'cols':60}),
       'ngss_standards': forms.SelectMultiple(attrs={'size':5}),
       'ct_stem_practices': forms.SelectMultiple(attrs={'size':5}),
       'subject': forms.SelectMultiple(attrs={'size':4}),
@@ -272,6 +273,7 @@ class AssessmentStepForm(ModelForm):
     widgets = {
       'title': forms.TextInput(attrs={'placeholder': 'Step Title'}),
       'content': forms.Textarea(attrs={'rows':0, 'cols':60}),
+      'teacher_notes': forms.Textarea(attrs={'rows':0, 'cols':60}),
     }
 
   def __init__(self, *args, **kwargs):

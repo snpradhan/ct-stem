@@ -72,8 +72,11 @@ class Lesson (models.Model):
   purpose = models.TextField(null=False)
   overview = models.TextField(null=False)
   content = models.TextField(null=False)
+  teacher_notes = models.TextField(null=False)
   status = models.CharField(max_length=1, default='D', choices=LESSON_STATUS_CHOICES)
   subject = models.ManyToManyField('Subject', null=False)
+  parent = models.ForeignKey('self', null=True, on_delete=models.SET_NULL)
+  version = models.IntegerField(default=1)
   #image = models.ImageField(upload_to=upload_image_to, null=True, blank=True)
   questions = models.ManyToManyField('Question', through='LessonQuestion', blank=True)
   ngss_standards = models.ManyToManyField('NGSSStandard')
@@ -96,6 +99,8 @@ class Assessment (models.Model):
   overview = models.TextField(null=False)
   status = models.CharField(max_length=1, default='D', choices=LESSON_STATUS_CHOICES)
   subject = models.ManyToManyField('Subject', null=False)
+  parent = models.ForeignKey('self', null=True, on_delete=models.SET_NULL)
+  version = models.IntegerField(default=1)
   #image = models.ImageField(upload_to=upload_image_to, null=True, blank=True)
   ngss_standards = models.ManyToManyField('NGSSStandard')
   ct_stem_practices = models.ManyToManyField('CTStemPractice')
@@ -117,6 +122,7 @@ class AssessmentStep(models.Model):
   title = models.CharField(null=True, max_length=256)
   order = models.IntegerField(null=True)
   content = models.TextField(null=False)
+  teacher_notes = models.TextField(null=False)
   questions = models.ManyToManyField('Question', through='AssessmentQuestion', blank=True)
 
 # Question model
