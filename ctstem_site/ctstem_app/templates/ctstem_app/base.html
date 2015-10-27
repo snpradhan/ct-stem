@@ -60,7 +60,17 @@
 
               <li class="{% navactive request 'ctstem:events' %}"><a href="{% url 'ctstem:events' %}">Events</a></li>
               <li class="{% navactive request 'ctstem:publications' %}"><a href="{% url 'ctstem:publications' %}">Publications</a></li>
-              <li class="{% navactive request 'ctstem:taxonomy' %}"><a href="{% url 'ctstem:taxonomy' %}">Taxonomy</a></li>
+              {% if user.administrator %}
+                <li class="dropdown {% url 'ctstem:ngss_standard' %} {% url 'ctstem:ctstem_practice' %}"><a href="#" class="dropdown-toggle" data-toggle="dropdown" id="welcome">Taxonomy  <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                      <li><a href="{% url 'ctstem:ngss_standard' %}">NGSS Standards</a></li>
+                      <li><a href="{% url 'ctstem:ctstem_practice' %}">CT-STEM Standards</a></li>
+
+                    </ul>
+                  </li>
+              {% else %}
+                <li class="{% navactive request 'ctstem:taxonomy' %}"><a href="{% url 'ctstem:taxonomy' %}">Taxonomy</a></li>
+              {% endif %}
               {% if user.administrator %}
                 <li class="dropdown {% navactive request 'ctstem:users' 'students' %} {% navactive request 'ctstem:users' 'teachers' %} {% navactive request 'ctstem:users' 'admins' %} {% navactive request 'ctstem:users' 'researchers' %} {% navactive request 'ctstem:users' 'authors' %}">
                   <a href="#" class="dropdown-toggle" data-toggle="dropdown" id="curriculum">Users  <b class="caret"></b></a>

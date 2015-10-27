@@ -73,7 +73,7 @@ class Lesson (models.Model):
   purpose = models.TextField(null=False)
   overview = models.TextField(null=False)
   content = models.TextField(null=False)
-  teacher_notes = models.TextField(null=False)
+  teacher_notes = models.TextField(null=True, blank=True)
   status = models.CharField(max_length=1, default='D', choices=LESSON_STATUS_CHOICES)
   subject = models.ManyToManyField('Subject', null=False)
   parent = models.ForeignKey('self', null=True, on_delete=models.SET_NULL)
@@ -123,7 +123,7 @@ class AssessmentStep(models.Model):
   title = models.CharField(null=True, max_length=256)
   order = models.IntegerField(null=True)
   content = models.TextField(null=False)
-  teacher_notes = models.TextField(null=False)
+  teacher_notes = models.TextField(null=True, blank=True)
   questions = models.ManyToManyField('Question', through='AssessmentQuestion', blank=True)
 
 # Question model

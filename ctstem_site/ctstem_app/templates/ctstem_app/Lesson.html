@@ -29,6 +29,11 @@
                 {{field}}
                 {% wysiwyg_editor "id_lesson-content" %}
               </div>
+            {% elif field.name == 'teacher_notes' %}
+              <div>
+                {{field}}
+                {% wysiwyg_editor "id_lesson-teacher_notes" %}
+              </div>
             {% else %}
               <div>
                 {{field}}

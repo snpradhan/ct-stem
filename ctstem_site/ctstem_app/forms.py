@@ -316,3 +316,44 @@ class AssessmentQuestionForm(ModelForm):
   class Meta:
     model = models.AssessmentQuestion
     exclude = ('order',)
+
+####################################
+# NGSS Standards Form
+####################################
+class NGSSStandardForm(ModelForm):
+
+  class Meta:
+    model = models.NGSSStandard
+    exclude = ('id',)
+    widgets = {
+      'title': forms.TextInput(attrs={'placeholder': 'NGSS Title'}),
+      'description': forms.Textarea(attrs={'rows':0, 'cols':60}),
+    }
+
+  def __init__(self, *args, **kwargs):
+    super(NGSSStandardForm, self).__init__(*args, **kwargs)
+
+    for field_name, field in self.fields.items():
+      field.widget.attrs['class'] = 'form-control'
+      field.widget.attrs['placeholder'] = field.help_text
+
+####################################
+# CTSTEM Practice Form
+####################################
+class CTStemPracticeForm(ModelForm):
+
+  class Meta:
+    model = models.CTStemPractice
+    exclude = ('id',)
+    widgets = {
+      'title': forms.TextInput(attrs={'placeholder': 'CT-STEM Practice Title'}),
+      'description': forms.Textarea(attrs={'rows':0, 'cols':60}),
+    }
+
+  def __init__(self, *args, **kwargs):
+    super(CTStemPracticeForm, self).__init__(*args, **kwargs)
+
+    for field_name, field in self.fields.items():
+      field.widget.attrs['class'] = 'form-control'
+      field.widget.attrs['placeholder'] = field.help_text
+

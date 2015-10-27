@@ -6,7 +6,7 @@ from django.contrib.auth import authenticate, login, logout
 from django import http, shortcuts, template
 from django.shortcuts import render
 from django.contrib import auth, messages
-from django.forms.models import inlineformset_factory
+from django.forms.models import inlineformset_factory, modelformset_factory
 from nested_formset import nestedformset_factory
 
 ####################################
@@ -379,8 +379,78 @@ def notimplemented(request):
   return render(request, 'ctstem_app/NotImplemented.html')
 
 def taxonomy(request):
-  return render(request, 'ctstem_app/NotImplemented.html')
+  ngss_standards = models.NGSSStandard.objects.all().order_by('title')
+  ctstem_practices_qs = models.CTStemPractice.objects.all().order_by('category', 'order')
+  ctstem_practices = {}
+  for cp in ctstem_practices_qs:
+    if cp.get_category_display() in ctstem_practices:
+      ctstem_practices[cp.get_category_display()].append(cp)
+    else:
+      ctstem_practices[cp.get_category_display()]= [cp]
 
+  context = {'ngss_standards': ngss_standards, 'ctstem_practices': ctstem_practices}
+  return render(request, 'ctstem_app/Taxonomy.html', context)
+
+####################################
+# NGSS STANDARDS
+####################################
+@login_required
+def ngss_standard(request):
+  if hasattr(request.user, 'administrator') == False:
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to view this page</h1>')
+
+  NGSSFormSet = modelformset_factory(models.NGSSStandard, form=forms.NGSSStandardForm, extra=1, can_delete=True)
+  if request.method == 'GET':
+    formset = NGSSFormSet(queryset=models.NGSSStandard.objects.all())
+    context = {'formset': formset}
+    return render(request, 'ctstem_app/NGSSStandard.html', context)
+  elif request.method == 'POST':
+    data = request.POST.copy()
+    formset = NGSSFormSet(data)
+
+    if formset.is_valid():
+      formset.save()
+      messages.success(request, "NGSS Standards saved successfully")
+      return shortcuts.redirect('ctstem:ngss_standard')
+    else:
+      print formset.errors
+      context = {'formset': formset}
+      return render(request, 'ctstem_app/NGSSStandard.html', context)
+
+  return http.HttpResponseNotAllowed(['GET', 'POST'])
+
+####################################
+# NGSS STANDARDS
+####################################
+@login_required
+def ctstem_practice(request):
+  if hasattr(request.user, 'administrator') == False:
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to view this page</h1>')
+
+  NGSSFormSet = modelformset_factory(models.CTStemPractice, form=forms.CTStemPracticeForm, extra=1, can_delete=True)
+  if request.method == 'GET':
+    formset = NGSSFormSet(queryset=models.CTStemPractice.objects.all())
+    context = {'formset': formset}
+    return render(request, 'ctstem_app/CTStemPractice.html', context)
+  elif request.method == 'POST':
+    data = request.POST.copy()
+    formset = NGSSFormSet(data)
+
+    if formset.is_valid():
+      formset.save()
+      messages.success(request, "CT-STEM Practices saved successfully")
+      return shortcuts.redirect('ctstem:ctstem_practice')
+    else:
+      print formset.errors
+      context = {'formset': formset}
+      return render(request, 'ctstem_app/CTStemPractice.html', context)
+
+  return http.HttpResponseNotAllowed(['GET', 'POST'])
+
+####################################
+# USER LIST
+####################################
+@login_required
 def users(request, role):
   if role == 'students':
     users = models.Student.objects.all()

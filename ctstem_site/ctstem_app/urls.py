@@ -21,6 +21,9 @@ urlpatterns = [
     url(r'^lesson/preview/(?P<id>[\d]+)/$', views.lessonPreview, name='lessonPreview'),
     url(r'^assessment/preview/(?P<id>[\d]+)/$', views.assessmentPreview, name='assessmentPreview'),
     url(r'^taxonomy/$', views.taxonomy, name='taxonomy'),
+    url(r'^taxonomy/ngss_standard/$', views.ngss_standard, name='ngss_standard'),
+    url(r'^taxonomy/ctstem_practice/$', views.ctstem_practice, name='ctstem_practice'),
     url(r'^users/(?P<role>[a-zA-Z0-9]+)/$', views.users, name='users'),
+
 
 ]

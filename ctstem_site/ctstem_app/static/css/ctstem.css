@@ -140,7 +140,7 @@ div.table#lesson, div.table#lessonPreview, div.table#assessment, div.table#asses
   width: 90%;
   padding: 3em 4em;
 }
-div.table.step, div.table#assessmentPreview {
+div.table.step, div.table#assessmentPreview, div.table.ngss, div.table.taxonomy {
   margin-top: 3em;
 }
 
@@ -154,6 +154,19 @@ div.table#lessonPreview, div.table#assessmentPreview{
 
 div.table#lessonPreview div.lesson-row, div.table#assessmentPreview div.assessment-row{
   margin-bottom: 2em;
+}
+
+div.table.taxonomy {
+  font-size: 1.5em;
+}
+
+div.table.taxonomy li {
+  margin-bottom: 0.5em;
+  margin-top: 1em;
+}
+
+div.table.taxonomy h3 {
+  text-decoration: underline;
 }
 
 /******************
