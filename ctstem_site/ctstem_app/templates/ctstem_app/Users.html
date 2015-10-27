@@ -1,0 +1,62 @@
+{% extends "ctstem_app/base.html" %}
+
+{% block media %}
+  {{ block.super }}
+  {{ form.media }}
+{% endblock %}
+
+{% block content %}
+  {{block.super}}
+  <div class="content">
+    <h2> {{role|title}} </h2>
+
+    {% if users %}
+      <table class="table" id="users">
+        <thead>
+          <tr>
+            <th> Name </th>
+            <th> Email </th>
+            <th> School </th>
+            <th> User Code </th>
+          </tr>
+        </thead>
+        <tfoot>
+          <tr>
+            <th> Name </th>
+            <th> Email </th>
+            <th> School </th>
+            <th> User Code </th>
+          </tr>
+        </tfoot>
+        <tbody>
+          {% for userProfile in users %}
+            <tr>
+              <td>{{userProfile.user.get_full_name}}</td>
+              <td>{{userProfile.user.email}}</td>
+              {% if role == 'teachers' or role == 'students' or role == 'researchers' %}
+                <td>{{userProfile.school}}</td>
+                <td>{{userProfile.permission_code}}</td>
+              {% else %}
+                <td></td>
+                <td></td>
+              {% endif %}
+              <td></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p>No Users</p>
+    {% endif %}
+
+
+  </div>
+  <script type="text/javascript">
+    $(document).ready(function() {
+        // DataTable
+       $('#users').DataTable();
+    });
+  </script>
+{% endblock %}
+
+

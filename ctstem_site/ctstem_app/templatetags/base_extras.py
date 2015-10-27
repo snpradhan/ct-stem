@@ -10,7 +10,11 @@ import random
 register = template.Library()
 
 @register.simple_tag
-def navactive(request, urls):
+def navactive(request, urls, args=None):
+  if args:
+    if request.path in ( reverse(url, args=(args,)) for url in urls.split() ):
+      return "active"
+  else:
     if request.path in ( reverse(url) for url in urls.split() ):
-        return "active"
-    return ""
+      return "active"
+  return ""

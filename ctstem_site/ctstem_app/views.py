@@ -377,3 +377,23 @@ def userProfile(request, id=''):
 
 def notimplemented(request):
   return render(request, 'ctstem_app/NotImplemented.html')
+
+def taxonomy(request):
+  return render(request, 'ctstem_app/NotImplemented.html')
+
+def users(request, role):
+  if role == 'students':
+    users = models.Student.objects.all()
+  elif role == 'teachers':
+    users = models.Teacher.objects.all()
+  elif role == 'admins':
+    users = models.Administrator.objects.all()
+  elif role == 'researchers':
+    users = models.Researcher.objects.all()
+  elif role == 'authors':
+    users = models.Author.objects.all()
+  else:
+    users = None
+  context = {'users': users, 'role': role}
+  return render(request, 'ctstem_app/Users.html', context)
+

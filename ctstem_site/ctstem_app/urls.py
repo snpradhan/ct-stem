@@ -9,7 +9,7 @@ urlpatterns = [
     url(r'^assessment/(?P<id>[\d]+)/$', views.assessment, name='assessment'),
     url(r'^lessons/$', views.lessons, name='lessons'),
     url(r'^partners/$', views.notimplemented, name='partners'),
-    url(r'^workshops/$', views.notimplemented, name='workshops'),
+    url(r'^events/$', views.notimplemented, name='events'),
     url(r'^publications/$', views.notimplemented, name='publications'),
     url(r'^about-us/$', views.about_us, name='about_us'),
     url(r'^register/$', views.register, name='register'),
@@ -20,5 +20,7 @@ urlpatterns = [
     url(r'^lesson/new/$', views.lesson, name='newLesson'),
     url(r'^lesson/preview/(?P<id>[\d]+)/$', views.lessonPreview, name='lessonPreview'),
     url(r'^assessment/preview/(?P<id>[\d]+)/$', views.assessmentPreview, name='assessmentPreview'),
+    url(r'^taxonomy/$', views.taxonomy, name='taxonomy'),
+    url(r'^users/(?P<role>[a-zA-Z0-9]+)/$', views.users, name='users'),
 
 ]
