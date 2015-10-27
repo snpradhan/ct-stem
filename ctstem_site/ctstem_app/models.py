@@ -48,6 +48,7 @@ USER_ROLE_CHOICES = (
     (u'R', u'Researcher/School Admin'),
     (u'S', u'Student'),
     (u'A', u'Site Administrator'),
+    (u'C', u'Content Author'),
 
 )
 
@@ -217,6 +218,14 @@ class Researcher(models.Model):
   school = models.ForeignKey(School)
   teachers = models.ManyToManyField(Teacher, blank=True)
   permission_code = models.CharField(null=False, max_length=256, unique=True)
+
+  def __unicode__(self):
+      return u'%s' % (self.user.get_full_name())
+
+# Administrator models
+# This model represents a super user
+class Author(models.Model):
+  user = models.OneToOneField(User, unique=True, null=False, related_name="author")
 
   def __unicode__(self):
       return u'%s' % (self.user.get_full_name())
