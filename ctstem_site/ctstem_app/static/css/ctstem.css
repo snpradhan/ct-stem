@@ -79,8 +79,8 @@ body {
 .navbar {
   line-height: 1em;
   font-size: 1.5em;
-  padding-left: 20em;
-  padding-right: 10em;
+  padding-left: 10em;
+  padding-right: 5em;
   min-height:20px !important;
   background-color: #520063;
 }
