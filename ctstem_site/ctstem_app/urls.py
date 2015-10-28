@@ -3,7 +3,7 @@ from django.conf.urls import url
 from . import views
 
 urlpatterns = [
-    url(r'^$', views.notimplemented, name='home'),
+    url(r'^$', views.home, name='home'),
     url(r'^assessments/$', views.assessments, name='assessments'),
     url(r'^assessment/new/$', views.assessment, name='newAssessment'),
     url(r'^assessment/(?P<id>[\d]+)/$', views.assessment, name='assessment'),
@@ -11,7 +11,8 @@ urlpatterns = [
     url(r'^publication/new/$', views.publication, name='newPublication'),
     url(r'^publications/$', views.publications, name='publications'),
     url(r'^lessons/$', views.lessons, name='lessons'),
-    url(r'^partners/$', views.notimplemented, name='partners'),
+    url(r'^partners/$', views.partners, name='partners'),
+    url(r'^jobs/$', views.notimplemented, name='jobs'),
     url(r'^events/$', views.notimplemented, name='events'),
     url(r'^publications/$', views.notimplemented, name='publications'),
     url(r'^about-us/$', views.about_us, name='about_us'),

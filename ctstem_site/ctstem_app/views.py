@@ -10,6 +10,19 @@ from django.forms.models import inlineformset_factory, modelformset_factory
 from nested_formset import nestedformset_factory
 from slugify import slugify
 
+
+
+####################################
+# HOME
+####################################
+def home(request):
+  return render(request, 'ctstem_app/Home.html')
+
+####################################
+# PARTNERS
+####################################
+def partners(request):
+  return render(request, 'ctstem_app/Partners.html')
 ####################################
 # ABOUT US
 ####################################

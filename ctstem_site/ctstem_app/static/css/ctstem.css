@@ -199,6 +199,11 @@ div.content {
   margin-bottom: 40px;
 }
 
+div.content#home {
+  width: 60%;
+  font-size: 1.3em;
+}
+
 div.btn-group {
   margin-bottom: 10px;
 }
