@@ -1,0 +1,28 @@
+{% extends "ctstem_app/base.html" %}
+
+{% block title %}Publication |{% endblock %}
+
+{% block content %}
+  {{block.super}}
+  <div class="content">
+    <h2>Publication</h2>
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="table" id="publication">
+        {{form.management_form}}
+        {% for field in form %}
+          <div class="form-group">
+            <label for="id_{{field.name}}">{{ field.label|title }}</label>
+            <div>
+              {{field}}
+            </div>
+            <div class="error">{{ field.errors }}</div>
+          </div>
+        {% endfor %}
+        <div class="form-group button-group-fixed">
+          <input type="submit" class="btn btn-success" id="submit" value="Save Publication"/>
+        </div>
+      </div>
+    </form>
+  </div>
+{% endblock %}

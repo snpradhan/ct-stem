@@ -8,6 +8,7 @@ from django.shortcuts import render
 from django.contrib import auth, messages
 from django.forms.models import inlineformset_factory, modelformset_factory
 from nested_formset import nestedformset_factory
+from slugify import slugify
 
 ####################################
 # ABOUT US
@@ -466,4 +467,57 @@ def users(request, role):
     users = None
   context = {'users': users, 'role': role}
   return render(request, 'ctstem_app/Users.html', context)
+
+####################################
+# PUBLICATIONS TABLE VIEW
+####################################
+def publications(request):
+  if hasattr(request.user, 'administrator') == False:
+    publications = models.Publication.objects.filter(viewable=True).order_by('created')
+  else:
+    publications = models.Publication.objects.order_by('created')
+  context = {'publications': publications}
+  return render(request, 'ctstem_app/Publications.html', context)
+
+
+####################################
+# CREATE MODIFY A PUBLICATION
+####################################
+@login_required
+def publication(request, slug=''):
+  try:
+    # check if the user has permission to create or modify a lesson
+    if hasattr(request.user, 'administrator') == False:
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to modify this publication</h1>')
+    # check if the lesson exists
+    if 'new' != slug:
+      publication = models.Publication.objects.get(slug=slug)
+    else:
+      publication = models.Publication()
+
+    if request.method == 'GET':
+        form = forms.PublicationForm(instance=publication, prefix='publication')
+        context = {'form': form,}
+        return render(request, 'ctstem_app/Publication.html', context)
+
+    elif request.method == 'POST':
+      data = request.POST.copy()
+      print request.FILES
+      form = forms.PublicationForm(data, request.FILES, instance=publication, prefix="publication")
+      if form.is_valid():
+        savedPublication = form.save(commit=False)
+        savedPublication.slug = slugify(savedPublication.title)
+        savedPublication.save()
+        form.save()
+        messages.success(request, "Publication Saved.")
+        return shortcuts.redirect('ctstem:publications',)
+      else:
+        print form.errors
+        context = {'form': form}
+        return render(request, 'ctstem_app/Publication.html', context)
+
+    return http.HttpResponseNotAllowed(['GET', 'POST'])
+
+  except models.Lesson.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested publication not found</h1>')
 

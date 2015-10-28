@@ -45,6 +45,7 @@ INSTALLED_APPS = (
     'tinymce',
     'django_wysiwyg',
     'nested_formset',
+    'storages',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -57,6 +58,18 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
 )
+
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
+if 'AWS_ACCESS_KEY_ID' in os.environ:
+    AWS_ACCESS_KEY_ID =  os.environ['AWS_ACCESS_KEY_ID']    # enter your access key id
+    AWS_SECRET_ACCESS_KEY =  os.environ['AWS_SECRET_ACCESS_KEY'] # enter your secret access key
+else:
+    AWS_ACCESS_KEY_ID =  os.environ.get("AWS_ACCESS_KEY_ID", "")    # enter your access key id
+    AWS_SECRET_ACCESS_KEY =  os.environ.get("AWS_SECRET_ACCESS_KEY", "") # enter your secret access key
+
+AWS_STORAGE_BUCKET_NAME = 'ct-stem'
+AWS_S3_SECURE_URLS = False       # use http instead of https
+AWS_QUERYSTRING_AUTH = False
 
 DJANGO_WYSIWYG_FLAVOR =  "tinymce_advanced" #"tinymce"
 
@@ -98,11 +111,11 @@ else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': os.environ.get("CTSTEM_DB", ''),
-            'USER': os.environ.get("CTSTEM_DB_USER", ''),
-            'PASSWORD': os.environ.get("CTSTEM_DB_PSSWD", ''),
-            'HOST': os.environ.get("CTSTEM_DB_HOST", ''),                     # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
-            'PORT': os.environ.get("CTSTEM_DB_PORT", ''),
+            'NAME': os.environ.get('RDS_DB_NAME', ''),
+            'USER': os.environ.get('RDS_USERNAME', ''),
+            'PASSWORD': os.environ.get('RDS_PASSWORD', ''),
+            'HOST': os.environ.get('RDS_HOSTNAME', ''),                     # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
+            'PORT': os.environ.get('RDS_PORT', ''),
         }
     }
 

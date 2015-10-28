@@ -455,6 +455,20 @@ You will need to:
 3. [Add bucket permissions](http://docs.aws.amazon.com/AmazonS3/latest/UG/EditingBucketPermissions.html)
 4. [Configure your Django app to use S3 to serve your static files](https://docs.djangoproject.com/en/1.7/howto/static-files/)
 
+Add the AWS Credentials for your user as environment variables.
+```
+eb setenv AWS_S3_ACCESS_KEY_ID=xxxxxxxxxxxx AWS_S3_SECRET_ACCESS_KEY=yyyyyyyyyy
+```
+Then in your settings.py file add the following
+```
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
+AWS_ACCESS_KEY_ID =  os.environ['AWS_ACCESS_KEY_ID']
+AWS_SECRET_ACCESS_KEY =  os.environ['AWS_SECRET_ACCESS_KEY']
+AWS_STORAGE_BUCKET_NAME = 'bucket name'
+```
+This eliminates hard coding your AWS Credentials in the settings file.
+
+
 Since there are good write ups on this already, I’ll just point you to my favorite: [Using Amazon S3 to store you Django Static and Media Files](http://www.caktusgroup.com/blog/2014/11/10/Using-Amazon-S3-to-store-your-Django-sites-static-and-media-files/)
 
 ### Apache Config

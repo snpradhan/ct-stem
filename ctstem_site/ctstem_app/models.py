@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from tinymce.models import HTMLField
+from slugify import slugify
 
 LESSON_STATUS_CHOICES = (
     (u'D', u'Draft'),
@@ -49,18 +50,34 @@ USER_ROLE_CHOICES = (
     (u'S', u'Student'),
     (u'A', u'Site Administrator'),
     (u'C', u'Content Author'),
-
 )
 
-def upload_image_to(instance, filename):
+PUBLICATION_TYPES = (
+  (u'journal', u'Journal Articles'),
+  (u'book', u'Book Chapters'),
+  (u'refConfs', u'Refereed Conference Papers'),
+  (u'presentations', u'Presentations and Posters'),
+  (u'workshops', u'Workshop Papers'),
+  (u'others', u'Other Papers'),
+)
+
+PUBLICATION_AFFILIATION = (
+  (u'lab', u'TIDAL Lab'),
+  (u'personal', u'Personal'),
+)
+
+
+def upload_file_to(instance, filename):
   import os
   from django.utils.timezone import now
   filename_base, filename_ext = os.path.splitext(filename)
   print filename
   if isinstance(instance, Lesson):
-      return 'lesson/%s%s' % (instance.title, filename_ext.lower(),)
+      return 'lessons/%s%s' % (slugify(instance.title), filename_ext.lower(),)
   elif isinstance(instance, Assessment):
-      return 'assessment/%s%s' % (instance.name, filename_ext.lower(),)
+      return 'assessments/%s%s' % (slugify(instance.title), filename_ext.lower(),)
+  elif isinstance(instance, Publication):
+      return 'publications/%s%s' % (slugify(instance.title), filename_ext.lower(),)
   return 'misc/%s%s' % (instance.id,filename_ext.lower(),)
 
 # Create your models here.
@@ -246,3 +263,22 @@ class Section(models.Model):
   subject = models.ForeignKey(Subject)
   time = models.CharField(null=False, max_length=256)
   students = models.ManyToManyField(Student)
+
+
+#######################################################
+# Publication model
+class Publication(models.Model):
+  authors = models.CharField(max_length=255, help_text='Publication Author')
+  year = models.CharField(max_length=255, help_text='Publication Year')
+  title = models.CharField(max_length=255, help_text='Publication Title')
+  journal = models.CharField(max_length=255)
+  pages = models.CharField(max_length=255, blank=True)
+  award = models.CharField(max_length=255, blank=True)
+  slug = models.SlugField(unique=True, max_length=255)
+  viewable = models.BooleanField(default=True)
+  created = models.DateTimeField(auto_now_add=True)
+  local_copy = models.FileField(upload_to=upload_file_to, blank=True)
+  web_link = models.URLField(blank=True)
+  publication_type = models.CharField(max_length=255, choices=PUBLICATION_TYPES)
+  publication_affiliation = models.CharField(max_length=255, choices=PUBLICATION_AFFILIATION)
+
