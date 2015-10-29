@@ -9,8 +9,7 @@ from django.contrib import auth, messages
 from django.forms.models import inlineformset_factory, modelformset_factory
 from nested_formset import nestedformset_factory
 from slugify import slugify
-
-
+import json
 
 ####################################
 # HOME
@@ -272,17 +271,19 @@ def register(request):
 ####################################
 def user_login(request):
   username = password = ''
-
   if 'POST' == request.method:
     username = request.POST.get('username')
     password = request.POST.get('password')
     user = authenticate(username=username, password=password)
+    response_data = {}
     if user is not None and user.is_active:
       login(request, user)
-      return render(request, 'ctstem_app/About_us.html')
+      response_data['result'] = 'Success'
     else:
-      messages.error(request, "Your username and/or password were incorrect.")
-      return render(request, 'ctstem_app/About_us.html')
+      response_data['result'] = 'failed'
+      response_data['message'] = 'Your username and/or password is invalid'
+    return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+
   elif 'GET' == request.method:
     lessons = models.Lesson.objects.order_by('id')
     context = {'lessons': lessons}

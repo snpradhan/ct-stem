@@ -21,6 +21,35 @@
       <script type="text/javascript" src="/static/js/ctstem.js"></script>
       <link rel="stylesheet" href="/static/css/ctstem.css" media="screen"/>
 
+      <script type="text/javascript">
+        $(function (){
+          $("#formLogin").submit(function(e) {
+            e.preventDefault();
+            var data = $(this).serialize();
+            var url = "{% url 'ctstem:login' %}";
+            $.ajax({
+              type: "POST",
+              url: url,
+              data: data,
+              dataType: 'json',
+              success: function(data){
+                if(data['result'] == 'Success'){
+                  window.location = "{% url 'ctstem:home' %}";
+                }
+                else{
+                  $('#loginMsg').html(data['message']);
+                  $('#password').val('');
+                }
+              },
+              error: function(xhr, ajaxOptions, thrownError){
+                $('#loginMsg').html("Something went wrong.  Try again later!");
+                $('#password').val('');
+              },
+            });
+          });
+        });
+      </script>
+
     {% endblock %}
   </head>
 
@@ -61,10 +90,10 @@
               <li class="{% navactive request 'ctstem:events' %}"><a href="{% url 'ctstem:events' %}">Events</a></li>
               <li class="{% navactive request 'ctstem:publications' %}"><a href="{% url 'ctstem:publications' %}">Publications</a></li>
               {% if user.administrator %}
-                <li class="dropdown {% url 'ctstem:ngss_standard' %} {% url 'ctstem:ctstem_practice' %}"><a href="#" class="dropdown-toggle" data-toggle="dropdown" id="welcome">Taxonomy  <b class="caret"></b></a>
+                <li class="dropdown {% navactive request 'ctstem:ngss_standard' %} {% navactive request 'ctstem:ctstem_practice' %}"><a href="#" class="dropdown-toggle" data-toggle="dropdown" id="welcome">Taxonomy  <b class="caret"></b></a>
                     <ul class="dropdown-menu">
-                      <li><a href="{% url 'ctstem:ngss_standard' %}">NGSS Standards</a></li>
-                      <li><a href="{% url 'ctstem:ctstem_practice' %}">CT-STEM Standards</a></li>
+                      <li class="{% navactive request 'ctstem:ngss_standard' %}"><a href="{% url 'ctstem:ngss_standard' %}">NGSS Standards</a></li>
+                      <li class="{% navactive request 'ctstem:ctstem_practice' %}"><a href="{% url 'ctstem:ctstem_practice' %}">CT-STEM Standards</a></li>
 
                     </ul>
                   </li>
@@ -91,7 +120,7 @@
                 <ul class="nav navbar-nav pull-right">
                   <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown" id="welcome">Welcome, {{ user.first_name }}  <b class="caret"></b></a>
                     <ul class="dropdown-menu">
-                      <li><a href="{% url 'ctstem:userProfile' user.id %}"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Edit Profile</a></li>
+                      <li class="{% navactive request 'ctstem:userProfile' user.id %}"><a href="{% url 'ctstem:userProfile' user.id %}"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Edit Profile</a></li>
                       <li><a href=""><span class="glyphicon glyphicon-cog" aria-hidden="true"></span> Account Settings</a></li>
                       <li class="divider"></li>
                       <li><a href="{% url 'ctstem:logout' %}"><span class="glyphicon glyphicon-log-in" aria-hidden="true"></span> Logout</a></li>
@@ -127,12 +156,14 @@
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
                 <h3 class="modal-title">Login</h3>
               </div>
-              <form class="form" id="formLogin" action="/login/" method="post">
+              <div id="loginMsg">
+              </div>
+              <form class="form" id="formLogin" method="post">
                 {% csrf_token %}
                 <div class="modal-body">
                   <div class="form-group">
                     <label for="id_username">Username*</label>
-                    <input name="username" id="id_username" type="text" class="form-control">
+                    <input name="username" id="username" type="text" class="form-control">
                   </div>
                   <div class="form-group">
                     <label for="id_password">Password*</label>

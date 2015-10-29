@@ -81,4 +81,11 @@ $(function (){
   $('#closeLogin').click(function(){
     $('div#login').hide();
   });
+
+  $('#login').on('show.bs.modal', function () {
+    $(".modal-content #loginMsg").html('');
+    $(".modal-content #username").val('');
+    $(".modal-content #password").val('');
+  });
+
 });
