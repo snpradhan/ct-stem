@@ -136,11 +136,11 @@ div.table#register, div.table#userProfile {
   width: 50%;
   padding: 3em 4em;
 }
-div.table#lesson, div.table#lessonPreview, div.table#assessment, div.table#assessmentPreview, div.table.step{
+div.table#lesson, div.table#lessonPreview, div.table#assessment, div.table#assessmentPreview, div.table.step, div.table#lessonQuestions{
   width: 90%;
   padding: 3em 4em;
 }
-div.table.step, div.table#assessmentPreview, div.table.ngss, div.table.taxonomy {
+div.table.step, div.table#assessmentPreview, div.table.ngss, div.table.taxonomy, div.table#lessonQuestions {
   margin-top: 3em;
 }
 

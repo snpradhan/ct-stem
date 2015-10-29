@@ -144,28 +144,45 @@ def lesson(request, id=''):
     else:
       lesson = models.Lesson()
 
+    newQuestionForm = forms.QuestionForm()
+
     if request.method == 'GET':
       form = forms.LessonForm(instance=lesson, prefix='lesson')
-      QuestionFormSet = inlineformset_factory(models.Lesson, models.LessonQuestion, fields=('question', 'order'), extra=1)
-      formset = QuestionFormSet(instance=lesson)
-      context = {'form': form, 'formset':formset}
+      QuestionFormSet = inlineformset_factory(models.Lesson, models.LessonQuestion, form=forms.LessonQuestionForm, can_order=True, can_delete=True, extra=1)
+      formset = QuestionFormSet(instance=lesson, prefix='question')
+      context = {'form': form, 'formset':formset, 'newQuestionForm': newQuestionForm}
       return render(request, 'ctstem_app/Lesson.html', context)
 
     elif request.method == 'POST':
       data = request.POST.copy()
       form = forms.LessonForm(data, request.FILES, instance=lesson, prefix="lesson")
-      if form.is_valid():
+      QuestionFormSet = inlineformset_factory(models.Lesson, models.LessonQuestion, form=forms.LessonQuestionForm, can_order=True, can_delete=True, extra=1)
+      formset = QuestionFormSet(data, instance=lesson, prefix='question')
+      if form.is_valid() and formset.is_valid():
         savedLesson = form.save(commit=False)
         if '' == id:
             savedLesson.author = request.user
         savedLesson.modified_by = request.user
         savedLesson.save()
         form.save()
+
+        #save the questions
+        questions = formset.save(commit=False)
+        #maintain order
+        for qform in formset.ordered_forms:
+          qform.instance.order = qform.cleaned_data['ORDER']
+          qform.instance.lesson = savedLesson
+          qform.instance.save()
+        #remove deleted questions
+        for obj in formset.deleted_objects:
+          obj.delete()
+
         messages.success(request, "Lesson Saved.")
         return shortcuts.redirect('ctstem:lesson', id=savedLesson.id)
       else:
         print form.errors
-        context = {'form': form}
+        print formset.errors
+        context = {'form': form, 'formset':formset, 'newQuestionForm': newQuestionForm}
         return render(request, 'ctstem_app/Lesson.html', context)
 
     return http.HttpResponseNotAllowed(['GET', 'POST'])
@@ -534,4 +551,24 @@ def publication(request, slug=''):
 
   except models.Lesson.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested publication not found</h1>')
+
+####################################
+# ADD NEW QUESTION
+####################################
+@login_required
+def add_question(request):
+  # check if the user has permission to add a question
+  if hasattr(request.user, 'administrator') == False:
+    return http.HttpResponseNotFound('<h1>You do not have the privilege to add a question</h1>')
+
+  if 'POST' == request.method:
+    data = request.POST.copy()
+    print data
+    question = models.Question(question_text = data['question_text'], answer_field_type=data['answer_field_type'],
+                                        options=data['options'], answer=data['answer'])
+    question.save()
+    response_data = {'question_id': question.id, 'question_text': question.question_text}
+    return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+
+  return http.HttpResponseNotAllowed(['POST'])
 

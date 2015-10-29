@@ -147,7 +147,6 @@ class AssessmentStep(models.Model):
 # A bank of questions that can be resued across assessments and lessons
 class Question(models.Model):
   question_text = models.TextField(null=False, blank=False)
-  owner = models.ForeignKey(User, null=False)
   answer_field_type = models.CharField(null=False, max_length=2, choices=FIELD_TYPE_CHOICES)
   options = models.TextField(null=True, blank=True)
   answer = models.TextField(null=True, blank=True)
@@ -163,6 +162,10 @@ class LessonQuestion(models.Model):
 
   def __unicode__(self):
       return u'%s' % (self.question.question_text)
+
+  class Meta:
+      ordering = ['order']
+
 
 # A relation between Assessment Step and Question models
 class AssessmentQuestion(models.Model):

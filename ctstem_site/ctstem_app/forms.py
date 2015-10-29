@@ -173,7 +173,7 @@ class ResearcherForm (ModelForm):
 # Lesson Form
 ####################################
 class LessonForm(ModelForm):
-  questions = forms.ModelMultipleChoiceField(required=False, queryset=models.Question.objects.all(), widget=FilteredSelectMultiple(('Questions'), False, attrs={'size':15}))
+  #questions = forms.ModelMultipleChoiceField(required=False, queryset=models.Question.objects.all())#, widget=FilteredSelectMultiple(('Questions'), False, attrs={'size':15}))
 
   class Meta:
     model = models.Lesson
@@ -193,13 +193,7 @@ class LessonForm(ModelForm):
 
   def __init__(self, *args, **kwargs):
     super(LessonForm, self).__init__(*args, **kwargs)
-    if self.instance.id:
-      if 'instance' in kwargs:
-        initial = kwargs.setdefault('initial', {})
-        initial['questions'] = [t.pk for t in kwargs['instance'].questions.all()]
     forms.ModelForm.__init__(self, *args, **kwargs)
-    if 'instance' in kwargs:
-      self.fields['questions'].queryset = models.Question.objects.all()
 
     self.fields['ngss_standards'].label = "NGSS Standards"
     self.fields['ct_stem_practices'].label = "CT-STEM Practices"
@@ -208,7 +202,7 @@ class LessonForm(ModelForm):
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['placeholder'] = field.help_text
 
-  def save(self, commit=True):
+  '''def save(self, commit=True):
     instance = forms.ModelForm.save(self, False)
     old_save_m2m = self.save_m2m
 
@@ -234,7 +228,37 @@ class LessonForm(ModelForm):
     if commit:
       instance.save()
       self.save_m2m()
-    return instance
+    return instance'''
+
+####################################
+# Lesson Question Form
+####################################
+class LessonQuestionForm(ModelForm):
+
+  class Meta:
+    model = models.LessonQuestion
+    exclude = ('order',)
+
+####################################
+#  Question Form
+####################################
+class QuestionForm(ModelForm):
+
+  class Meta:
+    model = models.Question
+    fields = ['question_text', 'answer_field_type', 'options', 'answer']
+    widgets = {
+      'question_text': forms.TextInput(attrs={'placeholder': 'Lesson Title'}),
+      'options': forms.Textarea(attrs={'rows':5, 'cols':60, 'placeholder': 'Options for dropdown'}),
+      'answer': forms.Textarea(attrs={'rows':5, 'cols':60, 'placeholder': 'Answer if applicable'}),
+    }
+
+  def __init__(self, *args, **kwargs):
+    super(QuestionForm, self).__init__(*args, **kwargs)
+
+    for field_name, field in self.fields.items():
+      field.widget.attrs['class'] = 'form-control'
+      field.widget.attrs['placeholder'] = field.help_text
 
 ####################################
 # Assessment Form
