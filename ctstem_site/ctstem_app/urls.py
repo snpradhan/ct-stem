@@ -28,7 +28,8 @@ urlpatterns = [
     url(r'^taxonomy/ngss_standard/$', views.ngss_standard, name='ngss_standard'),
     url(r'^taxonomy/ctstem_practice/$', views.ctstem_practice, name='ctstem_practice'),
     url(r'^users/(?P<role>[a-zA-Z0-9]+)/$', views.users, name='users'),
-    url(r'^add_question/$', views.add_question, name='add_question'),
+    url(r'^question/new/$', views.question, name='newQuestion'),
+    url(r'^question/(?P<id>[\d]+)/$', views.question, name='question'),
 
 
 ]

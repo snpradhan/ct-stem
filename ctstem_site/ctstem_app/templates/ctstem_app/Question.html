@@ -1,0 +1,93 @@
+{% load wysiwyg %}
+{% wysiwyg_setup %}
+{% include "ctstem_app/django_wysiwyg_includes.html" %}
+
+<div class="modal-dialog modal-md">
+  <div class="modal-content">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal">&times;</button>
+      <h3 class="modal-title">{{title}}</h3>
+    </div>
+    <div id="questionMsg">
+    </div>
+    <form class="form" id="questionForm" method="post" action="{% if questionForm.instance.id %} {% url 'ctstem:question' questionForm.instance.id %} {% else %} {% url 'ctstem:newQuestion' %} {% endif %}">
+      {% csrf_token %}
+      <input id="id_question" type="hidden" value="{{questionForm.instance.id}}"/>
+      <div class="modal-body">
+        {% for field in questionForm %}
+          <div class="form-group">
+            <label for="id_{{field.name}}">{{ field.label|title }} {% if field.field.required %} (*) {% endif %}</label>
+            <div>
+              {{field}}
+              {% if field.name == 'question_text' %}
+                {% wysiwyg_editor field.auto_id %}
+                <input type="hidden" id="question_html" name="question_html" />
+              {% endif %}
+            </div>
+            <div class="error">{{ field.errors }}</div>
+          </div>
+        {% endfor %}
+      </div>
+      <div class="modal-footer">
+        <div class="form-group button-row">
+          <button type="submit" id="saveQuestion" class="btn btn-success">
+            Save
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script type="text/javascript">
+$(function (){
+
+  $("#questionForm").submit(function(e) {
+
+    e.preventDefault();
+    var question_text = tinymce.get('id_question_text').getContent();
+    data = {}
+    data['question_text'] = question_text;
+    data['answer_field_type'] = $("#id_answer_field_type").val();
+    data['options'] = $("#id_options").val();
+    data['answer'] = $("#id_answer").val();
+    data['csrfmiddlewaretoken'] = $('#questionForm').find('input:hidden').eq(0).val();
+    var data = $.param(data);
+    var question_id = $("#id_question").val();
+    /*var url = "{% url 'ctstem:newQuestion' %}";*/
+    $.ajax({
+      type: $(this).attr('method'),
+      url: this.action,
+      data: data,
+      context: this,
+      success: function(data){
+        if('error' in data){
+          $('#questionMsg').html(data['error']);
+        }
+        else {
+          if(question_id != 'None'){
+            $("table.table tr#question_row_"+question_id+" td.question_text div").html(data['question_text']);
+          }
+          else {
+            cloneMore('table.table tr:last', 'question');
+            var question_order = $("table.table > tbody > tr").length;
+            $("table.table tr:nth-last-child(2) td.question_order div").html("Q"+(question_order-1)+".");
+            $("table.table tr:nth-last-child(2)").attr('id', 'question_row_'+data['question_id']);
+            $("table.table tr:nth-last-child(2) input.question_id").val(data['question_id']);
+            $("table.table tr:nth-last-child(2) input.question_id").after(data['question_text'])
+            $("table.table tr:nth-last-child(2) button.edit_question").attr("data-form", '/question/'+data['question_id']+'/');
+            $("table.table tr:nth-last-child(2)").show();
+          }
+          $("#questionForm")[0].reset();
+          $("#questionModal").modal('toggle');
+        }
+        return false;
+      },
+      error: function(xhr, ajaxOptions, thrownError){
+        alert(thrownError);
+      },
+    });
+  });
+});
+
+</script>

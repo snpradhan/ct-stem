@@ -553,22 +553,39 @@ def publication(request, slug=''):
     return http.HttpResponseNotFound('<h1>Requested publication not found</h1>')
 
 ####################################
-# ADD NEW QUESTION
+# ADD/EDIT QUESTION
 ####################################
 @login_required
-def add_question(request):
+def question(request, id=''):
   # check if the user has permission to add a question
   if hasattr(request.user, 'administrator') == False:
     return http.HttpResponseNotFound('<h1>You do not have the privilege to add a question</h1>')
+  if '' == id:
+    question = models.Question()
+    title = 'Add Question'
+  else:
+    question = models.Question.objects.get(id=id)
+    title = 'Edit Question'
 
-  if 'POST' == request.method:
+  if 'GET' == request.method:
+    questionForm = forms.QuestionForm(instance=question)
+    context = {'questionForm': questionForm, 'title': title}
+    return render(request, 'ctstem_app/Question.html', context)
+
+  elif 'POST' == request.method:
     data = request.POST.copy()
-    print data
-    question = models.Question(question_text = data['question_text'], answer_field_type=data['answer_field_type'],
-                                        options=data['options'], answer=data['answer'])
-    question.save()
-    response_data = {'question_id': question.id, 'question_text': question.question_text}
-    return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+    questionForm = forms.QuestionForm(data, instance=question)
+    if questionForm.is_valid():
+      question = questionForm.save()
+      response_data = {'question_id': question.id, 'question_text': question.question_text}
+      return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+    else:
+      print questionForm.errors
+      response_data = {'error': 'Required fields are missing'}
+      return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 
-  return http.HttpResponseNotAllowed(['POST'])
+  return http.HttpResponseNotAllowed(['GET', 'POST'])
+
+
+
 
