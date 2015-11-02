@@ -600,6 +600,30 @@ def publication(request, slug=''):
     return http.HttpResponseNotFound('<h1>Requested publication not found</h1>')
 
 ####################################
+# DELETE PUBLICATION
+####################################
+def deletePublication(request, slug=''):
+  try:
+    # check if the user has permission to delete a lesson
+    if hasattr(request.user, 'administrator') == False:
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to delete this publication</h1>')
+    # check if the lesson exists
+    if '' != slug:
+      publication = models.Publication.objects.get(slug=slug)
+    else:
+      raise models.Publication.DoesNotExist
+
+    if request.method == 'GET' or request.method == 'POST':
+
+      publication.delete()
+      messages.success(request, '%s deleted' % publication.title)
+      return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+    return http.HttpResponseNotAllowed(['GET', 'POST'])
+
+  except models.Publication.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested publication not found</h1>')
+####################################
 # ADD/EDIT QUESTION
 ####################################
 @login_required

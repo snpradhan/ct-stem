@@ -9,6 +9,7 @@ urlpatterns = [
     url(r'^assessment/(?P<id>[\d]+)/$', views.assessment, name='assessment'),
     url(r'^assessment/delete/(?P<id>[\d]+)/$', views.deleteAssessment, name='deleteAssessment'),
     url(r'^publication/(?P<slug>[\w-]+)/$', views.publication, name='publication'),
+    url(r'^publication/delete/(?P<slug>[\w-]+)/$', views.deletePublication, name='deletePublication'),
     url(r'^publication/new/$', views.publication, name='newPublication'),
     url(r'^publications/$', views.publications, name='publications'),
     url(r'^lessons/$', views.lessons, name='lessons'),
