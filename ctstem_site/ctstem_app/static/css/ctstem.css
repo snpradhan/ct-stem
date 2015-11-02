@@ -190,6 +190,14 @@ table.table {
 table.table td {
   font-size: smaller;
 }
+
+table.table td.title {
+  font-weight: bold;
+}
+
+table.table td.title div.controls {
+  margin-top: 0.5em;
+}
 /***********   TABLE VIEW END   ************/
 
 
