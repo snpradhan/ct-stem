@@ -124,14 +124,7 @@ div.table {
   background-color: white;
   box-shadow: 10px 10px 10px rgba(204,204,204, 1);
 }
-/***********   CONTENT DIV END   ************/
 
-/***************************************
-            *   TABLE VIEW   *
- ***************************************/
-table.table {
-  margin: auto;
-}
 div.table#register, div.table#userProfile {
   width: 50%;
   padding: 3em 4em;
@@ -169,12 +162,6 @@ div.table.taxonomy h3 {
   text-decoration: underline;
 }
 
-/******************
- * ABOUT US
-*******************/
-div.row.portfolio {
-  text-align: center;
-}
 div.table.portfolio-item {
   width: 16%;
   text-align: center;
@@ -183,7 +170,30 @@ div.table.portfolio-item {
   height: 41%;
 }
 
+/***********   CONTENT DIV END   ************/
+
+/******************
+ * ABOUT US
+*******************/
+div.row.portfolio {
+  text-align: center;
+}
+/***********   ABOUT US END   ************/
+
+/***************************************
+            *   TABLE VIEW   *
+ ***************************************/
+table.table {
+  margin: auto;
+}
+
+table.table td {
+  font-size: smaller;
+}
 /***********   TABLE VIEW END   ************/
+
+
+
 
 /***************************************
             *   FORM GROUP   *

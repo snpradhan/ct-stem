@@ -98,7 +98,7 @@ def assessment(request, id=''):
 ####################################
 # PREVIEW A LESSON
 ####################################
-def assessmentPreview(request, id=''):
+def previewAssessment(request, id=''):
   try:
     # check if the lesson exists
     if '' != id:
@@ -121,6 +121,30 @@ def assessmentPreview(request, id=''):
 
   except models.Lesson.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested lesson not found</h1>')
+
+####################################
+# DELETE AN ASSESSMENT
+####################################
+def deleteAssessment(request, id=''):
+  try:
+    # check if the user has permission to delete a lesson
+    if hasattr(request.user, 'administrator') == False:
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to delete this assessment</h1>')
+    # check if the lesson exists
+    if '' != id:
+      assessment = models.Assessment.objects.get(id=id)
+    else:
+      raise models.Assessment.DoesNotExist
+
+    if request.method == 'GET' or request.method == 'POST':
+      assessment.delete()
+      messages.success(request, '%s deleted' % assessment.title)
+      return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+    return http.HttpResponseNotAllowed(['GET', 'POST'])
+
+  except models.Lesson.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested assessment not found</h1>')
 
 ####################################
 # LESSONS TABLE VIEW
@@ -193,7 +217,7 @@ def lesson(request, id=''):
 ####################################
 # PREVIEW A LESSON
 ####################################
-def lessonPreview(request, id=''):
+def previewLesson(request, id=''):
   try:
     # check if the lesson exists
     if '' != id:
@@ -213,6 +237,29 @@ def lessonPreview(request, id=''):
   except models.Lesson.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested lesson not found</h1>')
 
+####################################
+# DELETE A LESSON
+####################################
+def deleteLesson(request, id=''):
+  try:
+    # check if the user has permission to delete a lesson
+    if hasattr(request.user, 'administrator') == False:
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to delete this lesson</h1>')
+    # check if the lesson exists
+    if '' != id:
+      lesson = models.Lesson.objects.get(id=id)
+    else:
+      raise models.Lesson.DoesNotExist
+
+    if request.method == 'GET' or request.method == 'POST':
+      lesson.delete()
+      messages.success(request, '%s deleted' % lesson.title)
+      return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+    return http.HttpResponseNotAllowed(['GET', 'POST'])
+
+  except models.Lesson.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested lesson not found</h1>')
 ####################################
 # REGISTER
 ####################################
