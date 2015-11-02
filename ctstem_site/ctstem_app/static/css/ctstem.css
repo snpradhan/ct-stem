@@ -210,6 +210,10 @@ div.form-group label{
   font-size: 1.3em;
 }
 
+div.form-group label .required{
+  color: red;
+}
+
 div.content {
   width: 80%;
   margin-left: auto;

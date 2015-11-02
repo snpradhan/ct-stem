@@ -137,7 +137,7 @@ class Assessment (models.Model):
 # An assessment has one or more assessment steps
 class AssessmentStep(models.Model):
   assessment = models.ForeignKey(Assessment, null=False)
-  title = models.CharField(null=True, max_length=256)
+  title = models.CharField(null=False, max_length=256)
   order = models.IntegerField(null=True)
   content = models.TextField(null=False)
   teacher_notes = models.TextField(null=True, blank=True)
@@ -278,7 +278,6 @@ class Publication(models.Model):
   pages = models.CharField(max_length=255, blank=True)
   award = models.CharField(max_length=255, blank=True)
   slug = models.SlugField(unique=True, max_length=255)
-  viewable = models.BooleanField(default=True)
   created = models.DateTimeField(auto_now_add=True)
   local_copy = models.FileField(upload_to=upload_file_to, blank=True)
   web_link = models.URLField(blank=True)

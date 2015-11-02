@@ -12,7 +12,7 @@
         {{form.management_form}}
         {% for field in form %}
           <div class="form-group">
-            <label for="id_{{field.name}}">{{ field.label|title }}</label>
+            <label for="id_{{field.name}}">{{ field.label|title }} {% if field.field.required %}(<span class="required">*</span>){% endif %} </label>
             <div>
               {{field}}
             </div>

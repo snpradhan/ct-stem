@@ -20,7 +20,6 @@
         <thead>
           <tr>
             <th> Title </th>
-            <th> Viewable?</th>
             <th> Year </th>
             <th> Author(s) </th>
             <th> URL </th>
@@ -31,7 +30,6 @@
         <tfoot>
           <tr>
             <th> Title </th>
-            <th> Viewable?</th>
             <th> Year </th>
             <th> Author(s) </th>
             <th> URL </th>
@@ -58,13 +56,6 @@
                     </a>
                   {% endif %}
                 </div>
-              </td>
-              <td>
-                {% if pub.viewable == False %}
-                  <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
-                {% else %}
-                  <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
-                {% endif %}
               </td>
               <td>{{pub.year}}</td>
               <td>{{pub.authors}}</td>
