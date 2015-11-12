@@ -1,64 +1,198 @@
-{% extends "ctstem_app/base.html" %}
+
 {% load ctstem_extras %}
-
-{% block title %}Lesson Preview |{% endblock %}
-
 {% block media %}
-  {{block.super}}
-  <script type="text/javascript">
-    $(document).ready(function() {
-      $('#dataTable3').dataTable({
-        "ajax": '/static/data/warbler_table_data_with_errs.json'
-      });
-    });
-  </script>
+
+  <style type="text/css">
+    @page {
+      size: letter portrait;
+      margin: 1.5cm, 1cm, 1.5cm, 1cm;
+      @frame footer {
+        -pdf-frame-content: footerContent;
+        bottom: 0cm;
+        margin-left: 9cm;
+        margin-right: 9cm;
+        height: 1cm;
+      }
+    }
+
+    div.content {
+      width: 80%;
+      margin-left: auto;
+      margin-right: auto;
+      margin-bottom: 40px;
+    }
+    div.meta {
+      margin-bottom: 1em;
+    }
+    div.label {
+      font-size: 1.1em;
+      font-weight: bold;
+      text-decoration: underline;
+    }
+    div.table#lessonPreview, div.table#lessonQuestions{
+      font-size: 1.4em;
+    }
+
+    div.table#lessonPreview div.lesson-row, div.table#lessonQuestions div.question-row{
+      margin-bottom: 2em;
+    }
+    div.table#lessonQuestions .question_text, div.table#lessonQuestions .answer_field {
+      margin-left: 2em;
+
+    }
+
+    div.table#lessonQuestions .answer_field .note {
+      font-style: italic;
+    }
+
+    div.table#lessonQuestions .answer_field .options .circle {
+      border: 1px solid black;
+      border-radius: 20px;
+      height: 20px;
+      width: 20px;
+    }
+    div#lessonPreview img {
+      width: 200px;
+    }
+    h3 {
+      text-align: center;
+    }
+    div.textarea {
+      width: 90%;
+      height: 100px;
+      border: 2px solid black;
+
+    }
+    div.textfield {
+      width: 90%;
+      height: 20px;
+      border: 1px solid black;
+    }
+    div.multiplechoice .circle {
+      width: 25px;
+      height: 25px;
+    }
+
+    div.input_container {
+      margin-bottom: 15px;
+      vertical-align: middle;
+    }
+
+  </style>
 {% endblock %}
 
 {% block content %}
-  {{block.super}}
+
   <div class="content">
-    <h2>Lesson Preview</h2>
     <form>
-      {% csrf_token %}
       <div class="table" id="lessonPreview">
         {{form.management_form}}
-        <h3>{{form.title.value}}</h3>
+        <h3>{{form.title.value|title}}</h3>
         <hr>
-        <div class="lesson-row">
-          <label>{{form.time.label}}</label>
-          <div>{{form.time.value}}</div>
+        <div class="meta">
+          <div class="label">{{form.time.label}}</div>
+          {{form.time.value}}
         </div>
-        <div class="lesson-row">
-          <label>{{form.level.label}}</label>
+        <div class="meta">
+          <div class="label">{{form.level.label}}</div>
           <div>{{form.level.value}}</div>
         </div>
-        <div class="lesson-row">
-          <label>{{form.purpose.label}}</label>
+        <div class="meta">
+          <div class="label">{{form.purpose.label}}</div>
           <div>{{form.purpose.value}}</div>
         </div>
-        <div class="lesson-row">
-          <label>{{form.overview.label}}</label>
+        <div class="meta">
+          <div class="label">{{form.overview.label}}</div>
           <div>{{form.overview.value}}</div>
         </div>
-        <div class="lesson-row">
-          <label>{{form.ngss_standards.label}}</label>
-          <div>
-            {% for ngss in form|selected_labels:"ngss_standards" %}
-              {{ngss}}
-            {% endfor %}
-          </div>
+        <div class="meta">
+          <div class="label">{{form.ngss_standards.label}}</div>
+          {% for ngss in form|selected_labels:"ngss_standards" %}
+            {{ngss}}
+            <br>
+          {% endfor %}
         </div>
-        <div class="lesson-row">
-          <label>{{form.ct_stem_practices.label}}</label>
-          <div>
-            {% for ct_stem in form|selected_labels:"ct_stem_practices" %}
-              {{ct_stem}}
-            {% endfor %}</div>
+        <div class="meta">
+          <div class="label">{{form.ct_stem_practices.label}}</div>
+          {% for ct_stem in form|selected_labels:"ct_stem_practices" %}
+            {{ct_stem}}
+            <br>
+          {% endfor %}
         </div>
+      </div>
+      <hr>
+      <div class="table">
+        <div>{{form.content.value|format_iframe|safe}}</div>
+      </div>
+
+      <div>
+        <pdf:nextpage />
+      </div>
+
+      <div class="table" id="lessonQuestions">
+
+        <h3> Lesson Activity </h3>
         <hr>
-        <div class="lesson-row">
-          <div>{{form.content.value|safe}}</div>
-        </div>
+        <table>
+          <tr>
+            <td>Name:_________________________</td>
+            <td>Class:_________________</td>
+            <td>Date:__________________</td>
+          </tr>
+        </table>
+
+        {% for activity in formset %}
+          <h3> {{ activity.title.value }} </h3>
+
+          <div> {{activity.content.value|safe}} </div>
+
+          {% for questionForm in activity.nested %}
+            <table>
+              <tr>
+                <td> Q{{forloop.counter}}.</td>
+                <td> {{questionForm.instance.question.question_text|safe }} </td>
+              </tr>
+              <tr class="answer_field">
+                <td></td>
+                <td>
+                  {% with field_type=questionForm.instance.question.answer_field_type %}
+                    {% if field_type == 'TA' %}
+                      <div>
+                      <br><br><br><br><br>
+                      </div>
+
+                    {% elif field_type == 'TF' %}
+                      <div><br><br></div>
+                    {% elif field_type == 'DD' or field_type == 'MC' %}
+                      <div class="multiplechoice">
+                        <div class="note"> Note: Select one answer </div>
+                        {% for option in questionForm.instance.question.options|split:','%}
+                          <div class="input_container">
+                            <img src="https://s3-us-west-1.amazonaws.com/ct-stem/assets/images/Circle.gif" class="circle">&nbsp;&nbsp;{{option}}
+                          </div>
+                        {% endfor %}
+                      </div>
+                    {% elif field_type == 'MS' %}
+                      <div class="multiselect">
+                        <div class="note"> Note: Select all that apply </div>
+                        {% for option in questionForm.instance.question.options|split:','%}
+                          <div class="input_container">
+                            <img src="https://s3-us-west-1.amazonaws.com/ct-stem/assets/images/Square.gif" class="square" style="width:25px;">&nbsp;&nbsp;{{option}}
+                          </div>
+                        {% endfor %}
+                      </div>
+                    {% endif %}
+                  {% endwith %}
+                </td>
+              </tr>
+            </table>
+          {% endfor %}
+
+          <div>
+            <pdf:nextpage />
+          </div>
+
+        {% endfor %}
       </div>
 
     </form>

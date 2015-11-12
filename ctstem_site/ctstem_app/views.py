@@ -10,6 +10,13 @@ from django.forms.models import inlineformset_factory, modelformset_factory
 from nested_formset import nestedformset_factory
 from slugify import slugify
 import json
+from django_xhtml2pdf.utils import render_to_pdf_response
+from django.template.loader import render_to_string, get_template
+from django.template import RequestContext, Context
+import cStringIO as StringIO
+import xhtml2pdf.pisa as pisa
+import os
+from django.conf import settings
 
 ####################################
 # HOME
@@ -70,7 +77,7 @@ def assessment(request, id=''):
                                                     #can_delete=True, can_order=True, extra=0)
       AssessmentStepFormSet = nestedformset_factory(models.Assessment, models.AssessmentStep, form=forms.AssessmentStepForm,
                                                     nested_formset=inlineformset_factory(models.AssessmentStep, models.AssessmentQuestion, form=forms.AssessmentQuestionForm),
-                                                    can_delete=True, can_order=True, extra=0)
+                                                    can_delete=True, can_order=True, extra=1)
       formset = AssessmentStepFormSet(data, instance=assessment, prefix='form')
       print form.is_valid()
       print formset.is_valid()
@@ -79,6 +86,7 @@ def assessment(request, id=''):
         if '' == id:
             savedAssessment.author = request.user
         savedAssessment.modified_by = request.user
+        savedAssessment.slug = slugify(savedAssessment.title)
         savedAssessment.save()
         form.save()
         formset.save()
@@ -172,26 +180,37 @@ def lesson(request, id=''):
 
     if request.method == 'GET':
       form = forms.LessonForm(instance=lesson, prefix='lesson')
-      QuestionFormSet = inlineformset_factory(models.Lesson, models.LessonQuestion, form=forms.LessonQuestionForm, can_order=True, can_delete=True, extra=1)
-      formset = QuestionFormSet(instance=lesson, prefix='question')
+      LessonActivityFormSet = nestedformset_factory(models.Lesson, models.LessonActivity, form=forms.LessonActivityForm,
+                                                    nested_formset=inlineformset_factory(models.LessonActivity, models.LessonQuestion, form=forms.LessonQuestionForm, can_delete=True, can_order=True, extra=1),
+                                                    can_delete=True, can_order=True, extra=1)
+      #QuestionFormSet = inlineformset_factory(models.Lesson, models.LessonQuestion, form=forms.LessonQuestionForm, can_order=True, can_delete=True, extra=1)
+      formset = LessonActivityFormSet(instance=lesson, prefix='form')
       context = {'form': form, 'formset':formset, 'newQuestionForm': newQuestionForm}
       return render(request, 'ctstem_app/Lesson.html', context)
 
     elif request.method == 'POST':
       data = request.POST.copy()
+      print data
       form = forms.LessonForm(data, request.FILES, instance=lesson, prefix="lesson")
-      QuestionFormSet = inlineformset_factory(models.Lesson, models.LessonQuestion, form=forms.LessonQuestionForm, can_order=True, can_delete=True, extra=1)
-      formset = QuestionFormSet(data, instance=lesson, prefix='question')
+      LessonActivityFormSet = nestedformset_factory(models.Lesson, models.LessonActivity, form=forms.LessonActivityForm,
+                                                    nested_formset=inlineformset_factory(models.LessonActivity, models.LessonQuestion, form=forms.LessonQuestionForm, can_delete=True, can_order=True, extra=1),
+                                                    can_delete=True, can_order=True, extra=1)
+      #QuestionFormSet = inlineformset_factory(models.Lesson, models.LessonQuestion, form=forms.LessonQuestionForm, can_order=True, can_delete=True, extra=1)
+      formset = LessonActivityFormSet(data, instance=lesson, prefix='form')
+      print form.is_valid()
+      print formset.is_valid()
       if form.is_valid() and formset.is_valid():
         savedLesson = form.save(commit=False)
         if '' == id:
             savedLesson.author = request.user
         savedLesson.modified_by = request.user
+        savedLesson.slug = slugify(savedLesson.title)
         savedLesson.save()
         form.save()
+        formset.save()
 
         #save the questions
-        questions = formset.save(commit=False)
+        '''questions = formset.save(commit=False)
         #maintain order
         for qform in formset.ordered_forms:
           qform.instance.order = qform.cleaned_data['ORDER']
@@ -199,7 +218,7 @@ def lesson(request, id=''):
           qform.instance.save()
         #remove deleted questions
         for obj in formset.deleted_objects:
-          obj.delete()
+          obj.delete()'''
 
         messages.success(request, "Lesson Saved.")
         return shortcuts.redirect('ctstem:lesson', id=savedLesson.id)
@@ -215,9 +234,9 @@ def lesson(request, id=''):
     return http.HttpResponseNotFound('<h1>Requested lesson not found</h1>')
 
 ####################################
-# PREVIEW A LESSON
+# Lesson PDF
 ####################################
-def previewLesson(request, id=''):
+def previewLesson(request, id='', pdf='0'):
   try:
     # check if the lesson exists
     if '' != id:
@@ -227,10 +246,18 @@ def previewLesson(request, id=''):
 
     if request.method == 'GET':
       form = forms.LessonForm(instance=lesson, prefix='lesson')
-      QuestionFormSet = inlineformset_factory(models.Lesson, models.LessonQuestion, fields=('question', 'order'), extra=1)
-      formset = QuestionFormSet(instance=lesson)
+      LessonActivityFormSet = nestedformset_factory(models.Lesson, models.LessonActivity, form=forms.LessonActivityForm,
+                                                    nested_formset=inlineformset_factory(models.LessonActivity, models.LessonQuestion, form=forms.LessonQuestionForm, can_delete=True, can_order=True, extra=0),
+                                                    can_delete=True, can_order=True, extra=0)
+      #QuestionFormSet = inlineformset_factory(models.Lesson, models.LessonQuestion, form=forms.LessonQuestionForm, can_order=True, can_delete=True, extra=1)
+      formset = LessonActivityFormSet(instance=lesson, prefix='form')
       context = {'form': form, 'formset':formset}
-      return render(request, 'ctstem_app/LessonPreview.html', context)
+
+      #print settings.STATIC_ROOT
+      if pdf == '1':
+        return render_to_pdf_response('ctstem_app/LessonPreview.html', context, u'%s.%s'%(lesson.slug, 'pdf') )
+      else:
+        return render(request, 'ctstem_app/LessonPreview.html', context)
 
     return http.HttpResponseNotAllowed(['GET'])
 

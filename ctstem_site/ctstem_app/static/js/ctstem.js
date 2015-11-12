@@ -1,6 +1,6 @@
 /* clone questions in assessment steps */
 function cloneSomeMore(selector, outerType, innerType) {
-  var parent = $(selector).parent();
+  var parent = $(selector).closest('.form-group');
   var newElement = $(selector).clone(true);
   var total_forms = $(parent).find("input[id*='-TOTAL_FORMS']");
   var total = total_forms.val();

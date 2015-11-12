@@ -13,86 +13,139 @@
 {% block content %}
   {{block.super}}
   <div class="content">
-    <h2>Lesson</h2>
     <form method="post">
       {% csrf_token %}
       <div class="table" id="lesson">
-        {{form.management_form}}
-        {% for field in form %}
-          <div class="form-group">
-            <label for="id_{{field.name}}">{{ field.label }} {% if field.field.required %}(<span class="required">*</span>) {% endif %}</label>
-            {% if field.name == 'questions' %}
-              <div class="clearfix">
-                {{field}}
-              </div>
-            {% elif field.name == 'content' %}
-              <div>
-                {{field}}
-                {% wysiwyg_editor "id_lesson-content" %}
-              </div>
-            {% elif field.name == 'teacher_notes' %}
-              <div>
-                {{field}}
-                {% wysiwyg_editor "id_lesson-teacher_notes" %}
-              </div>
-            {% else %}
-              <div>
-                {{field}}
-              </div>
-            {% endif %}
-            <div class="error">{{ field.errors }}</div>
+        <h3> Lesson Plan </h3>
+        <div class="controls">
+          <div class="expand_collapse">
+            <span class="glyphicon glyphicon-collapse-up" aria-hidden="true"></span>
+            <span class="glyphicon glyphicon-collapse-down" aria-hidden="true" style="display:none;"></span>
           </div>
-        {% endfor %}
+        </div>
+        <div class="lesson_content">
+          {{form.management_form}}
+          {% for field in form %}
+            <div class="form-group">
+              <label for="id_{{field.name}}">{{ field.label }} {% if field.field.required %}(<span class="required">*</span>) {% endif %}</label>
+              {% if field.name == 'questions' %}
+                <div class="clearfix">
+                  {{field}}
+                </div>
+              {% elif field.name == 'content' %}
+                <div>
+                  {{field}}
+                  {% wysiwyg_editor "id_lesson-content" %}
+                </div>
+              {% elif field.name == 'teacher_notes' %}
+                <div>
+                  {{field}}
+                  {% wysiwyg_editor "id_lesson-teacher_notes" %}
+                </div>
+              {% else %}
+                <div>
+                  {{field}}
+                </div>
+              {% endif %}
+              <div class="error">{{ field.errors }}</div>
+            </div>
+          {% endfor %}
+        </div>
       </div>
 
-      <div class="table" id="lessonQuestions">
-        <h3>Activity Questions</h3>
-        {{formset.management_form}}
-        <table class="table table-striped table-condensed lessonQuestion">
-          <thead>
-            <tr>
-              <th></th>
-              <th style="width:60%;">Question</th>
-              <th>Edit</th>
-              <th>Order</th>
-              <th>Delete</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for questionForm in formset %}
-              <tr style="{% if forloop.last %} display:none; {% endif %}" id="question_row_{{questionForm.question.value}}">
-                <td class="question_order">
-                  {{form.id}}
-                  {{questionForm.id}}
-                  <div>
-                    Q{{questionForm.ORDER.value}}.
-                  </div>
-                </td>
-                <td class="question_text">
-                  {% if questionForm.question.value and questionForm.question.value != 'None' %}
-                    <input type="hidden" class="question_id" id="{{questionForm.question.auto_id}}" name="{{questionForm.question.html_name}}" value="{{questionForm.question.value}}"/>
-                    <div> {{questionForm.question.value|selected_question|safe }} </div>
+      {{formset.management_form}}
+      {% for activity in formset %}
+        <div class="table activity">
+          <h4> Lesson Activity </h4>
+          <div class="controls">
+            <div class="expand_collapse">
+              <span class="glyphicon glyphicon-collapse-up" aria-hidden="true"></span>
+              <span class="glyphicon glyphicon-collapse-down" aria-hidden="true" style="display:none;"></span>
+            </div>
+          </div>
+          {{ activity.management_form }}
+          {{activity.id}}
+          <div class="form-group">
+            <label for="id_{{activity.title.name}}">{{ activity.title.label }} {% if activity.title.field.required %}(<span class="required">*</span>) {% endif %}</label>
+            <div>{{activity.title}}</div>
+            <div class="error">{{ activity.title.errors }}</div>
+          </div>
+          <div class="lesson_content">
+            <div class="form-group">
+              <label for="id_{{activity.content.name}}">{{ activity.content.label }} {% if activity.content.field.required %}(<span class="required">*</span>) {% endif %}</label>
+              <div>
+                {{activity.content}}
+                {% wysiwyg_editor activity.content.auto_id %}
+              </div>
+              <div class="error">{{ activity.content.errors }}</div>
+            </div>
 
-                  {% else %}
-                    <input type="hidden" class="question_id" id="{{questionForm.question.auto_id}}" name="{{questionForm.question.html_name}}" value/>
-                  {% endif %}
-                </td>
-                <td>
-                  <button type="button" class="btn btn-default edit_question" name="edit_question" aria-label="Edit Question" data-form="{% url 'ctstem:question' questionForm.question.value|default:0 %}">
-                    <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
-                  </button>
-                </td>
-                <td>{{questionForm.ORDER }}</td>
-                <td>{{questionForm.DELETE }}</td>
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
+            <div class="form-group question_table">
+              {{activity.nested.management_form}}
+              {{activity.nested.id}}
+              <label for="id_question_table">Activity Question(s)</label>
+              <button class="btn btn-primary edit_question" name="add_question" data-form="{% url 'ctstem:newQuestion' %}">
+                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+              </button>
+              <table class="table table-striped table-condensed lessonQuestion">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th style="width:60%;"></th>
+                    <th></th>
+                    <th>Order</th>
+                    <th>Delete</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for questionForm in activity.nested %}
+                    <tr style="{% if forloop.last %} display:none; {% endif %}" id="question_row_{{questionForm.question.value}}">
+                      <td class="question_order">
+                        {{questionForm.id}}
+                        <div>
+                          Q{{questionForm.ORDER.value}}.
+                        </div>
+                      </td>
+                      <td class="question_text">
+                        {% if questionForm.question.value and questionForm.question.value != 'None' %}
+                          <input type="hidden" class="question_id" id="{{questionForm.question.auto_id}}" name="{{questionForm.question.html_name}}" value="{{questionForm.question.value}}"/>
+                          <div> {{questionForm.question.value|selected_question|safe }} </div>
+
+                        {% else %}
+                          <input type="hidden" class="question_id" id="{{questionForm.question.auto_id}}" name="{{questionForm.question.html_name}}" value/>
+                        {% endif %}
+                      </td>
+                      <td>
+                        <button type="button" class="btn btn-success edit_question" name="edit_question" aria-label="Edit Question" data-form="{% url 'ctstem:question' questionForm.question.value|default:0 %}" >
+                          <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+                        </button>
+                      </td>
+                      <td>{{questionForm.ORDER }}</td>
+                      <td>{{questionForm.DELETE }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+
+            </div>
+            <div class="form-group">
+              <label for="id_{{activity.ORDER.name}}">{{ activity.ORDER.label }}</label>
+              <div>{{activity.ORDER}}</div>
+              <div class="error">{{ activity.ORDER.errors }}</div>
+            </div>
+            <div class="form-group">
+              <label for="id_{{activity.DELETE.name}}">{{ activity.DELETE.label }}</label>
+              <div>{{activity.DELETE}}</div>
+              <div class="error">{{ activity.DELETE.errors }}</div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
 
       <div class="form-group button-group-fixed">
           <input type="submit" class="btn btn-success" id="submit" value="Save"/>
-          <button class="btn btn-primary edit_question" data-form="{% url 'ctstem:newQuestion' %}">Add Question</button>
+          <input type="button" class="btn btn-primary" id="addActivity" value="Add Activity"/>
+
         </div>
     </form>
     <div class="modal fade" id="questionModal" role="dialog">
@@ -103,10 +156,43 @@
       $("button.edit_question").click(function(e){
         e.preventDefault();
         var url = $(this).data("form");
+        var activity_div = $(this).closest('.activity');
+        var activity_id = $(activity_div).children(':hidden').first().attr('id');
         $("#questionModal").load(url, function() {
           $(this).modal('show');
+          $("#questionModal input[id='id_activity']").val(activity_id);
         });
+
         return false;
+      });
+
+      $('#addActivity').click(function() {
+        cloneMore('div.table:last', 'form');
+        //alert('after clone');
+        bindWysiwyg();
+        //rebind question clone
+      });
+
+      $('.addQuestion').click(function() {
+        //alert('clicked');
+        cloneSomeMore($(this).prev(), 'form', 'lessonquestion_set');
+      });
+
+      function bindWysiwyg(){
+        //alert($(step).attr('class'));
+        $('div.table:last').find('textarea').each(function(){
+          var id = $(this).attr('id');
+          var editor = $(this).attr('id')+'_editor';
+          var config = null;
+          django_wysiwyg.enable(editor, id, config);
+          $(this).next().show();
+        });
+      }
+      $(".expand_collapse").click(function(){
+        $(this).parent().siblings('.lesson_content').toggle();
+        $(this).children().each(function(){
+          $(this).toggle();
+        })
       });
     });
   </script>

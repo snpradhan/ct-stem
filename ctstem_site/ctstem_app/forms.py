@@ -202,33 +202,24 @@ class LessonForm(ModelForm):
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['placeholder'] = field.help_text
 
-  '''def save(self, commit=True):
-    instance = forms.ModelForm.save(self, False)
-    old_save_m2m = self.save_m2m
+####################################
+# Lesson Activity Form
+####################################
+class LessonActivityForm(ModelForm):
 
-    def save_m2m():
-      old_save_m2m()
-      old_questions = models.LessonQuestion.objects.filter(lesson=instance)
-      for old_question in old_questions:
-        changed = True
-        for curr_question in self.cleaned_data['questions']:
-          if old_question.question == curr_question:
-            changed = False
-        if changed:
-          old_question.delete()
+  class Meta:
+    model = models.LessonActivity
+    exclude = ('order',)
+    widgets = {
+      'title': forms.TextInput(attrs={'placeholder': 'Activity Title'}),
+      'content': forms.Textarea(attrs={'rows':0, 'cols':60}),
+    }
 
-      for question in self.cleaned_data['questions']:
-        try:
-          models.LessonQuestion.objects.get(lesson=instance, question=question)
-        except models.LessonQuestion.DoesNotExist:
-          q = models.LessonQuestion(lesson=instance, question=question)
-          q.save()
-
-    self.save_m2m = save_m2m
-    if commit:
-      instance.save()
-      self.save_m2m()
-    return instance'''
+  def __init__(self, *args, **kwargs):
+    super(LessonActivityForm, self).__init__(*args, **kwargs)
+    for field_name, field in self.fields.items():
+      field.widget.attrs['class'] = 'form-control'
+      field.widget.attrs['placeholder'] = field.help_text
 
 ####################################
 # Lesson Question Form
@@ -306,34 +297,7 @@ class AssessmentStepForm(ModelForm):
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['placeholder'] = field.help_text
 
-  '''def save(self, commit=True):
-    instance = forms.ModelForm.save(self, False)
-    old_save_m2m = self.save_m2m
 
-    def save_m2m():
-
-      old_save_m2m()
-      old_questions = models.AssessmentQuestion.objects.filter(assessment_step=instance)
-      for old_question in old_questions:
-        changed = True
-        for curr_question in self.cleaned_data['assessmentquestion_set']:
-          if old_question.question == curr_question:
-            changed = False
-        if changed:
-          old_question.delete()
-
-      for question in self.cleaned_data['assessmentquestion_set']:
-        try:
-          models.AssessmentQuestion.objects.get(assessment_step=instance, question=question)
-        except models.AssessmentQuestion.DoesNotExist:
-          q = models.AssessmentQuestion(assessment_step=instance, question=question)
-          q.save()
-
-    self.save_m2m = save_m2m
-    if commit:
-      instance.save()
-      self.save_m2m()
-    return instance'''
 
 class AssessmentQuestionForm(ModelForm):
 

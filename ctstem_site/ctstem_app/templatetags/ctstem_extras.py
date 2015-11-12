@@ -36,3 +36,11 @@ def listsort(value):
     return value
 listsort.is_safe = True
 
+@register.filter(name='split')
+def split(value, arg):
+    return value.split(arg)
+
+
+@register.filter
+def format_iframe(html_string):
+    return html_string.replace('<iframe', '<tr><td id="lessonContent"><p><iframe').replace('</iframe>', '</iframe></p></td></tr>')

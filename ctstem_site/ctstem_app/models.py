@@ -95,8 +95,9 @@ class Lesson (models.Model):
   subject = models.ManyToManyField('Subject', null=False)
   parent = models.ForeignKey('self', null=True, on_delete=models.SET_NULL)
   version = models.IntegerField(default=1)
+  slug = models.SlugField(unique=True, max_length=255)
   #image = models.ImageField(upload_to=upload_image_to, null=True, blank=True)
-  questions = models.ManyToManyField('Question', through='LessonQuestion', blank=True)
+  #questions = models.ManyToManyField('Question', through='LessonQuestion', blank=True)
   ngss_standards = models.ManyToManyField('NGSSStandard')
   ct_stem_practices = models.ManyToManyField('CTStemPractice')
   author = models.ForeignKey(User, null=False, related_name='lesson_author')
@@ -110,6 +111,15 @@ class Lesson (models.Model):
   def __unicode__(self):
       return u'%s' % (self.title)
 
+# Lesson Activity model
+# A lesson may have one or more activity
+class LessonActivity(models.Model):
+  lesson = models.ForeignKey(Lesson, null=False)
+  title = models.CharField(null=False, blank=False, max_length=256)
+  order = models.IntegerField(null=True)
+  content = models.TextField(null=False)
+  questions = models.ManyToManyField('Question', through='LessonQuestion', blank=True)
+
 # Assessment model
 class Assessment (models.Model):
   title = models.CharField(null=False, max_length=256, unique=True)
@@ -119,6 +129,7 @@ class Assessment (models.Model):
   subject = models.ManyToManyField('Subject', null=False)
   parent = models.ForeignKey('self', null=True, on_delete=models.SET_NULL)
   version = models.IntegerField(default=1)
+  slug = models.SlugField(unique=True, max_length=255)
   #image = models.ImageField(upload_to=upload_image_to, null=True, blank=True)
   ngss_standards = models.ManyToManyField('NGSSStandard')
   ct_stem_practices = models.ManyToManyField('CTStemPractice')
@@ -157,7 +168,7 @@ class Question(models.Model):
 # A relation between Lesson and Question models
 class LessonQuestion(models.Model):
   question = models.ForeignKey(Question)
-  lesson = models.ForeignKey(Lesson)
+  lesson_activity = models.ForeignKey(LessonActivity, null=True)
   order = models.IntegerField(null=True)
 
   def __unicode__(self):

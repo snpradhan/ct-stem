@@ -24,7 +24,7 @@ urlpatterns = [
     url(r'^user/(?P<id>[\d]+)/$', views.userProfile, name='userProfile'),
     url(r'^lesson/(?P<id>[\d]+)/$', views.lesson, name='lesson'),
     url(r'^lesson/new/$', views.lesson, name='newLesson'),
-    url(r'^lesson/preview/(?P<id>[\d]+)/$', views.previewLesson, name='previewLesson'),
+    url(r'^lesson/preview/(?P<id>[\d]+)/(?P<pdf>[\d]+)$', views.previewLesson, name='previewLesson'),
     url(r'^lesson/delete/(?P<id>[\d]+)/$', views.deleteLesson, name='deleteLesson'),
     url(r'^assessment/preview/(?P<id>[\d]+)/$', views.previewAssessment, name='previewAssessment'),
     url(r'^taxonomy/$', views.taxonomy, name='taxonomy'),
@@ -33,6 +33,5 @@ urlpatterns = [
     url(r'^users/(?P<role>[a-zA-Z0-9]+)/$', views.users, name='users'),
     url(r'^question/new/$', views.question, name='newQuestion'),
     url(r'^question/(?P<id>[\d]+)/$', views.question, name='question'),
-
 
 ]

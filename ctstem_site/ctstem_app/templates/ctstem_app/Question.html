@@ -13,6 +13,7 @@
     <form class="form" id="questionForm" method="post" action="{% if questionForm.instance.id %} {% url 'ctstem:question' questionForm.instance.id %} {% else %} {% url 'ctstem:newQuestion' %} {% endif %}">
       {% csrf_token %}
       <input id="id_question" type="hidden" value="{{questionForm.instance.id}}"/>
+      <input id="id_activity" type="hidden" value=""/>
       <div class="modal-body">
         {% for field in questionForm %}
           <div class="form-group">
@@ -54,6 +55,8 @@ $(function (){
     data['csrfmiddlewaretoken'] = $('#questionForm').find('input:hidden').eq(0).val();
     var data = $.param(data);
     var question_id = $("#id_question").val();
+    var id_activity = $("#questionForm input[id='id_activity']").val();
+
     /*var url = "{% url 'ctstem:newQuestion' %}";*/
     $.ajax({
       type: $(this).attr('method'),
@@ -65,18 +68,22 @@ $(function (){
           $('#questionMsg').html(data['error']);
         }
         else {
+          var activity_div = $("input[id="+id_activity+"]").parent();
+          var question_table = $(activity_div).find("table.table");
+
           if(question_id != 'None'){
-            $("table.table tr#question_row_"+question_id+" td.question_text div").html(data['question_text']);
+            $(question_table).find("tr#question_row_"+question_id+" td.question_text div").html(data['question_text']);
           }
           else {
-            cloneMore('table.table tr:last', 'question');
-            var question_order = $("table.table > tbody > tr").length;
-            $("table.table tr:nth-last-child(2) td.question_order div").html("Q"+(question_order-1)+".");
-            $("table.table tr:nth-last-child(2)").attr('id', 'question_row_'+data['question_id']);
-            $("table.table tr:nth-last-child(2) input.question_id").val(data['question_id']);
-            $("table.table tr:nth-last-child(2) input.question_id").after(data['question_text'])
-            $("table.table tr:nth-last-child(2) button.edit_question").attr("data-form", '/question/'+data['question_id']+'/');
-            $("table.table tr:nth-last-child(2)").show();
+            //cloneMore($(question_table).find('tr:last'), 'form');
+            cloneSomeMore($(question_table).find('tr:last'), 'form', 'lessonquestion_set');
+            var question_order = $(question_table).find("tbody > tr").length;
+            $(question_table).find("tr:nth-last-child(2) td.question_order div").html("Q"+(question_order-1)+".");
+            $(question_table).find("tr:nth-last-child(2)").attr('id', 'question_row_'+data['question_id']);
+            $(question_table).find("tr:nth-last-child(2) input.question_id").val(data['question_id']);
+            $(question_table).find("tr:nth-last-child(2) input.question_id").after(data['question_text'])
+            $(question_table).find("tr:nth-last-child(2) button.edit_question").attr("data-form", '/question/'+data['question_id']+'/');
+            $(question_table).find("tr:nth-last-child(2)").show();
           }
           $("#questionForm")[0].reset();
           $("#questionModal").modal('toggle');
