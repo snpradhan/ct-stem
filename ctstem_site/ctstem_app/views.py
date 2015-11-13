@@ -17,6 +17,7 @@ import cStringIO as StringIO
 import xhtml2pdf.pisa as pisa
 import os
 from django.conf import settings
+import datetime
 
 ####################################
 # HOME
@@ -71,7 +72,6 @@ def assessment(request, id=''):
 
     elif request.method == 'POST':
       data = request.POST.copy()
-      print data
       form = forms.AssessmentForm(data, request.FILES, instance=assessment, prefix="assessment")
       #AssessmentStepFormSet = inlineformset_factory(models.Assessment, models.AssessmentStep, form=forms.AssessmentStepForm,
                                                     #can_delete=True, can_order=True, extra=0)
@@ -190,7 +190,6 @@ def lesson(request, id=''):
 
     elif request.method == 'POST':
       data = request.POST.copy()
-      print data
       form = forms.LessonForm(data, request.FILES, instance=lesson, prefix="lesson")
       LessonActivityFormSet = nestedformset_factory(models.Lesson, models.LessonActivity, form=forms.LessonActivityForm,
                                                     nested_formset=inlineformset_factory(models.LessonActivity, models.LessonQuestion, form=forms.LessonQuestionForm, can_delete=True, can_order=True, extra=1),
@@ -207,7 +206,20 @@ def lesson(request, id=''):
         savedLesson.slug = slugify(savedLesson.title)
         savedLesson.save()
         form.save()
-        formset.save()
+        formset.save(commit=False)
+        for aform in formset.ordered_forms:
+          aform.instance.order = aform.cleaned_data['ORDER']
+          aform.instance.lesson = savedLesson
+          aform.instance.save()
+          for qform in aform.nested.ordered_forms:
+            qform.instance.order = qform.cleaned_data['ORDER']
+            qform.instance.lesson_activity = aform.instance
+            qform.instance.save()
+          for obj in aform.nested.deleted_objects:
+            obj.delete()
+        #remove deleted questions
+        for obj in formset.deleted_objects:
+          obj.delete()
 
         #save the questions
         '''questions = formset.save(commit=False)
@@ -229,6 +241,70 @@ def lesson(request, id=''):
         return render(request, 'ctstem_app/Lesson.html', context)
 
     return http.HttpResponseNotAllowed(['GET', 'POST'])
+
+  except models.Lesson.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested lesson not found</h1>')
+
+####################################
+# Lesson Copy
+####################################
+def copyLesson(request, id=''):
+  try:
+    # check if the user has permission to create or modify a lesson
+    if hasattr(request.user, 'administrator') == False:
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to modify this lesson</h1>')
+    # check if the lesson exists
+    else:
+      if request.method == 'GET' or request.method == 'POST':
+        if '' != id:
+          lesson = models.Lesson.objects.get(id=id)
+          lessonActivities = models.LessonActivity.objects.all().filter(lesson=lesson)
+          title = lesson.title
+          lesson.title = str(datetime.datetime.now())
+          lesson.slug = slugify(lesson.title)
+          lesson.pk = None
+          lesson.id = None
+          lesson.save()
+
+          original_lesson = models.Lesson.objects.get(id=id)
+          lesson.title = title + '-' + str(lesson.id)
+          lesson.slug = slugify(lesson.title)
+          lesson.author = request.user
+          lesson.modified_by = request.user
+          lesson.created_date = datetime.datetime.now()
+          lesson.modified_date = datetime.datetime.now()
+          lesson.parent = original_lesson
+          lesson.status = 'D'
+          lesson.version = int(original_lesson.version) + 1
+          lesson.subject = original_lesson.subject.all()
+          lesson.ngss_standards = original_lesson.ngss_standards.all()
+          lesson.ct_stem_practices = original_lesson.ct_stem_practices.all()
+          lesson.save()
+
+          for activity in lessonActivities:
+              activity_questions = models.LessonQuestion.objects.all().filter(lesson_activity=activity)
+              activity.pk = None
+              activity.id = None
+              activity.lesson = lesson
+              activity.save()
+              for activity_question in activity_questions:
+                  question = activity_question.question
+                  question.id = None
+                  question.pk = None
+                  question.save()
+
+                  activity_question.id = None
+                  activity_question.pk = None
+                  activity_question.question = question
+                  activity_question.lesson_activity = activity
+                  activity_question.save()
+
+          #archive the original lesson
+          original_lesson.status = 'A'
+          original_lesson.save()
+          messages.success(request, "A new version for %s created." % original_lesson.title)
+          return shortcuts.redirect('ctstem:lessons')
+      return http.HttpResponseNotAllowed(['GET', 'POST'])
 
   except models.Lesson.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested lesson not found</h1>')

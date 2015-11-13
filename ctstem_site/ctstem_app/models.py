@@ -6,6 +6,7 @@ from slugify import slugify
 LESSON_STATUS_CHOICES = (
     (u'D', u'Draft'),
     (u'P', u'Published'),
+    (u'A', u'Archived'),
 )
 
 FIELD_TYPE_CHOICES = (

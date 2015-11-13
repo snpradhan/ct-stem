@@ -26,6 +26,7 @@ urlpatterns = [
     url(r'^lesson/new/$', views.lesson, name='newLesson'),
     url(r'^lesson/preview/(?P<id>[\d]+)/(?P<pdf>[\d]+)$', views.previewLesson, name='previewLesson'),
     url(r'^lesson/delete/(?P<id>[\d]+)/$', views.deleteLesson, name='deleteLesson'),
+    url(r'^lesson/copy/(?P<id>[\d]+)/$', views.copyLesson, name='copyLesson'),
     url(r'^assessment/preview/(?P<id>[\d]+)/$', views.previewAssessment, name='previewAssessment'),
     url(r'^taxonomy/$', views.taxonomy, name='taxonomy'),
     url(r'^taxonomy/ngss_standard/$', views.ngss_standard, name='ngss_standard'),
