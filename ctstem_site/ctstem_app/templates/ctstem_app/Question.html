@@ -14,6 +14,7 @@
       {% csrf_token %}
       <input id="id_question" type="hidden" value="{{questionForm.instance.id}}"/>
       <input id="id_activity" type="hidden" value=""/>
+      <input id="id_step" type="hidden" value=""/>
       <div class="modal-body">
         {% for field in questionForm %}
           <div class="form-group">
@@ -56,6 +57,7 @@ $(function (){
     var data = $.param(data);
     var question_id = $("#id_question").val();
     var id_activity = $("#questionForm input[id='id_activity']").val();
+    var id_step = $("#questionForm input[id='id_step']").val();
 
     /*var url = "{% url 'ctstem:newQuestion' %}";*/
     $.ajax({
@@ -68,15 +70,26 @@ $(function (){
           $('#questionMsg').html(data['error']);
         }
         else {
-          var activity_div = $("input[id="+id_activity+"]").parent();
-          var question_table = $(activity_div).find("table.table");
+          if(id_activity !== ""){
+            var formset_div = $("input[id="+id_activity+"]").parent();
+          }
+          else{
+            var formset_div = $("input[id="+id_step+"]").parent();
+          }
+          var question_table = $(formset_div).find("table.table");
 
           if(question_id != 'None'){
             $(question_table).find("tr#question_row_"+question_id+" td.question_text div").html(data['question_text']);
           }
           else {
             //cloneMore($(question_table).find('tr:last'), 'form');
-            cloneSomeMore($(question_table).find('tr:last'), 'form', 'lessonquestion_set');
+            if(id_activity !== ""){
+              cloneSomeMore($(question_table).find('tr:last'), 'form', 'lessonquestion_set');
+            }
+            else{
+              cloneSomeMore($(question_table).find('tr:last'), 'form', 'assessmentquestion_set');
+            }
+
             var question_order = $(question_table).find("tbody > tr").length;
             $(question_table).find("tr:nth-last-child(2) td.question_order div").html("Q"+(question_order-1)+".");
             $(question_table).find("tr:nth-last-child(2)").attr('id', 'question_row_'+data['question_id']);

@@ -126,7 +126,6 @@
                   {% endfor %}
                 </tbody>
               </table>
-
             </div>
             <div class="form-group">
               <label for="id_{{activity.ORDER.name}}">{{ activity.ORDER.label }}</label>
@@ -171,11 +170,6 @@
         //alert('after clone');
         bindWysiwyg();
         //rebind question clone
-      });
-
-      $('.addQuestion').click(function() {
-        //alert('clicked');
-        cloneSomeMore($(this).prev(), 'form', 'lessonquestion_set');
       });
 
       function bindWysiwyg(){
