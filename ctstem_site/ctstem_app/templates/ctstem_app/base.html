@@ -55,25 +55,11 @@
 
   <body>
     {% block header %}
-      <div id="header">
-        <div class="innerWrap">
-          <div id="logo">
-            <a href="http://ct-stem.northwestern.edu/">
-              <img class="logo" src="/static/img/logo.png" alt="logo" width="191" height="115">
-            </a>
-          </div>
-          <div id="banner">
-            <h2 id="title">
-              <a href="http://ct-stem.northwestern.edu/">
-                Computational Thinking in STEM
-              </a>
-            </h2>
-          </div>
-        </div>
-      </div>
-
       <nav class="navbar navbar-default navbar-static-top">
         <div class="container-fluid">
+          <div class="navbar-header">
+            <a class="navbar-brand" href="/">CT-STEM</a>
+          </div>
           <!-- Collect the nav links, forms, and other content for toggling -->
           <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav navbar-center">
@@ -193,19 +179,21 @@
     {% endblock %}
 
     {% block footer %}
-      <div id="Footer">
-        <div class="innerWrap">
-          <p></p>
-          <div class="captionImage left" style="width: 100px;">
-            <img class="left" src="/static/img/NSFLogo.png" alt="NSF Logo" title="NSF Logo" width="100" height="100">
-          </div>
-          This work is supported in part National Science Foundation under NSF grant CNS-1138461. However, any opinions, findings, conclusions, and/or recommendations are those of the investigators and do not necessarily reflect the views of&nbsp; the Foundation.
-          <p>&nbsp;</p>
+      <div id="footer" class="row">
+        <div class="col-md-3">
+          <img src="/static/img/logo.png" alt="Northwestern Logo" title="Northwestern Logo">
         </div>
-        <div id="Copyright">
-          <div class="innerWrap">
+        <div class="col-md-6">
+          <div>
+            <p>This work is supported in part National Science Foundation under NSF grant CNS-1138461. However, any opinions, findings, conclusions, and/or recommendations are those of the investigators and do not necessarily reflect the views of&nbsp; the Foundation.
+             </p>
+          </div>
+          <div>
             <p style="text-align:center">Copyright © 2015 Northwestern University</p>
           </div>
+        </div>
+        <div class="col-md-3">
+          <img src="/static/img/NSFLogo.png" alt="NSF Logo" title="NSF Logo">
         </div>
       </div>
     {% endblock %}
