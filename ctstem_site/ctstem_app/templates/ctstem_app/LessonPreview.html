@@ -6,88 +6,85 @@
     @page {
       size: letter portrait;
       margin: 1.5cm, 1cm, 1.5cm, 1cm;
+      -pdf-line-spacing: 1em;
       @frame footer {
         -pdf-frame-content: footerContent;
         bottom: 0cm;
-        margin-left: 9cm;
-        margin-right: 9cm;
+        margin-left: 10cm;
+        margin-right: 10cm;
         height: 1cm;
       }
     }
+    @font-face {
+     font-family: Helvetica;
+    }
 
-    div.content {
+    div#content {
       width: 80%;
       margin-left: auto;
       margin-right: auto;
       margin-bottom: 40px;
+      font-size: 1em;
     }
-    div.meta {
+    div.table#lessonMeta {
+      font-size: 1.2em;
+    }
+    div.table#lessonMeta div.meta {
       margin-bottom: 1em;
     }
-    div.label {
-      font-size: 1.1em;
-      font-weight: bold;
+    div.table#lessonMeta div.meta div.label {
+      font-weight: 700;
       text-decoration: underline;
     }
-    div.table#lessonPreview, div.table#lessonQuestions{
-      font-size: 1.4em;
+    div.table#lessonContent {
+      font-size: 1.2em;
+    }
+    div.table#lessonContent img {
+      width: 200px;
+    }
+    div.table#lessonActivity {
+      font-size: 1.2em;
+    }
+    div.table#lessonActivity table.student_info {
+      font-weight: 700;
+      width: 100%;
+    }
+    div.table#lessonActivity table.activity_question_table {
+      font-size: 1em;
     }
 
-    div.table#lessonPreview div.lesson-row, div.table#lessonQuestions div.question-row{
-      margin-bottom: 2em;
+    div.table#lessonActivity table.activity_question_table .activity_question_no{
+      font-weight: 700;
     }
-    div.table#lessonQuestions .question_text, div.table#lessonQuestions .answer_field {
-      margin-left: 2em;
-
+    div.table#lessonActivity h3.activity_title {
+      text-decoration: underline;
     }
-
-    div.table#lessonQuestions .answer_field .note {
+    div.table#lessonActivity .note {
       font-style: italic;
     }
-
-    div.table#lessonQuestions .answer_field .options .circle {
+    div.table#lessonActivity div.activity_answer_field  div.input_container {
+      margin-bottom: 15px;
+      vertical-align: middle;
+    }
+    div.table#lessonActivity .activity_answer_field .input_container .circle {
       border: 1px solid black;
       border-radius: 20px;
       height: 20px;
       width: 20px;
     }
-    div#lessonPreview img {
-      width: 200px;
-    }
-    h3 {
+    h2, h3 {
       text-align: center;
     }
-    div.textarea {
-      width: 90%;
-      height: 100px;
-      border: 2px solid black;
-
-    }
-    div.textfield {
-      width: 90%;
-      height: 20px;
-      border: 1px solid black;
-    }
-    div.multiplechoice .circle {
-      width: 25px;
-      height: 25px;
-    }
-
-    div.input_container {
-      margin-bottom: 15px;
-      vertical-align: middle;
-    }
-
   </style>
 {% endblock %}
 
 {% block content %}
 
-  <div class="content">
+  <div id="content" style="font-size: 1em;">
     <form>
-      <div class="table" id="lessonPreview">
+      <div class="table" id="lessonMeta">
         {{form.management_form}}
-        <h3>{{form.title.value|title}}</h3>
+        <h2>{{form.title.value|title}}</h2>
         <hr>
         <div class="meta">
           <div class="label">{{form.time.label}}</div>
@@ -120,49 +117,48 @@
           {% endfor %}
         </div>
       </div>
+
       <hr>
-      <div class="table">
+
+      <div class="table" id="lessonContent">
         <div>{{form.content.value|format_iframe|safe}}</div>
       </div>
 
+      <hr>
       <div>
         <pdf:nextpage />
       </div>
 
-      <div class="table" id="lessonQuestions">
+      <div class="table" id="lessonActivity">
 
         <h3> Lesson Activity </h3>
-        <hr>
-        <table>
+        <table class="student_info">
           <tr>
-            <td>Name:_________________________</td>
-            <td>Class:_________________</td>
-            <td>Date:__________________</td>
+            <td width="40%">Name:_________________________</td>
+            <td width="30%">Class:_________________</td>
+            <td width="30%">Date:__________________</td>
           </tr>
         </table>
 
         {% for activity in formset %}
-          <h3> {{ activity.title.value }} </h3>
+          <h3 class="activity_title"> {{ activity.title.value }} </h3>
 
-          <div> {{activity.content.value|safe}} </div>
+          <div class="activity_content"> {{activity.content.value|safe}} </div>
 
-          {% for questionForm in activity.nested %}
-            <table>
+          <table class="activity_question_table">
+            {% for questionForm in activity.nested %}
               <tr>
-                <td> Q{{forloop.counter}}.</td>
-                <td> {{questionForm.instance.question.question_text|safe }} </td>
+                <td width="5%" style="vertical-align: top;" class="activity_question_no"> Q{{forloop.counter}}.</td>
+                <td class="activity_question_text"> {{questionForm.instance.question.question_text|safe }} </td>
               </tr>
-              <tr class="answer_field">
+              <tr>
                 <td></td>
-                <td>
+                <td class="activity_answer_field">
                   {% with field_type=questionForm.instance.question.answer_field_type %}
                     {% if field_type == 'TA' %}
-                      <div>
-                      <br><br><br><br><br>
-                      </div>
-
+                      <br><br><br><br><br><br><br><br><br><br>
                     {% elif field_type == 'TF' %}
-                      <div><br><br></div>
+                      <br><br><br><br><br>
                     {% elif field_type == 'DD' or field_type == 'MC' %}
                       <div class="multiplechoice">
                         <div class="note"> Note: Select one answer </div>
@@ -185,9 +181,8 @@
                   {% endwith %}
                 </td>
               </tr>
-            </table>
-          {% endfor %}
-
+            {% endfor %}
+          </table>
           <div>
             <pdf:nextpage />
           </div>
@@ -197,6 +192,10 @@
 
     </form>
   </div>
-
+  <div id="footerContent">
+    {%block page_foot%}
+        <pdf:pagenumber>
+    {%endblock%}
+  </div>
 {% endblock %}
 
