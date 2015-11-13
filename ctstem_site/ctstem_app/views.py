@@ -119,8 +119,8 @@ def previewAssessment(request, id=''):
       #AssessmentStepFormSet = inlineformset_factory(models.Assessment, models.AssessmentStep, form=forms.AssessmentStepForm,can_delete=True, can_order=True, extra=1)
 
       AssessmentStepFormSet = nestedformset_factory(models.Assessment, models.AssessmentStep, form=forms.AssessmentStepForm,
-                                                    nested_formset=inlineformset_factory(models.AssessmentStep, models.AssessmentQuestion, form=forms.AssessmentQuestionForm, can_delete=True, can_order=True, extra=1),
-                                                    can_delete=True, can_order=True, extra=1)
+                                                    nested_formset=inlineformset_factory(models.AssessmentStep, models.AssessmentQuestion, form=forms.AssessmentQuestionForm, can_delete=True, can_order=True, extra=0),
+                                                    can_delete=True, can_order=True, extra=0)
       formset = AssessmentStepFormSet(instance=assessment, prefix='form')
       context = {'form': form, 'formset':formset}
       return render(request, 'ctstem_app/AssessmentPreview.html', context)

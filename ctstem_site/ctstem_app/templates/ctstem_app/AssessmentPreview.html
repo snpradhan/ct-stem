@@ -24,15 +24,15 @@
         {{form.management_form}}
         <h3>{{form.title.value}}</h3>
         <hr>
-        <div class="assessment-row">
+        <div class="meta">
           <label>{{form.time.label}}</label>
           <div>{{form.time.value}}</div>
         </div>
-        <div class="assessment-row">
+        <div class="meta">
           <label>{{form.overview.label}}</label>
           <div>{{form.overview.value}}</div>
         </div>
-        <div class="assessment-row">
+        <div class="meta">
           <label>{{form.ngss_standards.label}}</label>
           <div>
             {% for ngss in form|selected_labels:"ngss_standards" %}
@@ -40,7 +40,7 @@
             {% endfor %}
           </div>
         </div>
-        <div class="assessment-row">
+        <div class="meta">
           <label>{{form.ct_stem_practices.label}}</label>
           <div>
             {% for ct_stem in form|selected_labels:"ct_stem_practices" %}
@@ -50,17 +50,47 @@
         <hr>
       </div>
       {% for step in formset %}
-        <div class="table" id="assessmentPreview">
+        <div class="table stepPreview">
           <h3>{{step.title.value}}</h3>
           <hr>
-          <div class="assessment-row">
-            <div>{{step.content.value|safe}}</div>
-          </div>
-          {% for quest in step.nested %}
-            <div class="assessment-row">
-              <div>{{quest.question}}</div>
-            </div>
-          {% endfor %}
+          <div>{{step.content.value|safe}}</div>
+          <table class="question_table">
+            {% for questionForm in step.nested %}
+              <tr>
+                <td width="5%" style="vertical-align: top;" class="question_no"> Q{{forloop.counter}}.</td>
+                <td class="question_text"> {{questionForm.instance.question.question_text|safe }} </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td class="answer_field">
+                  {% with field_type=questionForm.instance.question.answer_field_type %}
+                    {% if field_type == 'TA' %}
+                      <textarea placeholder="Enter your response" class="form-control"></textarea>
+                    {% elif field_type == 'TF' %}
+                      <input type="text" placeholder="Enter your response" class="form-control"/>
+                    {% elif field_type == 'DD' %}
+                      <select class="form-control">
+                        {% for option in questionForm.instance.question.options|split:','%}
+                          <option value="{{option}}">{{option}}</option>
+                        {% endfor %}
+                      </select>
+                    {% elif field_type == 'MC' %}
+                      <div class="note"> Note: Select one answer </div>
+                      {% for option in questionForm.instance.question.options|split:','%}
+                        <input type="radio" name="forloop.parent.counter" value="{{option}}"/>{{option}}<br>
+                      {% endfor %}
+                    {% elif field_type == 'MS' %}
+                      <div class="note"> Note: Select all that apply </div>
+                      {% for option in questionForm.instance.question.options|split:','%}
+                        <input type="checkbox" name="forloop.parent.counter" value="{{option}}"/>{{option}}<br>
+                      {% endfor %}
+
+                    {% endif %}
+                  {% endwith %}
+                </td>
+              </tr>
+            {% endfor %}
+          </table>
         </div>
       {% endfor %}
 

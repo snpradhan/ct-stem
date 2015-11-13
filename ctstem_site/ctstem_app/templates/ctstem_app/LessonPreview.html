@@ -49,11 +49,11 @@
       font-weight: 700;
       width: 100%;
     }
-    div.table#lessonActivity table.activity_question_table {
+    div.table#lessonActivity table.question_table {
       font-size: 1em;
     }
 
-    div.table#lessonActivity table.activity_question_table .activity_question_no{
+    div.table#lessonActivity table.question_table .question_no{
       font-weight: 700;
     }
     div.table#lessonActivity h3.activity_title {
@@ -62,11 +62,11 @@
     div.table#lessonActivity .note {
       font-style: italic;
     }
-    div.table#lessonActivity div.activity_answer_field  div.input_container {
+    div.table#lessonActivity .answer_field  .input_container {
       margin-bottom: 15px;
       vertical-align: middle;
     }
-    div.table#lessonActivity .activity_answer_field .input_container .circle {
+    div.table#lessonActivity .answer_field .input_container .circle {
       border: 1px solid black;
       border-radius: 20px;
       height: 20px;
@@ -145,15 +145,15 @@
 
           <div class="activity_content"> {{activity.content.value|safe}} </div>
 
-          <table class="activity_question_table">
+          <table class="question_table">
             {% for questionForm in activity.nested %}
               <tr>
-                <td width="5%" style="vertical-align: top;" class="activity_question_no"> Q{{forloop.counter}}.</td>
-                <td class="activity_question_text"> {{questionForm.instance.question.question_text|safe }} </td>
+                <td width="5%" style="vertical-align: top;" class="question_no"> Q{{forloop.counter}}.</td>
+                <td class="question_text"> {{questionForm.instance.question.question_text|safe }} </td>
               </tr>
               <tr>
                 <td></td>
-                <td class="activity_answer_field">
+                <td class="answer_field">
                   {% with field_type=questionForm.instance.question.answer_field_type %}
                     {% if field_type == 'TA' %}
                       <br><br><br><br><br><br><br><br><br><br>
