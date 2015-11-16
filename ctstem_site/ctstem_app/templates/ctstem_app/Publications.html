@@ -16,7 +16,7 @@
       </div>
     {% endif %}
     {% if publications %}
-      <table class="table table-striped" id="publications">
+      <table class="table table-striped dt" id="publications">
         <thead>
           <tr>
             <th> Title </th>
@@ -71,12 +71,6 @@
     {% endif %}
   </div>
 
-  <script type="text/javascript">
-    $(document).ready(function() {
-        // DataTable
-       $('#publications').DataTable();
-    });
-  </script>
 {% endblock %}
 
 

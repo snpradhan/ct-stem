@@ -74,6 +74,7 @@ function cloneMore(selector, type) {
 }
 
 $(function (){
+  //login modal
   $('#navLogin').click(function(){
     $('div#login').show();
   });
@@ -86,6 +87,27 @@ $(function (){
     $(".modal-content #loginMsg").html('');
     $(".modal-content #username").val('');
     $(".modal-content #password").val('');
+  });
+
+  //datatables configuration
+  $('table.table.dt tfoot th').each( function () {
+        var title = $(this).text();
+        $(this).html( '<input type="text" placeholder="Search '+title+'" />' );
+    } );
+
+  var table = $('table.table.dt').DataTable();
+
+  // Apply the search
+  table.columns().every( function () {
+    var that = this;
+
+    $( 'input', this.footer() ).on( 'keyup change', function () {
+      if ( that.search() !== this.value ) {
+        that
+          .search( this.value )
+          .draw();
+      }
+    });
   });
 
 });

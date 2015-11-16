@@ -16,7 +16,7 @@
       </div>
     {% endif %}
     {% if assessments %}
-      <table class="table" id="assessments">
+      <table class="table table-striped dt" id="assessments">
         <thead>
           <tr>
             <th> Assessment Title </th>
@@ -94,14 +94,8 @@
       <p>No assessments have been published.</p>
     {% endif %}
 
-
   </div>
-  <script type="text/javascript">
-    $(document).ready(function() {
-        // DataTable
-       $('#assessments').DataTable();
-    });
-  </script>
+
 {% endblock %}
 
 

@@ -148,7 +148,7 @@ div.table#register, div.table#userProfile {
   padding: 3em 4em;
 }
 div.table#lesson, div.table#lessonPreview, div.table#assessment, div.table.step, div.table#assessmentPreview, div.table.stepPreview, div.table#lessonQuestions, div.table.activity{
-  width: 90%;
+  width: 70%;
   padding: 3em 4em;
 
 }
@@ -238,22 +238,23 @@ div.row.portfolio {
 table.table {
   margin: auto;
 }
-
+table.table tfoot th {
+  font-weight: 400;
+  font-size: smaller;
+}
+table.table tfoot th input {
+  width: 90%;
+}
 table.table td {
   font-size: smaller;
 }
-
 table.table td.title {
   font-weight: bold;
 }
-
 table.table td.title div.controls {
   margin-top: 0.5em;
 }
 /***********   TABLE VIEW END   ************/
-
-
-
 
 /***************************************
             *   FORM GROUP   *
@@ -267,10 +268,11 @@ div.form-group label .required{
 }
 
 div.content {
-  width: 80%;
+  width: 90%;
   margin-left: auto;
   margin-right: auto;
   margin-bottom: 40px;
+  margin-top: 40px;
   min-height: 75%;
 }
 

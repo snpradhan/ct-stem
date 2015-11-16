@@ -15,7 +15,7 @@
       </div>
     {% endif %}
     {% if lessons %}
-      <table class="table table-striped" id="lessons">
+      <table class="table table-striped dt" id="lessons">
         <thead>
           <tr>
             <th> Lesson Title </th>
@@ -44,7 +44,7 @@
                   <a type="button" class="btn btn-primary preview" aria-label="Preview Lesson" title="Preview Lesson" href="{% url 'ctstem:previewLesson' lesson.id 0 %}" target="_blank">
                     <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
                   </a>
-                  <a type="button" class="btn btn-primary pdf" aria-label="Lesson PDF" title="Lesson PDF" href="{% url 'ctstem:previewLesson' lesson.id 1 %}">
+                  <a type="button" class="btn btn-primary pdf" aria-label="Print Lesson" title="Print Lesson" href="{% url 'ctstem:previewLesson' lesson.id 1 %}">
                     <span class="glyphicon glyphicon-print" aria-hidden="true"></span>
                   </a>
                   {% if user.administrator %}
@@ -104,14 +104,8 @@
       <p>No lessons have been published.</p>
     {% endif %}
 
-
   </div>
-  <script type="text/javascript">
-    $(document).ready(function() {
-        // DataTable
-       $('#lessons').DataTable();
-    });
-  </script>
+
 {% endblock %}
 
 
