@@ -85,7 +85,7 @@ def upload_file_to(instance, filename):
 
 # Lesson model
 class Lesson (models.Model):
-  title = models.CharField(null=False, max_length=256, unique=True)
+  title = models.CharField(null=False, max_length=256)
   time = models.CharField(null=True, max_length=256)
   level = models.TextField(null=False)
   purpose = models.TextField(null=False)
@@ -108,6 +108,7 @@ class Lesson (models.Model):
 
   class Meta:
       ordering = ['-id']
+      unique_together = ('title', 'version')
 
   def __unicode__(self):
       return u'%s' % (self.title)
@@ -123,7 +124,7 @@ class LessonActivity(models.Model):
 
 # Assessment model
 class Assessment (models.Model):
-  title = models.CharField(null=False, max_length=256, unique=True)
+  title = models.CharField(null=False, max_length=256)
   time = models.CharField(null=True, max_length=256)
   overview = models.TextField(null=False)
   status = models.CharField(max_length=1, default='D', choices=LESSON_STATUS_CHOICES)
@@ -141,6 +142,7 @@ class Assessment (models.Model):
 
   class Meta:
       ordering = ['-id']
+      unique_together = ('title', 'version')
 
   def __unicode__(self):
       return u'%s' % (self.title)

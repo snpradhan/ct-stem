@@ -40,7 +40,7 @@
         <tbody>
           {% for assessment in assessments %}
             <tr>
-              <td class="title">{{assessment.title}}
+              <td class="title">{{assessment.title}} - v{{assessment.version}}.
                 <div class="controls">
                   <a type="button" class="btn btn-primary" aria-label="Preview Assessment" title="Preview Assessment" href="{% url 'ctstem:previewAssessment' assessment.id %}">
                     <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>

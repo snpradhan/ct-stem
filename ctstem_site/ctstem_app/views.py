@@ -40,7 +40,10 @@ def about_us(request):
 # ASSESSMENTS TABLE VIEW
 ####################################
 def assessments(request):
-  assessments = models.Assessment.objects.order_by('id')
+  if hasattr(request.user, 'administrator') == False:
+    assessments = models.Assessment.objects.all().filter(status='P').order_by('id')
+  else:
+    assessments = models.Assessment.objects.order_by('id')
   context = {'assessments': assessments}
   return render(request, 'ctstem_app/Assessments.html', context)
 
@@ -86,7 +89,7 @@ def assessment(request, id=''):
         if '' == id:
             savedAssessment.author = request.user
         savedAssessment.modified_by = request.user
-        savedAssessment.slug = slugify(savedAssessment.title)
+        savedAssessment.slug = slugify(savedAssessment.title) + '-v%s'%savedAssessment.version
         savedAssessment.save()
         form.save()
         formset.save()
@@ -158,7 +161,10 @@ def deleteAssessment(request, id=''):
 # LESSONS TABLE VIEW
 ####################################
 def lessons(request):
-  lessons = models.Lesson.objects.order_by('id')
+  if hasattr(request.user, 'administrator') == False:
+    lessons = models.Lesson.objects.all().filter(status='P').order_by('id')
+  else:
+    lessons = models.Lesson.objects.order_by('id')
   context = {'lessons': lessons}
   return render(request, 'ctstem_app/Lessons.html', context)
 
@@ -203,7 +209,7 @@ def lesson(request, id=''):
         if '' == id:
             savedLesson.author = request.user
         savedLesson.modified_by = request.user
-        savedLesson.slug = slugify(savedLesson.title)
+        savedLesson.slug = slugify(savedLesson.title) + '-v%s'%savedLesson.version
         savedLesson.save()
         form.save()
         formset.save(commit=False)
@@ -267,8 +273,7 @@ def copyLesson(request, id=''):
           lesson.save()
 
           original_lesson = models.Lesson.objects.get(id=id)
-          lesson.title = title + '-' + str(lesson.id)
-          lesson.slug = slugify(lesson.title)
+          lesson.title = title
           lesson.author = request.user
           lesson.modified_by = request.user
           lesson.created_date = datetime.datetime.now()
@@ -276,6 +281,7 @@ def copyLesson(request, id=''):
           lesson.parent = original_lesson
           lesson.status = 'D'
           lesson.version = int(original_lesson.version) + 1
+          lesson.slug = slugify(lesson.title) + '-v%s'%lesson.version
           lesson.subject = original_lesson.subject.all()
           lesson.ngss_standards = original_lesson.ngss_standards.all()
           lesson.ct_stem_practices = original_lesson.ct_stem_practices.all()
@@ -653,10 +659,7 @@ def users(request, role):
 # PUBLICATIONS TABLE VIEW
 ####################################
 def publications(request):
-  if hasattr(request.user, 'administrator') == False:
-    publications = models.Publication.objects.filter(viewable=True).order_by('created')
-  else:
-    publications = models.Publication.objects.order_by('created')
+  publications = models.Publication.objects.all().order_by('created')
   context = {'publications': publications}
   return render(request, 'ctstem_app/Publications.html', context)
 
