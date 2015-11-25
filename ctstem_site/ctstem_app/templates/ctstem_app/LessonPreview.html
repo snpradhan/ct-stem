@@ -2,17 +2,32 @@
 {% load ctstem_extras %}
 {% block media %}
 
-  <style type="text/css">
+  <style type="text/css" media="screen, print">
     @page {
       size: letter portrait;
-      margin: 1.5cm, 1cm, 1.5cm, 1cm;
-      -pdf-line-spacing: 1em;
+      margin: 4cm, 1cm, 2cm, 1cm;
+
+      @frame pagenumber {
+        -pdf-frame-content: pageNumber;
+        bottom: 1.5cm;
+        margin-left: 20cm;
+        margin-right: 1cm;
+        height: 1cm;
+      }
       @frame footer {
         -pdf-frame-content: footerContent;
         bottom: 0cm;
-        margin-left: 10cm;
-        margin-right: 10cm;
-        height: 1cm;
+        margin-left: 1cm;
+        margin-right: 1cm;
+        height: 2cm;
+      }
+
+      @frame header {
+        -pdf-frame-content: headerContent;
+        top: 1cm;
+        margin-left: 0cm;
+        margin-right: 0cm;
+        height: 10cm;
       }
     }
     @font-face {
@@ -20,12 +35,13 @@
     }
 
     div#content {
-      width: 80%;
+      width: 90%;
       margin-left: auto;
       margin-right: auto;
       margin-bottom: 40px;
       font-size: 1em;
     }
+
     div.table#lessonMeta {
       font-size: 1.2em;
     }
@@ -38,9 +54,14 @@
     }
     div.table#lessonContent {
       font-size: 1.2em;
+      page-break-after: always;
     }
     div.table#lessonContent img {
       width: 200px;
+    }
+    div.table#lessonContent li {
+      margin: 0 !important;
+      padding: 0 !important;
     }
     div.table#lessonActivity {
       font-size: 1.2em;
@@ -51,6 +72,7 @@
     }
     div.table#lessonActivity table.question_table {
       font-size: 1em;
+      page-break-inside: avoid;
     }
 
     div.table#lessonActivity table.question_table .question_no{
@@ -63,8 +85,10 @@
       font-style: italic;
     }
     div.table#lessonActivity .answer_field  .input_container {
-      margin-bottom: 15px;
-      vertical-align: middle;
+      margin-bottom: 10px;
+    }
+    div.table#lessonActivity .answer_field  .input_container span{
+      vertical-align: top;
     }
     div.table#lessonActivity .answer_field .input_container .circle {
       border: 1px solid black;
@@ -75,11 +99,29 @@
     h2, h3 {
       text-align: center;
     }
+    div#headerContent{
+      text-align: center;
+    }
+    div#headerContent img {
+      vertical-align: middle;
+      height: 60px;
+      width: auto;
+      margin-right: 30px;
+    }
+
+
   </style>
 {% endblock %}
 
 {% block content %}
-
+  <div id="headerContent">
+    <img style="vertical-align: middle; height: 60px; width: auto;" src="http://ct-stem.northwestern.edu/assets/logo.png"/> &nbsp;&nbsp;&nbsp;&nbsp;
+    <img style="vertical-align: middle; height: 60px; width: auto;" src="http://ct-stem.northwestern.edu/assets/ccl.png"/> &nbsp;&nbsp;&nbsp;&nbsp;
+    <img style="vertical-align: middle; height: 60px; width: auto;" src="http://ct-stem.northwestern.edu/assets/tidal.png"/> &nbsp;&nbsp;&nbsp;&nbsp;
+    <img style="vertical-align: middle; height: 60px; width: auto;" src="http://ct-stem.northwestern.edu/assets/osep.png"/> &nbsp;&nbsp;&nbsp;&nbsp;
+     <img style="vertical-align: middle; height: 60px; width: auto;" src="http://ct-stem.northwestern.edu/assets/adler.png"/> &nbsp;&nbsp;&nbsp;&nbsp;
+    <img style="vertical-align: middle; height: 60px; width: auto;" src="http://ct-stem.northwestern.edu/assets/ciera.png"/> &nbsp;&nbsp;&nbsp;&nbsp;
+  </div>
   <div id="content" style="font-size: 1em;">
     <form>
       <div class="table" id="lessonMeta">
@@ -118,15 +160,9 @@
         </div>
       </div>
 
-      <hr>
 
       <div class="table" id="lessonContent">
-        <div>{{form.content.value|format_iframe|safe}}</div>
-      </div>
-
-      <hr>
-      <div>
-        <pdf:nextpage />
+        <div>{{form.content.value|format_iframe|inline_style|safe}}</div>
       </div>
 
       <div class="table" id="lessonActivity">
@@ -141,12 +177,12 @@
         </table>
 
         {% for activity in formset %}
-          <h3 class="activity_title"> {{ activity.title.value }} </h3>
+          <h3 class="activity_title" style="text-decoration: underline;"> {{ activity.title.value }} </h3>
 
           <div class="activity_content"> {{activity.content.value|safe}} </div>
 
-          <table class="question_table">
             {% for questionForm in activity.nested %}
+            <table class="question_table">
               <tr>
                 <td width="5%" style="vertical-align: top;" class="question_no"> Q{{forloop.counter}}.</td>
                 <td class="question_text"> {{questionForm.instance.question.question_text|safe }} </td>
@@ -161,19 +197,19 @@
                       <br><br><br><br><br>
                     {% elif field_type == 'DD' or field_type == 'MC' %}
                       <div class="multiplechoice">
-                        <div class="note"> Note: Select one answer </div>
+                        <p class="note"> Note: Select one answer </p>
                         {% for option in questionForm.instance.question.options|split:','%}
                           <div class="input_container">
-                            <img src="https://s3-us-west-1.amazonaws.com/ct-stem/assets/images/Circle.gif" class="circle">&nbsp;&nbsp;{{option}}
+                            <img src="https://s3-us-west-1.amazonaws.com/ct-stem/assets/images/Circle.gif" class="circle"><span>&nbsp;&nbsp;{{option}}</span>
                           </div>
                         {% endfor %}
                       </div>
                     {% elif field_type == 'MS' %}
                       <div class="multiselect">
-                        <div class="note"> Note: Select all that apply </div>
+                        <p class="note"> Note: Select all that apply </p>
                         {% for option in questionForm.instance.question.options|split:','%}
                           <div class="input_container">
-                            <img src="https://s3-us-west-1.amazonaws.com/ct-stem/assets/images/Square.gif" class="square" style="width:25px;">&nbsp;&nbsp;{{option}}
+                            <img src="https://s3-us-west-1.amazonaws.com/ct-stem/assets/images/Square.gif" class="square" style="width:25px;"><span>&nbsp;&nbsp;{{option}} </span>
                           </div>
                         {% endfor %}
                       </div>
@@ -181,21 +217,33 @@
                   {% endwith %}
                 </td>
               </tr>
+              </table>
             {% endfor %}
-          </table>
-          <div>
-            <pdf:nextpage />
-          </div>
+
+          <div> &nbsp; </div>
 
         {% endfor %}
       </div>
 
     </form>
   </div>
-  <div id="footerContent">
+  <div id="pageNumber">
     {%block page_foot%}
-        <pdf:pagenumber>
+      <pdf:pagenumber>
     {%endblock%}
   </div>
+  <div id="footerContent">
+    <table style="text-align:center;">
+      <tr>
+        <td width="10%"><img style="vertical-align: middle; height: 40px; width: auto;" src="http://ct-stem.northwestern.edu/assets/Logos/_resampled/resizedimage100100-NSFLogo.png"/></td>
+        <td>This work is supported in part National Science Foundation under NSF grant CNS-1138461. However, any opinions, findings, conclusions, and/or recommendations are those of the investigators and do not necessarily reflect the views of the Foundation. </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>Copyright © 2015 Northwestern University</td>
+      </tr>
+    </table>
+  </div>
+
 {% endblock %}
 

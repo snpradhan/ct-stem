@@ -183,7 +183,7 @@ div.table.stepPreview .note {
   font-style: italic;
 }
 div.table.stepPreview .answer_field .input_container {
-  margin-bottom: 15px;
+  margin-bottom: 10px;
   vertical-align: middle;
 }
 div.table.stepPreview .answer_field .input_container .circle {

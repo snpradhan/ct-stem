@@ -44,3 +44,7 @@ def split(value, arg):
 @register.filter
 def format_iframe(html_string):
     return html_string.replace('<iframe', '<tr><td id="lessonContent"><p><iframe').replace('</iframe>', '</iframe></p></td></tr>')
+
+@register.filter
+def inline_style(html_string):
+  return html_string.replace('<li', '<li style="margin:0;padding:0"');
