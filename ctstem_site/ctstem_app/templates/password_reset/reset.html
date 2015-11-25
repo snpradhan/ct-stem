@@ -1,0 +1,41 @@
+{% extends "ctstem_app/base.html" %}
+{% load i18n %}
+
+{% block content %}
+	<div class="content">
+	{% if invalid %}
+		{% url "password_reset_recover" as recovery_url %}
+		{% blocktrans %}
+			Sorry, this password reset link is invalid. You can still <a href="{{ recovery_url }}">request a new one</a>.
+		{% endblocktrans %}
+	{% else %}
+		<div class="table" id="password">
+			<div style="font-size: 1.4em; margin-bottom: 1em;">
+				{% blocktrans %}
+					Hi, <strong>{{ username }}</strong>. Please choose your new password.
+				{% endblocktrans %}
+			</div>
+			<div>
+				<form method="post" action="{% url "password_reset_reset" token %}">
+					{% csrf_token %}
+					{% for field in form %}
+	          <div class="form-group">
+	            <label for="id_{{field.name}}">{{ field.label|title }} {% if field.field.required %}(<span class="required">*</span>){% endif %} </label>
+	            <div>
+	              {{field}}
+	            </div>
+	            <div class="error">{{ field.errors }}</div>
+	          </div>
+	        {% endfor %}
+					<input type="submit" value="{% trans "Set new password" %}" class="btn btn-primary">
+				</form>
+			</div>
+		</div>
+	{% endif %}
+	</div>
+	<script type="text/javascript">
+    $(document).ready(function(){
+      $('input[type="password"]').addClass('form-control');
+    });
+  </script>
+{% endblock %}

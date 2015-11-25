@@ -143,7 +143,7 @@ div.table {
   box-shadow: 10px 10px 10px rgba(204,204,204, 1);
 }
 
-div.table#register, div.table#userProfile {
+div.table#register, div.table#userProfile, div.table#password {
   width: 50%;
   padding: 3em 4em;
 }

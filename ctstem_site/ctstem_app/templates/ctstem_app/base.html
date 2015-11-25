@@ -136,7 +136,8 @@
           {% endfor %}
         </ul>
       {% endif %}
-      {% block login %}
+    {% endblock %}
+    {% block login %}
         <div class="modal fade" id="login" role="dialog">
           <div class="modal-dialog modal-sm">
             <div class="modal-content">
@@ -167,7 +168,7 @@
                     <a type="button" href="{% url 'ctstem:register' %}" class="btn btn-primary">Register</a>
                   </div>
                   <div class="form-group button-row">
-                    <a href="{% url 'ctstem:register' %}">Forgot Password</a>
+                    <a href="{% url 'password_reset_recover' %}">Forgot Password</a>
                   </div>
                 </div>
               </form>
@@ -175,8 +176,6 @@
           </div>
         </div>
       {% endblock %}
-
-    {% endblock %}
 
     {% block footer %}
       <div id="footer" class="row">
