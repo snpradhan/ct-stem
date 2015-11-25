@@ -382,7 +382,7 @@ def register(request):
                                       form.cleaned_data['password1'])
       user.first_name = form.cleaned_data['first_name']
       user.last_name = form.cleaned_data['last_name']
-      if form.cleaned_data['account_type'] in  ['A', 'R']:
+      if form.cleaned_data['account_type'] in  ['A', 'R', 'C']:
           user.is_active = False
       else:
           user.is_active = True
@@ -391,11 +391,11 @@ def register(request):
       if form.cleaned_data['account_type'] == 'T':
         newUser = models.Teacher()
         newUser.school = form.cleaned_data['school']
-        newUser.permission_code =  form.cleaned_data['user_code']
+        newUser.user_code =  form.cleaned_data['user_code']
         newUser.user = user
         newUser.save()
         #get the school admin based on the permission code
-        researcher = models.Researcher.objects.get(permission_code = form.cleaned_data['permission_code'])
+        researcher = models.Researcher.objects.get(user_code = form.cleaned_data['permission_code'])
         researcher.teachers.add(newUser)
 
       elif form.cleaned_data['account_type'] == 'S':
@@ -404,7 +404,7 @@ def register(request):
         newUser.user = user
         newUser.save()
         #get the teacher based on the permission code
-        teacher = models.Teacher.objects.get(permission_code = form.cleaned_data['permission_code'])
+        teacher = models.Teacher.objects.get(user_code = form.cleaned_data['permission_code'])
         teacher.students.add(newUser)
 
       elif form.cleaned_data['account_type'] == 'A':
@@ -415,11 +415,15 @@ def register(request):
       elif form.cleaned_data['account_type'] == 'R':
         newUser = models.Researcher()
         newUser.school = form.cleaned_data['school']
-        newUser.permission_code =  form.cleaned_data['user_code']
+        newUser.user_code =  form.cleaned_data['user_code']
+        newUser.user = user
+        newUser.save()
+      elif form.cleaned_data['account_type'] == 'C':
+        newUser = models.Author()
         newUser.user = user
         newUser.save()
 
-      if form.cleaned_data['account_type'] in ['A', 'R']:
+      if form.cleaned_data['account_type'] in ['A', 'R', 'C']:
         messages.info(request, 'Your account is pending admin approval.  Please contact the system administrator to request approval.')
         return render(request, 'ctstem_app/About_us.html')
       elif form.cleaned_data['account_type'] in ['T', 'S']:

@@ -240,7 +240,7 @@ class Teacher(models.Model):
   user = models.OneToOneField(User, unique=True, null=False, related_name="teacher")
   school = models.ForeignKey(School)
   students = models.ManyToManyField(Student, blank=True)
-  permission_code = models.CharField(null=False, max_length=256, unique=True)
+  user_code = models.CharField(null=False, max_length=256, unique=True)
 
   def __unicode__(self):
       return u'%s' % (self.user.get_full_name())
@@ -251,7 +251,7 @@ class Researcher(models.Model):
   user = models.OneToOneField(User, unique=True, null=False, related_name="researcher")
   school = models.ForeignKey(School)
   teachers = models.ManyToManyField(Teacher, blank=True)
-  permission_code = models.CharField(null=False, max_length=256, unique=True)
+  user_code = models.CharField(null=False, max_length=256, unique=True)
 
   def __unicode__(self):
       return u'%s' % (self.user.get_full_name())

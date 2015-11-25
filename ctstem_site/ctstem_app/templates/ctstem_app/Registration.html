@@ -20,7 +20,7 @@
         <fieldset>
           {{form.management_form}}
           {% for field in form %}
-            <div class="form-group">
+            <div class="form-group" id="div_{{field.name}}">
               <label for="id_{{field.name}}">{{ field.label|title }}</label>
               {{field}}
               <div class="error">{{ field.errors }}</div>
@@ -39,26 +39,39 @@
     </form>
 
     <script type="text/javascript">
+      $(document).ready(function(){
+        set_user_fields();
+      });
       $('#id_account_type').change(function() {
-        if($(this).val() === 'A'){
+        set_user_fields();
+      });
+
+      function set_user_fields(){
+        var account_type = $('#id_account_type').val();
+        if(account_type === 'A'){
           $('#div_school').hide();
           $('#div_permission_code').hide();
           $('#div_user_code').hide();
         }
-        else if($(this).val() === 'R'){
+        else if(account_type === 'R'){
           $('#div_permission_code').hide();
           $('#div_user_code').show();
         }
-        else if($(this).val() === 'T'){
+        else if(account_type === 'T'){
           $('#div_school').show();
           $('#div_permission_code').show();
           $('#div_user_code').show();
+        }
+        else if(account_type === 'C'){
+          $('#div_school').hide();
+          $('#div_permission_code').hide();
+          $('#div_user_code').hide();
         }
         else {
           $('#div_permission_code').show();
           $('#div_user_code').hide();
         }
-      });
+      }
 
       $("#signupTerms").popover({
           placement: 'right',

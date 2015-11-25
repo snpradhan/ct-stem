@@ -55,33 +55,69 @@ class RegistrationForm (forms.Form):
       return valid
 
     clean = True
+    error_list = []
     #check password
     if self.cleaned_data['password1'] != self.cleaned_data['password2']:
+      error_list.append('P')
       self._errors['password1'] = u'Passwords are not identical'
       clean = False
-    #check school
-    if self.cleaned_data['account_type'] in ['S', 'T', 'R']:
+    #check fields for Teacher
+    if self.cleaned_data['account_type'] == 'T':
       if self.cleaned_data['school'] is None or self.cleaned_data['school'] == '':
-        self._errors['school'] = u'School is required'
-        clean =  False
-
-    # check permission code
-    if self.cleaned_data['account_type'] in ['S', 'T']:
+        error_list.append('SR');
       if self.cleaned_data['permission_code'] is None or self.cleaned_data['permission_code'] == '':
-        self._errors['permission_code'] = u'Permission code is required'
-        clean = False
-      elif self.cleaned_data['account_type'] == 'T':
+        error_list.append('PR');
+      else:
         try:
-          models.Researcher.objects.get(permission_code=self.cleaned_data['permission_code'])
+          models.Researcher.objects.get(user_code=self.cleaned_data['permission_code'], user__is_active=True)
         except models.Researcher.DoesNotExist:
-          self._errors['permission_code'] = u'Permission code is not valid'
-          clean = False
-      elif self.cleaned_data['account_type'] == 'S':
+          error_list.append('PI');
+      if self.cleaned_data['user_code'] is None or self.cleaned_data['user_code'] == '':
+        error_list.append('UR');
+      else:
         try:
-          models.Teacher.objects.get(permission_code=self.cleaned_data['permission_code'])
+          models.Teacher.objects.get(user_code=self.cleaned_data['user_code'])
+          error_list.append('UI');
         except models.Teacher.DoesNotExist:
-          self._errors['permission_code'] = u'Permission code is not valid'
-          clean = False
+          pass
+    #check fields for Student
+    elif self.cleaned_data['account_type'] == 'S':
+      if self.cleaned_data['school'] is None or self.cleaned_data['school'] == '':
+        error_list.append('SR');
+      if self.cleaned_data['permission_code'] is None or self.cleaned_data['permission_code'] == '':
+        error_list.append('PR');
+      else:
+        try:
+          models.Teacher.objects.get(user_code=self.cleaned_data['permission_code'], user__is_active=True)
+        except models.Teacher.DoesNotExist:
+          error_list.append('PI');
+    #check fields for Researcher
+    elif self.cleaned_data['account_type'] == 'R':
+      if self.cleaned_data['school'] is None or self.cleaned_data['school'] == '':
+        error_list.append('SR');
+      if self.cleaned_data['user_code'] is None or self.cleaned_data['user_code'] == '':
+        error_list.append('UR');
+      else:
+        try:
+          models.Researcher.objects.get(user_code=self.cleaned_data['user_code'])
+          error_list.append('UI');
+        except models.Researcher.DoesNotExist:
+          pass
+    if len(error_list) > 0:
+      clean = False
+
+    for error in error_list:
+      if error == 'SR':
+        self._errors['school'] = u'School is required'
+      elif error == 'PR':
+        self._errors['permission_code'] = u'Permission code is required'
+      elif error == 'PI':
+        self._errors['permission_code'] = u'Permission code is not valid'
+      elif error == 'UR':
+        self._errors['user_code'] = u'User code is required'
+      elif error == 'UI':
+        self._errors['user_code'] = u'User code is not unique'
+
 
     return clean
 
@@ -146,7 +182,7 @@ class StudentForm (ModelForm):
 class TeacherForm (ModelForm):
   class Meta:
     model = models.Teacher
-    fields = ['school','students', 'permission_code']
+    fields = ['school','students', 'user_code']
 
   def __init__(self, *args, **kwargs):
     super(TeacherForm, self).__init__(*args, **kwargs)
@@ -161,7 +197,7 @@ class TeacherForm (ModelForm):
 class ResearcherForm (ModelForm):
   class Meta:
     model = models.Researcher
-    fields = ['school','teachers', 'permission_code']
+    fields = ['school','teachers', 'user_code']
   def __init__(self, *args, **kwargs):
     super(ResearcherForm, self).__init__(*args, **kwargs)
     for field_name, field in self.fields.items():
