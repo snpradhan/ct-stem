@@ -22,6 +22,7 @@ urlpatterns = [
     url(r'^login/$', views.user_login, name='login'),
     url(r'^logout/$', views.user_logout, name='logout'),
     url(r'^user/(?P<id>[\d]+)/$', views.userProfile, name='userProfile'),
+    url(r'^user/delete/(?P<id>[\d]+)/$', views.deleteUser, name='deleteUser'),
     url(r'^lesson/(?P<id>[\d]+)/$', views.lesson, name='lesson'),
     url(r'^lesson/new/$', views.lesson, name='newLesson'),
     url(r'^lesson/preview/(?P<id>[\d]+)/(?P<pdf>[\d]+)$', views.previewLesson, name='previewLesson'),

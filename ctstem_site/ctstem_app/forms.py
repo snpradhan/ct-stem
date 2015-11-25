@@ -206,6 +206,19 @@ class ResearcherForm (ModelForm):
       field.widget.attrs['placeholder'] = field.help_text
 
 ####################################
+# Author Form
+####################################
+class AuthorForm (ModelForm):
+  class Meta:
+    model = models.Author
+    fields = []
+  def __init__(self, *args, **kwargs):
+    super(AuthorForm, self).__init__(*args, **kwargs)
+    for field_name, field in self.fields.items():
+      field.widget.attrs['class'] = 'form-control'
+      field.widget.attrs['aria-describedby'] = field.label
+      field.widget.attrs['placeholder'] = field.help_text
+####################################
 # Lesson Form
 ####################################
 class LessonForm(ModelForm):

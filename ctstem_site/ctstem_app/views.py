@@ -174,7 +174,7 @@ def lessons(request):
 def lesson(request, id=''):
   try:
     # check if the user has permission to create or modify a lesson
-    if hasattr(request.user, 'administrator') == False:
+    if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'researcher') == False and hasattr(request.user, 'author') == False:
       return http.HttpResponseNotFound('<h1>You do not have the privilege to modify this lesson</h1>')
     # check if the lesson exists
     if '' != id:
@@ -458,7 +458,10 @@ def user_login(request):
       response_data['result'] = 'Success'
     else:
       response_data['result'] = 'failed'
-      response_data['message'] = 'Your username and/or password is invalid'
+      if user and user.is_active == False:
+        response_data['message'] = 'Your account has not been activated'
+      else:
+        response_data['message'] = 'Your username and/or password is invalid'
     return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 
   elif 'GET' == request.method:
@@ -498,12 +501,15 @@ def userProfile(request, id=''):
     elif hasattr(user, 'researcher'):
       role = 'R'
       researcher = models.Researcher.objects.get(user__id=id)
+    elif hasattr(user, 'author'):
+      role = 'C'
+      author = models.Author.objects.get(user__id=id)
     else:
       return http.HttpResponseForbidden('<h1>User has no role</h1>')
 
     if request.method == 'GET':
       userform = forms.UserProfileForm(instance=user, prefix='user')
-      if role in ['S', 'T', 'A', 'R']:
+      if role in ['S', 'T', 'A', 'R', 'C']:
         if role == 'S':
           profileform = forms.StudentForm(instance=student, prefix='student')
         elif role == 'T':
@@ -512,6 +518,8 @@ def userProfile(request, id=''):
           profileform = None
         elif role == 'R':
           profileform = forms.ResearcherForm(instance=researcher, prefix='researcher')
+        elif role == 'C':
+          profileform = forms.AuthorForm(instance=author, prefix='author')
         else:
           return http.HttpResponseNotFound('<h1>Requested user does not have a role</h1>')
 
@@ -528,7 +536,8 @@ def userProfile(request, id=''):
           data.__setitem__('admin-user', admin.user.id)
       elif role == 'R':
           data.__setitem__('researcher-user', researcher.user.id)
-
+      elif role == 'C':
+          data.__setitem__('author-user', author.user.id)
       data.__setitem__('user-password', user.password)
       data.__setitem__('user-last_login', user.last_login)
       data.__setitem__('user-date_joined', user.date_joined)
@@ -541,6 +550,8 @@ def userProfile(request, id=''):
         profileform = forms.TeacherForm(data, instance=teacher, prefix='teacher')
       elif role == 'R':
         profileform = forms.ResearcherForm(data, instance=researcher, prefix='researcher')
+      elif role == 'C':
+        profileform = forms.AuthorForm(data, instance=author, prefix='author')
 
       if userform.is_valid():
         if profileform is None:
@@ -566,6 +577,29 @@ def userProfile(request, id=''):
 
   except User.DoesNotExist:
       return http.HttpResponseNotFound('<h1>Requested user not found</h1>')
+
+####################################
+# DELETE USER
+####################################
+def deleteUser(request, id=''):
+  try:
+    # check if the user has permission to delete a lesson
+    if hasattr(request.user, 'administrator') == False:
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to delete this user</h1>')
+    # check if the lesson exists
+    if '' != id:
+      user = User.objects.get(id=id)
+
+    if request.method == 'GET' or request.method == 'POST':
+      user.delete()
+      messages.success(request, '%s deleted' % user.username)
+      return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+    return http.HttpResponseNotAllowed(['GET', 'POST'])
+
+  except User.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>User not found</h1>')
+
 
 def notimplemented(request):
   return render(request, 'ctstem_app/NotImplemented.html')
