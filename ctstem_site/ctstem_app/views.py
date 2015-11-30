@@ -281,7 +281,7 @@ def copyLesson(request, id=''):
           lesson.parent = original_lesson
           lesson.status = 'D'
           lesson.version = int(original_lesson.version) + 1
-          lesson.slug = slugify(lesson.title) + '-v%s'%lesson.version
+          lesson.slug = slugify(lesson.title) + '-v%s'%lesson.version + '-%s'%lesson.id
           lesson.subject = original_lesson.subject.all()
           lesson.ngss_standards = original_lesson.ngss_standards.all()
           lesson.ct_stem_practices = original_lesson.ct_stem_practices.all()
@@ -305,10 +305,7 @@ def copyLesson(request, id=''):
                   activity_question.lesson_activity = activity
                   activity_question.save()
 
-          #archive the original lesson
-          original_lesson.status = 'A'
-          original_lesson.save()
-          messages.success(request, "A new version for %s created." % original_lesson.title)
+          messages.success(request, "A new copy of %s created.  Please archive the original lesson" % original_lesson.title)
           return shortcuts.redirect('ctstem:lessons')
       return http.HttpResponseNotAllowed(['GET', 'POST'])
 

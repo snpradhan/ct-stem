@@ -108,7 +108,6 @@ class Lesson (models.Model):
 
   class Meta:
       ordering = ['-id']
-      unique_together = ('title', 'version')
 
   def __unicode__(self):
       return u'%s' % (self.title)
