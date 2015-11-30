@@ -333,6 +333,13 @@ ul.messages {
   list-style-type: none;
   text-align: center;
   font-size: 1.5em;
+  top: 50px;
+  position: absolute;
+  width: 100%;
+}
+
+ul.messages li {
+  text-align: center;
 }
 .error {
   color: red;
