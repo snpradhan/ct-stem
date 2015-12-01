@@ -1,0 +1,1 @@
+Username*,First name*,Last name*,Email*,Password*,"Account Type* (Admin, Researcher, Teacher, Student, Author)",School,"Permission Code (Teachers added by Researchers will be automatically added under that Researcher. Likewise, Students added by Teachers will also be automatically added under that Teacher.)"

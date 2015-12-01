@@ -3,6 +3,7 @@ from ctstem_app import models, forms
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
+from django.db import IntegrityError
 from django import http, shortcuts, template
 from django.shortcuts import render
 from django.contrib import auth, messages
@@ -18,6 +19,9 @@ import xhtml2pdf.pisa as pisa
 import os
 from django.conf import settings
 import datetime
+from django.utils.crypto import get_random_string
+import string
+import csv
 
 ####################################
 # HOME
@@ -371,7 +375,6 @@ def deleteLesson(request, id=''):
 ####################################
 def register(request):
   if request.method == 'POST':
-    print request.POST
     form = forms.RegistrationForm(data=request.POST)
     if form.is_valid():
       user = User.objects.create_user(form.cleaned_data['username'],
@@ -675,19 +678,31 @@ def ctstem_practice(request):
 ####################################
 @login_required
 def users(request, role):
-  if role == 'students':
+
+  if hasattr(request.user, 'administrator'):
+    privilege = 10
+  elif hasattr(request.user, 'researcher'):
+    privilege = 7
+  elif hasattr(request.user, 'teacher'):
+    privilege = 5
+  elif hasattr(request.user, 'student') or hasattr(request.user, 'author'):
+    privilege = 1
+
+  if role == 'students' and privilege > 1:
     users = models.Student.objects.all()
-  elif role == 'teachers':
+  elif role == 'teachers' and privilege > 5:
     users = models.Teacher.objects.all()
-  elif role == 'admins':
+  elif role == 'admins' and privilege > 7:
     users = models.Administrator.objects.all()
-  elif role == 'researchers':
+  elif role == 'researchers' and privilege > 7:
     users = models.Researcher.objects.all()
-  elif role == 'authors':
+  elif role == 'authors' and privilege > 7:
     users = models.Author.objects.all()
   else:
-    users = None
-  context = {'users': users, 'role': role}
+    return http.HttpResponseNotFound('<h1>You do not have the privilege view %s</h1>'% role)
+
+  uploadForm = forms.UploadFileForm()
+  context = {'users': users, 'role': role, 'uploadForm': uploadForm}
   return render(request, 'ctstem_app/Users.html', context)
 
 ####################################
@@ -798,6 +813,147 @@ def question(request, id=''):
 
   return http.HttpResponseNotAllowed(['GET', 'POST'])
 
+####################################
+# GENERATE UNIQUE USER CODE
+####################################
+def generate_code(request):
+  user_code = generate_code_helper(request)
+  response_data = {'user_code': user_code}
+  return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 
+####################################
+# GENERATE UNIQUE USER CODE HELPER
+####################################
+def generate_code_helper(request):
+  allowed_chars = ''.join((string.uppercase, string.digits))
+  user_code = get_random_string(length=5, allowed_chars=allowed_chars)
+  teachers = models.Teacher.objects.all().filter(user_code=user_code)
+  researchers = models.Researcher.objects.all().filter(user_code=user_code)
+  # ensure the user code is unique across teachers and researchers
+  while teachers.count() > 0 or researchers.count() > 0:
+    user_code = get_random_string(length=5, allowed_chars=allowed_chars)
+    teachers = models.Teacher.objects.all().filter(user_code=user_code)
+    researchers = models.Researcher.objects.all().filter(user_code=user_code)
 
+  return user_code
+####################################
+# UPLOAD USERS
+####################################
+@login_required
+def user_upload(request):
+  if hasattr(request.user, 'administrator'):
+    role = 'admin'
+  elif hasattr(request.user, 'researcher'):
+    role = 'researcher'
+  elif hasattr(request.user, 'teacher'):
+    role = 'teacher'
+  else:
+    return http.HttpResponseNotFound('<h1>You do not have the privilege to upload users</h1>')
+
+  if request.method == 'POST':
+    form = forms.UploadFileForm(request.POST, request.FILES)
+    if form.is_valid():
+      f = request.FILES['uploadFile']
+      reader = csv.reader(f.read().splitlines(), delimiter=',')
+      count = 0
+      for row in reader:
+        count += 1
+        if row[0] != 'Username*':
+          username = str(row[0])
+          first_name = str(row[1])
+          last_name = str(row[2])
+          email = str(row[3])
+          password = str(row[4])
+          account_type = str(row[5])
+          school = str(row[6])
+          permission_code = str(row[7])
+          print username, first_name, last_name, email, password, account_type, school, permission_code
+          # check fields are not blank
+          if username is None or username == '':
+            messages.success(request, 'Username is missing on row %d' % count)
+          elif first_name is None or first_name == '':
+            messages.success(request, 'First name is missing on row %d' % count)
+          elif last_name is None or last_name == '':
+            messages.success(request, 'Last name is missing on row %d' % count)
+          elif email is None or email == '':
+            messages.success(request, 'Email is missing on row %d' % count)
+          elif account_type is None or account_type == '' or account_type not in ['Admin', 'Researcher', 'Teacher', 'Student', 'Author']:
+            messages.success(request, 'Account Type is missing or invalid on row %d' % count)
+          # check user has privilege to create other users
+          elif role == 'researcher' and account_type in ['Admin', 'Researcher']:
+            messages.success(request, 'You do not have the privilege to add  %s on row %d' % (account_type, count))
+          elif role == 'teacher' and account_type in ['Admin', 'Researcher', 'Teacher']:
+            messages.success(request, 'You do not have the privilege to add  %s on row %d' % (account_type, count))
+          # everything cool so far
+          else:
+            try:
+              if password is None or password == '':
+                #generate a random password
+                password = User.objects.make_random_password()
+              #create the user object
+              if User.objects.filter(username=username).exists() or User.objects.filter(email=email).exists():
+                raise IntegrityError('User already exists')
+              user = User.objects.create_user(username=username, email=email, password=password)
+              user.first_name = first_name
+              user.last_name = last_name
+              user.save()
+              #check the account type
+              #create an admin
+              if account_type == 'Admin':
+                admin = models.Administrator.objects.create(user=user)
+              #create a researcher
+              elif account_type == 'Researcher':
+                user_code = generate_code_helper(request)
+                school_obj = models.School.objects.get(name=school)
+                researcher = models.Researcher.objects.create(user=user, user_code=user_code, school=school_obj)
+              #create a teacher
+              elif account_type == 'Teacher':
+                user_code_obj = generate_code_helper(request)
+                school_obj = models.School.objects.get(name=school)
+                teacher = models.Teacher.objects.create(user=user, user_code=user_code, school=school_obj)
+                # associate the teacher with a researcher
+                if role == 'researcher':
+                  #associate the teacher with the login in researcher
+                  request.user.researcher.teachers.add(teacher)
+                else:
+                  #find the researcher with the permission code
+                  if permission_code is not None and permission_code != '':
+                    researcher = models.Researcher.objects.get(user_code=permission_code)
+                    researcher.teachers.add(teacher)
+                  else:
+                    messages.success(request, 'Teacher on row %d not affiliated with a researcher because permission code not specified' % count)
+              #create a student
+              elif account_type == 'Student':
+                school_obj = models.School.objects.get(name=school)
+                student = models.Student.objects.create(user=user, school=school_obj)
+                if role == 'teacher':
+                  #associate student with the logged in teacher
+                  request.user.teacher.students.add(student)
+                else:
+                  #find the teacher with the permission code
+                  if permission_code is not None and permission_code != '':
+                    teacher = models.Teacher.objects.get(user_code=permission_code)
+                    teacher.students.add(student)
+                  else:
+                    messages.success(request, 'Student on row %d not affiliated with a teacher because permission code not specified' % count)
+              #create an author
+              else:
+                author = models.Author.objects.create(user=user)
+
+            except IntegrityError:
+              messages.success(request, 'Username and/or email used on row %d already exists, so the user was not created' % count)
+            except models.School.DoesNotExist:
+              messages.success(request, 'School %s on row %d does not exist in the system' % (school, count))
+              user.delete()
+            except models.Researcher.DoesNotExist:
+              messages.success(request, 'Researcher with user code %s on row %d does not exist in the system' % (permission_code, count))
+              user.delete()
+
+      response_data = {'result': 'Success'}
+    else:
+      print form.errors
+      response_data = {'result': 'Failure', 'message': 'The uploaded csv is not valid. Please revise the csv and upload again.'}
+    return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+
+  return http.HttpResponseNotAllowed(['POST'])
 

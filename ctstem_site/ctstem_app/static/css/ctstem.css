@@ -300,6 +300,10 @@ div.btn-group {
   width: 100%;
 }
 
+div.btn-group input {
+  margin-left: 90%;
+}
+
 div.button-group-fixed {
   position: fixed;
   top: 30%;
@@ -499,4 +503,25 @@ a.selector-chooseall, a.selector-clearall {
 }
 
 /************* TOGGLE SWITCH END ***************/
+
+/********* Tabs **********/
+
+.nav-tabs {
+  margin-bottom: 1em;
+  font-size: 1.2em;
+  font-weight: 700;
+}
+.nav-tabs>li.active>a,
+.nav-tabs>li.active>a:focus,
+.nav-tabs>li.active>a:hover {
+  border-left: 1px solid #4d4d4d;
+  border-top: 1px solid #4d4d4d;
+  border-right: 1px solid #4d4d4d;
+  border-bottom: 1px solid #999999;
+}
+
+.nav-tabs>li>a {
+  border: 1px solid #999999;
+  background-color: #e6e6e6;
+}
 

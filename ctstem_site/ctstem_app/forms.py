@@ -410,3 +410,9 @@ class PublicationForm(ModelForm):
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['placeholder'] = field.help_text
 
+####################################
+# CSV Upload Form
+####################################
+class UploadFileForm(forms.Form):
+    uploadFile = forms.FileField()
+

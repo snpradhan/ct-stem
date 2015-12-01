@@ -88,14 +88,20 @@
               {% else %}
                 <li class="{% navactive request 'ctstem:taxonomy' %}"><a href="{% url 'ctstem:taxonomy' %}">Taxonomy</a></li>
               {% endif %}
-              {% if user.administrator %}
+              {% if user.administrator or user.researcher or user.teacher %}
                 <li class="dropdown {% navactive request 'ctstem:users' 'students' %} {% navactive request 'ctstem:users' 'teachers' %} {% navactive request 'ctstem:users' 'admins' %} {% navactive request 'ctstem:users' 'researchers' %} {% navactive request 'ctstem:users' 'authors' %}">
-                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" id="curriculum">Users  <b class="caret"></b></a>
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" id="users">Users  <b class="caret"></b></a>
                   <ul class="dropdown-menu">
+              {% endif %}
+              {% if user.administrator %}
                     <li class="{% navactive request 'ctstem:users' 'admins' %}"><a href="{% url 'ctstem:users' 'admins' %}">Site Admins</a></li>
                     <li class="{% navactive request 'ctstem:users' 'researchers' %}"><a href="{% url 'ctstem:users' 'researchers' %}">Researchers/School Admins</a></li>
                     <li class="{% navactive request 'ctstem:users' 'authors' %}"><a href="{% url 'ctstem:users' 'authors' %}">Content Authors</a></li>
+              {% endif %}
+              {% if user.administrator or user.researcher %}
                     <li class="{% navactive request 'ctstem:users' 'teachers' %}"><a href="{% url 'ctstem:users' 'teachers' %}">Teachers</a></li>
+              {% endif %}
+              {% if user.administrator or user.researcher or user.teacher %}
                     <li class="{% navactive request 'ctstem:users' 'students' %}"><a href="{% url 'ctstem:users' 'students' %}">Students</a></li>
                   </ul>
                 </li>

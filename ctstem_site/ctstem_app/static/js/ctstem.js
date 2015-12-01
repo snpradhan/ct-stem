@@ -89,6 +89,24 @@ $(function (){
     $(".modal-content #password").val('');
   });
 
+  //user code generation
+  $("#generate_code").click(function(){
+    var url = "/generate_code";
+    $.ajax({
+      type: 'GET',
+      url: url,
+      dataType: 'json',
+      success: function(data){
+        $("#id_user_code").val(data['user_code']);
+      },
+      error: function(){
+        alert("Please try generating the user code again.")
+      }
+
+    });
+  });
+
+
   //datatables configuration
   $('table.table.dt tfoot th').each( function () {
         var title = $(this).text();
@@ -107,6 +125,35 @@ $(function (){
           .search( this.value )
           .draw();
       }
+    });
+  });
+
+  //csv upload
+  $("#formUpload").submit(function(e) {
+    e.preventDefault();
+    //var data = $(this).serialize();
+    var data = new FormData($('form').get(0));
+    var url = "/upload/users";
+    $.ajax({
+      type: "POST",
+      url: url,
+      data: data,
+      dataType: 'json',
+      enctype: 'multipart/form-data',
+      cache: false,
+      processData: false,
+      contentType: false,
+      success: function(data){
+        if(data['result'] == 'Success'){
+          window.location.reload();
+        }
+        else{
+          $('#uploadMsg').html(data['message']);
+        }
+      },
+      error: function(xhr, ajaxOptions, thrownError){
+        $('#uploadMsg').html("Something went wrong.  Try again later!");
+      },
     });
   });
 
