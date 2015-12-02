@@ -102,6 +102,7 @@ def assessment(request, id=''):
       else:
         print form.errors
         print formset.errors
+        messages.error(request, "The assessment could not be saved because there were errors.  Please check the errors below.")
         context = {'form': form, 'formset':formset}
         return render(request, 'ctstem_app/Assessment.html', context)
 
@@ -153,7 +154,7 @@ def deleteAssessment(request, id=''):
 
     if request.method == 'GET' or request.method == 'POST':
       assessment.delete()
-      messages.success(request, '%s deleted' % assessment.title)
+      messages.success(request, 'Assessment %s deleted' % assessment.title)
       return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
     return http.HttpResponseNotAllowed(['GET', 'POST'])
@@ -242,11 +243,12 @@ def lesson(request, id=''):
         for obj in formset.deleted_objects:
           obj.delete()'''
 
-        messages.success(request, "Lesson Saved.")
+        messages.success(request, "Lesson %s Saved."%savedLesson.title)
         return shortcuts.redirect('ctstem:lesson', id=savedLesson.id)
       else:
         print form.errors
         print formset.errors
+        messages.error(request, "The lesson could not be saved because there were errors.  Please check the errors below.")
         context = {'form': form, 'formset':formset, 'newQuestionForm': newQuestionForm}
         return render(request, 'ctstem_app/Lesson.html', context)
 
@@ -363,7 +365,7 @@ def deleteLesson(request, id=''):
 
     if request.method == 'GET' or request.method == 'POST':
       lesson.delete()
-      messages.success(request, '%s deleted' % lesson.title)
+      messages.success(request, 'Lesson %s deleted' % lesson.title)
       return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
     return http.HttpResponseNotAllowed(['GET', 'POST'])
@@ -490,53 +492,53 @@ def userProfile(request, id=''):
     role = None
 
     if hasattr(user, 'administrator'):
-      role = 'A'
+      role = 'administrator'
       admin = models.Administrator.objects.get(user__id=id)
     elif hasattr(user, 'teacher'):
-      role = 'T'
+      role = 'teacher'
       teacher = models.Teacher.objects.get(user__id=id)
     elif hasattr(user, 'student'):
-      role = 'S'
+      role = 'student'
       student = models.Student.objects.get(user__id=id)
     elif hasattr(user, 'researcher'):
-      role = 'R'
+      role = 'researcher'
       researcher = models.Researcher.objects.get(user__id=id)
     elif hasattr(user, 'author'):
-      role = 'C'
+      role = 'author'
       author = models.Author.objects.get(user__id=id)
     else:
       return http.HttpResponseForbidden('<h1>User has no role</h1>')
 
     if request.method == 'GET':
       userform = forms.UserProfileForm(instance=user, prefix='user')
-      if role in ['S', 'T', 'A', 'R', 'C']:
-        if role == 'S':
+      if role in ['student', 'teacher', 'administrator', 'researcher', 'author']:
+        if role == 'student':
           profileform = forms.StudentForm(instance=student, prefix='student')
-        elif role == 'T':
+        elif role == 'teacher':
           profileform = forms.TeacherForm(instance=teacher, prefix='teacher')
-        elif role == 'A':
+        elif role == 'administrator':
           profileform = None
-        elif role == 'R':
+        elif role == 'researcher':
           profileform = forms.ResearcherForm(instance=researcher, prefix='researcher')
-        elif role == 'C':
+        elif role == 'author':
           profileform = forms.AuthorForm(instance=author, prefix='author')
         else:
           return http.HttpResponseNotFound('<h1>Requested user does not have a role</h1>')
 
-        context = {'profileform': profileform, 'userform': userform, }
+        context = {'profileform': profileform, 'userform': userform, 'role': role}
         return render(request, 'ctstem_app/UserProfile.html', context)
 
     elif request.method == 'POST':
       data = request.POST.copy()
-      if role == 'S':
+      if role == 'student':
           data.__setitem__('student-user', student.user.id)
-      elif role == 'T':
+      elif role == 'teacher':
           data.__setitem__('teacher-user', teacher.user.id)
-      elif role == 'A':
+      elif role == 'administrator':
           data.__setitem__('admin-user', admin.user.id)
-      elif role == 'R':
+      elif role == 'researcher':
           data.__setitem__('researcher-user', researcher.user.id)
-      elif role == 'C':
+      elif role == 'author':
           data.__setitem__('author-user', author.user.id)
       data.__setitem__('user-password', user.password)
       data.__setitem__('user-last_login', user.last_login)
@@ -544,13 +546,13 @@ def userProfile(request, id=''):
       userform = forms.UserProfileForm(data, instance=user, prefix='user')
 
       profileform = None
-      if role == 'S':
+      if role == 'student':
         profileform = forms.StudentForm(data, instance=student, prefix='student')
-      elif role == 'T':
+      elif role == 'teacher':
         profileform = forms.TeacherForm(data, instance=teacher, prefix='teacher')
-      elif role == 'R':
+      elif role == 'researcher':
         profileform = forms.ResearcherForm(data, instance=researcher, prefix='researcher')
-      elif role == 'C':
+      elif role == 'author':
         profileform = forms.AuthorForm(data, instance=author, prefix='author')
 
       if userform.is_valid():
@@ -562,14 +564,16 @@ def userProfile(request, id=''):
           userform.save()
           profileform.save()
           messages.success(request, "User profile saved successfully")
-          context = {'profileform': profileform, 'userform': userform, }
+          context = {'profileform': profileform, 'userform': userform, 'role': role}
         else:
           print profileform.errors
-          context = {'profileform': profileform, 'userform': userform, }
+          messages.error(request, "User profile could not be saved. Please check the errors below.")
+          context = {'profileform': profileform, 'userform': userform, 'role': role}
       else:
         print profileform.errors
         print userform.errors
-        context = {'profileform': profileform, 'userform': userform, }
+        messages.error(request, "User profile could not be saved. Please check the errors below.")
+        context = {'profileform': profileform, 'userform': userform, 'role': role}
 
       return render(request, 'ctstem_app/UserProfile.html', context)
 
@@ -747,6 +751,7 @@ def publication(request, slug=''):
         return shortcuts.redirect('ctstem:publications',)
       else:
         print form.errors
+        messages.error(request, "The publication could not be saved because there were errors.  Please check the errors below.")
         context = {'form': form}
         return render(request, 'ctstem_app/Publication.html', context)
 

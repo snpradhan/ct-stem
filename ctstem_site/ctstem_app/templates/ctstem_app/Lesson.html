@@ -13,10 +13,10 @@
 {% block content %}
   {{block.super}}
   <div class="content">
+    <h2> Lesson Plan </h2>
     <form method="post">
       {% csrf_token %}
       <div class="table" id="lesson">
-        <h3> Lesson Plan </h3>
         <div class="controls">
           <div class="expand_collapse">
             <span class="glyphicon glyphicon-collapse-up" aria-hidden="true"></span>

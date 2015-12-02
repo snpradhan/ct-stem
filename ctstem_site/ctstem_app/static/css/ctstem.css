@@ -147,7 +147,7 @@ div.table#register, div.table#userProfile, div.table#password {
   width: 50%;
   padding: 3em 4em;
 }
-div.table#lesson, div.table#lessonPreview, div.table#assessment, div.table.step, div.table#assessmentPreview, div.table.stepPreview, div.table#lessonQuestions, div.table.activity{
+div.table#lesson, div.table#lessonPreview, div.table#assessment, div.table.step, div.table#assessmentPreview, div.table.stepPreview, div.table#lessonQuestions, div.table.activity, div.table#publication{
   width: 70%;
   padding: 3em 4em;
 
@@ -286,7 +286,7 @@ div.content {
   margin-left: auto;
   margin-right: auto;
   margin-bottom: 40px;
-  margin-top: 80px;
+  margin-top: 50px;
   min-height: 75%;
 }
 
@@ -298,10 +298,6 @@ div.content#home {
 div.btn-group {
   margin-bottom: 10px;
   width: 100%;
-}
-
-div.btn-group input {
-  margin-left: 90%;
 }
 
 div.button-group-fixed {
@@ -337,8 +333,7 @@ ul.messages {
   list-style-type: none;
   text-align: center;
   font-size: 1.5em;
-  top: 50px;
-  position: absolute;
+  margin-top: 50px;
   width: 100%;
 }
 
