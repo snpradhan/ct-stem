@@ -46,11 +46,11 @@ SUBJECT_CHOICES = (
 )
 
 USER_ROLE_CHOICES = (
-    (u'T', u'Teacher'),
-    (u'R', u'Researcher/School Admin'),
-    (u'S', u'Student'),
     (u'A', u'Site Administrator'),
+    (u'R', u'Researcher/School Admin'),
     (u'C', u'Content Author'),
+    (u'T', u'Teacher'),
+    (u'S', u'Student'),
 )
 
 PUBLICATION_TYPES = (

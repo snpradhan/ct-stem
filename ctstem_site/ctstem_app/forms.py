@@ -33,11 +33,18 @@ class RegistrationForm (forms.Form):
   user_code = forms.CharField(required=False, max_length=256, label=u'User code', help_text='A unique code to share with your students or teachers')
 
   def __init__(self, *args, **kwargs):
+    user = kwargs.pop('user')
     super(RegistrationForm, self).__init__(*args, **kwargs)
+    if user.is_authenticated():
+      if hasattr(user, 'researcher'):
+        self.fields['account_type'].choices = models.USER_ROLE_CHOICES[3:]
+      elif hasattr(user, 'teacher'):
+        self.fields['account_type'].choices = models.USER_ROLE_CHOICES[4:]
     for field_name, field in self.fields.items():
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['aria-describedby'] = field.label
       field.widget.attrs['placeholder'] = field.help_text
+
 
   def clean_username(self):
     if User.objects.filter(username=self.cleaned_data['username']).count() > 0:
@@ -65,9 +72,7 @@ class RegistrationForm (forms.Form):
     if self.cleaned_data['account_type'] == 'T':
       if self.cleaned_data['school'] is None or self.cleaned_data['school'] == '':
         error_list.append('SR');
-      if self.cleaned_data['permission_code'] is None or self.cleaned_data['permission_code'] == '':
-        error_list.append('PR');
-      else:
+      if self.cleaned_data['permission_code'] is not None and self.cleaned_data['permission_code'] != '':
         try:
           models.Researcher.objects.get(user_code=self.cleaned_data['permission_code'], user__is_active=True)
         except models.Researcher.DoesNotExist:
@@ -84,9 +89,7 @@ class RegistrationForm (forms.Form):
     elif self.cleaned_data['account_type'] == 'S':
       if self.cleaned_data['school'] is None or self.cleaned_data['school'] == '':
         error_list.append('SR');
-      if self.cleaned_data['permission_code'] is None or self.cleaned_data['permission_code'] == '':
-        error_list.append('PR');
-      else:
+      if self.cleaned_data['permission_code'] is not None and self.cleaned_data['permission_code'] != '':
         try:
           models.Teacher.objects.get(user_code=self.cleaned_data['permission_code'], user__is_active=True)
         except models.Teacher.DoesNotExist:
@@ -109,8 +112,6 @@ class RegistrationForm (forms.Form):
     for error in error_list:
       if error == 'SR':
         self._errors['school'] = u'School is required'
-      elif error == 'PR':
-        self._errors['permission_code'] = u'Permission code is required'
       elif error == 'PI':
         self._errors['permission_code'] = u'Permission code is not valid'
       elif error == 'UR':

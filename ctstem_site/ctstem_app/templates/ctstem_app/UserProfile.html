@@ -23,7 +23,7 @@
         {% endfor %}
         {% for field in profileform %}
           <div class="form-group">
-            <label for="id_{{field.name}}">{{ field.label }}</label>
+            <label for="id_{{field.name}}">{{ field.label }} {% if field.field.required %}(<span class="required">*</span>) {% endif %} </label>
             {% if field.name == 'user_code' %}
               <div class="input-group">
                 {{field}}

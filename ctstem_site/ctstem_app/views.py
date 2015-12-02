@@ -377,14 +377,14 @@ def deleteLesson(request, id=''):
 ####################################
 def register(request):
   if request.method == 'POST':
-    form = forms.RegistrationForm(data=request.POST)
+    form = forms.RegistrationForm(user=request.user, data=request.POST)
     if form.is_valid():
       user = User.objects.create_user(form.cleaned_data['username'],
                                       form.cleaned_data['email'],
                                       form.cleaned_data['password1'])
       user.first_name = form.cleaned_data['first_name']
       user.last_name = form.cleaned_data['last_name']
-      if form.cleaned_data['account_type'] in  ['A', 'R', 'C']:
+      if form.cleaned_data['account_type'] in  ['A', 'R', 'C'] and request.user.is_anonymous():
           user.is_active = False
       else:
           user.is_active = True
@@ -397,8 +397,12 @@ def register(request):
         newUser.user = user
         newUser.save()
         #get the school admin based on the permission code
-        researcher = models.Researcher.objects.get(user_code = form.cleaned_data['permission_code'])
-        researcher.teachers.add(newUser)
+
+        if request.user.is_authenticated() and hasattr(request.user, 'researcher'):
+          request.user.researcher.teachers.add(newUser)
+        elif form.cleaned_data['permission_code']:
+          researcher = models.Researcher.objects.get(user_code = form.cleaned_data['permission_code'])
+          researcher.teachers.add(newUser)
 
       elif form.cleaned_data['account_type'] == 'S':
         newUser = models.Student()
@@ -406,8 +410,11 @@ def register(request):
         newUser.user = user
         newUser.save()
         #get the teacher based on the permission code
-        teacher = models.Teacher.objects.get(user_code = form.cleaned_data['permission_code'])
-        teacher.students.add(newUser)
+        if request.user.is_authenticated() and hasattr(request.user, 'teacher'):
+          request.user.teacher.students.add(newUser)
+        elif form.cleaned_data['permission_code']:
+          teacher = models.Teacher.objects.get(user_code = form.cleaned_data['permission_code'])
+          teacher.students.add(newUser)
 
       elif form.cleaned_data['account_type'] == 'A':
           newUser = models.Administrator()
@@ -425,23 +432,38 @@ def register(request):
         newUser.user = user
         newUser.save()
 
-      if form.cleaned_data['account_type'] in ['A', 'R', 'C']:
-        messages.info(request, 'Your account is pending admin approval.  Please contact the system administrator to request approval.')
+      if request.user.is_anonymous():
+        if form.cleaned_data['account_type'] in ['A', 'R', 'C']:
+          messages.info(request, 'Your account is pending admin approval.  Please contact the system administrator to request approval.')
+          return render(request, 'ctstem_app/About_us.html')
+        elif form.cleaned_data['account_type'] in ['T', 'S']:
+          new_user = authenticate(username=form.cleaned_data['username'],
+                                  password=form.cleaned_data['password1'], )
+          login(request, new_user)
+          lessons = models.Lesson.objects.order_by('id')
+          context = {'lessons': lessons}
+          return render(request, 'ctstem_app/Lessons.html', context)
+      else:
+        messages.info(request, 'User account has been created.')
+        if form.cleaned_data['account_type'] == 'A':
+          return shortcuts.redirect('ctstem:users', role='admins')
+        elif form.cleaned_data['account_type'] == 'R':
+          return shortcuts.redirect('ctstem:users', role='researchers')
+        elif form.cleaned_data['account_type'] == 'C':
+          return shortcuts.redirect('ctstem:users', role='authors')
+        elif form.cleaned_data['account_type'] == 'T':
+          return shortcuts.redirect('ctstem:users', role='teachers')
+        elif form.cleaned_data['account_type'] == 'S':
+          return shortcuts.redirect('ctstem:users', role='students')
         return render(request, 'ctstem_app/About_us.html')
-      elif form.cleaned_data['account_type'] in ['T', 'S']:
-        new_user = authenticate(username=form.cleaned_data['username'],
-                                password=form.cleaned_data['password1'], )
-        login(request, new_user)
-        lessons = models.Lesson.objects.order_by('id')
-        context = {'lessons': lessons}
-        return render(request, 'ctstem_app/Lessons.html', context)
 
     else:
-     context = {'form': form}
-    return render(request, 'ctstem_app/Registration.html', context)
+      print form.errors
+      context = {'form': form}
+      return render(request, 'ctstem_app/Registration.html', context)
 
   else:
-    form = forms.RegistrationForm()
+    form = forms.RegistrationForm(user=request.user)
     context = {'form': form}
     return render(request, 'ctstem_app/Registration.html', context)
 
@@ -459,7 +481,7 @@ def user_login(request):
       login(request, user)
       response_data['result'] = 'Success'
     else:
-      response_data['result'] = 'failed'
+      response_data['result'] = 'Failed'
       if user and user.is_active == False:
         response_data['message'] = 'Your account has not been activated'
       else:
@@ -588,11 +610,18 @@ def userProfile(request, id=''):
 def deleteUser(request, id=''):
   try:
     # check if the user has permission to delete a lesson
-    if hasattr(request.user, 'administrator') == False:
-      return http.HttpResponseNotFound('<h1>You do not have the privilege to delete this user</h1>')
+    if hasattr(request.user, 'author') or hasattr(request.user, 'student'):
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to delete users</h1>')
     # check if the lesson exists
     if '' != id:
       user = User.objects.get(id=id)
+
+    if hasattr(request.user, 'researcher'):
+      if hasattr(user, 'administrator') or hasattr(user, 'researcher') or hasattr(user, 'author'):
+        return http.HttpResponseNotFound('<h1>You do not have the privilege to delete this user</h1>')
+    if hasattr(request.user, 'teacher'):
+      if hasattr(user, 'administrator') or hasattr(user, 'researcher') or hasattr(user, 'author') or hasattr(user, 'teacher'):
+        return http.HttpResponseNotFound('<h1>You do not have the privilege to delete this user</h1>')
 
     if request.method == 'GET' or request.method == 'POST':
       user.delete()
@@ -855,12 +884,13 @@ def user_upload(request):
   else:
     return http.HttpResponseNotFound('<h1>You do not have the privilege to upload users</h1>')
 
+  count = 0
+  added = 0
   if request.method == 'POST':
     form = forms.UploadFileForm(request.POST, request.FILES)
     if form.is_valid():
       f = request.FILES['uploadFile']
       reader = csv.reader(f.read().splitlines(), delimiter=',')
-      count = 0
       for row in reader:
         count += 1
         if row[0] != 'Username*':
@@ -875,20 +905,20 @@ def user_upload(request):
           print username, first_name, last_name, email, password, account_type, school, permission_code
           # check fields are not blank
           if username is None or username == '':
-            messages.success(request, 'Username is missing on row %d' % count)
+            messages.error(request, 'Username is missing on row %d' % count)
           elif first_name is None or first_name == '':
-            messages.success(request, 'First name is missing on row %d' % count)
+            messages.error(request, 'First name is missing on row %d' % count)
           elif last_name is None or last_name == '':
-            messages.success(request, 'Last name is missing on row %d' % count)
+            messages.error(request, 'Last name is missing on row %d' % count)
           elif email is None or email == '':
-            messages.success(request, 'Email is missing on row %d' % count)
+            messages.error(request, 'Email is missing on row %d' % count)
           elif account_type is None or account_type == '' or account_type not in ['Admin', 'Researcher', 'Teacher', 'Student', 'Author']:
-            messages.success(request, 'Account Type is missing or invalid on row %d' % count)
+            messages.error(request, 'Account Type is missing or invalid on row %d' % count)
           # check user has privilege to create other users
-          elif role == 'researcher' and account_type in ['Admin', 'Researcher']:
-            messages.success(request, 'You do not have the privilege to add  %s on row %d' % (account_type, count))
-          elif role == 'teacher' and account_type in ['Admin', 'Researcher', 'Teacher']:
-            messages.success(request, 'You do not have the privilege to add  %s on row %d' % (account_type, count))
+          elif role == 'researcher' and account_type in ['Admin', 'Researcher', 'Author']:
+            messages.error(request, 'You do not have the privilege to add  %s on row %d' % (account_type, count))
+          elif role == 'teacher' and account_type in ['Admin', 'Researcher', 'Teacher', 'Author']:
+            messages.error(request, 'You do not have the privilege to add  %s on row %d' % (account_type, count))
           # everything cool so far
           else:
             try:
@@ -913,7 +943,7 @@ def user_upload(request):
                 researcher = models.Researcher.objects.create(user=user, user_code=user_code, school=school_obj)
               #create a teacher
               elif account_type == 'Teacher':
-                user_code_obj = generate_code_helper(request)
+                user_code = generate_code_helper(request)
                 school_obj = models.School.objects.get(name=school)
                 teacher = models.Teacher.objects.create(user=user, user_code=user_code, school=school_obj)
                 # associate the teacher with a researcher
@@ -926,7 +956,7 @@ def user_upload(request):
                     researcher = models.Researcher.objects.get(user_code=permission_code)
                     researcher.teachers.add(teacher)
                   else:
-                    messages.success(request, 'Teacher on row %d not affiliated with a researcher because permission code not specified' % count)
+                    messages.warning(request, 'Teacher on row %d created but not affiliated with a researcher because permission code not specified' % count)
               #create a student
               elif account_type == 'Student':
                 school_obj = models.School.objects.get(name=school)
@@ -940,20 +970,29 @@ def user_upload(request):
                     teacher = models.Teacher.objects.get(user_code=permission_code)
                     teacher.students.add(student)
                   else:
-                    messages.success(request, 'Student on row %d not affiliated with a teacher because permission code not specified' % count)
+                    messages.warning(request, 'Student on row %d created but not affiliated with a teacher because permission code not specified' % count)
               #create an author
               else:
                 author = models.Author.objects.create(user=user)
 
-            except IntegrityError:
-              messages.success(request, 'Username and/or email used on row %d already exists, so the user was not created' % count)
-            except models.School.DoesNotExist:
-              messages.success(request, 'School %s on row %d does not exist in the system' % (school, count))
-              user.delete()
-            except models.Researcher.DoesNotExist:
-              messages.success(request, 'Researcher with user code %s on row %d does not exist in the system' % (permission_code, count))
-              user.delete()
+              added += 1
 
+            except IntegrityError:
+              messages.error(request, 'Username and/or email used on row %d already exists, so the user was not created' % count)
+              continue
+            except models.School.DoesNotExist:
+              messages.error(request, 'School %s on row %d does not exist in the system' % (school, count))
+              user.delete()
+              continue
+            except models.Teacher.DoesNotExist:
+              messages.error(request, 'Teacher with user code %s on row %d does not exist in the system' % (permission_code, count))
+              user.delete()
+              continue
+            except models.Researcher.DoesNotExist:
+              messages.error(request, 'Researcher with user code %s on row %d does not exist in the system' % (permission_code, count))
+              user.delete()
+              continue
+      messages.success(request, '%d out of %d users were added.' % (added, count-1))
       response_data = {'result': 'Success'}
     else:
       print form.errors

@@ -25,7 +25,9 @@
           {{form.management_form}}
           {% for field in form %}
             <div class="form-group" id="div_{{field.name}}">
-              <label for="id_{{field.name}}">{{ field.label|title }} (<span class="required">*</span>)</label>
+              <label for="id_{{field.name}}">{{ field.label|title }}
+                {% if field.field.required  or field.name == 'user_code' %}(<span class="required">*</span>) {% endif %}
+              </label>
               {% if field.name == 'user_code' %}
                 <div class="input-group">
                   {{field}}
@@ -41,7 +43,7 @@
           {% endfor %}
           {% if user.is_authenticated %}
             <div class="form-group button-group">
-              <input type="submit" class="btn btn-success" id="submit" value="Add" disabled/>
+              <input type="submit" class="btn btn-success" id="submit" value="Add"/>
             </div>
           {% else %}
             <div class="checkbox">
@@ -73,6 +75,7 @@
           $('#div_user_code').hide();
         }
         else if(account_type === 'R'){
+          $('#div_school').show();
           $('#div_permission_code').hide();
           $('#div_user_code').show();
         }
