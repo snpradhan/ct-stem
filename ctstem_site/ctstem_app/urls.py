@@ -37,5 +37,9 @@ urlpatterns = [
     url(r'^users/(?P<role>[a-zA-Z0-9]+)/$', views.users, name='users'),
     url(r'^question/new/$', views.question, name='newQuestion'),
     url(r'^question/(?P<id>[\d]+)/$', views.question, name='question'),
+    url(r'^group/(?P<id>[\d]+)/$', views.group, name='group'),
+    url(r'^groups/$', views.groups, name='groups'),
+    url(r'^group/new/$', views.group, name='newGroup'),
+
 
 ]

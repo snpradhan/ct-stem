@@ -18,6 +18,7 @@
       <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 
       <script type="text/javascript" src="/static/js/django-admin.multiselect.js"></script>
+      <script type="text/javascript" src="{% url 'admin:jsi18n' %}"></script>
       <script type="text/javascript" src="/static/js/ctstem.js"></script>
       <link rel="stylesheet" href="/static/css/ctstem.css" media="screen"/>
 
@@ -89,7 +90,7 @@
                 <li class="{% navactive request 'ctstem:taxonomy' %}"><a href="{% url 'ctstem:taxonomy' %}">Taxonomy</a></li>
               {% endif %}
               {% if user.administrator or user.researcher or user.teacher %}
-                <li class="dropdown {% navactive request 'ctstem:users' 'students' %} {% navactive request 'ctstem:users' 'teachers' %} {% navactive request 'ctstem:users' 'admins' %} {% navactive request 'ctstem:users' 'researchers' %} {% navactive request 'ctstem:users' 'authors' %}">
+                <li class="dropdown {% navactive request 'ctstem:users' 'students' %} {% navactive request 'ctstem:users' 'teachers' %} {% navactive request 'ctstem:users' 'admins' %} {% navactive request 'ctstem:users' 'researchers' %} {% navactive request 'ctstem:users' 'authors' %} {% navactive request 'ctstem:groups' %}">
                   <a href="#" class="dropdown-toggle" data-toggle="dropdown" id="users">Users  <b class="caret"></b></a>
                   <ul class="dropdown-menu">
               {% endif %}
@@ -103,6 +104,8 @@
               {% endif %}
               {% if user.administrator or user.researcher or user.teacher %}
                     <li class="{% navactive request 'ctstem:users' 'students' %}"><a href="{% url 'ctstem:users' 'students' %}">Students</a></li>
+                    <li class="divider"></li>
+                    <li class="{% navactive request 'ctstem:groups' %}"><a href="{% url 'ctstem:groups' %}">User Groups</a></li>
                   </ul>
                 </li>
               {% endif %}

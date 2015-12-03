@@ -412,6 +412,68 @@ class PublicationForm(ModelForm):
       field.widget.attrs['placeholder'] = field.help_text
 
 ####################################
+# User Group Form
+####################################
+class UserGroupForm(ModelForm):
+  members = forms.ModelMultipleChoiceField(required=False, queryset=models.Student.objects.all(), widget=FilteredSelectMultiple(('Members'), False, attrs={'size':5}))
+  assignments = forms.ModelMultipleChoiceField(required=False, queryset=models.Assessment.objects.all(), widget=FilteredSelectMultiple(('Assignments'), False, attrs={'size':5}))
+
+  class Meta:
+    model = models.UserGroup
+    exclude = ('id',)
+
+  def __init__(self, *args, **kwargs):
+    super(UserGroupForm, self).__init__(*args, **kwargs)
+
+    for field_name, field in self.fields.items():
+      field.widget.attrs['class'] = 'form-control'
+      field.widget.attrs['placeholder'] = field.help_text
+
+  def save(self, commit=True):
+    instance = forms.ModelForm.save(self, False)
+
+    def save_m2m():
+
+      old_members = models.Membership.objects.filter(group=instance)
+      for old_member in old_members:
+        changed = True
+        for curr_member in self.cleaned_data['members']:
+            if old_member.student == curr_member:
+                changed = False
+        if changed:
+            old_member.delete()
+
+      for member in self.cleaned_data['members']:
+        try:
+            models.Membership.objects.get(group=instance, student=member)
+        except models.Membership.DoesNotExist:
+            membership = models.Membership(group=instance, student=member)
+            membership.save()
+
+      old_assignments = models.Assignment.objects.filter(group=instance)
+      for old_assignment in old_assignments:
+        changed = True
+        for curr_assignment in self.cleaned_data['assignments']:
+            if old_assignment.assessment == curr_assignment:
+                changed = False
+        if changed:
+            old_assignment.delete()
+
+      for assignment in self.cleaned_data['assignments']:
+        try:
+            models.Assignment.objects.get(group=instance, assessment=assignment)
+        except models.Assignment.DoesNotExist:
+            ga = models.Assignment(group=instance, assessment=assignment)
+            ga.save()
+
+    self.save_m2m = save_m2m
+    if commit:
+        instance.save()
+        self.save_m2m()
+
+    return instance
+
+####################################
 # CSV Upload Form
 ####################################
 class UploadFileForm(forms.Form):

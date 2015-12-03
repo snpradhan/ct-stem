@@ -283,6 +283,7 @@ class Section(models.Model):
 
 #######################################################
 # Publication model
+#######################################################
 class Publication(models.Model):
   authors = models.CharField(max_length=255, help_text='Publication Author')
   year = models.CharField(max_length=255, help_text='Publication Year')
@@ -297,3 +298,35 @@ class Publication(models.Model):
   publication_type = models.CharField(max_length=255, choices=PUBLICATION_TYPES)
   publication_affiliation = models.CharField(max_length=255, choices=PUBLICATION_AFFILIATION)
 
+
+#######################################################
+# Group model
+#######################################################
+class UserGroup(models.Model):
+  title = models.CharField(max_length=255, help_text='Group Title')
+  subject = models.ForeignKey(Subject)
+  time = models.CharField(null=False, max_length=256)
+  teacher = models.ForeignKey(Teacher)
+  description = models.TextField(null=True)
+  members = models.ManyToManyField(Student, through='Membership', blank=True, null=True, related_name='member_of')
+  assignments = models.ManyToManyField(Assessment, through='Assignment', blank=True, null=True, related_name='assigned_to')
+
+  def __unicode__(self):
+    return u'%s' % (self.title)
+
+#######################################################
+# Assignment model
+#######################################################
+class Assignment(models.Model):
+  assessment = models.ForeignKey(Assessment)
+  group = models.ForeignKey(UserGroup, related_name="group_assignments")
+  assigned_date = models.DateTimeField(auto_now_add=True)
+  due_date = models.DateTimeField(null=True)
+
+#######################################################
+# Membership model
+#######################################################
+class Membership(models.Model):
+  student = models.ForeignKey(Student)
+  group = models.ForeignKey(UserGroup, related_name="group_members")
+  joined_on = models.DateTimeField(auto_now_add=True)

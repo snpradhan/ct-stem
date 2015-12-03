@@ -813,6 +813,56 @@ def deletePublication(request, slug=''):
 
   except models.Publication.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested publication not found</h1>')
+
+
+####################################
+# GROUPS TABLE VIEW
+####################################
+@login_required
+def groups(request):
+  groups = models.UserGroup.objects.all().order_by('id')
+  context = {'groups': groups}
+  return render(request, 'ctstem_app/UserGroups.html', context)
+
+
+####################################
+# CREATE MODIFY A USER GROUP
+####################################
+@login_required
+def group(request, id=''):
+  try:
+    # check if the user has permission to create or modify a lesson
+    if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'researcher') == False and hasattr(request.user, 'teacher') == False:
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to create/modify a group</h1>')
+    # check if the lesson exists
+    if '' != id:
+      group = models.UserGroup.objects.get(id=id)
+    else:
+      group = models.UserGroup()
+
+    print group
+    if request.method == 'GET':
+        form = forms.UserGroupForm(instance=group, prefix='group')
+        context = {'form': form,}
+        return render(request, 'ctstem_app/UserGroup.html', context)
+
+    elif request.method == 'POST':
+      data = request.POST.copy()
+      form = forms.UserGroupForm(data, instance=group, prefix="group")
+      if form.is_valid():
+        savedGroup = form.save()
+        messages.success(request, "User Group Saved.")
+        return shortcuts.redirect('ctstem:group', id=savedGroup.id)
+      else:
+        print form.errors
+        messages.error(request, "The group could not be saved because there were errors.  Please check the errors below.")
+        context = {'form': form}
+        return render(request, 'ctstem_app/UserGroup.html', context)
+
+    return http.HttpResponseNotAllowed(['GET', 'POST'])
+
+  except models.Lesson.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested group not found</h1>')
 ####################################
 # ADD/EDIT QUESTION
 ####################################
