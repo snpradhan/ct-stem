@@ -163,10 +163,8 @@ div.table.step div.row.question {
   margin-bottom: 1em;
 }
 
-div.table#lesson div.controls, div.table.activity div.controls {
-  margin-left: 98%;
-  font-size: 2em;
-  margin-bottom: 1em;
+div.table#lesson span.controls, div.table.activity span.controls, div.table#assessment span.controls, div.table.step span.controls {
+  float: right;
 }
 
 div.table.activity .question_table {
@@ -254,7 +252,23 @@ div.row.portfolio {
  ***************************************/
 table.table {
   margin: auto;
+  border-radius: 10px;
+  border-collapse:separate;
+  border: inherit !important;
 }
+table.table tr:first-child th:first-child {
+    border-top-left-radius: 10px;
+}
+table.table tr:first-child th:last-child {
+  border-top-right-radius: 10px;
+}
+table.table tr:last-child td:first-child {
+    border-bottom-left-radius: 10px;
+}
+table.table tr:last-child td:last-child {
+  border-bottom-right-radius: 10px;
+}
+
 table.table thead tr#filterrow th {
   font-weight: 400;
   font-size: smaller;
@@ -270,6 +284,28 @@ table.table td.title {
 }
 table.table td.title div.controls {
   margin-top: 0.5em;
+}
+
+table.table.dt thead tr:not(#filterrow) {
+  background-color: #666666;
+  color: #e5e5e5;
+}
+
+table.table thead tr:not(#filterrow) th{
+  text-align: center;
+}
+
+.dataTables_wrapper .dataTables_length,
+.dataTables_wrapper .dataTables_filter,
+.dataTables_wrapper .dataTables_info,
+.dataTables_wrapper .dataTables_processing,
+.dataTables_wrapper .dataTables_paginate {
+  font-size: 1.4em;
+}
+
+.dataTables_wrapper .dataTables_filter input {
+  width: 15em;
+  border-radius: 5px;
 }
 /***********   TABLE VIEW END   ************/
 

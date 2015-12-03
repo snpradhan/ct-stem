@@ -154,4 +154,11 @@ $(function (){
     });
   });
 
+  $(".expand_collapse").click(function(){
+    $(this).closest('.table').children('.curriculum_content').toggle();
+    $(this).children().each(function(){
+      $(this).toggle();
+    })
+  });
+
 });

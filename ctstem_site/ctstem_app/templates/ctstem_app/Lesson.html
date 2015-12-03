@@ -17,13 +17,16 @@
     <form method="post">
       {% csrf_token %}
       <div class="table" id="lesson">
-        <div class="controls">
-          <div class="expand_collapse">
-            <span class="glyphicon glyphicon-collapse-up" aria-hidden="true"></span>
-            <span class="glyphicon glyphicon-collapse-down" aria-hidden="true" style="display:none;"></span>
-          </div>
-        </div>
-        <div class="lesson_content">
+        <h4>Lesson Meta
+          <span class="controls">
+            <span class="expand_collapse">
+              <span class="glyphicon glyphicon-collapse-up" aria-hidden="true"></span>
+              <span class="glyphicon glyphicon-collapse-down" aria-hidden="true" style="display:none;"></span>
+            </span>
+          </span>
+        </h4>
+
+        <div class="curriculum_content">
           {{form.management_form}}
           {% for field in form %}
             <div class="form-group">
@@ -56,13 +59,23 @@
       {{formset.management_form}}
       {% for activity in formset %}
         <div class="table activity">
-          <h4> Lesson Activity </h4>
-          <div class="controls">
-            <div class="expand_collapse">
-              <span class="glyphicon glyphicon-collapse-up" aria-hidden="true"></span>
-              <span class="glyphicon glyphicon-collapse-down" aria-hidden="true" style="display:none;"></span>
-            </div>
-          </div>
+          <h4>
+            Lesson Activity
+            <span class="activity_order">
+              {% if activity.ORDER.value %}
+                {{ activity.ORDER.value}}
+              {% else %}
+                {{forloop.counter}}
+            {% endif %}
+            </span>
+            <span class="controls">
+              <span class="expand_collapse">
+                <span class="glyphicon glyphicon-collapse-up" aria-hidden="true"></span>
+                <span class="glyphicon glyphicon-collapse-down" aria-hidden="true" style="display:none;"></span>
+              </span>
+            </span>
+          </h4>
+
           {{ activity.management_form }}
           {{activity.id}}
           <div class="form-group">
@@ -70,7 +83,7 @@
             <div>{{activity.title}}</div>
             <div class="error">{{ activity.title.errors }}</div>
           </div>
-          <div class="lesson_content">
+          <div class="curriculum_content">
             <div class="form-group">
               <label for="id_{{activity.content.name}}">{{ activity.content.label }} {% if activity.content.field.required %}(<span class="required">*</span>) {% endif %}</label>
               <div>
@@ -167,6 +180,9 @@
 
       $('#addActivity').click(function() {
         cloneMore('div.table:last', 'form');
+        var activity_order_div = $('div.table:last span.activity_order');
+        var activity_order = parseInt($(activity_order_div).html()) + 1;
+        $(activity_order_div).html(activity_order);
         //alert('after clone');
         bindWysiwyg();
         //rebind question clone
@@ -182,12 +198,6 @@
           $(this).next().show();
         });
       }
-      $(".expand_collapse").click(function(){
-        $(this).parent().siblings('.lesson_content').toggle();
-        $(this).children().each(function(){
-          $(this).toggle();
-        })
-      });
     });
   </script>
 
