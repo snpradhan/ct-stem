@@ -108,25 +108,22 @@ $(function (){
 
 
   //datatables configuration
-  $('table.table.dt tfoot th').each( function () {
+  $('table.table.dt thead tr#filterrow th').each( function () {
         var title = $(this).text();
         $(this).html( '<input type="text" placeholder="Search '+title+'" />' );
     } );
 
-  var table = $('table.table.dt').DataTable();
+  var table = $('table.table.dt').DataTable({
+    orderCellsTop: true
+  });
 
-  // Apply the search
-  table.columns().every( function () {
-    var that = this;
-
-    $( 'input', this.footer() ).on( 'keyup change', function () {
-      if ( that.search() !== this.value ) {
-        that
+  // Apply the filter
+  $("table.table.dt thead input").on( 'keyup change', function () {
+      table
+          .column( $(this).parent().index()+':visible' )
           .search( this.value )
           .draw();
-      }
-    });
-  });
+  } );
 
   //csv upload
   $("#formUpload").submit(function(e) {

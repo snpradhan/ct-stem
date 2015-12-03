@@ -255,11 +255,11 @@ div.row.portfolio {
 table.table {
   margin: auto;
 }
-table.table tfoot th {
+table.table thead tr#filterrow th {
   font-weight: 400;
   font-size: smaller;
 }
-table.table tfoot th input {
+table.table thead tr#filterrow th input {
   width: 90%;
 }
 table.table td {

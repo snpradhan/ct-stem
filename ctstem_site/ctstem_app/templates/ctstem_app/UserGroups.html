@@ -26,9 +26,7 @@
             <th> Students </th>
             <th> Assignments </th>
           </tr>
-        </thead>
-        <tfoot>
-          <tr>
+          <tr id="filterrow">
             <th> Title </th>
             <th> Subject </th>
             <th> Time </th>
@@ -36,7 +34,7 @@
             <th> Students </th>
             <th> Assignments </th>
           </tr>
-        </tfoot>
+        </thead>
         <tbody>
           {% for group in groups %}
             <tr>
@@ -51,7 +49,7 @@
               <td>{{group.teacher}}</td>
               <td>
                 {{group.members.count}}
-                {% if group.members %}
+                {% if group.members.count > 0 %}
                   <span class="expand_collapse">
                     <span class="glyphicon glyphicon-collapse-up" aria-hidden="true" style="display:none;"></span>
                     <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
@@ -66,7 +64,7 @@
               </td>
               <td>
                 {{group.assignments.count}}
-                {% if group.assignments %}
+                {% if group.assignments.count > 0 %}
                   <span class="expand_collapse">
                     <span class="glyphicon glyphicon-collapse-up" aria-hidden="true" style="display:none;"></span>
                     <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>

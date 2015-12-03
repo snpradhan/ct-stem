@@ -48,9 +48,7 @@
               <th> User Code </th>
             {% endif %}
           </tr>
-        </thead>
-        <tfoot>
-          <tr>
+          <tr id="filterrow">
             <th> Username </th>
             <th> Name </th>
             <th> Email </th>
@@ -62,7 +60,7 @@
               <th> User Code </th>
             {% endif %}
           </tr>
-        </tfoot>
+        </thead>
         <tbody>
           {% for userProfile in users %}
             <tr>
