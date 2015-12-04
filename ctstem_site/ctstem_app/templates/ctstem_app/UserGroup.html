@@ -24,10 +24,66 @@
             <div class="error">{{ field.errors }}</div>
           </div>
         {% endfor %}
+
+        <div class="form-group assignment_table">
+          {{formset.management_form}}
+          {{formset.id}}
+          <div>
+            <label for="id_assignment_table">Assignments</label>
+            <button type="button" class="btn btn-primary" id="addAssignment">
+              <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+            </button>
+          </div>
+          <table class="table table-striped table-condensed" style="text-align:center;">
+            <thead>
+              <tr>
+                <th style="width:60%;"></th>
+                <th>Assigned Date</th>
+                <th>Due Date</th>
+                <th>Delete</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for assignmentForm in formset %}
+                <tr>
+                  <td class="assessment_title">
+                    {{assignmentForm.id}}
+                    {{assignmentForm.assessment}}
+                    <div class="error">
+                      {{assignmentForm.assessment.errors}}
+                    </div>
+                  </td>
+                  <td style="vertical-align:middle;">{{assignmentForm.get_assigned_date|date}}</td>
+                  <td>
+                    {{assignmentForm.due_date }}
+                    <div class="error">
+                      {{assignmentForm.due_date.errors }}
+                    </div>
+                  </td>
+                  <td>{{assignmentForm.DELETE }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
         <div class="form-group button-group-fixed">
           <input type="submit" class="btn btn-success" id="submit" value="Save Group"/>
         </div>
       </div>
     </form>
   </div>
+  <script type="text/javascript">
+  $(function (){
+    $('#addAssignment').click(function() {
+      cloneMore('div.assignment_table table.table tr:last', 'form');
+      $('div.assignment_table table.table tr:last .datepicker').removeClass('hasDatepicker');
+      $('div.assignment_table table.table tr:last .datepicker').datepicker({dateFormat: 'M d, yy'});
+    });
+
+
+  });
+  $(document).ready(function() {
+        $('.datepicker').datepicker({dateFormat: 'M d, yy'});
+    });
+  </script>
 {% endblock %}

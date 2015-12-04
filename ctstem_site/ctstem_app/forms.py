@@ -15,7 +15,6 @@ from django.utils.safestring import mark_safe
 from django.core.exceptions import ObjectDoesNotExist
 from tinymce.widgets import TinyMCE
 
-
 ####################################
 # Registration Form
 ####################################
@@ -416,7 +415,6 @@ class PublicationForm(ModelForm):
 ####################################
 class UserGroupForm(ModelForm):
   members = forms.ModelMultipleChoiceField(required=False, queryset=models.Student.objects.all(), widget=FilteredSelectMultiple(('Members'), False, attrs={'size':5}))
-  assignments = forms.ModelMultipleChoiceField(required=False, queryset=models.Assessment.objects.all(), widget=FilteredSelectMultiple(('Assignments'), False, attrs={'size':5}))
 
   class Meta:
     model = models.UserGroup
@@ -450,28 +448,36 @@ class UserGroupForm(ModelForm):
             membership = models.Membership(group=instance, student=member)
             membership.save()
 
-      old_assignments = models.Assignment.objects.filter(group=instance)
-      for old_assignment in old_assignments:
-        changed = True
-        for curr_assignment in self.cleaned_data['assignments']:
-            if old_assignment.assessment == curr_assignment:
-                changed = False
-        if changed:
-            old_assignment.delete()
-
-      for assignment in self.cleaned_data['assignments']:
-        try:
-            models.Assignment.objects.get(group=instance, assessment=assignment)
-        except models.Assignment.DoesNotExist:
-            ga = models.Assignment(group=instance, assessment=assignment)
-            ga.save()
-
     self.save_m2m = save_m2m
     if commit:
         instance.save()
         self.save_m2m()
 
     return instance
+
+####################################
+# Assignment Form
+####################################
+class AssignmentForm(ModelForm):
+  due_date = forms.DateField(widget=forms.DateInput(format='%b %d, %Y'), input_formats=['%b %d, %Y'])
+
+  class Meta:
+    model = models.Assignment
+    exclude = ('group', )
+
+  def __init__(self, *args, **kwargs):
+    super(AssignmentForm, self).__init__(*args, **kwargs)
+
+    for field_name, field in self.fields.items():
+      if field_name == 'due_date':
+        field.widget.attrs['class'] = 'form-control datepicker'
+      else:
+        field.widget.attrs['class'] = 'form-control'
+      field.widget.attrs['placeholder'] = field.help_text
+
+  def get_assigned_date(self):
+    if self.instance.id:
+      return self.instance.assigned_date
 
 ####################################
 # CSV Upload Form

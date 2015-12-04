@@ -50,7 +50,7 @@
               <td>
                 {{group.members.count}}
                 {% if group.members.count > 0 %}
-                  <span class="expand_collapse">
+                  <span class="expand_collapse2">
                     <span class="glyphicon glyphicon-collapse-up" aria-hidden="true" style="display:none;"></span>
                     <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
                   </span>
@@ -65,13 +65,13 @@
               <td>
                 {{group.assignments.count}}
                 {% if group.assignments.count > 0 %}
-                  <span class="expand_collapse">
+                  <span class="expand_collapse2">
                     <span class="glyphicon glyphicon-collapse-up" aria-hidden="true" style="display:none;"></span>
                     <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
                   </span>
                   <div class="assignments" style="display:none;">
                     {% for assignment in group.assignments.all %}
-                      {{assignment}} </br>
+                      {{assignment.assessment}} </br>
                     {% endfor %}
                   </div>
                 {% endif %}
@@ -86,7 +86,7 @@
   </div>
 
   <script type="text/javascript">
-    $(".expand_collapse").click(function(){
+    $(".expand_collapse2").click(function(){
         $(this).next().toggle();
         $(this).children().each(function(){
           $(this).toggle();

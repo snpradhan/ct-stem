@@ -29,6 +29,7 @@ ALLOWED_HOSTS = []
 
 SITE_ID = 1
 
+USE_L10N=False
 
 # Application definition
 

@@ -840,29 +840,36 @@ def group(request, id=''):
     else:
       group = models.UserGroup()
 
-    print group
     if request.method == 'GET':
         form = forms.UserGroupForm(instance=group, prefix='group')
-        context = {'form': form,}
+        assignmentFormset=inlineformset_factory(models.UserGroup, models.Assignment, form=forms.AssignmentForm, can_delete=True, extra=1)
+        formset = assignmentFormset(instance=group, prefix='form')
+        context = {'form': form, 'formset': formset}
         return render(request, 'ctstem_app/UserGroup.html', context)
 
     elif request.method == 'POST':
       data = request.POST.copy()
+      print data
       form = forms.UserGroupForm(data, instance=group, prefix="group")
-      if form.is_valid():
+      assignmentFormset=inlineformset_factory(models.UserGroup, models.Assignment, form=forms.AssignmentForm, can_delete=True, extra=1)
+      formset = assignmentFormset(data, instance=group, prefix='form')
+      if form.is_valid() and formset.is_valid():
         savedGroup = form.save()
+        formset.save()
         messages.success(request, "User Group Saved.")
         return shortcuts.redirect('ctstem:group', id=savedGroup.id)
       else:
         print form.errors
+        print formset.errors
         messages.error(request, "The group could not be saved because there were errors.  Please check the errors below.")
-        context = {'form': form}
+        context = {'form': form, 'formset':formset}
         return render(request, 'ctstem_app/UserGroup.html', context)
 
     return http.HttpResponseNotAllowed(['GET', 'POST'])
 
   except models.Lesson.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested group not found</h1>')
+
 ####################################
 # ADD/EDIT QUESTION
 ####################################
