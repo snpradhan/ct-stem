@@ -83,7 +83,7 @@ def assessment(request, id=''):
       #AssessmentStepFormSet = inlineformset_factory(models.Assessment, models.AssessmentStep, form=forms.AssessmentStepForm,
                                                     #can_delete=True, can_order=True, extra=0)
       AssessmentStepFormSet = nestedformset_factory(models.Assessment, models.AssessmentStep, form=forms.AssessmentStepForm,
-                                                    nested_formset=inlineformset_factory(models.AssessmentStep, models.AssessmentQuestion, form=forms.AssessmentQuestionForm),
+                                                    nested_formset=inlineformset_factory(models.AssessmentStep, models.AssessmentQuestion, form=forms.AssessmentQuestionForm, can_delete=True, can_order=True, extra=1),
                                                     can_delete=True, can_order=True, extra=1)
       formset = AssessmentStepFormSet(data, instance=assessment, prefix='form')
       print form.is_valid()
@@ -96,7 +96,21 @@ def assessment(request, id=''):
         savedAssessment.slug = slugify(savedAssessment.title) + '-v%s'%savedAssessment.version
         savedAssessment.save()
         form.save()
-        formset.save()
+        formset.save(commit=False)
+        for stepform in formset.ordered_forms:
+          stepform.instance.order = stepform.cleaned_data['ORDER']
+          stepform.instance.lesson = savedAssessment
+          stepform.instance.save()
+          for qform in stepform.nested.ordered_forms:
+            qform.instance.order = qform.cleaned_data['ORDER']
+            qform.instance.assessment_step = stepform.instance
+            qform.instance.save()
+          for obj in stepform.nested.deleted_objects:
+            obj.delete()
+        #remove deleted questions
+        for obj in formset.deleted_objects:
+          obj.delete()
+
         messages.success(request, "Assessment Saved.")
         return shortcuts.redirect('ctstem:assessment', id=savedAssessment.id)
       else:
@@ -869,6 +883,117 @@ def group(request, id=''):
 
   except models.Lesson.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested group not found</h1>')
+
+####################################
+# STUDENT ASSIGNMENTS
+####################################
+@login_required
+def assignments(request, id=''):
+  try:
+    if hasattr(request.user, 'student') == False:
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to view assignments</h1>')
+
+    student = models.Student.objects.get(id=id)
+    if request.method == 'GET':
+      groups = models.Membership.objects.all().filter(student=student).values_list('group', flat=True)
+      print groups
+      #for each group
+      assignments = models.Assignment.objects.all().filter(group__in=groups)
+      assignment_list = []
+      for assignment in assignments:
+        try:
+          instance = models.AssignmentInstance.objects.get(assignment=assignment, student=student)
+        except models.AssignmentInstance.DoesNotExist:
+          instance = None
+
+        assignment_list.append({'assignment': assignment, 'instance': instance})
+      context = {'assignment_list': assignment_list}
+      return render(request, 'ctstem_app/Assignments.html', context)
+    return http.HttpResponseNotAllowed(['GET'])
+
+  except models.Student.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested student not found</h1>')
+
+####################################
+# STUDENT ATTEMPTING ASSIGNMENTS
+####################################
+@login_required
+def assignment(request, assignment_id='', instance_id='', step_order=''):
+  try:
+    if hasattr(request.user, 'student') == False:
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to do this assignments</h1>')
+
+    print instance_id
+    if '' != instance_id:
+      instance = models.AssignmentInstance.objects.get(id=instance_id)
+    else:
+      instance = models.AssignmentInstance(assignment_id=assignment_id, student=request.user.student, status='N')
+      step_order = 1
+
+    if 'GET' == request.method or 'POST' == request.method:
+      assessmentSteps = models.AssessmentStep.objects.all().filter(assessment=instance.assignment.assessment)
+      assessmentStep = assessmentSteps.get(order=step_order)
+      total_steps = assessmentSteps.count()
+      initial_data = []
+      try:
+        assignmentStepResponse = models.AssignmentStepResponse.objects.get(instance=instance, assessment_step=assessmentStep)
+        extra = 0
+      except models.AssignmentStepResponse.DoesNotExist:
+        #unsaved object
+        assignmentStepResponse = models.AssignmentStepResponse(instance=instance, assessment_step=assessmentStep)
+        assessmentQuestions = models.AssessmentQuestion.objects.all().filter(assessment_step=assessmentStep).order_by('order')
+        extra = assessmentQuestions.count()
+        for assessmentQuestion in assessmentQuestions:
+          initial_data.append({'assessment_question': assessmentQuestion.id, 'response': ''})
+
+
+      if 'GET' == request.method:
+        #get the assignment step
+        form = forms.AssignmentStepResponseForm(instance=assignmentStepResponse, prefix="step_response")
+        questionResponseFormset=inlineformset_factory(models.AssignmentStepResponse, models.QuestionResponse, form=forms.QuestionResponseForm, can_delete=False, extra=extra)
+        formset = questionResponseFormset(instance=assignmentStepResponse, prefix='form')
+
+        if len(initial_data):
+          for subform, data in zip(formset.forms, initial_data):
+            subform.initial = data
+
+        #context = {'step': assessmentStep, 'instance': instance, 'total_steps': total_steps}
+        context = {'form': form, 'formset': formset, 'total_steps': total_steps}
+        return render(request, 'ctstem_app/AssignmentStep.html', context)
+      elif 'POST' == request.method:
+        data = request.POST.copy()
+
+        form = forms.AssignmentStepResponseForm(data, instance=assignmentStepResponse, prefix="step_response")
+        questionResponseFormset=inlineformset_factory(models.AssignmentStepResponse, models.QuestionResponse, form=forms.QuestionResponseForm, can_delete=False, extra=0)
+        formset = questionResponseFormset(data, instance=assignmentStepResponse, prefix='form')
+
+        if form.is_valid() and formset.is_valid():
+          instance.last_step = assessmentStep.order
+          if assessmentStep.order < total_steps:
+            instance.status = 'P'
+          else:
+            instance.status = 'S'
+          instance.save()
+          assignmentStepResponse = form.save(commit=False)
+          assignmentStepResponse.instance = instance
+          assignmentStepResponse.save()
+          formset.save()
+          #update the instance
+
+          return shortcuts.redirect('ctstem:resumeAssignment', assignment_id=assignment_id, instance_id=instance.id, step_order=assessmentStep.order+1)
+        else:
+          print form.errors
+          print formset.errors
+
+        context = {'form': form, 'formset': formset}
+        return render(request, 'ctstem_app/AssignmentStep.html', context)
+
+    return http.HttpResponseNotAllowed(['GET', 'POST'])
+  except models.AssignmentInstance.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested assignment not found</h1>')
+  except models.AssessmentStep.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Assessment Step not found </h1>')
+
 
 ####################################
 # ADD/EDIT QUESTION

@@ -1,0 +1,78 @@
+{% extends "ctstem_app/base.html" %}
+
+{% block media %}
+  {{ block.super }}
+  {{ form.media }}
+{% endblock %}
+{% block title %}Assignments |{% endblock %}
+
+{% block content %}
+  {{block.super}}
+  <div class="content">
+    <h2> Assignments </h2>
+
+    {% if assignment_list %}
+      <table class="table table-striped table-bordered table-condensed dt" id="assignments">
+        <thead>
+          <tr>
+            <th> Assessment Title </th>
+            <th> Group </th>
+            <th> Assigned Date </th>
+            <th> Due Date </th>
+            <th> Status </th>
+
+          </tr>
+          <tr id="filterrow">
+            <th> Assessment Title </th>
+            <th> Group </th>
+            <th> Assigned Date </th>
+            <th> Due Date </th>
+            <th> Status </th>
+
+          </tr>
+        </thead>
+        <tbody>
+          {% for assignment_details in assignment_list %}
+            <tr>
+              <td class="title">{{assignment_details.assignment.assessment.title}}
+              {% if assignment_details.instance %}
+                <a type="button" class="btn btn-primary" aria-label="Resume Assignment" title="Resume Assignment" href="{% url 'ctstem:resumeAssignment' assignment_details.assignment.id assignment_details.instance.id assignment_details.instance.last_step %}">
+                    <span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span>
+                  </a>
+              {% else %}
+                <a type="button" class="btn btn-success" aria-label="Start Assignment" title="Start Assignment" href="{% url 'ctstem:startAssignment' assignment_details.assignment.id %}">
+                    <span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+                  </a>
+              {% endif %}
+
+              </td>
+              <td>
+                {{assignment_details.assignment.group}}
+              </td>
+              <td>
+                {{assignment_details.assignment.assigned_date|date}}
+              </td>
+              <td>
+                {{assignment_details.assignment.due_date|date}}
+              </td>
+              <td>
+                {% if assignment_details.instance %}
+                  {{assignment_details.instance.get_status_display}}
+                {% else %}
+                  New
+                {% endif %}
+              </td>
+
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p>You do not have any assignments.</p>
+    {% endif %}
+
+  </div>
+
+{% endblock %}
+
+

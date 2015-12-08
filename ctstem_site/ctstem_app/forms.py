@@ -485,3 +485,21 @@ class AssignmentForm(ModelForm):
 class UploadFileForm(forms.Form):
     uploadFile = forms.FileField()
 
+
+####################################
+# AssignmentStepResponse Form
+####################################
+class AssignmentStepResponseForm(ModelForm):
+  class Meta:
+    model = models.AssignmentStepResponse
+    exclude = ('instance', 'assessment_step',)
+
+
+####################################
+# QuestionResponse Form
+####################################
+class QuestionResponseForm(ModelForm):
+  class Meta:
+    model = models.QuestionResponse
+    exclude = ('created_date', 'modified_date',)
+

@@ -152,8 +152,6 @@ div.table#assessment, div.table#assessmentPreview,
 div.table.step,  div.table.stepPreview,
 div.table#lessonQuestions, div.table.activity, div.table#publication, div.table#group {
   width: 70%;
-  padding: 3em 4em;
-
 }
 div.table.step, div.table.activity, div.table.ngss, div.table.taxonomy, div.table#lessonQuestions, div.table#assessmentPreview, div.table.stepPreview {
   margin-top: 3em;
@@ -200,6 +198,31 @@ div.table#lessonPreview, div.table#lessonQuestions, div.table#assessmentPreview,
 
 div.table#lessonPreview div.lesson-row, div.table#lessonQuestions div.question-row{
   margin-bottom: 2em;
+}
+
+div.table#assignment {
+  padding: 3em 4em;
+}
+
+div.table#assignment .row .back {
+  text-align: left;
+}
+div.table#assignment .row .next {
+  text-align: right;
+}
+div.table#assignment .row .title {
+  text-align: center;
+  font-size: 1.6em;
+  font-weight: 700;
+}
+div.table#assignment .row .title .assessment_title {
+  font-size: 1.3em;
+  text-decoration: underline;
+  margin-bottom: 1em;
+}
+
+div.table#assignment div.assessment_content {
+  min-height: 50%;
 }
 
 div.table.taxonomy {
@@ -258,15 +281,19 @@ table.table {
 }
 table.table tr:first-child th:first-child {
     border-top-left-radius: 10px;
+    -moz-border-top-left-radius:: 10px;
 }
 table.table tr:first-child th:last-child {
   border-top-right-radius: 10px;
+  -moz-border-top-right-radius: 10px;
 }
 table.table tr:last-child td:first-child {
-    border-bottom-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  -moz-border-bottom-left-radius: 10px;
 }
 table.table tr:last-child td:last-child {
   border-bottom-right-radius: 10px;
+  -moz-border-bottom-right-radius: 10px;
 }
 
 table.table thead tr#filterrow th {

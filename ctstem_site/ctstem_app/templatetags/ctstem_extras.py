@@ -19,6 +19,22 @@ def selected_question(question_id):
   except models.Question.DoesNotExist:
     return ''
 
+@register.filter
+def get_assessment_question(question_id):
+  try:
+    if question_id != 'None':
+      question = models.Question.objects.get(assessment_question__id=question_id)
+      return question
+    else:
+      return None
+  except models.Question.DoesNotExist:
+    return None
+
+@register.filter
+def is_in(var, obj):
+    return var in obj
+
+
 @register.filter(name='sort')
 def listsort(value):
   if isinstance(value,dict):

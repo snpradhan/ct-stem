@@ -67,6 +67,12 @@ PUBLICATION_AFFILIATION = (
   (u'personal', u'Personal'),
 )
 
+ASSIGNMENT_STATUS = (
+  (u'N', u'New'),
+  (u'P', u'In Progress'),
+  (u'S', u'Submitted'),
+  (u'F', u'Feedback Ready'),
+)
 
 def upload_file_to(instance, filename):
   import os
@@ -182,7 +188,7 @@ class LessonQuestion(models.Model):
 
 # A relation between Assessment Step and Question models
 class AssessmentQuestion(models.Model):
-  question = models.ForeignKey(Question)
+  question = models.ForeignKey(Question, related_name="assessment_question")
   assessment_step = models.ForeignKey(AssessmentStep)
   order = models.IntegerField(null=True)
 
@@ -329,3 +335,33 @@ class Membership(models.Model):
   student = models.ForeignKey(Student)
   group = models.ForeignKey(UserGroup, related_name="group_members")
   joined_on = models.DateTimeField(auto_now_add=True)
+
+
+#######################################################
+# Assignment Instance Model
+#######################################################
+class AssignmentInstance(models.Model):
+  assignment = models.ForeignKey(Assignment)
+  student = models.ForeignKey(Student)
+  status = models.CharField(max_length=255, choices=ASSIGNMENT_STATUS)
+  last_step = models.IntegerField(null=False, blank=False, default=0)
+
+  class Meta:
+    unique_together = ('assignment', 'student')
+
+
+class AssignmentStepResponse(models.Model):
+  instance = models.ForeignKey(AssignmentInstance)
+  assessment_step = models.ForeignKey(AssessmentStep)
+
+#######################################################
+# Question Response Model
+#######################################################
+class QuestionResponse(models.Model):
+  step_response = models.ForeignKey(AssignmentStepResponse)
+  assessment_question = models.ForeignKey(AssessmentQuestion)
+  response = models.TextField(null=False, blank=False)
+  created_date = models.DateTimeField(auto_now_add=True)
+  modified_date = models.DateTimeField(auto_now=True)
+
+
