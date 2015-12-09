@@ -179,13 +179,13 @@
         {% for activity in formset %}
           <h3 class="activity_title" style="text-decoration: underline;"> {{ activity.title.value }} </h3>
 
-          <div class="activity_content"> {{activity.content.value|safe}} </div>
+          <div class="activity_content"> {{activity.content.value|inline_style|safe}} </div>
 
             {% for questionForm in activity.nested %}
             <table class="question_table">
               <tr>
                 <td width="5%" style="vertical-align: top;" class="question_no"> Q{{forloop.counter}}.</td>
-                <td class="question_text"> {{questionForm.instance.question.question_text|safe }} </td>
+                <td class="question_text"> {{questionForm.instance.question.question_text|inline_style|safe }} </td>
               </tr>
               <tr>
                 <td></td>

@@ -53,12 +53,12 @@
         <div class="table stepPreview">
           <h3>{{step.title.value}}</h3>
           <hr>
-          <div>{{step.content.value|safe}}</div>
+          <div>{{step.content.value|inline_style|safe}}</div>
           <table class="question_table">
             {% for questionForm in step.nested %}
               <tr>
                 <td width="5%" style="vertical-align: top;" class="question_no"> Q{{forloop.counter}}.</td>
-                <td class="question_text"> {{questionForm.instance.question.question_text|safe }} </td>
+                <td class="question_text"> {{questionForm.instance.question.question_text|inline_style|safe }} </td>
               </tr>
               <tr>
                 <td></td>
