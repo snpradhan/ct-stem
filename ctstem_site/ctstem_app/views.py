@@ -173,7 +173,23 @@ def deleteAssessment(request, id=''):
 
     return http.HttpResponseNotAllowed(['GET', 'POST'])
 
-  except models.Lesson.DoesNotExist:
+  except models.Assessment.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested assessment not found</h1>')
+
+####################################
+# DELETE AN ASSESSMENT
+####################################
+def assessmentMeta(request, id=''):
+  try:
+    if '' != id:
+      assessment = models.Assessment.objects.get(id=id)
+      if 'GET' == request.method:
+        context = {'assessment': assessment}
+        return render(request, 'ctstem_app/AssessmentMeta.html', context)
+      return http.HttpResponseNotAllowed(['GET'])
+    else:
+      raise models.Assessment.DoesNotExist
+  except models.Assessment.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested assessment not found</h1>')
 
 ####################################
@@ -888,12 +904,12 @@ def group(request, id=''):
 # STUDENT ASSIGNMENTS
 ####################################
 @login_required
-def assignments(request, id=''):
+def assignments(request):
   try:
     if hasattr(request.user, 'student') == False:
       return http.HttpResponseNotFound('<h1>You do not have the privilege to view assignments</h1>')
 
-    student = models.Student.objects.get(id=id)
+    student = request.user.student
     if request.method == 'GET':
       groups = models.Membership.objects.all().filter(student=student).values_list('group', flat=True)
       print groups
@@ -979,11 +995,15 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
           assignmentStepResponse.save()
           formset.save()
           #update the instance
-
-          return shortcuts.redirect('ctstem:resumeAssignment', assignment_id=assignment_id, instance_id=instance.id, step_order=assessmentStep.order+1)
+          if instance.status == 'P':
+            return shortcuts.redirect('ctstem:resumeAssignment', assignment_id=assignment_id, instance_id=instance.id, step_order=assessmentStep.order+1)
+          else:
+            messages.success(request, 'Your assignment has been submitted')
+            return shortcuts.redirect('ctstem:assignments')
         else:
           print form.errors
           print formset.errors
+          messages.error(request, 'Please check the errors below')
 
         context = {'form': form, 'formset': formset}
         return render(request, 'ctstem_app/AssignmentStep.html', context)

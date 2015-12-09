@@ -152,6 +152,7 @@ div.table#assessment, div.table#assessmentPreview,
 div.table.step,  div.table.stepPreview,
 div.table#lessonQuestions, div.table.activity, div.table#publication, div.table#group {
   width: 70%;
+  padding: 3em 4em;
 }
 div.table.step, div.table.activity, div.table.ngss, div.table.taxonomy, div.table#lessonQuestions, div.table#assessmentPreview, div.table.stepPreview {
   margin-top: 3em;
@@ -202,6 +203,12 @@ div.table#lessonPreview div.lesson-row, div.table#lessonQuestions div.question-r
 
 div.table#assignment {
   padding: 3em 4em;
+  background-color: #eee;
+  font-size: 1.3em;
+}
+
+div.table#assignment hr {
+  border-top: 1px solid #949494;
 }
 
 div.table#assignment .row .back {
@@ -212,17 +219,31 @@ div.table#assignment .row .next {
 }
 div.table#assignment .row .title {
   text-align: center;
-  font-size: 1.6em;
+  font-size: 1.3em;
   font-weight: 700;
 }
 div.table#assignment .row .title .assessment_title {
-  font-size: 1.3em;
+  font-size: 1.1em;
   text-decoration: underline;
   margin-bottom: 1em;
 }
 
 div.table#assignment div.assessment_content {
   min-height: 50%;
+}
+
+div.table#assignment div.question_container div.question {
+  margin-bottom: 2em;
+}
+
+div.table#assignment div.question_container div.question div.question_text {
+  font-weight: 700;
+}
+
+div.table#assignment div.question_container div.question div.answer_field input:disabled,
+div.table#assignment div.question_container div.question div.answer_field select:disabled,
+div.table#assignment div.question_container div.question div.answer_field textarea:disabled {
+  color: blue;
 }
 
 div.table.taxonomy {

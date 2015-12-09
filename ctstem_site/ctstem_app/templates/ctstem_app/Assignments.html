@@ -16,35 +16,62 @@
         <thead>
           <tr>
             <th> Assessment Title </th>
+            <th> Status </th>
+            <th> Last Modified </th>
             <th> Group </th>
             <th> Assigned Date </th>
             <th> Due Date </th>
-            <th> Status </th>
-
           </tr>
           <tr id="filterrow">
             <th> Assessment Title </th>
+            <th> Status </th>
+            <th> Last Modified </th>
             <th> Group </th>
             <th> Assigned Date </th>
             <th> Due Date </th>
-            <th> Status </th>
-
           </tr>
         </thead>
         <tbody>
           {% for assignment_details in assignment_list %}
             <tr>
               <td class="title">{{assignment_details.assignment.assessment.title}}
-              {% if assignment_details.instance %}
-                <a type="button" class="btn btn-primary" aria-label="Resume Assignment" title="Resume Assignment" href="{% url 'ctstem:resumeAssignment' assignment_details.assignment.id assignment_details.instance.id assignment_details.instance.last_step %}">
-                    <span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span>
-                  </a>
-              {% else %}
-                <a type="button" class="btn btn-success" aria-label="Start Assignment" title="Start Assignment" href="{% url 'ctstem:startAssignment' assignment_details.assignment.id %}">
-                    <span class="glyphicon glyphicon-play" aria-hidden="true"></span>
-                  </a>
-              {% endif %}
-
+                <div class="controls">
+                  <button class="btn btn-primary assessment_info" name="assessment_info" data-form="{% url 'ctstem:assessmentMeta' assignment_details.assignment.assessment.id %}">
+                    <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
+                  </button>
+                  {% if assignment_details.instance %}
+                    {% if assignment_details.instance.status == 'P' %}
+                      <a type="button" class="btn btn-primary btn-sm" aria-label="Resume Assignment" title="Resume Assignment" href="{% url 'ctstem:resumeAssignment' assignment_details.assignment.id assignment_details.instance.id assignment_details.instance.last_step %}">
+                        Resume <span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span>
+                      </a>
+                    {% else %}
+                      <a type="button" class="btn btn-info btn-sm" aria-label="Resume Assignment" title="Resume Assignment" href="{% url 'ctstem:resumeAssignment' assignment_details.assignment.id assignment_details.instance.id 1 %}">
+                        View <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
+                      </a>
+                    {% endif %}
+                  {% else %}
+                    <a type="button" class="btn btn-success btn-sm" aria-label="Start Assignment" title="Start Assignment" href="{% url 'ctstem:startAssignment' assignment_details.assignment.id %}">
+                      Start <span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+                    </a>
+                  {% endif %}
+                </div>
+              </td>
+              <td>
+                {% if assignment_details.instance %}
+                  {{assignment_details.instance.get_status_display}}
+                {% else %}
+                  New
+                {% endif %}
+                {% if assignment_details.instance.status == 'P' %}
+                  ({{assignment_details.instance.last_step}}/{{assignment_details.assignment.assessment.assessment_steps.all.count}})
+                {% endif %}
+              </td>
+              <td>
+                {% if assignment_details.instance %}
+                  {{assignment_details.instance.modified_date|date}}
+                {% else %}
+                  -
+                {% endif %}
               </td>
               <td>
                 {{assignment_details.assignment.group}}
@@ -55,14 +82,6 @@
               <td>
                 {{assignment_details.assignment.due_date|date}}
               </td>
-              <td>
-                {% if assignment_details.instance %}
-                  {{assignment_details.instance.get_status_display}}
-                {% else %}
-                  New
-                {% endif %}
-              </td>
-
             </tr>
           {% endfor %}
         </tbody>
@@ -71,8 +90,22 @@
       <p>You do not have any assignments.</p>
     {% endif %}
 
-  </div>
+    <div class="modal fade" id="assessmentModal" role="dialog">
+    </div>
 
+  </div>
+  <script type="text/javascript">
+    $(function (){
+      $("button.assessment_info").click(function(e){
+        e.preventDefault();
+        var url = $(this).data("form");
+        $("#assessmentModal").load(url, function() {
+          $(this).modal('show');
+        });
+        return false;
+      });
+    });
+  </script>
 {% endblock %}
 
 

@@ -9,12 +9,10 @@
   {{block.super}}
 
   <div class="content">
-
     <form method="post">
       {% csrf_token %}
       <div class="table" id="assignment">
         {{form.management_form}}
-
         <div class="row header">
           <div class="col-md-3 back">
             {% if form.instance.assessment_step.order > 1 %}
@@ -34,35 +32,46 @@
           </div>
           <div class="col-md-3 next">
             {% if form.instance.assessment_step.order != total_steps %}
-            <button type="submit" class="btn btn-primary" title="Next Step" >
-              Next <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
-            </button>
-          {% else %}
-            <button type="submit" class="btn btn-primary" title="Submit Assignment">
-              Submit
-            </button>
-          {% endif %}
+              {% if form.instance.instance.status == 'S' %}
+                 <a type="button" class="btn btn-primary" title="Next Step" href="{% url 'ctstem:resumeAssignment'  form.instance.instance.assignment.id form.instance.instance.id form.instance.assessment_step.order|add:'1' %}">
+                  Next <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
+                </a>
+              {% else %}
+                <button type="submit" class="btn btn-primary" title="Next Step" >
+                  Next <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
+                </button>
+              {% endif %}
+            {% else %}
+              {% if form.instance.instance.status == 'S' %}
+                <a type="button" class="btn btn-danger" title="Next Step" href="{% url 'ctstem:assignments' %}">
+                  Exit
+                </a>
+              {% else %}
+                <button type="submit" class="btn btn-success" title="Submit Assignment">
+                  Submit
+                </button>
+              {% endif %}
+            {% endif %}
           </div>
         </div>
         <input type="hidden" name="step_order" value="{{step.order}}"/>
         <hr>
-
         <div class="assessment_content">
-          <div>{{form.instance.assessment_step.content|safe}}</div>
-          <table class="question_table">
+          <div class="assessment_context">{{form.instance.assessment_step.content|safe}}</div>
+          <hr>
+          <div class="question_container">
             {{formset.management_form}}
 
             {% for questionForm in formset %}
               {% with questionObj=questionForm.assessment_question.value|get_assessment_question %}
-              <tr>
-                {{questionForm.id}}
-                <td width="5%" style="vertical-align: top;" class="question_no"> Q{{forloop.counter}}.</td>
-                <td class="question_text"> {{questionObj.question_text|safe }} </td>
-                <input type="hidden" name="{{questionForm.assessment_question.html_name}}" id="{{questionForm.assessment_question.auto_id}}" value="{{questionForm.assessment_question.value}}"/>
-              </tr>
-              <tr>
-                <td></td>
-                <td class="answer_field">
+              <div class="question">
+                <div class="question_text">
+                  {{questionForm.id}}
+                  <span> Q{{forloop.counter}}.</span>
+                  <span> {{questionObj.question_text|safe}} </span>
+                  <input type="hidden" name="{{questionForm.assessment_question.html_name}}" id="{{questionForm.assessment_question.auto_id}}" value="{{questionForm.assessment_question.value}}"/>
+                </div>
+                <div class="answer_field">
                   {% with field_type=questionObj.answer_field_type %}
                     {% if field_type == 'TA' %}
                       <textarea placeholder="Enter your response" class="form-control" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" required>{{questionForm.response.value}}</textarea>
@@ -83,15 +92,15 @@
                       {% for option in questionObj.options|split:','%}
                         {% if forloop.counter == 1 %}
                           {% if option|slugify == questionForm.response.value|slugify %}
-                            <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}" required checked="true" />{{option}}<br>
+                            <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}" required checked="true"/>  {{option}}<br>
                           {% else %}
-                            <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}" required/>{{option}}<br>
+                            <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}" required/>  {{option}}<br>
                           {% endif %}
                         {% else %}
                           {% if option|slugify == questionForm.response.value|slugify %}
-                            <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}" checked="true" />{{option}}<br>
+                            <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}" checked="true" />  {{option}}<br>
                           {% else %}
-                            <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}"/>{{option}}<br>
+                            <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}"/>  {{option}}<br>
                           {% endif %}
                         {% endif %}
                       {% endfor %}
@@ -101,20 +110,20 @@
                       {% with chosen=questionForm.response.value|split:',' %}
                       {% for option in questionObj.options|split:','%}
                         {% if option|is_in:chosen %}
-                          <input type="checkbox" name="{{questionForm.response.html_name}}_cb" id="{{questionForm.response.auto_id}}_cb" value="{{option}}" checked/>{{option}}<br>
+                          <input type="checkbox" name="{{questionForm.response.html_name}}_cb" id="{{questionForm.response.auto_id}}_cb" value="{{option}}" checked/>  {{option}}<br>
                         {% else %}
-                          <input type="checkbox" name="{{questionForm.response.html_name}}_cb" id="{{questionForm.response.auto_id}}_cb" value="{{option}}"/>{{option}}<br>
+                          <input type="checkbox" name="{{questionForm.response.html_name}}_cb" id="{{questionForm.response.auto_id}}_cb" value="{{option}}"/>  {{option}}<br>
                         {% endif %}
                       {% endfor %}
                       {% endwith %}
-
                     {% endif %}
                   {% endwith %}
-                </td>
-              </tr>
+                  <div class="error">{{questionForm.response.errors}}</div>
+                </div>
+              </div>
               {% endwith %}
             {% endfor %}
-          </table>
+          </div>
         </div>
         <hr>
         <div class="row footer">
@@ -127,25 +136,45 @@
           </div>
           <div class="col-md-6 next">
             {% if form.instance.assessment_step.order != total_steps %}
-            <button type="submit" class="btn btn-primary" title="Next Step" >
-              Next <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
-            </button>
-          {% else %}
-            <button type="submit" class="btn btn-primary" title="Submit Assignment">
-              Submit
-            </button>
-          {% endif %}
+              {% if form.instance.instance.status == 'S' %}
+                 <a type="button" class="btn btn-primary" title="Next Step" href="{% url 'ctstem:resumeAssignment'  form.instance.instance.assignment.id form.instance.instance.id form.instance.assessment_step.order|add:'1' %}">
+                  Next <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
+                </a>
+              {% else %}
+                <button type="submit" class="btn btn-primary" title="Next Step" >
+                  Next <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
+                </button>
+              {% endif %}
+            {% else %}
+              {% if form.instance.instance.status == 'S' %}
+                <a type="button" class="btn btn-danger" title="Next Step" href="{% url 'ctstem:assignments' %}">
+                  Exit
+                </a>
+              {% else %}
+                <button type="submit" class="btn btn-success" title="Submit Assignment">
+                  Submit
+                </button>
+              {% endif %}
+            {% endif %}
           </div>
         </div>
       </div>
     </form>
 
     <script type="text/javascript">
-    $(".content input:checkbox").change(function(){
-      var selectedValues = $("input[id="+$(this).attr('id')+"]:checked").map(function() {return this.value;}).get().join(',')
-      var hiddenVar = $(this).prevAll('input:hidden');
-      $(hiddenVar).val(selectedValues);
-    });
+      $(".content input:checkbox").change(function(){
+        var selectedValues = $("input[id="+$(this).attr('id')+"]:checked").map(function() {return this.value;}).get().join(',')
+        var hiddenVar = $(this).prevAll('input:hidden');
+        $(hiddenVar).val(selectedValues);
+      });
+
+      $(document).ready(function(){
+        var status = "{{form.instance.instance.status}}";
+        if(status == "S"){
+          $(':input').attr('disabled', 'disabled');
+        }
+      });
+
     </script>
   </div>
 {% endblock %}

@@ -40,9 +40,10 @@ urlpatterns = [
     url(r'^group/(?P<id>[\d]+)/$', views.group, name='group'),
     url(r'^groups/$', views.groups, name='groups'),
     url(r'^group/new/$', views.group, name='newGroup'),
-    url(r'^assignments/(?P<id>[\d]+)/$', views.assignments, name='assignments'),
+    url(r'^assignments/$', views.assignments, name='assignments'),
     url(r'^assignment/(?P<assignment_id>[\d]+)/new/$', views.assignment, name='startAssignment'),
     url(r'^assignment/(?P<assignment_id>[\d]+)/(?P<instance_id>[\d]+)/(?P<step_order>[\d]+)/$', views.assignment, name='resumeAssignment'),
+    url(r'^assessmentMeta/(?P<id>[\d]+)/$', views.assessmentMeta, name='assessmentMeta'),
 
 
 ]

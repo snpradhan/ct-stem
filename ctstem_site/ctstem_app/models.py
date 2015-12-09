@@ -155,7 +155,7 @@ class Assessment (models.Model):
 # Assessment Step model
 # An assessment has one or more assessment steps
 class AssessmentStep(models.Model):
-  assessment = models.ForeignKey(Assessment, null=False)
+  assessment = models.ForeignKey(Assessment, null=False, related_name='assessment_steps')
   title = models.CharField(null=False, max_length=256)
   order = models.IntegerField(null=True)
   content = models.TextField(null=False)
@@ -345,6 +345,7 @@ class AssignmentInstance(models.Model):
   student = models.ForeignKey(Student)
   status = models.CharField(max_length=255, choices=ASSIGNMENT_STATUS)
   last_step = models.IntegerField(null=False, blank=False, default=0)
+  modified_date = models.DateTimeField(auto_now=True)
 
   class Meta:
     unique_together = ('assignment', 'student')

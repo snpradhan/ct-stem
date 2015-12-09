@@ -80,7 +80,7 @@
               <li class="{% navactive request 'ctstem:lessons' %}"><a href="{% url 'ctstem:lessons' %}">Lesson Plans</a></li>
               <li class="{% navactive request 'ctstem:assessments' %}"><a href="{% url 'ctstem:assessments' %}">Assessments</a></li>
               {% if user.student %}
-                <li class="{% navactive request 'ctstem:assignments' user.student.id %}"><a href="{% url 'ctstem:assignments' user.student.id %}">Assignments</a></li>
+                <li class="{% navactive request 'ctstem:assignments' %}"><a href="{% url 'ctstem:assignments' %}">Assignments</a></li>
               {% endif %}
               <li class="{% navactive request 'ctstem:events' %}"><a href="{% url 'ctstem:events' %}">Events</a></li>
               <li class="{% navactive request 'ctstem:publications' %}"><a href="{% url 'ctstem:publications' %}">Publications</a></li>
