@@ -1,6 +1,3 @@
-{% load wysiwyg %}
-{% wysiwyg_setup %}
-{% include "ctstem_app/django_wysiwyg_includes.html" %}
 
 <div class="modal-dialog modal-md">
   <div class="modal-content">
@@ -12,6 +9,7 @@
     </div>
     <form class="form" id="questionForm" method="post" action="{% if questionForm.instance.id %} {% url 'ctstem:question' questionForm.instance.id %} {% else %} {% url 'ctstem:newQuestion' %} {% endif %}">
       {% csrf_token %}
+      {{questionForm.media}}
       <input id="id_question" type="hidden" value="{{questionForm.instance.id}}"/>
       <input id="id_activity" type="hidden" value=""/>
       <input id="id_step" type="hidden" value=""/>
@@ -22,7 +20,6 @@
             <div>
               {{field}}
               {% if field.name == 'question_text' %}
-                {% wysiwyg_editor field.auto_id %}
                 <input type="hidden" id="question_html" name="question_html" />
               {% endif %}
             </div>
@@ -47,7 +44,7 @@ $(function (){
   $("#questionForm").submit(function(e) {
 
     e.preventDefault();
-    var question_text = tinymce.get('id_question_text').getContent();
+    var question_text = CKEDITOR.instances.id_question_text.getData(); //tinymce.get('id_question_text').getContent();
     data = {}
     data['question_text'] = question_text;
     data['answer_field_type'] = $("#id_answer_field_type").val();

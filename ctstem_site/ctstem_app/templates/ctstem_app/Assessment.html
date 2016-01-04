@@ -1,12 +1,6 @@
 {% extends "ctstem_app/base.html" %}
 {% load ctstem_extras %}
 {% block title %}Assessment |{% endblock %}
-{% block media %}
-  {{block.super}}
-  {% load wysiwyg %}
-  {% wysiwyg_setup %}
-  {% include "ctstem_app/django_wysiwyg_includes.html" %}
-{% endblock %}
 
 {% block content %}
   {{block.super}}
@@ -14,6 +8,7 @@
     <h2>Assessment</h2>
     <form method="post">
       {% csrf_token %}
+      {{form.media}}
       <div class="table" id="assessment">
         <h4> Assessment Meta
           <span class="controls">
@@ -64,7 +59,6 @@
               <label for="id_{{step.content.name}}">{{ step.content.label }} {% if step.content.field.required %}(<span class="required">*</span>) {% endif %}</label>
               <div>
                 {{step.content}}
-                {% wysiwyg_editor step.content.auto_id %}
               </div>
               <div class="error">{{ step.content.errors }}</div>
             </div>
@@ -72,7 +66,6 @@
               <label for="id_{{step.teacher_notes.name}}">{{ step.teacher_notes.label|title }} {% if step.teacher_notes.field.required %}(<span class="required">*</span>) {% endif %}</label>
               <div>
                 {{step.teacher_notes}}
-                {% wysiwyg_editor step.teacher_notes.auto_id %}
               </div>
               <div class="error">{{ step.teacher_notes.errors }}</div>
             </div>

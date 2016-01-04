@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from tinymce.models import HTMLField
 from slugify import slugify
+from ckeditor_uploader.fields import RichTextUploadingField
+
 
 LESSON_STATUS_CHOICES = (
     (u'D', u'Draft'),
@@ -96,8 +98,8 @@ class Lesson (models.Model):
   level = models.TextField(null=False)
   purpose = models.TextField(null=False)
   overview = models.TextField(null=False)
-  content = models.TextField(null=False)
-  teacher_notes = models.TextField(null=True, blank=True)
+  content = RichTextUploadingField(null=False)
+  teacher_notes = RichTextUploadingField(null=True, blank=True)
   status = models.CharField(max_length=1, default='D', choices=LESSON_STATUS_CHOICES)
   subject = models.ManyToManyField('Subject', null=False)
   parent = models.ForeignKey('self', null=True, on_delete=models.SET_NULL)
@@ -124,7 +126,7 @@ class LessonActivity(models.Model):
   lesson = models.ForeignKey(Lesson, null=False)
   title = models.CharField(null=False, blank=False, max_length=256)
   order = models.IntegerField(null=True)
-  content = models.TextField(null=False)
+  content = RichTextUploadingField(null=False)
   questions = models.ManyToManyField('Question', through='LessonQuestion', blank=True)
 
 # Assessment model
@@ -158,14 +160,14 @@ class AssessmentStep(models.Model):
   assessment = models.ForeignKey(Assessment, null=False, related_name='assessment_steps')
   title = models.CharField(null=False, max_length=256)
   order = models.IntegerField(null=True)
-  content = models.TextField(null=False)
+  content = RichTextUploadingField(null=False)
   teacher_notes = models.TextField(null=True, blank=True)
   questions = models.ManyToManyField('Question', through='AssessmentQuestion', blank=True)
 
 # Question model
 # A bank of questions that can be resued across assessments and lessons
 class Question(models.Model):
-  question_text = models.TextField(null=False, blank=False)
+  question_text = RichTextUploadingField(null=False, blank=False)
   answer_field_type = models.CharField(null=False, max_length=2, choices=FIELD_TYPE_CHOICES)
   options = models.TextField(null=True, blank=True)
   answer = models.TextField(null=True, blank=True)

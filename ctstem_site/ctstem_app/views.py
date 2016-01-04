@@ -1021,6 +1021,7 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
 @login_required
 def question(request, id=''):
   # check if the user has permission to add a question
+  print 'in question'
   if hasattr(request.user, 'administrator') == False:
     return http.HttpResponseNotFound('<h1>You do not have the privilege to add a question</h1>')
   if '' == id:

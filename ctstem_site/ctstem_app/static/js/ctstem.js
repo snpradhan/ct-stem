@@ -37,6 +37,10 @@ function cloneMore(selector, type) {
       var name = $(this).attr('name').replace('-' + (total-1) + '-','-' + total + '-');
       var id = "id_" + name;
       $(this).attr({'name': name, 'id': id}).val('').removeAttr('checked');
+      if($(this).attr('data-id') !== undefined){
+        var data_id = $(this).attr('data-id').replace('-' + (total-1) + '-','-' + total + '-');
+        $(this).attr({'data-id': data_id});
+      }
       //$(this).val('').removeAttr('checked');
     });
     newElement.find('a').each(function() {
@@ -50,18 +54,15 @@ function cloneMore(selector, type) {
     newElement.find('input[id^=id_'+type+'][id$=id]').each(function(){
         $(this).removeAttr('value');
     });
-
-    newElement.find('span[role="application"]').each(function(){
-      $(this).remove();
+    newElement.find('div').each(function(){
+      if($(this).attr('data-field-id') !== undefined){
+        var data_field_id = $(this).attr('data-field-id').replace('-' + (total-1) + '-','-' + total + '-');
+        $(this).attr({'data-field-id': data_field_id});
+      }
+      $(this).find("div[id*='cke']").each(function(){
+        $(this).remove();
+      })
     });
-    newElement.find('script').each(function(){
-      $(this).remove();
-    });
-
-    /*var newHTML = newElement[0].outerHTML;
-    var regex = new RegExp('id_'+type+'-'+(total-1), 'g');
-    newHTML = newHTML.replace(regex, 'id_'+type+'-'+(total));
-    newElement = $.parseHTML(newHTML);*/
 
     total++;
     $('#id_' + type + '-TOTAL_FORMS').val(total);
@@ -70,7 +71,6 @@ function cloneMore(selector, type) {
     $(newElement).find("input[id*='-MIN_NUM_FORMS']").val(0);
     $(newElement).find("input[id*='-MAX_NUM_FORMS']").val(1000);
     $(selector).after(newElement);
-
 }
 
 $(function (){
@@ -113,9 +113,9 @@ $(function (){
         $(this).html( '<input type="text" placeholder="Search '+title+'" />' );
     } );
 
-  var table = $('table.table.dt').DataTable({
+  /*$('table.table.dt').DataTable({
     orderCellsTop: true
-  });
+  });*/
 
   // Apply the filter
   $("table.table.dt thead input").on( 'keyup change', function () {
@@ -160,5 +160,6 @@ $(function (){
       $(this).toggle();
     })
   });
+
 
 });

@@ -15,11 +15,15 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
+from ckeditor_uploader import views
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^tinymce/', include('tinymce.urls')),
+    #url(r'^ckeditor/', include('ckeditor_uploader.urls')),
     url(r'^password_reset/', include('password_reset.urls')),
     url(r'^', include('ctstem_app.urls', namespace="ctstem")),
+    url(r'^ckeditor/upload/', views.upload, name='ckeditor_upload'),
+    url(r'^ckeditor/browse/', views.browse, name='ckeditor_browse'),
 
 ]

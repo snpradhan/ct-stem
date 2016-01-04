@@ -44,6 +44,8 @@ INSTALLED_APPS = (
     'ctstem_app',
     'django-dia',
     'tinymce',
+    'ckeditor',
+    'ckeditor_uploader',
     'django_wysiwyg',
     'nested_formset',
     'storages',
@@ -73,7 +75,27 @@ AWS_STORAGE_BUCKET_NAME = 'ct-stem'
 AWS_S3_SECURE_URLS = False       # use http instead of https
 AWS_QUERYSTRING_AUTH = False
 
-DJANGO_WYSIWYG_FLAVOR =  "tinymce_advanced" #"tinymce"
+#CKEDITOR_JQUERY_URL = 'https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js'
+CKEDITOR_UPLOAD_PATH = "uploads/"
+CKEDITOR_UPLOAD_SLUGIFY_FILENAME = False
+CKEDITOR_RESTRICT_BY_USER = True
+CKEDITOR_IMAGE_BACKEND = "pillow"
+CKEDITOR_CONFIGS = {
+    'default': {
+        'removePlugins': 'stylesheetparser',
+        'toolbar': None,  # put selected toolbar config here
+        'height': 500,
+        'width': 900,
+        'mathJaxLib': '//cdn.mathjax.org/mathjax/2.2-latest/MathJax.js?config=TeX-AMS_HTML',
+        'extraPlugins': ','.join(
+            ['mathjax']
+        ),
+
+    },
+}
+
+MEDIA_ROOT = os.environ.get('MEDIA_ROOT',os.path.join(BASE_DIR, 'media'))
+MEDIA_URL = '/media/'
 
 ROOT_URLCONF = 'ctstem_site.urls'
 

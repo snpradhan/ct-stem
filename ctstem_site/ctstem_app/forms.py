@@ -288,7 +288,7 @@ class QuestionForm(ModelForm):
     model = models.Question
     fields = ['question_text', 'answer_field_type', 'options', 'answer']
     widgets = {
-      'question_text': forms.TextInput(attrs={'placeholder': 'Lesson Title'}),
+      'question_text': forms.TextInput(attrs={'placeholder': 'Enter question here'}),
       'options': forms.Textarea(attrs={'rows':5, 'cols':60, 'placeholder': 'Options for dropdown'}),
       'answer': forms.Textarea(attrs={'rows':5, 'cols':60, 'placeholder': 'Answer if applicable'}),
     }
