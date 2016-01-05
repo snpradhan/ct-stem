@@ -22,6 +22,7 @@ import datetime
 from django.utils.crypto import get_random_string
 import string
 import csv
+from django.db.models import Q
 
 ####################################
 # HOME
@@ -45,7 +46,7 @@ def about_us(request):
 ####################################
 def assessments(request):
   if hasattr(request.user, 'administrator') == False:
-    assessments = models.Assessment.objects.all().filter(status='P').order_by('id')
+    assessments = models.Assessment.objects.all().filter(Q(status='P') | Q(author=request.user)).order_by('id')
   else:
     assessments = models.Assessment.objects.order_by('id')
   context = {'assessments': assessments}
@@ -58,8 +59,8 @@ def assessments(request):
 def assessment(request, id=''):
   try:
     # check if the user has permission to create or modify a lesson
-    if hasattr(request.user, 'administrator') == False:
-      return http.HttpResponseNotFound('<h1>You do not have the privilege to modify this assessment</h1>')
+    if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'researcher') == False and hasattr(request.user, 'author') == False:
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to create/modify assessments</h1>')
     # check if the lesson exists
     if '' != id:
       assessment = models.Assessment.objects.get(id=id)
@@ -197,7 +198,7 @@ def assessmentMeta(request, id=''):
 ####################################
 def lessons(request):
   if hasattr(request.user, 'administrator') == False:
-    lessons = models.Lesson.objects.all().filter(status='P').order_by('id')
+    lessons = models.Lesson.objects.all().filter(Q(status='P') | Q(author=request.user)).order_by('id')
   else:
     lessons = models.Lesson.objects.order_by('id')
   context = {'lessons': lessons}
@@ -939,7 +940,6 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
     if hasattr(request.user, 'student') == False:
       return http.HttpResponseNotFound('<h1>You do not have the privilege to do this assignments</h1>')
 
-    print instance_id
     if '' != instance_id:
       instance = models.AssignmentInstance.objects.get(id=instance_id)
     else:
@@ -1021,8 +1021,7 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
 @login_required
 def question(request, id=''):
   # check if the user has permission to add a question
-  print 'in question'
-  if hasattr(request.user, 'administrator') == False:
+  if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'researcher') == False and hasattr(request.user, 'author') == False:
     return http.HttpResponseNotFound('<h1>You do not have the privilege to add a question</h1>')
   if '' == id:
     question = models.Question()

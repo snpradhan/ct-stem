@@ -31,6 +31,7 @@
       </div>
       {{formset.management_form}}
       {% for step in formset %}
+        {{step.media}}
         <div class="table step">
           <h4> Assessment Step
             <span class="step_order">
@@ -154,15 +155,31 @@
 
       $('#addStep').click(function() {
         cloneMore('div.table:last', 'form');
+        $('div.table:last').find('textarea').each(function(){
+          if($(this).attr('name') !== undefined && $(this).attr('data-config') !== undefined){
+            var config = {
+              removePlugins: 'stylesheetparser',
+              toolbar: 'None',
+              height: 300,
+              width: 950,
+              filebrowserUploadUrl: "/ckeditor/upload/",
+              filebrowserBrowseUrl: "/ckeditor/browse/",
+              skin: "moono",
+              mathJaxLib: '//cdn.mathjax.org/mathjax/2.2-latest/MathJax.js?config=TeX-AMS_HTML',
+              extraPlugins: 'mathjax, pastefromword',
+            }
+            CKEDITOR.replace($(this).attr('name'), config);
+          }
+        });
         var step_order_div = $('div.table:last span.step_order');
         var step_order = parseInt($(step_order_div).html()) + 1;
         $(step_order_div).html(step_order);
         //alert('after clone');
-        bindWysiwyg();
+        //bindWysiwyg();
         //rebind question clone
       });
 
-      function bindWysiwyg(){
+      /*function bindWysiwyg(){
         //alert($(step).attr('class'));
         $('div.table:last').find('textarea').each(function(){
           var id = $(this).attr('id');
@@ -171,7 +188,7 @@
           django_wysiwyg.enable(editor, id, config);
           $(this).next().show();
         });
-      }
+      }*/
 
     });
   </script>

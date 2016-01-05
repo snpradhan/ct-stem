@@ -153,9 +153,7 @@
         var url = $(this).data("form");
         var activity_div = $(this).closest('.activity');
         var activity_id = $(activity_div).children(':hidden').first().attr('id');
-
         $("#questionModal").load(url, function() {
-          alert(activity_id);
           $(this).modal('show');
           $("#questionModal input[id='id_activity']").val(activity_id);
         });
@@ -170,13 +168,13 @@
             var config = {
               removePlugins: 'stylesheetparser',
               toolbar: 'None',
-              height: 500,
-              width: 900,
+              height: 300,
+              width: 950,
               filebrowserUploadUrl: "/ckeditor/upload/",
               filebrowserBrowseUrl: "/ckeditor/browse/",
               skin: "moono",
               mathJaxLib: '//cdn.mathjax.org/mathjax/2.2-latest/MathJax.js?config=TeX-AMS_HTML',
-              extraPlugins: 'mathjax',
+              extraPlugins: 'mathjax, pastefromword',
             }
             CKEDITOR.replace($(this).attr('name'), config);
           }

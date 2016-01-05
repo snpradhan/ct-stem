@@ -161,13 +161,13 @@ class AssessmentStep(models.Model):
   title = models.CharField(null=False, max_length=256)
   order = models.IntegerField(null=True)
   content = RichTextUploadingField(null=False)
-  teacher_notes = models.TextField(null=True, blank=True)
+  teacher_notes = RichTextUploadingField(null=True, blank=True)
   questions = models.ManyToManyField('Question', through='AssessmentQuestion', blank=True)
 
 # Question model
 # A bank of questions that can be resued across assessments and lessons
 class Question(models.Model):
-  question_text = RichTextUploadingField(null=False, blank=False)
+  question_text = RichTextUploadingField(null=False, blank=False, config_name='question_ckeditor')
   answer_field_type = models.CharField(null=False, max_length=2, choices=FIELD_TYPE_CHOICES)
   options = models.TextField(null=True, blank=True)
   answer = models.TextField(null=True, blank=True)

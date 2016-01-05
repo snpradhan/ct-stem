@@ -84,18 +84,27 @@ CKEDITOR_CONFIGS = {
     'default': {
         'removePlugins': 'stylesheetparser',
         'toolbar': None,  # put selected toolbar config here
-        'height': 500,
-        'width': 900,
+        'height': 300,
+        'width': 975,
+        'mathJaxLib': '//cdn.mathjax.org/mathjax/2.2-latest/MathJax.js?config=TeX-AMS_HTML',
+        'extraPlugins': ','.join(
+            ['mathjax', 'pastefromword']
+        ),
+    },
+    'question_ckeditor': {
+        'removePlugins': 'stylesheetparser',
+        'toolbar': 'Full',  # put selected toolbar config here
+        'height': 100,
+        'width': 560,
         'mathJaxLib': '//cdn.mathjax.org/mathjax/2.2-latest/MathJax.js?config=TeX-AMS_HTML',
         'extraPlugins': ','.join(
             ['mathjax']
         ),
-
     },
 }
 
-MEDIA_ROOT = os.environ.get('MEDIA_ROOT',os.path.join(BASE_DIR, 'media'))
-MEDIA_URL = '/media/'
+#MEDIA_ROOT = os.environ.get('MEDIA_ROOT',os.path.join(BASE_DIR, 'media'))
+#MEDIA_URL = '/media/'
 
 ROOT_URLCONF = 'ctstem_site.urls'
 
