@@ -123,9 +123,9 @@ $(function (){
         $(this).html( '<input type="text" placeholder="Search '+title+'" />' );
     } );
 
-  /*$('table.table.dt').DataTable({
+  var table = $('table.table.dt').DataTable({
     orderCellsTop: true
-  });*/
+  });
 
   // Apply the filter
   $("table.table.dt thead input").on( 'keyup change', function () {
