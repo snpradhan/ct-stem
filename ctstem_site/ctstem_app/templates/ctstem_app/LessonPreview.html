@@ -6,29 +6,14 @@
   <style type="text/css" media="screen, print">
     @page {
       size: letter portrait;
-      margin: 4cm, 1cm, 2cm, 1cm;
+      margin: 2cm, 1cm, 2cm, 1cm;
 
-      @frame pagenumber {
-        -pdf-frame-content: pageNumber;
-        bottom: 1.5cm;
-        margin-left: 20cm;
-        margin-right: 1cm;
-        height: 1cm;
-      }
       @frame footer {
         -pdf-frame-content: footerContent;
         bottom: 0cm;
         margin-left: 1cm;
         margin-right: 1cm;
         height: 2cm;
-      }
-
-      @frame header {
-        -pdf-frame-content: headerContent;
-        top: 1cm;
-        margin-left: 0cm;
-        margin-right: 0cm;
-        height: 10cm;
       }
     }
     @font-face {
@@ -40,6 +25,7 @@
       margin-left: auto;
       margin-right: auto;
       margin-bottom: 40px;
+      margin-top: 2em;
       font-size: 1em;
     }
 
@@ -102,26 +88,25 @@
     }
     div#headerContent{
       text-align: center;
+      margin-bottom: 3em;
     }
     div#headerContent img {
       vertical-align: middle;
-      height: 60px;
       width: auto;
       margin-right: 30px;
     }
-
 
   </style>
 {% endblock %}
 
 {% block content %}
   <div id="headerContent">
-    <img style="vertical-align: middle; height: 60px; width: auto;" src="http://ct-stem.northwestern.edu/assets/logo.png"/> &nbsp;&nbsp;&nbsp;&nbsp;
-    <img style="vertical-align: middle; height: 60px; width: auto;" src="http://ct-stem.northwestern.edu/assets/ccl.png"/> &nbsp;&nbsp;&nbsp;&nbsp;
-    <img style="vertical-align: middle; height: 60px; width: auto;" src="http://ct-stem.northwestern.edu/assets/tidal.png"/> &nbsp;&nbsp;&nbsp;&nbsp;
-    <img style="vertical-align: middle; height: 60px; width: auto;" src="http://ct-stem.northwestern.edu/assets/osep.png"/> &nbsp;&nbsp;&nbsp;&nbsp;
-     <img style="vertical-align: middle; height: 60px; width: auto;" src="http://ct-stem.northwestern.edu/assets/adler.png"/> &nbsp;&nbsp;&nbsp;&nbsp;
-    <img style="vertical-align: middle; height: 60px; width: auto;" src="http://ct-stem.northwestern.edu/assets/ciera.png"/> &nbsp;&nbsp;&nbsp;&nbsp;
+    <img style="vertical-align: middle; height: 50px; width: auto;" src="http://ct-stem.northwestern.edu/assets/logo.png"/> &nbsp;&nbsp;&nbsp;
+    <img style="vertical-align: middle; height: 50px; width: auto;" src="http://ct-stem.northwestern.edu/assets/ccl.png"/> &nbsp;&nbsp;&nbsp;
+    <img style="vertical-align: middle; height: 50px; width: auto;" src="http://ct-stem.northwestern.edu/assets/tidal.png"/> &nbsp;&nbsp;&nbsp;
+    <img style="vertical-align: middle; height: 50px; width: auto;" src="http://ct-stem.northwestern.edu/assets/osep.png"/> &nbsp;&nbsp;&nbsp;
+    <img style="vertical-align: middle; height: 50px; width: auto;" src="http://ct-stem.northwestern.edu/assets/adler.png"/> &nbsp;&nbsp;&nbsp;
+    <img style="vertical-align: middle; height: 50px; width: auto;" src="http://ct-stem.northwestern.edu/assets/ciera.png"/> &nbsp;&nbsp;&nbsp;
   </div>
   <div id="content" style="font-size: 1em;">
     <form>
@@ -228,11 +213,7 @@
 
     </form>
   </div>
-  <div id="pageNumber">
-    {%block page_foot%}
-      <pdf:pagenumber>
-    {%endblock%}
-  </div>
+
   <div id="footerContent">
     <table style="text-align:center;">
       <tr>
@@ -242,6 +223,12 @@
       <tr>
         <td></td>
         <td>Copyright © 2015 Northwestern University</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          <pdf:pagenumber />
+        </td>
       </tr>
     </table>
   </div>
