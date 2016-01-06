@@ -165,13 +165,18 @@ div.table.step div.row.question {
 div.table#lesson span.controls, div.table.activity span.controls, div.table#assessment span.controls, div.table.step span.controls {
   float: right;
 }
-
+span.expand_collapse_notes {
+  font-size: 16px;
+}
 div.table.activity .question_table {
   margin-top: 3em;
 }
 
 div.table#assessmentPreview .meta {
   margin-bottom: 1em;
+}
+div.table#assessmentPreview, div.table.stepPreview {
+  background-color: #eee;
 }
 div.table.stepPreview table.question_table .question_no{
   font-weight: 700;
@@ -207,7 +212,7 @@ div.table#assignment {
   font-size: 1.3em;
 }
 
-div.table#assignment hr {
+div.table#assessmentPreview hr, div.table.stepPreview hr, div.table#assignment hr {
   border-top: 1px solid #949494;
 }
 

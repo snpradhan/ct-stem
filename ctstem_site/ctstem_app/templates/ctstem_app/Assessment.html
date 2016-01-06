@@ -65,7 +65,11 @@
             </div>
             <div class="form-group">
               <label for="id_{{step.teacher_notes.name}}">{{ step.teacher_notes.label|title }} {% if step.teacher_notes.field.required %}(<span class="required">*</span>) {% endif %}</label>
-              <div>
+              <span class="expand_collapse_notes">
+                <span class="glyphicon glyphicon-collapse-up" aria-hidden="true" style="display:none;"></span>
+                <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
+              </span>
+              <div style="display:none;">
                 {{step.teacher_notes}}
               </div>
               <div class="error">{{ step.teacher_notes.errors }}</div>

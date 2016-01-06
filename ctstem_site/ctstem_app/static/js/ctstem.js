@@ -170,6 +170,12 @@ $(function (){
       $(this).toggle();
     })
   });
+  $(".expand_collapse_notes").click(function(){
+    $(this).next('div').toggle();
+    $(this).children().each(function(){
+      $(this).toggle();
+    })
+  });
 
 
 });

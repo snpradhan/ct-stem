@@ -52,13 +52,14 @@
       </div>
       {% for step in formset %}
         <div class="table stepPreview">
-          <h3>{{step.title.value}}</h3>
+          <h3>{{step.title.value}} {{step.ORDER.value}}</h3>
           <hr>
           <div>{{step.content.value|inline_style|safe}}</div>
+          <hr>
           <table class="question_table">
             {% for questionForm in step.nested %}
               <tr>
-                <td width="5%" style="vertical-align: top;" class="question_no"> Q{{forloop.counter}}.</td>
+                <td width="10%" style="vertical-align: top;" class="question_no"> Q{{forloop.counter}}.</td>
                 <td class="question_text"> {{questionForm.instance.question.question_text|inline_style|safe }} </td>
               </tr>
               <tr>
@@ -85,11 +86,11 @@
                       {% for option in questionForm.instance.question.options|split:','%}
                         <input type="checkbox" name="forloop.parent.counter" value="{{option}}"/>{{option}}<br>
                       {% endfor %}
-
                     {% endif %}
                   {% endwith %}
                 </td>
               </tr>
+
             {% endfor %}
           </table>
         </div>
