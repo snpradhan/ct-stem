@@ -83,7 +83,7 @@
               <button class="btn btn-primary edit_question" name="add_question" data-form="{% url 'ctstem:newQuestion' %}">
                 <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
               </button>
-              <table class="table table-striped table-condensed lessonQuestion">
+              <table class="table table-striped table-condensed question">
                 <thead>
                   <tr>
                     <th></th>
@@ -109,6 +109,7 @@
 
                         {% else %}
                           <input type="hidden" class="question_id" id="{{questionForm.question.auto_id}}" name="{{questionForm.question.html_name}}" value/>
+                          <div></div>
                         {% endif %}
                       </td>
                       <td>
@@ -174,7 +175,7 @@
               filebrowserBrowseUrl: "/ckeditor/browse/",
               skin: "moono",
               mathJaxLib: '//cdn.mathjax.org/mathjax/2.2-latest/MathJax.js?config=TeX-AMS_HTML',
-              extraPlugins: 'mathjax, pastefromword',
+              extraPlugins: 'mathjax',
             }
             CKEDITOR.replace($(this).attr('name'), config);
           }

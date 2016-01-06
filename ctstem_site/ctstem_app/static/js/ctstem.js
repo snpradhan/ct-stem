@@ -70,6 +70,16 @@ function cloneMore(selector, type) {
     $(newElement).find("input[id*='-INITIAL_FORMS']").val(0);
     $(newElement).find("input[id*='-MIN_NUM_FORMS']").val(0);
     $(newElement).find("input[id*='-MAX_NUM_FORMS']").val(1000);
+
+    $(newElement).find('div.question_table table.question tbody tr:not(:last)').remove();
+    $(newElement).find('div.question_table table.question tbody input').each(function(){
+      var name = $(this).attr('name').replace(/-[0-9]+-id/, '-0-id');
+      name = name.replace(/-[0-9]+-question/, '-0-question');
+      name = name.replace(/-[0-9]+-ORDER/, '-0-ORDER');
+      name = name.replace(/-[0-9]+-DELETE/, '-0-DELETE');
+      var id = "id_" + name;
+      $(this).attr({'name': name, 'id': id});
+    });
     $(selector).after(newElement);
 }
 
