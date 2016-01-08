@@ -339,7 +339,7 @@ table.table td.title div.controls {
   margin-top: 0.5em;
 }
 
-table.table.dt thead tr:not(#filterrow) {
+table.table.dt thead tr:not(#filterrow), table.table#category thead tr {
   background-color: #666666;
   color: #e5e5e5;
 }
@@ -393,6 +393,9 @@ div.content#home {
 div.btn-group {
   margin-bottom: 10px;
   width: 100%;
+}
+div.btn-group a{
+  margin-right: 1em;
 }
 
 div.button-group-fixed {

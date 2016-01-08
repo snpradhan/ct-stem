@@ -9,38 +9,26 @@
 {% block content %}
   {{block.super}}
   <div class="content">
-    <h2> Taxonomy </h2>
-    <div class="table taxonomy">
-      <h3>CT-STEM Practices</h3>
-      <ul>
-      {% for key, value in ctstem_practices.items|sort %}
-        <li><a href="#">{{key}}</a></li>
-        <ul style="display: none;">
-          {% for v in value %}
-            <li><a href="#">{{v.title}}</a></li>
-            <div style="display: none;">{{v.overview}}</div>
-          {% endfor %}
-        </ul>
-      {% endfor %}
-      </ul>
-    </div>
-    <div class="table taxonomy">
-      <h3>Next Generation Science Standards (NGSS) Practices</h3>
-      <ul>
-        {% for np in ngss_standards %}
-          <li><a href="#">{{np.title}}</a></li>
-          <div style="display: none;">{{np.description}}</div>
+    <h2>Taxonomy</h2>
+    <form method="post">
+      {% csrf_token %}
+      <div class="table" id="taxonomy">
+        {{form.management_form}}
+        {% for field in form %}
+          <div class="form-group">
+            <label for="id_{{field.name}}">{{ field.label|title }} {% if field.field.required %}(<span class="required">*</span>){% endif %} </label>
+            <div>
+              {{field}}
+            </div>
+            <div class="error">{{ field.errors }}</div>
+          </div>
         {% endfor %}
-      </ul>
-    </div>
+        <div class="form-group button-group-fixed">
+          <input type="submit" class="btn btn-success" id="submit" value="Save Taxonomy"/>
+        </div>
+      </div>
+    </form>
   </div>
-
-  <script type="text/javascript">
-    $('.taxonomy li a').click(function(){
-      $(this).parent().next().toggle();
-      return false;
-    });
-  </script>
 
 {% endblock %}
 

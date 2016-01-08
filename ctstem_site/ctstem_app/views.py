@@ -668,74 +668,132 @@ def deleteUser(request, id=''):
 def notimplemented(request):
   return render(request, 'ctstem_app/NotImplemented.html')
 
-def taxonomy(request):
-  ngss_standards = models.NGSSStandard.objects.all().order_by('title')
-  ctstem_practices_qs = models.CTStemPractice.objects.all().order_by('category', 'order')
-  ctstem_practices = {}
-  for cp in ctstem_practices_qs:
-    if cp.get_category_display() in ctstem_practices:
-      ctstem_practices[cp.get_category_display()].append(cp)
+@login_required
+def taxonomy(request, id=''):
+  try:
+    if hasattr(request.user, 'author') == False and hasattr(request.user, 'researcher') == False and  hasattr(request.user, 'administrator') == False:
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to add/modify taxonomy</h1>')
+    if '' != id:
+      taxonomy = models.Taxonomy.objects.get(id=id)
     else:
-      ctstem_practices[cp.get_category_display()]= [cp]
+      taxonomy = models.Taxonomy()
+    if request.method == 'GET':
+      form = forms.TaxonomyForm(instance=taxonomy)
+      context = {'form': form}
+      return render(request, 'ctstem_app/Taxonomy.html', context)
 
-  context = {'ngss_standards': ngss_standards, 'ctstem_practices': ctstem_practices}
-  return render(request, 'ctstem_app/Taxonomy.html', context)
+    elif request.method == 'POST':
+      data = request.POST.copy()
+      form = forms.TaxonomyForm(data, instance=taxonomy)
+      if form.is_valid():
+        form.save()
+        messages.success(request, '%s saved' % taxonomy)
+        return shortcuts.redirect('ctstem:taxonomies', taxonomy.standard.id)
+      else:
+        print form.errors
+        messages.error(request, "The taxonomy could not be saved because there were errors.  Please check the errors below.")
+        context = {'form': form}
+        return render(request, 'ctstem_app/Taxonomy.html', context)
+
+  except models.Taxonomy.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Taxonomy not found</h1>')
+
+def taxonomies(request, standard_id=''):
+  standards = models.Standard.objects.all().order_by('name')
+  taxonomies  = models.Taxonomy.objects.all().filter(standard__id=standard_id).order_by('category__standard__name', 'category__name', 'title')
+  context = {'standards': standards, 'taxonomies': taxonomies, 'page': 'taxonomy'}
+  return render(request, 'ctstem_app/Taxonomies.html', context)
+
+def standards(request):
+  standards = models.Standard.objects.all().order_by('name')
+  context = {'standards': standards, 'page': 'standards'}
+  return render(request, 'ctstem_app/Taxonomies.html', context)
+
+@login_required
+def standard(request, id=''):
+  try:
+    if hasattr(request.user, 'author') == False and hasattr(request.user, 'researcher') == False and  hasattr(request.user, 'administrator') == False:
+        return http.HttpResponseNotFound('<h1>You do not have the privilege to add/modify standard</h1>')
+    if '' != id:
+      standard = models.Standard.objects.get(id=id)
+    else:
+      standard = models.Standard()
+
+    if request.method == 'GET':
+      form = forms.StandardForm(instance=standard, prefix='standard')
+      CategoryFormSet = inlineformset_factory(models.Standard, models.Category, form=forms.CategoryForm, can_delete=True, extra=1)
+      #QuestionFormSet = inlineformset_factory(models.Lesson, models.LessonQuestion, form=forms.LessonQuestionForm, can_order=True, can_delete=True, extra=1)
+      formset = CategoryFormSet(instance=standard, prefix='form')
+      context = {'form': form, 'formset':formset}
+      return render(request, 'ctstem_app/Standard.html', context)
+
+    elif request.method == 'POST':
+      data = request.POST.copy()
+      form = forms.StandardForm(data, instance=standard, prefix='standard')
+      CategoryFormSet = inlineformset_factory(models.Standard, models.Category, form=forms.CategoryForm, can_delete=True, extra=1)
+      formset = CategoryFormSet(data, instance=standard, prefix='form')
+      if form.is_valid() and formset.is_valid():
+        savedStandard = form.save()
+        formset.save()
+        messages.success(request, "Standard Saved.")
+        return shortcuts.redirect('ctstem:standard', id=savedStandard.id)
+      else:
+        print form.errors
+        print formset.errors
+        messages.error(request, "The standard could not be saved because there were errors.  Please check the errors below.")
+        context = {'form': form, 'formset':formset}
+        return render(request, 'ctstem_app/Standard.html', context)
+
+    return http.HttpResponseNotAllowed(['GET', 'POST'])
+
+  except models.Lesson.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested group not found</h1>')
 
 ####################################
-# NGSS STANDARDS
+# DELETE Standard, Category or Taxonomy
 ####################################
 @login_required
-def ngss_standard(request):
-  if hasattr(request.user, 'administrator') == False:
-      return http.HttpResponseNotFound('<h1>You do not have the privilege to view this page</h1>')
-
-  NGSSFormSet = modelformset_factory(models.NGSSStandard, form=forms.NGSSStandardForm, extra=1, can_delete=True)
-  if request.method == 'GET':
-    formset = NGSSFormSet(queryset=models.NGSSStandard.objects.all())
-    context = {'formset': formset}
-    return render(request, 'ctstem_app/NGSSStandard.html', context)
-  elif request.method == 'POST':
-    data = request.POST.copy()
-    formset = NGSSFormSet(data)
-
-    if formset.is_valid():
-      formset.save()
-      messages.success(request, "NGSS Standards saved successfully")
-      return shortcuts.redirect('ctstem:ngss_standard')
+def deleteTaxonomy(request, model_type='', id=''):
+  try:
+    # check if the user has permission to delete a taxonomy
+    if hasattr(request.user, 'author') == False and hasattr(request.user, 'researcher') == False and  hasattr(request.user, 'administrator') == False:
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to delete this publication</h1>')
+    # check if the lesson exists
+    if model_type == 'Standard':
+      if '' != id:
+        obj = models.Standard.objects.get(id=id)
+        title = obj.name
+      else:
+        raise models.Standard.DoesNotExist
+    elif model_type == 'Category':
+      if '' != id:
+        obj = models.Category.objects.get(id=id)
+        title = obj.name
+      else:
+        raise models.Category.DoesNotExist
+    elif model_type == 'Taxonomy':
+      if '' != id:
+        obj = models.Taxonomy.objects.get(id=id)
+        title = obj.title
+      else:
+        raise models.Taxonomy.DoesNotExist
     else:
-      print formset.errors
-      context = {'formset': formset}
-      return render(request, 'ctstem_app/NGSSStandard.html', context)
+      return http.HttpResponseNotFound('<h1>Model type does not exist</h1>')
 
-  return http.HttpResponseNotAllowed(['GET', 'POST'])
+    if request.method == 'GET' or request.method == 'POST':
 
-####################################
-# NGSS STANDARDS
-####################################
-@login_required
-def ctstem_practice(request):
-  if hasattr(request.user, 'administrator') == False:
-      return http.HttpResponseNotFound('<h1>You do not have the privilege to view this page</h1>')
+      obj.delete()
+      messages.success(request, '%s deleted' % title)
+      return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
-  NGSSFormSet = modelformset_factory(models.CTStemPractice, form=forms.CTStemPracticeForm, extra=1, can_delete=True)
-  if request.method == 'GET':
-    formset = NGSSFormSet(queryset=models.CTStemPractice.objects.all())
-    context = {'formset': formset}
-    return render(request, 'ctstem_app/CTStemPractice.html', context)
-  elif request.method == 'POST':
-    data = request.POST.copy()
-    formset = NGSSFormSet(data)
+    return http.HttpResponseNotAllowed(['GET', 'POST'])
 
-    if formset.is_valid():
-      formset.save()
-      messages.success(request, "CT-STEM Practices saved successfully")
-      return shortcuts.redirect('ctstem:ctstem_practice')
-    else:
-      print formset.errors
-      context = {'formset': formset}
-      return render(request, 'ctstem_app/CTStemPractice.html', context)
-
-  return http.HttpResponseNotAllowed(['GET', 'POST'])
+  except models.Standard.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Standard not found</h1>')
+  except models.Category.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Category not found</h1>')
+  except models.Taxonomy.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Taxonomy not found</h1>')
 
 ####################################
 # USER LIST

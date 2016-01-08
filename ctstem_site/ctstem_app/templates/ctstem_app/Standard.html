@@ -1,0 +1,63 @@
+{% extends "ctstem_app/base.html" %}
+{% load ctstem_extras %}
+{% block title %}Standard |{% endblock %}
+
+{% block content %}
+  {{block.super}}
+  <div class="content">
+    <h2>Standard</h2>
+    <form method="post">
+      {% csrf_token %}
+      <div class="table" id="assessment">
+        {{form.management_form}}
+        <div>
+          {% for field in form %}
+            <div class="form-group">
+              <label for="id_{{field.name}}">{{ field.label }} {% if field.field.required %} (<span class="required">*</span>) {% endif %}</label>
+              <div>{{field}}</div>
+              <div class="error">{{ field.errors }}</div>
+            </div>
+          {% endfor %}
+        </div>
+        <div>
+          {{formset.management_form}}
+          <table class="table table-striped table-condensed table-bordered" id="category">
+            <thead>
+              <tr>
+                <th> Category name </th>
+                <th> Delete ? </th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for category in formset %}
+                <tr>
+                  <td>
+                    {{category.id}}
+                    {{category.name}}
+                    {{category.errors}}
+                  </td>
+                  <td style="text-align:center;">
+                    {{category.DELETE}}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="form-group button-group-fixed">
+        <input type="submit" class="btn btn-success" id="submit" value="Save"/>
+        <input type="button" class="btn btn-primary" id="addCategory" value="Add Category"/>
+      </div>
+
+    </form>
+  </div>
+  <script type="text/javascript">
+    $(function (){
+      $('#addCategory').click(function() {
+        cloneMore('div.table table.table tr:last', 'form');
+      });
+    });
+  </script>
+
+{% endblock %}

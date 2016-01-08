@@ -226,7 +226,7 @@ class LessonForm(ModelForm):
 
   class Meta:
     model = models.Lesson
-    fields = ['title', 'time', 'level', 'purpose', 'overview', 'status', 'subject', 'ngss_standards', 'ct_stem_practices', 'content', 'teacher_notes']
+    fields = ['title', 'time', 'level', 'purpose', 'overview', 'status', 'subject', 'taxonomy', 'content', 'teacher_notes']
     widgets = {
       'title': forms.TextInput(attrs={'placeholder': 'Lesson Title'}),
       'time': forms.TextInput(attrs={'rows':0, 'cols':60}),
@@ -235,17 +235,13 @@ class LessonForm(ModelForm):
       'overview': forms.Textarea(attrs={'rows':0, 'cols':60}),
       'content': forms.Textarea(attrs={'rows':0, 'cols':60}),
       'teacher_notes': forms.Textarea(attrs={'rows':0, 'cols':60}),
-      'ngss_standards': forms.SelectMultiple(attrs={'size':5}),
-      'ct_stem_practices': forms.SelectMultiple(attrs={'size':5}),
+      'taxonomy': forms.SelectMultiple(attrs={'size':5}),
       'subject': forms.SelectMultiple(attrs={'size':4}),
     }
 
   def __init__(self, *args, **kwargs):
     super(LessonForm, self).__init__(*args, **kwargs)
     forms.ModelForm.__init__(self, *args, **kwargs)
-
-    self.fields['ngss_standards'].label = "NGSS Standards"
-    self.fields['ct_stem_practices'].label = "CT-STEM Practices"
 
     for field_name, field in self.fields.items():
       field.widget.attrs['class'] = 'form-control'
@@ -307,20 +303,17 @@ class AssessmentForm(ModelForm):
 
   class Meta:
     model = models.Assessment
-    fields = ['title', 'time', 'overview', 'status', 'subject', 'ngss_standards', 'ct_stem_practices']
+    fields = ['title', 'time', 'overview', 'status', 'subject', 'taxonomy']
     widgets = {
       'title': forms.TextInput(attrs={'placeholder': 'Lesson Title'}),
       'time': forms.TextInput(attrs={'rows':0, 'cols':60}),
       'overview': forms.Textarea(attrs={'rows':0, 'cols':60}),
-      'ngss_standards': forms.SelectMultiple(attrs={'size':5}),
-      'ct_stem_practices': forms.SelectMultiple(attrs={'size':5}),
+      'taxonomy': forms.SelectMultiple(attrs={'size':5}),
       'subject': forms.SelectMultiple(attrs={'size':4}),
     }
 
   def __init__(self, *args, **kwargs):
     super(AssessmentForm, self).__init__(*args, **kwargs)
-    self.fields['ngss_standards'].label = "NGSS Standards"
-    self.fields['ct_stem_practices'].label = "CT-STEM Practices"
 
     for field_name, field in self.fields.items():
       field.widget.attrs['class'] = 'form-control'
@@ -354,45 +347,66 @@ class AssessmentQuestionForm(ModelForm):
     model = models.AssessmentQuestion
     exclude = ('order',)
 
+
 ####################################
-# NGSS Standards Form
+# Taxonomy Form
 ####################################
-class NGSSStandardForm(ModelForm):
+class TaxonomyForm(ModelForm):
 
   class Meta:
-    model = models.NGSSStandard
+    model = models.Taxonomy
     exclude = ('id',)
     widgets = {
-      'title': forms.TextInput(attrs={'placeholder': 'NGSS Title'}),
+      'code': forms.TextInput(attrs={'placeholder': 'Taxonomy code'}),
       'description': forms.Textarea(attrs={'rows':0, 'cols':60}),
+      'link': forms.TextInput(attrs={'placeholder': 'URL'}),
     }
 
   def __init__(self, *args, **kwargs):
-    super(NGSSStandardForm, self).__init__(*args, **kwargs)
+    super(TaxonomyForm, self).__init__(*args, **kwargs)
 
     for field_name, field in self.fields.items():
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['placeholder'] = field.help_text
 
 ####################################
-# CTSTEM Practice Form
+# Standards Form
 ####################################
-class CTStemPracticeForm(ModelForm):
+class StandardForm(ModelForm):
 
   class Meta:
-    model = models.CTStemPractice
+    model = models.Standard
     exclude = ('id',)
     widgets = {
-      'title': forms.TextInput(attrs={'placeholder': 'CT-STEM Practice Title'}),
-      'description': forms.Textarea(attrs={'rows':0, 'cols':60}),
+      'name': forms.TextInput(attrs={'placeholder': 'Standard name'}),
     }
 
   def __init__(self, *args, **kwargs):
-    super(CTStemPracticeForm, self).__init__(*args, **kwargs)
+    super(StandardForm, self).__init__(*args, **kwargs)
 
     for field_name, field in self.fields.items():
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['placeholder'] = field.help_text
+
+####################################
+# Category Form
+####################################
+class CategoryForm(ModelForm):
+
+  class Meta:
+    model = models.Category
+    exclude = ('id', 'standard')
+    widgets = {
+      'name': forms.TextInput(attrs={'placeholder': 'Category name'}),
+    }
+
+  def __init__(self, *args, **kwargs):
+    super(CategoryForm, self).__init__(*args, **kwargs)
+
+    for field_name, field in self.fields.items():
+      field.widget.attrs['class'] = 'form-control'
+      field.widget.attrs['placeholder'] = field.help_text
+
 
 ####################################
 # Publication Form

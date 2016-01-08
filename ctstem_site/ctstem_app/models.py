@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from tinymce.models import HTMLField
 from slugify import slugify
 from ckeditor_uploader.fields import RichTextUploadingField
+from smart_selects.db_fields import ChainedForeignKey
 
 
 LESSON_STATUS_CHOICES = (
@@ -105,10 +106,7 @@ class Lesson (models.Model):
   parent = models.ForeignKey('self', null=True, on_delete=models.SET_NULL)
   version = models.IntegerField(default=1)
   slug = models.SlugField(unique=True, max_length=255)
-  #image = models.ImageField(upload_to=upload_image_to, null=True, blank=True)
-  #questions = models.ManyToManyField('Question', through='LessonQuestion', blank=True)
-  ngss_standards = models.ManyToManyField('NGSSStandard')
-  ct_stem_practices = models.ManyToManyField('CTStemPractice')
+  taxonomy = models.ManyToManyField('Taxonomy')
   author = models.ForeignKey(User, null=False, related_name='lesson_author')
   modified_by = models.ForeignKey(User, null=False, related_name='lesson_modifier')
   created_date = models.DateTimeField(auto_now_add=True)
@@ -139,9 +137,7 @@ class Assessment (models.Model):
   parent = models.ForeignKey('self', null=True, on_delete=models.SET_NULL)
   version = models.IntegerField(default=1)
   slug = models.SlugField(unique=True, max_length=255)
-  #image = models.ImageField(upload_to=upload_image_to, null=True, blank=True)
-  ngss_standards = models.ManyToManyField('NGSSStandard')
-  ct_stem_practices = models.ManyToManyField('CTStemPractice')
+  taxonomy = models.ManyToManyField('Taxonomy')
   author = models.ForeignKey(User, null=False, related_name='assessment_author')
   modified_by = models.ForeignKey(User, null=False, related_name='assessment_modifier')
   created_date = models.DateTimeField(auto_now_add=True)
@@ -201,26 +197,37 @@ class Subject(models.Model):
   def __unicode__(self):
       return u'%s' % (self.name)
 
-# NGSS Standard model
-# This model will be populated from an external source
-# This model has many to many relation with Lesson and Assessment models
-class NGSSStandard(models.Model):
+# Standards model
+# These would include NGSS, CT-STEM Practice, Common Core, Illinois State Science Standards etc
+class Standard(models.Model):
+  name = models.CharField(null=False, max_length=256)
+  short_name = models.CharField(null=False, max_length=256)
+
+  def __unicode__(self):
+      return u'%s' % (self.short_name)
+
+# Category in a standard
+class Category(models.Model):
+  standard = models.ForeignKey(Standard, related_name="category")
+  name = models.CharField(null=False, max_length=256)
+
+  def __unicode__(self):
+      return u'%s' % (self.name)
+
+# Taxonomy model
+class Taxonomy(models.Model):
+  standard = models.ForeignKey(Standard, related_name="taxonomy")
+  category = ChainedForeignKey(Category, chained_field="standard",
+        chained_model_field="standard",
+        show_all=False,
+        auto_choose=True)
   title = models.CharField(null=False, max_length=256)
-  description = models.TextField(null=True, blank=True)
+  code = models.CharField(null=True, max_length=256, blank=True)
+  description = models.CharField(null=True, max_length=256, blank=True)
+  link = models.URLField(null=True, max_length=500, blank=True)
 
   def __unicode__(self):
       return u'%s' % (self.title)
-
-# CT Stem Practice model
-# This model has many to many relation with Lesson and Assessment models
-class CTStemPractice(models.Model):
-  category = models.CharField(null=False, max_length=2, choices=CT_STEW_PRACTICE_CATEGORY)
-  title = models.CharField(null=True, max_length=256)
-  overview = models.TextField(null=False)
-  order = models.IntegerField(null=True)
-
-  def __unicode__(self):
-      return u'%s-%s' % (self.category, self.title)
 
 # School model
 class School(models.Model):

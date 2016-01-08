@@ -50,6 +50,7 @@ INSTALLED_APPS = (
     'nested_formset',
     'storages',
     'password_reset',
+    'smart_selects',
 )
 
 MIDDLEWARE_CLASSES = (
