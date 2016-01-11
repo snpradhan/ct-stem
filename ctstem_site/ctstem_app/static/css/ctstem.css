@@ -165,6 +165,11 @@ div.table.step div.row.question {
 div.table#lesson span.controls, div.table.activity span.controls, div.table#assessment span.controls, div.table.step span.controls {
   float: right;
 }
+div.curriculum_content div#taxonomy_div {
+  max-height: 40%;
+  overflow-y: auto;
+}
+div.curriculum_content div#taxonomy_div
 span.expand_collapse_notes {
   font-size: 16px;
 }
@@ -339,7 +344,7 @@ table.table td.title div.controls {
   margin-top: 0.5em;
 }
 
-table.table.dt thead tr:not(#filterrow), table.table#category thead tr {
+table.table.dt thead tr:not(#filterrow), table.table#category thead tr, table.table#taxonomy thead tr:not(#filterrow) {
   background-color: #666666;
   color: #e5e5e5;
 }
@@ -407,11 +412,18 @@ div.button-group-fixed {
 /***********   FORM GROUP END   ************/
 
 /***************************************
-            *   LOGIN FORM   *
+            *   MODAL FORM   *
  ***************************************/
+div.modal-content {
+  max-height: 90%;
+  overflow-y: scroll;
+}
 div.modal-content div#loginMsg {
   text-align: center;
   color: red;
+}
+div.modal-content div#taxonomyResults {
+  padding: 0 2em 1em 2em;
 }
 /***********   FORM GROUP END   ************/
 

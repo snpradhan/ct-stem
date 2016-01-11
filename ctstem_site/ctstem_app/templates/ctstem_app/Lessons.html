@@ -1,5 +1,5 @@
 {% extends "ctstem_app/base.html" %}
-
+{% load ctstem_extras %}
 {% block media %}
   {{ block.super }}
   {{ form.media }}
@@ -21,16 +21,14 @@
             <th> Lesson Title </th>
             <th> Status </th>
             <th> Subject </th>
-            <th> CT-STEM Practices </th>
-            <th> NGSS Practices </th>
+            <th> Taxonomy </th>
             <th> Notes </th>
           </tr>
           <tr id="filterrow">
             <th> Lesson Title </th>
             <th> Status </th>
             <th> Subject </th>
-            <th> CT-STEM Practices </th>
-            <th> NGSS Practices </th>
+            <th> Taxonomy </th>
             <th> Notes </th>
           </tr>
         </thead>
@@ -76,22 +74,21 @@
               </td>
 
               <td>
-                {% if lesson.ct_stem_practices.all %}
-                  {% for practice in lesson.ct_stem_practices.all %}
-                    {{ practice }} <br>
+                <ul class="standard">
+                  {% for standard, categories in lesson.taxonomy.all|taxonomyHelper %}
+                    <li>{{standard}}</li>
+                    <ul class="category">
+                      {% for category, taxonomies in categories.items %}
+                        <li>{{category}}</li>
+                        <ul class="taxonomy">
+                        {% for taxonomy in taxonomies %}
+                          <li>{{taxonomy}} </li>
+                        {% endfor %}
+                        </ul>
+                      {% endfor %}
+                    </ul>
                   {% endfor %}
-                {% else %}
-                  -
-                {% endif %}
-              </td>
-              <td>
-                {% if lesson.ngss_standards.all %}
-                  {% for standard in lesson.ngss_standards.all %}
-                    {{ standard }} <br>
-                  {% endfor %}
-                {% else %}
-                  -
-                {% endif %}
+                </ul>
               </td>
               <td></td>
             </tr>

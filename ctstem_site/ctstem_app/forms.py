@@ -357,6 +357,7 @@ class TaxonomyForm(ModelForm):
     model = models.Taxonomy
     exclude = ('id',)
     widgets = {
+      'title': forms.TextInput(attrs={'placeholder': 'Taxonomy title'}),
       'code': forms.TextInput(attrs={'placeholder': 'Taxonomy code'}),
       'description': forms.Textarea(attrs={'rows':0, 'cols':60}),
       'link': forms.TextInput(attrs={'placeholder': 'URL'}),
@@ -367,7 +368,29 @@ class TaxonomyForm(ModelForm):
 
     for field_name, field in self.fields.items():
       field.widget.attrs['class'] = 'form-control'
-      field.widget.attrs['placeholder'] = field.help_text
+      if field.help_text:
+        field.widget.attrs['placeholder'] = field.help_text
+
+####################################
+# Taxonomy Search Form
+####################################
+class TaxonomySearchForm(ModelForm):
+
+  class Meta:
+    model = models.Taxonomy
+    exclude = ('id', 'description', 'link',)
+    widgets = {
+      'title': forms.TextInput(attrs={'placeholder': 'Taxonomy title'}),
+      'code': forms.TextInput(attrs={'placeholder': 'Taxonomy code'}),
+    }
+
+  def __init__(self, *args, **kwargs):
+    super(TaxonomySearchForm, self).__init__(*args, **kwargs)
+
+    for field_name, field in self.fields.items():
+      field.widget.attrs['class'] = 'form-control'
+      if field.help_text:
+        field.widget.attrs['placeholder'] = field.help_text
 
 ####################################
 # Standards Form

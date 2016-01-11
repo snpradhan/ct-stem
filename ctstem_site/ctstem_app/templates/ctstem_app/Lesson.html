@@ -29,6 +29,44 @@
                 <div class="clearfix">
                   {{field}}
                 </div>
+              {% elif field.name == 'taxonomy' %}
+                <button class="btn btn-primary search_taxonomy" name="search_taxonomy" data-form="{% url 'ctstem:searchTaxonomy' %}">
+                  <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                </button>
+                <div style="display:none;">
+                  {{field}}
+                </div>
+                <div id="taxonomy_div">
+                  <table class="table table-bordered table-striped table-condensed" id="taxonomy">
+                    <thead>
+                      <tr>
+                        <th>Standard</th>
+                        <th>Category</th>
+                        <th>Title</th>
+                        <th>Code</th>
+                        <th>Remove?</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for x in field.value %}
+                        {% with taxonomy=x|getTaxonomy %}
+                        <tr id="{{taxonomy.id}}">
+                          <td>{{taxonomy.standard.short_name}}</td>
+                          <td>{{taxonomy.category.name}}</td>
+                          <td>{{taxonomy.title}}</td>
+                          <td>{{taxonomy.code}}</td>
+                          <td>
+                            <button type="button" class="btn btn-warning remove_taxonomy" title="Remove Taxonomy">
+                              <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                            </button>
+                          </td>
+                        </tr>
+                        {% endwith %}
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+
               {% else %}
                 <div>
                   {{field}}
@@ -146,6 +184,8 @@
     </form>
     <div class="modal fade" id="questionModal" role="dialog">
     </div>
+    <div class="modal fade" id="taxonomyModal" role="dialog">
+    </div>
   </div>
   <script type="text/javascript">
     $(function (){
@@ -160,6 +200,21 @@
         });
 
         return false;
+      });
+
+      $("button.search_taxonomy").click(function(e){
+        e.preventDefault();
+        var url = $(this).data("form");
+        $("#taxonomyModal").load(url, function() {
+          $(this).modal('show');
+        });
+        return false;
+      });
+
+      $("button.remove_taxonomy").click(function(e){
+        var taxonomy_id = $(this).closest('tr').attr('id');
+        $('#id_lesson-taxonomy option[value="'+taxonomy_id+'"]').prop('selected', false);
+        $('div.curriculum_content div#taxonomy_div table#taxonomy tbody tr#'+taxonomy_id).remove();
       });
 
       $('#addActivity').click(function() {

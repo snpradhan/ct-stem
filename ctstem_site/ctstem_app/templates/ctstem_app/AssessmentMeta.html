@@ -1,3 +1,5 @@
+{% load ctstem_extras %}
+
 <div class="modal-dialog modal-md">
   <div class="modal-content">
     <div class="modal-header">
@@ -26,20 +28,22 @@
         </div>
       </div>
       <div class="form-group">
-        <label>NGSS Standards</label>
-        <div>
-          {% for standard in assessment.ngss_standards.all %}
-            {{ standard }} <br>
+        <label>Taxonomy</label>
+        <ul class="standard">
+          {% for standard, categories in assessment.taxonomy.all|taxonomyHelper %}
+            <li>{{standard}}</li>
+            <ul class="category">
+              {% for category, taxonomies in categories.items %}
+                <li>{{category}}</li>
+                <ul class="taxonomy">
+                {% for taxonomy in taxonomies %}
+                  <li>{{taxonomy}} </li>
+                {% endfor %}
+                </ul>
+              {% endfor %}
+            </ul>
           {% endfor %}
-        </div>
-      </div>
-      <div class="form-group">
-        <label>CT-STEM Practices</label>
-        <div>
-          {% for practice in assessment.ct_stem_practices.all %}
-            {{ practice }} <br>
-          {% endfor %}
-        </div>
+        </ul>
       </div>
     </div>
     <div class="modal-footer"></div>

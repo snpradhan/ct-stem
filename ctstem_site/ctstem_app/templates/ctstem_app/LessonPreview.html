@@ -95,6 +95,25 @@
       width: auto;
       margin-right: 30px;
     }
+    ul {
+      margin-top: 0;
+      margin-bottom: 0;
+
+    }
+    ul.standard {
+      list-style-type: disc;
+      margin-bottom: 10px;
+    }
+    ul.category {
+      list-style-type: lower-latin;
+    }
+    ul.taxonomy {
+      list-style-type: lower-roman;
+    }
+    li {
+      margin:0;
+      padding:0;
+    }
 
   </style>
 {% endblock %}
@@ -131,24 +150,28 @@
           <div>{{form.overview.value}}</div>
         </div>
         <div class="meta">
-          <div class="label">{{form.ngss_standards.label}}</div>
-          {% for ngss in form|selected_labels:"ngss_standards" %}
-            {{ngss}}
-            <br>
-          {% endfor %}
-        </div>
-        <div class="meta">
-          <div class="label">{{form.ct_stem_practices.label}}</div>
-          {% for ct_stem in form|selected_labels:"ct_stem_practices" %}
-            {{ct_stem}}
-            <br>
-          {% endfor %}
+          <div class="label">{{form.taxonomy.label}}</div>
+          <ul class="standard">
+            {% for standard, categories in form|getSelectedTaxonomy:"taxonomy" %}
+              <li>{{standard}}</li>
+              <ul class="category">
+                {% for category, taxonomies in categories.items %}
+                  <li>{{category}}</li>
+                  <ul class="taxonomy">
+                  {% for taxonomy in taxonomies %}
+                    <li>{{taxonomy}} </li>
+                  {% endfor %}
+                  </ul>
+                {% endfor %}
+              </ul>
+            {% endfor %}
+          </ul>
         </div>
       </div>
 
 
       <div class="table" id="lessonContent">
-        <div>{{form.content.value|format_iframe|inline_style|safe}}</div>
+        <div>{{form.content.value|format_iframe|safe}}</div>
       </div>
 
       <div class="table" id="lessonActivity">

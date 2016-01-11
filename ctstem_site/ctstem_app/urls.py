@@ -33,6 +33,7 @@ urlpatterns = [
     url(r'^assessment/preview/(?P<id>[\d]+)/$', views.previewAssessment, name='previewAssessment'),
     url(r'^taxonomy/(?P<id>[\d]+)/$', views.taxonomy, name='taxonomy'),
     url(r'^taxonomy/new/$', views.taxonomy, name='newTaxonomy'),
+    url(r'^taxonomy/search/$', views.searchTaxonomy, name='searchTaxonomy'),
     url(r'^taxonomies/(?P<standard_id>[\d]+)/$', views.taxonomies, name='taxonomies'),
     url(r'^taxonomy/delete/(?P<model_type>[\w-]+)/(?P<id>[\d]+)/$', views.deleteTaxonomy, name='deleteTaxonomy'),
     url(r'^standard/new/$', views.standard, name='newStandard'),

@@ -64,3 +64,28 @@ def format_iframe(html_string):
 @register.filter
 def inline_style(html_string):
   return html_string.replace('<li', '<li style="margin:0;padding:0"');
+
+@register.filter
+def getSelectedTaxonomy(form, field):
+  selectedTaxonomy = [value for value, label in form.fields[field].choices if value in form[field].value()]
+  taxonomies = models.Taxonomy.objects.all().filter(id__in=selectedTaxonomy)
+  return taxonomyHelper(taxonomies)
+
+@register.filter
+def taxonomyHelper(taxonomies):
+  taxonomy_dictionary = {}
+  for taxonomy in taxonomies:
+    if taxonomy.standard.name in taxonomy_dictionary:
+      if taxonomy.category.name in taxonomy_dictionary[taxonomy.standard.name]:
+        taxonomy_dictionary[taxonomy.standard.name][taxonomy.category.name].append(taxonomy)
+      else:
+        taxonomy_dictionary[taxonomy.standard.name][taxonomy.category.name] = [taxonomy]
+    else:
+      taxonomy_dictionary[taxonomy.standard.name] = {taxonomy.category.name: [taxonomy]}
+
+  return taxonomy_dictionary.items()
+
+@register.filter
+def getTaxonomy(value):
+  taxonomy = models.Taxonomy.objects.get(id=value)
+  return taxonomy

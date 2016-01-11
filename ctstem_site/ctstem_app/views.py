@@ -46,7 +46,10 @@ def about_us(request):
 ####################################
 def assessments(request):
   if hasattr(request.user, 'administrator') == False:
-    assessments = models.Assessment.objects.all().filter(Q(status='P') | Q(author=request.user)).order_by('id')
+    if request.user.is_authenticated():
+      assessments = models.Assessment.objects.all().filter(Q(status='P') | Q(author=request.user)).order_by('id')
+    else:
+      assessments = models.Assessment.objects.all().filter(Q(status='P')).order_by('id')
   else:
     assessments = models.Assessment.objects.order_by('id')
   context = {'assessments': assessments}
@@ -198,7 +201,10 @@ def assessmentMeta(request, id=''):
 ####################################
 def lessons(request):
   if hasattr(request.user, 'administrator') == False:
-    lessons = models.Lesson.objects.all().filter(Q(status='P') | Q(author=request.user)).order_by('id')
+    if request.user.is_authenticated():
+      lessons = models.Lesson.objects.all().filter(Q(status='P') | Q(author=request.user)).order_by('id')
+    else:
+      lessons = models.Lesson.objects.all().filter(Q(status='P')).order_by('id')
   else:
     lessons = models.Lesson.objects.order_by('id')
   context = {'lessons': lessons}
@@ -320,8 +326,7 @@ def copyLesson(request, id=''):
           lesson.version = int(original_lesson.version) + 1
           lesson.slug = slugify(lesson.title) + '-v%s'%lesson.version + '-%s'%lesson.id
           lesson.subject = original_lesson.subject.all()
-          lesson.ngss_standards = original_lesson.ngss_standards.all()
-          lesson.ct_stem_practices = original_lesson.ct_stem_practices.all()
+          lesson.taxonomy = original_lesson.taxonomy.all()
           lesson.save()
 
           for activity in lessonActivities:
@@ -796,6 +801,42 @@ def deleteTaxonomy(request, model_type='', id=''):
     return http.HttpResponseNotFound('<h1>Taxonomy not found</h1>')
 
 ####################################
+# Search Taxonomy
+####################################
+@login_required
+def searchTaxonomy(request):
+  # check if the user has permission to add a question
+  if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'researcher') == False and hasattr(request.user, 'author') == False:
+    return http.HttpResponseNotFound('<h1>You do not have the privilege search taxonomy</h1>')
+
+  taxonomy = models.Taxonomy()
+  title = 'Search Taxonomy'
+  if 'GET' == request.method:
+    form = forms.TaxonomySearchForm(instance=taxonomy)
+    context = {'form': form, 'title': title}
+    return render(request, 'ctstem_app/TaxonomySearch.html', context)
+
+  elif 'POST' == request.method:
+    data = request.POST.copy()
+    print data
+    query_filter = {}
+    if data['standard']:
+      query_filter['standard__id'] = int(data['standard'])
+    if data['category']:
+      query_filter['category__id'] = int(data['category'])
+    if data['title']:
+      query_filter['title'] = str(data['title'])
+    if data['code']:
+      query_filter['code'] = str(data['code'])
+    print query_filter
+    taxonomyList = models.Taxonomy.objects.filter(**query_filter)
+    print taxonomyList
+    taxonomy_list = [{'standard': taxonomy.standard.short_name, 'category': taxonomy.category.name, 'title': taxonomy.title, 'code': taxonomy.code, 'id': taxonomy.id} for taxonomy in taxonomyList]
+    print json.dumps(taxonomy_list)
+    return http.HttpResponse(json.dumps(taxonomy_list), content_type="application/json")
+
+  return http.HttpResponseNotAllowed(['GET', 'POST'])
+####################################
 # USER LIST
 ####################################
 @login_required
@@ -1106,6 +1147,7 @@ def question(request, id=''):
       return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 
   return http.HttpResponseNotAllowed(['GET', 'POST'])
+
 
 ####################################
 # GENERATE UNIQUE USER CODE

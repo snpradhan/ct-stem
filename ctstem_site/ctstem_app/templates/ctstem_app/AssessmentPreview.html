@@ -34,19 +34,22 @@
           <div>{{form.overview.value}}</div>
         </div>
         <div class="meta">
-          <label>{{form.ngss_standards.label}}</label>
-          <div>
-            {% for ngss in form|selected_labels:"ngss_standards" %}
-              {{ngss}}
+          <label>{{form.taxonomy.label}}</label>
+          <ul class="standard">
+            {% for standard, categories in form|getSelectedTaxonomy:"taxonomy" %}
+              <li>{{standard}}</li>
+              <ul class="category">
+                {% for category, taxonomies in categories.items %}
+                  <li>{{category}}</li>
+                  <ul class="taxonomy">
+                  {% for taxonomy in taxonomies %}
+                    <li>{{taxonomy}} </li>
+                  {% endfor %}
+                  </ul>
+                {% endfor %}
+              </ul>
             {% endfor %}
-          </div>
-        </div>
-        <div class="meta">
-          <label>{{form.ct_stem_practices.label}}</label>
-          <div>
-            {% for ct_stem in form|selected_labels:"ct_stem_practices" %}
-              {{ct_stem}}
-            {% endfor %}</div>
+          </ul>
         </div>
         <hr>
       </div>
