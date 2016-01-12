@@ -49,6 +49,14 @@ urlpatterns = [
     url(r'^assignment/(?P<assignment_id>[\d]+)/new/$', views.assignment, name='startAssignment'),
     url(r'^assignment/(?P<assignment_id>[\d]+)/(?P<instance_id>[\d]+)/(?P<step_order>[\d]+)/$', views.assignment, name='resumeAssignment'),
     url(r'^assessmentMeta/(?P<id>[\d]+)/$', views.assessmentMeta, name='assessmentMeta'),
+    url(r'^subjects/$', views.subjects, name='subjects'),
+    url(r'^subject/(?P<id>[\d]+)/$', views.subject, name='subject'),
+    url(r'^subject/new/$', views.subject, name='newSubject'),
+    url(r'^subject/delete/(?P<id>[\d]+)/$', views.deleteSubject, name='deleteSubject'),
+    url(r'^schools/$', views.schools, name='schools'),
+    url(r'^school/(?P<id>[\d]+)/$', views.school, name='school'),
+    url(r'^school/new/$', views.school, name='newSchool'),
+    url(r'^school/delete/(?P<id>[\d]+)/$', views.deleteSchool, name='deleteSchool'),
 
 
 ]

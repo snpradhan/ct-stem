@@ -344,9 +344,15 @@ table.table td.title div.controls {
   margin-top: 0.5em;
 }
 
-table.table.dt thead tr:not(#filterrow), table.table#category thead tr, table.table#taxonomy thead tr:not(#filterrow) {
+table.table.dt thead tr:not(#filterrow), table.table.inner_table thead tr {
   background-color: #666666;
   color: #e5e5e5;
+}
+table.table.inner_table {
+  margin-top: 1em;
+}
+table.table.inner_table thead tr {
+  font-size: 0.9em;
 }
 
 table.table thead tr:not(#filterrow) th{
@@ -372,6 +378,7 @@ table.table thead tr:not(#filterrow) th{
  ***************************************/
 div.form-group {
   overflow: auto;
+  margin-bottom: 2.5em;
 }
 div.form-group label{
   font-size: 1.3em;
@@ -418,7 +425,7 @@ div.modal-content {
   max-height: 90%;
   overflow-y: scroll;
 }
-div.modal-content div#loginMsg {
+div.modal-content div#loginMsg , div.modal-content div#uploadMsg{
   text-align: center;
   color: red;
 }

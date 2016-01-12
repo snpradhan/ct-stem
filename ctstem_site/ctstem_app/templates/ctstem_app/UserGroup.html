@@ -17,9 +17,19 @@
         {{form.management_form}}
         {% for field in form %}
           <div class="form-group">
-            <label for="id_{{field.name}}">{{ field.label|title }} {% if field.field.required %}(<span class="required">*</span>){% endif %} </label>
+            {% if field.name != 'teacher' or user.teacher == '' %}
+              <label for="id_{{field.name}}">{{ field.label|title }} {% if field.field.required %}(<span class="required">*</span>){% endif %} </label>
+            {% endif %}
             <div class="controls">
-              {{field}}
+              {% if field.name == 'teacher' %}
+                {% if user.teacher %}
+                  <input type="hidden" id="id_group-teacher" name="group-teacher" value="{{user.teacher.id}}"/>
+                {% else %}
+                  {{field}}
+                {% endif %}
+              {% else %}
+                {{field}}
+              {% endif %}
             </div>
             <div class="error">{{ field.errors }}</div>
           </div>
@@ -31,13 +41,13 @@
           <div>
             <label for="id_assignment_table">Assignments</label>
             <button type="button" class="btn btn-primary" id="addAssignment">
-              <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+              Add More Assignment
             </button>
           </div>
-          <table class="table table-striped table-condensed" style="text-align:center;">
+          <table class="table table-striped table-condensed table-bordered inner_table">
             <thead>
               <tr>
-                <th style="width:60%;"></th>
+                <th style="width:60%;">Assessment</th>
                 <th>Assigned Date</th>
                 <th>Due Date</th>
                 <th>Delete</th>

@@ -10,15 +10,27 @@
   <div class="content">
     <h2> {{role|title}} </h2>
     <div class="form-group">
-      <a type="button" class="btn btn-primary" href="{% url 'ctstem:register' %}" title="Add a new user">
-        <span class="glyphicon glyphicon-user" aria-hidden="true"></span> Create User
-      </a>
-      <a type="button" class="btn btn-warning" href="/static/excel/User_Template.csv" title="Download User Template">
-        <span class="glyphicon glyphicon-download" aria-hidden="true"></span> Download User Template
-      </a>
-      <a type="button" class="btn btn-success" href="#" data-toggle="modal" data-target="#upload" title="Upload Users">
-        <span class="glyphicon glyphicon-upload" aria-hidden="true"></span> Upload Users
-      </a>
+      {% if user.administrator or user.researcher %}
+        <a type="button" class="btn btn-primary" href="{% url 'ctstem:register' %}" title="Add a new user">
+          <span class="glyphicon glyphicon-user" aria-hidden="true"></span> Create User
+        </a>
+        <a type="button" class="btn btn-warning" href="/static/excel/User_Template.csv" title="Download User Template">
+          <span class="glyphicon glyphicon-download" aria-hidden="true"></span> Download User Template
+        </a>
+        <a type="button" class="btn btn-success" href="#" data-toggle="modal" data-target="#upload" title="Upload Users">
+          <span class="glyphicon glyphicon-upload" aria-hidden="true"></span> Upload Users
+        </a>
+      {% elif user.teacher %}
+        <a type="button" class="btn btn-primary" href="{% url 'ctstem:register' %}" title="Add a new user">
+          <span class="glyphicon glyphicon-user" aria-hidden="true"></span> Create Student
+        </a>
+        <a type="button" class="btn btn-warning" href="/static/excel/Student_Template.csv" title="Download Student Template">
+          <span class="glyphicon glyphicon-download" aria-hidden="true"></span> Download Student Template
+        </a>
+        <a type="button" class="btn btn-success" href="#" data-toggle="modal" data-target="#upload" title="Upload Students">
+          <span class="glyphicon glyphicon-upload" aria-hidden="true"></span> Upload Student
+        </a>
+      {% endif %}
     </div>
     <ul class="nav nav-tabs">
       {% if user.administrator %}
@@ -65,12 +77,14 @@
           {% for userProfile in users %}
             <tr>
               <td>{{userProfile.user.username}}
-                <a type="button" class="btn btn-default edit" aria-label="Edit User" title="Edit User" href="{% url 'ctstem:userProfile' userProfile.user.id %}">
-                  <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
-                </a>
-                <a type="button" class="btn btn-default delete" aria-label="Delete User" title="Delete User" href="{% url 'ctstem:deleteUser' userProfile.user.id %}" onclick="return confirm('Are you sure you want to delete user {{userProfile.user.username}}?')">
-                  <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-                </a>
+                <div class="controls">
+                  <a type="button" class="btn btn-success edit" aria-label="Edit User" title="Edit User" href="{% url 'ctstem:userProfile' userProfile.user.id %}">
+                    <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+                  </a>
+                  <a type="button" class="btn btn-warning delete" aria-label="Delete User" title="Delete User" href="{% url 'ctstem:deleteUser' userProfile.user.id %}" onclick="return confirm('Are you sure you want to delete user {{userProfile.user.username}}?')">
+                    <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                  </a>
+                </div>
               </td>
               <td>{{userProfile.user.get_full_name}}</td>
               <td>{{userProfile.user.email}}</td>
@@ -96,7 +110,11 @@
         <div class="modal-content">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal">&times;</button>
-            <h3 class="modal-title">User Upload</h3>
+            {% if user.administrator or user.researcher %}
+              <h3 class="modal-title">User Upload</h3>
+            {% elif user.teacher %}
+              <h3 class="modal-title">Student Upload</h3>
+            {% endif %}
           </div>
           <div id="uploadMsg">
           </div>

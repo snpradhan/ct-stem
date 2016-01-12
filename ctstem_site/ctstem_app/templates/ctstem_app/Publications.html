@@ -33,7 +33,6 @@
                 <th> Author(s) </th>
                 <th> URL </th>
                 <th> Type </th>
-                <th> Affiliation </th>
               </tr>
               <tr id="filterrow">
                 <th> Title </th>
@@ -41,7 +40,6 @@
                 <th> Author(s) </th>
                 <th> URL </th>
                 <th> Type </th>
-                <th> Affiliation </th>
               </tr>
             </thead>
             <tbody>
@@ -68,7 +66,6 @@
                   <td>{{pub.authors}}</td>
                   <td><a href="{{pub.web_link}}" target="_blank">Link</a></td>
                   <td>{{pub.get_publication_type_display}}</td>
-                  <td>{{pub.get_publication_affiliation_display}}</td>
                 </tr>
               {% endfor %}
             </tbody>

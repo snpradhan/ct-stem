@@ -460,6 +460,8 @@ class UserGroupForm(ModelForm):
   def __init__(self, *args, **kwargs):
     super(UserGroupForm, self).__init__(*args, **kwargs)
 
+    self.fields['time'].label = 'Time/Period'
+
     for field_name, field in self.fields.items():
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['placeholder'] = field.help_text
@@ -540,3 +542,34 @@ class QuestionResponseForm(ModelForm):
     model = models.QuestionResponse
     exclude = ('created_date', 'modified_date',)
 
+####################################
+# School Form
+####################################
+class SchoolForm(ModelForm):
+
+  class Meta:
+    model = models.School
+    exclude = ('id',)
+
+  def __init__(self, *args, **kwargs):
+    super(SchoolForm, self).__init__(*args, **kwargs)
+
+    for field_name, field in self.fields.items():
+      field.widget.attrs['class'] = 'form-control'
+      field.widget.attrs['placeholder'] = field.help_text
+
+####################################
+# Subject Form
+####################################
+class SubjectForm(ModelForm):
+
+  class Meta:
+    model = models.Subject
+    exclude = ('id',)
+
+  def __init__(self, *args, **kwargs):
+    super(SubjectForm, self).__init__(*args, **kwargs)
+
+    for field_name, field in self.fields.items():
+      field.widget.attrs['class'] = 'form-control'
+      field.widget.attrs['placeholder'] = field.help_text

@@ -107,7 +107,7 @@ $(function (){
       url: url,
       dataType: 'json',
       success: function(data){
-        $("#id_user_code").val(data['user_code']);
+        $("input[id^='id'][id$='code']").val(data['code']);
       },
       error: function(){
         alert("Please try generating the user code again.")

@@ -916,7 +916,7 @@ def publication(request, slug=''):
 
     return http.HttpResponseNotAllowed(['GET', 'POST'])
 
-  except models.Lesson.DoesNotExist:
+  except models.Publication.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested publication not found</h1>')
 
 ####################################
@@ -950,7 +950,15 @@ def deletePublication(request, slug=''):
 ####################################
 @login_required
 def groups(request):
-  groups = models.UserGroup.objects.all().order_by('id')
+  if hasattr(request.user, 'administrator'):
+    groups = models.UserGroup.objects.all().order_by('id')
+  elif hasattr(request.user, 'researcher'):
+    subordinate_teachers = request.user.researcher.teachers.all()
+    groups = models.UserGroup.objects.all().filter(teacher__in=subordinate_teachers).order_by('id')
+  elif hasattr(request.user, 'teacher'):
+    groups = models.UserGroup.objects.all().filter(teacher=request.user.teacher).order_by('id')
+  else:
+    return http.HttpResponseNotFound('<h1>You do not have the privilege to view student groups</h1>')
   context = {'groups': groups}
   return render(request, 'ctstem_app/UserGroups.html', context)
 
@@ -1153,8 +1161,8 @@ def question(request, id=''):
 # GENERATE UNIQUE USER CODE
 ####################################
 def generate_code(request):
-  user_code = generate_code_helper(request)
-  response_data = {'user_code': user_code}
+  code = generate_code_helper(request)
+  response_data = {'code': code}
   return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 
 ####################################
@@ -1162,16 +1170,18 @@ def generate_code(request):
 ####################################
 def generate_code_helper(request):
   allowed_chars = ''.join((string.uppercase, string.digits))
-  user_code = get_random_string(length=5, allowed_chars=allowed_chars)
-  teachers = models.Teacher.objects.all().filter(user_code=user_code)
-  researchers = models.Researcher.objects.all().filter(user_code=user_code)
+  code = get_random_string(length=5, allowed_chars=allowed_chars)
+  teachers = models.Teacher.objects.all().filter(user_code=code)
+  researchers = models.Researcher.objects.all().filter(user_code=code)
+  schools = models.School.objects.all().filter(school_code=code)
   # ensure the user code is unique across teachers and researchers
-  while teachers.count() > 0 or researchers.count() > 0:
-    user_code = get_random_string(length=5, allowed_chars=allowed_chars)
-    teachers = models.Teacher.objects.all().filter(user_code=user_code)
-    researchers = models.Researcher.objects.all().filter(user_code=user_code)
+  while teachers.count() > 0 or researchers.count() > 0 or schools.count() > 0:
+    code = get_random_string(length=5, allowed_chars=allowed_chars)
+    teachers = models.Teacher.objects.all().filter(user_code=code)
+    researchers = models.Researcher.objects.all().filter(user_code=code)
+    schools = models.School.objects.all().filter(school_code=code)
 
-  return user_code
+  return code
 ####################################
 # UPLOAD USERS
 ####################################
@@ -1200,11 +1210,15 @@ def user_upload(request):
           first_name = str(row[1])
           last_name = str(row[2])
           email = str(row[3])
-          password = str(row[4])
-          account_type = str(row[5])
-          school = str(row[6])
-          permission_code = str(row[7])
-          print username, first_name, last_name, email, password, account_type, school, permission_code
+          if role == 'teacher':
+            account_type = None
+            school_code = None
+            permission_code = None;
+          else:
+            account_type = str(row[4])
+            school_code = str(row[5])
+            permission_code = str(row[6])
+          print username, first_name, last_name, email, account_type, school_code, permission_code
           # check fields are not blank
           if username is None or username == '':
             messages.error(request, 'Username is missing on row %d' % count)
@@ -1214,19 +1228,18 @@ def user_upload(request):
             messages.error(request, 'Last name is missing on row %d' % count)
           elif email is None or email == '':
             messages.error(request, 'Email is missing on row %d' % count)
-          elif account_type is None or account_type == '' or account_type not in ['Admin', 'Researcher', 'Teacher', 'Student', 'Author']:
-            messages.error(request, 'Account Type is missing or invalid on row %d' % count)
-          # check user has privilege to create other users
-          elif role == 'researcher' and account_type in ['Admin', 'Researcher', 'Author']:
-            messages.error(request, 'You do not have the privilege to add  %s on row %d' % (account_type, count))
-          elif role == 'teacher' and account_type in ['Admin', 'Researcher', 'Teacher', 'Author']:
-            messages.error(request, 'You do not have the privilege to add  %s on row %d' % (account_type, count))
+          elif role == 'admin' and account_type not in ['Admin', 'Researcher', 'Teacher', 'Student', 'Author']:
+            messages.error(request, 'Account Type is missing or invalid on row %d.  Account type has to be one of %s' % (count, 'Admin, Researcher, Teacher, Student or Author'))
+          elif role == 'researcher' and account_type not in ['Teacher', 'Student']:
+            messages.error(request, 'Account Type is missing or invalid on row %d.  Account type has to be one of %s' % (count, 'Teacher or Student'))
+          elif role == 'teacher' and account_type is not None and account_type != '':
+            messages.error(request, 'You do not have the privilege to add  %s on row %d.  Please use a valid Student Template' % (account_type, count))
           # everything cool so far
           else:
             try:
-              if password is None or password == '':
-                #generate a random password
-                password = User.objects.make_random_password()
+
+              #generate a random password
+              password = User.objects.make_random_password()
               #create the user object
               if User.objects.filter(username=username).exists() or User.objects.filter(email=email).exists():
                 raise IntegrityError('User already exists')
@@ -1241,12 +1254,12 @@ def user_upload(request):
               #create a researcher
               elif account_type == 'Researcher':
                 user_code = generate_code_helper(request)
-                school_obj = models.School.objects.get(name=school)
+                school_obj = models.School.objects.get(school_code=school_code)
                 researcher = models.Researcher.objects.create(user=user, user_code=user_code, school=school_obj)
               #create a teacher
               elif account_type == 'Teacher':
                 user_code = generate_code_helper(request)
-                school_obj = models.School.objects.get(name=school)
+                school_obj = models.School.objects.get(school_code=school_code)
                 teacher = models.Teacher.objects.create(user=user, user_code=user_code, school=school_obj)
                 # associate the teacher with a researcher
                 if role == 'researcher':
@@ -1260,19 +1273,22 @@ def user_upload(request):
                   else:
                     messages.warning(request, 'Teacher on row %d created but not affiliated with a researcher because permission code not specified' % count)
               #create a student
-              elif account_type == 'Student':
-                school_obj = models.School.objects.get(name=school)
-                student = models.Student.objects.create(user=user, school=school_obj)
+              elif account_type == 'Student' or (role == 'teacher' and (account_type is None or account_type == '')):
                 if role == 'teacher':
+                  school_obj = request.user.teacher.school
+                  student = models.Student.objects.create(user=user, school=school_obj)
                   #associate student with the logged in teacher
                   request.user.teacher.students.add(student)
                 else:
                   #find the teacher with the permission code
                   if permission_code is not None and permission_code != '':
                     teacher = models.Teacher.objects.get(user_code=permission_code)
+                    school_obj = teacher.school
+                    student = models.Student.objects.create(user=user, school=school_obj)
                     teacher.students.add(student)
                   else:
-                    messages.warning(request, 'Student on row %d created but not affiliated with a teacher because permission code not specified' % count)
+                    user.delete()
+                    messages.warning(request, 'Student on row %d not created because teacher permission code not specified' % count)
               #create an author
               else:
                 author = models.Author.objects.create(user=user)
@@ -1302,4 +1318,152 @@ def user_upload(request):
     return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 
   return http.HttpResponseNotAllowed(['POST'])
+
+####################################
+# Schools
+####################################
+@login_required
+def schools(request):
+  if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'researcher') == False:
+    return http.HttpResponseNotFound('<h1>You do not have the privilege to view schools</h1>')
+
+  schools = models.School.objects.all()
+  context = {'schools': schools}
+  return render(request, 'ctstem_app/Schools.html', context)
+
+####################################
+# Add/Edit School
+####################################
+@login_required
+def school(request, id=''):
+  try:
+    if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'researcher') == False:
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to add/edit schools</h1>')
+
+    if ''!= id:
+      school = models.School.objects.get(id=id)
+    else:
+      school = models.School()
+
+    if request.method == 'GET':
+        form = forms.SchoolForm(instance=school, prefix='school')
+        context = {'form': form,}
+        return render(request, 'ctstem_app/School.html', context)
+
+    elif request.method == 'POST':
+      data = request.POST.copy()
+
+      form = forms.SchoolForm(data, instance=school, prefix="school")
+      if form.is_valid():
+        form.save()
+        messages.success(request, "School Saved.")
+        return shortcuts.redirect('ctstem:schools',)
+      else:
+        print form.errors
+        messages.error(request, "The school could not be saved because there were errors.  Please check the errors below.")
+        context = {'form': form}
+        return render(request, 'ctstem_app/School.html', context)
+
+    return http.HttpResponseNotAllowed(['GET', 'POST'])
+
+  except models.School.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested publication not found</h1>')
+
+####################################
+# Delete School
+####################################
+def deleteSchool(request, id=''):
+  try:
+    # check if the user has permission to delete a school
+    if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'researcher') == False:
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to delete this school</h1>')
+    # check if the lesson exists
+    if '' != id:
+      school = models.School.objects.get(id=id)
+    else:
+      raise models.School.DoesNotExist
+
+    if request.method == 'GET' or request.method == 'POST':
+      school.delete()
+      messages.success(request, '%s deleted' % school.name)
+      return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+    return http.HttpResponseNotAllowed(['GET', 'POST'])
+
+  except models.School.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested school not found</h1>')
+
+####################################
+# Subjects
+####################################
+@login_required
+def subjects(request):
+  if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'researcher') == False:
+    return http.HttpResponseNotFound('<h1>You do not have the privilege to view subjects</h1>')
+
+  subjects = models.Subject.objects.all()
+  context = {'subjects': subjects}
+  return render(request, 'ctstem_app/Subjects.html', context)
+
+####################################
+# Add/Edit Subject
+####################################
+@login_required
+def subject(request, id=''):
+  try:
+    if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'researcher') == False:
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to add/edit subjects</h1>')
+
+    if ''!= id:
+      subject = models.Subject.objects.get(id=id)
+    else:
+      subject = models.Subject()
+
+    if request.method == 'GET':
+        form = forms.SubjectForm(instance=subject, prefix='subject')
+        context = {'form': form,}
+        return render(request, 'ctstem_app/Subject.html', context)
+
+    elif request.method == 'POST':
+      data = request.POST.copy()
+
+      form = forms.SubjectForm(data, instance=subject, prefix="subject")
+      if form.is_valid():
+        form.save()
+        messages.success(request, "Subject Saved.")
+        return shortcuts.redirect('ctstem:subjects',)
+      else:
+        print form.errors
+        messages.error(request, "The subject could not be saved because there were errors.  Please check the errors below.")
+        context = {'form': form}
+        return render(request, 'ctstem_app/Subject.html', context)
+
+    return http.HttpResponseNotAllowed(['GET', 'POST'])
+
+  except models.Subject.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested subject not found</h1>')
+
+####################################
+# Delete Subject
+####################################
+def deleteSubject(request, id=''):
+  try:
+    # check if the user has permission to delete a subject
+    if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'researcher') == False:
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to delete this subject</h1>')
+    # check if the lesson exists
+    if '' != id:
+      subject = models.Subject.objects.get(id=id)
+    else:
+      raise models.Subject.DoesNotExist
+
+    if request.method == 'GET' or request.method == 'POST':
+      subject.delete()
+      messages.success(request, '%s deleted' % subject.name)
+      return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+    return http.HttpResponseNotAllowed(['GET', 'POST'])
+
+  except models.Subject.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested subject not found</h1>')
 

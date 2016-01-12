@@ -9,8 +9,11 @@
 {% block content %}
   {{block.super}}
   <div class="content">
-    <h2> User Groups </h2>
-
+    {% if user.teacher %}
+      <h2> My Student Groups </h2>
+    {% else %}
+      <h2> Student Groups </h2>
+    {% endif %}
     <div class="btn-group">
       <a type="button" class="btn btn-primary" href="{% url 'ctstem:newGroup' %}" title="Create new group">Create Group</a>
     </div>

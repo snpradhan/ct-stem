@@ -20,33 +20,6 @@ FIELD_TYPE_CHOICES = (
     (u'MS', u'Multi-Select'),
     (u'MC', u'Multiple Choice'),
 )
-CT_STEW_PRACTICE_CATEGORY = (
-    (u'DA', u'Data Analysis'),
-    (u'MS', u'Modeling & Simulation'),
-    (u'CP', u'Computational Problem Solving'),
-    (u'ST', u'Systems Thinking'),
-)
-
-SUBJECT_CHOICES = (
-    (u'PHYSICS', u'PHYSICS'),
-    (u'BIOLOGY', u'BIOLOGY'),
-    (u'CHEMISTRY', u'CHEMISTRY'),
-    (u'MATH', u'MATH'),
-    (u'ASTRONOMY', u'ASTRONOMY'),
-    (u'EARTH SCIENCE', u'EARTH SCIENCE'),
-    (u'BIOTECHNOLOGY', u'BIOTECHNOLOGY'),
-    (u'GENETICS', u'GENETICS'),
-    (u'PHYSIOLOGY', u'PHYSIOLOGY'),
-    (u'HUMAN ANATOMY', u'HUMAN ANATOMY'),
-    (u'ENVIRONMENTAL SCIENCE', u'ENVIRONMENTAL SCIENCE'),
-    (u'SPACE SCIENCE', u'SPACE SCIENCE'),
-    (u'FORENSIC SCIENCE', u'FORENSIC SCIENCE'),
-    (u'PHYSICAL SCIENCE', u'PHYSICAL SCIENCE'),
-    (u'NATURAL SCIENCE', u'NATURAL SCIENCE'),
-    (u'GEOLOGY', u'GEOLOGY'),
-    (u'ECOLOGY', u'ECOLOGY'),
-    (u'GENERAL SCIENCE', u'GENERAL SCIENCE'),
-)
 
 USER_ROLE_CHOICES = (
     (u'A', u'Site Administrator'),
@@ -63,11 +36,6 @@ PUBLICATION_TYPES = (
   (u'presentations', u'Presentations and Posters'),
   (u'workshops', u'Workshop Papers'),
   (u'others', u'Other Papers'),
-)
-
-PUBLICATION_AFFILIATION = (
-  (u'lab', u'TIDAL Lab'),
-  (u'personal', u'Personal'),
 )
 
 ASSIGNMENT_STATUS = (
@@ -192,7 +160,8 @@ class AssessmentQuestion(models.Model):
 
 # Subject model
 class Subject(models.Model):
-  name = models.CharField(null=False, max_length=256, choices=SUBJECT_CHOICES)
+  name = models.CharField(null=False, max_length=256)
+  abbrevation = models.CharField(null=True, blank=True, max_length=10)
 
   def __unicode__(self):
       return u'%s' % (self.name)
@@ -233,6 +202,7 @@ class Taxonomy(models.Model):
 class School(models.Model):
   name = models.CharField(null=False, max_length=256)
   city = models.CharField(null=False, max_length=256)
+  school_code = models.CharField(null=False, max_length=10, unique=True)
 
   def __unicode__(self):
       return u'%s' % (self.name)
@@ -311,14 +281,12 @@ class Publication(models.Model):
   local_copy = models.FileField(upload_to=upload_file_to, blank=True)
   web_link = models.URLField(blank=True)
   publication_type = models.CharField(max_length=255, choices=PUBLICATION_TYPES)
-  publication_affiliation = models.CharField(max_length=255, choices=PUBLICATION_AFFILIATION)
-
 
 #######################################################
 # Group model
 #######################################################
 class UserGroup(models.Model):
-  title = models.CharField(max_length=255, help_text='Group Title')
+  title = models.CharField(max_length=255, help_text='Group Title. Eg. Physics Section A')
   subject = models.ForeignKey(Subject)
   time = models.CharField(null=False, max_length=256)
   teacher = models.ForeignKey(Teacher)
