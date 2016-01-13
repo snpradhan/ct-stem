@@ -1112,7 +1112,7 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
           print formset.errors
           messages.error(request, 'Please check the errors below')
 
-        context = {'form': form, 'formset': formset}
+        context = {'form': form, 'formset': formset, 'total_steps': total_steps}
         return render(request, 'ctstem_app/AssignmentStep.html', context)
 
     return http.HttpResponseNotAllowed(['GET', 'POST'])

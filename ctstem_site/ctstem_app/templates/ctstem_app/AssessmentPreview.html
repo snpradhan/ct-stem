@@ -55,47 +55,96 @@
       </div>
       {% for step in formset %}
         <div class="table stepPreview">
-          <h3>{{step.title.value}} {{step.ORDER.value}}</h3>
+          <div class="row header">
+            <div class="col-md-3 back">
+              {% if forloop.counter > 1 %}
+                <a type="button" class="btn btn-primary" title="Previous Step" href="">
+                  <span class="glyphicon glyphicon-triangle-left" aria-hidden="true"></span> Previous
+                </a>
+              {% endif %}
+            </div>
+            <div class="col-md-6 title">
+              <div class="assessment_title">
+                {{form.title.value|title}}
+              </div>
+              <div class="assessment_step_title">
+                <span>{{step.title.value}}</span>
+                <span>({{forloop.counter}}/{{formset|length}})</span>
+              </div>
+            </div>
+            <div class="col-md-3 next">
+              {% if forloop.last %}
+                <button type="submit" class="btn btn-success" title="Submit Assignment">
+                  Submit
+                </button>
+              {% else %}
+                <button type="submit" class="btn btn-primary" title="Next Step" >
+                  Next <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
+                </button>
+              {% endif %}
+            </div>
+          </div>
           <hr>
           <div>{{step.content.value|inline_style|safe}}</div>
-          <hr>
-          <table class="question_table">
+          <div class="question_container">
             {% for questionForm in step.nested %}
-              <tr>
-                <td width="10%" style="vertical-align: top;" class="question_no"> Q{{forloop.counter}}.</td>
-                <td class="question_text"> {{questionForm.instance.question.question_text|inline_style|safe }} </td>
-              </tr>
-              <tr>
-                <td></td>
-                <td class="answer_field">
-                  {% with field_type=questionForm.instance.question.answer_field_type %}
+              {% with questionObj=questionForm.instance.question %}
+              <div class="question">
+                <div class="question_text">
+                  <span> Q{{forloop.counter}}.</span>
+                  <span> {{questionObj.question_text|safe}} </span>
+                  <input type="hidden" name="{{questionForm.assessment_question.html_name}}" id="{{questionForm.assessment_question.auto_id}}" value="{{questionForm.assessment_question.value}}"/>
+                </div>
+                <div class="answer_field">
+                  {% with field_type=questionObj.answer_field_type %}
                     {% if field_type == 'TA' %}
-                      <textarea placeholder="Enter your response" class="form-control"></textarea>
+                      <textarea placeholder="Enter your response" class="form-control" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" required>{{questionForm.response.value}}</textarea>
                     {% elif field_type == 'TF' %}
-                      <input type="text" placeholder="Enter your response" class="form-control"/>
+                      <input type="text" placeholder="Enter your response" class="form-control" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" required value="{{questionForm.response.value}}" />
                     {% elif field_type == 'DD' %}
-                      <select class="form-control">
-                        {% for option in questionForm.instance.question.options|split:','%}
+                      <select class="form-control" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" required>
+                        {% for option in questionObj.options|split:','%}
                           <option value="{{option}}">{{option}}</option>
                         {% endfor %}
                       </select>
                     {% elif field_type == 'MC' %}
                       <div class="note"> Note: Select one answer </div>
-                      {% for option in questionForm.instance.question.options|split:','%}
-                        <input type="radio" name="forloop.parent.counter" value="{{option}}"/>{{option}}<br>
+                      {% for option in questionObj.options|split:','%}
+                        <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}"/>  {{option}}<br>
                       {% endfor %}
                     {% elif field_type == 'MS' %}
                       <div class="note"> Note: Select all that apply </div>
-                      {% for option in questionForm.instance.question.options|split:','%}
-                        <input type="checkbox" name="forloop.parent.counter" value="{{option}}"/>{{option}}<br>
+                      {% for option in questionObj.options|split:','%}
+                        <input type="checkbox" name="{{questionForm.response.html_name}}_cb" id="{{questionForm.response.auto_id}}_cb" value="{{option}}"/>  {{option}}<br>
                       {% endfor %}
                     {% endif %}
                   {% endwith %}
-                </td>
-              </tr>
-
+                </div>
+              </div>
+              {% endwith %}
             {% endfor %}
-          </table>
+          </div>
+          <hr>
+          <div class="row footer">
+            <div class="col-md-6 back">
+              {% if forloop.counter > 1 %}
+                <a type="button" class="btn btn-primary" title="Previous Step" href="">
+                  <span class="glyphicon glyphicon-triangle-left" aria-hidden="true"></span> Previous
+                </a>
+              {% endif %}
+            </div>
+            <div class="col-md-6 next">
+              {% if forloop.last %}
+                <button type="submit" class="btn btn-success" title="Submit Assignment">
+                  Submit
+                </button>
+              {% else %}
+                <button type="submit" class="btn btn-primary" title="Next Step" >
+                  Next <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
+                </button>
+              {% endif %}
+            </div>
+          </div>
         </div>
       {% endfor %}
 

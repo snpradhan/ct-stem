@@ -221,18 +221,18 @@ div.table#assessmentPreview hr, div.table.stepPreview hr, div.table#assignment h
   border-top: 1px solid #949494;
 }
 
-div.table#assignment .row .back {
+div.table#assignment .row .back, div.table.stepPreview .row .back {
   text-align: left;
 }
-div.table#assignment .row .next {
+div.table#assignment .row .next, div.table.stepPreview .row .next {
   text-align: right;
 }
-div.table#assignment .row .title {
+div.table#assignment .row .title, div.table.stepPreview .row .title {
   text-align: center;
   font-size: 1.3em;
   font-weight: 700;
 }
-div.table#assignment .row .title .assessment_title {
+div.table#assignment .row .title .assessment_title, div.table.stepPreview .row .title .assessment_title {
   font-size: 1.1em;
   text-decoration: underline;
   margin-bottom: 1em;
@@ -242,11 +242,11 @@ div.table#assignment div.assessment_content {
   min-height: 50%;
 }
 
-div.table#assignment div.question_container div.question {
+div.question_container div.question {
   margin-bottom: 2em;
 }
 
-div.table#assignment div.question_container div.question div.question_text {
+div.question_container div.question div.question_text {
   font-weight: 700;
 }
 
