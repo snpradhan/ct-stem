@@ -825,9 +825,9 @@ def searchTaxonomy(request):
     if data['category']:
       query_filter['category__id'] = int(data['category'])
     if data['title']:
-      query_filter['title'] = str(data['title'])
+      query_filter['title__icontains'] = str(data['title'])
     if data['code']:
-      query_filter['code'] = str(data['code'])
+      query_filter['code__icontains'] = str(data['code'])
     print query_filter
     taxonomyList = models.Taxonomy.objects.filter(**query_filter)
     print taxonomyList
