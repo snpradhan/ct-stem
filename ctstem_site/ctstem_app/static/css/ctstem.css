@@ -214,7 +214,7 @@ div.table#lessonPreview div.lesson-row, div.table#lessonQuestions div.question-r
 div.table#assignment {
   padding: 3em 4em;
   background-color: #eee;
-  font-size: 1.3em;
+  font-size: 1.5em;
 }
 
 div.table#assessmentPreview hr, div.table.stepPreview hr, div.table#assignment hr {

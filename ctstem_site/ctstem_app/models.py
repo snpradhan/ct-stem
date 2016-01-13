@@ -95,6 +95,9 @@ class LessonActivity(models.Model):
   content = RichTextUploadingField(null=False)
   questions = models.ManyToManyField('Question', through='LessonQuestion', blank=True)
 
+  class Meta:
+      ordering = ['order']
+
 # Assessment model
 class Assessment (models.Model):
   title = models.CharField(null=False, max_length=256)
@@ -127,6 +130,9 @@ class AssessmentStep(models.Model):
   content = RichTextUploadingField(null=False)
   teacher_notes = RichTextUploadingField(null=True, blank=True)
   questions = models.ManyToManyField('Question', through='AssessmentQuestion', blank=True)
+
+  class Meta:
+      ordering = ['order']
 
 # Question model
 # A bank of questions that can be resued across assessments and lessons
