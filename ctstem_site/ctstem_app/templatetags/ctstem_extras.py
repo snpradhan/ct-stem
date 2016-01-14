@@ -68,7 +68,7 @@ def inline_style(html_string):
 @register.filter
 def getSelectedTaxonomy(form, field):
   selectedTaxonomy = [value for value, label in form.fields[field].choices if value in form[field].value()]
-  taxonomies = models.Taxonomy.objects.all().filter(id__in=selectedTaxonomy)
+  taxonomies = models.Subcategory.objects.all().filter(id__in=selectedTaxonomy)
   return taxonomyHelper(taxonomies)
 
 @register.filter
@@ -87,5 +87,5 @@ def taxonomyHelper(taxonomies):
 
 @register.filter
 def getTaxonomy(value):
-  taxonomy = models.Taxonomy.objects.get(id=value)
+  taxonomy = models.Subcategory.objects.get(id=value)
   return taxonomy

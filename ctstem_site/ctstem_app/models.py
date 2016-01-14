@@ -74,7 +74,7 @@ class Lesson (models.Model):
   parent = models.ForeignKey('self', null=True, on_delete=models.SET_NULL)
   version = models.IntegerField(default=1)
   slug = models.SlugField(unique=True, max_length=255)
-  taxonomy = models.ManyToManyField('Taxonomy')
+  taxonomy = models.ManyToManyField('Subcategory')
   author = models.ForeignKey(User, null=False, related_name='lesson_author')
   modified_by = models.ForeignKey(User, null=False, related_name='lesson_modifier')
   created_date = models.DateTimeField(auto_now_add=True)
@@ -108,7 +108,7 @@ class Assessment (models.Model):
   parent = models.ForeignKey('self', null=True, on_delete=models.SET_NULL)
   version = models.IntegerField(default=1)
   slug = models.SlugField(unique=True, max_length=255)
-  taxonomy = models.ManyToManyField('Taxonomy')
+  taxonomy = models.ManyToManyField('Subcategory')
   author = models.ForeignKey(User, null=False, related_name='assessment_author')
   modified_by = models.ForeignKey(User, null=False, related_name='assessment_modifier')
   created_date = models.DateTimeField(auto_now_add=True)
@@ -189,9 +189,9 @@ class Category(models.Model):
   def __unicode__(self):
       return u'%s' % (self.name)
 
-# Taxonomy model
-class Taxonomy(models.Model):
-  standard = models.ForeignKey(Standard, related_name="taxonomy")
+# Subcategory model
+class Subcategory(models.Model):
+  standard = models.ForeignKey(Standard, related_name="subcategory")
   category = ChainedForeignKey(Category, chained_field="standard",
         chained_model_field="standard",
         show_all=False,

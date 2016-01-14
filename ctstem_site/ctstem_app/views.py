@@ -674,45 +674,45 @@ def notimplemented(request):
   return render(request, 'ctstem_app/NotImplemented.html')
 
 @login_required
-def taxonomy(request, id=''):
+def subcategory(request, id=''):
   try:
     if hasattr(request.user, 'author') == False and hasattr(request.user, 'researcher') == False and  hasattr(request.user, 'administrator') == False:
-      return http.HttpResponseNotFound('<h1>You do not have the privilege to add/modify taxonomy</h1>')
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to add/modify subcategories</h1>')
     if '' != id:
-      taxonomy = models.Taxonomy.objects.get(id=id)
+      subcategory = models.Subcategory.objects.get(id=id)
     else:
-      taxonomy = models.Taxonomy()
+      subcategory = models.Subcategory()
     if request.method == 'GET':
-      form = forms.TaxonomyForm(instance=taxonomy)
+      form = forms.SubcategoryForm(instance=subcategory)
       context = {'form': form}
-      return render(request, 'ctstem_app/Taxonomy.html', context)
+      return render(request, 'ctstem_app/Subcategory.html', context)
 
     elif request.method == 'POST':
       data = request.POST.copy()
-      form = forms.TaxonomyForm(data, instance=taxonomy)
+      form = forms.SubcategoryForm(data, instance=subcategory)
       if form.is_valid():
         form.save()
-        messages.success(request, '%s saved' % taxonomy)
-        return shortcuts.redirect('ctstem:taxonomies', taxonomy.standard.id)
+        messages.success(request, '%s saved' % subcategory)
+        return shortcuts.redirect('ctstem:subcategories', subcategory.standard.id)
       else:
         print form.errors
-        messages.error(request, "The taxonomy could not be saved because there were errors.  Please check the errors below.")
+        messages.error(request, "The subcategory could not be saved because there were errors.  Please check the errors below.")
         context = {'form': form}
-        return render(request, 'ctstem_app/Taxonomy.html', context)
+        return render(request, 'ctstem_app/Subcategory.html', context)
 
-  except models.Taxonomy.DoesNotExist:
-    return http.HttpResponseNotFound('<h1>Taxonomy not found</h1>')
+  except models.Subcategory.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Subcategory not found</h1>')
 
-def taxonomies(request, standard_id=''):
+def subcategories(request, standard_id=''):
   standards = models.Standard.objects.all().order_by('name')
-  taxonomies  = models.Taxonomy.objects.all().filter(standard__id=standard_id).order_by('category__standard__name', 'category__name', 'title')
-  context = {'standards': standards, 'taxonomies': taxonomies, 'page': 'taxonomy'}
-  return render(request, 'ctstem_app/Taxonomies.html', context)
+  subcategories  = models.Subcategory.objects.all().filter(standard__id=standard_id).order_by('category__standard__name', 'category__name', 'title')
+  context = {'standards': standards, 'subcategories': subcategories, 'page': 'subcategory'}
+  return render(request, 'ctstem_app/Subcategories.html', context)
 
 def standards(request):
   standards = models.Standard.objects.all().order_by('name')
   context = {'standards': standards, 'page': 'standards'}
-  return render(request, 'ctstem_app/Taxonomies.html', context)
+  return render(request, 'ctstem_app/Subcategories.html', context)
 
 @login_required
 def standard(request, id=''):
@@ -755,12 +755,12 @@ def standard(request, id=''):
     return http.HttpResponseNotFound('<h1>Requested group not found</h1>')
 
 ####################################
-# DELETE Standard, Category or Taxonomy
+# DELETE Standard, Category or Subcategory
 ####################################
 @login_required
-def deleteTaxonomy(request, model_type='', id=''):
+def deleteSubcategory(request, model_type='', id=''):
   try:
-    # check if the user has permission to delete a taxonomy
+    # check if the user has permission to delete a subcategory
     if hasattr(request.user, 'author') == False and hasattr(request.user, 'researcher') == False and  hasattr(request.user, 'administrator') == False:
       return http.HttpResponseNotFound('<h1>You do not have the privilege to delete this publication</h1>')
     # check if the lesson exists
@@ -776,12 +776,12 @@ def deleteTaxonomy(request, model_type='', id=''):
         title = obj.name
       else:
         raise models.Category.DoesNotExist
-    elif model_type == 'Taxonomy':
+    elif model_type == 'Subcategory':
       if '' != id:
-        obj = models.Taxonomy.objects.get(id=id)
+        obj = models.Subcategory.objects.get(id=id)
         title = obj.title
       else:
-        raise models.Taxonomy.DoesNotExist
+        raise models.Subcategory.DoesNotExist
     else:
       return http.HttpResponseNotFound('<h1>Model type does not exist</h1>')
 
@@ -797,8 +797,8 @@ def deleteTaxonomy(request, model_type='', id=''):
     return http.HttpResponseNotFound('<h1>Standard not found</h1>')
   except models.Category.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Category not found</h1>')
-  except models.Taxonomy.DoesNotExist:
-    return http.HttpResponseNotFound('<h1>Taxonomy not found</h1>')
+  except models.Subcategory.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Subcategory not found</h1>')
 
 ####################################
 # Search Taxonomy
@@ -809,10 +809,10 @@ def searchTaxonomy(request):
   if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'researcher') == False and hasattr(request.user, 'author') == False:
     return http.HttpResponseNotFound('<h1>You do not have the privilege search taxonomy</h1>')
 
-  taxonomy = models.Taxonomy()
+  subcategory = models.Subcategory()
   title = 'Search Taxonomy'
   if 'GET' == request.method:
-    form = forms.TaxonomySearchForm(instance=taxonomy)
+    form = forms.TaxonomySearchForm(instance=subcategory)
     context = {'form': form, 'title': title}
     return render(request, 'ctstem_app/TaxonomySearch.html', context)
 
@@ -829,9 +829,8 @@ def searchTaxonomy(request):
     if data['code']:
       query_filter['code__icontains'] = str(data['code'])
     print query_filter
-    taxonomyList = models.Taxonomy.objects.filter(**query_filter)
-    print taxonomyList
-    taxonomy_list = [{'standard': taxonomy.standard.short_name, 'category': taxonomy.category.name, 'title': taxonomy.title, 'code': taxonomy.code, 'id': taxonomy.id} for taxonomy in taxonomyList]
+    taxonomyList = models.Subcategory.objects.filter(**query_filter)
+    taxonomy_list = [{'standard': subcategory.standard.short_name, 'category': subcategory.category.name, 'title': subcategory.title, 'code': subcategory.code, 'id': subcategory.id} for subcategory in taxonomyList]
     print json.dumps(taxonomy_list)
     return http.HttpResponse(json.dumps(taxonomy_list), content_type="application/json")
 

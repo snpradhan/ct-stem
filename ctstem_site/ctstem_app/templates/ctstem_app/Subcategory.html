@@ -5,11 +5,11 @@
   {{ block.super }}
   {{ form.media }}
 {% endblock %}
-{% block title %}Taxonomy |{% endblock %}
+{% block title %}Subcategory |{% endblock %}
 {% block content %}
   {{block.super}}
   <div class="content">
-    <h2>Taxonomy</h2>
+    <h2>Subcategory</h2>
     <form method="post">
       {% csrf_token %}
       <div class="table" id="taxonomy">
@@ -24,7 +24,7 @@
           </div>
         {% endfor %}
         <div class="form-group button-group-fixed">
-          <input type="submit" class="btn btn-success" id="submit" value="Save Taxonomy"/>
+          <input type="submit" class="btn btn-success" id="submit" value="Save Subcategory"/>
         </div>
       </div>
     </form>

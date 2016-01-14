@@ -349,22 +349,22 @@ class AssessmentQuestionForm(ModelForm):
 
 
 ####################################
-# Taxonomy Form
+# Subcategory Form
 ####################################
-class TaxonomyForm(ModelForm):
+class SubcategoryForm(ModelForm):
 
   class Meta:
-    model = models.Taxonomy
+    model = models.Subcategory
     exclude = ('id',)
     widgets = {
-      'title': forms.TextInput(attrs={'placeholder': 'Taxonomy title'}),
-      'code': forms.TextInput(attrs={'placeholder': 'Taxonomy code'}),
+      'title': forms.TextInput(attrs={'placeholder': 'Subcategory title'}),
+      'code': forms.TextInput(attrs={'placeholder': 'Subcategory code'}),
       'description': forms.Textarea(attrs={'rows':0, 'cols':60}),
       'link': forms.TextInput(attrs={'placeholder': 'URL'}),
     }
 
   def __init__(self, *args, **kwargs):
-    super(TaxonomyForm, self).__init__(*args, **kwargs)
+    super(SubcategoryForm, self).__init__(*args, **kwargs)
 
     for field_name, field in self.fields.items():
       field.widget.attrs['class'] = 'form-control'
@@ -377,7 +377,7 @@ class TaxonomyForm(ModelForm):
 class TaxonomySearchForm(ModelForm):
 
   class Meta:
-    model = models.Taxonomy
+    model = models.Subcategory
     exclude = ('id', 'description', 'link',)
     widgets = {
       'title': forms.TextInput(attrs={'placeholder': 'Taxonomy title'}),
