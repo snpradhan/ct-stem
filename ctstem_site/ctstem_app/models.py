@@ -56,6 +56,8 @@ def upload_file_to(instance, filename):
       return 'assessments/%s%s' % (slugify(instance.title), filename_ext.lower(),)
   elif isinstance(instance, Publication):
       return 'publications/%s%s' % (slugify(instance.title), filename_ext.lower(),)
+  elif isinstance(instance, Team):
+      return 'team/%s%s' % (slugify(instance.name), filename_ext.lower(),)
   return 'misc/%s%s' % (instance.id,filename_ext.lower(),)
 
 # Create your models here.
@@ -348,4 +350,19 @@ class QuestionResponse(models.Model):
   created_date = models.DateTimeField(auto_now_add=True)
   modified_date = models.DateTimeField(auto_now=True)
 
+#######################################################
+# Team Model
+#######################################################
+class TeamRole(models.Model):
+  role = models.CharField(max_length=255, blank=False)
+  order = models.IntegerField(null=False, blank=False, unique=True)
 
+  def __unicode__(self):
+    return u'%s' % (self.role)
+
+class Team(models.Model):
+  role = models.ForeignKey(TeamRole)
+  name = models.CharField(max_length=255, blank=False)
+  description = models.TextField(null=True)
+  url = models.URLField(null=True, max_length=500, blank=True)
+  image = models.ImageField(upload_to=upload_file_to, blank=False)

@@ -1,0 +1,52 @@
+{% extends "ctstem_app/base.html" %}
+{% load base_extras %}
+
+{% block title %}Team Roles |{% endblock %}
+
+{% block content %}
+  {{block.super}}
+  <div class="content">
+    <h2>Team Roles</h2>
+    {% if user.administrator or user.researcher%}
+      <div class="btn-group">
+        <a type="button" class="btn btn-primary" href="{% url 'ctstem:newMember' %}" title="Create new team member">Create Team Member</a>
+      </div>
+      <ul class="nav nav-tabs">
+        <li class="{% navactive request 'ctstem:teamMembers' %}"><a href="{% url 'ctstem:teamMembers' %}">Team Members</a></li>
+        <li class="{% navactive request 'ctstem:teamRoles' %}"><a href="{% url 'ctstem:teamRoles' %}">Team Roles</a></li>
+      </ul>
+    {% endif %}
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="table">
+        {{formset.management_form}}
+        <table class="table table-bordered table-striped table-condensed inner_table" id="roles">
+          <thead>
+            <tr>
+              <th width="80%">Role(*)</th>
+              <th>Weight(*)</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for form in formset %}
+            <tr>
+              <td>
+                {{form.id}}
+                {{form.role}}
+                <div class="error">{{ form.role.errors }}</div>
+              </td>
+              <td>
+                {{form.order}}
+                <div class="error">{{ form.order.errors }}</div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+        </table>
+        <div class="form-group button-group-fixed">
+          <input type="submit" class="btn btn-success" id="submit" value="Save Roles"/>
+        </div>
+      </div>
+    </form>
+  </div>
+{% endblock %}

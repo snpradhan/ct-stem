@@ -68,15 +68,7 @@
           <!-- Collect the nav links, forms, and other content for toggling -->
           <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav navbar-center">
-              <li class="dropdown {% navactive request 'ctstem:home' %} {% navactive request 'ctstem:about_us' %} {% navactive request 'ctstem:partners' %}">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown" id="home">Home<b class="caret"></b></a>
-                <ul class="dropdown-menu">
-                  <li class="{% navactive request 'ctstem:home' %}"><a href="{% url 'ctstem:home' %}" title="Landing Page" class="link">Home</a></li>
-                  <li class="{% navactive request 'ctstem:about_us' %}"><a href="{% url 'ctstem:about_us' %}" title="Go to the About Us page" class="link">About Us</a></li>
-                  <li class="{% navactive request 'ctstem:partners' %}"><a href="{% url 'ctstem:partners' %}" title="Go to the Partners page" class="link">Partners</a></li>
-                </ul>
-              </li>
-
+              <li class="{% navactive request 'ctstem:home' %} {% navactive request 'ctstem:team' %}"><a href="{% url 'ctstem:home' %}" title="Landing Page" class="link">Home</a></li>
               <li class="{% navactive request 'ctstem:lessons' %}"><a href="{% url 'ctstem:lessons' %}">Lesson Plans</a></li>
               <li class="{% navactive request 'ctstem:assessments' %}"><a href="{% url 'ctstem:assessments' %}">Assessments</a></li>
 
@@ -115,6 +107,7 @@
                   <ul class="dropdown-menu">
                     <li class="{% navactive request 'ctstem:subjects' %}"><a href="{% url 'ctstem:subjects' %}">Subjects</a></li>
                     <li class="{% navactive request 'ctstem:schools' %}"><a href="{% url 'ctstem:schools' %}">Schools</a></li>
+                    <li class="{% navactive request 'ctstem:teamMembers' %}"><a href="{% url 'ctstem:teamMembers' %}">Team</a></li>
                   </ul>
                 </li>
               {% endif %}

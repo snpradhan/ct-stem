@@ -269,6 +269,63 @@ div.table.taxonomy h3 {
   text-decoration: underline;
 }
 
+div.table.offer-item {
+  width: 17%;
+  text-align: center;
+  margin: 2em;
+  display: inline-table;
+  height: 30%;
+  max-height: 30%;
+  overflow-y: scroll;
+
+}
+div.table.offer-item a {
+  text-decoration: none;
+}
+div.table.offer-item  .tile-icon-holder {
+  height: 30%;
+  text-align: center;
+  vertical-align:middle;
+}
+
+div.table.offer-item .text-holder {
+  height: 70%;
+  margin-top: 3em;
+  text-align: center;
+  color: #f2f2f2;
+  font-size: 0.9em;
+  vertical-align:bottom;
+}
+
+div.table.offer-item#taxonomy {
+  background-color: #E51400;
+}
+div.table.offer-item#taxonomy:hover {
+  background-color: #990d00;
+}
+div.table.offer-item#lessons {
+  background-color: #2E8BCC;
+}
+div.table.offer-item#lessons:hover {
+  background-color: #20608e;
+}
+div.table.offer-item#assessments {
+  background-color: #F09609;
+}
+div.table.offer-item#assessments:hover {
+  background-color: #a66806;
+}
+div.table.offer-item#workshops {
+  background-color: #8CBF26;
+}
+div.table.offer-item#workshops:hover {
+  background-color: #5d7f19;
+}
+div.table.offer-item .glyphicon {
+  font-size: 2.5em;
+  color: white;
+}
+
 div.table.portfolio-item {
   width: 16%;
   text-align: center;
@@ -399,9 +456,33 @@ div.content {
 
 div.content#home {
   width: 60%;
-  font-size: 1.3em;
+  font-size: 1.5em;
+  /*background-color: rgba(204,204,204, 1);
+  border-radius: 2em;*/
+  padding: 1em;
 }
 
+div.content#home h3 {
+  text-decoration: underline;
+}
+div.content#home #image img{
+  width: 100%;
+}
+div.content#home #tags{
+  margin-top: 1em;
+  margin-bottom: 2em;
+}
+div.content#home #offer{
+  margin-top: 1em;
+  margin-bottom: 2em;
+}
+div.content#home #team{
+  margin-top: 1em;
+  margin-bottom: 2em;
+}
+div.content#home .keyword {
+  text-decoration: underline;
+}
 div.btn-group {
   margin-bottom: 10px;
   width: 100%;

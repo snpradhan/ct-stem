@@ -8,43 +8,82 @@
 {% block content %}
   {{block.super}}
   <div class="content" id="home">
-    <h2> Home </h2>
-    <div>
-      <p>Computational thinking plays an increasingly important role in science, technology, engineering, and mathematics. Yet, many high school students never encounter computational thinking in their day-to-day coursework. Our project develops computational thinking activities that can be embedded in existing high school STEM courses (CT-STEM).</p>
+    <h2> Computational Thinking in STEM </h2>
 
-      <p style="text-align: center;">
-        <a href="http://ct-stem.northwestern.edu/assets/poster2012.pdf" target="_blank">
-          <img src="http://ct-stem.northwestern.edu/assets/_resampled/resizedimage260173-poster2012.jpg" width="260" height="173" alt="" title="">
-        </a>
-        <a href="http://ct-stem.northwestern.edu/assets/poster2013.pdf" target="_blank">
-          <img src="http://ct-stem.northwestern.edu/assets/_resampled/resizedimage260174-poster2013_2.jpg" width="260" height="174" alt="" title="">
-        </a>
-      </p>
-      <p style="text-align: center;">Download our 2012 and 2013 posters.</p>
+    <div id="image">
+      <img src="http://lorempixel.com/image_output/abstract-q-c-1000-300-1.jpg" title="landing"/>
     </div>
-    <div>
-      <strong>Our Program</strong>
-      <ul style="font-style: italic;">
-        <li >Developing and testing 60 CT activities that can be embedded in existing high school STEM courses</li>
-        <li >Conducting summer professional development workshops and ongoing    Saturday coaching sessions to prepare and support over 50 teachers from 35 Chicago area schools to use our CT activities in their STEM classrooms</li>
-        <li >Engaging over 1000 high-school students across 14 schools in CT activities</li>
-        <li >Rigorous evaluation studies will document the CT learning and   attitudinal gains for both teachers and students and provide&nbsp;   evidence for the success of our embedded CT approach</li>
-        <li >Impacting a broad cross-section of students, including under-represented groups</li>
-        <li >Creating a pipeline to the new AP CS Principles course</li>
-        <li >Addressing the new computational thinking and modeling requirements in the NGSS</li>
+    <div id="tags">
+      <ul>
+        <li>Helping high school teachers promote <b>computational literacy</b> in science and mathematics.</li>
+        <li>Empowering <b>all</b> students to participate in a computational <b>future</b>.</li>
       </ul>
-      <div style="text-align: center;">
-        <img src="http://ct-stem.northwestern.edu/assets/_resampled/resizedimage60067-icons.png" width="600" height="67" alt="" title="">
+    </div>
+
+    <div id="offer">
+      <h3>What We Offer</h3>
+      <div class="row portfolio">
+
+        <div class="table offer-item" id="taxonomy">
+          <a href="{% url 'ctstem:standards' %}">
+            <div class="tile-icon-holder">
+              <span class="glyphicon glyphicon-tags" aria-hidden="true"></span>
+            </div>
+            <div class="text-holder">
+              <h4> Taxonomy </h4>
+              <p>A taxonomy of computational skills and practices for STEM education</p>
+            </div>
+          </a>
+        </div>
+
+        <div class="table offer-item" id="lessons">
+          <a href="{% url 'ctstem:lessons' %}">
+            <div class="tile-icon-holder">
+              <span class="glyphicon glyphicon-book" aria-hidden="true"></span>
+            </div>
+            <div class="text-holder">
+              <h4> Lesson Plans </h4>
+              <p>Lesson plans for (middle/high school) physics, chemistry, biology, and mathematics</p>
+            </div>
+          </a>
+        </div>
+
+        <div class="table offer-item" id="assessments">
+          <a href="{% url 'ctstem:assessments' %}">
+            <div class="tile-icon-holder">
+              <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+            </div>
+            <div class="text-holder">
+              <h4> Assessments </h4>
+              <p>Assessments of computational literacy for high school students</p>
+            </div>
+          </a>
+        </div>
+
+         <div class="table offer-item" id="workshops">
+          <a href="{% url 'ctstem:events' %}">
+            <div class="tile-icon-holder">
+              <span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+            </div>
+            <div class="text-holder">
+              <h4> Workshops </h4>
+              <p>Professional development workshops</p>
+            </div>
+          </a>
+        </div>
+
+      </div>
+
+      <div>
+        Interested in learning more? <a href="mailto:ct-stem@ccl.northwestern.edu" target="_top" class="keyword">Contact Us</a>
       </div>
     </div>
-    <div>
-      <strong>Outcomes</strong>
-      <ul style="font-style: italic;"><li >By  engaging students with CT activities embedded in their STEM courses, we  seek to gradually increase the interest and appeal of CT by casting a  wide net.</li>
-        <li >Advancing understanding of how to engage a broad population of  high-school students and teachers in CT with the goal of fundamentally  transforming the way in which students are exposed to CT in high school.</li>
-        <li >By incorporating the embedded-CT activities into standard STEM  courses, we seek to impact the broadest cross-section of student  populations, including those from traditionally underrepresented groups  in CS, and more effectively recruit students into our full-year CT  course, creating a pipeline to the new AP CS Principles course, and  perhaps a future CT career trajectory.</li>
-      </ul>
+    <div id="team">
+      <h3>Who We Are</h3>
+      <div>
+        We are a <a href="{% url 'ctstem:team' %}" class="keyword">team</a> of computer scientists, learning scientists, STEM educators, and STEM practitioners at Northwestern University. With support from the National Science Foundation and the Spencer Foundation we seek to broaden students’ participation in a computational future through the use of innovative curriculum and assessments for high school science and mathematics.
+      </div>
     </div>
-    <h3>Contact us: ct-stem@<span style="display: none">null</span>ccl.northwestern.edu</h3>
   </div>
 
 {% endblock %}

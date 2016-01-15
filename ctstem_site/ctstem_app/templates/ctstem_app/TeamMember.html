@@ -1,0 +1,28 @@
+{% extends "ctstem_app/base.html" %}
+
+{% block title %}Team Member |{% endblock %}
+
+{% block content %}
+  {{block.super}}
+  <div class="content">
+    <h2>Team Member</h2>
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="table" id="member">
+        {{form.management_form}}
+        {% for field in form %}
+          <div class="form-group">
+            <label for="id_{{field.name}}">{{ field.label|title }} {% if field.field.required %}(<span class="required">*</span>){% endif %} </label>
+            <div>
+              {{field}}
+            </div>
+            <div class="error">{{ field.errors }}</div>
+          </div>
+        {% endfor %}
+        <div class="form-group button-group-fixed">
+          <input type="submit" class="btn btn-success" id="submit" value="Save Member"/>
+        </div>
+      </div>
+    </form>
+  </div>
+{% endblock %}

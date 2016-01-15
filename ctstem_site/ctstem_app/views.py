@@ -31,15 +31,10 @@ def home(request):
   return render(request, 'ctstem_app/Home.html')
 
 ####################################
-# PARTNERS
-####################################
-def partners(request):
-  return render(request, 'ctstem_app/Partners.html')
-####################################
 # ABOUT US
 ####################################
-def about_us(request):
-  return render(request, 'ctstem_app/About_us.html')
+def team(request):
+  return render(request, 'ctstem_app/Team.html')
 
 ####################################
 # ASSESSMENTS TABLE VIEW
@@ -1465,4 +1460,98 @@ def deleteSubject(request, id=''):
 
   except models.Subject.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested subject not found</h1>')
+
+####################################
+# Team Roles
+####################################
+@login_required
+def teamRoles(request):
+  if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'researcher') == False:
+    return http.HttpResponseNotFound('<h1>You do not have the privilege to edit team roles</h1>')
+
+  TeamRoleFormSet = modelformset_factory(models.TeamRole, form=forms.TeamRoleForm)
+  if request.method == 'GET':
+    formset = TeamRoleFormSet(queryset=models.TeamRole.objects.all())
+    context = {'formset': formset}
+    return render(request, 'ctstem_app/TeamRoles.html', context)
+  elif request.method == 'POST':
+    data = request.POST.copy()
+    formset = TeamRoleFormSet(data, queryset=models.TeamRole.objects.all())
+    if formset.is_valid():
+      formset.save()
+      messages.success(request, 'Team roles saved')
+      return shortcuts.redirect('ctstem:teamRoles')
+    else:
+      print formset.errors
+      context = {'formset': formset}
+      return render(request, 'ctstem_app/TeamRoles.html', context)
+  return http.HttpResponseNotAllowed(['GET', 'POST'])
+
+
+@login_required
+def teamMembers(request):
+  if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'researcher') == False:
+    return http.HttpResponseNotFound('<h1>You do not have the privilege to edit team roles</h1>')
+
+  members = models.Team.objects.all()
+  context = {'members': members}
+  return render(request, 'ctstem_app/TeamMembers.html', context)
+
+@login_required
+def teamMember(request, id=''):
+  try:
+    if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'researcher') == False:
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to add/edit team members</h1>')
+
+    if ''!= id:
+      member = models.Team.objects.get(id=id)
+    else:
+      member = models.Team()
+
+    if request.method == 'GET':
+        form = forms.TeamMemberForm(instance=member, prefix='team')
+        context = {'form': form,}
+        return render(request, 'ctstem_app/TeamMember.html', context)
+
+    elif request.method == 'POST':
+      data = request.POST.copy()
+
+      form = forms.TeamMemberForm(data, request.FILES, instance=member, prefix="team")
+      if form.is_valid():
+        form.save()
+        messages.success(request, "Team Member Saved.")
+        return shortcuts.redirect('ctstem:teamMembers')
+      else:
+        print form.errors
+        messages.error(request, "Team member could not be saved because there were errors.  Please check the errors below.")
+        context = {'form': form}
+        return render(request, 'ctstem_app/TeamMember.html', context)
+
+    return http.HttpResponseNotAllowed(['GET', 'POST'])
+
+  except models.Subject.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested subject not found</h1>')
+
+@login_required
+def deleteMember(request, id=''):
+  try:
+    # check if the user has permission to delete a subject
+    if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'researcher') == False:
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to delete team member</h1>')
+    # check if the lesson exists
+    if ''!= id:
+      member = models.Team.objects.get(id=id)
+    else:
+      raise models.Team.DoesNotExist
+
+    if request.method == 'GET' or request.method == 'POST':
+      member.delete()
+      messages.success(request, '%s deleted' % member.name)
+      return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+    return http.HttpResponseNotAllowed(['GET', 'POST'])
+
+  except models.Team.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested Team Member not found</h1>')
+
 

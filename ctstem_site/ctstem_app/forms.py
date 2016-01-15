@@ -573,3 +573,35 @@ class SubjectForm(ModelForm):
     for field_name, field in self.fields.items():
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['placeholder'] = field.help_text
+
+####################################
+# Team Role Form
+####################################
+class TeamRoleForm(ModelForm):
+
+  class Meta:
+    model = models.TeamRole
+    exclude = ('id',)
+
+  def __init__(self, *args, **kwargs):
+    super(TeamRoleForm, self).__init__(*args, **kwargs)
+
+    for field_name, field in self.fields.items():
+      field.widget.attrs['class'] = 'form-control'
+      field.widget.attrs['placeholder'] = field.help_text
+
+####################################
+# Team Member Form
+####################################
+class TeamMemberForm(ModelForm):
+
+  class Meta:
+    model = models.Team
+    exclude = ('id',)
+
+  def __init__(self, *args, **kwargs):
+    super(TeamMemberForm, self).__init__(*args, **kwargs)
+
+    for field_name, field in self.fields.items():
+      field.widget.attrs['class'] = 'form-control'
+      field.widget.attrs['placeholder'] = field.help_text
