@@ -360,9 +360,16 @@ class TeamRole(models.Model):
   def __unicode__(self):
     return u'%s' % (self.role)
 
+  class Meta:
+      ordering = ['order']
+
 class Team(models.Model):
-  role = models.ForeignKey(TeamRole)
+  role = models.ForeignKey(TeamRole, related_name='members')
   name = models.CharField(max_length=255, blank=False)
   description = models.TextField(null=True)
   url = models.URLField(null=True, max_length=500, blank=True)
   image = models.ImageField(upload_to=upload_file_to, blank=False)
+  order = models.IntegerField(null=False, blank=False)
+
+  class Meta:
+      ordering = ['order']

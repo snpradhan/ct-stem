@@ -34,7 +34,9 @@ def home(request):
 # ABOUT US
 ####################################
 def team(request):
-  return render(request, 'ctstem_app/Team.html')
+  roles = models.TeamRole.objects.all()
+  context = {'roles': roles}
+  return render(request, 'ctstem_app/Team.html', context)
 
 ####################################
 # ASSESSMENTS TABLE VIEW
