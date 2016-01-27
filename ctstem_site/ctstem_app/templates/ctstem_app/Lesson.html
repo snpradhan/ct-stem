@@ -20,7 +20,7 @@
           </span>
         </h4>
 
-        <div class="curriculum_content">
+        <div class="curriculum_content collapsible_content">
           {{form.management_form}}
           {% for field in form %}
             <div class="form-group">
@@ -51,7 +51,7 @@
                       {% for x in field.value %}
                         {% with taxonomy=x|getTaxonomy %}
                         <tr id="{{taxonomy.id}}">
-                          <td>{{taxonomy.standard.short_name}}</td>
+                          <td>{{taxonomy.category.standard.short_name}}</td>
                           <td>{{taxonomy.category.name}}</td>
                           <td>{{taxonomy.title}}</td>
                           <td>{{taxonomy.code}}</td>
@@ -105,7 +105,7 @@
             <div>{{activity.title}}</div>
             <div class="error">{{ activity.title.errors }}</div>
           </div>
-          <div class="curriculum_content">
+          <div class="curriculum_content collapsible_content">
             <div class="form-group">
               <label for="id_{{activity.content.name}}">{{ activity.content.label }} {% if activity.content.field.required %}(<span class="required">*</span>) {% endif %}</label>
               <div>

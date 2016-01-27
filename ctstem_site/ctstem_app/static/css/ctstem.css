@@ -150,7 +150,7 @@ div.table#register, div.table#userProfile, div.table#password {
 div.table#lesson, div.table#lessonPreview,
 div.table#assessment, div.table#assessmentPreview,
 div.table.step,  div.table.stepPreview,
-div.table#lessonQuestions, div.table.activity, div.table#publication, div.table#group {
+div.table#lessonQuestions, div.table.activity, div.table#publication, div.table#group, div.table#standard {
   width: 70%;
   padding: 3em 4em;
 }
@@ -256,6 +256,10 @@ div.table#assignment div.question_container div.question div.answer_field textar
   color: blue;
 }
 
+div.table.standard table.subcategories {
+  font-size: 0.8em;
+}
+
 div.table.taxonomy {
   font-size: 1.5em;
 }
@@ -354,6 +358,10 @@ ul#publications li.publication{
 ul#publications li.publication span.journal {
   font-style: italic;
 }
+
+div#categories {
+  margin-top: 2em;
+}
 /***********   CONTENT DIV END   ************/
 
 /******************
@@ -370,7 +378,7 @@ div.row.portfolio {
 table.table {
   margin: auto;
   border-radius: 10px;
-  border-collapse:separate;
+  border-collapse:collapse;
   border: inherit !important;
 }
 table.table tr:first-child th:first-child {
@@ -398,7 +406,7 @@ table.table thead tr#filterrow th input {
   width: 90%;
 }
 table.table td {
-  font-size: smaller;
+  font-size: 0.9em;
 }
 table.table td.title {
   font-weight: bold;
@@ -518,7 +526,8 @@ div.modal-content {
   max-height: 90%;
   overflow-y: scroll;
 }
-div.modal-content div#loginMsg , div.modal-content div#uploadMsg{
+div.modal-content div#loginMsg , div.modal-content div#uploadMsg, div.modal-content div#questionMsg, div.modal-content div#subcategoryMsg
+{
   text-align: center;
   color: red;
 }
@@ -729,4 +738,18 @@ a.selector-chooseall, a.selector-clearall {
   border: 1px solid #999999;
   background-color: #e6e6e6;
 }
+
+/******* glyphicon colors and behavior ********/
+.glyphicon {
+  cursor: pointer;
+}
+
+span.ec .glyphicon-collapse-down {
+  color: #3e8f3e;
+}
+
+span.ec .glyphicon-collapse-up{
+  color: #e38d13;
+}
+/*************************************/
 

@@ -670,47 +670,28 @@ def deleteUser(request, id=''):
 def notimplemented(request):
   return render(request, 'ctstem_app/NotImplemented.html')
 
-@login_required
-def subcategory(request, id=''):
-  try:
-    if hasattr(request.user, 'author') == False and hasattr(request.user, 'researcher') == False and  hasattr(request.user, 'administrator') == False:
-      return http.HttpResponseNotFound('<h1>You do not have the privilege to add/modify subcategories</h1>')
-    if '' != id:
-      subcategory = models.Subcategory.objects.get(id=id)
-    else:
-      subcategory = models.Subcategory()
-    if request.method == 'GET':
-      form = forms.SubcategoryForm(instance=subcategory)
-      context = {'form': form}
-      return render(request, 'ctstem_app/Subcategory.html', context)
+####################################
+# List of categories for a standard
+####################################
+def categories(request, standard_id=''):
+  categories  = models.Category.objects.all().filter(standard__id=standard_id).order_by('name')
+  category_list = []
+  for category in categories:
+    category_list.append({'id': category.id, 'category': category.name})
+  response_data = {'category_list': category_list}
+  return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 
-    elif request.method == 'POST':
-      data = request.POST.copy()
-      form = forms.SubcategoryForm(data, instance=subcategory)
-      if form.is_valid():
-        form.save()
-        messages.success(request, '%s saved' % subcategory)
-        return shortcuts.redirect('ctstem:subcategories', subcategory.standard.id)
-      else:
-        print form.errors
-        messages.error(request, "The subcategory could not be saved because there were errors.  Please check the errors below.")
-        context = {'form': form}
-        return render(request, 'ctstem_app/Subcategory.html', context)
-
-  except models.Subcategory.DoesNotExist:
-    return http.HttpResponseNotFound('<h1>Subcategory not found</h1>')
-
-def subcategories(request, standard_id=''):
-  standards = models.Standard.objects.all().order_by('name')
-  subcategories  = models.Subcategory.objects.all().filter(standard__id=standard_id).order_by('category__standard__name', 'category__name', 'title')
-  context = {'standards': standards, 'subcategories': subcategories, 'page': 'subcategory'}
-  return render(request, 'ctstem_app/Subcategories.html', context)
-
+####################################
+# Table view of standards
+####################################
 def standards(request):
   standards = models.Standard.objects.all().order_by('name')
-  context = {'standards': standards, 'page': 'standards'}
-  return render(request, 'ctstem_app/Subcategories.html', context)
+  context = {'standards': standards}
+  return render(request, 'ctstem_app/Standards.html', context)
 
+####################################
+# Add/Edit Standard
+####################################
 @login_required
 def standard(request, id=''):
   try:
@@ -723,7 +704,11 @@ def standard(request, id=''):
 
     if request.method == 'GET':
       form = forms.StandardForm(instance=standard, prefix='standard')
-      CategoryFormSet = inlineformset_factory(models.Standard, models.Category, form=forms.CategoryForm, can_delete=True, extra=1)
+      CategoryFormSet = nestedformset_factory(models.Standard, models.Category, form=forms.CategoryForm,
+                                                    nested_formset=inlineformset_factory(models.Category, models.Subcategory, form=forms.SubcategoryForm, can_delete=True, can_order=True, extra=1),
+                                                    can_delete=True, can_order=True, extra=1)
+      #QuestionFormSet = inlineformset_factory(models.Lesson, models.LessonQuestion, form=forms.LessonQuestionForm, can_order=True, can_delete=True, extra=1)
+      #CategoryFormSet = inlineformset_factory(models.Standard, models.Category, form=forms.CategoryForm, can_delete=True, extra=1)
       #QuestionFormSet = inlineformset_factory(models.Lesson, models.LessonQuestion, form=forms.LessonQuestionForm, can_order=True, can_delete=True, extra=1)
       formset = CategoryFormSet(instance=standard, prefix='form')
       context = {'form': form, 'formset':formset}
@@ -732,8 +717,13 @@ def standard(request, id=''):
     elif request.method == 'POST':
       data = request.POST.copy()
       form = forms.StandardForm(data, instance=standard, prefix='standard')
-      CategoryFormSet = inlineformset_factory(models.Standard, models.Category, form=forms.CategoryForm, can_delete=True, extra=1)
+      CategoryFormSet = nestedformset_factory(models.Standard, models.Category, form=forms.CategoryForm,
+                                                    nested_formset=inlineformset_factory(models.Category, models.Subcategory, form=forms.SubcategoryForm, can_delete=True, can_order=True, extra=1),
+                                                    can_delete=True, can_order=True, extra=1)
+      #CategoryFormSet = inlineformset_factory(models.Standard, models.Category, form=forms.CategoryForm, can_delete=True, extra=1)
       formset = CategoryFormSet(data, instance=standard, prefix='form')
+      print form.is_valid()
+      print formset.is_valid()
       if form.is_valid() and formset.is_valid():
         savedStandard = form.save()
         formset.save()
@@ -752,50 +742,26 @@ def standard(request, id=''):
     return http.HttpResponseNotFound('<h1>Requested group not found</h1>')
 
 ####################################
-# DELETE Standard, Category or Subcategory
+# DELETE Standard
 ####################################
 @login_required
-def deleteSubcategory(request, model_type='', id=''):
+def deleteStandard(request, id=''):
   try:
     # check if the user has permission to delete a subcategory
     if hasattr(request.user, 'author') == False and hasattr(request.user, 'researcher') == False and  hasattr(request.user, 'administrator') == False:
-      return http.HttpResponseNotFound('<h1>You do not have the privilege to delete this publication</h1>')
-    # check if the lesson exists
-    if model_type == 'Standard':
-      if '' != id:
-        obj = models.Standard.objects.get(id=id)
-        title = obj.name
-      else:
-        raise models.Standard.DoesNotExist
-    elif model_type == 'Category':
-      if '' != id:
-        obj = models.Category.objects.get(id=id)
-        title = obj.name
-      else:
-        raise models.Category.DoesNotExist
-    elif model_type == 'Subcategory':
-      if '' != id:
-        obj = models.Subcategory.objects.get(id=id)
-        title = obj.title
-      else:
-        raise models.Subcategory.DoesNotExist
-    else:
-      return http.HttpResponseNotFound('<h1>Model type does not exist</h1>')
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to delete this Standard</h1>')
+
+    standard = models.Standard.objects.get(id=id)
 
     if request.method == 'GET' or request.method == 'POST':
-
-      obj.delete()
-      messages.success(request, '%s deleted' % title)
+      standard.delete()
+      messages.success(request, '%s deleted' % standard.name)
       return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
     return http.HttpResponseNotAllowed(['GET', 'POST'])
 
   except models.Standard.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Standard not found</h1>')
-  except models.Category.DoesNotExist:
-    return http.HttpResponseNotFound('<h1>Category not found</h1>')
-  except models.Subcategory.DoesNotExist:
-    return http.HttpResponseNotFound('<h1>Subcategory not found</h1>')
 
 ####################################
 # Search Taxonomy
@@ -815,10 +781,9 @@ def searchTaxonomy(request):
 
   elif 'POST' == request.method:
     data = request.POST.copy()
-    print data
     query_filter = {}
     if data['standard']:
-      query_filter['standard__id'] = int(data['standard'])
+      query_filter['category__standard__id'] = int(data['standard'])
     if data['category']:
       query_filter['category__id'] = int(data['category'])
     if data['title']:
@@ -827,11 +792,11 @@ def searchTaxonomy(request):
       query_filter['code__icontains'] = str(data['code'])
     print query_filter
     taxonomyList = models.Subcategory.objects.filter(**query_filter)
-    taxonomy_list = [{'standard': subcategory.standard.short_name, 'category': subcategory.category.name, 'title': subcategory.title, 'code': subcategory.code, 'id': subcategory.id} for subcategory in taxonomyList]
-    print json.dumps(taxonomy_list)
+    taxonomy_list = [{'standard': subcategory.category.standard.short_name, 'category': subcategory.category.name, 'title': subcategory.title, 'code': subcategory.code, 'id': subcategory.id} for subcategory in taxonomyList]
     return http.HttpResponse(json.dumps(taxonomy_list), content_type="application/json")
 
   return http.HttpResponseNotAllowed(['GET', 'POST'])
+
 ####################################
 # USER LIST
 ####################################
@@ -871,7 +836,6 @@ def publications(request):
   publications = models.Publication.objects.all().order_by('created')
   context = {'publications': publications}
   return render(request, 'ctstem_app/Publications.html', context)
-
 
 ####################################
 # CREATE MODIFY A PUBLICATION

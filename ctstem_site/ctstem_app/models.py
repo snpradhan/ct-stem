@@ -179,6 +179,7 @@ class Subject(models.Model):
 class Standard(models.Model):
   name = models.CharField(null=False, max_length=256)
   short_name = models.CharField(null=False, max_length=256)
+  primary = models.BooleanField(default=False)
 
   def __unicode__(self):
       return u'%s' % (self.short_name)
@@ -193,11 +194,7 @@ class Category(models.Model):
 
 # Subcategory model
 class Subcategory(models.Model):
-  standard = models.ForeignKey(Standard, related_name="subcategory")
-  category = ChainedForeignKey(Category, chained_field="standard",
-        chained_model_field="standard",
-        show_all=False,
-        auto_choose=True)
+  category = models.ForeignKey(Category, related_name="subcategory")
   title = models.CharField(null=False, max_length=256)
   code = models.CharField(null=True, max_length=256, blank=True)
   description = models.CharField(null=True, max_length=256, blank=True)

@@ -75,13 +75,13 @@ def getSelectedTaxonomy(form, field):
 def taxonomyHelper(taxonomies):
   taxonomy_dictionary = {}
   for taxonomy in taxonomies:
-    if taxonomy.standard.name in taxonomy_dictionary:
-      if taxonomy.category.name in taxonomy_dictionary[taxonomy.standard.name]:
-        taxonomy_dictionary[taxonomy.standard.name][taxonomy.category.name].append(taxonomy)
+    if taxonomy.category.standard.name in taxonomy_dictionary:
+      if taxonomy.category.name in taxonomy_dictionary[taxonomy.category.standard.name]:
+        taxonomy_dictionary[taxonomy.category.standard.name][taxonomy.category.name].append(taxonomy)
       else:
-        taxonomy_dictionary[taxonomy.standard.name][taxonomy.category.name] = [taxonomy]
+        taxonomy_dictionary[taxonomy.category.standard.name][taxonomy.category.name] = [taxonomy]
     else:
-      taxonomy_dictionary[taxonomy.standard.name] = {taxonomy.category.name: [taxonomy]}
+      taxonomy_dictionary[taxonomy.category.standard.name] = {taxonomy.category.name: [taxonomy]}
 
   return taxonomy_dictionary.items()
 

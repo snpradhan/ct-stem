@@ -375,6 +375,7 @@ class SubcategoryForm(ModelForm):
 # Taxonomy Search Form
 ####################################
 class TaxonomySearchForm(ModelForm):
+  standard = forms.ModelChoiceField(queryset=models.Standard.objects.all())
 
   class Meta:
     model = models.Subcategory
@@ -392,6 +393,8 @@ class TaxonomySearchForm(ModelForm):
       if field.help_text:
         field.widget.attrs['placeholder'] = field.help_text
 
+      if field_name == 'category':
+        field.queryset = models.Category.objects.none()
 ####################################
 # Standards Form
 ####################################

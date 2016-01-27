@@ -165,7 +165,7 @@ $(function (){
   });
 
   $(".expand_collapse").click(function(){
-    $(this).closest('.table').children('.curriculum_content').toggle();
+    $(this).closest('.table').children('.collapsible_content').toggle();
     $(this).children().each(function(){
       $(this).toggle();
     })
@@ -176,6 +176,14 @@ $(function (){
       $(this).toggle();
     })
   });
+
+  $(".ec").click(function(){
+    $(this).closest('li').next('ul').toggle();
+    $(this).children().each(function(){
+      $(this).toggle();
+    });
+  });
+
 
 
 });

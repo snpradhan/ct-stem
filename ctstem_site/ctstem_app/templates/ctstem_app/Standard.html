@@ -8,42 +8,135 @@
     <h2>Standard</h2>
     <form method="post">
       {% csrf_token %}
-      <div class="table" id="assessment">
+      <div class="table" id="standard">
         {{form.management_form}}
-        <div>
-          {% for field in form %}
-            <div class="form-group">
-              <label for="id_{{field.name}}">{{ field.label }} {% if field.field.required %} (<span class="required">*</span>) {% endif %}</label>
-              <div>{{field}}</div>
-              <div class="error">{{ field.errors }}</div>
+        <div class="form-group">
+          <label for="id_name">Standard/Practice Name {% if form.name.field.required %} (<span class="required">*</span>) {% endif %}</label>
+          <div>{{form.name}}</div>
+          <div class="error">{{ form.name.errors }}</div>
+        </div>
+        <div class="form-group">
+          <label for="id_short_name">{{ form.short_name.label }} {% if form.short_name.field.required %} (<span class="required">*</span>) {% endif %}</label>
+          <div>{{form.short_name}}</div>
+          <div class="error">{{ form.short_name.errors }}</div>
+        </div>
+        <div class="form-group">
+          <label for="id_primary">{{ form.primary.label }} {% if form.primary.field.required %} (<span class="required">*</span>) {% endif %}</label>
+          <div>{{form.primary}}</div>
+          <div class="error">{{ form.primary.errors }}</div>
+        </div>
+      </div>
+      <div id="categories">
+        {{formset.management_form}}
+        {% for category in formset %}
+          <div class="table step" style="{% if forloop.last %} display:none; {% endif %}">
+            <h4>
+              <span>&nbsp;</span>
+              <span class="subcategory_title" style="font-weight: bold; text-decoration: underline;">{{category.name.value|default_if_none:"  "}}</span>
+              <span>&nbsp;</span>
+              <span class="controls">
+                <span>
+                  <button type="button" class="btn btn-danger delete_category" name="delete_category" aria-label="Delete Category" title="Delete Category">
+                    <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                  </button>
+                  {{category.DELETE.as_hidden}}
+                </span>
+                <span class="expand_collapse">
+                  <button type="button" class="btn btn-warning" style="display:none;" name="collapse_category" aria-label="Collapse Category" title="Collapse Category">
+                    <span class="glyphicon glyphicon-collapse-up" aria-hidden="true"></span>
+                  </button>
+                  <button type="button" class="btn btn-success" name="expand_category" aria-label="Expand Category" title="Expand Category">
+                    <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
+                  </button>
+                </span>
+              </span>
+            </h4>
+            <div class="collapsible_content" style="display:none;">
+              {{category.management_form}}
+              {{category.id}}
+              <div class="form-group">
+                <label for="id_{{category.name.name}}">Category Name {% if category.name.field.required %}(<span class="required">*</span>) {% endif %}</label>
+                <div id="id_{{category.name.name}}">{{category.name}}</div>
+                <div class="error">{{ category.name.errors }}</div>
+              </div>
+
+              <div class="form-group">
+                {{category.nested.management_form}}
+                {{category.nested.id}}
+                <label for="id_question_table">Subcategories</label>
+                <button class="btn btn-primary add_subcategory" name="add_subcategory" aria-label="Add Subcategory" title="Add Subcategory">
+                  <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                </button>
+
+                <table class="table table-striped table-condensed table-bordered subcategories inner_table">
+                  <thead>
+                    <tr>
+                      <th width="30%">Title</th>
+                      <th width="30%">Description</th>
+                      <th width="10%">Code</th>
+                      <th width="20%">Link</th>
+                      <th width="10%">Delete</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for subcategoryForm in category.nested %}
+
+                      <tr style="{% if forloop.last %} display:none; {% endif %}">
+                        {{subcategoryForm.id}}
+                        <td class="subcategory_title">
+                          {% if subcategoryForm.title.value and subcategoryForm.title.value != 'None' %}
+                            <div class="title_text">{{subcategoryForm.title.value}}</div>
+                            <input type="hidden" class="subcategory_id" id="{{subcategoryForm.title.auto_id}}" name="{{subcategoryForm.title.html_name}}" value="{{subcategoryForm.title.value}}"/>
+                          {% else %}
+                            <div class="title_text"></div>
+                            <input type="hidden" class="subcategory_id" id="{{subcategoryForm.title.auto_id}}" name="{{subcategoryForm.title.html_name}}" value/>
+                          {% endif %}
+                        </td>
+                        <td class="subcategory_description">
+                          {% if subcategoryForm.description.value and subcategoryForm.description.value != 'None' %}
+                            <div class="description_text">{{subcategoryForm.description.value}}</div>
+                            <input type="hidden" class="subcategory_id" id="{{subcategoryForm.description.auto_id}}" name="{{subcategoryForm.description.html_name}}" value="{{subcategoryForm.description.value|default_if_none:''}}"/>
+                          {% else %}
+                            <div class="description_text"></div>
+                            <input type="hidden" class="subcategory_id" id="{{subcategoryForm.description.auto_id}}" name="{{subcategoryForm.description.html_name}}" value/>
+                          {% endif %}
+                        </td>
+                        <td class="subcategory_code">
+                          {% if subcategoryForm.code.value and subcategoryForm.code.value != 'None' %}
+                            <div class="code_text"> {{subcategoryForm.code.value}} </div>
+                            <input type="hidden" class="subcategory_id" id="{{subcategoryForm.code.auto_id}}" name="{{subcategoryForm.code.html_name}}" value="{{subcategoryForm.code.value}}"/>
+                          {% else %}
+                            <div class="code_text"> </div>
+                            <input type="hidden" class="subcategory_id" id="{{subcategoryForm.code.auto_id}}" name="{{subcategoryForm.code.html_name}}" value/>
+                          {% endif %}
+                        </td>
+
+                        <td class="subcategory_link">
+                          {% if subcategoryForm.link.value and subcategoryForm.link.value != 'None' %}
+                            <div class="link_text">{{subcategoryForm.link.value}}</div>
+                            <input type="hidden" class="subcategory_id" id="{{subcategoryForm.link.auto_id}}" name="{{subcategoryForm.link.html_name}}" value="{{subcategoryForm.link.value}}"/>
+                          {% else %}
+                            <div class="link_text"></div>
+                            <input type="hidden" class="subcategory_id" id="{{subcategoryForm.link.auto_id}}" name="{{subcategoryForm.link.html_name}}" value/>
+                          {% endif %}
+                        </td>
+                        <td class="subcategory_edit">
+                          <button type="button" class="btn btn-danger delete_subcategory" name="delete_subcategory" aria-label="Delete Subcategory" title="Delete Subcategory">
+                            <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                          </button>
+                          {{subcategoryForm.DELETE.as_hidden}}
+                          <button type="button" class="btn btn-success edit_subcategory" name="edit_subcategory" aria-label="Edit Subcategory" title="Edit Subcategory">
+                              <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+                          </button>
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          {% endfor %}
-        </div>
-        <div>
-          {{formset.management_form}}
-          <table class="table table-striped table-condensed table-bordered inner_table">
-            <thead>
-              <tr>
-                <th> Category name </th>
-                <th> Delete ? </th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for category in formset %}
-                <tr>
-                  <td>
-                    {{category.id}}
-                    {{category.name}}
-                    {{category.errors}}
-                  </td>
-                  <td style="text-align:center;">
-                    {{category.DELETE}}
-                  </td>
-                </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
+          </div>
+        {% endfor %}
       </div>
       <div class="form-group button-group-fixed">
         <input type="submit" class="btn btn-success" id="submit" value="Save"/>
@@ -51,12 +144,142 @@
       </div>
 
     </form>
+    <div class="modal fade" id="subcategoryModal" role="dialog">
+      <div class="modal-dialog modal-md">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h3 class="modal-title"></h3>
+          </div>
+          <div id="subcategoryMsg">
+          </div>
+          <form class="form" id="subcategoryForm" method="post">
+            <input id="id_row" type="hidden" value=""/>
+            <div class="modal-body">
+              <div class="form-group">
+                <label for="id_title">Title (*)</label>
+                <input type="text" id="id_title" class="form-control" required/>
+              </div>
+              <div class="form-group">
+                <label for="id_description">Description</label>
+                <textarea id="id_description" class="form-control"></textarea>
+              </div>
+              <div class="form-group">
+                <label for="id_code">Code</label>
+                <input type="text" id="id_code" class="form-control"/>
+              </div>
+              <div class="form-group">
+                <label for="id_link">Link</label>
+                <input type="text" id="id_link" class="form-control"/>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <div class="form-group button-row">
+                <button type="submit" id="saveSubcategory" class="btn btn-success">
+                  Save
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
   </div>
   <script type="text/javascript">
     $(function (){
-      $('#addCategory').click(function() {
-        cloneMore('div.table table.table tr:last', 'form');
+      $("button.edit_subcategory").click(function(e){
+        e.preventDefault();
+        //load subcategory content onto the modal
+        $("#subcategoryModal form")[0].reset();
+        var row = $(this).closest('tr');
+        var title = $(row).find('td.subcategory_title input').val();
+        var description = $(row).find('td.subcategory_description input').val();
+        var code = $(row).find('td.subcategory_code input').val();
+        var link = $(row).find('td.subcategory_link input').val();
+        var row_id = $(row).children('input:first').attr('id');
+
+        $('#subcategoryModal input#id_title').val(title);
+        $('#subcategoryModal textarea#id_description').html(description);
+        $('#subcategoryModal input#id_code').val(code);
+        $('#subcategoryModal input#id_link').val(link);
+        $('#subcategoryModal h3.modal-title').html('Edit Subcategory');
+        $('#subcategoryModal input#id_row').val(row_id);
+        $('#subcategoryModal').modal('show');
+        //var subcategories_table = $(this).parent().find('table.subcategories');
+        //cloneSomeMore($(subcategories_table).find('tr:last'), 'form', 'subcategory');
+
       });
+
+      $("button.add_subcategory").click(function(e){
+        e.preventDefault();
+        var subcategories_table = $(this).parent().find('table.subcategories');
+        cloneSomeMore($(subcategories_table).find('tr:last'), 'form', 'subcategory');
+        var row = $(subcategories_table).find('tr:last').prev();
+        var row_id = $(row).children('input:first').attr('id');
+        $("#subcategoryModal form")[0].reset();
+        $('#subcategoryModal input#id_row').val(row_id);
+        $('#subcategoryModal h3.modal-title').html('Add Subcategory');
+        $('#subcategoryModal').modal('show');
+
+
+      });
+      $("button#saveSubcategory").click(function(e){
+        e.preventDefault();
+        var title = $('#subcategoryModal input#id_title').val();
+        if(title == ''){
+          $("#subcategoryModal #subcategoryMsg").html("Title is required");
+        }
+        else{
+          var row_id = $('#subcategoryModal input#id_row').val();
+          var row = $('#'+row_id).parent();
+
+          var description = $('#subcategoryModal textarea#id_description').val();
+          var code = $('#subcategoryModal input#id_code').val();
+          var link = $('#subcategoryModal input#id_link').val();
+          $(row).find('td.subcategory_title input').val(title);
+          $(row).find('td.subcategory_description input').val(description);
+          $(row).find('td.subcategory_code input').val(code);
+          $(row).find('td.subcategory_link input').val(link);
+
+          $(row).find('td.subcategory_title div.title_text').html(title);
+          $(row).find('td.subcategory_description div.description_text').html(description);
+          $(row).find('td.subcategory_code div.code_text').html(code);
+          $(row).find('td.subcategory_link div.link_text').html(link);
+          $("#subcategoryModal").modal('toggle');
+          $(row).show();
+        }
+
+      });
+
+      $('#addCategory').click(function() {
+        cloneMore('div.table:last', 'form');
+        var new_category_div = $('div.table:last').prev();
+        $(new_category_div).toggle();
+        $(new_category_div).find('.expand_collapse').children().toggle();
+        $(new_category_div).find('.collapsible_content').toggle();
+
+      });
+
+      $('div#id_name input').on('input', function(){
+        $(this).closest('div.table.step').find('h4 span.subcategory_title').html($(this).val());
+      });
+
+      $('button.delete_subcategory').click(function(){
+        var r = confirm("Are you sure you want to delete this subcategory?");
+        if (r == true) {
+          $(this).next('input').val('on');
+          $(this).closest('tr').hide();
+        }
+      });
+      $('button.delete_category').click(function(){
+        var r = confirm("Are you sure you want to delete this category?");
+        if (r == true) {
+          $(this).next('input').val('on');
+          $(this).closest('div.table.step').hide();
+        }
+      });
+
+
     });
   </script>
 

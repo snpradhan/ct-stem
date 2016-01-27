@@ -22,14 +22,14 @@
             <th> Assessment Title </th>
             <th> Status </th>
             <th> Subject </th>
-            <th> Taxonomy </th>
+            <th> Standards </th>
             <th> Notes </th>
           </tr>
           <tr id="filterrow">
             <th> Assessment Title </th>
             <th> Status </th>
             <th> Subject </th>
-            <th> Taxonomy </th>
+            <th> Standards </th>
             <th> Notes </th>
           </tr>
         </thead>
@@ -66,11 +66,21 @@
               <td>
                 <ul class="standard">
                   {% for standard, categories in assessment.taxonomy.all|taxonomyHelper %}
-                    <li>{{standard}}</li>
-                    <ul class="category">
+                    <li>{{standard}}
+                      <span class="ec">
+                        <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
+                        <span class="glyphicon glyphicon-collapse-up" aria-hidden="true" style="display:none;"></span>
+                      </span>
+                    </li>
+                    <ul class="category" style="display:none;">
                       {% for category, taxonomies in categories.items %}
-                        <li>{{category}}</li>
-                        <ul class="taxonomy">
+                        <li>{{category}}
+                          <span class="ec">
+                            <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
+                            <span class="glyphicon glyphicon-collapse-up" aria-hidden="true" style="display:none;"></span>
+                          </span>
+                        </li>
+                        <ul class="taxonomy" style="display:none;">
                         {% for taxonomy in taxonomies %}
                           <li>{{taxonomy}} </li>
                         {% endfor %}
