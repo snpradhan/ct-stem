@@ -42,7 +42,7 @@ def team(request):
 # ASSESSMENTS TABLE VIEW
 ####################################
 def assessments(request):
-  if hasattr(request.user, 'administrator') == False:
+  if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'researcher') == False:
     if request.user.is_authenticated():
       assessments = models.Assessment.objects.all().filter(Q(status='P') | Q(author=request.user)).order_by('id')
     else:
@@ -197,7 +197,7 @@ def assessmentMeta(request, id=''):
 # LESSONS TABLE VIEW
 ####################################
 def lessons(request):
-  if hasattr(request.user, 'administrator') == False:
+  if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'researcher') == False:
     if request.user.is_authenticated():
       lessons = models.Lesson.objects.all().filter(Q(status='P') | Q(author=request.user)).order_by('id')
     else:

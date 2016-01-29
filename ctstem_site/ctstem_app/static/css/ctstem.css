@@ -751,5 +751,9 @@ span.ec .glyphicon-collapse-down {
 span.ec .glyphicon-collapse-up{
   color: #e38d13;
 }
+
+.order input[type='number'] {
+  width: 5em;
+}
 /*************************************/
 

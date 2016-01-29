@@ -88,9 +88,8 @@ $(function (){
             }
 
             var question_order = $(question_table).find("tbody > tr").length;
-            $(question_table).find("tr:nth-last-child(2) td.question_order div").html("Q"+(question_order-1)+".");
             $(question_table).find("tr:nth-last-child(2)").attr('id', 'question_row_'+data['question_id']);
-            $(question_table).find("tr:nth-last-child(2) input.question_id").val(data['question_id']);
+            $(question_table).find("tr:nth-last-child(2) td.question_text input[type=hidden]").val(data['question_id']);
             $(question_table).find("tr:nth-last-child(2) td.question_text div").html(data['question_text']);
             $(question_table).find("tr:nth-last-child(2) button.edit_question").attr("data-form", '/question/'+data['question_id']+'/');
             $(question_table).find("tr:nth-last-child(2)").show();

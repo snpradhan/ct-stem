@@ -125,7 +125,7 @@ $(function (){
               $(taxonomy_row).find('td:not(:last)').each(function(){
                 taxonomy += "<td>"+$(this).html()+"</td>";
               });
-              taxonomy += "<td> <button type='button' class='btn btn-warning remove_taxonomy' title='Remove Taxonomy'><span class='glyphicon glyphicon-trash' aria-hidden='true'></span></button></td>";
+              taxonomy += "<td> <button type='button' class='btn btn-danger remove_taxonomy' title='Remove Taxonomy'><span class='glyphicon glyphicon-trash' aria-hidden='true'></span></button></td>";
               $('div.curriculum_content div#taxonomy_div table#taxonomy tbody').append(taxonomy);
 
               //bind remove function

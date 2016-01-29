@@ -75,7 +75,7 @@
                       <th width="30%">Description</th>
                       <th width="10%">Code</th>
                       <th width="20%">Link</th>
-                      <th width="10%">Delete</th>
+                      <th width="10%">Edit/Delete</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -86,39 +86,40 @@
                         <td class="subcategory_title">
                           {% if subcategoryForm.title.value and subcategoryForm.title.value != 'None' %}
                             <div class="title_text">{{subcategoryForm.title.value}}</div>
-                            <input type="hidden" class="subcategory_id" id="{{subcategoryForm.title.auto_id}}" name="{{subcategoryForm.title.html_name}}" value="{{subcategoryForm.title.value}}"/>
+                            {{subcategoryForm.title.as_hidden}}
                           {% else %}
                             <div class="title_text"></div>
-                            <input type="hidden" class="subcategory_id" id="{{subcategoryForm.title.auto_id}}" name="{{subcategoryForm.title.html_name}}" value/>
+                            {{subcategoryForm.title.as_hidden}}
                           {% endif %}
                         </td>
                         <td class="subcategory_description">
                           {% if subcategoryForm.description.value and subcategoryForm.description.value != 'None' %}
                             <div class="description_text">{{subcategoryForm.description.value}}</div>
-                            <input type="hidden" class="subcategory_id" id="{{subcategoryForm.description.auto_id}}" name="{{subcategoryForm.description.html_name}}" value="{{subcategoryForm.description.value|default_if_none:''}}"/>
+                            {{subcategoryForm.description.as_hidden}}
                           {% else %}
                             <div class="description_text"></div>
-                            <input type="hidden" class="subcategory_id" id="{{subcategoryForm.description.auto_id}}" name="{{subcategoryForm.description.html_name}}" value/>
+                            {{subcategoryForm.description.as_hidden}}
                           {% endif %}
                         </td>
                         <td class="subcategory_code">
                           {% if subcategoryForm.code.value and subcategoryForm.code.value != 'None' %}
                             <div class="code_text"> {{subcategoryForm.code.value}} </div>
-                            <input type="hidden" class="subcategory_id" id="{{subcategoryForm.code.auto_id}}" name="{{subcategoryForm.code.html_name}}" value="{{subcategoryForm.code.value}}"/>
+                            {{subcategoryForm.code.as_hidden}}
                           {% else %}
                             <div class="code_text"> </div>
-                            <input type="hidden" class="subcategory_id" id="{{subcategoryForm.code.auto_id}}" name="{{subcategoryForm.code.html_name}}" value/>
+                            {{subcategoryForm.code.as_hidden}}
                           {% endif %}
                         </td>
 
                         <td class="subcategory_link">
                           {% if subcategoryForm.link.value and subcategoryForm.link.value != 'None' %}
                             <div class="link_text">{{subcategoryForm.link.value}}</div>
-                            <input type="hidden" class="subcategory_id" id="{{subcategoryForm.link.auto_id}}" name="{{subcategoryForm.link.html_name}}" value="{{subcategoryForm.link.value}}"/>
+                            {{subcategoryForm.link.as_hidden}}
                           {% else %}
                             <div class="link_text"></div>
-                            <input type="hidden" class="subcategory_id" id="{{subcategoryForm.link.auto_id}}" name="{{subcategoryForm.link.html_name}}" value/>
+                            {{subcategoryForm.link.as_hidden}}
                           {% endif %}
+
                         </td>
                         <td class="subcategory_edit">
                           <button type="button" class="btn btn-danger delete_subcategory" name="delete_subcategory" aria-label="Delete Subcategory" title="Delete Subcategory">
@@ -170,7 +171,7 @@
               </div>
               <div class="form-group">
                 <label for="id_link">Link</label>
-                <input type="text" id="id_link" class="form-control"/>
+                <input type="url" id="id_link" class="form-control"  pattern="https?://.+"/>
               </div>
             </div>
             <div class="modal-footer">
@@ -212,6 +213,7 @@
 
       $("button.add_subcategory").click(function(e){
         e.preventDefault();
+        $("#subcategoryModal form")[0].reset();
         var subcategories_table = $(this).parent().find('table.subcategories');
         cloneSomeMore($(subcategories_table).find('tr:last'), 'form', 'subcategory');
         var row = $(subcategories_table).find('tr:last').prev();
@@ -226,8 +228,13 @@
       $("button#saveSubcategory").click(function(e){
         e.preventDefault();
         var title = $('#subcategoryModal input#id_title').val();
+        var link = $('#subcategoryModal input#id_link').val();
+        var regex = new RegExp(/https?:\/\/(?:www\.|(?!www))[^\s\.]+\.[^\s]{2,}|www\.[^\s]+\.[^\s]{2,}/);
         if(title == ''){
           $("#subcategoryModal #subcategoryMsg").html("Title is required");
+        }
+        else if(link != '' && !link.match(regex)){
+          $("#subcategoryModal #subcategoryMsg").html("The url format is not valid");
         }
         else{
           var row_id = $('#subcategoryModal input#id_row').val();

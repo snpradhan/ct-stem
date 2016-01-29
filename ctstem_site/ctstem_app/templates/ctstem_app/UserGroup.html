@@ -10,7 +10,7 @@
 {% block content %}
   {{block.super}}
   <div class="content">
-    <h2>User Group</h2>
+    <h2>Student Group</h2>
     <form method="post">
       {% csrf_token %}
       <div class="table" id="group">
@@ -40,9 +40,9 @@
           {{formset.id}}
           <div>
             <label for="id_assignment_table">Assignments</label>
-            <button type="button" class="btn btn-primary" id="addAssignment">
-              Add More Assignment
-            </button>
+            <a type="button" class="btn btn-primary add_assignment" name="add_assignment" title="Add Assignment" id="addAssignment">
+              <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+            </a>
           </div>
           <table class="table table-striped table-condensed table-bordered inner_table">
             <thead>
@@ -55,7 +55,7 @@
             </thead>
             <tbody>
               {% for assignmentForm in formset %}
-                <tr>
+                <tr style="{% if forloop.last %} display:none; {% endif %}">
                   <td class="assessment_title">
                     {{assignmentForm.id}}
                     {{assignmentForm.assessment}}
@@ -70,7 +70,12 @@
                       {{assignmentForm.due_date.errors }}
                     </div>
                   </td>
-                  <td>{{assignmentForm.DELETE }}</td>
+                  <td>
+                    <button type="button" class="btn btn-danger delete_assignment" name="delete_assignment" aria-label="Delete Assignment" title="Delete Assignment">
+                      <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                    </button>
+                    {{assignmentForm.DELETE.as_hidden}}
+                  </td>
                 </tr>
               {% endfor %}
             </tbody>
@@ -83,17 +88,26 @@
     </form>
   </div>
   <script type="text/javascript">
-  $(function (){
-    $('#addAssignment').click(function() {
-      cloneMore('div.assignment_table table.table tr:last', 'form');
-      $('div.assignment_table table.table tr:last .datepicker').removeClass('hasDatepicker');
-      $('div.assignment_table table.table tr:last .datepicker').datepicker({dateFormat: 'M d, yy'});
-    });
+    $(function (){
 
+      $('a#addAssignment').click(function() {
+        cloneMore('div.assignment_table table.table tr:last', 'form');
+        var new_assignment_row = $('div.assignment_table table.table tr:nth-last-child(2)');
+        $(new_assignment_row).toggle();
+        $(new_assignment_row).find('.datepicker').removeClass('hasDatepicker');
+        $(new_assignment_row).find('.datepicker').datepicker({dateFormat: 'M d, yy'});
+      });
 
-  });
-  $(document).ready(function() {
-        $('.datepicker').datepicker({dateFormat: 'M d, yy'});
+      $('button.delete_assignment').click(function(){
+        var r = confirm("Are you sure you want to delete this assignment?");
+        if (r == true) {
+          $(this).next('input').val('on');
+          $(this).closest('tr').hide();
+        }
+      });
+
+      $('.datepicker').datepicker({dateFormat: 'M d, yy'});
+
     });
   </script>
 {% endblock %}

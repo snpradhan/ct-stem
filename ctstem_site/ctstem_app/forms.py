@@ -242,6 +242,7 @@ class LessonForm(ModelForm):
   def __init__(self, *args, **kwargs):
     super(LessonForm, self).__init__(*args, **kwargs)
     forms.ModelForm.__init__(self, *args, **kwargs)
+    self.fields['taxonomy'].label = "Standards"
 
     for field_name, field in self.fields.items():
       field.widget.attrs['class'] = 'form-control'
@@ -314,7 +315,7 @@ class AssessmentForm(ModelForm):
 
   def __init__(self, *args, **kwargs):
     super(AssessmentForm, self).__init__(*args, **kwargs)
-
+    self.fields['taxonomy'].label = "Standards"
     for field_name, field in self.fields.items():
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['placeholder'] = field.help_text

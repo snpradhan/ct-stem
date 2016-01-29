@@ -11,15 +11,21 @@
       {% csrf_token %}
       {{form.media}}
       <div class="table" id="lesson">
-        <h4>Lesson Meta
+        <h4>
+          <span>&nbsp;</span>
+          <span class="lesson_title" style="font-weight: bold; text-decoration: underline;">{{form.title.value|default_if_none:"  "}}</span>
+          <span>&nbsp;</span>
           <span class="controls">
             <span class="expand_collapse">
-              <span class="glyphicon glyphicon-collapse-up" aria-hidden="true"></span>
-              <span class="glyphicon glyphicon-collapse-down" aria-hidden="true" style="display:none;"></span>
+              <button type="button" class="btn btn-warning" name="collapse_lesson" aria-label="Collapse Lesson" title="Collapse Lesson">
+                <span class="glyphicon glyphicon-collapse-up" aria-hidden="true"></span>
+              </button>
+              <button type="button" class="btn btn-success" style="display:none;" name="expand_lesson" aria-label="Expand Lesson" title="Expand Lesson">
+                <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
+              </button>
             </span>
           </span>
         </h4>
-
         <div class="curriculum_content collapsible_content">
           {{form.management_form}}
           {% for field in form %}
@@ -56,7 +62,7 @@
                           <td>{{taxonomy.title}}</td>
                           <td>{{taxonomy.code}}</td>
                           <td>
-                            <button type="button" class="btn btn-warning remove_taxonomy" title="Remove Taxonomy">
+                            <button type="button" class="btn btn-danger remove_taxonomy" title="Remove Taxonomy">
                               <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
                             </button>
                           </td>
@@ -80,32 +86,43 @@
 
       {{formset.management_form}}
       {% for activity in formset %}
-        <div class="table activity">
+        <div class="table activity" style="{% if forloop.last %} display:none; {% endif %}">
           <h4>
-            Lesson Activity
-            <span class="activity_order">
-              {% if activity.ORDER.value %}
-                {{ activity.ORDER.value}}
-              {% else %}
-                {{forloop.counter}}
-            {% endif %}
-            </span>
+            <span>&nbsp;</span>
+            <span class="activity_title" style="font-weight: bold; text-decoration: underline;">{{activity.title.value|default_if_none:"  "}}</span>
+            <span>{% if activity.ORDER.value %}({{activity.ORDER.value}}) {% endif %}</span>
+            <span>&nbsp;</span>
             <span class="controls">
+              <span>
+                <button type="button" class="btn btn-danger delete_activity" name="delete_activity" aria-label="Delete Activity" title="Delete Activity">
+                  <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                </button>
+                {{activity.DELETE.as_hidden}}
+              </span>
               <span class="expand_collapse">
-                <span class="glyphicon glyphicon-collapse-up" aria-hidden="true"></span>
-                <span class="glyphicon glyphicon-collapse-down" aria-hidden="true" style="display:none;"></span>
+                <button type="button" class="btn btn-warning" name="collapse_activity" aria-label="Collapse Activity" title="Collapse Activity">
+                  <span class="glyphicon glyphicon-collapse-up" aria-hidden="true"></span>
+                </button>
+                <button type="button" class="btn btn-success" style="display:none;" name="expand_activity" aria-label="Expand Activity" title="Expand Activity">
+                  <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
+                </button>
               </span>
             </span>
           </h4>
 
           {{ activity.management_form }}
           {{activity.id}}
-          <div class="form-group">
-            <label for="id_{{activity.title.name}}">{{ activity.title.label }} {% if activity.title.field.required %}(<span class="required">*</span>) {% endif %}</label>
-            <div>{{activity.title}}</div>
-            <div class="error">{{ activity.title.errors }}</div>
-          </div>
           <div class="curriculum_content collapsible_content">
+            <div class="form-group order">
+              <label for="id_{{activity.ORDER.name}}"> Activity #.</label>
+              <div>{{activity.ORDER}}</div>
+              <div class="error">{{ activity.ORDER.errors }}</div>
+            </div>
+            <div class="form-group">
+              <label for="id_{{activity.title.name}}">{{ activity.title.label }} {% if activity.title.field.required %}(<span class="required">*</span>) {% endif %}</label>
+              <div class="activity_title">{{activity.title}}</div>
+              <div class="error">{{ activity.title.errors }}</div>
+            </div>
             <div class="form-group">
               <label for="id_{{activity.content.name}}">{{ activity.content.label }} {% if activity.content.field.required %}(<span class="required">*</span>) {% endif %}</label>
               <div>
@@ -118,74 +135,58 @@
               {{activity.nested.management_form}}
               {{activity.nested.id}}
               <label for="id_question_table">Activity Question(s)</label>
-              <button class="btn btn-primary edit_question" name="add_question" data-form="{% url 'ctstem:newQuestion' %}">
+              <button class="btn btn-primary edit_question" name="add_question" data-form="{% url 'ctstem:newQuestion' %}" aria-label="Add New Question" title="Add New Question">
                 <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
               </button>
-              <table class="table table-striped table-condensed question">
+              <table class="table table-striped table-condensed table-bordered question inner_table">
                 <thead>
                   <tr>
-                    <th></th>
-                    <th style="width:60%;"></th>
-                    <th></th>
-                    <th>Order</th>
-                    <th>Delete</th>
+                    <th>Q#.</th>
+                    <th style="width:70%;">Question</th>
+                    <th>Delete/Edit</th>
                   </tr>
                 </thead>
                 <tbody>
                   {% for questionForm in activity.nested %}
                     <tr style="{% if forloop.last %} display:none; {% endif %}" id="question_row_{{questionForm.question.value}}">
-                      <td class="question_order">
+                      <td class="order">
                         {{questionForm.id}}
-                        <div>
-                          Q{{questionForm.ORDER.value}}.
-                        </div>
+                        {{questionForm.ORDER}}
                       </td>
                       <td class="question_text">
                         {% if questionForm.question.value and questionForm.question.value != 'None' %}
-                          <input type="hidden" class="question_id" id="{{questionForm.question.auto_id}}" name="{{questionForm.question.html_name}}" value="{{questionForm.question.value}}"/>
+                          {{questionForm.question.as_hidden}}
                           <div> {{questionForm.question.value|selected_question|safe }} </div>
-
                         {% else %}
-                          <input type="hidden" class="question_id" id="{{questionForm.question.auto_id}}" name="{{questionForm.question.html_name}}" value/>
+                          {{questionForm.question.as_hidden}}
                           <div></div>
                         {% endif %}
                       </td>
-                      <td>
-                        <button type="button" class="btn btn-success edit_question" name="edit_question" aria-label="Edit Question" data-form="{% url 'ctstem:question' questionForm.question.value|default:0 %}" >
+                      <td class="question_edit">
+                        <button type="button" class="btn btn-danger delete_question" name="delete_question" aria-label="Delete Question" title="Delete Question">
+                          <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                        </button>
+                        {{questionForm.DELETE.as_hidden}}
+                        <button type="button" class="btn btn-success edit_question" name="edit_question" aria-label="Edit Question" title="Edit Question" data-form="{% url 'ctstem:question' questionForm.question.value|default:0 %}" >
                           <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
                         </button>
                       </td>
-                      <td>{{questionForm.ORDER }}</td>
-                      <td>{{questionForm.DELETE }}</td>
                     </tr>
                   {% endfor %}
                 </tbody>
               </table>
-            </div>
-            <div class="form-group">
-              <label for="id_{{activity.ORDER.name}}">{{ activity.ORDER.label }}</label>
-              <div>{{activity.ORDER}}</div>
-              <div class="error">{{ activity.ORDER.errors }}</div>
-            </div>
-            <div class="form-group">
-              <label for="id_{{activity.DELETE.name}}">{{ activity.DELETE.label }}</label>
-              <div>{{activity.DELETE}}</div>
-              <div class="error">{{ activity.DELETE.errors }}</div>
             </div>
           </div>
         </div>
       {% endfor %}
 
       <div class="form-group button-group-fixed">
-          <input type="submit" class="btn btn-success" id="submit" value="Save"/>
-          <input type="button" class="btn btn-primary" id="addActivity" value="Add Activity"/>
-
-        </div>
+        <input type="submit" class="btn btn-success" id="submit" value="Save"/>
+        <input type="button" class="btn btn-primary" id="addActivity" value="Add Activity"/>
+      </div>
     </form>
-    <div class="modal fade" id="questionModal" role="dialog">
-    </div>
-    <div class="modal fade" id="taxonomyModal" role="dialog">
-    </div>
+    <div class="modal fade" id="questionModal" role="dialog"></div>
+    <div class="modal fade" id="taxonomyModal" role="dialog"></div>
   </div>
   <script type="text/javascript">
     $(function (){
@@ -219,7 +220,10 @@
 
       $('#addActivity').click(function() {
         cloneMore('div.table:last', 'form');
-        $('div.table:last').find('textarea').each(function(){
+        var new_activity_div = $('div.table:last').prev();
+        $(new_activity_div).toggle();
+
+        $(new_activity_div).find('textarea').each(function(){
           if($(this).attr('name') !== undefined && $(this).attr('data-config') !== undefined){
             var config = {
               removePlugins: 'stylesheetparser',
@@ -237,24 +241,33 @@
           }
         });
 
-        var activity_order_div = $('div.table:last span.activity_order');
+        /*var activity_order_div = $('div.table:last span.activity_order');
         var activity_order = parseInt($(activity_order_div).html()) + 1;
-        $(activity_order_div).html(activity_order);
-        //alert('after clone');
-        //bindWysiwyg();
-        //rebind question clone
+        $(activity_order_div).html(activity_order);*/
       });
 
-      /*function bindWysiwyg(){
-        //alert($(step).attr('class'));
-        $('div.table:last').find('textarea').each(function(){
-          var id = $(this).attr('id');
-          var editor = $(this).attr('id')+'_editor';
-          var config = null;
-          django_wysiwyg.enable(editor, id, config);
-          $(this).next().show();
-        });
-      }*/
+      $('input#id_lesson-title').on('input', function(){
+        $(this).closest('div.table').find('h4 span.lesson_title').html($(this).val());
+      });
+      $('div.activity_title input').on('input', function(){
+        $(this).closest('div.table.activity').find('h4 span.activity_title').html($(this).val());
+      });
+
+      $('button.delete_activity').click(function(){
+        var r = confirm("Are you sure you want to delete this activity?");
+        if (r == true) {
+          $(this).next('input').val('on');
+          $(this).closest('div.table.activity').hide();
+        }
+      });
+      $('button.delete_question').click(function(){
+        var r = confirm("Are you sure you want to delete this question?");
+        if (r == true) {
+          $(this).next('input').val('on');
+          $(this).closest('tr').hide();
+        }
+      });
+
     });
   </script>
 
