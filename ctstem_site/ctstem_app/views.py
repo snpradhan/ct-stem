@@ -23,6 +23,7 @@ from django.utils.crypto import get_random_string
 import string
 import csv
 from django.db.models import Q
+from django.core.files.base import ContentFile
 
 ####################################
 # HOME
@@ -314,6 +315,7 @@ def copyLesson(request, id=''):
         if '' != id:
           lesson = models.Lesson.objects.get(id=id)
           lessonActivities = models.LessonActivity.objects.all().filter(lesson=lesson)
+          attachments = models.Attachment.objects.all().filter(lesson=lesson)
           title = lesson.title
           lesson.title = str(datetime.datetime.now())
           lesson.slug = slugify(lesson.title)
@@ -334,6 +336,19 @@ def copyLesson(request, id=''):
           lesson.subject = original_lesson.subject.all()
           lesson.taxonomy = original_lesson.taxonomy.all()
           lesson.save()
+
+          for attachment in attachments:
+            source = attachment.file_object
+            filecontent = ContentFile(source.file.read())
+            filename = os.path.split(source.file.name)[-1]
+            filename_array = filename.split('.')
+            filename = filename_array[0] + '-' + str(lesson.id) + '.' + filename_array[1]
+            attachment.pk = None
+            attachment.id = None
+            attachment.lesson = lesson
+            attachment.file_object.save(filename, filecontent)
+            attachment.save()
+            source.file.close()
 
           for activity in lessonActivities:
               activity_questions = models.LessonQuestion.objects.all().filter(lesson_activity=activity)
