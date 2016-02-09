@@ -130,29 +130,28 @@
   <div id="content" style="font-size: 1em;">
     <form>
       <div class="table" id="lessonMeta">
-        {{form.management_form}}
-        <h2>{{form.title.value|title}}</h2>
+        <h2>{{lesson.title|title}}</h2>
         <hr>
         <div class="meta">
-          <div class="label">{{form.time.label}}</div>
-          {{form.time.value}}
+          <div class="label">Time</div>
+          {{lesson.time}}
         </div>
         <div class="meta">
-          <div class="label">{{form.level.label}}</div>
-          <div>{{form.level.value}}</div>
+          <div class="label">Level</div>
+          <div>{{lesson.level}}</div>
         </div>
         <div class="meta">
-          <div class="label">{{form.purpose.label}}</div>
-          <div>{{form.purpose.value}}</div>
+          <div class="label">Purpose</div>
+          <div>{{lesson.purpose}}</div>
         </div>
         <div class="meta">
-          <div class="label">{{form.overview.label}}</div>
-          <div>{{form.overview.value}}</div>
+          <div class="label">Overview</div>
+          <div>{{lesson.overview}}</div>
         </div>
         <div class="meta">
-          <div class="label">{{form.taxonomy.label}}</div>
+          <div class="label">Standards</div>
           <ul class="standard">
-            {% for standard, categories in form|getSelectedTaxonomy:"taxonomy" %}
+            {% for standard, categories in lesson.taxonomy.all|taxonomyHelper %}
               <li>{{standard}}</li>
               <ul class="category">
                 {% for category, taxonomies in categories.items %}
@@ -167,11 +166,20 @@
             {% endfor %}
           </ul>
         </div>
+        <div class="meta">
+          <div class="label">Attachments</div>
+          <ul>
+            {% for attachment in attachments %}
+              <li><a href="{{attachment.file_object.url}}" target="_blank">{{attachment.title}}</a> - ({{attachment.file_object.url}})</li>
+            {% endfor %}
+          </ul>
+        </div>
       </div>
 
 
+
       <div class="table" id="lessonContent">
-        <div>{{form.content.value|format_iframe|safe}}</div>
+        <div>{{lesson.content|format_iframe|safe}}</div>
       </div>
 
       <div class="table" id="lessonActivity">
@@ -185,21 +193,21 @@
           </tr>
         </table>
 
-        {% for activity in formset %}
-          <h3 class="activity_title" style="text-decoration: underline;"> {{ activity.title.value }} </h3>
+        {% for activity in activities %}
+          <h3 class="activity_title" style="text-decoration: underline;"> {{ activity.title }} </h3>
 
-          <div class="activity_content"> {{activity.content.value|inline_style|safe}} </div>
+          <div class="activity_content"> {{activity.content|inline_style|safe}} </div>
 
-            {% for questionForm in activity.nested %}
+            {% for question in activity.questions.all %}
             <table class="question_table">
               <tr>
                 <td width="5%" style="vertical-align: top;" class="question_no"> Q{{forloop.counter}}.</td>
-                <td class="question_text"> {{questionForm.instance.question.question_text|inline_style|safe }} </td>
+                <td class="question_text"> {{question.question.question_text|inline_style|safe }} </td>
               </tr>
               <tr>
                 <td></td>
                 <td class="answer_field">
-                  {% with field_type=questionForm.instance.question.answer_field_type %}
+                  {% with field_type=question.question.answer_field_type %}
                     {% if field_type == 'TA' %}
                       <br><br><br><br><br><br><br><br><br><br>
                     {% elif field_type == 'TF' %}
@@ -207,7 +215,7 @@
                     {% elif field_type == 'DD' or field_type == 'MC' %}
                       <div class="multiplechoice">
                         <p class="note"> Note: Select one answer </p>
-                        {% for option in questionForm.instance.question.options|split:','%}
+                        {% for option in question.question.options|split:','%}
                           <div class="input_container">
                             <img src="https://s3-us-west-1.amazonaws.com/ct-stem/assets/images/Circle.gif" class="circle"><span>&nbsp;&nbsp;{{option}}</span>
                           </div>
@@ -216,7 +224,7 @@
                     {% elif field_type == 'MS' %}
                       <div class="multiselect">
                         <p class="note"> Note: Select all that apply </p>
-                        {% for option in questionForm.instance.question.options|split:','%}
+                        {% for option in question.question.options|split:','%}
                           <div class="input_container">
                             <img src="https://s3-us-west-1.amazonaws.com/ct-stem/assets/images/Square.gif" class="square" style="width:25px;"><span>&nbsp;&nbsp;{{option}} </span>
                           </div>

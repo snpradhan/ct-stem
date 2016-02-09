@@ -372,14 +372,10 @@ def previewLesson(request, id='', pdf='0'):
       lesson = models.Lesson()
 
     if request.method == 'GET':
-      form = forms.LessonForm(instance=lesson, prefix='lesson')
-      LessonActivityFormSet = nestedformset_factory(models.Lesson, models.LessonActivity, form=forms.LessonActivityForm,
-                                                    nested_formset=inlineformset_factory(models.LessonActivity, models.LessonQuestion, form=forms.LessonQuestionForm, can_delete=True, can_order=True, extra=0),
-                                                    can_delete=True, can_order=True, extra=0)
-      #QuestionFormSet = inlineformset_factory(models.Lesson, models.LessonQuestion, form=forms.LessonQuestionForm, can_order=True, can_delete=True, extra=1)
-      formset = LessonActivityFormSet(instance=lesson, prefix='form')
-      context = {'form': form, 'formset':formset}
+      activities = models.LessonActivity.objects.all().filter(lesson=lesson)
+      attachments = models.Attachment.objects.all().filter(lesson=lesson)
 
+      context = {'lesson': lesson, 'attachments': attachments, 'activities':activities}
       #print settings.STATIC_ROOT
       if pdf == '1':
         return render_to_pdf_response('ctstem_app/LessonPreview.html', context, u'%s.%s'%(lesson.slug, 'pdf') )
