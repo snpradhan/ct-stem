@@ -225,25 +225,32 @@ def lesson(request, id=''):
 
     if request.method == 'GET':
       form = forms.LessonForm(instance=lesson, prefix='lesson')
+      AttachmentFormSet = inlineformset_factory(models.Lesson, models.Attachment, form=forms.AttachmentForm, can_delete=True, extra=1)
       LessonActivityFormSet = nestedformset_factory(models.Lesson, models.LessonActivity, form=forms.LessonActivityForm,
                                                     nested_formset=inlineformset_factory(models.LessonActivity, models.LessonQuestion, form=forms.LessonQuestionForm, can_delete=True, can_order=True, extra=1),
                                                     can_delete=True, can_order=True, extra=1)
       #QuestionFormSet = inlineformset_factory(models.Lesson, models.LessonQuestion, form=forms.LessonQuestionForm, can_order=True, can_delete=True, extra=1)
       formset = LessonActivityFormSet(instance=lesson, prefix='form')
-      context = {'form': form, 'formset':formset, 'newQuestionForm': newQuestionForm}
+      attachment_formset = AttachmentFormSet(instance=lesson, prefix='attachment_form')
+      context = {'form': form, 'attachment_formset': attachment_formset, 'formset':formset, 'newQuestionForm': newQuestionForm}
       return render(request, 'ctstem_app/Lesson.html', context)
 
     elif request.method == 'POST':
       data = request.POST.copy()
+      print request.FILES
       form = forms.LessonForm(data, request.FILES, instance=lesson, prefix="lesson")
+      AttachmentFormSet = inlineformset_factory(models.Lesson, models.Attachment, form=forms.AttachmentForm, can_delete=True, extra=1)
       LessonActivityFormSet = nestedformset_factory(models.Lesson, models.LessonActivity, form=forms.LessonActivityForm,
                                                     nested_formset=inlineformset_factory(models.LessonActivity, models.LessonQuestion, form=forms.LessonQuestionForm, can_delete=True, can_order=True, extra=1),
                                                     can_delete=True, can_order=True, extra=1)
       #QuestionFormSet = inlineformset_factory(models.Lesson, models.LessonQuestion, form=forms.LessonQuestionForm, can_order=True, can_delete=True, extra=1)
       formset = LessonActivityFormSet(data, instance=lesson, prefix='form')
-      print form.is_valid()
-      print formset.is_valid()
-      if form.is_valid() and formset.is_valid():
+      attachment_formset = AttachmentFormSet(data, request.FILES, instance=lesson, prefix='attachment_form')
+      print 'form ', form.is_valid()
+      print 'formset ', formset.is_valid()
+      print 'attachment ', attachment_formset.is_valid()
+
+      if form.is_valid() and formset.is_valid() and attachment_formset.is_valid():
         savedLesson = form.save(commit=False)
         if '' == id:
             savedLesson.author = request.user
@@ -251,6 +258,7 @@ def lesson(request, id=''):
         savedLesson.slug = slugify(savedLesson.title) + '-v%s'%savedLesson.version
         savedLesson.save()
         form.save()
+        attachment_formset.save()
         formset.save(commit=False)
         for aform in formset.ordered_forms:
           aform.instance.order = aform.cleaned_data['ORDER']
@@ -282,8 +290,9 @@ def lesson(request, id=''):
       else:
         print form.errors
         print formset.errors
+        print attachment_formset.errors
         messages.error(request, "The lesson could not be saved because there were errors.  Please check the errors below.")
-        context = {'form': form, 'formset':formset, 'newQuestionForm': newQuestionForm}
+        context = {'form': form, 'attachment_formset': attachment_formset, 'formset':formset, 'newQuestionForm': newQuestionForm}
         return render(request, 'ctstem_app/Lesson.html', context)
 
     return http.HttpResponseNotAllowed(['GET', 'POST'])

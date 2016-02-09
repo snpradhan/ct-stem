@@ -170,8 +170,8 @@ $(function (){
       $(this).toggle();
     })
   });
-  $(".expand_collapse_notes").click(function(){
-    $(this).next('div').toggle();
+  $(".expand_collapse_other").click(function(){
+    $(this).next().toggle();
     $(this).children().each(function(){
       $(this).toggle();
     })

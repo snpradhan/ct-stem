@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import ModelForm
 from django.forms.formsets import BaseFormSet
-from ctstem_app import models
+from ctstem_app import models, widgets
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
 from django.forms.models import inlineformset_factory
@@ -10,7 +10,7 @@ from django.forms.models import modelformset_factory
 from django.forms.formsets import formset_factory
 from datetime import datetime
 from django.contrib.admin.widgets import FilteredSelectMultiple
-from django.forms.widgets import RadioSelect
+from django.forms.widgets import RadioSelect, FileInput, ClearableFileInput
 from django.utils.safestring import mark_safe
 from django.core.exceptions import ObjectDoesNotExist
 from tinymce.widgets import TinyMCE
@@ -263,6 +263,25 @@ class LessonActivityForm(ModelForm):
 
   def __init__(self, *args, **kwargs):
     super(LessonActivityForm, self).__init__(*args, **kwargs)
+    for field_name, field in self.fields.items():
+      field.widget.attrs['class'] = 'form-control'
+      field.widget.attrs['placeholder'] = field.help_text
+
+####################################
+# Lesson Attachment Form
+####################################
+class AttachmentForm(ModelForm):
+
+  class Meta:
+    model = models.Attachment
+    fields = ['title', 'file_object']
+    widgets = {
+      'title': forms.TextInput(attrs={'placeholder': 'Activity Title'}),
+      'file_object': widgets.NotClearableFileInput,
+    }
+
+  def __init__(self, *args, **kwargs):
+    super(AttachmentForm, self).__init__(*args, **kwargs)
     for field_name, field in self.fields.items():
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['placeholder'] = field.help_text

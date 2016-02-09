@@ -51,13 +51,15 @@ def upload_file_to(instance, filename):
   filename_base, filename_ext = os.path.splitext(filename)
   print filename
   if isinstance(instance, Lesson):
-      return 'lessons/%s%s' % (slugify(instance.title), filename_ext.lower(),)
+    return 'lessons/%s%s' % (slugify(instance.title), filename_ext.lower(),)
   elif isinstance(instance, Assessment):
-      return 'assessments/%s%s' % (slugify(instance.title), filename_ext.lower(),)
+    return 'assessments/%s%s' % (slugify(instance.title), filename_ext.lower(),)
   elif isinstance(instance, Publication):
       return 'publications/%s%s' % (slugify(instance.title), filename_ext.lower(),)
   elif isinstance(instance, Team):
-      return 'team/%s%s' % (slugify(instance.name), filename_ext.lower(),)
+    return 'team/%s%s' % (slugify(instance.name), filename_ext.lower(),)
+  elif isinstance(instance, Attachment):
+    return 'attachment/%s%s' % (filename_base.lower(), filename_ext.lower(),)
   return 'misc/%s%s' % (instance.id,filename_ext.lower(),)
 
 # Create your models here.
@@ -99,6 +101,16 @@ class LessonActivity(models.Model):
 
   class Meta:
       ordering = ['order']
+
+# Lesson Attachment model
+# A lesson may have one or more attachments
+class Attachment(models.Model):
+  lesson = models.ForeignKey(Lesson, null=False)
+  title = models.CharField(null=False, blank=False, max_length=256)
+  file_object = models.FileField(upload_to=upload_file_to, blank=True)
+
+  class Meta:
+      ordering = ['title']
 
 # Assessment model
 class Assessment (models.Model):
