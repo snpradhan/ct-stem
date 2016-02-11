@@ -1,7 +1,7 @@
 {% extends "ctstem_app/base.html" %}
 {% load ctstem_extras %}
 
-{% block title %}Assessment Preview |{% endblock %}
+{% block title %}Curriculum Preview |{% endblock %}
 
 {% block media %}
   {{block.super}}
@@ -18,25 +18,27 @@
 {% block content %}
   {{block.super}}
   <div class="content">
-    <h2>Assessment Preview</h2>
+    {% if curriculum.curriculum_type == 'A' %}
+      <h2>Assessment Preview</h2>
+    {% else %}
+      <h2>Lesson Plan Preview</h2>
+    {% endif %}
     <form>
-      {% csrf_token %}
-      <div class="table" id="assessmentPreview">
-        {{form.management_form}}
-        <h3>{{form.title.value}}</h3>
+      <div class="table" id="curriculumPreview">
+        <h3>{{curriculum.title}}</h3>
         <hr>
         <div class="meta">
-          <label>{{form.time.label}}</label>
-          <div>{{form.time.value}}</div>
+          <label>Time</label>
+          <div>{{curriculum.time}}</div>
         </div>
         <div class="meta">
-          <label>{{form.overview.label}}</label>
-          <div>{{form.overview.value}}</div>
+          <label>Overview</label>
+          <div>{{curriculum.overview}}</div>
         </div>
         <div class="meta">
-          <label>{{form.taxonomy.label}}</label>
+          <label>Standards</label>
           <ul class="standard">
-            {% for standard, categories in form|getSelectedTaxonomy:"taxonomy" %}
+            {% for standard, categories in curriculum.taxonomy.all|taxonomyHelper %}
               <li>{{standard}}</li>
               <ul class="category">
                 {% for category, taxonomies in categories.items %}
@@ -51,9 +53,17 @@
             {% endfor %}
           </ul>
         </div>
+        <div class="meta">
+          <label>Attachments</label>
+          <ul>
+            {% for attachment in attachments %}
+              <li><a href="{{attachment.file_object.url}}" target="_blank">{{attachment.title}}</a> - ({{attachment.file_object.url}})</li>
+            {% endfor %}
+          </ul>
+        </div>
         <hr>
       </div>
-      {% for step in formset %}
+      {% for step in steps %}
         <div class="table stepPreview">
           <div class="row header">
             <div class="col-md-3 back">
@@ -65,11 +75,11 @@
             </div>
             <div class="col-md-6 title">
               <div class="assessment_title">
-                {{form.title.value|title}}
+                {{curriculum.title|title}}
               </div>
               <div class="assessment_step_title">
                 <span>{{step.title.value}}</span>
-                <span>({{forloop.counter}}/{{formset|length}})</span>
+                <span>({{forloop.counter}}/{{steps|length}})</span>
               </div>
             </div>
             <div class="col-md-3 next">
@@ -85,43 +95,46 @@
             </div>
           </div>
           <hr>
-          <div>{{step.content.value|inline_style|safe}}</div>
+          <div>{{step.content|inline_style|safe}}</div>
           <div class="question_container">
-            {% for questionForm in step.nested %}
-              {% with questionObj=questionForm.instance.question %}
-              <div class="question">
-                <div class="question_text">
-                  <span> Q{{forloop.counter}}.</span>
-                  <span> {{questionObj.question_text|safe}} </span>
-                  <input type="hidden" name="{{questionForm.assessment_question.html_name}}" id="{{questionForm.assessment_question.auto_id}}" value="{{questionForm.assessment_question.value}}"/>
-                </div>
-                <div class="answer_field">
-                  {% with field_type=questionObj.answer_field_type %}
+            {% for question in step.questions.all %}
+            <table class="question_table">
+              <tr>
+                <td width="5%" style="vertical-align: top;" class="question_no"> Q{{forloop.counter}}.</td>
+                <td class="question_text"> {{question.question_text|inline_style|safe }} </td>
+              </tr>
+              <tr>
+                <td></td>
+                <td class="answer_field">
+                  {% with field_type=question.answer_field_type %}
                     {% if field_type == 'TA' %}
-                      <textarea placeholder="Enter your response" class="form-control" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" required>{{questionForm.response.value}}</textarea>
+                      <textarea placeholder="Enter your response" class="form-control" required></textarea>
                     {% elif field_type == 'TF' %}
-                      <input type="text" placeholder="Enter your response" class="form-control" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" required value="{{questionForm.response.value}}" />
+                      <input type="text" placeholder="Enter your response" class="form-control"/>
                     {% elif field_type == 'DD' %}
-                      <select class="form-control" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" required>
-                        {% for option in questionObj.options|split:','%}
-                          <option value="{{option}}">{{option}}</option>
-                        {% endfor %}
+                      <div class="multiplechoice">
+                        <div class="note"> Note: Select one answer </p>
+                        <select class="form-control" required>
+                          {% for option in question.options|split:','%}
+                            <option value="{{option}}">{{option}}</option>
+                          {% endfor %}
                       </select>
+                      </div>
                     {% elif field_type == 'MC' %}
                       <div class="note"> Note: Select one answer </div>
-                      {% for option in questionObj.options|split:','%}
-                        <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}"/>  {{option}}<br>
+                      {% for option in question.options|split:','%}
+                        <input type="radio" name="{{question.id}}" id="{{question.id}}" value="{{option}}"/>  {{option}}<br>
                       {% endfor %}
                     {% elif field_type == 'MS' %}
                       <div class="note"> Note: Select all that apply </div>
-                      {% for option in questionObj.options|split:','%}
-                        <input type="checkbox" name="{{questionForm.response.html_name}}_cb" id="{{questionForm.response.auto_id}}_cb" value="{{option}}"/>  {{option}}<br>
+                      {% for option in question.options|split:','%}
+                        <input type="checkbox" name="{{question.id}}_cb" id="{{question.id}}_cb" value="{{option}}"/>  {{option}}<br>
                       {% endfor %}
                     {% endif %}
                   {% endwith %}
-                </div>
-              </div>
-              {% endwith %}
+                </td>
+              </tr>
+              </table>
             {% endfor %}
           </div>
           <hr>

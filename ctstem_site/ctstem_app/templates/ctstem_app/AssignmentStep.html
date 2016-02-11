@@ -16,25 +16,25 @@
         {{form.management_form}}
         <div class="row header">
           <div class="col-md-3 back">
-            {% if form.instance.assessment_step.order > 1 %}
-              <a type="button" class="btn btn-primary" title="Previous Step" href="{% url 'ctstem:resumeAssignment'  form.instance.instance.assignment.id form.instance.instance.id form.instance.assessment_step.order|add:'-1' %}">
+            {% if form.instance.step.order > 1 %}
+              <a type="button" class="btn btn-primary" title="Previous Step" href="{% url 'ctstem:resumeAssignment'  form.instance.instance.assignment.id form.instance.instance.id form.instance.step.order|add:'-1' %}">
                 <span class="glyphicon glyphicon-triangle-left" aria-hidden="true"></span> Previous
               </a>
             {% endif %}
           </div>
           <div class="col-md-6 title">
-            <div class="assessment_title">
-              {{form.instance.assessment_step.assessment.title|title}}
+            <div class="curriculum_title">
+              {{form.instance.step.curriculum.title|title}}
             </div>
-            <div class="assessment_step_title">
-              <span>{{form.instance.assessment_step.title}}</span>
-              <span>({{form.instance.assessment_step.order}}/{{total_steps}})</span>
+            <div class="step_title">
+              <span>{{form.instance.step.title}}</span>
+              <span>({{form.instance.step.order}}/{{total_steps}})</span>
             </div>
           </div>
           <div class="col-md-3 next">
-            {% if form.instance.assessment_step.order != total_steps %}
+            {% if form.instance.step.order != total_steps %}
               {% if form.instance.instance.status == 'S' %}
-                 <a type="button" class="btn btn-primary" title="Next Step" href="{% url 'ctstem:resumeAssignment'  form.instance.instance.assignment.id form.instance.instance.id form.instance.assessment_step.order|add:'1' %}">
+                 <a type="button" class="btn btn-primary" title="Next Step" href="{% url 'ctstem:resumeAssignment'  form.instance.instance.assignment.id form.instance.instance.id form.instance.step.order|add:'1' %}">
                   Next <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
                 </a>
               {% else %}
@@ -57,19 +57,19 @@
         </div>
         <input type="hidden" name="step_order" value="{{step.order}}"/>
         <hr>
-        <div class="assessment_content">
-          <div class="assessment_context">{{form.instance.assessment_step.content|safe}}</div>
+        <div class="curriculum_content">
+          <div class="curriculum_context">{{form.instance.step.content|safe}}</div>
           <div class="question_container">
             {{formset.management_form}}
 
             {% for questionForm in formset %}
-              {% with questionObj=questionForm.assessment_question.value|get_assessment_question %}
+              {% with questionObj=questionForm.curriculum_question.value|get_curriculum_question %}
               <div class="question">
                 <div class="question_text">
                   {{questionForm.id}}
                   <span> Q{{forloop.counter}}.</span>
                   <span> {{questionObj.question_text|safe}} </span>
-                  <input type="hidden" name="{{questionForm.assessment_question.html_name}}" id="{{questionForm.assessment_question.auto_id}}" value="{{questionForm.assessment_question.value}}"/>
+                  <input type="hidden" name="{{questionForm.curriculum_question.html_name}}" id="{{questionForm.curriculum_question.auto_id}}" value="{{questionForm.curriculum_question.value}}"/>
                 </div>
                 <div class="answer_field">
                   {% with field_type=questionObj.answer_field_type %}
@@ -128,16 +128,16 @@
         <hr>
         <div class="row footer">
           <div class="col-md-6 back">
-            {% if form.instance.assessment_step.order > 1 %}
-              <a type="button" class="btn btn-primary" title="Previous Step" href="{% url 'ctstem:resumeAssignment'  form.instance.instance.assignment.id form.instance.instance.id form.instance.assessment_step.order|add:'-1' %}">
+            {% if form.instance.step.order > 1 %}
+              <a type="button" class="btn btn-primary" title="Previous Step" href="{% url 'ctstem:resumeAssignment'  form.instance.instance.assignment.id form.instance.instance.id form.instance.step.order|add:'-1' %}">
                 <span class="glyphicon glyphicon-triangle-left" aria-hidden="true"></span> Previous
               </a>
             {% endif %}
           </div>
           <div class="col-md-6 next">
-            {% if form.instance.assessment_step.order != total_steps %}
+            {% if form.instance.step.order != total_steps %}
               {% if form.instance.instance.status == 'S' %}
-                 <a type="button" class="btn btn-primary" title="Next Step" href="{% url 'ctstem:resumeAssignment'  form.instance.instance.assignment.id form.instance.instance.id form.instance.assessment_step.order|add:'1' %}">
+                 <a type="button" class="btn btn-primary" title="Next Step" href="{% url 'ctstem:resumeAssignment'  form.instance.instance.assignment.id form.instance.instance.id form.instance.step.order|add:'1' %}">
                   Next <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
                 </a>
               {% else %}

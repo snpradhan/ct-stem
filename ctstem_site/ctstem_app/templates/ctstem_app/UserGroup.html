@@ -47,7 +47,7 @@
           <table class="table table-striped table-condensed table-bordered inner_table">
             <thead>
               <tr>
-                <th style="width:60%;">Assessment</th>
+                <th style="width:60%;">Lesson Plan/Assessment</th>
                 <th>Assigned Date</th>
                 <th>Due Date</th>
                 <th>Delete</th>
@@ -58,9 +58,9 @@
                 <tr style="{% if forloop.last %} display:none; {% endif %}">
                   <td class="assessment_title">
                     {{assignmentForm.id}}
-                    {{assignmentForm.assessment}}
+                    {{assignmentForm.curriculum}}
                     <div class="error">
-                      {{assignmentForm.assessment.errors}}
+                      {{assignmentForm.curriculum.errors}}
                     </div>
                   </td>
                   <td style="vertical-align:middle;">{{assignmentForm.get_assigned_date|date}}</td>

@@ -86,7 +86,7 @@ CKEDITOR_CONFIGS = {
     'default': {
         'removePlugins': 'stylesheetparser',
         'toolbar': None,  # put selected toolbar config here
-        'height': 300,
+        'height': 100,
         'width': 975,
         'allowedContent': True,
         'mathJaxLib': '//cdn.mathjax.org/mathjax/2.2-latest/MathJax.js?config=TeX-AMS_HTML',

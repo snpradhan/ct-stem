@@ -1,25 +1,26 @@
 {% extends "ctstem_app/base.html" %}
 {% load ctstem_extras %}
-{% block title %}Assessment |{% endblock %}
+
+{% block title %}Curriculum |{% endblock %}
 
 {% block content %}
   {{block.super}}
   <div class="content">
-    <h2>Assessment</h2>
-    <form method="post">
+    <h2> Curriculum </h2>
+    <form method="post" enctype="multipart/form-data">
       {% csrf_token %}
       {{form.media}}
-      <div class="table" id="assessment">
+      <div class="table" id="curriculum">
         <h4>
           <span>&nbsp;</span>
-          <span class="assessment_title" style="font-weight: bold; text-decoration: underline;">{{form.title.value|default_if_none:"  "}}</span>
+          <span class="curriculum_title" style="font-weight: bold; text-decoration: underline;">{{form.title.value|default_if_none:"  "}}</span>
           <span>&nbsp;</span>
           <span class="controls">
             <span class="expand_collapse">
-              <button type="button" class="btn btn-warning" name="collapse_assessment" aria-label="Collapse Assessment" title="Collapse Assessment">
+              <button type="button" class="btn btn-warning" name="collapse_curriculum" aria-label="Collapse Curriculum" title="Collapse Curriculum">
                 <span class="glyphicon glyphicon-collapse-up" aria-hidden="true"></span>
               </button>
-              <button type="button" class="btn btn-success" style="display:none;" name="expand_assessment" aria-label="Expand Assessment" title="Expand Assessment">
+              <button type="button" class="btn btn-success" style="display:none;" name="expand_curriculum" aria-label="Expand Curriculum" title="Expand Curriculum">
                 <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
               </button>
             </span>
@@ -29,14 +30,22 @@
           {{form.management_form}}
           {% for field in form %}
             <div class="form-group">
-              <label for="id_{{field.name}}">{{ field.label }} {% if field.field.required %} (<span class="required">*</span>) {% endif %}</label>
+              <label for="id_{{field.name}}">{{ field.label }} {% if field.field.required %}(<span class="required">*</span>) {% endif %}</label>
               {% if field.name == 'taxonomy' %}
-                <button class="btn btn-primary search_taxonomy" name="search_taxonomy" data-form="{% url 'ctstem:searchTaxonomy' %}">
-                  <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
-                </button>
                 <div style="display:none;">
                   {{field}}
                 </div>
+                <button class="btn btn-primary search_taxonomy" name="search_taxonomy" data-form="{% url 'ctstem:searchTaxonomy' %}">
+                  <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                </button>
+                <span class="expand_collapse_other">
+                  <button type="button" class="btn btn-warning" name="collapse_standards" aria-label="Collapse Standards" title="Collapse Standards">
+                    <span class="glyphicon glyphicon-collapse-up" aria-hidden="true"></span>
+                  </button>
+                  <button type="button" class="btn btn-success" style="display:none;" name="expand_standards" aria-label="Expand Standards" title="Expand Standards">
+                    <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
+                  </button>
+                </span>
                 <div id="taxonomy_div">
                   <table class="table table-bordered table-striped table-condensed inner_table" id="taxonomy">
                     <thead>
@@ -67,17 +76,79 @@
                     </tbody>
                   </table>
                 </div>
-              {% else %}
-                <div>{{field}}</div>
+              {% elif field.name == 'teacher_notes'%}
+                <span class="expand_collapse_other">
+                  <button type="button" class="btn btn-warning" style="display:none;" name="collapse_notes" aria-label="Collapse Notes" title="Collapse Notes">
+                    <span class="glyphicon glyphicon-collapse-up" aria-hidden="true"></span>
+                  </button>
+                  <button type="button" class="btn btn-success"  name="expand_notes" aria-label="Expand Notes" title="Expand Notes">
+                    <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
+                  </button>
+                </span>
+                <div style="display:none; margin-top: 1em;">
+                  {{field}}
+                </div>
                 <div class="error">{{ field.errors }}</div>
+              {% else %}
+                <div>
+                  {{field}}
+                </div>
               {% endif %}
+              <div class="error">{{ field.errors }}</div>
             </div>
           {% endfor %}
+          <div class="form-group attachment_table">
+            {{attachment_formset.management_form}}
+            <label for="id_attachment_table">Attachment(s)</label>
+            <a type="button" class="btn btn-primary" id="add_attachment" title="Add New Attachment">
+              <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+            </a>
+            <span class="expand_collapse_other">
+              <button type="button" class="btn btn-warning" name="collapse_attachment" aria-label="Collapse Attachments" title="Collapse Attachments">
+                <span class="glyphicon glyphicon-collapse-up" aria-hidden="true"></span>
+              </button>
+              <button type="button" class="btn btn-success" style="display:none;" name="expand_attachment" aria-label="Expand Attachments" title="Expand Attachments">
+                <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
+              </button>
+            </span>
+            <table class="table table-striped table-condensed table-bordered attachment inner_table collapsible_content">
+              <thead>
+                <tr>
+                  <th style="width:40%;">Title</th>
+                  <th>File</th>
+                  <th>Delete</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for attachmentForm in attachment_formset %}
+                  <tr style="{% if forloop.last %} display:none; {% endif %}">
+                    <td class="attachment_title">
+                      {{attachmentForm.id}}
+                      <div>
+                        {{attachmentForm.title}}
+                      </div>
+                      <div class="error">{{ attachmentForm.title.errors }}</div>
+                    </td>
+                    <td class="attached_file">
+                      <div>{{attachmentForm.file_object}}</div>
+                      <div class="error">{{ attachmentForm.file_object.errors }}</div>
+                    </td>
+                    <td class="attachment_edit">
+                      <button type="button" class="btn btn-danger delete_attachment" name="delete_attachment" aria-label="Delete Attachment" title="Delete Attachment">
+                        <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                      </button>
+                      {{attachmentForm.DELETE.as_hidden}}
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
+
       {{formset.management_form}}
       {% for step in formset %}
-        {{step.media}}
         <div class="table step" style="{% if forloop.last %} display:none; {% endif %}">
           <h4>
             <span>&nbsp;</span>
@@ -92,7 +163,7 @@
                 {{step.DELETE.as_hidden}}
               </span>
               <span class="expand_collapse">
-                <button type="button" class="btn btn-warning" name="collapse_activity" aria-label="Collapse Step" title="Collapse Step">
+                <button type="button" class="btn btn-warning" name="collapse_step" aria-label="Collapse Step" title="Collapse Step">
                   <span class="glyphicon glyphicon-collapse-up" aria-hidden="true"></span>
                 </button>
                 <button type="button" class="btn btn-success" style="display:none;" name="expand_step" aria-label="Expand Step" title="Expand Step">
@@ -100,19 +171,19 @@
                 </button>
               </span>
             </span>
-
           </h4>
+
           {{ step.management_form }}
           {{step.id}}
           <div class="curriculum_content collapsible_content">
             <div class="form-group order">
-              <label for="id_{{step.ORDER.name}}">Step #.</label>
+              <label for="id_{{step.ORDER.name}}"> Step #.</label>
               <div>{{step.ORDER}}</div>
               <div class="error">{{ step.ORDER.errors }}</div>
             </div>
             <div class="form-group">
               <label for="id_{{step.title.name}}">{{ step.title.label }} {% if step.title.field.required %}(<span class="required">*</span>) {% endif %}</label>
-              <div>{{step.title}}</div>
+              <div class="step_title">{{step.title}}</div>
               <div class="error">{{ step.title.errors }}</div>
             </div>
             <div class="form-group">
@@ -137,6 +208,7 @@
               </div>
               <div class="error">{{ step.teacher_notes.errors }}</div>
             </div>
+
             <div class="form-group question_table">
               {{step.nested.management_form}}
               {{step.nested.id}}
@@ -144,6 +216,14 @@
               <button class="btn btn-primary edit_question" name="add_question" data-form="{% url 'ctstem:newQuestion' %}" aria-label="Add New Question" title="Add New Question">
                 <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
               </button>
+              <span class="expand_collapse_other">
+                <button type="button" class="btn btn-warning" name="collapse_notes" aria-label="Collapse Notes" title="Collapse Notes">
+                  <span class="glyphicon glyphicon-collapse-up" aria-hidden="true"></span>
+                </button>
+                <button type="button" class="btn btn-success"  style="display:none;" name="expand_notes" aria-label="Expand Notes" title="Expand Notes">
+                  <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
+                </button>
+              </span>
               <table class="table table-striped table-condensed table-bordered question inner_table">
                 <thead>
                   <tr>
@@ -173,7 +253,7 @@
                           <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
                         </button>
                         {{questionForm.DELETE.as_hidden}}
-                        <button type="button" class="btn btn-success edit_question" name="edit_question" aria-label="Edit Question" data-form="{% url 'ctstem:question' questionForm.question.value|default:0 %}" >
+                        <button type="button" class="btn btn-success edit_question" name="edit_question" aria-label="Edit Question" title="Edit Question" data-form="{% url 'ctstem:question' questionForm.question.value|default:0 %}" >
                           <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
                         </button>
                       </td>
@@ -185,13 +265,14 @@
           </div>
         </div>
       {% endfor %}
+
       <div class="form-group button-group-fixed">
         <input type="submit" class="btn btn-success" id="submit" value="Save"/>
         <input type="button" class="btn btn-primary" id="addStep" value="Add Step"/>
       </div>
-      <div class="modal fade" id="questionModal" role="dialog"></div>
-      <div class="modal fade" id="taxonomyModal" role="dialog"></div>
     </form>
+    <div class="modal fade" id="questionModal" role="dialog"></div>
+    <div class="modal fade" id="taxonomyModal" role="dialog"></div>
   </div>
   <script type="text/javascript">
     $(function (){
@@ -219,15 +300,15 @@
 
       $("button.remove_taxonomy").click(function(e){
         var taxonomy_id = $(this).closest('tr').attr('id');
-        $('#id_assessment-taxonomy option[value="'+taxonomy_id+'"]').prop('selected', false);
+        $('#id_curriculum-taxonomy option[value="'+taxonomy_id+'"]').prop('selected', false);
         $('div.curriculum_content div#taxonomy_div table#taxonomy tbody tr#'+taxonomy_id).remove();
       });
-
 
       $('#addStep').click(function() {
         cloneMore('div.table:last', 'form');
         var new_step_div = $('div.table:last').prev();
         $(new_step_div).toggle();
+
         $(new_step_div).find('textarea').each(function(){
           if($(this).attr('name') !== undefined && $(this).attr('data-config') !== undefined){
             var config = {
@@ -246,13 +327,13 @@
           }
         });
 
-        //alert('after clone');
-        //bindWysiwyg();
-        //rebind question clone
+        /*var step_order_div = $('div.table:last span.step_order');
+        var step_order = parseInt($(step_order_div).html()) + 1;
+        $(step_order_div).html(step_order);*/
       });
 
-      $('input#id_assessment-title').on('input', function(){
-        $(this).closest('div.table').find('h4 span.assessment_title').html($(this).val());
+      $('input#id_curriculum-title').on('input', function(){
+        $(this).closest('div.table').find('h4 span.curriculum_title').html($(this).val());
       });
       $('div.step_title input').on('input', function(){
         $(this).closest('div.table.step').find('h4 span.step_title').html($(this).val());
@@ -267,6 +348,19 @@
       });
       $('button.delete_question').click(function(){
         var r = confirm("Are you sure you want to delete this question?");
+        if (r == true) {
+          $(this).next('input').val('on');
+          $(this).closest('tr').hide();
+        }
+      });
+
+      $('a#add_attachment').click(function() {
+        cloneMore('div.attachment_table table.table tr:last', 'attachment_form');
+        var new_row = $('div.attachment_table table.table tr:nth-last-child(2)');
+        $(new_row).toggle();
+      });
+      $('button.delete_attachment').click(function(){
+        var r = confirm("Are you sure you want to delete this attachment?");
         if (r == true) {
           $(this).next('input').val('on');
           $(this).closest('tr').hide();

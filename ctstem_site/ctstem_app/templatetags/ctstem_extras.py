@@ -20,10 +20,10 @@ def selected_question(question_id):
     return ''
 
 @register.filter
-def get_assessment_question(question_id):
+def get_curriculum_question(question_id):
   try:
     if question_id != 'None':
-      question = models.Question.objects.get(assessment_question__id=question_id)
+      question = models.Question.objects.get(curriculum_question__id=question_id)
       return question
     else:
       return None

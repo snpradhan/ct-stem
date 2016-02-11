@@ -7,31 +7,27 @@
       <button type="button" class="close" data-dismiss="modal">&times;</button>
       <h3 class="modal-title">{{title}}</h3>
     </div>
-    <div id="taxonomyMsg">
+    <div id="assignmentMsg">
     </div>
-    <form class="form" id="taxonomyForm" method="post" action="{% url 'ctstem:searchTaxonomy' %}">
+    <form class="form" id="assignmentForm" method="post" action="{% url 'ctstem:searchAssignment' %}">
       {% csrf_token %}
 
       <div class="modal-body">
-        <div class="form-inline">
-          <div class="form-group">
-            <label for="id_standard">Standard</label>
-            <div>{{form.standard}}</div>
-          </div>
-          <div class="form-group">
-            <label for="id_category">Category</label>
-            <div>{{form.category}}</div>
-          </div>
+        <div class="form-group">
+          <label for="id_type">Assignment Type</label>
+          <div>{{form.assignment_type}}</div>
         </div>
-        <div class="form-inline">
-          <div class="form-group">
-            <label for="id_title">Title</label>
-            <div>{{form.title}}</div>
-          </div>
-          <div class="form-group">
-            <label for="id_code">Code</label>
-            <div>{{form.code}}</div>
-          </div>
+        <div class="form-group">
+          <label for="id_title">Title</label>
+          <div>{{form.title}}</div>
+        </div>
+        <div class="form-group">
+          <label for="id_subject">Subject</label>
+          <div>{{form.subject}}</div>
+        </div>
+        <div class="form-group">
+          <label for="id_standards">Standards</label>
+          <div>{{form.standards}}</div>
         </div>
       </div>
       <div class="modal-footer">
@@ -42,15 +38,14 @@
         </div>
       </div>
     </form>
-    <div id="taxonomyResults" style="display:none;">
+    <div id="assignmentResults" style="display:none;">
       <table class="table table-bordered table-striped table-condensed inner_table">
         <thead>
           <tr>
-            <th>Standard</th>
-            <th>Category</th>
             <th>Title</th>
-            <th>Code</th>
-            <th>Select?</th>
+            <th>Subject</th>
+            <th>Standards</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -63,40 +58,16 @@
 <script type="text/javascript">
 $(function (){
 
-  $("#id_standard").change(function(){
-    var html = "<option value 'selected'>----------</option>";
-    if($(this).val() != ''){
-      var url = "{% url 'ctstem:categories' 0 %}".replace('0', $(this).val());
-      $.ajax({
-        type: 'GET',
-        url: url,
-        context: this,
-        success: function(data){
-          data['category_list'].forEach(function(element, index, array){
-            html += "<option value='"+element['id']+"'>"+element['category']+"</option>";
-          });
-          $('select#id_category').html(html);
-        },
-        error: function(xhr, ajaxOptions, thrownError){
-          alert(thrownError);
-        },
-      });
-    }
-    else{
-      $('select#id_category').html(html);
-    }
-  });
-
-  $("#taxonomyForm").submit(function(e) {
+  $("#assignmentForm").submit(function(e) {
 
     e.preventDefault();
-    $("#taxonomyResults table tbody").empty();
+    $("#assignmentResults table tbody").empty();
     data = {}
-    data['standard'] = $("#id_standard").val();
-    data['category'] = $("#id_category").val();
+    data['type'] = $("#id_assignment_type").val();
+    data['standards'] = $("#id_standards").val();
+    data['subject'] = $("#id_subject").val();
     data['title'] = $("#id_title").val();
-    data['code'] = $("#id_code").val();
-    data['csrfmiddlewaretoken'] = $('#taxonomyForm').find('input:hidden').eq(0).val();
+    data['csrfmiddlewaretoken'] = $('#assignmentForm').find('input:hidden').eq(0).val();
     var data = $.param(data);
     /*var url = "{% url 'ctstem:newQuestion' %}";*/
     $.ajax({
@@ -106,16 +77,16 @@ $(function (){
       context: this,
       success: function(data){
         if('error' in data){
-          $('#taxonomyMsg').html(data['error']);
+          $('#assignmentMsg').html(data['error']);
         }
         else {
-          var taxonomy = "";
+          var assignment = "";
           $.each(data, function(key, value){
-            taxonomy += "<tr><td>"+value['standard']+"</td><<td>"+value['category']+"</td><<td>"+value['title']+"</td><td>"+value['code']+"</td><td><button type='button' class='btn btn-primary select_taxonomy' id='"+value['id']+"''>Select</a></td></tr>";
+            assignment += "<tr><td>"+value['title']+"</td><<td>"+value['subject']+"</td><td>"+value['standards']+"</td><td><button type='button' class='btn btn-primary select_assignment' id='"+value['id']+"''>Assign</a></td></tr>";
           });
-          $("#taxonomyResults table tbody").html(taxonomy);
-          $("#taxonomyResults").show();
-          $("#taxonomyResults button.select_taxonomy").click(function(){
+          $("#assignmentResults table tbody").html(assignment);
+          $("#assignmentResults").show();
+          $("#assignmentResults button.select_assignment").click(function(){
             //if the taxonomy isn't already selected
             if($('select[id^="id"][id$="taxonomy"] option[value="'+$(this).attr('id')+'"]').prop('selected') == false){
               //select the taxonomy in the lesson plan taxonomy dropdown with is hidden

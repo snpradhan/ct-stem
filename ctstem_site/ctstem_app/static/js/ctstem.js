@@ -184,6 +184,7 @@ $(function (){
     });
   });
 
-
+  //add form-control class to ORDER fields
+  $('input[id$=ORDER]').addClass('form-control');
 
 });

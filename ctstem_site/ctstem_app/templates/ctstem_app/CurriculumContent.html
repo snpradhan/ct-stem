@@ -4,19 +4,19 @@
   <div class="modal-content">
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal">&times;</button>
-      <h3 class="modal-title">{{assessment.title}}</h3>
+      <h3 class="modal-title">{{curriculum.title}}</h3>
     </div>
     <div class="modal-body">
       <div class="form-group">
         <label>Time</label>
         <div>
-          {{assessment.time}}
+          {{curriculum.time}}
         </div>
       </div>
       <div class="form-group">
         <label>Subject</label>
         <div>
-          {% for subject in assessment.subject.all %}
+          {% for subject in curriculum.subject.all %}
             {{ subject }} <br>
           {% endfor %}
         </div>
@@ -24,13 +24,13 @@
       <div class="form-group">
         <label>Overview</label>
         <div>
-          {{assessment.overview}}
+          {{curriculum.overview}}
         </div>
       </div>
       <div class="form-group">
         <label>Taxonomy</label>
         <ul class="standard">
-          {% for standard, categories in assessment.taxonomy.all|taxonomyHelper %}
+          {% for standard, categories in curriculum.taxonomy.all|taxonomyHelper %}
             <li>{{standard}}</li>
             <ul class="category">
               {% for category, taxonomies in categories.items %}

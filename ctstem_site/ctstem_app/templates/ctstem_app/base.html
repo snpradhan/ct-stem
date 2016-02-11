@@ -70,8 +70,8 @@
             <ul class="nav navbar-nav navbar-center">
               <li class="{% navactive request 'ctstem:home' %} {% navactive request 'ctstem:team' %}"><a href="{% url 'ctstem:home' %}" title="Landing Page" class="link">Home</a></li>
               {% if not user.student %}
-                <li class="{% navactive request 'ctstem:lessons' %}"><a href="{% url 'ctstem:lessons' %}">Lesson Plans</a></li>
-                <li class="{% navactive request 'ctstem:assessments' %}"><a href="{% url 'ctstem:assessments' %}">Assessments</a></li>
+                <li class="{% navactive request 'ctstem:curricula' 'lessons' %}"><a href="{% url 'ctstem:curricula' 'lessons' %}">Lesson Plans</a></li>
+                <li class="{% navactive request 'ctstem:curricula' 'assessments' %}"><a href="{% url 'ctstem:curricula' 'assessments' %}">Assessments</a></li>
               {% endif %}
               {% if user.student %}
                 <li class="{% navactive request 'ctstem:assignments' %}"><a href="{% url 'ctstem:assignments' %}">Assignments</a></li>

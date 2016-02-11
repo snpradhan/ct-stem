@@ -219,14 +219,13 @@ class AuthorForm (ModelForm):
       field.widget.attrs['aria-describedby'] = field.label
       field.widget.attrs['placeholder'] = field.help_text
 ####################################
-# Lesson Form
+# Curriculum Form
 ####################################
-class LessonForm(ModelForm):
-  #questions = forms.ModelMultipleChoiceField(required=False, queryset=models.Question.objects.all())#, widget=FilteredSelectMultiple(('Questions'), False, attrs={'size':15}))
+class CurriculumForm(ModelForm):
 
   class Meta:
-    model = models.Lesson
-    fields = ['title', 'time', 'level', 'purpose', 'overview', 'status', 'subject', 'taxonomy', 'content', 'teacher_notes']
+    model = models.Curriculum
+    fields = ['curriculum_type', 'title', 'time', 'level', 'purpose', 'overview', 'status', 'subject', 'taxonomy', 'content', 'teacher_notes']
     widgets = {
       'title': forms.TextInput(attrs={'placeholder': 'Lesson Title'}),
       'time': forms.TextInput(attrs={'rows':0, 'cols':60}),
@@ -240,7 +239,7 @@ class LessonForm(ModelForm):
     }
 
   def __init__(self, *args, **kwargs):
-    super(LessonForm, self).__init__(*args, **kwargs)
+    super(CurriculumForm, self).__init__(*args, **kwargs)
     forms.ModelForm.__init__(self, *args, **kwargs)
     self.fields['taxonomy'].label = "Standards"
 
@@ -249,20 +248,21 @@ class LessonForm(ModelForm):
       field.widget.attrs['placeholder'] = field.help_text
 
 ####################################
-# Lesson Activity Form
+# Curriculum Step Form
 ####################################
-class LessonActivityForm(ModelForm):
+class StepForm(ModelForm):
 
   class Meta:
-    model = models.LessonActivity
+    model = models.Step
     exclude = ('order',)
     widgets = {
-      'title': forms.TextInput(attrs={'placeholder': 'Activity Title'}),
+      'title': forms.TextInput(attrs={'placeholder': 'Step Title'}),
       'content': forms.Textarea(attrs={'rows':0, 'cols':60}),
+      'teacher_notes': forms.Textarea(attrs={'rows':0, 'cols':60}),
     }
 
   def __init__(self, *args, **kwargs):
-    super(LessonActivityForm, self).__init__(*args, **kwargs)
+    super(StepForm, self).__init__(*args, **kwargs)
     for field_name, field in self.fields.items():
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['placeholder'] = field.help_text
@@ -287,12 +287,12 @@ class AttachmentForm(ModelForm):
       field.widget.attrs['placeholder'] = field.help_text
 
 ####################################
-# Lesson Question Form
+# Curriculum Question Form
 ####################################
-class LessonQuestionForm(ModelForm):
+class CurriculumQuestionForm(ModelForm):
 
   class Meta:
-    model = models.LessonQuestion
+    model = models.CurriculumQuestion
     exclude = ('order',)
 
 ####################################
@@ -315,58 +315,6 @@ class QuestionForm(ModelForm):
     for field_name, field in self.fields.items():
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['placeholder'] = field.help_text
-
-####################################
-# Assessment Form
-####################################
-class AssessmentForm(ModelForm):
-
-  class Meta:
-    model = models.Assessment
-    fields = ['title', 'time', 'overview', 'status', 'subject', 'taxonomy']
-    widgets = {
-      'title': forms.TextInput(attrs={'placeholder': 'Lesson Title'}),
-      'time': forms.TextInput(attrs={'rows':0, 'cols':60}),
-      'overview': forms.Textarea(attrs={'rows':0, 'cols':60}),
-      'taxonomy': forms.SelectMultiple(attrs={'size':5}),
-      'subject': forms.SelectMultiple(attrs={'size':4}),
-    }
-
-  def __init__(self, *args, **kwargs):
-    super(AssessmentForm, self).__init__(*args, **kwargs)
-    self.fields['taxonomy'].label = "Standards"
-    for field_name, field in self.fields.items():
-      field.widget.attrs['class'] = 'form-control'
-      field.widget.attrs['placeholder'] = field.help_text
-
-####################################
-# Assessment Form
-####################################
-class AssessmentStepForm(ModelForm):
-
-  class Meta:
-    model = models.AssessmentStep
-    exclude = ('order',)
-    widgets = {
-      'title': forms.TextInput(attrs={'placeholder': 'Step Title'}),
-      'content': forms.Textarea(attrs={'rows':0, 'cols':60}),
-      'teacher_notes': forms.Textarea(attrs={'rows':0, 'cols':60}),
-    }
-
-  def __init__(self, *args, **kwargs):
-    super(AssessmentStepForm, self).__init__(*args, **kwargs)
-    for field_name, field in self.fields.items():
-      field.widget.attrs['class'] = 'form-control'
-      field.widget.attrs['placeholder'] = field.help_text
-
-
-
-class AssessmentQuestionForm(ModelForm):
-
-  class Meta:
-    model = models.AssessmentQuestion
-    exclude = ('order',)
-
 
 ####################################
 # Subcategory Form
@@ -401,8 +349,8 @@ class TaxonomySearchForm(ModelForm):
     model = models.Subcategory
     exclude = ('id', 'description', 'link',)
     widgets = {
-      'title': forms.TextInput(attrs={'placeholder': 'Taxonomy title'}),
-      'code': forms.TextInput(attrs={'placeholder': 'Taxonomy code'}),
+      'title': forms.TextInput(attrs={'placeholder': 'Standards title'}),
+      'code': forms.TextInput(attrs={'placeholder': 'Standards code'}),
     }
 
   def __init__(self, *args, **kwargs):
@@ -529,6 +477,7 @@ class AssignmentForm(ModelForm):
 
   def __init__(self, *args, **kwargs):
     super(AssignmentForm, self).__init__(*args, **kwargs)
+    self.fields["curriculum"].queryset = models.Curriculum.objects.filter(status='P')
 
     for field_name, field in self.fields.items():
       if field_name == 'due_date':
@@ -554,7 +503,7 @@ class UploadFileForm(forms.Form):
 class AssignmentStepResponseForm(ModelForm):
   class Meta:
     model = models.AssignmentStepResponse
-    exclude = ('instance', 'assessment_step',)
+    exclude = ('instance', 'step',)
 
 
 ####################################

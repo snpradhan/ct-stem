@@ -4,11 +4,9 @@ from ctstem_app import models
 # Register your models here.
 
 admin.site.register(models.Administrator)
-admin.site.register(models.Assessment)
-admin.site.register(models.AssessmentQuestion)
-admin.site.register(models.AssessmentStep)
-admin.site.register(models.Lesson)
-admin.site.register(models.LessonQuestion)
+admin.site.register(models.Curriculum)
+admin.site.register(models.CurriculumQuestion)
+admin.site.register(models.Step)
 admin.site.register(models.Standard)
 admin.site.register(models.Category)
 admin.site.register(models.Subcategory)

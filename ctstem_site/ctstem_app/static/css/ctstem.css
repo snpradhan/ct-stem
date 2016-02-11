@@ -147,14 +147,13 @@ div.table#register, div.table#userProfile, div.table#password {
   width: 50%;
   padding: 3em 4em;
 }
-div.table#lesson, div.table#lessonPreview,
-div.table#assessment, div.table#assessmentPreview,
+div.table#curriculum, div.table#curriculumPreview,
 div.table.step,  div.table.stepPreview,
-div.table#lessonQuestions, div.table.activity, div.table#publication, div.table#group, div.table#standard {
+div.table#curriculumQuestions, div.table.activity, div.table#publication, div.table#group, div.table#standard {
   width: 70%;
   padding: 3em 4em;
 }
-div.table.step, div.table.activity, div.table.ngss, div.table.taxonomy, div.table#lessonQuestions, div.table#assessmentPreview, div.table.stepPreview {
+div.table.step, div.table.activity, div.table.ngss, div.table.taxonomy, div.table#curriculumQuestions, div.table#curriculumPreview, div.table.stepPreview {
   margin-top: 3em;
 }
 
@@ -162,7 +161,7 @@ div.table.step div.row.question {
   margin-bottom: 1em;
 }
 
-div.table#lesson span.controls, div.table.activity span.controls, div.table#assessment span.controls, div.table.step span.controls {
+div.table#curriculum span.controls, div.table.activity span.controls, div.table#assessment span.controls, div.table.step span.controls {
   float: right;
 }
 div.curriculum_content div#taxonomy_div {
@@ -177,10 +176,10 @@ div.table.activity .question_table {
   margin-top: 3em;
 }
 
-div.table#assessmentPreview .meta {
+div.table#curriculumPreview .meta {
   margin-bottom: 1em;
 }
-div.table#assessmentPreview, div.table.stepPreview {
+div.table#curriculumPreview, div.table.stepPreview {
   background-color: #eee;
 }
 div.table.stepPreview table.question_table .question_no{
@@ -203,11 +202,11 @@ div.table.stepPreview .answer_field .input_container .circle {
   width: 20px;
 }
 
-div.table#lessonPreview, div.table#lessonQuestions, div.table#assessmentPreview, div.table.stepPreview{
+div.table#curriculumPreview, div.table#curriculumQuestions, div.table#curriculumPreview, div.table.stepPreview{
   font-size: 1.5em;
 }
 
-div.table#lessonPreview div.lesson-row, div.table#lessonQuestions div.question-row{
+div.table#curriculumPreview div.curriculum-row, div.table#curriculumQuestions div.question-row{
   margin-bottom: 2em;
 }
 
@@ -217,7 +216,7 @@ div.table#assignment {
   font-size: 1.5em;
 }
 
-div.table#assessmentPreview hr, div.table.stepPreview hr, div.table#assignment hr {
+div.table#curriculumPreview hr, div.table.stepPreview hr, div.table#assignment hr {
   border-top: 1px solid #949494;
 }
 
@@ -372,6 +371,20 @@ div.row.portfolio {
 }
 /***********   ABOUT US END   ************/
 
+/***************** input fields ************/
+textarea, input[type="text"], input[type="password"], input[type="datetime"],
+input[type="datetime-local"], input[type="date"], input[type="month"], input[type="time"],
+input[type="week"], input[type="number"], input[type="email"], input[type="url"],
+input[type="tel"], input[type="color"], .uneditable-input {
+    display: inline-block;
+    height: auto;
+    max-width: 100%;
+}
+select {
+  width: auto !important;
+}
+/***************** end input *******************/
+
 /***************************************
             *   TABLE VIEW   *
  ***************************************/
@@ -516,6 +529,10 @@ div.button-group-fixed {
   top: 30%;
   left: 87%;
 
+}
+
+.form-inline > * {
+   margin: 1em;
 }
 /***********   FORM GROUP END   ************/
 

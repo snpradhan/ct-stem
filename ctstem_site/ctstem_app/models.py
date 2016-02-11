@@ -6,10 +6,15 @@ from ckeditor_uploader.fields import RichTextUploadingField
 from smart_selects.db_fields import ChainedForeignKey
 
 
-LESSON_STATUS_CHOICES = (
+CURRICULUM_STATUS_CHOICES = (
     (u'D', u'Draft'),
     (u'P', u'Published'),
     (u'A', u'Archived'),
+)
+
+CURRICULUM_TYPE_CHOICES = (
+    (u'L', u'Lesson Plan'),
+    (u'A', u'Assessment'),
 )
 
 FIELD_TYPE_CHOICES = (
@@ -50,10 +55,8 @@ def upload_file_to(instance, filename):
   from django.utils.timezone import now
   filename_base, filename_ext = os.path.splitext(filename)
   print filename
-  if isinstance(instance, Lesson):
-    return 'lessons/%s%s' % (slugify(instance.title), filename_ext.lower(),)
-  elif isinstance(instance, Assessment):
-    return 'assessments/%s%s' % (slugify(instance.title), filename_ext.lower(),)
+  if isinstance(instance, Curriculum):
+    return 'curriculum/%s%s' % (slugify(instance.title), filename_ext.lower(),)
   elif isinstance(instance, Publication):
       return 'publications/%s%s' % (slugify(instance.title), filename_ext.lower(),)
   elif isinstance(instance, Team):
@@ -64,8 +67,8 @@ def upload_file_to(instance, filename):
 
 # Create your models here.
 
-# Lesson model
-class Lesson (models.Model):
+class Curriculum (models.Model):
+  curriculum_type = models.CharField(max_length=1, choices=CURRICULUM_TYPE_CHOICES)
   title = models.CharField(null=False, max_length=256)
   time = models.CharField(null=True, max_length=256)
   level = models.TextField(null=False)
@@ -73,14 +76,14 @@ class Lesson (models.Model):
   overview = models.TextField(null=False)
   content = RichTextUploadingField(null=False)
   teacher_notes = RichTextUploadingField(null=True, blank=True)
-  status = models.CharField(max_length=1, default='D', choices=LESSON_STATUS_CHOICES)
+  status = models.CharField(max_length=1, default='D', choices=CURRICULUM_STATUS_CHOICES)
   subject = models.ManyToManyField('Subject', null=False)
   parent = models.ForeignKey('self', null=True, on_delete=models.SET_NULL)
   version = models.IntegerField(default=1)
   slug = models.SlugField(unique=True, max_length=255)
   taxonomy = models.ManyToManyField('Subcategory')
-  author = models.ForeignKey(User, null=False, related_name='lesson_author')
-  modified_by = models.ForeignKey(User, null=False, related_name='lesson_modifier')
+  author = models.ForeignKey(User, null=False, related_name='curriculum_author')
+  modified_by = models.ForeignKey(User, null=False, related_name='curriculum_modifier')
   created_date = models.DateTimeField(auto_now_add=True)
   modified_date = models.DateTimeField(auto_now=True)
 
@@ -90,14 +93,28 @@ class Lesson (models.Model):
   def __unicode__(self):
       return u'%s' % (self.title)
 
-# Lesson Activity model
-# A lesson may have one or more activity
-class LessonActivity(models.Model):
-  lesson = models.ForeignKey(Lesson, null=False)
+# Curriculum Step model
+# A curriculum may have one or more step/activity
+class Step(models.Model):
+  curriculum = models.ForeignKey(Curriculum, null=False, related_name="steps")
   title = models.CharField(null=False, blank=False, max_length=256)
   order = models.IntegerField(null=True)
   content = RichTextUploadingField(null=False)
-  questions = models.ManyToManyField('Question', through='LessonQuestion', blank=True)
+  teacher_notes = RichTextUploadingField(null=True, blank=True)
+  questions = models.ManyToManyField('Question', through='CurriculumQuestion', blank=True)
+
+  class Meta:
+      ordering = ['order']
+
+
+# A relation between Curriculum and Question models
+class CurriculumQuestion(models.Model):
+  question = models.ForeignKey('Question', related_name="curriculum_question")
+  step = models.ForeignKey(Step, null=True)
+  order = models.IntegerField(null=True)
+
+  def __unicode__(self):
+      return u'%s' % (self.question.question_text)
 
   class Meta:
       ordering = ['order']
@@ -105,48 +122,12 @@ class LessonActivity(models.Model):
 # Lesson Attachment model
 # A lesson may have one or more attachments
 class Attachment(models.Model):
-  lesson = models.ForeignKey(Lesson, null=False)
+  curriculum = models.ForeignKey(Curriculum, null=False)
   title = models.CharField(null=False, blank=False, max_length=256)
   file_object = models.FileField(upload_to=upload_file_to, blank=True)
 
   class Meta:
       ordering = ['title']
-
-# Assessment model
-class Assessment (models.Model):
-  title = models.CharField(null=False, max_length=256)
-  time = models.CharField(null=True, max_length=256)
-  overview = models.TextField(null=False)
-  status = models.CharField(max_length=1, default='D', choices=LESSON_STATUS_CHOICES)
-  subject = models.ManyToManyField('Subject', null=False)
-  parent = models.ForeignKey('self', null=True, on_delete=models.SET_NULL)
-  version = models.IntegerField(default=1)
-  slug = models.SlugField(unique=True, max_length=255)
-  taxonomy = models.ManyToManyField('Subcategory')
-  author = models.ForeignKey(User, null=False, related_name='assessment_author')
-  modified_by = models.ForeignKey(User, null=False, related_name='assessment_modifier')
-  created_date = models.DateTimeField(auto_now_add=True)
-  modified_date = models.DateTimeField(auto_now=True)
-
-  class Meta:
-      ordering = ['-id']
-      unique_together = ('title', 'version')
-
-  def __unicode__(self):
-      return u'%s' % (self.title)
-
-# Assessment Step model
-# An assessment has one or more assessment steps
-class AssessmentStep(models.Model):
-  assessment = models.ForeignKey(Assessment, null=False, related_name='assessment_steps')
-  title = models.CharField(null=False, max_length=256)
-  order = models.IntegerField(null=True)
-  content = RichTextUploadingField(null=False)
-  teacher_notes = RichTextUploadingField(null=True, blank=True)
-  questions = models.ManyToManyField('Question', through='AssessmentQuestion', blank=True)
-
-  class Meta:
-      ordering = ['order']
 
 # Question model
 # A bank of questions that can be resued across assessments and lessons
@@ -158,25 +139,6 @@ class Question(models.Model):
 
   def __unicode__(self):
       return u'%s' % (self.question_text)
-
-# A relation between Lesson and Question models
-class LessonQuestion(models.Model):
-  question = models.ForeignKey(Question)
-  lesson_activity = models.ForeignKey(LessonActivity, null=True)
-  order = models.IntegerField(null=True)
-
-  def __unicode__(self):
-      return u'%s' % (self.question.question_text)
-
-  class Meta:
-      ordering = ['order']
-
-
-# A relation between Assessment Step and Question models
-class AssessmentQuestion(models.Model):
-  question = models.ForeignKey(Question, related_name="assessment_question")
-  assessment_step = models.ForeignKey(AssessmentStep)
-  order = models.IntegerField(null=True)
 
 # Subject model
 class Subject(models.Model):
@@ -317,7 +279,7 @@ class UserGroup(models.Model):
 # Assignment model
 #######################################################
 class Assignment(models.Model):
-  assessment = models.ForeignKey(Assessment)
+  curriculum = models.ForeignKey(Curriculum)
   group = models.ForeignKey(UserGroup, related_name="assignments")
   assigned_date = models.DateTimeField(auto_now_add=True)
   due_date = models.DateTimeField(null=False, blank=False)
@@ -347,14 +309,14 @@ class AssignmentInstance(models.Model):
 
 class AssignmentStepResponse(models.Model):
   instance = models.ForeignKey(AssignmentInstance)
-  assessment_step = models.ForeignKey(AssessmentStep)
+  step = models.ForeignKey(Step)
 
 #######################################################
 # Question Response Model
 #######################################################
 class QuestionResponse(models.Model):
   step_response = models.ForeignKey(AssignmentStepResponse)
-  assessment_question = models.ForeignKey(AssessmentQuestion)
+  curriculum_question = models.ForeignKey(CurriculumQuestion)
   response = models.TextField(null=False, blank=False)
   created_date = models.DateTimeField(auto_now_add=True)
   modified_date = models.DateTimeField(auto_now=True)

@@ -40,72 +40,86 @@ def team(request):
   return render(request, 'ctstem_app/Team.html', context)
 
 ####################################
-# ASSESSMENTS TABLE VIEW
+# Curricula TABLE VIEW
 ####################################
-def assessments(request):
+def curricula(request, curriculum_type=''):
+  if curriculum_type == 'assessments':
+    curr_type = 'A'
+  else:
+    curr_type = 'L'
+
   if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'researcher') == False:
     if request.user.is_authenticated():
-      assessments = models.Assessment.objects.all().filter(Q(status='P') | Q(author=request.user)).order_by('id')
+      curricula = models.Curriculum.objects.all().filter(Q(curriculum_type = curr_type), Q(status='P') | Q(author=request.user) ).order_by('id')
     else:
-      assessments = models.Assessment.objects.all().filter(Q(status='P')).order_by('id')
+      curricula = models.Curriculum.objects.all().filter(curriculum_type = curr_type, status='P').order_by('id')
   else:
-    assessments = models.Assessment.objects.order_by('id')
-  context = {'assessments': assessments}
-  return render(request, 'ctstem_app/Assessments.html', context)
+    curricula = models.Curriculum.objects.all().filter(curriculum_type = curr_type).order_by('id')
+  context = {'curricula': curricula, 'curriculum_type': curr_type}
+  return render(request, 'ctstem_app/Curricula.html', context)
 
 
 ####################################
-# CREATE MODIFY AN ASSESSMENT
+# CREATE MODIFY a curriculum
 ####################################
-def assessment(request, id=''):
+def curriculum(request, id=''):
   try:
     # check if the user has permission to create or modify a lesson
     if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'researcher') == False and hasattr(request.user, 'author') == False:
-      return http.HttpResponseNotFound('<h1>You do not have the privilege to create/modify assessments</h1>')
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to create/modify this curriculum</h1>')
     # check if the lesson exists
     if '' != id:
-      assessment = models.Assessment.objects.get(id=id)
+      curriculum = models.Curriculum.objects.get(id=id)
     else:
-      assessment = models.Assessment()
+      curriculum = models.Curriculum()
+
+    newQuestionForm = forms.QuestionForm()
 
     if request.method == 'GET':
-      form = forms.AssessmentForm(instance=assessment, prefix='assessment')
+      form = forms.CurriculumForm(instance=curriculum, prefix='curriculum')
       #AssessmentStepFormSet = inlineformset_factory(models.Assessment, models.AssessmentStep, form=forms.AssessmentStepForm,can_delete=True, can_order=True, extra=1)
 
-      AssessmentStepFormSet = nestedformset_factory(models.Assessment, models.AssessmentStep, form=forms.AssessmentStepForm,
-                                                    nested_formset=inlineformset_factory(models.AssessmentStep, models.AssessmentQuestion, form=forms.AssessmentQuestionForm, can_delete=True, can_order=True, extra=1),
+      StepFormSet = nestedformset_factory(models.Curriculum, models.Step, form=forms.StepForm,
+                                                    nested_formset=inlineformset_factory(models.Step, models.CurriculumQuestion, form=forms.CurriculumQuestionForm, can_delete=True, can_order=True, extra=1),
                                                     can_delete=True, can_order=True, extra=1)
-      formset = AssessmentStepFormSet(instance=assessment, prefix='form')
-      context = {'form': form, 'formset':formset}
-      return render(request, 'ctstem_app/Assessment.html', context)
+      AttachmentFormSet = inlineformset_factory(models.Curriculum, models.Attachment, form=forms.AttachmentForm, can_delete=True, extra=1)
+
+      formset = StepFormSet(instance=curriculum, prefix='form')
+      attachment_formset = AttachmentFormSet(instance=curriculum, prefix='attachment_form')
+      context = {'form': form, 'attachment_formset': attachment_formset, 'formset':formset, 'newQuestionForm': newQuestionForm}
+      return render(request, 'ctstem_app/Curriculum.html', context)
 
     elif request.method == 'POST':
       data = request.POST.copy()
-      form = forms.AssessmentForm(data, request.FILES, instance=assessment, prefix="assessment")
+      form = forms.CurriculumForm(data, request.FILES, instance=curriculum, prefix="curriculum")
       #AssessmentStepFormSet = inlineformset_factory(models.Assessment, models.AssessmentStep, form=forms.AssessmentStepForm,
                                                     #can_delete=True, can_order=True, extra=0)
-      AssessmentStepFormSet = nestedformset_factory(models.Assessment, models.AssessmentStep, form=forms.AssessmentStepForm,
-                                                    nested_formset=inlineformset_factory(models.AssessmentStep, models.AssessmentQuestion, form=forms.AssessmentQuestionForm, can_delete=True, can_order=True, extra=1),
+      StepFormSet = nestedformset_factory(models.Curriculum, models.Step, form=forms.StepForm,
+                                                    nested_formset=inlineformset_factory(models.Step, models.CurriculumQuestion, form=forms.CurriculumQuestionForm, can_delete=True, can_order=True, extra=1),
                                                     can_delete=True, can_order=True, extra=1)
-      formset = AssessmentStepFormSet(data, instance=assessment, prefix='form')
+      AttachmentFormSet = inlineformset_factory(models.Curriculum, models.Attachment, form=forms.AttachmentForm, can_delete=True, extra=1)
+
+      formset = StepFormSet(data, instance=curriculum, prefix='form')
+      attachment_formset = AttachmentFormSet(data, request.FILES, instance=curriculum, prefix='attachment_form')
       print form.is_valid()
       print formset.is_valid()
-      if form.is_valid() and formset.is_valid():
-        savedAssessment = form.save(commit=False)
+      if form.is_valid() and formset.is_valid() and attachment_formset.is_valid():
+        savedCurriculum = form.save(commit=False)
         if '' == id:
-            savedAssessment.author = request.user
-        savedAssessment.modified_by = request.user
-        savedAssessment.slug = slugify(savedAssessment.title) + '-v%s'%savedAssessment.version
-        savedAssessment.save()
+            savedCurriculum.author = request.user
+        savedCurriculum.modified_by = request.user
+        savedCurriculum.slug = slugify(savedCurriculum.title) + '-v%s'%savedCurriculum.version
+        savedCurriculum.save()
         form.save()
+        attachment_formset.save()
         formset.save(commit=False)
         for stepform in formset.ordered_forms:
           stepform.instance.order = stepform.cleaned_data['ORDER']
-          stepform.instance.lesson = savedAssessment
+          stepform.instance.curriculum = savedCurriculum
           stepform.instance.save()
           for qform in stepform.nested.ordered_forms:
             qform.instance.order = qform.cleaned_data['ORDER']
-            qform.instance.assessment_step = stepform.instance
+            qform.instance.step = stepform.instance
             qform.instance.save()
           for obj in stepform.nested.deleted_objects:
             obj.delete()
@@ -113,105 +127,111 @@ def assessment(request, id=''):
         for obj in formset.deleted_objects:
           obj.delete()
 
-        messages.success(request, "Assessment Saved.")
-        return shortcuts.redirect('ctstem:assessment', id=savedAssessment.id)
+        messages.success(request, "Curriculum Saved.")
+        return shortcuts.redirect('ctstem:curriculum', id=savedCurriculum.id)
       else:
         print form.errors
         print formset.errors
-        messages.error(request, "The assessment could not be saved because there were errors.  Please check the errors below.")
-        context = {'form': form, 'formset':formset}
-        return render(request, 'ctstem_app/Assessment.html', context)
+        messages.error(request, "The curriculum could not be saved because there were errors.  Please check the errors below.")
+        context = {'form': form, 'attachment_formset': attachment_formset, 'formset':formset, 'newQuestionForm': newQuestionForm}
+        return render(request, 'ctstem_app/Curriculum.html', context)
 
     return http.HttpResponseNotAllowed(['GET', 'POST'])
 
-  except models.Assessment.DoesNotExist:
-    return http.HttpResponseNotFound('<h1>Requested assessment not found</h1>')
+  except models.Curriculum.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested curriculum not found</h1>')
 
 ####################################
 # PREVIEW A LESSON
 ####################################
-def previewAssessment(request, id=''):
+def previewCurriculum(request, id=''):
   try:
     # check if the lesson exists
     if '' != id:
-      assessment = models.Assessment.objects.get(id=id)
+      curriculum = models.Curriculum.objects.get(id=id)
     else:
-      assessment = models.Assessment()
+      curriculum = models.Curriculum()
 
     if request.method == 'GET':
-      form = forms.AssessmentForm(instance=assessment, prefix='assessment')
-      #AssessmentStepFormSet = inlineformset_factory(models.Assessment, models.AssessmentStep, form=forms.AssessmentStepForm,can_delete=True, can_order=True, extra=1)
+      steps = models.Step.objects.all().filter(curriculum=curriculum)
+      attachments = models.Attachment.objects.all().filter(curriculum=curriculum)
 
-      AssessmentStepFormSet = nestedformset_factory(models.Assessment, models.AssessmentStep, form=forms.AssessmentStepForm,
-                                                    nested_formset=inlineformset_factory(models.AssessmentStep, models.AssessmentQuestion, form=forms.AssessmentQuestionForm, can_delete=True, can_order=True, extra=0),
-                                                    can_delete=True, can_order=True, extra=0)
-      formset = AssessmentStepFormSet(instance=assessment, prefix='form')
-      context = {'form': form, 'formset':formset}
-      return render(request, 'ctstem_app/AssessmentPreview.html', context)
+      context = {'curriculum': curriculum, 'attachments': attachments, 'steps':steps}
+      return render(request, 'ctstem_app/CurriculumPreview.html', context)
 
     return http.HttpResponseNotAllowed(['GET'])
 
-  except models.Lesson.DoesNotExist:
-    return http.HttpResponseNotFound('<h1>Requested lesson not found</h1>')
+  except models.Curriculum.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested curriculum not found</h1>')
 
 ####################################
-# DELETE AN ASSESSMENT
+# Lesson PDF
 ####################################
-def deleteAssessment(request, id=''):
+def pdfCurriculum(request, id='', pdf='0'):
+  try:
+    # check if the lesson exists
+    if '' != id:
+      curriculum = models.Curriculum.objects.get(id=id)
+    else:
+      curriculum = models.Curriculum()
+
+    if request.method == 'GET':
+      steps = models.Step.objects.all().filter(curriculum=curriculum)
+      attachments = models.Attachment.objects.all().filter(curriculum=curriculum)
+
+      context = {'curriculum': curriculum, 'attachments': attachments, 'steps':steps}
+      #print settings.STATIC_ROOT
+      return render_to_pdf_response('ctstem_app/CurriculumPDF.html', context, u'%s.%s'%(curriculum.slug, 'pdf') )
+
+    return http.HttpResponseNotAllowed(['GET'])
+
+  except models.Curriculum.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested lesson not found</h1>')
+####################################
+# DELETE a curriculum
+####################################
+def deleteCurriculum(request, id=''):
   try:
     # check if the user has permission to delete a lesson
     if hasattr(request.user, 'administrator') == False:
-      return http.HttpResponseNotFound('<h1>You do not have the privilege to delete this assessment</h1>')
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to delete this curriculum</h1>')
     # check if the lesson exists
     if '' != id:
-      assessment = models.Assessment.objects.get(id=id)
+      curriculum = models.Curriculum.objects.get(id=id)
     else:
-      raise models.Assessment.DoesNotExist
+      raise models.Curriculum.DoesNotExist
 
     if request.method == 'GET' or request.method == 'POST':
-      assessment.delete()
-      messages.success(request, 'Assessment %s deleted' % assessment.title)
+      curriculum.delete()
+      messages.success(request, 'Curriculum %s deleted' % curriculum.title)
       return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
     return http.HttpResponseNotAllowed(['GET', 'POST'])
 
-  except models.Assessment.DoesNotExist:
+  except models.Curriculum.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested assessment not found</h1>')
 
 ####################################
-# DELETE AN ASSESSMENT
+# Curriculum content
 ####################################
-def assessmentMeta(request, id=''):
+def curriculumContent(request, id=''):
   try:
     if '' != id:
-      assessment = models.Assessment.objects.get(id=id)
+      curriculum = models.Curriculum.objects.get(id=id)
       if 'GET' == request.method:
-        context = {'assessment': assessment}
-        return render(request, 'ctstem_app/AssessmentMeta.html', context)
+        context = {'curriculum': curriculum}
+        return render(request, 'ctstem_app/CurriculumContent.html', context)
       return http.HttpResponseNotAllowed(['GET'])
     else:
-      raise models.Assessment.DoesNotExist
-  except models.Assessment.DoesNotExist:
+      raise models.Curriculum.DoesNotExist
+  except models.Curriculum.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested assessment not found</h1>')
 
-####################################
-# LESSONS TABLE VIEW
-####################################
-def lessons(request):
-  if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'researcher') == False:
-    if request.user.is_authenticated():
-      lessons = models.Lesson.objects.all().filter(Q(status='P') | Q(author=request.user)).order_by('id')
-    else:
-      lessons = models.Lesson.objects.all().filter(Q(status='P')).order_by('id')
-  else:
-    lessons = models.Lesson.objects.order_by('id')
-  context = {'lessons': lessons}
-  return render(request, 'ctstem_app/Lessons.html', context)
 
 ####################################
 # CREATE MODIFY A LESSON
 ####################################
-def lesson(request, id=''):
+'''def lesson(request, id=''):
   try:
     # check if the user has permission to create or modify a lesson
     if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'researcher') == False and hasattr(request.user, 'author') == False:
@@ -276,15 +296,7 @@ def lesson(request, id=''):
           obj.delete()
 
         #save the questions
-        '''questions = formset.save(commit=False)
-        #maintain order
-        for qform in formset.ordered_forms:
-          qform.instance.order = qform.cleaned_data['ORDER']
-          qform.instance.lesson = savedLesson
-          qform.instance.save()
-        #remove deleted questions
-        for obj in formset.deleted_objects:
-          obj.delete()'''
+
 
         messages.success(request, "Lesson %s Saved."%savedLesson.title)
         return shortcuts.redirect('ctstem:lesson', id=savedLesson.id)
@@ -299,132 +311,82 @@ def lesson(request, id=''):
     return http.HttpResponseNotAllowed(['GET', 'POST'])
 
   except models.Lesson.DoesNotExist:
-    return http.HttpResponseNotFound('<h1>Requested lesson not found</h1>')
+    return http.HttpResponseNotFound('<h1>Requested lesson not found</h1>')'''
 
 ####################################
 # Lesson Copy
 ####################################
-def copyLesson(request, id=''):
+def copyCurriculum(request, id=''):
   try:
-    # check if the user has permission to create or modify a lesson
+    # check if the user has permission to create or modify a curriculum
     if hasattr(request.user, 'administrator') == False:
-      return http.HttpResponseNotFound('<h1>You do not have the privilege to modify this lesson</h1>')
-    # check if the lesson exists
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to modify this curriculum</h1>')
+    # check if the curriculum exists
     else:
       if request.method == 'GET' or request.method == 'POST':
         if '' != id:
-          lesson = models.Lesson.objects.get(id=id)
-          lessonActivities = models.LessonActivity.objects.all().filter(lesson=lesson)
-          attachments = models.Attachment.objects.all().filter(lesson=lesson)
-          title = lesson.title
-          lesson.title = str(datetime.datetime.now())
-          lesson.slug = slugify(lesson.title)
-          lesson.pk = None
-          lesson.id = None
-          lesson.save()
+          curriculum = models.Curriculum.objects.get(id=id)
+          steps = models.Step.objects.all().filter(curriculum=curriculum)
+          attachments = models.Attachment.objects.all().filter(curriculum=curriculum)
+          title = curriculum.title
+          curriculum.title = str(datetime.datetime.now())
+          curriculum.slug = slugify(curriculum.title)
+          curriculum.pk = None
+          curriculum.id = None
+          curriculum.save()
 
-          original_lesson = models.Lesson.objects.get(id=id)
-          lesson.title = title
-          lesson.author = request.user
-          lesson.modified_by = request.user
-          lesson.created_date = datetime.datetime.now()
-          lesson.modified_date = datetime.datetime.now()
-          lesson.parent = original_lesson
-          lesson.status = 'D'
-          lesson.version = int(original_lesson.version) + 1
-          lesson.slug = slugify(lesson.title) + '-v%s'%lesson.version + '-%s'%lesson.id
-          lesson.subject = original_lesson.subject.all()
-          lesson.taxonomy = original_lesson.taxonomy.all()
-          lesson.save()
+          original_curriculum = models.Curriculum.objects.get(id=id)
+          curriculum.title = title
+          curriculum.author = request.user
+          curriculum.modified_by = request.user
+          curriculum.created_date = datetime.datetime.now()
+          curriculum.modified_date = datetime.datetime.now()
+          curriculum.parent = original_curriculum
+          curriculum.status = 'D'
+          curriculum.version = int(original_curriculum.version) + 1
+          curriculum.slug = slugify(curriculum.title) + '-v%s'%curriculum.version + '-%s'%curriculum.id
+          curriculum.subject = original_curriculum.subject.all()
+          curriculum.taxonomy = original_curriculum.taxonomy.all()
+          curriculum.save()
 
           for attachment in attachments:
             source = attachment.file_object
             filecontent = ContentFile(source.file.read())
             filename = os.path.split(source.file.name)[-1]
             filename_array = filename.split('.')
-            filename = filename_array[0] + '-' + str(lesson.id) + '.' + filename_array[1]
+            filename = filename_array[0] + '-' + str(curriculum.id) + '.' + filename_array[1]
             attachment.pk = None
             attachment.id = None
-            attachment.lesson = lesson
+            attachment.curriculum = curriculum
             attachment.file_object.save(filename, filecontent)
             attachment.save()
             source.file.close()
 
-          for activity in lessonActivities:
-              activity_questions = models.LessonQuestion.objects.all().filter(lesson_activity=activity)
-              activity.pk = None
-              activity.id = None
-              activity.lesson = lesson
-              activity.save()
-              for activity_question in activity_questions:
-                  question = activity_question.question
+          for step in steps:
+              step_questions = models.CurriculumQuestion.objects.all().filter(step=step)
+              step.pk = None
+              step.id = None
+              step.curriculum = curriculum
+              step.save()
+              for step_question in step_questions:
+                  question = step_question.question
                   question.id = None
                   question.pk = None
                   question.save()
 
-                  activity_question.id = None
-                  activity_question.pk = None
-                  activity_question.question = question
-                  activity_question.lesson_activity = activity
-                  activity_question.save()
+                  step_question.id = None
+                  step_question.pk = None
+                  step_question.question = question
+                  step_question.step = step
+                  step_question.save()
 
-          messages.success(request, "A new copy of %s created.  Please archive the original lesson" % original_lesson.title)
-          return shortcuts.redirect('ctstem:lessons')
+          messages.success(request, "A new copy of %s created.  Please archive the original curriculum" % original_curriculum.title)
+          return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
       return http.HttpResponseNotAllowed(['GET', 'POST'])
 
-  except models.Lesson.DoesNotExist:
-    return http.HttpResponseNotFound('<h1>Requested lesson not found</h1>')
+  except models.Curriculum.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested curriculum not found</h1>')
 
-####################################
-# Lesson PDF
-####################################
-def previewLesson(request, id='', pdf='0'):
-  try:
-    # check if the lesson exists
-    if '' != id:
-      lesson = models.Lesson.objects.get(id=id)
-    else:
-      lesson = models.Lesson()
-
-    if request.method == 'GET':
-      activities = models.LessonActivity.objects.all().filter(lesson=lesson)
-      attachments = models.Attachment.objects.all().filter(lesson=lesson)
-
-      context = {'lesson': lesson, 'attachments': attachments, 'activities':activities}
-      #print settings.STATIC_ROOT
-      if pdf == '1':
-        return render_to_pdf_response('ctstem_app/LessonPreview.html', context, u'%s.%s'%(lesson.slug, 'pdf') )
-      else:
-        return render(request, 'ctstem_app/LessonPreview.html', context)
-
-    return http.HttpResponseNotAllowed(['GET'])
-
-  except models.Lesson.DoesNotExist:
-    return http.HttpResponseNotFound('<h1>Requested lesson not found</h1>')
-
-####################################
-# DELETE A LESSON
-####################################
-def deleteLesson(request, id=''):
-  try:
-    # check if the user has permission to delete a lesson
-    if hasattr(request.user, 'administrator') == False:
-      return http.HttpResponseNotFound('<h1>You do not have the privilege to delete this lesson</h1>')
-    # check if the lesson exists
-    if '' != id:
-      lesson = models.Lesson.objects.get(id=id)
-    else:
-      raise models.Lesson.DoesNotExist
-
-    if request.method == 'GET' or request.method == 'POST':
-      lesson.delete()
-      messages.success(request, 'Lesson %s deleted' % lesson.title)
-      return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-
-    return http.HttpResponseNotAllowed(['GET', 'POST'])
-
-  except models.Lesson.DoesNotExist:
-    return http.HttpResponseNotFound('<h1>Requested lesson not found</h1>')
 ####################################
 # REGISTER
 ####################################
@@ -1034,20 +996,20 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
       step_order = 1
 
     if 'GET' == request.method or 'POST' == request.method:
-      assessmentSteps = models.AssessmentStep.objects.all().filter(assessment=instance.assignment.assessment)
-      assessmentStep = assessmentSteps.get(order=step_order)
-      total_steps = assessmentSteps.count()
+      steps = models.Step.objects.all().filter(curriculum=instance.assignment.curriculum)
+      step = steps.get(order=step_order)
+      total_steps = steps.count()
       initial_data = []
       try:
-        assignmentStepResponse = models.AssignmentStepResponse.objects.get(instance=instance, assessment_step=assessmentStep)
+        assignmentStepResponse = models.AssignmentStepResponse.objects.get(instance=instance, step=step)
         extra = 0
       except models.AssignmentStepResponse.DoesNotExist:
         #unsaved object
-        assignmentStepResponse = models.AssignmentStepResponse(instance=instance, assessment_step=assessmentStep)
-        assessmentQuestions = models.AssessmentQuestion.objects.all().filter(assessment_step=assessmentStep).order_by('order')
-        extra = assessmentQuestions.count()
-        for assessmentQuestion in assessmentQuestions:
-          initial_data.append({'assessment_question': assessmentQuestion.id, 'response': ''})
+        assignmentStepResponse = models.AssignmentStepResponse(instance=instance, step=step)
+        curriculumQuestions = models.CurriculumQuestion.objects.all().filter(step=step).order_by('order')
+        extra = curriculumQuestions.count()
+        for curriculumQuestion in curriculumQuestions:
+          initial_data.append({'curriculum_question': curriculumQuestion.id, 'response': ''})
 
 
       if 'GET' == request.method:
@@ -1071,8 +1033,8 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
         formset = questionResponseFormset(data, instance=assignmentStepResponse, prefix='form')
 
         if form.is_valid() and formset.is_valid():
-          instance.last_step = assessmentStep.order
-          if assessmentStep.order < total_steps:
+          instance.last_step = step.order
+          if step.order < total_steps:
             instance.status = 'P'
           else:
             instance.status = 'S'
@@ -1083,7 +1045,7 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
           formset.save()
           #update the instance
           if instance.status == 'P':
-            return shortcuts.redirect('ctstem:resumeAssignment', assignment_id=assignment_id, instance_id=instance.id, step_order=assessmentStep.order+1)
+            return shortcuts.redirect('ctstem:resumeAssignment', assignment_id=assignment_id, instance_id=instance.id, step_order=step.order+1)
           else:
             messages.success(request, 'Your assignment has been submitted')
             return shortcuts.redirect('ctstem:assignments')
@@ -1098,8 +1060,8 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
     return http.HttpResponseNotAllowed(['GET', 'POST'])
   except models.AssignmentInstance.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested assignment not found</h1>')
-  except models.AssessmentStep.DoesNotExist:
-    return http.HttpResponseNotFound('<h1>Assessment Step not found </h1>')
+  except models.Step.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Curriculum Step not found </h1>')
 
 
 ####################################
