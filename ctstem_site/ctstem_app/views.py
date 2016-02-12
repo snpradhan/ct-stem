@@ -142,7 +142,7 @@ def curriculum(request, id=''):
     return http.HttpResponseNotFound('<h1>Requested curriculum not found</h1>')
 
 ####################################
-# PREVIEW A LESSON
+# PREVIEW A Curriculum
 ####################################
 def previewCurriculum(request, id=''):
   try:
@@ -227,94 +227,8 @@ def curriculumContent(request, id=''):
   except models.Curriculum.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested assessment not found</h1>')
 
-
 ####################################
-# CREATE MODIFY A LESSON
-####################################
-'''def lesson(request, id=''):
-  try:
-    # check if the user has permission to create or modify a lesson
-    if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'researcher') == False and hasattr(request.user, 'author') == False:
-      return http.HttpResponseNotFound('<h1>You do not have the privilege to modify this lesson</h1>')
-    # check if the lesson exists
-    if '' != id:
-      lesson = models.Lesson.objects.get(id=id)
-    else:
-      lesson = models.Lesson()
-
-    newQuestionForm = forms.QuestionForm()
-
-    if request.method == 'GET':
-      form = forms.LessonForm(instance=lesson, prefix='lesson')
-      AttachmentFormSet = inlineformset_factory(models.Lesson, models.Attachment, form=forms.AttachmentForm, can_delete=True, extra=1)
-      LessonActivityFormSet = nestedformset_factory(models.Lesson, models.LessonActivity, form=forms.LessonActivityForm,
-                                                    nested_formset=inlineformset_factory(models.LessonActivity, models.LessonQuestion, form=forms.LessonQuestionForm, can_delete=True, can_order=True, extra=1),
-                                                    can_delete=True, can_order=True, extra=1)
-      #QuestionFormSet = inlineformset_factory(models.Lesson, models.LessonQuestion, form=forms.LessonQuestionForm, can_order=True, can_delete=True, extra=1)
-      formset = LessonActivityFormSet(instance=lesson, prefix='form')
-      attachment_formset = AttachmentFormSet(instance=lesson, prefix='attachment_form')
-      context = {'form': form, 'attachment_formset': attachment_formset, 'formset':formset, 'newQuestionForm': newQuestionForm}
-      return render(request, 'ctstem_app/Lesson.html', context)
-
-    elif request.method == 'POST':
-      data = request.POST.copy()
-      print request.FILES
-      form = forms.LessonForm(data, request.FILES, instance=lesson, prefix="lesson")
-      AttachmentFormSet = inlineformset_factory(models.Lesson, models.Attachment, form=forms.AttachmentForm, can_delete=True, extra=1)
-      LessonActivityFormSet = nestedformset_factory(models.Lesson, models.LessonActivity, form=forms.LessonActivityForm,
-                                                    nested_formset=inlineformset_factory(models.LessonActivity, models.LessonQuestion, form=forms.LessonQuestionForm, can_delete=True, can_order=True, extra=1),
-                                                    can_delete=True, can_order=True, extra=1)
-      #QuestionFormSet = inlineformset_factory(models.Lesson, models.LessonQuestion, form=forms.LessonQuestionForm, can_order=True, can_delete=True, extra=1)
-      formset = LessonActivityFormSet(data, instance=lesson, prefix='form')
-      attachment_formset = AttachmentFormSet(data, request.FILES, instance=lesson, prefix='attachment_form')
-      print 'form ', form.is_valid()
-      print 'formset ', formset.is_valid()
-      print 'attachment ', attachment_formset.is_valid()
-
-      if form.is_valid() and formset.is_valid() and attachment_formset.is_valid():
-        savedLesson = form.save(commit=False)
-        if '' == id:
-            savedLesson.author = request.user
-        savedLesson.modified_by = request.user
-        savedLesson.slug = slugify(savedLesson.title) + '-v%s'%savedLesson.version
-        savedLesson.save()
-        form.save()
-        attachment_formset.save()
-        formset.save(commit=False)
-        for aform in formset.ordered_forms:
-          aform.instance.order = aform.cleaned_data['ORDER']
-          aform.instance.lesson = savedLesson
-          aform.instance.save()
-          for qform in aform.nested.ordered_forms:
-            qform.instance.order = qform.cleaned_data['ORDER']
-            qform.instance.lesson_activity = aform.instance
-            qform.instance.save()
-          for obj in aform.nested.deleted_objects:
-            obj.delete()
-        #remove deleted questions
-        for obj in formset.deleted_objects:
-          obj.delete()
-
-        #save the questions
-
-
-        messages.success(request, "Lesson %s Saved."%savedLesson.title)
-        return shortcuts.redirect('ctstem:lesson', id=savedLesson.id)
-      else:
-        print form.errors
-        print formset.errors
-        print attachment_formset.errors
-        messages.error(request, "The lesson could not be saved because there were errors.  Please check the errors below.")
-        context = {'form': form, 'attachment_formset': attachment_formset, 'formset':formset, 'newQuestionForm': newQuestionForm}
-        return render(request, 'ctstem_app/Lesson.html', context)
-
-    return http.HttpResponseNotAllowed(['GET', 'POST'])
-
-  except models.Lesson.DoesNotExist:
-    return http.HttpResponseNotFound('<h1>Requested lesson not found</h1>')'''
-
-####################################
-# Lesson Copy
+# Curriculum Copy
 ####################################
 def copyCurriculum(request, id=''):
   try:
@@ -455,9 +369,9 @@ def register(request):
           new_user = authenticate(username=form.cleaned_data['username'],
                                   password=form.cleaned_data['password1'], )
           login(request, new_user)
-          lessons = models.Lesson.objects.order_by('id')
-          context = {'lessons': lessons}
-          return render(request, 'ctstem_app/Lessons.html', context)
+          curricula = models.Curriculum.objects.all().filter(curriculum_type = 'L').order_by('id')
+          context = {'curricula': curricula, 'curriculum_type': curr_type}
+          return render(request, 'ctstem_app/Curricula.html', context)
       else:
         messages.info(request, 'User account has been created.')
         if form.cleaned_data['account_type'] == 'A':
@@ -495,6 +409,7 @@ def user_login(request):
     if user is not None and user.is_active:
       login(request, user)
       response_data['result'] = 'Success'
+      messages.success(request, "You have logged in")
     else:
       response_data['result'] = 'Failed'
       if user and user.is_active == False:
@@ -504,9 +419,7 @@ def user_login(request):
     return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 
   elif 'GET' == request.method:
-    lessons = models.Lesson.objects.order_by('id')
-    context = {'lessons': lessons}
-    return render(request, 'ctstem_app/Lessons.html', context)
+    return shortcuts.redirect('ctstem:home')
 
 ####################################
 # USER LOGOUT
@@ -514,7 +427,8 @@ def user_login(request):
 @login_required
 def user_logout(request):
   logout(request)
-  return shortcuts.redirect('ctstem:login')
+  messages.success(request, "You have logged out")
+  return shortcuts.redirect('ctstem:home')
 
 ####################################
 # USER PROFILE
@@ -689,9 +603,6 @@ def standard(request, id=''):
       CategoryFormSet = nestedformset_factory(models.Standard, models.Category, form=forms.CategoryForm,
                                                     nested_formset=inlineformset_factory(models.Category, models.Subcategory, form=forms.SubcategoryForm, can_delete=True, can_order=True, extra=1),
                                                     can_delete=True, can_order=True, extra=1)
-      #QuestionFormSet = inlineformset_factory(models.Lesson, models.LessonQuestion, form=forms.LessonQuestionForm, can_order=True, can_delete=True, extra=1)
-      #CategoryFormSet = inlineformset_factory(models.Standard, models.Category, form=forms.CategoryForm, can_delete=True, extra=1)
-      #QuestionFormSet = inlineformset_factory(models.Lesson, models.LessonQuestion, form=forms.LessonQuestionForm, can_order=True, can_delete=True, extra=1)
       formset = CategoryFormSet(instance=standard, prefix='form')
       context = {'form': form, 'formset':formset}
       return render(request, 'ctstem_app/Standard.html', context)
@@ -702,7 +613,6 @@ def standard(request, id=''):
       CategoryFormSet = nestedformset_factory(models.Standard, models.Category, form=forms.CategoryForm,
                                                     nested_formset=inlineformset_factory(models.Category, models.Subcategory, form=forms.SubcategoryForm, can_delete=True, can_order=True, extra=1),
                                                     can_delete=True, can_order=True, extra=1)
-      #CategoryFormSet = inlineformset_factory(models.Standard, models.Category, form=forms.CategoryForm, can_delete=True, extra=1)
       formset = CategoryFormSet(data, instance=standard, prefix='form')
       print form.is_valid()
       print formset.is_valid()
@@ -720,8 +630,8 @@ def standard(request, id=''):
 
     return http.HttpResponseNotAllowed(['GET', 'POST'])
 
-  except models.Lesson.DoesNotExist:
-    return http.HttpResponseNotFound('<h1>Requested group not found</h1>')
+  except models.Standard.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested standard not found</h1>')
 
 ####################################
 # DELETE Standard
@@ -947,7 +857,7 @@ def group(request, id=''):
 
     return http.HttpResponseNotAllowed(['GET', 'POST'])
 
-  except models.Lesson.DoesNotExist:
+  except models.UserGroup.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested group not found</h1>')
 
 ####################################
