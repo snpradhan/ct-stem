@@ -63,6 +63,8 @@ def upload_file_to(instance, filename):
     return 'team/%s%s' % (slugify(instance.name), filename_ext.lower(),)
   elif isinstance(instance, Attachment):
     return 'attachment/%s%s' % (filename_base.lower(), filename_ext.lower(),)
+  elif isinstance(instance, Category):
+    return 'standard/%s%s' % (filename_base.lower(), filename_ext.lower(),)
   return 'misc/%s%s' % (instance.id,filename_ext.lower(),)
 
 # Create your models here.
@@ -162,6 +164,7 @@ class Standard(models.Model):
 class Category(models.Model):
   standard = models.ForeignKey(Standard, related_name="category")
   name = models.CharField(null=False, max_length=256)
+  icon = models.ImageField(upload_to=upload_file_to, blank=True, null=True)
 
   def __unicode__(self):
       return u'%s' % (self.name)

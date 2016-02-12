@@ -581,9 +581,14 @@ def categories(request, standard_id=''):
 # Table view of standards
 ####################################
 def standards(request):
-  standards = models.Standard.objects.all().order_by('name')
-  context = {'standards': standards}
-  return render(request, 'ctstem_app/Standards.html', context)
+  if hasattr(request.user, 'author') == False and hasattr(request.user, 'researcher') == False and  hasattr(request.user, 'administrator') == False:
+    standard = models.Standard.objects.all().filter(primary=True).order_by('name')[0]
+    context = {'standard': standard}
+    return render(request, 'ctstem_app/Standards.html', context)
+  else:
+    standards = models.Standard.objects.all().order_by('name')
+    context = {'standards': standards}
+    return render(request, 'ctstem_app/Standards.html', context)
 
 ####################################
 # Add/Edit Standard
@@ -613,7 +618,7 @@ def standard(request, id=''):
       CategoryFormSet = nestedformset_factory(models.Standard, models.Category, form=forms.CategoryForm,
                                                     nested_formset=inlineformset_factory(models.Category, models.Subcategory, form=forms.SubcategoryForm, can_delete=True, can_order=True, extra=1),
                                                     can_delete=True, can_order=True, extra=1)
-      formset = CategoryFormSet(data, instance=standard, prefix='form')
+      formset = CategoryFormSet(data, request.FILES, instance=standard, prefix='form')
       print form.is_valid()
       print formset.is_valid()
       if form.is_valid() and formset.is_valid():
