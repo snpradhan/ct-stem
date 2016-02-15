@@ -35,7 +35,7 @@
     div.table#curriculumMeta div.meta {
       margin-bottom: 1em;
     }
-    div.table#curriculumMeta div.meta div.label {
+    div.table#curriculumMeta div.meta div.label, div.table#curriculumContent div.label {
       font-weight: 700;
       text-decoration: underline;
     }
@@ -167,85 +167,87 @@
           </ul>
         </div>
         <div class="meta">
-          <div class="label">Attachments</div>
-          <ul>
-            {% for attachment in attachments %}
-              <li><a href="{{attachment.file_object.url}}" target="_blank">{{attachment.title}}</a> - ({{attachment.file_object.url}})</li>
-            {% endfor %}
-          </ul>
+          {% if attachments %}
+            <div class="label">Attachments</div>
+            <ul>
+              {% for attachment in attachments %}
+                <li><a href="{{attachment.file_object.url}}" target="_blank">{{attachment.title}}</a> - ({{attachment.file_object.url}})</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
         </div>
       </div>
 
-
-
       <div class="table" id="curriculumContent">
+        <div class="label">Content</div>
         <div>{{curriculum.content|format_iframe|safe}}</div>
       </div>
 
-      <div class="table" id="curriculumStep">
+      {% if steps %}
+        <div class="table" id="curriculumStep">
 
-        {% if curriculum.curriculum_type == 'A' %}
-          <h3> Assessment </h3>
-        {% else %}
-          <h3> Activity </h3>
-        {% endif %}
-        <table class="student_info">
-          <tr>
-            <td width="40%">Name:_________________________</td>
-            <td width="30%">Class:_________________</td>
-            <td width="30%">Date:__________________</td>
-          </tr>
-        </table>
+          {% if curriculum.curriculum_type == 'A' %}
+            <h3> Assessment </h3>
+          {% else %}
+            <h3> Activity </h3>
+          {% endif %}
+          <table class="student_info">
+            <tr>
+              <td width="40%">Name:_________________________</td>
+              <td width="30%">Class:_________________</td>
+              <td width="30%">Date:__________________</td>
+            </tr>
+          </table>
 
-        {% for step in steps %}
-          <h3 class="step_title" style="text-decoration: underline;"> {{ step.title }} </h3>
+          {% for step in steps %}
+            <h3 class="step_title" style="text-decoration: underline;"> {{ step.title }} </h3>
 
-          <div class="step_content"> {{step.content|inline_style|safe}} </div>
+            <div class="step_content"> {{step.content|inline_style|safe}} </div>
 
-            {% for question in step.questions.all %}
-            <table class="question_table">
-              <tr>
-                <td width="5%" style="vertical-align: top;" class="question_no"> Q{{forloop.counter}}.</td>
-                <td class="question_text"> {{question.question_text|inline_style|safe }} </td>
-              </tr>
-              <tr>
-                <td></td>
-                <td class="answer_field">
-                  {% with field_type=question.answer_field_type %}
-                    {% if field_type == 'TA' %}
-                      <br><br><br><br><br><br><br><br><br><br>
-                    {% elif field_type == 'TF' %}
-                      <br><br><br><br><br>
-                    {% elif field_type == 'DD' or field_type == 'MC' %}
-                      <div class="multiplechoice">
-                        <p class="note"> Note: Select one answer </p>
-                        {% for option in question.options|split:','%}
-                          <div class="input_container">
-                            <img src="https://s3-us-west-1.amazonaws.com/ct-stem/assets/images/Circle.gif" class="circle"><span>&nbsp;&nbsp;{{option}}</span>
-                          </div>
-                        {% endfor %}
-                      </div>
-                    {% elif field_type == 'MS' %}
-                      <div class="multiselect">
-                        <p class="note"> Note: Select all that apply </p>
-                        {% for option in question.options|split:','%}
-                          <div class="input_container">
-                            <img src="https://s3-us-west-1.amazonaws.com/ct-stem/assets/images/Square.gif" class="square" style="width:25px;"><span>&nbsp;&nbsp;{{option}} </span>
-                          </div>
-                        {% endfor %}
-                      </div>
-                    {% endif %}
-                  {% endwith %}
-                </td>
-              </tr>
-              </table>
-            {% endfor %}
+              {% for question in step.questions.all %}
+              <table class="question_table">
+                <tr>
+                  <td width="5%" style="vertical-align: top;" class="question_no"> Q{{forloop.counter}}.</td>
+                  <td class="question_text"> {{question.question_text|inline_style|safe }} </td>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td class="answer_field">
+                    {% with field_type=question.answer_field_type %}
+                      {% if field_type == 'TA' %}
+                        <br><br><br><br><br><br><br><br><br><br>
+                      {% elif field_type == 'TF' %}
+                        <br><br><br><br><br>
+                      {% elif field_type == 'DD' or field_type == 'MC' %}
+                        <div class="multiplechoice">
+                          <p class="note"> Note: Select one answer </p>
+                          {% for option in question.options|split:','%}
+                            <div class="input_container">
+                              <img src="https://s3-us-west-1.amazonaws.com/ct-stem/assets/images/Circle.gif" class="circle"><span>&nbsp;&nbsp;{{option}}</span>
+                            </div>
+                          {% endfor %}
+                        </div>
+                      {% elif field_type == 'MS' %}
+                        <div class="multiselect">
+                          <p class="note"> Note: Select all that apply </p>
+                          {% for option in question.options|split:','%}
+                            <div class="input_container">
+                              <img src="https://s3-us-west-1.amazonaws.com/ct-stem/assets/images/Square.gif" class="square" style="width:25px;"><span>&nbsp;&nbsp;{{option}} </span>
+                            </div>
+                          {% endfor %}
+                        </div>
+                      {% endif %}
+                    {% endwith %}
+                  </td>
+                </tr>
+                </table>
+              {% endfor %}
 
-          <div> &nbsp; </div>
+            <div> &nbsp; </div>
 
-        {% endfor %}
-      </div>
-
+          {% endfor %}
+        </div>
+      {% endif %}
     </form>
   </div>
 

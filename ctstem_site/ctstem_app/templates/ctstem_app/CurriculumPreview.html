@@ -53,14 +53,22 @@
             {% endfor %}
           </ul>
         </div>
-        <div class="meta">
-          <label>Attachments</label>
-          <ul>
-            {% for attachment in attachments %}
-              <li><a href="{{attachment.file_object.url}}" target="_blank">{{attachment.title}}</a> - ({{attachment.file_object.url}})</li>
-            {% endfor %}
-          </ul>
-        </div>
+        {% if attachments %}
+          <div class="meta">
+            <label>Attachments</label>
+            <ul>
+              {% for attachment in attachments %}
+                <li><a href="{{attachment.file_object.url}}" target="_blank">{{attachment.title}}</a> - ({{attachment.file_object.url}})</li>
+              {% endfor %}
+            </ul>
+          </div>
+        {% endif %}
+        {% if curriculum.content %}
+          <div class="meta">
+            <label>Content</label>
+            <div>{{curriculum.content|safe}}</div>
+          </div>
+        {% endif %}
         <hr>
       </div>
       {% for step in steps %}
