@@ -365,6 +365,18 @@ div.table.item#workshops:hover, div.table#category_4:hover {
   background-color: #5d7f19;
   cursor: pointer;
 }
+div.table[id^='category_'] {
+  background-color: #9752A5;
+}
+div.table[id^='category_']:hover {
+  background-color: #5a3163;
+  cursor: pointer;
+}
+table.table[id^='subcategory_'] thead {
+  background-color: #5a3163;
+  color: #f2f2f2;
+}
+
 
 table.table.sub {
   display:none;
