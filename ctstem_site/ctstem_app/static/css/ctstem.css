@@ -182,7 +182,11 @@ div.table#curriculumPreview .meta {
 div.table#curriculumPreview, div.table.stepPreview {
   background-color: #eee;
 }
-div.table.stepPreview table.question_table .question_no{
+table.question_table {
+  margin-bottom: 2em;
+}
+
+table.question_table .question_no{
   font-weight: 700;
 }
 div.table.stepPreview h3.activity_title {
@@ -231,7 +235,7 @@ div.table#assignment .row .title, div.table.stepPreview .row .title {
   font-size: 1.3em;
   font-weight: 700;
 }
-div.table#assignment .row .title .assessment_title, div.table.stepPreview .row .title .assessment_title {
+div.table#assignment .row .title .curriculum_title, div.table.stepPreview .row .title .curriculum_title {
   font-size: 1.1em;
   text-decoration: underline;
   margin-bottom: 1em;

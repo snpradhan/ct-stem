@@ -82,11 +82,11 @@
               {% endif %}
             </div>
             <div class="col-md-6 title">
-              <div class="assessment_title">
+              <div class="curriculum_title">
                 {{curriculum.title|title}}
               </div>
-              <div class="assessment_step_title">
-                <span>{{step.title.value}}</span>
+              <div class="step_title">
+                <span>{{step.title}}</span>
                 <span>({{forloop.counter}}/{{steps|length}})</span>
               </div>
             </div>
@@ -104,44 +104,47 @@
           </div>
           <hr>
           <div>{{step.content|inline_style|safe}}</div>
+          {% if step.questions.count %}
+            <hr>
+          {% endif %}
           <div class="question_container">
             {% for question in step.questions.all %}
-            <table class="question_table">
-              <tr>
-                <td width="5%" style="vertical-align: top;" class="question_no"> Q{{forloop.counter}}.</td>
-                <td class="question_text"> {{question.question_text|inline_style|safe }} </td>
-              </tr>
-              <tr>
-                <td></td>
-                <td class="answer_field">
-                  {% with field_type=question.answer_field_type %}
-                    {% if field_type == 'TA' %}
-                      <textarea placeholder="Enter your response" class="form-control" required></textarea>
-                    {% elif field_type == 'TF' %}
-                      <input type="text" placeholder="Enter your response" class="form-control"/>
-                    {% elif field_type == 'DD' %}
-                      <div class="multiplechoice">
-                        <div class="note"> Note: Select one answer </p>
-                        <select class="form-control" required>
-                          {% for option in question.options|split:','%}
-                            <option value="{{option}}">{{option}}</option>
-                          {% endfor %}
-                      </select>
-                      </div>
-                    {% elif field_type == 'MC' %}
-                      <div class="note"> Note: Select one answer </div>
-                      {% for option in question.options|split:','%}
-                        <input type="radio" name="{{question.id}}" id="{{question.id}}" value="{{option}}"/>  {{option}}<br>
-                      {% endfor %}
-                    {% elif field_type == 'MS' %}
-                      <div class="note"> Note: Select all that apply </div>
-                      {% for option in question.options|split:','%}
-                        <input type="checkbox" name="{{question.id}}_cb" id="{{question.id}}_cb" value="{{option}}"/>  {{option}}<br>
-                      {% endfor %}
-                    {% endif %}
-                  {% endwith %}
-                </td>
-              </tr>
+              <table class="question_table">
+                <tr>
+                  <td width="5%" style="vertical-align: top;" class="question_no"> Q.</td>
+                  <td class="question_text"> {{question.question_text|inline_style|safe }} </td>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td class="answer_field">
+                    {% with field_type=question.answer_field_type %}
+                      {% if field_type == 'TA' %}
+                        <textarea placeholder="Enter your response" class="form-control" required></textarea>
+                      {% elif field_type == 'TF' %}
+                        <input type="text" placeholder="Enter your response" class="form-control"/>
+                      {% elif field_type == 'DD' %}
+                        <div class="multiplechoice">
+                          <div class="note"> Note: Select one answer </div>
+                          <select class="form-control" required>
+                            {% for option in question.options|split:','%}
+                              <option value="{{option}}">{{option}}</option>
+                            {% endfor %}
+                          </select>
+                        </div>
+                      {% elif field_type == 'MC' %}
+                        <div class="note"> Note: Select one answer </div>
+                        {% for option in question.options|split:','%}
+                          <input type="radio" name="{{question.id}}" id="{{question.id}}" value="{{option}}"/>  {{option}}<br>
+                        {% endfor %}
+                      {% elif field_type == 'MS' %}
+                        <div class="note"> Note: Select all that apply </div>
+                        {% for option in question.options|split:','%}
+                          <input type="checkbox" name="{{question.id}}_cb" id="{{question.id}}_cb" value="{{option}}"/>  {{option}}<br>
+                        {% endfor %}
+                      {% endif %}
+                    {% endwith %}
+                  </td>
+                </tr>
               </table>
             {% endfor %}
           </div>
