@@ -108,8 +108,8 @@
             <hr>
           {% endif %}
           <div class="question_container">
-            {% for question in step.questions.all %}
-              <table class="question_table">
+            <table class="question_table">
+              {% for question in step.questions.all %}
                 <tr>
                   <td width="5%" style="vertical-align: top;" class="question_no"> Q.</td>
                   <td class="question_text"> {{question.question_text|inline_style|safe }} </td>
@@ -145,8 +145,8 @@
                     {% endwith %}
                   </td>
                 </tr>
-              </table>
-            {% endfor %}
+              {% endfor %}
+            </table>
           </div>
           <hr>
           <div class="row footer">

@@ -64,9 +64,9 @@
             {% if formset|length %}
               <hr>
             {% endif %}
-            {% for questionForm in formset %}
-              {% with questionObj=questionForm.curriculum_question.value|get_curriculum_question %}
-              <table class="question_table">
+            <table class="question_table">
+              {% for questionForm in formset %}
+                {% with questionObj=questionForm.curriculum_question.value|get_curriculum_question %}
                 <tr>
                   <td width="5%" style="vertical-align: top;" class="question_no">
                     {{questionForm.id}}
@@ -132,9 +132,9 @@
                   <td></td>
                   <td><div class="error">{{questionForm.response.errors}}</div></td>
                 </tr>
-              </table>
               {% endwith %}
-            {% endfor %}
+              {% endfor %}
+            </table>
           </div>
         </div>
         <hr>

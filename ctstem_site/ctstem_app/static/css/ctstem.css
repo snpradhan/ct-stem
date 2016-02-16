@@ -183,9 +183,8 @@ div.table#curriculumPreview, div.table.stepPreview {
   background-color: #eee;
 }
 table.question_table {
-  margin-bottom: 2em;
+  margin-bottom: 1em;
 }
-
 table.question_table .question_no{
   font-weight: 700;
 }
@@ -204,6 +203,9 @@ div.table.stepPreview .answer_field .input_container .circle {
   border-radius: 20px;
   height: 20px;
   width: 20px;
+}
+table.question_table td.answer_field {
+  padding-bottom: 2em;
 }
 
 div.table#curriculumPreview, div.table#curriculumQuestions, div.table#curriculumPreview, div.table.stepPreview{
