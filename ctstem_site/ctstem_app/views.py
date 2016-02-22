@@ -369,9 +369,8 @@ def register(request):
           new_user = authenticate(username=form.cleaned_data['username'],
                                   password=form.cleaned_data['password1'], )
           login(request, new_user)
-          curricula = models.Curriculum.objects.all().filter(curriculum_type = 'L').order_by('id')
-          context = {'curricula': curricula, 'curriculum_type': curr_type}
-          return render(request, 'ctstem_app/Curricula.html', context)
+          messages.info(request, 'Your have successfully registered.')
+          return shortcuts.redirect('ctstem:home')
       else:
         messages.info(request, 'User account has been created.')
         if form.cleaned_data['account_type'] == 'A':

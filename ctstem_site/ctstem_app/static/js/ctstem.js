@@ -102,12 +102,13 @@ $(function (){
   //user code generation
   $("#generate_code").click(function(){
     var url = "/generate_code";
+    var obj = $(this);
     $.ajax({
       type: 'GET',
       url: url,
       dataType: 'json',
       success: function(data){
-        $("input[id^='id'][id$='code']").val(data['code']);
+        $(obj).closest('.input-group').find("input[id^='id'][id$='code']").val(data['code']);
       },
       error: function(){
         alert("Please try generating the user code again.")
