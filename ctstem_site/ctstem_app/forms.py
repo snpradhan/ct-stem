@@ -514,6 +514,17 @@ class QuestionResponseForm(ModelForm):
     model = models.QuestionResponse
     exclude = ('created_date', 'modified_date',)
 
+  def clean(self):
+    cleaned_data = super(QuestionResponseForm, self).clean()
+    response = cleaned_data.get('response')
+    responseFile = cleaned_data.get('responseFile')
+    if not response and not responseFile:
+      self.add_error('response', 'This field is required')
+      self.add_error('responseFile', 'This field is required')
+    elif responseFile and responseFile._size >  5*1024*1024:
+      self.add_error('responseFile', 'Uploaded file cannot be bigger than 5MB')
+
+
 ####################################
 # School Form
 ####################################

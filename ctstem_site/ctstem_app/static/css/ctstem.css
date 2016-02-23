@@ -205,7 +205,10 @@ div.table.stepPreview .answer_field .input_container .circle {
   width: 20px;
 }
 table.question_table td.answer_field {
-  padding-bottom: 2em;
+  padding-bottom: 0.5em;
+}
+table.question_table td.error {
+  padding-bottom: 1em;
 }
 
 div.table#curriculumPreview, div.table#curriculumQuestions, div.table#curriculumPreview, div.table.stepPreview{

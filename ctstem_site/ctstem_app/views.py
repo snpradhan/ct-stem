@@ -941,10 +941,9 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
         return render(request, 'ctstem_app/AssignmentStep.html', context)
       elif 'POST' == request.method:
         data = request.POST.copy()
-
         form = forms.AssignmentStepResponseForm(data, instance=assignmentStepResponse, prefix="step_response")
         questionResponseFormset=inlineformset_factory(models.AssignmentStepResponse, models.QuestionResponse, form=forms.QuestionResponseForm, can_delete=False, extra=0)
-        formset = questionResponseFormset(data, instance=assignmentStepResponse, prefix='form')
+        formset = questionResponseFormset(data, request.FILES, instance=assignmentStepResponse, prefix='form')
 
         if form.is_valid() and formset.is_valid():
           instance.last_step = step.order

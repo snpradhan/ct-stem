@@ -141,9 +141,16 @@
                         {% for option in question.options|split:','%}
                           <input type="checkbox" name="{{question.id}}_cb" id="{{question.id}}_cb" value="{{option}}"/>  {{option}}<br>
                         {% endfor %}
+                      {% elif field_type == 'FI' %}
+                        <div class="note"> Note: Upload a file </div>
+                        <input type="file" placeholder="Upload your file" class="form-control"/>
                       {% endif %}
                     {% endwith %}
                   </td>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td class="error"></td>
                 </tr>
               {% endfor %}
             </table>

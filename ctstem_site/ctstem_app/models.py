@@ -24,6 +24,7 @@ FIELD_TYPE_CHOICES = (
     (u'DD', u'Drop Down'),
     (u'MS', u'Multi-Select'),
     (u'MC', u'Multiple Choice'),
+    (u'FI', u'File'),
 )
 
 USER_ROLE_CHOICES = (
@@ -65,6 +66,8 @@ def upload_file_to(instance, filename):
     return 'attachment/%s%s' % (filename_base.lower(), filename_ext.lower(),)
   elif isinstance(instance, Category):
     return 'standard/%s%s' % (filename_base.lower(), filename_ext.lower(),)
+  elif isinstance(instance, QuestionResponse):
+    return 'questionResponse/%s/%s%s' % (instance.step_response.instance.student.user, filename_base.lower(), filename_ext.lower(),)
   return 'misc/%s%s' % (instance.id,filename_ext.lower(),)
 
 # Create your models here.
@@ -320,7 +323,8 @@ class AssignmentStepResponse(models.Model):
 class QuestionResponse(models.Model):
   step_response = models.ForeignKey(AssignmentStepResponse)
   curriculum_question = models.ForeignKey(CurriculumQuestion)
-  response = models.TextField(null=False, blank=False)
+  response = models.TextField(null=True, blank=True)
+  responseFile = models.FileField(upload_to=upload_file_to, blank=True)
   created_date = models.DateTimeField(auto_now_add=True)
   modified_date = models.DateTimeField(auto_now=True)
 
