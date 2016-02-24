@@ -868,7 +868,7 @@ def group(request, id=''):
 # STUDENT ASSIGNMENTS
 ####################################
 @login_required
-def assignments(request):
+def assignments(request, bucket=''):
   try:
     if hasattr(request.user, 'student') == False:
       return http.HttpResponseNotFound('<h1>You do not have the privilege to view assignments</h1>')
@@ -876,23 +876,60 @@ def assignments(request):
     student = request.user.student
     if request.method == 'GET':
       groups = models.Membership.objects.all().filter(student=student).values_list('group', flat=True)
-      print groups
       #for each group
       assignments = models.Assignment.objects.all().filter(group__in=groups)
       assignment_list = []
+      active_list = []
+      archived_list = []
+      new_count = 0
+      serial = 1
       for assignment in assignments:
         try:
           instance = models.AssignmentInstance.objects.get(assignment=assignment, student=student)
+          if instance.status in ['P', 'S', 'F']:
+            active_list.append({'serial': serial, 'assignment': assignment, 'instance': instance, 'percent_complete': float(instance.last_step)/len(assignment.curriculum.steps.all())*100})
+          else:
+            archived_list.append({'serial': serial, 'assignment': assignment, 'instance': instance, 'percent_complete': 100})
         except models.AssignmentInstance.DoesNotExist:
           instance = None
+          new_count += 1
+          active_list.append({'serial': serial, 'assignment': assignment, 'instance': instance, 'percent_complete': 0})
+        serial += 1
 
-        assignment_list.append({'assignment': assignment, 'instance': instance})
-      context = {'assignment_list': assignment_list}
-      return render(request, 'ctstem_app/Assignments.html', context)
+      if bucket == 'inbox':
+        assignment_list = active_list
+      else:
+        assignment_list = archived_list
+
+      assignment_list.sort(key=lambda item:item['assignment'].assigned_date, reverse=True)
+      context = {'assignment_list': assignment_list, 'new': new_count, 'inbox': len(active_list), 'archived': len(archived_list)}
+      return render(request, 'ctstem_app/MyAssignments.html', context)
     return http.HttpResponseNotAllowed(['GET'])
 
   except models.Student.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested student not found</h1>')
+
+####################################
+# STUDENT archives assignment
+####################################
+@login_required
+def archiveAssignment(request, instance_id=''):
+  try:
+    if hasattr(request.user, 'student') == False:
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to archive this assignments</h1>')
+
+    instance = models.AssignmentInstance.objects.get(id=instance_id)
+    if instance.status == 'F':
+      instance.status = 'A'
+      instance.save()
+      messages.success(request, 'Your assignment has been archived')
+    else:
+      messages.success(request, 'Only assignments with status Feedback Ready can be archived')
+
+    return shortcuts.redirect('ctstem:assignments', bucket='inbox')
+
+  except models.AssignmentInstance.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested assignment not found</h1>')
 
 ####################################
 # STUDENT ATTEMPTING ASSIGNMENTS
@@ -961,7 +998,7 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
             return shortcuts.redirect('ctstem:resumeAssignment', assignment_id=assignment_id, instance_id=instance.id, step_order=step.order+1)
           else:
             messages.success(request, 'Your assignment has been submitted')
-            return shortcuts.redirect('ctstem:assignments')
+            return shortcuts.redirect('ctstem:assignments', bucket='inbox')
         else:
           print form.errors
           print formset.errors

@@ -1,0 +1,129 @@
+{% extends "ctstem_app/base.html" %}
+{% load base_extras %}
+{% block media %}
+  {{ block.super }}
+  {{ form.media }}
+  <link href="/static/css/circliful.css" rel="stylesheet" type="text/css" />
+  <script src="/static/js/circliful.min.js"></script>
+{% endblock %}
+{% block title %}My Assignments |{% endblock %}
+
+{% block content %}
+  {{block.super}}
+  <div class="content" id="assignments">
+    <h2> My Assignments </h2>
+    <ul class="nav nav-tabs">
+      <li class="{% navactive request 'ctstem:assignments' 'inbox' %}"><a href="{% url 'ctstem:assignments' 'inbox' %}">Inbox ({{new}}/{{inbox}})</a></li>
+      <li class="{% navactive request 'ctstem:assignments' 'archive' %}"><a href="{% url 'ctstem:assignments' 'archive' %}">Archive ({{archived}})</a></li>
+    </ul>
+    {% if assignment_list %}
+      <table class="table table-striped" id="assignments">
+        <tbody>
+          {% for assignment_details in assignment_list %}
+            <tr>
+              <td width="7%">
+                {% if assignment_details.assignment.curriculum.icon %}
+                  <img src="{{assignment_details.assignment.curriculum.icon.url}}" class="icon"/>
+                {% else %}
+                  <img src="/static/img/assignment_icon.png" class="icon"/>
+                {% endif %}
+              </td>
+              <td class="title">
+                <div class="title">
+                  <a class="assessment_info" name="assessment_info" data-form="{% url 'ctstem:curriculumContent' assignment_details.assignment.curriculum.id %}"> {{assignment_details.assignment.curriculum.title}} </a>
+                </div>
+                <div class="row dates">
+                  <div class="col-sm-3"> Group: <div class="normal">{{assignment_details.assignment.group}}</div></div>
+                  <div class="col-sm-3"> Assigned: <div class="normal">{{assignment_details.assignment.assigned_date|date}}</div> </div>
+                  <div class="col-sm-3">  Due: <div class="normal">{{assignment_details.assignment.due_date|date}}</div> </div>
+                  <div class="col-sm-3"> Modified: <div class="normal">{% if assignment_details.instance %}
+                                {{assignment_details.instance.modified_date|date}}
+                              {% else %}
+                                -
+                              {% endif %}</div>
+                  </div>
+                </div>
+              </td>
+              <td class="status" width="20%">
+                <div class="row">
+                  <div class="col-sm-6 status">
+                    <div>
+                      {% if assignment_details.instance %}
+                        {{assignment_details.instance.get_status_display}}
+                        <!--{% if assignment_details.instance.status == 'P' %}
+                          ({{assignment_details.instance.last_step}}/{{assignment_details.assignment.curriculum.steps.all.count}})
+                        {% endif %}-->
+                      {% else %}
+                        New
+                      {% endif %}
+                    </div>
+                  </div>
+                  <div class="col-sm-6">
+                    <div id="chart_{{assignment_details.serial}}" class="chart" name={{assignment_details.percent_complete}}></div>
+                  </div>
+                </div>
+
+                <div class="buttons">
+                  {% if assignment_details.instance %}
+                    {% if assignment_details.instance.status == 'P' %}
+                      <a type="button" class="btn btn-primary btn-sm" aria-label="Resume Assignment" title="Resume Assignment" href="{% url 'ctstem:resumeAssignment' assignment_details.assignment.id assignment_details.instance.id assignment_details.instance.last_step %}">
+                        Resume <span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span>
+                      </a>
+                    {% else %}
+                      <a type="button" class="btn btn-info btn-sm" aria-label="Resume Assignment" title="Resume Assignment" href="{% url 'ctstem:resumeAssignment' assignment_details.assignment.id assignment_details.instance.id 1 %}">
+                        View <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
+                      </a>
+                    {% endif %}
+                    {% if assignment_details.instance.status == 'F' %}
+                      <a type="button" class="btn btn-warning btn-sm" aria-label="Archive Assignment" title="Archive Assignment" href="{% url 'ctstem:archiveAssignment' assignment_details.instance.id %}">
+                        Archive <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
+                      </a>
+                    {% endif %}
+                  {% else %}
+                    <a type="button" class="btn btn-success btn-sm" aria-label="Start Assignment" title="Start Assignment" href="{% url 'ctstem:startAssignment' assignment_details.assignment.id %}">
+                      Start <span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+                    </a>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p>You do not have any assignments.</p>
+    {% endif %}
+
+    <div class="modal fade" id="assessmentModal" role="dialog">
+    </div>
+
+  </div>
+  <script type="text/javascript">
+    $(function (){
+      $("a.assessment_info").click(function(e){
+        e.preventDefault();
+        var url = $(this).data("form");
+        $("#assessmentModal").load(url, function() {
+          $(this).modal('show');
+        });
+        return false;
+      });
+      $(".chart").each(function(){
+        var id = $(this).attr('id');
+        var percentage = $(this).attr('name');
+        $("#"+id).circliful({
+          animationStep: 10,
+          foregroundBorderWidth: 25,
+          backgroundBorderWidth: 25,
+          percent: percentage,
+          fontColor: '#000',
+          foregroundColor: '#006000',
+          text: 'Complete'
+        });
+      });
+
+    });
+  </script>
+{% endblock %}
+
+

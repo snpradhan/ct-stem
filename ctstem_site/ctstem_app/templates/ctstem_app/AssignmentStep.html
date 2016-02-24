@@ -33,7 +33,7 @@
           </div>
           <div class="col-md-3 next">
             {% if form.instance.step.order != total_steps %}
-              {% if form.instance.instance.status == 'S' %}
+              {% if form.instance.instance.status == 'S' or form.instance.instance.status == 'F' or form.instance.instance.status == 'A' %}
                  <a type="button" class="btn btn-primary" title="Next Step" href="{% url 'ctstem:resumeAssignment'  form.instance.instance.assignment.id form.instance.instance.id form.instance.step.order|add:'1' %}">
                   Next <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
                 </a>
@@ -43,8 +43,8 @@
                 </button>
               {% endif %}
             {% else %}
-              {% if form.instance.instance.status == 'S' %}
-                <a type="button" class="btn btn-danger" title="Next Step" href="{% url 'ctstem:assignments' %}">
+              {% if form.instance.instance.status == 'S' or form.instance.instance.status == 'F' or form.instance.instance.status == 'A'%}
+                <a type="button" class="btn btn-danger" title="Next Step" href="{% url 'ctstem:assignments' 'inbox' %}">
                   Exit
                 </a>
               {% else %}
@@ -159,7 +159,7 @@
           </div>
           <div class="col-md-6 next">
             {% if form.instance.step.order != total_steps %}
-              {% if form.instance.instance.status == 'S' %}
+              {% if form.instance.instance.status == 'S' or form.instance.instance.status == 'F' or form.instance.instance.status == 'A' %}
                  <a type="button" class="btn btn-primary" title="Next Step" href="{% url 'ctstem:resumeAssignment'  form.instance.instance.assignment.id form.instance.instance.id form.instance.step.order|add:'1' %}">
                   Next <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
                 </a>
@@ -169,8 +169,8 @@
                 </button>
               {% endif %}
             {% else %}
-              {% if form.instance.instance.status == 'S' %}
-                <a type="button" class="btn btn-danger" title="Next Step" href="{% url 'ctstem:assignments' %}">
+              {% if form.instance.instance.status == 'S' or form.instance.instance.status == 'F' or form.instance.instance.status == 'A' %}
+                <a type="button" class="btn btn-danger" title="Next Step" href="{% url 'ctstem:assignments' 'inbox' %}">
                   Exit
                 </a>
               {% else %}
@@ -193,7 +193,8 @@
 
       $(document).ready(function(){
         var status = "{{form.instance.instance.status}}";
-        if(status == "S"){
+        var closedStatus = ['S', 'F', 'A'];
+        if(closedStatus.indexOf(status) >= 0){
           $(':input').attr('disabled', 'disabled');
         }
       });

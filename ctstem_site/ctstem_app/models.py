@@ -49,6 +49,7 @@ ASSIGNMENT_STATUS = (
   (u'P', u'In Progress'),
   (u'S', u'Submitted'),
   (u'F', u'Feedback Ready'),
+  (u'A', u'Archived'),
 )
 
 def upload_file_to(instance, filename):
@@ -91,6 +92,7 @@ class Curriculum (models.Model):
   modified_by = models.ForeignKey(User, null=False, related_name='curriculum_modifier')
   created_date = models.DateTimeField(auto_now_add=True)
   modified_date = models.DateTimeField(auto_now=True)
+  icon = models.FileField(upload_to=upload_file_to, blank=True)
 
   class Meta:
       ordering = ['-id']

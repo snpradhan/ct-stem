@@ -72,14 +72,14 @@
               {% if not user.student %}
                 <li class="{% navactive request 'ctstem:curricula' 'lessons' %}"><a href="{% url 'ctstem:curricula' 'lessons' %}">Lesson Plans</a></li>
                 <li class="{% navactive request 'ctstem:curricula' 'assessments' %}"><a href="{% url 'ctstem:curricula' 'assessments' %}">Assessments</a></li>
+                <li class="{% navactive request 'ctstem:events' %}"><a href="{% url 'ctstem:events' %}">Events</a></li>
+                <li class="{% navactive request 'ctstem:publications' %}"><a href="{% url 'ctstem:publications' %}">Publications</a></li>
+                <li class="{% navactive request 'ctstem:standards' %}"><a href="{% url 'ctstem:standards' %}">Standards</a></li>
+                <li class="{% navactive request 'ctstem:jobs' %}"><a href="{% url 'ctstem:jobs' %}">Jobs</a></li>
               {% endif %}
               {% if user.student %}
-                <li class="{% navactive request 'ctstem:assignments' %}"><a href="{% url 'ctstem:assignments' %}">Assignments</a></li>
+                <li class="{% navactive request 'ctstem:assignments' 'inbox' %}"><a href="{% url 'ctstem:assignments' 'inbox' %}">My Assignments</a></li>
               {% endif %}
-
-              <li class="{% navactive request 'ctstem:events' %}"><a href="{% url 'ctstem:events' %}">Events</a></li>
-              <li class="{% navactive request 'ctstem:publications' %}"><a href="{% url 'ctstem:publications' %}">Publications</a></li>
-              <li class="{% navactive request 'ctstem:standards' %}"><a href="{% url 'ctstem:standards' %}">Standards</a></li>
 
               {% if user.administrator or user.researcher or user.teacher %}
                 <li class="dropdown {% navactive request 'ctstem:users' 'students' %} {% navactive request 'ctstem:users' 'teachers' %} {% navactive request 'ctstem:users' 'admins' %} {% navactive request 'ctstem:users' 'researchers' %} {% navactive request 'ctstem:users' 'authors' %} {% navactive request 'ctstem:groups' %}">
@@ -101,7 +101,7 @@
                   </ul>
                 </li>
               {% endif %}
-              <li class="{% navactive request 'ctstem:jobs' %}"><a href="{% url 'ctstem:jobs' %}">Jobs</a></li>
+
               {% if user.administrator or user.researcher %}
                 <li class="dropdown {% navactive request 'ctstem:subjects' %} {% navactive request 'ctstem:schools' %}">
                   <a href="#" class="dropdown-toggle" data-toggle="dropdown" id="metadata">Metadata<b class="caret"></b></a>

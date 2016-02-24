@@ -225,7 +225,7 @@ class CurriculumForm(ModelForm):
 
   class Meta:
     model = models.Curriculum
-    fields = ['curriculum_type', 'title', 'time', 'level', 'purpose', 'overview', 'status', 'subject', 'taxonomy', 'content', 'teacher_notes']
+    fields = ['curriculum_type', 'title', 'icon', 'time', 'level', 'purpose', 'overview', 'status', 'subject', 'taxonomy', 'content', 'teacher_notes']
     widgets = {
       'title': forms.TextInput(attrs={'placeholder': 'Lesson Title'}),
       'time': forms.TextInput(attrs={'rows':0, 'cols':60}),
