@@ -1,7 +1,7 @@
 /* Page Element Styles */
 body {
   color:#434547;
-  font-family:Verdana,helvetica,Arial,sans-serif;
+  font-family:'Roboto Condensed' !important;
   font-size:1em;
   font-size-adjust:none;
   font-stretch:normal;
@@ -86,15 +86,16 @@ body {
  ***************************************/
 .navbar {
   line-height: 1em;
-  font-size: 1.5em;
+  font-size: 1.8em;
   padding-left: 5em;
   padding-right: 5em;
   min-height:20px !important;
-  background-color: #520063;
+  background-color: #492771;
 }
 
 .navbar-default {
   background-image: none !important;
+  border: none;
 }
 
 .navbar-default .navbar-nav > li > a, .navbar-default .pull-right > li > a {
@@ -117,8 +118,8 @@ body {
 .navbar-default .navbar-brand {
   float: left;
   height: 1em;
+  font-size: 1.5em;
   padding: 8px 0 0 0;
-  font-size: 20px;
   line-height: 20px;
   color: white;
 }
@@ -381,25 +382,7 @@ div.table[id^='category_']:hover {
   background-color: #5a3163;
   cursor: pointer;
 }
-table.table[id^='subcategory_'] thead {
-  background-color: #5a3163;
-  color: #f2f2f2;
-}
 
-table.table#assignments {
-  text-align: center;
-}
-
-
-table.table.sub {
-  display:none;
-  max-width: 60%;
-  min-width: 40%;
-  text-align: center;
-}
-table.table.sub a:hover {
-  cursor: pointer;
-}
 div.table.item .glyphicon {
   font-size: 2.5em;
   color: white;
@@ -410,7 +393,7 @@ div.table.item .icon {
 ul#publications{
   font-size: 1.5em;
   list-style: none;
-  width: 80%;
+  width: 100%;
   margin: auto;
 }
 
@@ -426,8 +409,11 @@ div#categories {
   margin-top: 2em;
 }
 
-img.icon {
+div.standards img.icon {
   max-width: 100%;
+}
+table.table#assignments img.icon {
+  width: 100%;
 }
 /***********   CONTENT DIV END   ************/
 
@@ -456,12 +442,28 @@ select {
 /***************************************
             *   TABLE VIEW   *
  ***************************************/
-table.table {
+ table.table {
   margin: auto;
   border-radius: 10px;
   border-collapse:collapse;
   border: inherit !important;
 }
+table.table thead {
+  font-family: 'QuaTrocento Regular';
+  font-size: 1.2em;
+  font-weight: 400;
+}
+table.table thead tr#filterrow th{
+  font-size: 1em;
+}
+table.table thead tr#filterrow th input{
+  width: 100%;
+}
+table.table tbody {
+  font-family: 'Roboto Condensed Light';
+  font-size: 1em;
+}
+
 table.table tr:first-child th:first-child {
     border-top-left-radius: 10px;
     -moz-border-top-left-radius:: 10px;
@@ -479,16 +481,6 @@ table.table tr:last-child td:last-child {
   -moz-border-bottom-right-radius: 10px;
 }
 
-table.table thead tr#filterrow th {
-  font-weight: 400;
-  font-size: smaller;
-}
-table.table thead tr#filterrow th input {
-  width: 90%;
-}
-table.table td {
-  font-size: 0.9em;
-}
 table.table td.title, table.table td.status {
   font-weight: bold;
 }
@@ -526,6 +518,28 @@ table.table.inner_table thead tr {
 table.table thead tr:not(#filterrow) th{
   text-align: center;
 }
+table.table[id^='subcategory_'] thead {
+  background-color: #5a3163;
+  color: #f2f2f2;
+}
+
+table.table#assignments {
+  text-align: center;
+}
+table.table#assignments td.thumb {
+  width: 7%;
+  vertical-align: middle;
+}
+
+table.table.sub {
+  display:none;
+  max-width: 60%;
+  min-width: 40%;
+  text-align: center;
+}
+table.table.sub a:hover {
+  cursor: pointer;
+}
 
 .dataTables_wrapper .dataTables_length,
 .dataTables_wrapper .dataTables_filter,
@@ -549,7 +563,7 @@ div.form-group {
   margin-bottom: 2.5em;
 }
 div.form-group label{
-  font-size: 1.3em;
+  font-size: 1.6em;
 }
 
 div.form-group label .required{
@@ -566,22 +580,43 @@ div.content {
 }
 
 div.content#home {
-  width: 80%;
+  width: 100%;
   font-size: 1.5em;
   /*background-color: rgba(204,204,204, 1);
   border-radius: 2em;*/
-  padding: 1em;
+  margin: 0 0 1em 0;
 }
 
 div.content#home h3 {
   text-decoration: underline;
 }
-div.content#home #image img{
+div.content#home #image{
+  height: 50%;
   width: 100%;
+  background-image: url(/static/img/landing.png);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
 }
-div.content#home #tags{
-  margin-top: 1em;
-  margin-bottom: 2em;
+div.content#home #image #tags{
+  position: relative;
+  padding-top: 10%;
+  color: #f2f2f2;
+  text-align: center;
+  font-size: 1.5em;
+}
+div.content#home #image #tags #firsttag {
+  margin-top: 5%;
+}
+div.content#home #image #tags #secondtag {
+  margin-top: 2%;
+}
+div.content#home div#other_content {
+  width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 40px;
+  margin-top: 50px;
 }
 div.content#home #offer{
   margin-top: 1em;
@@ -646,6 +681,12 @@ div.modal-content div#taxonomyResults {
 .h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
   text-align: center;
   margin-top: 10px;
+  font-family: 'Quattrocento';
+  font-weight: bold;
+}
+
+.h1, h1 {
+  font-size: 36px;
 }
 /***********   HEADINGS END   ************/
 

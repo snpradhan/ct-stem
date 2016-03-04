@@ -21,7 +21,7 @@
         <tbody>
           {% for assignment_details in assignment_list %}
             <tr>
-              <td width="7%">
+              <td class="thumb">
                 {% if assignment_details.assignment.curriculum.icon %}
                   <img src="{{assignment_details.assignment.curriculum.icon.url}}" class="icon"/>
                 {% else %}
