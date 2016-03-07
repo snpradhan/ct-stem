@@ -30,6 +30,8 @@ ALLOWED_HOSTS = []
 SITE_ID = 1
 
 USE_L10N=False
+LOGIN_URL = '/'
+LOGIN_REDIRECT_URL = '/'
 
 # Application definition
 
@@ -52,6 +54,7 @@ INSTALLED_APPS = (
     'password_reset',
     'smart_selects',
     'django_cleanup',
+    'session_security',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -60,6 +63,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
+    'session_security.middleware.SessionSecurityMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -189,3 +193,6 @@ EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = 'sachin.pradhan@northwestern.edu'
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_SECURITY_WARN_AFTER = 1740
+SESSION_SECURITY_EXPIRE_AFTER = 1800
+SESSION_SECURITY_PASSIVE_URLS = ['/core/notice/check/']
