@@ -187,3 +187,5 @@ else:
 
 EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = 'sachin.pradhan@northwestern.edu'
+
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
