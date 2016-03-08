@@ -15,14 +15,7 @@
       <div class="table" id="assignment">
         {{form.management_form}}
         <div class="row header">
-          <div class="col-md-3 back">
-            {% if form.instance.step.order > 1 %}
-              <a type="button" class="btn btn-primary" title="Previous Step" href="{% url 'ctstem:resumeAssignment'  form.instance.instance.assignment.id form.instance.instance.id form.instance.step.order|add:'-1' %}">
-                <span class="glyphicon glyphicon-triangle-left" aria-hidden="true"></span> Previous
-              </a>
-            {% endif %}
-          </div>
-          <div class="col-md-6 title">
+          <div class="col-md-12 title">
             <div class="curriculum_title">
               {{form.instance.step.curriculum.title|title}}
             </div>
@@ -30,29 +23,6 @@
               <span>{{form.instance.step.title}}</span>
               <span>({{form.instance.step.order}}/{{total_steps}})</span>
             </div>
-          </div>
-          <div class="col-md-3 next">
-            {% if form.instance.step.order != total_steps %}
-              {% if form.instance.instance.status == 'S' or form.instance.instance.status == 'F' or form.instance.instance.status == 'A' %}
-                 <a type="button" class="btn btn-primary" title="Next Step" href="{% url 'ctstem:resumeAssignment'  form.instance.instance.assignment.id form.instance.instance.id form.instance.step.order|add:'1' %}">
-                  Next <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
-                </a>
-              {% else %}
-                <button type="submit" class="btn btn-primary" title="Next Step" >
-                  Next <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
-                </button>
-              {% endif %}
-            {% else %}
-              {% if form.instance.instance.status == 'S' or form.instance.instance.status == 'F' or form.instance.instance.status == 'A'%}
-                <a type="button" class="btn btn-danger" title="Next Step" href="{% url 'ctstem:assignments' 'inbox' %}">
-                  Exit
-                </a>
-              {% else %}
-                <button type="submit" class="btn btn-success" title="Submit Assignment">
-                  Submit
-                </button>
-              {% endif %}
-            {% endif %}
           </div>
         </div>
         <input type="hidden" name="step_order" value="{{step.order}}"/>
@@ -76,17 +46,18 @@
                   <td class="question_text">
                     {{questionObj.question_text|inline_style|safe}}
                     {{questionForm.curriculum_question.as_hidden}}
+                    {{questionForm.save.as_hidden}}
                   </td>
                 </tr>
                 <tr>
                   <td></td>
                   <td class="answer_field">
                     {% if field_type == 'TA' %}
-                      <textarea placeholder="Enter your response" class="form-control" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" required>{{questionForm.response.value}}</textarea>
+                      <textarea placeholder="Enter your response" class="form-control" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" >{{questionForm.response.value}}</textarea>
                     {% elif field_type == 'TF' %}
-                      <input type="text" placeholder="Enter your response" class="form-control" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" required value="{{questionForm.response.value}}" />
+                      <input type="text" placeholder="Enter your response" class="form-control" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{questionForm.response.value}}" />
                     {% elif field_type == 'DD' %}
-                      <select class="form-control" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" required>
+                      <select class="form-control" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}">
                         {% for option in questionObj.options|split:','%}
                           {% if option == questionForm.response.value %}
                             <option value="{{option}}" selected>{{option}}</option>
@@ -100,9 +71,9 @@
                       {% for option in questionObj.options|split:','%}
                         {% if forloop.counter == 1 %}
                           {% if option|slugify == questionForm.response.value|slugify %}
-                            <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}" required checked="true"/>  {{option}}<br>
+                            <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}"  checked="true"/>  {{option}}<br>
                           {% else %}
-                            <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}" required/>  {{option}}<br>
+                            <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}" />  {{option}}<br>
                           {% endif %}
                         {% else %}
                           {% if option|slugify == questionForm.response.value|slugify %}
@@ -142,6 +113,7 @@
                     </div>
                   </td>
                 </tr>
+
               {% endwith %}
               {% endwith %}
               {% endfor %}
@@ -153,7 +125,7 @@
           <div class="col-md-6 back">
             {% if form.instance.step.order > 1 %}
               <a type="button" class="btn btn-primary" title="Previous Step" href="{% url 'ctstem:resumeAssignment'  form.instance.instance.assignment.id form.instance.instance.id form.instance.step.order|add:'-1' %}">
-                <span class="glyphicon glyphicon-triangle-left" aria-hidden="true"></span> Previous
+                <span class="glyphicon glyphicon-triangle-left" aria-hidden="true"></span> Back
               </a>
             {% endif %}
           </div>
@@ -164,8 +136,11 @@
                   Next <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
                 </a>
               {% else %}
-                <button type="submit" class="btn btn-primary" title="Next Step" >
-                  Next <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
+                <button type="button" class="btn btn-primary save" title="Save" >
+                  Save
+                </button>
+                <button type="button" class="btn btn-primary submit" title="Next Step" >
+                  Save &amp; Continue <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
                 </button>
               {% endif %}
             {% else %}
@@ -174,12 +149,16 @@
                   Exit
                 </a>
               {% else %}
-                <button type="submit" class="btn btn-success" title="Submit Assignment">
+                <button type="button" class="btn btn-primary save" title="Save" >
+                  Save
+                </button>
+                <button type="button" class="btn btn-success submit" title="Submit Assignment">
                   Submit
                 </button>
               {% endif %}
             {% endif %}
           </div>
+          <input type="hidden" id="save" name="save" value="0"/>
         </div>
       </div>
     </form>
@@ -197,6 +176,18 @@
         if(closedStatus.indexOf(status) >= 0){
           $(':input').attr('disabled', 'disabled');
         }
+      });
+
+      $('button.save').click(function(){
+        $('input:hidden[id="save"]').val(1);
+        $('input:hidden[id*="save"][id*="form"]').val('on');
+        $('form').submit();
+      });
+
+      $('button.submit').click(function(){
+        $('input:hidden[id="save"]').val(0);
+        $('input:hidden[id*="save"][id*="form"]').val('');
+        $('form').submit();
       });
 
     </script>

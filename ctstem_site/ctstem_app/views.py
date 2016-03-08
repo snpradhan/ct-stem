@@ -978,13 +978,14 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
         return render(request, 'ctstem_app/AssignmentStep.html', context)
       elif 'POST' == request.method:
         data = request.POST.copy()
+        save_only = int(data['save'])
         form = forms.AssignmentStepResponseForm(data, instance=assignmentStepResponse, prefix="step_response")
         questionResponseFormset=inlineformset_factory(models.AssignmentStepResponse, models.QuestionResponse, form=forms.QuestionResponseForm, can_delete=False, extra=0)
         formset = questionResponseFormset(data, request.FILES, instance=assignmentStepResponse, prefix='form')
 
         if form.is_valid() and formset.is_valid():
           instance.last_step = step.order
-          if step.order < total_steps:
+          if save_only == 1 or step.order < total_steps:
             instance.status = 'P'
           else:
             instance.status = 'S'
@@ -994,15 +995,24 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
           assignmentStepResponse.save()
           formset.save()
           #update the instance
-          if instance.status == 'P':
-            return shortcuts.redirect('ctstem:resumeAssignment', assignment_id=assignment_id, instance_id=instance.id, step_order=step.order+1)
-          else:
+          #submission
+          if instance.status == 'S':
             messages.success(request, 'Your assignment has been submitted')
             return shortcuts.redirect('ctstem:assignments', bucket='inbox')
+          #Save or Save & Continue
+          else:
+            if save_only == 1:
+              messages.success(request, 'Your responses have been saved')
+              next_step = step.order
+            else:
+              messages.success(request, 'Your previous steps have been saved')
+              next_step = step.order + 1
+            return shortcuts.redirect('ctstem:resumeAssignment', assignment_id=assignment_id, instance_id=instance.id, step_order=next_step)
+
         else:
           print form.errors
           print formset.errors
-          messages.error(request, 'Please check the errors below')
+          messages.error(request, 'Please answer all the questions on this step before continuing on to the next step')
 
         context = {'form': form, 'formset': formset, 'total_steps': total_steps}
         return render(request, 'ctstem_app/AssignmentStep.html', context)

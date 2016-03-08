@@ -74,14 +74,7 @@
       {% for step in steps %}
         <div class="table stepPreview">
           <div class="row header">
-            <div class="col-md-3 back">
-              {% if forloop.counter > 1 %}
-                <a type="button" class="btn btn-primary" title="Previous Step" href="">
-                  <span class="glyphicon glyphicon-triangle-left" aria-hidden="true"></span> Previous
-                </a>
-              {% endif %}
-            </div>
-            <div class="col-md-6 title">
+            <div class="col-md-12 title">
               <div class="curriculum_title">
                 {{curriculum.title|title}}
               </div>
@@ -89,17 +82,6 @@
                 <span>{{step.title}}</span>
                 <span>({{forloop.counter}}/{{steps|length}})</span>
               </div>
-            </div>
-            <div class="col-md-3 next">
-              {% if forloop.last %}
-                <button type="submit" class="btn btn-success" title="Submit Assignment">
-                  Submit
-                </button>
-              {% else %}
-                <button type="submit" class="btn btn-primary" title="Next Step" >
-                  Next <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
-                </button>
-              {% endif %}
             </div>
           </div>
           <hr>
@@ -159,19 +141,22 @@
           <div class="row footer">
             <div class="col-md-6 back">
               {% if forloop.counter > 1 %}
-                <a type="button" class="btn btn-primary" title="Previous Step" href="">
-                  <span class="glyphicon glyphicon-triangle-left" aria-hidden="true"></span> Previous
-                </a>
+                <button type="button" class="btn btn-primary" title="Previous Step" disabled>
+                  <span class="glyphicon glyphicon-triangle-left" aria-hidden="true"></span> Back
+                </button>
               {% endif %}
             </div>
             <div class="col-md-6 next">
+              <button type="button" class="btn btn-primary save" title="Save" disabled>
+                Save
+              </button>
               {% if forloop.last %}
-                <button type="submit" class="btn btn-success" title="Submit Assignment">
+                <button type="submit" class="btn btn-success" title="Submit Assignment" disabled>
                   Submit
                 </button>
               {% else %}
-                <button type="submit" class="btn btn-primary" title="Next Step" >
-                  Next <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
+                <button type="button" class="btn btn-primary submit" title="Next Step" disabled>
+                  Save &amp; Continue <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
                 </button>
               {% endif %}
             </div>
