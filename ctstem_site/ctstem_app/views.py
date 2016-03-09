@@ -887,7 +887,9 @@ def assignments(request, bucket=''):
         try:
           instance = models.AssignmentInstance.objects.get(assignment=assignment, student=student)
           if instance.status in ['P', 'S', 'F']:
-            active_list.append({'serial': serial, 'assignment': assignment, 'instance': instance, 'percent_complete': float(instance.last_step)/len(assignment.curriculum.steps.all())*100})
+            total_questions = models.CurriculumQuestion.objects.all().filter(step__curriculum=assignment.curriculum).count()
+            attempted_questions = models.QuestionResponse.objects.all().filter(step_response__instance=instance).exclude(response__exact='', responseFile__exact='').count()
+            active_list.append({'serial': serial, 'assignment': assignment, 'instance': instance, 'percent_complete': float(attempted_questions)/float(total_questions)*100})
           else:
             archived_list.append({'serial': serial, 'assignment': assignment, 'instance': instance, 'percent_complete': 100})
         except models.AssignmentInstance.DoesNotExist:
@@ -941,7 +943,14 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
       return http.HttpResponseNotFound('<h1>You do not have the privilege to do this assignments</h1>')
 
     if '' != instance_id:
-      instance = models.AssignmentInstance.objects.get(id=instance_id)
+      instance = models.AssignmentInstance.objects.get(assignment_id=assignment_id, id=instance_id, student=request.user.student)
+      last_step = instance.last_step
+      print last_step, step_order
+      if int(step_order) > last_step + 1:
+        messages.error(request, 'Please use the buttons below to navigate between steps')
+        return shortcuts.redirect('ctstem:resumeAssignment', assignment_id=assignment_id, instance_id=instance.id, step_order=last_step)
+      if int(step_order) == 0:
+        step_order = 1
     else:
       instance = models.AssignmentInstance(assignment_id=assignment_id, student=request.user.student, status='N')
       step_order = 1
@@ -984,11 +993,15 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
         formset = questionResponseFormset(data, request.FILES, instance=assignmentStepResponse, prefix='form')
 
         if form.is_valid() and formset.is_valid():
-          instance.last_step = step.order
           if save_only == 1 or step.order < total_steps:
             instance.status = 'P'
+            if save_only == 0:
+              instance.last_step = step.order
+            else:
+              instance.last_step = step.order - 1
           else:
             instance.status = 'S'
+            instance.last_step = step.order
           instance.save()
           assignmentStepResponse = form.save(commit=False)
           assignmentStepResponse.instance = instance

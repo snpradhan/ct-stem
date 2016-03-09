@@ -524,8 +524,7 @@ class QuestionResponseForm(ModelForm):
     if save == False and not response and not responseFile:
       self.add_error('response', 'Please answer this question')
       self.add_error('responseFile', 'Please upload a file for this question')
-    print responseFile
-    if responseFile and responseFile._size >  5*1024*1024:
+    if responseFile and responseFile.size >  5*1024*1024:
       self.add_error('responseFile', 'Uploaded file cannot be bigger than 5MB')
 
 
