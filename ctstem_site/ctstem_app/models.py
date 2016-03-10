@@ -319,6 +319,9 @@ class AssignmentStepResponse(models.Model):
   instance = models.ForeignKey(AssignmentInstance)
   step = models.ForeignKey(Step)
 
+  class Meta:
+    unique_together = ('instance', 'step')
+
 #######################################################
 # Question Response Model
 #######################################################
@@ -329,6 +332,9 @@ class QuestionResponse(models.Model):
   responseFile = models.FileField(upload_to=upload_file_to, blank=True)
   created_date = models.DateTimeField(auto_now_add=True)
   modified_date = models.DateTimeField(auto_now=True)
+
+  class Meta:
+    unique_together = ('step_response', 'curriculum_question')
 
 #######################################################
 # Team Model
