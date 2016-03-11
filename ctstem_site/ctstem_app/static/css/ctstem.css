@@ -673,6 +673,9 @@ div.modal-content div#loginMsg , div.modal-content div#uploadMsg, div.modal-cont
 div.modal-content div#taxonomyResults {
   padding: 0 2em 1em 2em;
 }
+div.modal-content span.time {
+  color: red;
+}
 /***********   FORM GROUP END   ************/
 
 /***************************************

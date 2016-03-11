@@ -1496,4 +1496,21 @@ def deleteMember(request, id=''):
   except models.Team.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested Team Member not found</h1>')
 
+# Check session to see if it has expired
+@login_required
+def check_session(request):
+  if 'GET' == request.method:
+    data = {}
+    if hasattr(request.user, 'student') == True and datetime.datetime.now() - datetime.datetime.strptime(request.session['last_touch'], "%Y-%m-%d %H:%M:%S.%f") > datetime.timedelta( 0, settings.AUTO_LOGOUT_DELAY * 60, 0):
+      data['session_expired'] =  True
+    else:
+      data['session_expired'] =  False
+
+    return http.HttpResponse(json.dumps(data), content_type="application/json")
+
+  elif 'POST' == request.method:
+    request.session['last_touch'] = str(datetime.datetime.now())
+    return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+  return http.HttpResponseNotAllowed(['GET', 'POST'])
 

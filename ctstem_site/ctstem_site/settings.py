@@ -54,7 +54,6 @@ INSTALLED_APPS = (
     'password_reset',
     'smart_selects',
     'django_cleanup',
-    'session_security',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -63,10 +62,10 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
-    'session_security.middleware.SessionSecurityMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'ctstem_app.middleware.UpdateSession',
 )
 
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
@@ -193,6 +192,5 @@ EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = 'sachin.pradhan@northwestern.edu'
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-SESSION_SECURITY_WARN_AFTER = 1740
-SESSION_SECURITY_EXPIRE_AFTER = 1800
-SESSION_SECURITY_PASSIVE_URLS = ['/core/notice/check/']
+# Auto logout delay in minutes
+AUTO_LOGOUT_DELAY = 30

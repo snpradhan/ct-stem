@@ -10,7 +10,7 @@
 {% block content %}
   {{block.super}}
   <div class="content">
-    <form method="post" enctype="multipart/form-data" method="POST" id="assignmentForm">
+    <form method="post" enctype="multipart/form-data" id="assignmentForm">
       {% csrf_token %}
       <div class="table" id="assignment">
         {{form.management_form}}
@@ -181,21 +181,21 @@
       $('button.save').click(function(){
         $('input:hidden[id="save"]').val(1);
         $('input:hidden[id*="save"][id*="form"]').val('on');
-        $('form').submit();
+        $('form#assignmentForm').submit();
       });
 
       $('button.submit').click(function(){
         $('input:hidden[id="save"]').val(0);
         $('input:hidden[id*="save"][id*="form"]').val('');
-        $('form').submit();
+        $('form#assignmentForm').submit();
       });
 
       //auto submit form every 60 seconds
       $(function(){
+        {% if form.instance.instance.status != 'S' and form.instance.instance.status != 'F' and form.instance.instance.status != 'A' %}
         setInterval(function(){
           $('input:hidden[id="save"]').val(1);
           $('input:hidden[id*="save"][id*="form"]').val('on');
-
           $('#assignmentForm').ajaxSubmit({
             dataType : 'json',
             success: function(data){
@@ -222,8 +222,8 @@
             }
           });
           return false;
-
         }, 60000)
+        {% endif %}
       });
 
 

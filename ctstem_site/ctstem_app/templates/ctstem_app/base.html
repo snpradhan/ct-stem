@@ -25,7 +25,6 @@
 
       <script type="text/javascript" src="/static/js/ctstem.js"></script>
       <link rel="stylesheet" href="/static/css/ctstem.css" media="screen"/>
-      {% include 'session_security/all.html' %}
 
       <script type="text/javascript">
         $(function (){
@@ -53,6 +52,11 @@
               },
             });
           });
+          //check student session every 60 seconds
+          {% if user.student %}
+            setInterval(check_session, 60000);
+          {% endif %}
+
         });
       </script>
 
@@ -185,6 +189,34 @@
                   </div>
                   <div class="form-group button-row">
                     <a href="{% url 'password_reset_recover' %}">Forgot Password</a>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      {% endblock %}
+      {% block session_expiry %}
+        <div class="modal fade" id="session_expiry" role="dialog">
+          <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h3 class="modal-title">Session Expiring</h3>
+              </div>
+              <div id="sessionMsg">
+              </div>
+              <form class="form" id="formSession" method="post" action="{% url 'ctstem:check_session' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                  <h5>Your session is timing out in <span class="time"></span> second(s)</h5>
+                </div>
+                <div class="modal-footer">
+                  <div class="form-group button-row">
+                    <button type="submit" id="btnSession" class="btn btn-success">
+                      Keep Session
+                    </button>
+                    <a type="button" href="{% url 'ctstem:logout' %}" class="btn btn-warning">Logout</a>
                   </div>
                 </div>
               </form>
