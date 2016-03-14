@@ -413,7 +413,7 @@ div.standards img.icon {
   max-width: 100%;
 }
 table.table#assignments img.icon {
-  width: 100%;
+  width: 50%;
 }
 /***********   CONTENT DIV END   ************/
 
@@ -481,27 +481,29 @@ table.table tr:last-child td:last-child {
   -moz-border-bottom-right-radius: 10px;
 }
 
-table.table td.title, table.table td.status {
+table.table td.status {
   font-weight: bold;
 }
-table.table td.title div.title {
-  font-size: 1.3em;
+table.table td > div.title {
+  font-size: 1.4em;
+  font-weight: bold;
+  margin-bottom: 1em;
 }
-table.table td.status div.status {
-  margin-top: 2.8em;
+table.table td div.status {
   text-transform: uppercase;
+  font-weight: bold
 }
-table.table td.title .normal {
-  font-weight: normal;
+table.table td div.dates div.title {
+  font-weight: bold;
 }
-table.table td.title div.controls {
-  margin-top: 0.5em;
-}
-table.table td.title .dates {
-  margin-top: 1.5em;
-}
-table.table td.status .buttons {
+table.table td div.status .buttons {
   margin-top: .5em;
+}
+table.table td div.status div.chart_container {
+  margin-left: auto;
+  margin-right: auto;
+  width: 60%;
+  font-size: 0.8em;
 }
 
 table.table.dt thead tr:not(#filterrow), table.table.inner_table thead tr {
@@ -630,7 +632,7 @@ div.content#home .keyword {
   text-decoration: underline;
 }
 div.content#assignments {
-  width: 70%;
+  width: 50%;
 }
 div.btn-group {
   margin-bottom: 10px;

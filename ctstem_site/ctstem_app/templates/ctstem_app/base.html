@@ -201,7 +201,6 @@
           <div class="modal-dialog modal-sm">
             <div class="modal-content">
               <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
                 <h3 class="modal-title">Session Expiring</h3>
               </div>
               <div id="sessionMsg">
@@ -209,7 +208,7 @@
               <form class="form" id="formSession" method="post" action="{% url 'ctstem:check_session' %}">
                 {% csrf_token %}
                 <div class="modal-body">
-                  <h5>Your session is timing out in <span class="time"></span> second(s)</h5>
+                  <h5>Your session is expiring in <span class="time"></span> second(s)</h5>
                 </div>
                 <div class="modal-footer">
                   <div class="form-group button-row">

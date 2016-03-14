@@ -201,6 +201,10 @@ function check_session(){
         //set a counter on the dialog and show
         var sec = 30;
         $("div#session_expiry span.time").text(sec);
+        $('div#session_expiry').modal({
+                                backdrop: 'static',
+                                keyboard: false
+                              });
         $('div#session_expiry').modal('show');
         //logout in 30 seconds if the user does not respond
         var timeout = setTimeout(function(){
