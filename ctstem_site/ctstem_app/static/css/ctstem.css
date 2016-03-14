@@ -1,6 +1,5 @@
 /* Page Element Styles */
 body {
-  color:#434547;
   font-family:'Roboto Condensed' !important;
   font-size:1em;
   font-size-adjust:none;
@@ -84,50 +83,40 @@ body {
 /***************************************
             *   NAVBAR   *
  ***************************************/
-.navbar {
-  line-height: 1em;
-  font-size: 1.8em;
-  padding-left: 5em;
-  padding-right: 5em;
-  min-height:20px !important;
-  background-color: #492771;
-}
-
-.navbar-default {
+ .navbar-default {
   background-image: none !important;
   border: none;
+  background-color: black;
+  padding: 5px 0;
 }
 
-.navbar-default .navbar-nav > li > a, .navbar-default .pull-right > li > a {
-  padding-top: 10px;
-  padding-bottom: 5px;
-  color: white;
-}
-
-.navbar-default .navbar-nav > li > a:hover, .navbar-default .pull-right > li > a:hover{
-  background-color: #c097c9;
-  color: black;
-}
-
-.navbar-default .navbar-nav > li.active > a, .navbar-default .navbar-nav > li.active > a:hover{
-  background-color: #9752a5;
-  background-image: none;
-  color: white;
-  text-shadow: none;
+.navbar-default .navbar-nav {
+  font-size: 1.1em;
 }
 .navbar-default .navbar-brand {
-  float: left;
-  height: 1em;
-  font-size: 1.5em;
-  padding: 8px 0 0 0;
-  line-height: 20px;
-  color: white;
+  font-size: 1.7em;
+  font-family: 'Roboto Slab, serif';
 }
-
-.navbar-default .navbar-header {
-  margin-right: 5em;
+.navbar-default .navbar-brand span {
+  font-family: 'Montserrat, sans-serif';
+  font-size-adjust: 0.5;
 }
-
+.navbar-default .navbar-nav > li.active > a, .navbar-default .navbar-nav > li.active > a:hover{
+  background-image: none !important;
+}
+.navbar-default .navbar-nav .dropdown-menu {
+  background-color: black;
+}
+#intro-image-caption {
+  font-size: 0.8em;
+  font-family: sans-serif;
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  text-align: right;
+  width: 90%;
+  color: rgba(255, 255, 255, 0.7);
+}
 /***********   NAVBAR END   ************/
 
 
@@ -577,8 +566,28 @@ div.content {
   margin-left: auto;
   margin-right: auto;
   margin-bottom: 40px;
-  margin-top: 50px;
+  margin-top: 70px;
   min-height: 75%;
+}
+
+div.content#home header{
+  background-image:url(/static/img/header-bg3.jpg);
+  position: relative;
+  background-blend-mode: ;
+}
+div.content#home header .intro-text {
+  padding-top: 200px;
+  padding-bottom: 150px;
+  text-shadow: 3px 3px 10px rgba(0, 0, 0, 0.5);
+}
+div.content#home section {
+  padding: 80px 0px;
+}
+
+div.content#home section h3.section-subheading {
+  line-height: 150%;
+  padding: 0 150px;
+  font-style: normal;
 }
 
 div.content#home {
@@ -589,48 +598,7 @@ div.content#home {
   margin: 0 0 1em 0;
 }
 
-div.content#home h3 {
-  text-decoration: underline;
-}
-div.content#home #image{
-  height: 50%;
-  width: 100%;
-  background-image: url(/static/img/landing.png);
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: center;
-}
-div.content#home #image #tags{
-  position: relative;
-  padding-top: 10%;
-  color: #f2f2f2;
-  text-align: center;
-  font-size: 1.5em;
-}
-div.content#home #image #tags #firsttag {
-  margin-top: 5%;
-}
-div.content#home #image #tags #secondtag {
-  margin-top: 2%;
-}
-div.content#home div#other_content {
-  width: 80%;
-  margin-left: auto;
-  margin-right: auto;
-  margin-bottom: 40px;
-  margin-top: 50px;
-}
-div.content#home #offer{
-  margin-top: 1em;
-  margin-bottom: 2em;
-}
-div.content#home #team{
-  margin-top: 1em;
-  margin-bottom: 2em;
-}
-div.content#home .keyword {
-  text-decoration: underline;
-}
+
 div.content#assignments {
   width: 50%;
 }
@@ -685,14 +653,11 @@ div.modal-content span.time {
  ***************************************/
 .h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
   text-align: center;
-  margin-top: 10px;
-  font-family: 'Quattrocento';
-  font-weight: bold;
 }
 
-.h1, h1 {
+/*.h1, h1 {
   font-size: 36px;
-}
+}*/
 /***********   HEADINGS END   ************/
 
 /***************************************
