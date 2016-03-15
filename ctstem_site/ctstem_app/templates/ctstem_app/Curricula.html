@@ -15,7 +15,7 @@
     {% endif %}
     {% if user.administrator or user.researcher or user.author %}
       <div class="btn-group">
-        <a type="button" class="btn btn-primary" href="{% url 'ctstem:newCurriculum' %}" title="Create new curriculum">Create Curriculum</a>
+        <a type="button" class="btn btn-success" href="{% url 'ctstem:newCurriculum' %}" title="Create new curriculum">Create Curriculum</a>
       </div>
     {% endif %}
     {% if curricula %}
@@ -39,12 +39,12 @@
             <tr>
               <td class="title">{{curriculum.title}} - v{{curriculum.version}}.
                 <div class="controls">
-                  <a type="button" class="btn btn-primary preview" aria-label="Preview Curriculum" title="Preview Curriculum" href="{% url 'ctstem:previewCurriculum' curriculum.id %}" target="_blank">
+                  <a type="button" class="btn btn-warning preview" aria-label="Preview Curriculum" title="Preview Curriculum" href="{% url 'ctstem:previewCurriculum' curriculum.id %}" target="_blank">
                     <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
                   </a>
                   {% if curriculum.curriculum_type == 'L' %}
                     <a type="button" class="btn btn-default pdf" title="Download Curriculum PDF" href="{% url 'ctstem:pdfCurriculum' curriculum.id %}">
-                      <img src="/static/img/pdf.png"/>
+                      <span class="glyphicon glyphicon-save-file" aria-hidden="true"></span>
                     </a>
                   {% endif %}
                   {% if user.administrator or user.researcher or user.author %}

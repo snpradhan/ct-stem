@@ -36,12 +36,12 @@
             <tr>
               <td class="title">{{assignment_details.assignment.curriculum.title}}
                 <div class="controls">
-                  <button class="btn btn-primary assessment_info" name="assessment_info" data-form="{% url 'ctstem:curriculumContent' assignment_details.assignment.curriculum.id %}">
+                  <button class="btn btn-default assessment_info" name="assessment_info" data-form="{% url 'ctstem:curriculumContent' assignment_details.assignment.curriculum.id %}">
                     <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
                   </button>
                   {% if assignment_details.instance %}
                     {% if assignment_details.instance.status == 'P' %}
-                      <a type="button" class="btn btn-primary btn-sm" aria-label="Resume Assignment" title="Resume Assignment" href="{% url 'ctstem:resumeAssignment' assignment_details.assignment.id assignment_details.instance.id assignment_details.instance.last_step %}">
+                      <a type="button" class="btn btn-default btn-sm" aria-label="Resume Assignment" title="Resume Assignment" href="{% url 'ctstem:resumeAssignment' assignment_details.assignment.id assignment_details.instance.id assignment_details.instance.last_step %}">
                         Resume <span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span>
                       </a>
                     {% else %}

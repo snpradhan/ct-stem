@@ -73,7 +73,7 @@
                 <div class="buttons">
                   {% if assignment_details.instance %}
                     {% if assignment_details.instance.status == 'P' %}
-                      <a type="button" class="btn btn-primary btn-md" aria-label="Resume Assignment" title="Resume Assignment" href="{% url 'ctstem:resumeAssignment' assignment_details.assignment.id assignment_details.instance.id assignment_details.instance.last_step|add:'1' %}">
+                      <a type="button" class="btn btn-warning btn-md" aria-label="Resume Assignment" title="Resume Assignment" href="{% url 'ctstem:resumeAssignment' assignment_details.assignment.id assignment_details.instance.id assignment_details.instance.last_step|add:'1' %}">
                         Resume <span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span>
                       </a>
                     {% else %}

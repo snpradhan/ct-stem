@@ -82,7 +82,7 @@ $(function (){
         else {
           var assignment = "";
           $.each(data, function(key, value){
-            assignment += "<tr><td>"+value['title']+"</td><<td>"+value['subject']+"</td><td>"+value['standards']+"</td><td><button type='button' class='btn btn-primary select_assignment' id='"+value['id']+"''>Assign</a></td></tr>";
+            assignment += "<tr><td>"+value['title']+"</td><<td>"+value['subject']+"</td><td>"+value['standards']+"</td><td><button type='button' class='btn btn-info select_assignment' id='"+value['id']+"''>Assign</a></td></tr>";
           });
           $("#assignmentResults table tbody").html(assignment);
           $("#assignmentResults").show();

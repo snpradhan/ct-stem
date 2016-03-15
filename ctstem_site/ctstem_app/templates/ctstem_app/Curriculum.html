@@ -35,7 +35,7 @@
                 <div style="display:none;">
                   {{field}}
                 </div>
-                <button class="btn btn-primary search_taxonomy" name="search_taxonomy" data-form="{% url 'ctstem:searchTaxonomy' %}">
+                <button class="btn btn-info search_taxonomy" name="search_taxonomy" data-form="{% url 'ctstem:searchTaxonomy' %}">
                   <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
                 </button>
                 <span class="expand_collapse_other">
@@ -100,7 +100,7 @@
           <div class="form-group attachment_table">
             {{attachment_formset.management_form}}
             <label for="id_attachment_table">Attachment(s)</label>
-            <a type="button" class="btn btn-primary" id="add_attachment" title="Add New Attachment">
+            <a type="button" class="btn btn-info" id="add_attachment" title="Add New Attachment">
               <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
             </a>
             <span class="expand_collapse_other">
@@ -213,7 +213,7 @@
               {{step.nested.management_form}}
               {{step.nested.id}}
               <label for="id_question_table">Step Question(s)</label>
-              <button class="btn btn-primary edit_question" name="add_question" data-form="{% url 'ctstem:newQuestion' %}" aria-label="Add New Question" title="Add New Question">
+              <button class="btn btn-info edit_question" name="add_question" data-form="{% url 'ctstem:newQuestion' %}" aria-label="Add New Question" title="Add New Question">
                 <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
               </button>
               <span class="expand_collapse_other">
@@ -268,7 +268,7 @@
 
       <div class="form-group button-group-fixed">
         <input type="submit" class="btn btn-success" id="submit" value="Save"/>
-        <input type="button" class="btn btn-primary" id="addStep" value="Add Step"/>
+        <input type="button" class="btn btn-info" id="addStep" value="Add Step"/>
       </div>
     </form>
     <div class="modal fade" id="questionModal" role="dialog"></div>

@@ -111,7 +111,7 @@ $(function (){
         else {
           var taxonomy = "";
           $.each(data, function(key, value){
-            taxonomy += "<tr><td>"+value['standard']+"</td><<td>"+value['category']+"</td><<td>"+value['title']+"</td><td>"+value['code']+"</td><td><button type='button' class='btn btn-primary select_taxonomy' id='"+value['id']+"''>Select</a></td></tr>";
+            taxonomy += "<tr><td>"+value['standard']+"</td><<td>"+value['category']+"</td><<td>"+value['title']+"</td><td>"+value['code']+"</td><td><button type='button' class='btn btn-info select_taxonomy' id='"+value['id']+"''>Select</a></td></tr>";
           });
           $("#taxonomyResults table tbody").html(taxonomy);
           $("#taxonomyResults").show();

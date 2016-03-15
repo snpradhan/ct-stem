@@ -124,7 +124,7 @@
         <div class="row footer">
           <div class="col-md-6 back">
             {% if form.instance.step.order > 1 %}
-              <a type="button" class="btn btn-primary" title="Previous Step" href="{% url 'ctstem:resumeAssignment'  form.instance.instance.assignment.id form.instance.instance.id form.instance.step.order|add:'-1' %}">
+              <a type="button" class="btn btn-info" title="Previous Step" href="{% url 'ctstem:resumeAssignment'  form.instance.instance.assignment.id form.instance.instance.id form.instance.step.order|add:'-1' %}">
                 <span class="glyphicon glyphicon-triangle-left" aria-hidden="true"></span> Back
               </a>
             {% endif %}
@@ -132,14 +132,14 @@
           <div class="col-md-6 next">
             {% if form.instance.step.order != total_steps %}
               {% if form.instance.instance.status == 'S' or form.instance.instance.status == 'F' or form.instance.instance.status == 'A' %}
-                 <a type="button" class="btn btn-primary" title="Next Step" href="{% url 'ctstem:resumeAssignment'  form.instance.instance.assignment.id form.instance.instance.id form.instance.step.order|add:'1' %}">
+                 <a type="button" class="btn btn-info" title="Next Step" href="{% url 'ctstem:resumeAssignment'  form.instance.instance.assignment.id form.instance.instance.id form.instance.step.order|add:'1' %}">
                   Next <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
                 </a>
               {% else %}
-                <button type="button" class="btn btn-primary save" title="Save" >
+                <button type="button" class="btn btn-info save" title="Save" >
                   Save
                 </button>
-                <button type="button" class="btn btn-primary submit" title="Next Step" >
+                <button type="button" class="btn btn-info submit" title="Next Step" >
                   Save &amp; Continue <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
                 </button>
               {% endif %}
@@ -149,7 +149,7 @@
                   Exit
                 </a>
               {% else %}
-                <button type="button" class="btn btn-primary save" title="Save" >
+                <button type="button" class="btn btn-info save" title="Save" >
                   Save
                 </button>
                 <button type="button" class="btn btn-success submit" title="Submit Assignment">

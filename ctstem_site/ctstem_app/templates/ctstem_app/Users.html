@@ -11,7 +11,7 @@
     <h2> {{role|title}} </h2>
     <div class="form-group">
       {% if user.administrator or user.researcher %}
-        <a type="button" class="btn btn-primary" href="{% url 'ctstem:register' %}" title="Add a new user">
+        <a type="button" class="btn btn-info" href="{% url 'ctstem:register' %}" title="Add a new user">
           <span class="glyphicon glyphicon-user" aria-hidden="true"></span> Create User
         </a>
         <a type="button" class="btn btn-warning" href="/static/excel/User_Template.csv" title="Download User Template">
@@ -21,7 +21,7 @@
           <span class="glyphicon glyphicon-upload" aria-hidden="true"></span> Upload Users
         </a>
       {% elif user.teacher %}
-        <a type="button" class="btn btn-primary" href="{% url 'ctstem:register' %}" title="Add a new user">
+        <a type="button" class="btn btn-info" href="{% url 'ctstem:register' %}" title="Add a new user">
           <span class="glyphicon glyphicon-user" aria-hidden="true"></span> Create Student
         </a>
         <a type="button" class="btn btn-warning" href="/static/excel/Student_Template.csv" title="Download Student Template">
@@ -132,7 +132,7 @@
                   <span class="glyphicon glyphicon-upload" aria-hidden="true"></span>
                   Upload
                 </button>
-                <a type="button" class="btn btn-primary" data-dismiss="modal">Cancel</a>
+                <a type="button" class="btn btn-danger" data-dismiss="modal">Cancel</a>
               </div>
 
             </div>

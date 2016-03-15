@@ -141,13 +141,13 @@
           <div class="row footer">
             <div class="col-md-6 back">
               {% if forloop.counter > 1 %}
-                <button type="button" class="btn btn-primary" title="Previous Step" disabled>
+                <button type="button" class="btn btn-default" title="Previous Step" disabled>
                   <span class="glyphicon glyphicon-triangle-left" aria-hidden="true"></span> Back
                 </button>
               {% endif %}
             </div>
             <div class="col-md-6 next">
-              <button type="button" class="btn btn-primary save" title="Save" disabled>
+              <button type="button" class="btn btn-default save" title="Save" disabled>
                 Save
               </button>
               {% if forloop.last %}
@@ -155,7 +155,7 @@
                   Submit
                 </button>
               {% else %}
-                <button type="button" class="btn btn-primary submit" title="Next Step" disabled>
+                <button type="button" class="btn btn-default submit" title="Next Step" disabled>
                   Save &amp; Continue <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
                 </button>
               {% endif %}

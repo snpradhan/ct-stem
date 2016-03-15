@@ -9,7 +9,7 @@
     <h2>Team Roles</h2>
     {% if user.administrator or user.researcher%}
       <div class="btn-group">
-        <a type="button" class="btn btn-primary" href="{% url 'ctstem:newMember' %}" title="Create new team member">Create Team Member</a>
+        <a type="button" class="btn btn-default" href="{% url 'ctstem:newMember' %}" title="Create new team member">Create Team Member</a>
       </div>
       <ul class="nav nav-tabs">
         <li class="{% navactive request 'ctstem:teamMembers' %}"><a href="{% url 'ctstem:teamMembers' %}">Team Members</a></li>

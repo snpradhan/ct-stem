@@ -12,7 +12,7 @@
     <h2> Schools </h2>
     {% if user.administrator or user.researcher%}
       <div class="btn-group">
-        <a type="button" class="btn btn-primary" href="{% url 'ctstem:newSchool' %}" title="Create new school">Create School</a>
+        <a type="button" class="btn btn-info" href="{% url 'ctstem:newSchool' %}" title="Create new school">Create School</a>
       </div>
     {% endif %}
     {% if schools %}
