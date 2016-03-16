@@ -161,14 +161,18 @@ div.table#register, div.table#userProfile, div.table#password {
   width: 50%;
   padding: 3em 4em;
 }
-div.table#curriculum, div.table#curriculumPreview,
-div.table.step,  div.table.stepPreview,
+div.table#curriculum, div.table.step,
 div.table#curriculumQuestions, div.table.activity, div.table#publication, div.table#group, div.table#standard {
   width: 70%;
   padding: 3em 4em;
 }
 div.table.step, div.table.activity, div.table.ngss, div.table.taxonomy, div.table#curriculumQuestions, div.table#curriculumPreview, div.table.stepPreview {
   margin-top: 3em;
+}
+div.table#curriculumPreview, div.table.stepPreview {
+  width: 90%;
+  text-align: left !important;
+  padding: 3em 4em;
 }
 
 div.table.step div.row.question {

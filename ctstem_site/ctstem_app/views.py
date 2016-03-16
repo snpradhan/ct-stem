@@ -34,7 +34,8 @@ def home(request):
   assessments = models.Curriculum.objects.all().filter(curriculum_type = 'A', status='P')[:6]
   practices = models.Category.objects.all().filter(standard__primary=True).select_related()
   team = models.Team.objects.all().order_by('role__order', 'order')
-  context = {'lessons': lessons, 'assessments' : assessments, 'practices': practices, 'team': team}
+  publications = models.Publication.objects.all()
+  context = {'lessons': lessons, 'assessments' : assessments, 'practices': practices, 'team': team, 'publications': publications}
   return render(request, 'ctstem_app/Home.html', context)
 
 ####################################

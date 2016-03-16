@@ -190,6 +190,14 @@ $(function (){
 
   $('ul.messages').delay(10000).fadeOut('slow');
 
+  $("a.preview").click(function(e){
+    e.preventDefault();
+    var url = $(this).data("form");
+    $(".portfolio-modal#curriculum").load(url, function() {
+      $(this).modal('show');
+    });
+    return false;
+  });
 });
 
 function check_session(){
