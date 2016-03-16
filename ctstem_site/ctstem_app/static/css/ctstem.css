@@ -613,6 +613,12 @@ div.content#home section h3.section-subheading {
   padding: 0 150px;
   font-style: normal;
 }
+div.content#home section.portfolio .portfolio-caption {
+  background-color: #f7f7f7;
+}
+div.content#home section.portfolio.bg-light-gray .portfolio-caption {
+  background-color: #fff;
+}
 
 div.content#home {
   width: 100%;

@@ -30,7 +30,6 @@
       <script type="text/javascript" src="{% url 'admin:jsi18n' %}"></script>
 
       <script type="text/javascript" src="/static/js/ctstem.js"></script>
-      <link rel="stylesheet" href="/static/css/agency.css" media="screen"/>
 
 
       <link href="/static/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
@@ -38,6 +37,7 @@
       <link href='https://fonts.googleapis.com/css?family=Kaushan+Script' rel='stylesheet' type='text/css'>
       <link href='https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
       <link href='https://fonts.googleapis.com/css?family=Roboto+Slab:400,100,300,700' rel='stylesheet' type='text/css'>
+      <link rel="stylesheet" href="/static/css/agency.css">
       <link rel="stylesheet" href="/static/css/ctstem.css" media="screen"/>
       <!-- Plugin JavaScript -->
 
@@ -82,7 +82,7 @@
       <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
         <div class="container">
           <div class="navbar-header page-scroll">
-            <button type="button" class="navbar-toggle" data-toggle="collapse">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
               <span class="sr-only">Toggle navigation</span>
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
@@ -91,7 +91,7 @@
             <a class="navbar-brand" href="{% url 'ctstem:home' %}">CT<span>STEM</span></a>
           </div>
           <!-- Collect the nav links, forms, and other content for toggling -->
-          <div class="collapse navbar-collapse">
+          <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
               {% if not user.student %}
                 {% if user.is_authenticated %}
@@ -101,12 +101,12 @@
                   <li class="{% navactive request 'ctstem:publications' %}"><a href="{% url 'ctstem:publications' %}">Research</a></li>
                   <li class="{% navactive request 'ctstem:standards' %}"><a href="{% url 'ctstem:standards' %}">Standards</a></li>
                 {% else %}
-                  <li class="page-scroll"><a href="#lessons">Lessons</a></li>
-                  <li class="page-scroll"><a href="#assessments">Assessments</a></li>
-                  <li class="page-scroll"><a href="#workshops">Workshops</a></li>
-                  <li class="page-scroll"><a href="#research">Research</a></li>
-                  <li class="page-scroll"><a href="#practices">Standards</a></li>
-                  <li class="page-scroll"><a href="#team">Team</a></li>
+                  <li><a class="page-scroll" href="#lessons">Lessons</a></li>
+                  <li><a class="page-scroll" href="#assessments">Assessments</a></li>
+                  <li><a class="page-scroll" href="#workshops">Workshops</a></li>
+                  <li><a class="page-scroll" href="#research">Research</a></li>
+                  <li><a class="page-scroll" href="#practices">Standards</a></li>
+                  <li><a class="page-scroll" href="#team">Team</a></li>
                 {% endif %}
               {% endif %}
               {% if user.student %}

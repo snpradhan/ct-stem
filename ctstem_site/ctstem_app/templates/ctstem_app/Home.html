@@ -24,7 +24,7 @@
     </header>
 
     <!-- Services Section -->
-    <section id="services">
+    <section id="services" class="bg-light-gray">
       <div class="container">
         <div class="row">
           <div class="col-lg-12 text-center">
@@ -88,7 +88,7 @@
       </div>
     </section>
     <!-- Portfolio Grid Section -->
-    <section id="lessons" class="portfolio bg-light-gray">
+    <section id="lessons" class="portfolio">
       <div class="container">
         <div class="row">
           <div class="col-lg-12 text-center">
@@ -117,7 +117,7 @@
       </div>
     </section>
     <!-- Portfolio Grid Section -->
-    <section id="assessments" class="portfolio">
+    <section id="assessments" class="portfolio bg-light-gray">
       <div class="container">
         <div class="row">
           <div class="col-lg-12 text-center">
@@ -126,19 +126,19 @@
           </div>
         </div>
         <div class="row">
-          {% for lesson in lessons %}
+          {% for assessment in assessments %}
           <div class="col-md-4 col-sm-6 portfolio-item">
-            <a href="#portfolioModal1" class="portfolio-link" data-toggle="modal">
+            <a href="#" class="portfolio-link" data-toggle="modal">
               <div class="portfolio-hover">
                 <div class="portfolio-hover-content">
                   <i class="fa fa-plus fa-3x"></i>
                 </div>
               </div>
-              <img src="{{lesson.icon.url}}" class="img-responsive" alt="">
+              <img src="{{assessment.icon.url}}" class="img-responsive" alt="">
             </a>
             <div class="portfolio-caption">
-              <h4>{{lesson.title}}</h4>
-              <p class="text-muted">{{lesson.overview|truncatechars:50 }}</p>
+              <h4>{{assessment.title}}</h4>
+              <p class="text-muted">{{assessment.overview|truncatechars:50 }}</p>
             </div>
           </div>
           {% endfor %}
@@ -146,7 +146,7 @@
       </div>
     </section>
     <!-- Workshop Grid Section -->
-    <section id="workshops" class="portfolio bg-light-gray">
+    <section id="workshops" class="portfolio">
       <div class="container">
         <div class="row">
           <div class="col-lg-12 text-center">
@@ -175,7 +175,7 @@
       </div>
     </section>
     <!-- Research Section -->
-    <section id="research" class="portfolio">
+    <section id="research" class="portfolio bg-light-gray">
       <div class="container">
         <div class="row">
           <div class="col-lg-12 text-center">
@@ -186,7 +186,7 @@
       </div>
     </section>
     <!-- About Section -->
-    <section id="practices" class="bg-light-gray">
+    <section id="practices">
       <div class="container">
         <div class="row">
           <div class="col-lg-12 text-center">
@@ -224,7 +224,7 @@
     </section>
 
     <!-- Team Section -->
-    <section id="team">
+    <section id="team" class="bg-light-gray">
       <div class="container">
         <div class="row">
           <div class="col-lg-12 text-center">
@@ -259,7 +259,7 @@
       </div>
     </section>
     <!-- Clients Aside -->
-    <aside class="clients bg-light-gray">
+    <aside class="clients">
       <div class="container">
         <div class="row">
           <div class="col-md-2 col-sm-4">
