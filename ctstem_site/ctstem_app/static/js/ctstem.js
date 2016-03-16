@@ -188,6 +188,8 @@ $(function (){
   //add form-control class to ORDER fields
   $('input[id$=ORDER]').addClass('form-control');
 
+  $('ul.messages').delay(10000).fadeOut('slow');
+
 });
 
 function check_session(){

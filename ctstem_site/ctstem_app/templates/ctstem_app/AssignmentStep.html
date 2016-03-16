@@ -124,7 +124,7 @@
         <div class="row footer">
           <div class="col-md-6 back">
             {% if form.instance.step.order > 1 %}
-              <a type="button" class="btn btn-info" title="Previous Step" href="{% url 'ctstem:resumeAssignment'  form.instance.instance.assignment.id form.instance.instance.id form.instance.step.order|add:'-1' %}">
+              <a type="button" class="btn btn-warning" title="Previous Step" href="{% url 'ctstem:resumeAssignment'  form.instance.instance.assignment.id form.instance.instance.id form.instance.step.order|add:'-1' %}">
                 <span class="glyphicon glyphicon-triangle-left" aria-hidden="true"></span> Back
               </a>
             {% endif %}
@@ -139,7 +139,7 @@
                 <button type="button" class="btn btn-info save" title="Save" >
                   Save
                 </button>
-                <button type="button" class="btn btn-info submit" title="Next Step" >
+                <button type="button" class="btn btn-success submit" title="Next Step" >
                   Save &amp; Continue <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
                 </button>
               {% endif %}
@@ -221,6 +221,8 @@
               $("ul.messages").html('<li class="error">The responses could not auto saved. Please click the Save or Save and Continue button at the bottom of the page.</li>');
             }
           });
+          $('ul.messages').show();
+          $('ul.messages').delay(10000).fadeOut('slow');
           return false;
         }, 60000)
         {% endif %}

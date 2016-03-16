@@ -39,7 +39,7 @@
             <tr>
               <td class="title">{{curriculum.title}} - v{{curriculum.version}}.
                 <div class="controls">
-                  <a type="button" class="btn btn-warning preview" aria-label="Preview Curriculum" title="Preview Curriculum" href="{% url 'ctstem:previewCurriculum' curriculum.id %}" target="_blank">
+                  <a type="button" class="btn btn-warning preview" aria-label="Preview Curriculum" title="Preview Curriculum" href="{% url 'ctstem:previewCurriculum' curriculum.id %}">
                     <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
                   </a>
                   {% if curriculum.curriculum_type == 'L' %}

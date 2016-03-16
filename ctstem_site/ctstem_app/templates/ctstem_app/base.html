@@ -200,7 +200,7 @@
     {% endblock %}
 
     {% block content %}
-      <ul class="messages">
+      <ul class="messages bg-light-gray">
         {% for message in messages %}
         <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
         {% endfor %}
@@ -273,37 +273,7 @@
       </div>
     {% endblock %}
 
-    {% block footer %}
-      <footer>
-        <div class="container">
-          <div class="row">
-            <div class="col-md-4">
-              <span class="copyright">Copyright &copy; CT-STEM 2016</span>
-            </div>
-            <div class="col-md-4">
-              <ul class="list-inline social-buttons">
-                <li><a href="#"><i class="fa fa-twitter"></i></a>
-                </li>
-                <li><a href="#"><i class="fa fa-facebook"></i></a>
-                </li>
-                <li><a href="#"><i class="fa fa-linkedin"></i></a>
-                </li>
-              </ul>
-            </div>
-            <div class="col-md-4">
-              <ul class="list-inline quicklinks">
-                <li><a href="#privacy" data-toggle="modal">Privacy Policy</a>
-                </li>
-                <li><a href="#terms" data-toggle="modal">Terms of Use</a>
-                </li>
-                <li><a href="#funding" data-toggle="modal">Funding Agency</a>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </footer>
-    {% endblock %}
+
 
     {% block privacy %}
       <div class="portfolio-modal modal fade" id="privacy" tabindex="-1" role="dialog" aria-hidden="true">
@@ -377,4 +347,38 @@
       </div>
     {% endblock %}
   </body>
+
+  <footer>
+    {% block footer %}
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4">
+          <span class="copyright">Copyright &copy; CT-STEM 2016</span>
+        </div>
+        <div class="col-md-4">
+          <ul class="list-inline social-buttons">
+            <li><a href="#"><i class="fa fa-twitter"></i></a>
+            </li>
+            <li><a href="#"><i class="fa fa-facebook"></i></a>
+            </li>
+            <li><a href="#"><i class="fa fa-linkedin"></i></a>
+            </li>
+          </ul>
+        </div>
+        <div class="col-md-4">
+          <ul class="list-inline quicklinks">
+            <li><a href="#privacy" data-toggle="modal">Privacy Policy</a>
+            </li>
+            <li><a href="#terms" data-toggle="modal">Terms of Use</a>
+            </li>
+            <li><a href="#funding" data-toggle="modal">Funding Agency</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    {% endblock %}
+  </footer>
+
+
 </html>
