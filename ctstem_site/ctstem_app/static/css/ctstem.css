@@ -162,7 +162,7 @@ div.table#register, div.table#userProfile, div.table#password {
   padding: 3em 4em;
 }
 div.table#curriculum, div.table.step,
-div.table#curriculumQuestions, div.table.activity, div.table#publication, div.table#group, div.table#standard {
+div.table#curriculumQuestions, div.table.activity, div.table#metadata, div.table#group, div.table#standard {
   width: 70%;
   padding: 3em 4em;
 }
@@ -580,6 +580,7 @@ table.table.sub a:hover {
 div.form-group {
   overflow: auto;
   margin-bottom: 2.5em;
+  margin-top: 1em;
 }
 div.form-group label{
   font-size: 1.6em;

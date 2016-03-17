@@ -567,7 +567,7 @@ class TeamRoleForm(ModelForm):
 
   class Meta:
     model = models.TeamRole
-    exclude = ('id',)
+    exclude = ('id', 'order',)
 
   def __init__(self, *args, **kwargs):
     super(TeamRoleForm, self).__init__(*args, **kwargs)

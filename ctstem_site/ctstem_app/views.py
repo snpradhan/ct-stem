@@ -516,7 +516,7 @@ def userProfile(request, id=''):
         if profileform is None:
           userform.save()
           messages.success(request, "User profile saved successfully")
-          context = {'userform': userform, }
+          context = {'userform': userform, 'role': role}
         elif profileform.is_valid():
           userform.save()
           profileform.save()
@@ -867,6 +867,40 @@ def group(request, id=''):
         return render(request, 'ctstem_app/UserGroup.html', context)
 
     return http.HttpResponseNotAllowed(['GET', 'POST'])
+
+  except models.UserGroup.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested group not found</h1>')
+
+####################################
+# DELETE A USER GROUP
+####################################
+@login_required
+def deleteGroup(request, id=''):
+  try:
+    # check if the group exists
+    if '' != id:
+      group = models.UserGroup.objects.get(id=id)
+      # check if the user has permission to delete this group
+      allowed = False
+      if hasattr(request.user, 'administrator'):
+        allowed = True
+      elif hasattr(request.user, 'researcher'):
+        subordinate_teachers = request.user.researcher.teachers.all()
+        if group.teacher in subordinate_teachers:
+          allowed = True
+      elif hasattr(request.user, 'teacher') and group.teacher == request.user.teacher:
+        allowed = True
+
+      if allowed == False:
+        return http.HttpResponseNotFound('<h1>You do not have the privilege to delete this group</h1>')
+
+      if request.method == 'GET' or request.method == 'POST':
+        group.delete()
+        messages.success(request, 'Student Group "%s" deleted' % group.title)
+        return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+    else:
+      raise models.UserGroup.DoesNotExist
 
   except models.UserGroup.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested group not found</h1>')
@@ -1418,16 +1452,18 @@ def teamRoles(request):
   if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'researcher') == False:
     return http.HttpResponseNotFound('<h1>You do not have the privilege to edit team roles</h1>')
 
-  TeamRoleFormSet = modelformset_factory(models.TeamRole, form=forms.TeamRoleForm)
+  TeamRoleFormSet = modelformset_factory(models.TeamRole, form=forms.TeamRoleForm, can_delete=True, can_order=True)
   if request.method == 'GET':
-    formset = TeamRoleFormSet(queryset=models.TeamRole.objects.all())
+    formset = TeamRoleFormSet(queryset=models.TeamRole.objects.all().order_by('order'))
     context = {'formset': formset}
     return render(request, 'ctstem_app/TeamRoles.html', context)
   elif request.method == 'POST':
     data = request.POST.copy()
     formset = TeamRoleFormSet(data, queryset=models.TeamRole.objects.all())
     if formset.is_valid():
-      formset.save()
+      for form in formset.ordered_forms:
+        form.instance.order = form.cleaned_data['ORDER']
+        form.save()
       messages.success(request, 'Team roles saved')
       return shortcuts.redirect('ctstem:teamRoles')
     else:

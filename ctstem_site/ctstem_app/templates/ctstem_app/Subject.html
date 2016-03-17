@@ -8,7 +8,7 @@
     <h2>Subject</h2>
     <form method="post" enctype="multipart/form-data">
       {% csrf_token %}
-      <div class="table" id="publication">
+      <div class="table" id="metadata">
         {{form.management_form}}
         {% for field in form %}
           <div class="form-group">
@@ -19,7 +19,7 @@
             <div class="error">{{ field.errors }}</div>
           </div>
         {% endfor %}
-        <div class="form-group button-group-fixed">
+        <div class="form-group button-group">
           <input type="submit" class="btn btn-success" id="submit" value="Save Subject"/>
         </div>
       </div>

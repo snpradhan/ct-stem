@@ -42,6 +42,7 @@ urlpatterns = [
     url(r'^question/new/$', views.question, name='newQuestion'),
     url(r'^question/(?P<id>[\d]+)/$', views.question, name='question'),
     url(r'^group/(?P<id>[\d]+)/$', views.group, name='group'),
+    url(r'^group/delete/(?P<id>[\d]+)/$', views.deleteGroup, name='deleteGroup'),
     url(r'^groups/$', views.groups, name='groups'),
     url(r'^group/new/$', views.group, name='newGroup'),
     url(r'^assignments/(?P<bucket>[\w-]+)/$', views.assignments, name='assignments'),
