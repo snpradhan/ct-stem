@@ -107,7 +107,7 @@
               </div>
               <img src="{{lesson.icon.url}}" class="img-responsive" alt="">
             </a>
-            <div class="portfolio-caption">
+            <div class="portfolio-caption bg-light-gray">
               <h4>{{lesson.title}}</h4>
               <p class="text-muted">{{lesson.overview|truncatechars:50}}</p>
             </div>
@@ -128,7 +128,7 @@
         <div class="row">
           {% for assessment in assessments %}
           <div class="col-md-4 col-sm-6 portfolio-item">
-            <a data-form="{% url 'ctstem:previewCurriculum' assessment.id %}" class="portfolio-link preview" data-toggle="modal">
+            <a data-form="{% url 'ctstem:previewCurriculum' assessment.id %}" class="portfolio-link preview" data-toggle="modal" data-target="curriculum">
               <div class="portfolio-hover">
                 <div class="portfolio-hover-content">
                   <i class="fa fa-plus fa-3x"></i>
@@ -179,27 +179,22 @@
       <div class="container">
         <div class="row">
           <div class="col-lg-12 text-center">
-            <h2 class="section-heading">Research</h2>
+            <h2 class="section-heading">Research Publications</h2>
             <h3 class="section-subheading text-muted">Lorem ipsum dolor sit amet consectetur.</h3>
           </div>
         </div>
         <div class="row">
           {% for publication in publications %}
-            <div class="col-md-4 col-sm-6 portfolio-item">
-              <a href="{{publication.web_link}}" class="portfolio-link" target="_blank">
-                <div class="portfolio-hover">
-                  <div class="portfolio-hover-content">
-                    <i class="fa fa-plus fa-3x"></i>
-                  </div>
-                </div>
-                <h5>{{publication.title}}</h5>
-              </a>
+            <div class="col-md-12 col-sm-12 portfolio-item">
               <div class="portfolio-caption">
-                <p>{{publication.authors}}</p>
+                <div class="title">{{publication.title}}</div>
+                <div class="authors">{{publication.authors}} <span class="journal"> - in {{publication.journal}}, {{publication.year}} </span></div>
+                <div>{% if publication.local_copy %}<a href="{{publication.local_copy.url}}" target="_blank">Download</a>{% endif %}</div>
               </div>
             </div>
           {% endfor %}
         </div>
+
       </div>
     </section>
     <!-- About Section -->

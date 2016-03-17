@@ -506,22 +506,6 @@ table.table td > div.title {
   font-weight: bold;
   margin-bottom: 1em;
 }
-table.table td div.status {
-  text-transform: uppercase;
-  font-weight: bold
-}
-table.table td div.dates div.title {
-  font-weight: bold;
-}
-table.table td div.status .buttons {
-  margin-top: .5em;
-}
-table.table td div.status div.chart_container {
-  margin-left: auto;
-  margin-right: auto;
-  width: 60%;
-  font-size: 0.8em;
-}
 
 table.table.dt thead tr:not(#filterrow), table.table.inner_table thead tr {
   background-color: #666666;
@@ -609,7 +593,7 @@ div.content#home header .intro-text {
   padding-bottom: 150px;
   text-shadow: 3px 3px 10px rgba(0, 0, 0, 0.5);
 }
-div.content#home section {
+div.content section {
   padding: 80px 0px;
 }
 
@@ -618,13 +602,30 @@ div.content#home section h3.section-subheading {
   padding: 0 150px;
   font-style: normal;
 }
-div.content#home section.portfolio .portfolio-caption {
+div.content section.portfolio .portfolio-caption {
   background-color: #f7f7f7;
 }
-div.content#home section.portfolio.bg-light-gray .portfolio-caption {
+div.content section.portfolio.bg-light-gray .portfolio-caption {
   background-color: #fff;
 }
 
+div.content#home section#research .portfolio-item .portfolio-caption{
+  text-align: left !important;
+  max-width: 100%;
+}
+div.content#home section#research .portfolio-item .portfolio-caption div {
+  margin-bottom: 0.5em;
+}
+div.content#home section#research .portfolio-item .portfolio-caption .title {
+  font-weight: bold;
+  font-size: 1.2em;
+}
+div.content#home section#research .portfolio-item .portfolio-caption .authors {
+  font-style: italic;
+}
+div.content#home section#research .portfolio-item .portfolio-caption .authors .journal {
+  font-style: normal;
+}
 div.content#home {
   width: 100%;
   font-size: 1.5em;
@@ -640,7 +641,29 @@ div.content#home section#practices img.img-circle {
 
 
 div.content#assignments {
-  width: 50%;
+  width: 80%;
+}
+
+div.content#assignments .assignment_title {
+  margin-bottom: 1em;
+}
+div.content#assignments .portfolio-item a {
+  border: 2px solid #f7f7f7;
+  border-radius: 6px;
+}
+div.content#assignments  .dates {
+  font-size: 1.3em;
+}
+div.content#assignments  .dates .row {
+  margin-bottom: 0.5em;
+}
+div.content#assignments  .dates .row .title {
+  font-weight: bold;
+}
+div.content#assignments .chart_container {
+  max-width: 200px;
+  margin-left: auto;
+  margin-right: auto;
 }
 div.btn-group {
   margin-bottom: 10px;
