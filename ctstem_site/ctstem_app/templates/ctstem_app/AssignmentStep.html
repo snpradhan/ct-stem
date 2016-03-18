@@ -9,7 +9,7 @@
 
 {% block content %}
   {{block.super}}
-  <div class="content">
+  <div class="content" id="assignment">
     <form method="post" enctype="multipart/form-data" id="assignmentForm">
       {% csrf_token %}
       <div class="table" id="assignment">
