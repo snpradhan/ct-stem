@@ -690,6 +690,9 @@ div.content#home section#practices img.img-circle {
   width: 100%;
 }
 
+div.content#home section .explore_more {
+  text-align: center;
+}
 
 div.content#assignments {
   width: 80%;
@@ -744,6 +747,11 @@ div.button-group-fixed {
   font-family: Montserrat, "Helvetica Neue", Helvetica, Arial, sans-serif;
   text-transform: uppercase;
   font-weight: 700
+}
+
+div.content #pagination {
+  text-align: center;
+  font-size: 2em;
 }
 /********************/
 

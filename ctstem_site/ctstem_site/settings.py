@@ -54,6 +54,7 @@ INSTALLED_APPS = (
     'password_reset',
     'smart_selects',
     'django_cleanup',
+    'endless_pagination',
 )
 
 MIDDLEWARE_CLASSES = (
