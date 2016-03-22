@@ -1,0 +1,23 @@
+<div class="modal-dialog modal-md">
+  <div class="modal-content">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="row">
+        <div class="col-md-4">
+          <img src="{{member.image.url}}" class="img-responsive img-circle" alt="">
+        </div>
+        <div class="col-md-8">
+          <h4 class="name">{{member.name}}</h4>
+          <div class="role">{{member.role}}</div>
+          {% if member.url %}
+            <div class="member_url"><i class="glyphicon glyphicon-globe"></i> <a href="{{member.url}}">{{member.url}}</a></div>
+          {% endif %}
+          <div class="bio">{{member.description}}</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

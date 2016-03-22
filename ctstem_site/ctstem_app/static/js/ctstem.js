@@ -198,6 +198,14 @@ $(function (){
     });
     return false;
   });
+  $("a.profile").click(function(e){
+    e.preventDefault();
+    var url = $(this).data("form");
+    $(".modal#profile").load(url, function() {
+      $(this).modal('show');
+    });
+    return false;
+  });
 });
 
 function check_session(){

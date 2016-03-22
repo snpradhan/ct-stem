@@ -1539,6 +1539,15 @@ def deleteMember(request, id=''):
   except models.Team.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested Team Member not found</h1>')
 
+def teamProfile(request, id=''):
+  try:
+    member = models.Team.objects.get(id=id)
+    context = {'member': member}
+    return render(request, 'ctstem_app/TeamProfile.html', context)
+
+  except models.Team.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested member not found</h1>')
+
 # Check session to see if it has expired
 @login_required
 def check_session(request):

@@ -12,7 +12,7 @@
     <header style="position: relative;">
       <div class="container">
         <div class="intro-text">
-          <div class="intro-heading" style="font-size: 3.3em;">Computational Thinking in STEM</div>
+          <div class="intro-heading" style="font-size: 3.3em;">Computational Thinking in Science and Math</div>
           <div class="intro-lead-in" style="font-size: 1.5em; letter-spacing: 0.075em;">
             Empowering all students to participate in a computational future by <br>
             promoting computational literacy in high school science and mathematics.
@@ -29,14 +29,14 @@
         <div class="row">
           <div class="col-lg-12 text-center">
             <h2 class="section-heading">About Us</h2>
-            <h3 class="section-subheading text-muted" style="line-height: 150%; padding: 0 150px; font-style: normal;">We are a team of computer scientists, learning scientists, STEM educators, and STEM practitioners at Northwestern University. With support from the National Science Foundation and the Spencer Foundation we seek to broaden students’ participation in a computational future through the use of innovative curriculum and assessments for high school science and mathematics. </h3>
+            <h3 class="section-subheading text-muted" style="line-height: 150%; padding: 0 150px; font-style: normal;">We are a team of scientists, learning researchers, and educators at Northwestern University. With support from the National Science Foundation and the Spencer Foundation we seek to broaden students’ participation in a computational future through the use of innovative curriculum and assessments for high school science and mathematics. </h3>
           </div>
         </div>
         <div class="row text-center">
           <div class="col-md-4">
             <a class="page-scroll" href="#lessons">
               <span class="fa-stack fa-4x">
-                <i class="fa fa-circle fa-stack-2x text-primary"></i>
+                <i class="fa fa-circle fa-stack-2x text-primary-red"></i>
                 <i class="fa fa-book fa-stack-1x fa-inverse"></i>
               </span>
             </a>
@@ -46,7 +46,7 @@
           <div class="col-md-4">
             <a class="page-scroll" href="#practices">
               <span class="fa-stack fa-4x">
-                <i class="fa fa-circle fa-stack-2x text-primary"></i>
+                <i class="fa fa-circle fa-stack-2x text-primary-green"></i>
                 <i class="fa fa-tags fa-stack-1x fa-inverse"></i>
               </span>
             </a>
@@ -56,7 +56,7 @@
           <div class="col-md-4">
             <a class="page-scroll" href="#assessments">
               <span class="fa-stack fa-4x">
-                <i class="fa fa-circle fa-stack-2x text-primary"></i>
+                <i class="fa fa-circle fa-stack-2x text-primary-blue"></i>
                 <i class="fa fa-pencil fa-stack-1x fa-inverse"></i>
               </span>
             </a>
@@ -68,7 +68,7 @@
           <div class="col-md-4">
             <a class="page-scroll" href="#workshops">
               <span class="fa-stack fa-4x">
-                <i class="fa fa-circle fa-stack-2x text-primary"></i>
+                <i class="fa fa-circle fa-stack-2x text-primary-yellow"></i>
                 <i class="fa fa-group fa-stack-1x fa-inverse"></i>
               </span>
             </a>
@@ -78,7 +78,7 @@
           <div class="col-md-4">
             <a class="page-scroll" href="#research">
               <span class="fa-stack fa-4x">
-                <i class="fa fa-circle fa-stack-2x text-primary"></i>
+                <i class="fa fa-circle fa-stack-2x text-primary-black"></i>
                 <i class="fa fa-laptop fa-stack-1x fa-inverse"></i>
               </span>
             </a>
@@ -88,7 +88,7 @@
           </div>
           <div class="col-md-4">
             <span class="fa-stack fa-4x">
-              <i class="fa fa-circle fa-stack-2x text-primary"></i>
+              <i class="fa fa-circle fa-stack-2x text-primary-purple"></i>
               <i class="fa fa-wrench fa-stack-1x fa-inverse"></i>
             </span>
             <h4 class="service-heading">Administrator Tools</h4>
@@ -141,7 +141,7 @@
         <div class="row">
           {% for assessment in assessments %}
           <div class="col-md-4 col-sm-6 portfolio-item">
-            <a data-form="{% url 'ctstem:previewCurriculum' assessment.id %}" class="portfolio-link preview" data-toggle="modal" data-target="curriculum">
+            <a data-form="{% url 'ctstem:previewCurriculum' assessment.id %}" class="portfolio-link preview" data-toggle="modal">
               <div class="portfolio-hover">
                 <div class="portfolio-hover-content">
                   <i class="fa fa-plus fa-3x"></i>
@@ -249,7 +249,7 @@
       <div class="container">
         <div class="row">
           <div class="col-lg-12 text-center">
-            <h2 class="section-heading">Our Amazing Team</h2>
+            <h2 class="section-heading">Our Team</h2>
             <h3 class="section-subheading text-muted">Lorem ipsum dolor sit amet consectetur.</h3>
           </div>
         </div>
@@ -257,17 +257,11 @@
           {% for member in team %}
           <div class="col-sm-4">
             <div class="team-member">
-              <img src="{{member.image.url}}" class="img-responsive img-circle" alt="">
+              <a data-form="{% url 'ctstem:teamProfile' member.id %}" data-toggle="modal" class="profile">
+                <img src="{{member.image.url}}" class="img-responsive img-circle" alt="">
+              </a>
               <h4>{{member.name}}</h4>
               <p class="text-muted">{{member.role}}</p>
-              <ul class="list-inline social-buttons">
-                <li><a href="#"><i class="fa fa-twitter"></i></a>
-                </li>
-                <li><a href="#"><i class="fa fa-facebook"></i></a>
-                </li>
-                <li><a href="#"><i class="fa fa-linkedin"></i></a>
-                </li>
-              </ul>
             </div>
           </div>
           {% endfor %}

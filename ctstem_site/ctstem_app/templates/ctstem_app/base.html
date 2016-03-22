@@ -88,7 +88,7 @@
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="{% url 'ctstem:home' %}">CT<span>STEM</span></a>
+            <a class="navbar-brand" href="{% url 'ctstem:home' %}">CTSTEM</a>
           </div>
           <!-- Collect the nav links, forms, and other content for toggling -->
           <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
@@ -164,10 +164,10 @@
                               </p>
                             </div>
                             <div class="col-lg-8">
-                              <p class="text-left"><a>{{user.get_full_name|title}}</a></p>
-                              <p class="text-left small"><a>{{user.email}}</a></p>
+                              <p class="text-left"><a class="profile">{{user.get_full_name|title}}</a></p>
+                              <p class="text-left small"><a class="profile">{{user.email}}</a></p>
                               <p class="text-left">
-                                <a href="{% url 'ctstem:userProfile' user.id %}" class="btn btn-success btn-block btn-sm">Edit Profile</a>
+                                <a href="{% url 'ctstem:userProfile' user.id %}" class="btn btn-success btn-block btn-sm profile">Edit Profile</a>
                               </p>
                             </div>
                           </div>
@@ -189,7 +189,7 @@
                   </li>
                 {% else %}
                   <li>
-                    <a data-toggle="modal" data-target="#login">Login</a>
+                    <a data-toggle="modal" data-target="#login" class="login" href="#">Login</a>
                   </li>
                 {% endif %}
               {% endblock %}
@@ -333,6 +333,8 @@
         </div>
       </div>
       <div class="modal fade" id="curriculum" role="dialog">
+      </div>
+      <div class="modal fade" id="profile" role="dialog">
       </div>
     {% endblock %}
   </body>

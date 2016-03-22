@@ -123,17 +123,14 @@ footer {
 }
 
 .navbar-default .navbar-nav {
-  font-size: 1.1em;
+  font-size: 1.2em;
   display: inline-block;
   float: none;
   vertical-align: top;
 }
 .navbar-default a.navbar-brand {
-  font-family: 'Roboto Slab, serif';
-}
-.navbar-default a.navbar-brand span {
-  font-family: 'Montserrat, sans-serif';
-  font-size-adjust: 0.5;
+  font-family: sans-serif;
+  font-size: 2.5em;
 }
 .navbar-default .navbar-nav > li.active > a, .navbar-default .navbar-nav > li.active > a:hover{
   background-image: none !important;
@@ -145,17 +142,9 @@ footer {
   padding: 0;
   font-size: 1em;
 }
-#intro-image-caption {
-  font-size: 0.8em;
-  font-family: sans-serif;
-  position: absolute;
-  bottom: 8px;
-  right: 8px;
-  text-align: right;
-  width: 90%;
-  color: rgba(255, 255, 255, 0.7);
+.navbar-default .navbar-right li a.login {
+  color: #fed136;
 }
-
 .navbar-login {
   width: 305px;
   padding: 10px;
@@ -644,6 +633,23 @@ div.content#home header .intro-text {
   padding-bottom: 150px;
   text-shadow: 3px 3px 10px rgba(0, 0, 0, 0.5);
 }
+
+div.content#home header .intro-text .intro-lead-in {
+  font-family: sans-serif;
+  font-style: normal;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+div.content#home header #intro-image-caption {
+  font-size: 0.8em;
+  font-family: sans-serif;
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  text-align: right;
+  width: 90%;
+  color: rgba(255, 255, 255, 0.7);
+}
 div.content section {
   padding: 80px 0px;
 }
@@ -658,6 +664,25 @@ div.content section.portfolio .portfolio-caption {
 }
 div.content section.portfolio.bg-light-gray .portfolio-caption {
   background-color: #fff;
+}
+
+div.content#home section#services i.text-primary-red {
+  color: #FE6D36;
+}
+div.content#home section#services i.text-primary-green {
+  color: #C7FE36;
+}
+div.content#home section#services i.text-primary-blue {
+  color: #3663fe;
+}
+div.content#home section#services i.text-primary-yellow {
+  color: #fed136;
+}
+div.content#home section#services i.text-primary-black {
+  color: black;
+}
+div.content#home section#services i.text-primary-purple {
+  color: #6d36fe;
 }
 
 div.content#home section#research .portfolio-item .portfolio-caption{
@@ -772,6 +797,16 @@ div.modal-content div#taxonomyResults {
 }
 div.modal-content span.time {
   color: red;
+}
+div#profile .modal-content .modal-body {
+  font-size: 1.3em;
+  font-family: Montserrat, "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+div#profile .modal-content .modal-body h4{
+  text-align: left !important;
+}
+div#profile .modal-content .modal-body div {
+  margin-bottom: 0.5em;
 }
 /***********   FORM GROUP END   ************/
 
