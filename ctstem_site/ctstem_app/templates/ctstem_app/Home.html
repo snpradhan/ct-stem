@@ -115,7 +115,11 @@
                   <i class="fa fa-plus fa-3x"></i>
                 </div>
               </div>
-              <img src="{{lesson.icon.url}}" class="img-responsive" alt="">
+              {% if lesson.icon %}
+                <img src="{{lesson.icon.url}}" class="img-responsive" alt="">
+              {% else %}
+                <img src="/static/img/lesson.png" class="img-responsive" alt="">
+              {% endif %}
             </a>
             <div class="portfolio-caption bg-light-gray">
               <h4>{{lesson.title}}</h4>
@@ -147,7 +151,11 @@
                   <i class="fa fa-plus fa-3x"></i>
                 </div>
               </div>
-              <img src="{{assessment.icon.url}}" class="img-responsive" alt="">
+              {% if assessment.icon %}
+                <img src="{{assessment.icon.url}}" class="img-responsive" alt="">
+              {% else %}
+                <img src="/static/img/assessment.png" class="img-responsive" alt="">
+              {% endif %}
             </a>
             <div class="portfolio-caption">
               <h4>{{assessment.title}}</h4>
@@ -170,24 +178,6 @@
             <h3 class="section-subheading text-muted">Interested in implementing computational thinking activities in your classroom? Check out our professional development workshops and resources.</h3>
           </div>
         </div>
-            <!--div class="row">
-              {% for lesson in lessons %}
-                <div class="col-md-4 col-sm-6 portfolio-item">
-                    <a href="#portfolioModal1" class="portfolio-link" data-toggle="modal">
-                        <div class="portfolio-hover">
-                            <div class="portfolio-hover-content">
-                                <i class="fa fa-plus fa-3x"></i>
-                            </div>
-                        </div>
-                        <img src="{{lesson.icon.url}}" class="img-responsive" alt="">
-                    </a>
-                    <div class="portfolio-caption">
-                        <h4>{{lesson.title}}</h4>
-                        <p class="text-muted">{{lesson.overview|truncatechars:50 }}</p>
-                    </div>
-                </div>
-              {% endfor %}
-            </div-->
       </div>
     </section>
     <!-- Research Section -->

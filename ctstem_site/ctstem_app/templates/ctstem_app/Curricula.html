@@ -139,7 +139,13 @@
                       <i class="fa fa-plus fa-3x"></i>
                     </div>
                   </div>
-                  <img src="{{curriculum.icon.url}}" class="img-responsive" alt="">
+                  {% if curriculum.icon %}
+                    <img src="{{curriculum.icon.url}}" class="img-responsive" alt="">
+                  {% elif curriculum_type == 'L' %}
+                    <img src="/static/img/lesson.png" class="img-responsive" alt="">
+                  {% else %}
+                    <img src="/static/img/assessment.png" class="img-responsive" alt="">
+                  {% endif %}
                 </a>
                 <div class="portfolio-caption bg-light-gray">
                   <h4>{{curriculum.title}}</h4>
