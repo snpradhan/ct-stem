@@ -69,7 +69,7 @@ MIDDLEWARE_CLASSES = (
     'ctstem_app.middleware.UpdateSession',
 )
 
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
+'''DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
 if 'AWS_ACCESS_KEY_ID' in os.environ:
     AWS_ACCESS_KEY_ID =  os.environ['AWS_ACCESS_KEY_ID']    # enter your access key id
     AWS_SECRET_ACCESS_KEY =  os.environ['AWS_SECRET_ACCESS_KEY'] # enter your secret access key
@@ -79,7 +79,7 @@ else:
 
 AWS_STORAGE_BUCKET_NAME = 'ct-stem'
 AWS_S3_SECURE_URLS = False       # use http instead of https
-AWS_QUERYSTRING_AUTH = False
+AWS_QUERYSTRING_AUTH = False'''
 
 #CKEDITOR_JQUERY_URL = 'https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js'
 CKEDITOR_UPLOAD_PATH = "uploads/"
@@ -110,8 +110,8 @@ CKEDITOR_CONFIGS = {
     },
 }
 
-#MEDIA_ROOT = os.environ.get('MEDIA_ROOT',os.path.join(BASE_DIR, 'media'))
-#MEDIA_URL = '/media/'
+MEDIA_ROOT = '/media/'
+MEDIA_URL = '/media/'
 
 ROOT_URLCONF = 'ctstem_site.urls'
 
