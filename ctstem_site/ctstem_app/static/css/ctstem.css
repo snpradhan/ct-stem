@@ -472,6 +472,11 @@ div.standards img.icon {
 table.table#assignments img.icon {
   width: 50%;
 }
+
+table.table#curricula img.icon, table.table#team img.icon {
+  max-width: 100px;
+  height: auto;
+}
 /***********   CONTENT DIV END   ************/
 
 /******************
