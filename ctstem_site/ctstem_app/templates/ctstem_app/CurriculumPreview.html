@@ -36,113 +36,120 @@
               {% endfor %}
             </ul>
           </div>
-          {% if attachments %}
+          {% if user.administrator or user.researcher or user.teacher or user.author %}
+            {% if attachments %}
+              <div class="meta">
+                <label>Attachments</label>
+                <ul>
+                  {% for attachment in attachments %}
+                    <li><a href="{{attachment.file_object.url}}" target="_blank">{{attachment.title}}</a> - ({{attachment.file_object.url}})</li>
+                  {% endfor %}
+                </ul>
+              </div>
+            {% endif %}
+            {% if curriculum.content %}
             <div class="meta">
-              <label>Attachments</label>
-              <ul>
-                {% for attachment in attachments %}
-                  <li><a href="{{attachment.file_object.url}}" target="_blank">{{attachment.title}}</a> - ({{attachment.file_object.url}})</li>
-                {% endfor %}
-              </ul>
+              <label>Content</label>
+              <div>{{curriculum.content|safe}}</div>
             </div>
-          {% endif %}
-          {% if curriculum.content %}
-          <div class="meta">
-            <label>Content</label>
-            <div>{{curriculum.content|safe}}</div>
-          </div>
+            {% endif %}
           {% endif %}
           <hr>
+          {% if user.is_anonymous %}
+            <h5><span class="label label-warning">Please login to see rest of the content</span></h5>
+          {% endif %}
         </div>
-        {% for step in steps %}
-          <div class="table stepPreview">
-            <div class="row header">
-              <div class="col-md-12 title">
-                <div class="step_title">
-                  <span>{{step.title}}</span>
-                  <span>({{forloop.counter}}/{{steps|length}})</span>
+        {% if user.administrator or user.researcher or user.teacher or user.author %}
+          {% for step in steps %}
+            <div class="table stepPreview">
+              <div class="row header">
+                <div class="col-md-12 title">
+                  <div class="step_title">
+                    <span>{{step.title}}</span>
+                    <span>({{forloop.counter}}/{{steps|length}})</span>
+                  </div>
+                </div>
+              </div>
+              <hr>
+              <div>{{step.content|inline_style|safe}}</div>
+              {% if step.questions.count %}
+                <hr>
+              {% endif %}
+              <div class="question_container">
+                <table class="question_table">
+                  {% for question in step.questions.all %}
+                    <tr>
+                      <td width="5%" style="vertical-align: top;" class="question_no"> Q.</td>
+                      <td class="question_text"> {{question.question_text|inline_style|safe }} </td>
+                    </tr>
+                    <tr>
+                      <td></td>
+                      <td class="answer_field">
+                        {% with field_type=question.answer_field_type %}
+                        {% if field_type == 'TA' %}
+                          <textarea placeholder="Enter your response" class="form-control" disabled></textarea>
+                        {% elif field_type == 'TF' %}
+                          <input type="text" placeholder="Enter your response" class="form-control" disabled/>
+                        {% elif field_type == 'DD' %}
+                          <div class="multiplechoice">
+                            <div class="note"> Note: Select one answer </div>
+                            <select class="form-control" disabled>
+                              {% for option in question.options|split:','%}
+                              <option value="{{option}}">{{option}}</option>
+                              {% endfor %}
+                            </select>
+                          </div>
+                        {% elif field_type == 'MC' %}
+                          <div class="note"> Note: Select one answer </div>
+                        {% for option in question.options|split:','%}
+                          <input type="radio" name="{{question.id}}" id="{{question.id}}" value="{{option}}" disabled/>  {{option}}<br>
+                        {% endfor %}
+                        {% elif field_type == 'MS' %}
+                          <div class="note"> Note: Select all that apply </div>
+                          {% for option in question.options|split:','%}
+                            <input type="checkbox" name="{{question.id}}_cb" id="{{question.id}}_cb" value="{{option}}" disabled/>  {{option}}<br>
+                          {% endfor %}
+                        {% elif field_type == 'FI' %}
+                          <div class="note"> Note: Upload a file </div>
+                          <input type="file" placeholder="Upload your file" class="form-control" disabled/>
+                        {% endif %}
+                        {% endwith %}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td></td>
+                      <td class="error"></td>
+                    </tr>
+                  {% endfor %}
+                </table>
+              </div>
+              <hr>
+              <div class="row footer">
+                <div class="col-md-6 back">
+                  {% if forloop.counter > 1 %}
+                    <button type="button" class="btn btn-warning" title="Previous Step" disabled>
+                      <span class="glyphicon glyphicon-triangle-left" aria-hidden="true"></span> Back
+                    </button>
+                  {% endif %}
+                </div>
+                <div class="col-md-6 next">
+                  <button type="button" class="btn btn-info save" title="Save" disabled>
+                    Save
+                  </button>
+                  {% if forloop.last %}
+                    <button type="submit" class="btn btn-success" title="Submit Assignment" disabled>
+                      Submit
+                    </button>
+                  {% else %}
+                    <button type="button" class="btn btn-success submit" title="Next Step" disabled>
+                      Save &amp; Continue <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
+                    </button>
+                  {% endif %}
                 </div>
               </div>
             </div>
-            <hr>
-            <div>{{step.content|inline_style|safe}}</div>
-            {% if step.questions.count %}
-              <hr>
-            {% endif %}
-            <div class="question_container">
-              <table class="question_table">
-                {% for question in step.questions.all %}
-                  <tr>
-                    <td width="5%" style="vertical-align: top;" class="question_no"> Q.</td>
-                    <td class="question_text"> {{question.question_text|inline_style|safe }} </td>
-                  </tr>
-                  <tr>
-                    <td></td>
-                    <td class="answer_field">
-                      {% with field_type=question.answer_field_type %}
-                      {% if field_type == 'TA' %}
-                        <textarea placeholder="Enter your response" class="form-control" disabled></textarea>
-                      {% elif field_type == 'TF' %}
-                        <input type="text" placeholder="Enter your response" class="form-control" disabled/>
-                      {% elif field_type == 'DD' %}
-                        <div class="multiplechoice">
-                          <div class="note"> Note: Select one answer </div>
-                          <select class="form-control" disabled>
-                            {% for option in question.options|split:','%}
-                            <option value="{{option}}">{{option}}</option>
-                            {% endfor %}
-                          </select>
-                        </div>
-                      {% elif field_type == 'MC' %}
-                        <div class="note"> Note: Select one answer </div>
-                      {% for option in question.options|split:','%}
-                        <input type="radio" name="{{question.id}}" id="{{question.id}}" value="{{option}}" disabled/>  {{option}}<br>
-                      {% endfor %}
-                      {% elif field_type == 'MS' %}
-                        <div class="note"> Note: Select all that apply </div>
-                        {% for option in question.options|split:','%}
-                          <input type="checkbox" name="{{question.id}}_cb" id="{{question.id}}_cb" value="{{option}}" disabled/>  {{option}}<br>
-                        {% endfor %}
-                      {% elif field_type == 'FI' %}
-                        <div class="note"> Note: Upload a file </div>
-                        <input type="file" placeholder="Upload your file" class="form-control" disabled/>
-                      {% endif %}
-                      {% endwith %}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td></td>
-                    <td class="error"></td>
-                  </tr>
-                {% endfor %}
-              </table>
-            </div>
-            <hr>
-            <div class="row footer">
-              <div class="col-md-6 back">
-                {% if forloop.counter > 1 %}
-                  <button type="button" class="btn btn-warning" title="Previous Step" disabled>
-                    <span class="glyphicon glyphicon-triangle-left" aria-hidden="true"></span> Back
-                  </button>
-                {% endif %}
-              </div>
-              <div class="col-md-6 next">
-                <button type="button" class="btn btn-info save" title="Save" disabled>
-                  Save
-                </button>
-                {% if forloop.last %}
-                  <button type="submit" class="btn btn-success" title="Submit Assignment" disabled>
-                    Submit
-                  </button>
-                {% else %}
-                  <button type="button" class="btn btn-success submit" title="Next Step" disabled>
-                    Save &amp; Continue <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
-                  </button>
-                {% endif %}
-              </div>
-            </div>
-          </div>
-        {% endfor %}
+          {% endfor %}
+        {% endif %}
       </form>
     </div>
     <div class="modal-footer">

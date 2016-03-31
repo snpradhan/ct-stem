@@ -195,3 +195,11 @@ DEFAULT_FROM_EMAIL = 'sachin.pradhan@northwestern.edu'
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 # Auto logout delay in minutes
 AUTO_LOGOUT_DELAY = 30
+
+
+import logging
+
+logging.basicConfig(
+    level = logging.INFO,
+    format = " %(levelname)s %(name)s: %(message)s",
+)

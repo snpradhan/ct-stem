@@ -191,12 +191,29 @@ def pdfCurriculum(request, id='', pdf='0'):
 
       context = {'curriculum': curriculum, 'attachments': attachments, 'steps':steps}
       #print settings.STATIC_ROOT
-      return render_to_pdf_response('ctstem_app/CurriculumPDF.html', context, u'%s.%s'%(curriculum.slug, 'pdf') )
+      #return render_to_pdf_response('ctstem_app/CurriculumPDF.html', context, u'%s.%s'%(curriculum.slug, 'pdf') )
+      return render_to_pdf('ctstem_app/CurriculumPDF.html', context, request)
+
 
     return http.HttpResponseNotAllowed(['GET'])
 
   except models.Curriculum.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested lesson not found</h1>')
+
+def fetch_resources(uri, rel):
+  if 'http' in uri:
+    return uri
+  else:
+    path = os.path.join(settings.STATIC_ROOT, uri.replace(settings.STATIC_URL, ""))
+    return path
+
+def render_to_pdf(template_src, context_dict, request):
+  html  = render_to_string(template_src, context_dict, context_instance=RequestContext(request))
+  result = StringIO.StringIO()
+  pdf = pisa.pisaDocument(StringIO.StringIO(html.encode('utf-8')), dest=result, link_callback=fetch_resources, encoding='utf-8')
+  if not pdf.err:
+    return http.HttpResponse(result.getvalue(), content_type='application/pdf')
+  return HttpResponse('We had some errors! %s' % escape(html))
 ####################################
 # DELETE a curriculum
 ####################################
@@ -218,22 +235,6 @@ def deleteCurriculum(request, id=''):
 
     return http.HttpResponseNotAllowed(['GET', 'POST'])
 
-  except models.Curriculum.DoesNotExist:
-    return http.HttpResponseNotFound('<h1>Requested assessment not found</h1>')
-
-####################################
-# Curriculum content
-####################################
-def curriculumContent(request, id=''):
-  try:
-    if '' != id:
-      curriculum = models.Curriculum.objects.get(id=id)
-      if 'GET' == request.method:
-        context = {'curriculum': curriculum}
-        return render(request, 'ctstem_app/CurriculumContent.html', context)
-      return http.HttpResponseNotAllowed(['GET'])
-    else:
-      raise models.Curriculum.DoesNotExist
   except models.Curriculum.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested assessment not found</h1>')
 
