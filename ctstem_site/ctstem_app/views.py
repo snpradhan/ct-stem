@@ -268,6 +268,12 @@ def copyCurriculum(request, id=''):
           curriculum.slug = slugify(curriculum.title) + '-v%s'%curriculum.version + '-%s'%curriculum.id
           curriculum.subject = original_curriculum.subject.all()
           curriculum.taxonomy = original_curriculum.taxonomy.all()
+
+          filecontent = ContentFile(original_curriculum.icon.file.read())
+          filename = os.path.split(original_curriculum.icon.file.name)[-1]
+          filename_array = filename.split('.')
+          filename = filename_array[0] + '-' + str(curriculum.id) + '.' + filename_array[1]
+          curriculum.icon.save(filename, filecontent)
           curriculum.save()
 
           for attachment in attachments:
