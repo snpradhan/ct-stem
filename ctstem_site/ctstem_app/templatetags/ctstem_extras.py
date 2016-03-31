@@ -89,3 +89,7 @@ def taxonomyHelper(taxonomies):
 def getTaxonomy(value):
   taxonomy = models.Subcategory.objects.get(id=value)
   return taxonomy
+
+@register.filter
+def iterate(value):
+  return range(1, value+1)

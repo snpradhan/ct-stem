@@ -304,6 +304,10 @@ div.table#assignment .row .title .curriculum_title, div.table.stepPreview .row .
   margin-bottom: 1em;
 }
 
+div.table#assignment .row .title .step_title, div.table.stepPreview .row .title .step_title {
+  margin-bottom: 1em;
+}
+
 div.table#assignment div.assessment_content {
   min-height: 50%;
 }

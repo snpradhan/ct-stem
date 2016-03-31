@@ -5,6 +5,7 @@
   {{block.super}}
   <script type="text/javascript" src="//cdn.mathjax.org/mathjax/2.2-latest/MathJax.js?config=TeX-AMS_HTML"></script>
   <script type="text/javascript" src="/static/js/jquery.form.min.js"></script>
+  <link href="/static/css/progress-wizard.min.css" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
@@ -22,6 +23,31 @@
             <div class="step_title">
               <span>{{form.instance.step.title}}</span>
               <span>({{form.instance.step.order}}/{{total_steps}})</span>
+            </div>
+            <div>
+              <ul class="progress-indicator">
+                {% for i in total_steps|iterate %}
+                  {% if i < form.instance.step.order %}
+                    <li class="completed">
+                      <a href="{% url 'ctstem:resumeAssignment'  form.instance.instance.assignment.id form.instance.instance.id i %}">
+                        <span class="bubble"></span> Step {{i}}.
+                      </a>
+                    </li>
+                  {% elif i == form.instance.step.order %}
+                    <li class="active"> <span class="bubble"></span> Step {{i}}. </li>
+                  {% else %}
+                    {% if form.instance.instance.status == 'S' or form.instance.instance.status == 'F' or form.instance.instance.status == 'A' %}
+                      <li class="completed">
+                        <a href="{% url 'ctstem:resumeAssignment'  form.instance.instance.assignment.id form.instance.instance.id i %}">
+                          <span class="bubble"></span> Step {{i}}.
+                        </a>
+                      </li>
+                    {% else %}
+                      <li> <span class="bubble"></span> Step {{i}}. </li>
+                    {% endif %}
+                  {% endif %}
+                {% endfor %}
+              </ul>
             </div>
           </div>
         </div>
