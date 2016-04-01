@@ -481,7 +481,7 @@ table.table#curricula img.icon, table.table#team img.icon {
   max-width: 100px;
   height: auto;
 }
-div.content #curricula_tile span.status img.icon {
+div.content #curricula_tile span.status img.icon , div.content#dashboard img.icon{
   height: 30px;
   width: auto;
   float: right;
@@ -596,6 +596,13 @@ table.table.sub {
 }
 table.table.sub a:hover {
   cursor: pointer;
+}
+
+table.table#assignment_info {
+  text-align: center;
+  font-size: 1.2em;
+  font-weight: bold;
+  margin-bottom: 2em;
 }
 
 .dataTables_wrapper .dataTables_length,

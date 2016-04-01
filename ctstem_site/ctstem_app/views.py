@@ -832,7 +832,7 @@ def groups(request):
     groups = models.UserGroup.objects.all().filter(teacher=request.user.teacher).order_by('id')
   else:
     return http.HttpResponseNotFound('<h1>You do not have the privilege to view student groups</h1>')
-  context = {'groups': groups}
+  context = {'groups': groups, 'role':'groups'}
   return render(request, 'ctstem_app/UserGroups.html', context)
 
 
@@ -914,6 +914,82 @@ def deleteGroup(request, id=''):
 
   except models.UserGroup.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested group not found</h1>')
+
+####################################
+# Group Dashboard
+####################################
+@login_required
+def groupDashboard(request, id=''):
+  try:
+    if request.method == 'GET':
+      group = models.UserGroup.objects.get(id=id)
+
+      if hasattr(request.user, 'administrator'):
+        pass
+      elif hasattr(request.user, 'researcher'):
+        subordinate_teachers = request.user.researcher.teachers.all()
+        if group.teacher not in subordinate_teachers:
+          return http.HttpResponseNotFound('<h1>You do not have the privilege to view this group</h1>')
+      elif hasattr(request.user, 'teacher'):
+        if group.teacher != request.user.teacher:
+          return http.HttpResponseNotFound('<h1>You do not have the privilege to view this group</h1>')
+      else:
+        return http.HttpResponseNotFound('<h1>You do not have the privilege to view this group</h1>')
+
+      assignments = models.Assignment.objects.all().filter(group=group)
+      context = {'group': group, 'assignments': assignments}
+      return render(request, 'ctstem_app/GroupDashboard.html', context)
+
+    return http.HttpResponseNotAllowed(['GET'])
+
+  except models.UserGroup.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested group not found</h1>')
+
+####################################
+# Assignment Dashboard
+####################################
+@login_required
+def assignmentDashboard(request, id=''):
+  try:
+    if request.method == 'GET':
+      assignment = models.Assignment.objects.get(id=id)
+
+      if hasattr(request.user, 'administrator'):
+        pass
+      elif hasattr(request.user, 'researcher'):
+        subordinate_teachers = request.user.researcher.teachers.all()
+        if assignment.teacher not in subordinate_teachers:
+          return http.HttpResponseNotFound('<h1>You do not have the privilege to view this assignment</h1>')
+      elif hasattr(request.user, 'teacher'):
+        if assignment.group.teacher != request.user.teacher:
+          return http.HttpResponseNotFound('<h1>You do not have the privilege to view this assignment</h1>')
+      else:
+        return http.HttpResponseNotFound('<h1>You do not have the privilege to view this grassignmentoup</h1>')
+
+      students = assignment.group.members.all()
+      instances = models.AssignmentInstance.objects.all().filter(assignment=assignment)
+      student_assignment_details = {}
+      serial = 1
+      for student in students:
+        try:
+          instance = instances.get(student=student)
+          total_questions = models.CurriculumQuestion.objects.all().filter(step__curriculum=assignment.curriculum).count()
+          attempted_questions = models.QuestionResponse.objects.all().filter(step_response__instance=instance).exclude(response__exact='', responseFile__exact='').count()
+          percent_complete =  float(attempted_questions)/float(total_questions)*100
+        except models.AssignmentInstance.DoesNotExist:
+          instance = None
+          percent_complete = 0
+
+        student_assignment_details[student] = {'serial': serial, 'instance': instance, 'percent_complete': percent_complete}
+        serial += 1
+
+      context = {'assignment': assignment, 'student_assignment_details': student_assignment_details}
+      return render(request, 'ctstem_app/AssignmentDashboard.html', context)
+
+    return http.HttpResponseNotAllowed(['GET'])
+
+  except models.Assignment.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested assignment not found</h1>')
 
 ####################################
 # STUDENT ASSIGNMENTS

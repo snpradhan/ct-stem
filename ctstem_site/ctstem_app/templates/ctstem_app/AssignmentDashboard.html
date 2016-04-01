@@ -1,0 +1,105 @@
+{% extends "ctstem_app/base.html" %}
+
+{% block media %}
+  {{ block.super }}
+  {{ form.media }}
+  <link href="/static/css/circliful.css" rel="stylesheet" type="text/css" />
+  <script src="/static/js/circliful.min.js"></script>
+{% endblock %}
+{% block title %}Assignment Dashboard |{% endblock %}
+
+{% block content %}
+  {{block.super}}
+  <div class="content" id="dashboard">
+    <h2> Assignment Dashboard </h2>
+    <table class="table table-striped table-bordered table-condensed inner_table" id="assignment_info">
+      <thead>
+        <tr>
+          <th>Group</th>
+          <th>Assignment</th>
+          <th>Assigned Date</th>
+          <th>Due Date </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><a href="{% url 'ctstem:groupDashboard' assignment.group.id %}">{{assignment.group}}</a></td>
+          <td>{{assignment.curriculum.title}}</td>
+          <td>{{assignment.assigned_date|date}}</td>
+          <td>{{assignment.due_date|date}}</td>
+        </tr>
+      </tbody>
+    </table>
+    {% if student_assignment_details %}
+      <table class="table table-striped table-bordered table-condensed dt" id="student_assignment_details">
+        <thead>
+          <tr>
+            <th> Student Name </th>
+            <th> Start Date </th>
+            <th> Last Modified </th>
+            <th> Status </th>
+            <th width="5%"> % Complete </th>
+            <th> View Response </th>
+          </tr>
+          <tr id="filterrow">
+            <th> Student Name </th>
+            <th> Start Date </th>
+            <th> Last Modified </th>
+            <th> Status </th>
+            <th> % Complete </th>
+            <th> View Response </th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for student, assignment_details in student_assignment_details.items %}
+            <tr>
+              <td>{{student}}</td>
+              <td> {{assignment_details.instance.created_date|date}} </td>
+              <td> {{assignment_details.instance.modified_date|date}} </td>
+              <td>
+                {% if assignment_details.instance.status == 'P' %}
+                  In Progress
+                {% elif assignment_details.instance.status == 'S' %}
+                  Submitted
+                {% elif assignment_details.instance.status == 'F' %}
+                  Feedback Provided
+                {% elif assignment_details.instance.status == 'A' %}
+                  Archived
+                {% else %}
+                  New
+                {% endif %}
+              </td>
+              <td>
+                <div class="chart_container">
+                  <div id="chart_{{assignment_details.serial}}" class="chart" name={{assignment_details.percent_complete}}></div>
+                </div>
+              </td>
+              <td> View </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p>No assignments available.</p>
+    {% endif %}
+  </div>
+
+  <script type="text/javascript">
+    $(".chart").each(function(){
+      var id = $(this).attr('id');
+      var percentage = $(this).attr('name');
+      $("#"+id).circliful({
+        animationStep: 10,
+        foregroundBorderWidth: 25,
+        backgroundBorderWidth: 25,
+        percent: percentage,
+        fontColor: '#000',
+        foregroundColor: '#006000',
+        text: 'Complete'
+      });
+    });
+  </script>
+
+{% endblock %}
+
+

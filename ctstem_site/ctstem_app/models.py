@@ -276,7 +276,7 @@ class UserGroup(models.Model):
   title = models.CharField(max_length=255, help_text='Group Title. Eg. Physics Section A')
   subject = models.ForeignKey(Subject)
   time = models.CharField(null=False, max_length=256)
-  teacher = models.ForeignKey(Teacher)
+  teacher = models.ForeignKey(Teacher, related_name='groups')
   description = models.TextField(null=True)
   members = models.ManyToManyField(Student, through='Membership', blank=True, null=True, related_name='member_of')
 
@@ -309,6 +309,7 @@ class AssignmentInstance(models.Model):
   student = models.ForeignKey(Student)
   status = models.CharField(max_length=255, choices=ASSIGNMENT_STATUS)
   last_step = models.IntegerField(null=False, blank=False, default=0)
+  created_date = models.DateTimeField(auto_now_add=True)
   modified_date = models.DateTimeField(auto_now=True)
 
   class Meta:
