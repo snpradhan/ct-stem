@@ -93,3 +93,7 @@ def getTaxonomy(value):
 @register.filter
 def iterate(value):
   return range(1, value+1)
+
+@register.filter
+def is_bookmarked(obj, qset):
+  return obj in qset

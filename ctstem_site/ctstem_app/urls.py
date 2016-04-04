@@ -5,8 +5,11 @@ from . import views
 urlpatterns = [
     url(r'^$', views.home, name='home'),
     url(r'^curricula/(?P<curriculum_type>[\w-]+)/$', views.curricula, name='curricula'),
+    url(r'^curricula/(?P<curriculum_type>[\w-]+)/(?P<bookmark>[\w-]+)/$', views.curricula, name='curricula'),
     url(r'^curriculum/new/$', views.curriculum, name='newCurriculum'),
     url(r'^curriculum/(?P<id>[\d]+)/$', views.curriculum, name='curriculum'),
+    url(r'^curriculum/bookmark/(?P<id>[\d]+)/$', views.bookmarkCurriculum, name='bookmarkCurriculum'),
+    url(r'^curriculum/removeBookmark/(?P<id>[\d]+)/$', views.removeBookmark, name='removeBookmark'),
     url(r'^curriculum/delete/(?P<id>[\d]+)/$', views.deleteCurriculum, name='deleteCurriculum'),
     url(r'^curriculum/preview/(?P<id>[\d]+)/$', views.previewCurriculum, name='previewCurriculum'),
     url(r'^curriculum/pdf/(?P<id>[\d]+)/$', views.pdfCurriculum, name='pdfCurriculum'),

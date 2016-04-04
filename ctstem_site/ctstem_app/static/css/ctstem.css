@@ -481,10 +481,17 @@ table.table#curricula img.icon, table.table#team img.icon {
   max-width: 100px;
   height: auto;
 }
-div.content #curricula_tile span.status img.icon , div.content#dashboard img.icon{
+div.content #curricula_tile span.status img.icon , div.content #curricula_tile span.status span.icon, div.content#dashboard img.icon{
   height: 30px;
   width: auto;
   float: right;
+}
+div.content #curricula_tile span.status span.icon {
+  font-size: 1.2em;
+  color: gray;
+}
+div.content #curricula_tile span.status span.icon.bookmarked {
+  color: #fed136;
 }
 /***********   CONTENT DIV END   ************/
 

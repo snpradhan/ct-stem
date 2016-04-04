@@ -95,8 +95,8 @@
             <ul class="nav navbar-nav">
               {% if not user.student %}
                 {% if user.is_authenticated %}
-                  <li class="{% navactive request 'ctstem:curricula' 'lessons' %}"><a href="{% url 'ctstem:curricula' 'lessons' %}">Lessons</a></li>
-                  <li class="{% navactive request 'ctstem:curricula' 'assessments' %}"><a href="{% url 'ctstem:curricula' 'assessments' %}">Assessments</a></li>
+                  <li class="{% navactive request 'ctstem:curricula' 'lessons'%} "><a href="{% url 'ctstem:curricula' 'lessons' %}">Lessons</a></li>
+                  <li class="{% navactive request 'ctstem:curricula' 'assessments' %} "><a href="{% url 'ctstem:curricula' 'assessments' %}">Assessments</a></li>
                   <li class="{% navactive request 'ctstem:events' %}"><a href="{% url 'ctstem:events' %}">Workshops</a></li>
                   <li class="{% navactive request 'ctstem:publications' %}"><a href="{% url 'ctstem:publications' %}">Research</a></li>
                   <li class="{% navactive request 'ctstem:standards' %}"><a href="{% url 'ctstem:standards' %}">Standards</a></li>

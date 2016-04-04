@@ -24,6 +24,17 @@
         </label>
       </div>
     {% endif %}
+    {% if user.teacher %}
+      <ul class="nav nav-tabs">
+        {% if curriculum_type == 'L' %}
+          <li {% if bookmark == '0' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'lessons' '0' %}">All Lessons</a></li>
+          <li {% if bookmark == '1' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'lessons' '1' %}">Bookmarked Lessons</a></li>
+        {% else %}
+          <li {% if bookmark == '0' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'assessments' '0' %}">All Assessments</a></li>
+          <li {% if bookmark == '1' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'assessments' '1' %}">Bookmarked Assessments</a></li>
+        {% endif %}
+      </ul>
+    {% endif %}
     {% if curricula %}
       {% if user.administrator or user.researcher %}
         <div id="curricula_table">
@@ -150,7 +161,15 @@
                       {% if curriculum.status == 'D' %}
                         <img class="icon" src="/static/img/draft.png" alt="Draft" title="Draft">
                       {% elif curriculum.status == 'P' %}
-                        <img class="icon" src="/static/img/published.png" alt="Published" title="Published">
+                        {% if user.administrator or user.researcher or user.author %}
+                          <img class="icon" src="/static/img/published.png" alt="Published" title="Published">
+                        {% elif user.teacher %}
+                          {% if curriculum|is_bookmarked:bookmarked %}
+                            <a href="{% url 'ctstem:removeBookmark' curriculum.id %}"> <span class="glyphicon glyphicon-star icon bookmarked" aria-hidden="true" title="Remove Bookmark"></span></a>
+                          {% else %}
+                           <a href="{% url 'ctstem:bookmarkCurriculum' curriculum.id %}"> <span class="glyphicon glyphicon-star-empty icon" aria-hidden="true" title="Bookmark"></span></a>
+                          {% endif %}
+                        {% endif %}
                       {% else %}
                         <img class="icon" src="/static/img/archive.png" alt="Archived" title="Archived">
                       {% endif %}

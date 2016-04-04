@@ -136,6 +136,13 @@ class Attachment(models.Model):
   class Meta:
       ordering = ['title']
 
+
+# Bookmarked Curriculum
+class BookmarkedCurriculum(models.Model):
+  curriculum = models.ForeignKey(Curriculum, null=False, related_name='bookmarked')
+  teacher = models.ForeignKey('Teacher', null=False)
+  created = models.DateTimeField(auto_now_add=True)
+
 # Question model
 # A bank of questions that can be resued across assessments and lessons
 class Question(models.Model):

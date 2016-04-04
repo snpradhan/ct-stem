@@ -52,20 +52,29 @@ def team(request):
 ####################################
 # Curricula TABLE VIEW
 ####################################
-def curricula(request, curriculum_type=''):
+def curricula(request, curriculum_type='', bookmark='0'):
   if curriculum_type == 'assessments':
     curr_type = 'A'
   else:
     curr_type = 'L'
 
-  if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'researcher') == False:
-    if request.user.is_authenticated():
-      curricula = models.Curriculum.objects.all().filter(Q(curriculum_type = curr_type), Q(status='P') | Q(author=request.user) ).order_by('id')
+  bookmarked = None
+
+  if hasattr(request.user, 'administrator') == True or hasattr(request.user, 'researcher') == True:
+    curricula = models.Curriculum.objects.all().filter(curriculum_type = curr_type).order_by('id')
+  elif hasattr(request.user, 'author') == True:
+    curricula = models.Curriculum.objects.all().filter(Q(curriculum_type = curr_type), Q(status='P') | Q(author=request.user) ).order_by('id')
+  elif hasattr(request.user, 'teacher') == True:
+    if bookmark == '1':
+      curricula = models.Curriculum.objects.all().filter(curriculum_type = curr_type, status='P', bookmarked__teacher=request.user.teacher).order_by('id')
+      bookmarked = curricula
     else:
       curricula = models.Curriculum.objects.all().filter(curriculum_type = curr_type, status='P').order_by('id')
+      bookmarked = curricula.filter(bookmarked__teacher=request.user.teacher)
   else:
-    curricula = models.Curriculum.objects.all().filter(curriculum_type = curr_type).order_by('id')
-  context = {'curricula': curricula, 'curriculum_type': curr_type}
+    curricula = models.Curriculum.objects.all().filter(curriculum_type = curr_type, status='P').order_by('id')
+
+  context = {'curricula': curricula, 'curriculum_type': curr_type, 'bookmark': bookmark, 'bookmarked': bookmarked}
   return render(request, 'ctstem_app/Curricula.html', context)
 
 
@@ -318,6 +327,53 @@ def copyCurriculum(request, id=''):
   except models.Curriculum.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested curriculum not found</h1>')
 
+@login_required
+def bookmarkCurriculum(request, id=''):
+  try:
+    # check if the user has permission to bookmark a curriculum
+    if hasattr(request.user, 'teacher') == False:
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to bookmark this curriculum</h1>')
+    # check if the lesson exists
+    if '' != id:
+      curriculum = models.Curriculum.objects.get(id=id)
+    else:
+      raise models.Curriculum.DoesNotExist
+
+    if request.method == 'GET' or request.method == 'POST':
+      bookmark, created = models.BookmarkedCurriculum.objects.get_or_create(curriculum=curriculum, teacher=request.user.teacher)
+      bookmark.save()
+      messages.success(request, 'Curriculum %s has been bookmarked' % curriculum.title)
+      return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+    return http.HttpResponseNotAllowed(['GET', 'POST'])
+
+  except models.Curriculum.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested curriculum not found</h1>')
+
+@login_required
+def removeBookmark(request, id=''):
+  try:
+    # check if the user has permission to bookmark a curriculum
+    if hasattr(request.user, 'teacher') == False:
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to remove bookmark from this curriculum</h1>')
+    # check if the lesson exists
+    if '' != id:
+      curriculum = models.Curriculum.objects.get(id=id)
+    else:
+      raise models.Curriculum.DoesNotExist
+
+    if request.method == 'GET' or request.method == 'POST':
+      bookmark = models.BookmarkedCurriculum.objects.get(curriculum=curriculum, teacher=request.user.teacher)
+      bookmark.delete()
+      messages.success(request, 'Bookmark on curriculum %s has been removed' % curriculum.title)
+      return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+    return http.HttpResponseNotAllowed(['GET', 'POST'])
+
+  except models.Curriculum.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested curriculum not found</h1>')
+  except models.BookmarkedCurriculum.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested bookmark not found</h1>')
 ####################################
 # REGISTER
 ####################################
