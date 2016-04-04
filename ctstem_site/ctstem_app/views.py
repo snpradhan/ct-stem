@@ -1014,7 +1014,7 @@ def assignmentDashboard(request, id=''):
         pass
       elif hasattr(request.user, 'researcher'):
         subordinate_teachers = request.user.researcher.teachers.all()
-        if assignment.teacher not in subordinate_teachers:
+        if assignment.group.teacher not in subordinate_teachers:
           return http.HttpResponseNotFound('<h1>You do not have the privilege to view this assignment</h1>')
       elif hasattr(request.user, 'teacher'):
         if assignment.group.teacher != request.user.teacher:
