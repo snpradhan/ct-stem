@@ -10,8 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.8/ref/settings/
 """
 
+from base_settings import *
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -23,13 +24,13 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'nlzkjs+7u#q+v_6hv2$!y5+t#@yjje9vqbqqq7)47b-2_1a$7i'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 
-ALLOWED_HOSTS = []
+TEMPLATE_DEBUG = DEBUG
+
+ALLOWED_HOSTS = ['*']
 
 SITE_ID = 1
 
-USE_L10N=False
 LOGIN_URL = '/'
 LOGIN_REDIRECT_URL = '/'
 
@@ -132,32 +133,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'ctstem_site.wsgi.application'
-
-
-# Database
-# https://docs.djangoproject.com/en/1.8/ref/settings/#databases
-if 'RDS_DB_NAME' in os.environ:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': os.environ['RDS_DB_NAME'],
-            'USER': os.environ['RDS_USERNAME'],
-            'PASSWORD': os.environ['RDS_PASSWORD'],
-            'HOST': os.environ['RDS_HOSTNAME'],
-            'PORT': os.environ['RDS_PORT'],
-        }
-    }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': os.environ.get('RDS_DB_NAME', ''),
-            'USER': os.environ.get('RDS_USERNAME', ''),
-            'PASSWORD': os.environ.get('RDS_PASSWORD', ''),
-            'HOST': os.environ.get('RDS_HOSTNAME', ''),                     # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
-            'PORT': os.environ.get('RDS_PORT', ''),
-        }
-    }
 
 
 # Internationalization
