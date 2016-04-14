@@ -71,13 +71,6 @@ MIDDLEWARE_CLASSES = (
 )
 
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
-if 'AWS_ACCESS_KEY_ID' in os.environ:
-    AWS_ACCESS_KEY_ID =  os.environ['AWS_ACCESS_KEY_ID']    # enter your access key id
-    AWS_SECRET_ACCESS_KEY =  os.environ['AWS_SECRET_ACCESS_KEY'] # enter your secret access key
-else:
-    AWS_ACCESS_KEY_ID =  os.environ.get("AWS_ACCESS_KEY_ID", "")    # enter your access key id
-    AWS_SECRET_ACCESS_KEY =  os.environ.get("AWS_SECRET_ACCESS_KEY", "") # enter your secret access key
-
 AWS_STORAGE_BUCKET_NAME = 'ct-stem'
 AWS_S3_SECURE_URLS = False       # use http instead of https
 AWS_QUERYSTRING_AUTH = False
@@ -157,13 +150,6 @@ STATIC_URL = '/static/'
 EMAIL_BACKEND = 'django_smtp_ssl.SSLEmailBackend'
 EMAIL_HOST = 'email-smtp.us-west-2.amazonaws.com'
 EMAIL_PORT = 465
-if 'EMAIL_HOST_USER' in os.environ:
-    EMAIL_HOST_USER = os.environ['EMAIL_HOST_USER']
-    EMAIL_HOST_PASSWORD = os.environ['EMAIL_HOST_PASSWORD']
-else:
-    EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
-    EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
-
 EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = 'sachin.pradhan@northwestern.edu'
 
