@@ -3,8 +3,7 @@
 {% block media %}
   {{ block.super }}
   {{ form.media }}
-  <link href="/static/css/circliful.css" rel="stylesheet" type="text/css" />
-  <script src="/static/js/circliful.min.js"></script>
+  <script src="https://code.highcharts.com/highcharts.js"></script>
 {% endblock %}
 {% block title %}My Assignments |{% endblock %}
 
@@ -84,7 +83,12 @@
                     </a>
                   {% else %}
                     <a type="button" class="btn btn-info btn-md" aria-label="Resume Assignment" title="Resume Assignment" href="{% url 'ctstem:resumeAssignment' assignment_details.assignment.id assignment_details.instance.id 1 %}">
-                      View <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
+                      {% if assignment_details.instance.status == 'F' or assignment_details.instance.status == 'A'%}
+                        Review Feedback
+                      {% else %}
+                        View
+                      {% endif %}
+                      <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
                     </a>
                   {% endif %}
                   {% if assignment_details.instance.status == 'F' %}
@@ -123,18 +127,57 @@
         return false;
       });
       $(".chart").each(function(){
-        var id = $(this).attr('id');
-        var percentage = $(this).attr('name');
-        $("#"+id).circliful({
-          animationStep: 10,
-          foregroundBorderWidth: 25,
-          backgroundBorderWidth: 25,
-          percent: percentage,
-          fontColor: '#000',
-          foregroundColor: '#006000',
-          text: 'Complete'
-        });
+      var id = $(this).attr('id');
+      var complete = parseInt($(this).attr('name'));
+      var remaining = 100-complete;
+      $("#"+id).highcharts({
+        chart: {
+          type: 'pie',
+          height:130,
+          backgroundColor: 'rgba(0,0,0,0)',
+        },
+        title: {
+          text: complete+'% Complete',
+          align: 'center',
+          verticalAlign: 'middle',
+          y: -10,
+          style: {
+            fontSize: '1em',
+            color: 'black',
+          },
+        },
+        tooltip: false,
+        plotOptions: {
+          pie: {
+            dataLabels: {
+              enabled: false,
+            },
+            startAngle: 0,
+            endAngle: 360,
+          }
+        },
+        credits: {
+          enabled: false
+        },
+        series: [{
+          type: 'pie',
+          name: 'Work',
+          innerSize: '80%',
+          data: [
+            {
+              name: 'Complete',
+              y: complete,
+              color: 'green',
+            },
+            {
+              name: 'Remaining',
+              y: remaining,
+              color: 'grey',
+            },
+          ]
+        }]
       });
+    });
 
     });
   </script>

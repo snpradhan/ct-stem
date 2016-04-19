@@ -1,0 +1,103 @@
+{% extends "ctstem_app/base.html" %}
+{% load ctstem_extras %}
+
+{% block title %}Feedback |{% endblock %}
+
+{% block content %}
+  {{block.super}}
+  <div class="content">
+    <h2> Assignment Feedback </h2>
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      {{ form.management_form }}
+      {{form.id}}
+      <table class="table table-striped table-bordered table-condensed inner_table" id="feedback_header">
+        <thead>
+          <tr>
+            <th>Student</th>
+            <th>Group</th>
+            <th>Assignment</th>
+            <th>Assigned Date</th>
+            <th>Due Date </th>
+            <th>Status</th>
+            <th>Last Modified</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>{{form.instance.instance.student}}</td>
+            <td><a href="{% url 'ctstem:groupDashboard' form.instance.instance.assignment.group.id %}">{{form.instance.instance.assignment.group}}</a></td>
+            <td><a href="{% url 'ctstem:assignmentDashboard' form.instance.instance.assignment.id %}">{{form.instance.instance.assignment.curriculum.title}}</a></td>
+            <td>{{form.instance.instance.assignment.assigned_date|date}}</td>
+            <td>{{form.instance.instance.assignment.due_date|date}}</td>
+            <td>{{form.instance.instance.get_status_display}}</td>
+            <td>{{form.instance.instance.modified_date|date}}</td>
+          </tr>
+        </tbody>
+      </table>
+      <div>
+        {{ formset.management_form }}
+        {% for step in formset %}
+          <div class="table feedback">
+            {{step.id}}
+            <h3> {{step.instance.step_response.step.title}} ({{step.instance.step_response.step.order}}/{{formset|length}})</h3>
+            {{step.nested.management_form}}
+            {% for question in step.nested %}
+              <div class="row question_answer_feedback">
+                {{question.id}}
+                <div class="col-md-8">
+                  <div>
+                    <label>Question: </label>
+                    <div class="question"> {{question.instance.response.curriculum_question.question|safe}}</div>
+                  </div>
+                  <div>
+                    <label>Response: </label>
+                    <div class="response">
+                      {% if question.instance.response.response %}
+                        {{question.instance.response.response}}
+                      {% elif question.instance.response.responseFile %}
+                        Student uploaded <a href="{{question.instance.response.responseFile.url}}" target="_blank">File</a>
+                      {% else %}
+                        <span style="font-style: italic;">No response yet</span>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  {% if form.instance.instance.status == 'F' or form.instance.instance.status == 'S' %}
+                    <label>Feedback: </label>
+                    <div class="feedback">
+                      {% if form.instance.instance.status == 'S' %}
+                        {{question.feedback}}
+                      {% elif form.instance.instance.status == 'F' %}
+                        {{question.feedback.value}}
+                      {% endif %}
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+              <hr>
+            {% endfor %}
+          </div>
+        {% endfor %}
+      </div>
+      <div>
+        <input type="hidden" name="save_and_send" id="save_and_send" value="false" />
+      </div>
+      {% if form.instance.instance.status == 'S' %}
+        <div class="form-group button-group-fixed">
+          <input type="submit" class="btn btn-info" id="save" value="Save"/>
+          <br>
+          <br>
+          <input type="button" class="btn btn-success" id="send" value="Save and Send"/>
+        </div>
+      {% endif %}
+    </form>
+  </div>
+  <script type="text/javascript">
+    $('#send').click(function(){
+      $("input#save_and_send").val('true');
+      this.form.submit();
+    });
+  </script>
+{% endblock %}

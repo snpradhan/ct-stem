@@ -60,24 +60,23 @@
             {% if formset|length %}
               <hr>
             {% endif %}
-            <table class="question_table">
+            <div class="question_table">
               {% for questionForm in formset %}
                 {% with questionObj=questionForm.curriculum_question.value|get_curriculum_question %}
                 {% with field_type=questionObj.answer_field_type %}
-                <tr>
-                  <td width="5%" style="vertical-align: top;" class="question_no">
+
+                <div class="question_text">
+                  <label> Question: </label>
+                  <div>
                     {{questionForm.id}}
-                    Q.
-                  </td>
-                  <td class="question_text">
                     {{questionObj.question_text|inline_style|safe}}
                     {{questionForm.curriculum_question.as_hidden}}
                     {{questionForm.save.as_hidden}}
-                  </td>
-                </tr>
-                <tr>
-                  <td></td>
-                  <td class="answer_field">
+                  </div>
+                </div>
+                <div class="answer_field">
+                  <label>Response:</label>
+                  <div>
                     {% if field_type == 'TA' %}
                       <textarea placeholder="Enter your response" class="form-control" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" >{{questionForm.response.value}}</textarea>
                     {% elif field_type == 'TF' %}
@@ -125,28 +124,33 @@
                       <div class="note"> Note: Upload a file </div>
                      {{questionForm.responseFile}}
                     {% endif %}
-                  </td>
-                </tr>
-                <tr>
-                  <td></td>
-                  <td class="error">
-                    <div class="error">
-                      {% if field_type == 'FI' %}
-                        {{questionForm.responseFile.errors}}
-                      {% else %}
-                        {{questionForm.response.errors}}
-                      {% endif %}
-                    </div>
-                  </td>
-                </tr>
+                  </div>
+                </div>
+                <div class="error">
+                  {% if field_type == 'FI' %}
+                    {{questionForm.responseFile.errors}}
+                  {% else %}
+                    {{questionForm.response.errors}}
+                  {% endif %}
+                </div>
 
+                {% if form.instance.instance.status == 'F' or form.instance.instance.status == 'A' %}
+                  <div class="feedback">
+                    <label>Feedback:</label>
+                    <div>{{questionForm.instance.id|getFeedback}}</div>
+                  </div>
+                {% endif %}
+                {% if forloop.last %}
+                  <hr>
+                {% else %}
+                  <hr class="light">
+                {% endif %}
               {% endwith %}
               {% endwith %}
-              {% endfor %}
-            </table>
+            {% endfor %}
           </div>
         </div>
-        <hr>
+
         <div class="row footer">
           <div class="col-md-6 back">
             {% if form.instance.step.order > 1 %}

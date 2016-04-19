@@ -209,10 +209,36 @@ div.table#curriculumQuestions, div.table.activity, div.table#metadata, div.table
 div.table.step, div.table.activity, div.table.ngss, div.table.taxonomy, div.table#curriculumQuestions, div.table#curriculumPreview, div.table.stepPreview {
   margin-top: 3em;
 }
-div.table#curriculumPreview, div.table.stepPreview {
+div.table#curriculumPreview, div.table.stepPreview{
   width: 90%;
   text-align: left !important;
   padding: 3em 4em;
+}
+div.table.feedback {
+  width: 80%;
+  margin-bottom: 2em;
+  padding: 2em 5em;
+}
+
+div.table.feedback div.question_answer_feedback {
+  font-size: 14px;
+  padding: 1em;
+}
+
+div.row.question_answer_feedback:nth-of-type(odd){
+  background-color: #f9f9f9;
+}
+
+div.table.feedback div.question_answer_feedback div.question {
+  color: #428bca;
+}
+
+div.table.feedback div.question_answer_feedback div.response {
+  color: #5cb85c;
+}
+
+div.table.feedback div.question_answer_feedback div.feedback textarea{
+  color: #d9534f !important;
 }
 
 div.table.step div.row.question {
@@ -240,12 +266,14 @@ div.table#curriculumPreview .meta {
 div.table#curriculumPreview, div.table.stepPreview {
   background-color: #eee;
 }
-table.question_table {
+div.question_table {
   margin-bottom: 1em;
 }
-table.question_table .question_no{
-  font-weight: 700;
+
+div.question_table div.question_text, div.question_table div.answer_field, div.question_table div.error,  div.question_table div.feedback{
+  margin-bottom: 1em;
 }
+
 div.table.stepPreview h3.activity_title {
   text-decoration: underline;
 }
@@ -262,13 +290,6 @@ div.table.stepPreview .answer_field .input_container .circle {
   height: 20px;
   width: 20px;
 }
-table.question_table td.answer_field {
-  padding-bottom: 0.5em;
-}
-table.question_table td.error {
-  padding-bottom: 1em;
-}
-
 div.table#curriculumPreview, div.table#curriculumQuestions, div.table#curriculumPreview, div.table.stepPreview{
   font-size: 1.5em;
 }
@@ -605,11 +626,14 @@ table.table.sub a:hover {
   cursor: pointer;
 }
 
-table.table#assignment_info {
+table.table#assignment_info, table.table#feedback_header {
   text-align: center;
   font-size: 1.2em;
   font-weight: bold;
   margin-bottom: 2em;
+}
+table.table#feedback_header {
+  width: 80%;
 }
 
 .dataTables_wrapper .dataTables_length,
@@ -785,11 +809,14 @@ div.button-group-fixed {
   position: fixed;
   top: 30%;
   left: 87%;
-
 }
 
 .form-inline > * {
    margin: 1em;
+}
+
+hr.light {
+  border-top: 1px solid #D3D3D3 !important;
 }
 /***********   FORM GROUP END   ************/
 

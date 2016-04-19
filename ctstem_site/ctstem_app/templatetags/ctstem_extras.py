@@ -97,3 +97,8 @@ def iterate(value):
 @register.filter
 def is_bookmarked(obj, qset):
   return obj in qset
+
+@register.filter
+def getFeedback(response_id):
+  feedback = models.QuestionFeedback.objects.all().filter(response__id=response_id)[0]
+  return feedback.feedback

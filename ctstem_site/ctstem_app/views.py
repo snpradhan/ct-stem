@@ -992,7 +992,31 @@ def groupDashboard(request, id=''):
       else:
         return http.HttpResponseNotFound('<h1>You do not have the privilege to view this group</h1>')
 
-      assignments = models.Assignment.objects.all().filter(group=group)
+      assignments = []
+      serial = 0
+      status_map = {'N': 'New', 'P': 'In Progress', 'S': 'Submitted', 'F': 'Feedback Ready', 'A': 'Archived'}
+      status_color = {'N': 'gray', 'P': 'blue', 'S': 'green', 'F': 'orange', 'A': 'black'}
+      for assignment in models.Assignment.objects.all().filter(group=group):
+        students = assignment.group.members.all()
+        instances = models.AssignmentInstance.objects.all().filter(assignment=assignment)
+        assignment_status = {}
+        status = []
+        for student in students:
+          try:
+            instance = instances.get(student=student)
+            if instance.status in assignment_status:
+              assignment_status[instance.status] +=1
+            else:
+              assignment_status[instance.status] =1
+          except models.AssignmentInstance.DoesNotExist:
+            if 'N' in assignment_status:
+              assignment_status['N'] +=1
+            else:
+              assignment_status['N'] =1
+        for key, value in assignment_status.items():
+          status.append({'name': status_map[key], 'y': value, 'color': status_color[key]})
+        serial += 1
+        assignments.append({'assignment': assignment, 'status': status, 'serial': serial})
       context = {'group': group, 'assignments': assignments}
       return render(request, 'ctstem_app/GroupDashboard.html', context)
 
@@ -1235,6 +1259,78 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
         return render(request, 'ctstem_app/AssignmentStep.html', context)
 
     return http.HttpResponseNotAllowed(['GET', 'POST'])
+  except models.AssignmentInstance.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested assignment not found</h1>')
+  except models.Step.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Curriculum Step not found </h1>')
+
+####################################
+# Teacher feedback
+####################################
+@login_required
+def feedback(request, assignment_id='', instance_id=''):
+  try:
+    if hasattr(request.user, 'teacher') == False and hasattr(request.user, 'administrator') == False:
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to provide feedback</h1>')
+
+    if '' != instance_id:
+      instance = models.AssignmentInstance.objects.get(assignment_id=assignment_id, id=instance_id)
+      feedback, created = models.AssignmentFeedback.objects.get_or_create(instance=instance)
+      stepResponses = models.AssignmentStepResponse.objects.all().filter(instance=instance)
+      for stepResponse in stepResponses:
+        stepFeeback, created = models.StepFeedback.objects.get_or_create(assignment_feedback=feedback, step_response=stepResponse)
+
+        questionResponses = models.QuestionResponse.objects.all().filter(step_response=stepResponse)
+        for questionResponse in questionResponses:
+          questionFeedback, created = models.QuestionFeedback.objects.get_or_create(step_feedback=stepFeeback, response=questionResponse)
+
+      if 'GET' == request.method:
+        form = forms.FeedbackForm(instance=feedback, prefix='feedback')
+        #AssessmentStepFormSet = inlineformset_factory(models.Assessment, models.AssessmentStep, form=forms.AssessmentStepForm,can_delete=True, can_order=True, extra=1)
+
+        StepFeedbackFormSet = nestedformset_factory(models.AssignmentFeedback, models.StepFeedback, form=forms.StepFeedbackForm,
+                                                      nested_formset=inlineformset_factory(models.StepFeedback, models.QuestionFeedback, form=forms.QuestionFeedbackForm, can_delete=False, can_order=False, extra=0),
+                                                      can_delete=False, can_order=False, extra=0)
+
+
+        formset = StepFeedbackFormSet(instance=feedback, prefix='form')
+
+        context = {'form': form, 'formset': formset}
+        return render(request, 'ctstem_app/Feedback.html', context)
+      elif 'POST' == request.method:
+        data = request.POST.copy()
+        print data
+        form = forms.FeedbackForm(data, instance=feedback, prefix='feedback')
+        #AssessmentStepFormSet = inlineformset_factory(models.Assessment, models.AssessmentStep, form=forms.AssessmentStepForm,can_delete=True, can_order=True, extra=1)
+
+        StepFeedbackFormSet = nestedformset_factory(models.AssignmentFeedback, models.StepFeedback, form=forms.StepFeedbackForm,
+                                                      nested_formset=inlineformset_factory(models.StepFeedback, models.QuestionFeedback, form=forms.QuestionFeedbackForm, can_delete=False, can_order=False, extra=0),
+                                                      can_delete=False, can_order=False, extra=0)
+
+
+        formset = StepFeedbackFormSet(data, instance=feedback, prefix='form')
+        print form.is_valid()
+        print formset.is_valid()
+        if form.is_valid() and formset.is_valid():
+          form.save()
+          formset.save()
+          if data['save_and_send'] == 'true':
+            instance.status = 'F'
+            instance.save()
+            messages.success(request, 'Your feedback has been saved and sent to the student')
+            return shortcuts.redirect('ctstem:assignmentDashboard', id=assignment_id)
+          else:
+            messages.success(request, 'Your feedback has been saved')
+        else:
+          print form.errors
+          print formset.errors
+          messages.error(request, 'Your feedback could not be saved')
+
+        context = {'form': form, 'formset': formset}
+        return render(request, 'ctstem_app/Feedback.html', context)
+    else:
+      raise models.AssignmentInstance.DoesNotExist
+
   except models.AssignmentInstance.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested assignment not found</h1>')
   except models.Step.DoesNotExist:

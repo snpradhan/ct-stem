@@ -528,6 +528,43 @@ class QuestionResponseForm(ModelForm):
       self.add_error('responseFile', 'Uploaded file cannot be bigger than 5MB')
 
 
+
+####################################
+# Feedback Form
+####################################
+class FeedbackForm(ModelForm):
+  class Meta:
+    model = models.AssignmentFeedback
+    exclude = ('instance',)
+
+####################################
+# Step Feedback Form
+####################################
+class StepFeedbackForm(ModelForm):
+
+  class Meta:
+    model = models.StepFeedback
+    exclude = ('assignment_feedback', 'step_response',)
+
+####################################
+# Question Feedback Form
+####################################
+class QuestionFeedbackForm(ModelForm):
+
+  class Meta:
+    model = models.QuestionFeedback
+    exclude = ('step_feedback', 'response', 'created_date', 'modified_date',)
+    widgets = {
+      'feedback': forms.Textarea(attrs={'rows':5, 'cols':60}),
+    }
+
+  def __init__(self, *args, **kwargs):
+    super(QuestionFeedbackForm, self).__init__(*args, **kwargs)
+
+    for field_name, field in self.fields.items():
+      field.widget.attrs['class'] = 'form-control'
+      field.widget.attrs['placeholder'] = field.help_text
+
 ####################################
 # School Form
 ####################################

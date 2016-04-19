@@ -323,6 +323,9 @@ class AssignmentInstance(models.Model):
     unique_together = ('assignment', 'student')
 
 
+#######################################################
+# Assignment Step Response Model
+#######################################################
 class AssignmentStepResponse(models.Model):
   instance = models.ForeignKey(AssignmentInstance)
   step = models.ForeignKey(Step)
@@ -343,6 +346,30 @@ class QuestionResponse(models.Model):
 
   class Meta:
     unique_together = ('step_response', 'curriculum_question')
+
+#######################################################
+# Assignment Feedback Model
+#######################################################
+class AssignmentFeedback(models.Model):
+  instance = models.ForeignKey(AssignmentInstance)
+
+#######################################################
+# Step Feedback Model
+#######################################################
+class StepFeedback(models.Model):
+  assignment_feedback = models.ForeignKey(AssignmentFeedback)
+  step_response = models.ForeignKey(AssignmentStepResponse)
+
+#######################################################
+# Question Feedback Model
+#######################################################
+class QuestionFeedback(models.Model):
+  step_feedback = models.ForeignKey(StepFeedback)
+  response = models.ForeignKey(QuestionResponse)
+  feedback = models.TextField(null=True, blank=True, help_text="Enter Feedback")
+  created_date = models.DateTimeField(auto_now_add=True)
+  modified_date = models.DateTimeField(auto_now=True)
+
 
 #######################################################
 # Team Model
