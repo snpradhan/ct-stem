@@ -11,7 +11,7 @@
 {% block content %}
   {{block.super}}
   <div class="content" id="dashboard">
-    <h2> {{group}} Assignments </h2>
+    <h2> {{group}} Dashboard </h2>
       {% include "ctstem_app/Tabs.html" with tab='group' group=group role='group_dashboard' %}
 
       {% if assignments %}
@@ -22,14 +22,14 @@
             <th> Assigned Date </th>
             <th> Due Date </th>
             <th width="30%"> Status </th>
-            <th width="10%"> Student Details </th>
+            <th width="10%"> Student Activity </th>
           </tr>
           <tr id="filterrow">
             <th> Assignment </th>
             <th> Assigned Date </th>
             <th> Due Date </th>
             <th> Status </th>
-            <th> Student Details </th>
+            <th> Student Activity </th>
           </tr>
         </thead>
         <tbody>
@@ -45,7 +45,7 @@
                   {% endif %}
                 </span>
                 <div class="controls">
-                  <a type="button" class="btn btn-warning preview" aria-label="Preview Curriculum" title="Preview Curriculum" data-form="{% url 'ctstem:previewCurriculum' assignment.assignment.curriculum.id %}" data-toggle="modal">
+                  <a type="button" class="btn btn-warning preview" aria-label="Preview Assignment" title="Preview Assignment" data-form="{% url 'ctstem:previewCurriculum' assignment.assignment.curriculum.id %}" data-toggle="modal">
                     <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
                   </a>
                 </div>
@@ -55,7 +55,17 @@
               <td>
                 <div id="chart_{{assignment.serial}}" class="chart" name="{{assignment.status}}"></div>
               </td>
-              <td> <a type="button" class="btn btn-success" href="{% url 'ctstem:assignmentDashboard' assignment.assignment.id %}">Assignment Dashboard</a> </td>
+              <td>
+
+                  <a type="button" class="btn btn-warning" href="{% url 'ctstem:assignmentDashboard' assignment.assignment.id %}" aria-label="View Assignment Dashboard" title="View Assignment Dashboard">
+                    <img src="/static/img/dashboard.png" class="icon" />
+                  </a>
+
+                  <a type="button" class="btn btn-info" href="{% url 'ctstem:export_group_response' assignment.assignment.id %}" aria-label="Export Student Response" title="Export Student Response">
+                     <span class="glyphicon glyphicon-export" aria-hidden="true"></span>
+                  </a>
+
+              </td>
             </tr>
           {% endfor %}
         </tbody>

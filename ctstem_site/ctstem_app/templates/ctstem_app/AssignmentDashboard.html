@@ -57,16 +57,27 @@
               <td style="text-align: center;">
                 {% if assignment_details.instance.status == 'P' %}
                   <div> In Progress </div>
-                  <div> <a type="button" class="btn btn-info" href="{% url 'ctstem:feedback' assignment.id  assignment_details.instance.id %}"> View Response </a> </div>
+                  <div>
+                    <a type="button" class="btn btn-default" href="{% url 'ctstem:feedback' assignment.id  assignment_details.instance.id %}" title="View Response/Feedback"> <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> </a>
+                  </div>
                 {% elif assignment_details.instance.status == 'S' %}
                   <div> Submitted </div>
-                  <div><a type="button" class="btn btn-success" href="{% url 'ctstem:feedback' assignment.id  assignment_details.instance.id %}"> Give Feedback </a></div>
+                  <div>
+                    <a type="button" class="btn btn-success" href="{% url 'ctstem:feedback' assignment.id  assignment_details.instance.id %}" title="Give Feedback"> <img src="/static/img/feedback.png" class="icon" /> </a>
+                    <a type="button" class="btn btn-info" href="{% url 'ctstem:export_student_response' assignment.id  student.id %}" title="Export Student Response"> <span class="glyphicon glyphicon-export" aria-hidden="true"></span> </a>
+                  </div>
                 {% elif assignment_details.instance.status == 'F' %}
                   <div> Feedback Provided </div>
-                  <div><a type="button" class="btn btn-default" href="{% url 'ctstem:feedback' assignment.id  assignment_details.instance.id %}"> View Response/Feedback </a></div>
+                  <div>
+                    <a type="button" class="btn btn-default" href="{% url 'ctstem:feedback' assignment.id  assignment_details.instance.id %}" title="View Response/Feedback"> <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> </a>
+                    <a type="button" class="btn btn-info" href="{% url 'ctstem:export_student_response' assignment.id  student.id %}" title="Export Student Response"> <span class="glyphicon glyphicon-export" aria-hidden="true"></span> </a>
+                  </div>
                 {% elif assignment_details.instance.status == 'A' %}
                   <div> Archived </div>
-                  <div><a type="button" class="btn btn-default" href="{% url 'ctstem:feedback' assignment.id  assignment_details.instance.id %}"> View Response/Feedback </a></div>
+                  <div>
+                    <a type="button" class="btn btn-default" href="{% url 'ctstem:feedback' assignment.id  assignment_details.instance.id %}" title="View Response/Feedback"> <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> </a>
+                    <a type="button" class="btn btn-info" href="{% url 'ctstem:export_student_response' assignment.id  student.id %}" title="Export Student Response"> <span class="glyphicon glyphicon-export" aria-hidden="true"></span> </a>
+                  </div>
                 {% else %}
                   <div> New </div>
                 {% endif %}

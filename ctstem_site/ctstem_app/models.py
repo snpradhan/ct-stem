@@ -299,6 +299,9 @@ class Assignment(models.Model):
   assigned_date = models.DateTimeField(auto_now_add=True)
   due_date = models.DateTimeField(null=False, blank=False)
 
+  def __unicode__(self):
+    return u'%s' % (self.curriculum.title)
+
 #######################################################
 # Membership model
 #######################################################

@@ -74,8 +74,8 @@
                   {% if group.assignments.count > 0 %}
                     {{group.assignments.count}} Assignments
                     <div>
-                      <a type="button" class="btn btn-warning" href="{% url 'ctstem:groupDashboard' group.id %}" aria-label="View Assignment" title="View Assignment">
-                        <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
+                      <a type="button" class="btn btn-warning" href="{% url 'ctstem:groupDashboard' group.id %}" aria-label="View Group Dashboard" title="View Group Dashboard">
+                        <img src="/static/img/dashboard.png" class="icon" />
                       </a>
                     </div>
                   {% else %}
