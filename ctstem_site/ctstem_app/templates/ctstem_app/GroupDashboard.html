@@ -12,6 +12,8 @@
   {{block.super}}
   <div class="content" id="dashboard">
     <h2> {{group}} Assignments </h2>
+      {% include "ctstem_app/Tabs.html" with tab='group' group=group role='group_dashboard' %}
+
       {% if assignments %}
       <table class="table table-striped table-bordered table-condensed dt" id="groups">
         <thead>
@@ -35,9 +37,6 @@
             <tr height="20px;">
               <td>
                 {{assignment.assignment.curriculum.title}}
-                <a type="button" class="btn btn-warning preview" aria-label="Preview Curriculum" title="Preview Curriculum" data-form="{% url 'ctstem:previewCurriculum' assignment.assignment.curriculum.id %}" data-toggle="modal">
-                  <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
-                </a>
                 <span>
                   {% if assignment.assignment.curriculum.curriculum_type == 'L' %}
                     <img src="/static/img/lesson.png" class="icon" alt="">
@@ -45,13 +44,18 @@
                     <img src="/static/img/assessment.png" class="icon" alt="">
                   {% endif %}
                 </span>
+                <div class="controls">
+                  <a type="button" class="btn btn-warning preview" aria-label="Preview Curriculum" title="Preview Curriculum" data-form="{% url 'ctstem:previewCurriculum' assignment.assignment.curriculum.id %}" data-toggle="modal">
+                    <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
+                  </a>
+                </div>
               </td>
               <td> {{assignment.assignment.assigned_date|date}} </td>
               <td> {{assignment.assignment.due_date|date}} </td>
               <td>
                 <div id="chart_{{assignment.serial}}" class="chart" name="{{assignment.status}}"></div>
               </td>
-              <td> <a type="button" class="btn btn-success" href="{% url 'ctstem:assignmentDashboard' assignment.assignment.id %}">View Student Details</a> </td>
+              <td> <a type="button" class="btn btn-success" href="{% url 'ctstem:assignmentDashboard' assignment.assignment.id %}">Assignment Dashboard</a> </td>
             </tr>
           {% endfor %}
         </tbody>
@@ -66,7 +70,6 @@
       var id = $(this).attr('id');
       var status_str = $(this).attr('name').replace(/'/g, '"');
       var status = $.parseJSON(status_str);
-      console.log(status);
       $("#"+id).highcharts({
         chart: {
           type: 'pie',

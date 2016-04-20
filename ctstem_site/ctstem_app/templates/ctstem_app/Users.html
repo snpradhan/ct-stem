@@ -10,6 +10,7 @@
   <div class="content">
     <h2> {{role|title}} </h2>
     {% include "ctstem_app/UserControls.html" %}
+    {% include "ctstem_app/Tabs.html" with tab='user'%}
 
     {% if users %}
       <table class="table table-striped table-bordered table-condensed dt" id="users">

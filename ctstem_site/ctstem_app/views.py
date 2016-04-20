@@ -911,7 +911,7 @@ def group(request, id=''):
         form = forms.UserGroupForm(instance=group, prefix='group')
         assignmentFormset=inlineformset_factory(models.UserGroup, models.Assignment, form=forms.AssignmentForm, can_delete=True, extra=1)
         formset = assignmentFormset(instance=group, prefix='form')
-        context = {'form': form, 'formset': formset}
+        context = {'form': form, 'formset': formset, 'role': 'group'}
         return render(request, 'ctstem_app/UserGroup.html', context)
 
     elif request.method == 'POST':
@@ -929,7 +929,7 @@ def group(request, id=''):
         print form.errors
         print formset.errors
         messages.error(request, "The group could not be saved because there were errors.  Please check the errors below.")
-        context = {'form': form, 'formset':formset}
+        context = {'form': form, 'formset':formset, 'role': 'group'}
         return render(request, 'ctstem_app/UserGroup.html', context)
 
     return http.HttpResponseNotAllowed(['GET', 'POST'])

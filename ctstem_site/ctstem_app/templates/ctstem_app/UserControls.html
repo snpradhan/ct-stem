@@ -24,17 +24,4 @@
     <a type="button" class="btn btn-info" href="{% url 'ctstem:newGroup' %}" title="Create new group">Create Group</a>
   {% endif %}
 </div>
-<ul class="nav nav-tabs">
-  {% if user.administrator %}
-    <li {% if role == 'admins' %} class="active"{% endif %}><a href="{% url 'ctstem:users' 'admins' %}">Admins</a></li>
-    <li {% if role == 'researchers' %} class="active"{% endif %}><a href="{% url 'ctstem:users' 'researchers' %}">Researchers</a></li>
-    <li {% if role == 'authors' %} class="active"{% endif %}><a href="{% url 'ctstem:users' 'authors' %}">Content Authors</a></li>
-  {% endif %}
-  {% if user.administrator or user.researcher %}
-    <li {% if role == 'teachers' %} class="active"{% endif %}><a href="{% url 'ctstem:users' 'teachers' %}">Teachers</a></li>
-  {% endif %}
-  {% if user.administrator or user.researcher or user.teacher %}
-    <li {% if role == 'students' %} class="active"{% endif %}><a href="{% url 'ctstem:users' 'students' %}">Students</a></li>
-    <li {% if role == 'groups' %} class="active"{% endif %}><a href="{% url 'ctstem:groups' %}">Student Groups</a></li>
-  {% endif %}
-</ul>
+

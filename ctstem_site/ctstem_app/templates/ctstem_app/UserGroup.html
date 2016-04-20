@@ -10,7 +10,12 @@
 {% block content %}
   {{block.super}}
   <div class="content">
-    <h2>Student Group</h2>
+    {% if form.instance %}
+      <h2>{{form.instance.title|title}}</h2>
+    {% else %}
+      <h2>Student Group</h2>
+    {% endif %}
+    {% include "ctstem_app/Tabs.html" with tab='group' group=form.instance role='group'%}
     <form method="post">
       {% csrf_token %}
       <div class="table" id="group">

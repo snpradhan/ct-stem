@@ -11,6 +11,7 @@
   {{block.super}}
   <div class="content" id="dashboard">
     <h2> Assignment Dashboard </h2>
+    {% include "ctstem_app/Tabs.html" with tab='assignment' group=assignment.group assignment=assignment role='assignment_dashboard'%}
     <table class="table table-striped table-bordered table-condensed inner_table" id="assignment_info">
       <thead>
         <tr>

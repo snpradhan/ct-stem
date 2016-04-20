@@ -15,6 +15,7 @@
       <h2> Student Groups </h2>
     {% endif %}
     {% include "ctstem_app/UserControls.html" %}
+    {% include "ctstem_app/Tabs.html" with tab='user'%}
 
     {% if groups %}
       <table class="table table-striped table-bordered table-condensed dt" id="groups">
@@ -45,15 +46,14 @@
             <tr>
               <td class="title">
                 {{group.title}}
-                <a type="button" class="btn btn-success" aria-label="Edit Group" title="Edit Group" href="{% url 'ctstem:group' group.id %}">
-                    <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
-                </a>
-                <a type="button" class="btn btn-danger" aria-label="Delete Group" title="Delete Group" href="{% url 'ctstem:deleteGroup' group.id %}">
-                    <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-                </a>
-                <a type="button" class="btn btn-warning" aria-label="Group Dashboard" title="Group Dashboard" href="{% url 'ctstem:groupDashboard' group.id %}">
-                    <span class="glyphicon glyphicon-dashboard" aria-hidden="true"></span>
-                </a>
+                <div class="controls">
+                  <a type="button" class="btn btn-success" aria-label="Edit Group" title="Edit Group" href="{% url 'ctstem:group' group.id %}">
+                      <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+                  </a>
+                  <a type="button" class="btn btn-danger" aria-label="Delete Group" title="Delete Group" href="{% url 'ctstem:deleteGroup' group.id %}">
+                      <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                  </a>
+                </div>
               </td>
               <td>{{group.subject}}</td>
               <td>{{group.time}}</td>
@@ -61,46 +61,27 @@
                 <td>{{group.teacher}}</td>
               {% endif %}
               <td>
-                {% if group.members.count > 0 %}
-                  <ul>
-                    <li>{{group.members.count}}
-                      <span class="ec">
-                        <span class="glyphicon glyphicon-collapse-up" aria-hidden="true" style="display:none;"></span>
-                        <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                      </span>
-                    </li>
-                    <ul class="members" style="display:none;">
-                      {% for member in group.members.all %}
-                        <li>{{member}}</li>
-                      {% endfor %}
-                    </ul>
-                  </ul>
-                {% else %}
-                  <ul>
-                    <li>{{group.members.count}}</li>
-                  </ul>
-                {% endif %}
+                 <div>
+                  {% if group.members.count > 0 %}
+                    {{group.members.count}} Members
+                  {% else %}
+                    No Member
+                  {% endif %}
+                </div>
               </td>
               <td>
-                {% if group.assignments.count > 0 %}
-                  <ul>
-                    <li>{{group.assignments.count}}
-                      <span class="ec">
-                        <span class="glyphicon glyphicon-collapse-up" aria-hidden="true" style="display:none;"></span>
-                        <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                      </span>
-                    </li>
-                    <ul class="members" style="display:none;">
-                      {% for assignment in group.assignments.all %}
-                        <li>{{assignment.assessment}}</li>
-                      {% endfor %}
-                    </ul>
-                  </ul>
-                {% else %}
-                  <ul>
-                    <li>{{group.assignments.count}}</li>
-                  </ul>
-                {% endif %}
+                <div>
+                  {% if group.assignments.count > 0 %}
+                    {{group.assignments.count}} Assignments
+                    <div>
+                      <a type="button" class="btn btn-warning" href="{% url 'ctstem:groupDashboard' group.id %}" aria-label="View Assignment" title="View Assignment">
+                        <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
+                      </a>
+                    </div>
+                  {% else %}
+                    No Assignment
+                  {% endif %}
+                </div>
               </td>
             </tr>
           {% endfor %}

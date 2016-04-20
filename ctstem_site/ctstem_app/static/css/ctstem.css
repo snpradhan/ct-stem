@@ -579,7 +579,9 @@ table.table tr:last-child td:last-child {
   border-bottom-right-radius: 10px;
   -moz-border-bottom-right-radius: 10px;
 }
-
+table.table td {
+  vertical-align: middle !important;
+}
 table.table td.status {
   font-weight: bold;
 }
