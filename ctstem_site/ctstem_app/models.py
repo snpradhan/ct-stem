@@ -52,6 +52,15 @@ ASSIGNMENT_STATUS = (
   (u'A', u'Archived'),
 )
 
+ASSIGNMENT_SORT = (
+  (u'assigned', u'Assigned Date'),
+  (u'group', u'Group'),
+  (u'due', u'Due Date'),
+  (u'status', u'Status'),
+  (u'percent', u'Percent Complete'),
+  (u'modified', u'Last Modified')
+)
+
 def upload_file_to(instance, filename):
   import os
   from django.utils.timezone import now

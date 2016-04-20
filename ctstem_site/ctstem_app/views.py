@@ -1081,7 +1081,7 @@ def assignments(request, bucket=''):
       return http.HttpResponseNotFound('<h1>You do not have the privilege to view assignments</h1>')
 
     student = request.user.student
-    if request.method == 'GET':
+    if request.method == 'GET' or request.method == 'POST':
       groups = models.Membership.objects.all().filter(student=student).values_list('group', flat=True)
       #for each group
       assignments = models.Assignment.objects.all().filter(group__in=groups)
@@ -1110,8 +1110,29 @@ def assignments(request, bucket=''):
       else:
         assignment_list = archived_list
 
-      assignment_list.sort(key=lambda item:item['assignment'].assigned_date, reverse=True)
-      context = {'assignment_list': assignment_list, 'new': new_count, 'inbox': len(active_list), 'archived': len(archived_list)}
+      if request.method == 'GET':
+        sort_by = 'assigned'
+        sort_form = forms.InboxSortForm()
+      else:
+        data = request.POST.copy()
+        sort_by = data['sort_by']
+        sort_form = forms.InboxSortForm(data)
+
+      print sort_by
+      if sort_by == 'assigned':
+        assignment_list.sort(key=lambda item:item['assignment'].assigned_date)
+      elif sort_by == 'group':
+        assignment_list.sort(key=lambda item:item['assignment'].group)
+      elif sort_by == 'due':
+        assignment_list.sort(key=lambda item:item['assignment'].due_date)
+      elif sort_by == 'status':
+        assignment_list.sort(key=lambda item:item['instance'].status)
+      elif sort_by == 'percent':
+        assignment_list.sort(key=lambda item:item['percent_complete'])
+      elif sort_by == 'modified':
+        assignment_list.sort(key=lambda item:item['instance'].modified_date)
+
+      context = {'assignment_list': assignment_list, 'new': new_count, 'inbox': len(active_list), 'archived': len(archived_list), 'sort_form': sort_form}
       return render(request, 'ctstem_app/MyAssignments.html', context)
     return http.HttpResponseNotAllowed(['GET'])
 
