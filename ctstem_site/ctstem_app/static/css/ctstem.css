@@ -712,7 +712,26 @@ div.content#home header #intro-image-caption {
 div.content section {
   padding: 80px 0px;
 }
-
+div.content section#standard {
+  padding: 40px 0px 10px 0px;
+}
+div.content section.practice {
+  padding: 10px 0px 20px 0px;
+}
+@media(min-width: 768px){
+  div.content section.practice .timeline>li {
+    min-height: 50px;
+    margin-bottom: 75px;
+  }
+  div.content section.practice .timeline>li .timeline-image {
+    width: 80px;
+    height: 80px;
+    margin-left: -40px;
+  }
+  div.content section.practice .timeline > li .timeline-panel {
+    padding-top: 20px;
+  }
+}
 div.content#home section h3.section-subheading.text-muted {
   line-height: 150%;
   padding: 0 20px !important;
@@ -720,6 +739,11 @@ div.content#home section h3.section-subheading.text-muted {
 }
 div.content section.portfolio .portfolio-item .portfolio-caption{
   background-color: #f7f7f7;
+  min-height: 100px;
+  max-height: 100px;
+  overflow-y: hidden;
+  padding: 10px;
+
 }
 div.content section.portfolio.bg-light-gray .portfolio-item .portfolio-caption {
   background-color: #fff;
@@ -814,7 +838,7 @@ a.btn.pdf img {
 
 div.button-group-fixed {
   position: fixed;
-  top: 30%;
+  top: 35%;
   left: 87%;
 }
 

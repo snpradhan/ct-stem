@@ -80,44 +80,71 @@
       {% endif %}
     {% else %}
       {% if standard %}
-        <h2> {{standard.short_name}} Practices</h2>
-        <div class="row standards">
-          {% for category in standard.category.all %}
-            <div class="table item" id="category_{{forloop.counter}}">
-              <div class="tile-icon-holder">
-                {% if category.icon %}
-                  <span><img class="icon" src="{{category.icon.url}}"/></span>
-                {% else %}
-                  <span><img class="icon" src="/static/img/tag.png"/></span>
-                {% endif %}
-              </div>
-              <div class="text-holder">
-                <h4> {{category.name}} </h4>
-                <p></p>
+        <div class="row">
+          <div class="col-lg-12 text-center">
+            <h2 class="section-heading">{{standard.name}} Practices</h2>
+          </div>
+        </div>
+        <div id="standard_tile">
+          <section id="standard" class="portfolio">
+            <div class="container">
+              <div class="row">
+                {% for practice in standard.category.all %}
+                <div class="col-md-3 col-sm-6 portfolio-item">
+                  <a class="portfolio-link" id="practice_{{forloop.counter}}">
+                    <div class="portfolio-hover">
+                      <div class="portfolio-hover-content">
+                        <i class="fa fa-plus fa-3x"></i>
+                      </div>
+                    </div>
+                    <img src="{{practice.icon.url}}" class="img-responsive" alt="">
+                  </a>
+                  <div class="portfolio-caption bg-light-gray">
+                    <h4>{{practice.name}}</h4>
+                  </div>
+                </div>
+                {% endfor %}
               </div>
             </div>
-          {% endfor %}
+          </section>
         </div>
-        <div>
-          {% for category in standard.category.all %}
-            <table class="table sub table-striped table-bordered" id="subcategory_{{forloop.counter}}">
-              <thead><th>{{category.name}}</th></thead>
-              <tbody>
-                {% for subcategory in category.subcategory.all %}
-                  <tr>
-                    <td>
-                      <div class="title"><a> {{subcategory.title}} </a></div>
-                      <div style="display:none;">
-                        <div>{{subcategory.description}}</div>
-                        <div>{{subcategory.link}}</div>
+
+        {% for practice in standard.category.all %}
+        <section id="practice_{{forloop.counter}}" class="practice">
+          <div class="container">
+            <div class="row">
+              <div class="col-lg-12 text-center">
+                <h3 class="section-heading">{{practice.name}}</h3>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-lg-12">
+                <ul class="timeline">
+                  {% for subcategory in practice.subcategory.all %}
+                  <li class="{% if forloop.counter|divisibleby:2 %}timeline-inverted{% endif %}">
+                    <div class="timeline-image">
+                      <img class="img-circle img-responsive" src="" alt="">
+                    </div>
+                    <div class="timeline-panel">
+                      <div class="timeline-heading">
+                        <h4 class="subheading">{{subcategory.title}}</h4>
                       </div>
-                    </td>
-                  </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          {% endfor %}
-        </div>
+                      <div class="timeline-body">
+                        <p class="text-muted">
+                          <div>{{subcategory.description}}</div>
+                          <div>{{subcategory.link}}</div>
+                        </p>
+                      </div>
+                    </div>
+                  </li>
+                  {% endfor %}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+        {% endfor %}
+
       {% endif %}
     {% endif %}
 
@@ -125,14 +152,11 @@
 
   <script type="text/javascript">
   $(function(){
-    $('div.table.item').click(function(){
-      $('table.table.sub').hide();
+    $("section.practice").hide();
+    $("a.portfolio-link").click(function(){
+      $("section.practice").hide();
       var id = $(this).attr('id');
-      $('table.table.sub#sub'+id).show();
-    });
-
-    $("table.table.sub div.title a").click(function(){
-      $(this).parent().next().toggle();
+      $("section.practice#"+id).show();
     });
   });
   </script>

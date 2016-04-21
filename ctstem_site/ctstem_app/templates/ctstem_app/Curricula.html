@@ -140,7 +140,7 @@
           <div class="container">
             <div class="row">
               {% for curriculum in curricula %}
-              <div class="col-md-4 col-sm-6 portfolio-item">
+              <div class="col-md-3 col-sm-6 portfolio-item">
                 <a data-form="{% url 'ctstem:previewCurriculum' curriculum.id %}" class="portfolio-link preview" data-toggle="modal">
                   <div class="portfolio-hover">
                     <div class="portfolio-hover-content">
@@ -156,7 +156,7 @@
                   {% endif %}
                 </a>
                 <div class="portfolio-caption bg-light-gray">
-                  <h4>{{curriculum.title}}
+                  <h5>{{curriculum.title|truncatechars:50}}
                     <span class="status">
                       {% if curriculum.status == 'D' %}
                         <img class="icon" src="/static/img/draft.png" alt="Draft" title="Draft">
@@ -174,7 +174,7 @@
                         <img class="icon" src="/static/img/archive.png" alt="Archived" title="Archived">
                       {% endif %}
                     </span>
-                  </h4>
+                  </h5>
                   <div class="row button">
                     {% if curriculum.curriculum_type == 'L' and user.is_authenticated %}
                       <a type="button" class="btn btn-default btn-sm pdf" title="Download Curriculum PDF" href="{% url 'ctstem:pdfCurriculum' curriculum.id %}">
