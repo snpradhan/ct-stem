@@ -389,7 +389,7 @@ class CategoryForm(ModelForm):
 
   class Meta:
     model = models.Category
-    exclude = ('id', 'standard')
+    exclude = ('id', 'standard', 'order')
     widgets = {
       'name': forms.TextInput(attrs={'placeholder': 'Category name'}),
     }

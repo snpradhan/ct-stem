@@ -696,7 +696,9 @@ def standard(request, id=''):
       print formset.is_valid()
       if form.is_valid() and formset.is_valid():
         savedStandard = form.save()
-        formset.save()
+        for form in formset.ordered_forms:
+          form.instance.order = form.cleaned_data['ORDER']
+          form.save()
         messages.success(request, "Standard Saved.")
         return shortcuts.redirect('ctstem:standard', id=savedStandard.id)
       else:

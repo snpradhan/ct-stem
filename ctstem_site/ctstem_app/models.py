@@ -186,9 +186,13 @@ class Category(models.Model):
   standard = models.ForeignKey(Standard, related_name="category")
   name = models.CharField(null=False, max_length=256)
   icon = models.ImageField(upload_to=upload_file_to, blank=True, null=True)
+  order = models.IntegerField(null=True)
 
   def __unicode__(self):
       return u'%s' % (self.name)
+
+  class Meta:
+      ordering = ['order']
 
 # Subcategory model
 class Subcategory(models.Model):
