@@ -215,7 +215,8 @@ div.table#curriculumPreview, div.table.stepPreview{
   padding: 3em 4em;
 }
 div.table.feedback {
-  width: 80%;
+  width: 85%;
+  margin-left: 0;
   margin-bottom: 2em;
   padding: 2em 5em;
 }
@@ -640,7 +641,7 @@ table.table#assignment_info, table.table#feedback_header {
   margin-bottom: 2em;
 }
 table.table#feedback_header {
-  width: 80%;
+  width: 100%;
 }
 
 .dataTables_wrapper .dataTables_length,
@@ -741,9 +742,11 @@ div.content section.portfolio .portfolio-item .portfolio-caption{
   background-color: #f7f7f7;
   min-height: 100px;
   max-height: 100px;
-  overflow-y: hidden;
   padding: 10px;
+}
 
+div.content#assignments section.portfolio .portfolio-item .portfolio-caption{
+  max-height: none;
 }
 div.content section.portfolio.bg-light-gray .portfolio-item .portfolio-caption {
   background-color: #fff;
@@ -839,7 +842,7 @@ a.btn.pdf img {
 div.button-group-fixed {
   position: fixed;
   top: 35%;
-  left: 87%;
+  left: 85%;
 }
 
 .form-inline > * {
