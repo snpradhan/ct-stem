@@ -24,6 +24,7 @@ import string
 import csv
 from django.db.models import Q
 from django.core.files.base import ContentFile
+from django.utils import timezone
 
 ####################################
 # HOME
@@ -1096,13 +1097,19 @@ def assignments(request, bucket=''):
           if instance.status in ['P', 'S', 'F']:
             total_questions = models.CurriculumQuestion.objects.all().filter(step__curriculum=assignment.curriculum).count()
             attempted_questions = models.QuestionResponse.objects.all().filter(step_response__instance=instance).exclude(response__exact='', responseFile__exact='').count()
-            active_list.append({'serial': serial, 'assignment': assignment, 'instance': instance, 'percent_complete': float(attempted_questions)/float(total_questions)*100})
+            if instance.status == 'P':
+              status = 2
+            elif instance.status == 'S':
+              status = 3
+            else:
+              status = 4
+            active_list.append({'serial': serial, 'assignment': assignment, 'instance': instance, 'percent_complete': float(attempted_questions)/float(total_questions)*100, 'status': status, 'modified_date': instance.modified_date})
           else:
-            archived_list.append({'serial': serial, 'assignment': assignment, 'instance': instance, 'percent_complete': 100})
+            archived_list.append({'serial': serial, 'assignment': assignment, 'instance': instance, 'percent_complete': 100, 'status': 5, 'modified_date': instance.modified_date})
         except models.AssignmentInstance.DoesNotExist:
           instance = None
           new_count += 1
-          active_list.append({'serial': serial, 'assignment': assignment, 'instance': instance, 'percent_complete': 0})
+          active_list.append({'serial': serial, 'assignment': assignment, 'instance': instance, 'percent_complete': 0, 'status': 1, 'modified_date': timezone.now()})
         serial += 1
 
       if bucket == 'inbox':
@@ -1126,11 +1133,11 @@ def assignments(request, bucket=''):
       elif sort_by == 'due':
         assignment_list.sort(key=lambda item:item['assignment'].due_date)
       elif sort_by == 'status':
-        assignment_list.sort(key=lambda item:item['instance'].status)
+        assignment_list.sort(key=lambda item:item['status'])
       elif sort_by == 'percent':
         assignment_list.sort(key=lambda item:item['percent_complete'])
       elif sort_by == 'modified':
-        assignment_list.sort(key=lambda item:item['instance'].modified_date)
+        assignment_list.sort(key=lambda item:item['modified_date'])
 
       context = {'assignment_list': assignment_list, 'new': new_count, 'inbox': len(active_list), 'archived': len(archived_list), 'sort_form': sort_form}
       return render(request, 'ctstem_app/MyAssignments.html', context)
