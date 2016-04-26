@@ -438,7 +438,7 @@ def register(request):
       if request.user.is_anonymous():
         if form.cleaned_data['account_type'] in ['A', 'R', 'C']:
           messages.info(request, 'Your account is pending admin approval.  Please contact the system administrator to request approval.')
-          return render(request, 'ctstem_app/About_us.html')
+          return shortcuts.redirect('ctstem:home')
         elif form.cleaned_data['account_type'] in ['T', 'S']:
           new_user = authenticate(username=form.cleaned_data['username'],
                                   password=form.cleaned_data['password1'], )
