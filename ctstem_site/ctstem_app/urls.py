@@ -41,6 +41,7 @@ urlpatterns = [
     url(r'^standard/(?P<id>[\d]+)/$', views.standard, name='standard'),
     url(r'^standards/$', views.standards, name='standards'),
     url(r'^categories/(?P<standard_id>[\d]+)/$', views.categories, name='categories'),
+    url(r'^subcategories/(?P<category_id>[\d]+)/$', views.subcategories, name='subcategories'),
     url(r'^users/(?P<role>[a-zA-Z0-9]+)/$', views.users, name='users'),
     url(r'^question/new/$', views.question, name='newQuestion'),
     url(r'^question/(?P<id>[\d]+)/$', views.question, name='question'),

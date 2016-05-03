@@ -640,6 +640,16 @@ def notimplemented(request):
   return render(request, 'ctstem_app/NotImplemented.html')
 
 ####################################
+# List of subcategories for a category
+####################################
+def subcategories(request, category_id=''):
+  category = models.Category.objects.get(id=category_id)
+  subcategories  = models.Subcategory.objects.all().filter(category__id=category_id).order_by('title')
+  context = {'category': category, 'subcategories': subcategories}
+  return render(request, 'ctstem_app/PracticeModal.html', context)
+
+
+####################################
 # List of categories for a standard
 ####################################
 def categories(request, standard_id=''):

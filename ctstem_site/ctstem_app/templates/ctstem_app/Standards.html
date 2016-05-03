@@ -91,16 +91,19 @@
               <div class="row">
                 {% for practice in standard.category.all %}
                 <div class="col-md-3 col-sm-6 portfolio-item">
-                  <a class="portfolio-link" id="practice_{{forloop.counter}}">
+                  <a data-form="{% url 'ctstem:subcategories' practice.id %}" class="portfolio-link preview" data-toggle="modal">
                     <div class="portfolio-hover">
                       <div class="portfolio-hover-content">
                         <i class="fa fa-plus fa-3x"></i>
                       </div>
                     </div>
-                    <img src="{{practice.icon.url}}" class="img-responsive" alt="">
+                    {% if practice.icon %}
+                      <img src="{{practice.icon.url}}" class="img-responsive" alt="">
+                    {% endif %}
                   </a>
                   <div class="portfolio-caption bg-light-gray">
-                    <h4>{{practice.name}}</h4>
+                    <h5>{{practice.name}}</h5>
+                    <!--p class="text-muted">{{assessment.overview|truncatechars:50 }}</p-->
                   </div>
                 </div>
                 {% endfor %}
@@ -108,43 +111,6 @@
             </div>
           </section>
         </div>
-
-        {% for practice in standard.category.all %}
-        <section id="practice_{{forloop.counter}}" class="practice">
-          <div class="container">
-            <div class="row">
-              <div class="col-lg-12 text-center">
-                <h3 class="section-heading">{{practice.name}}</h3>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-lg-12">
-                <ul class="timeline">
-                  {% for subcategory in practice.subcategory.all %}
-                  <li class="{% if forloop.counter|divisibleby:2 %}timeline-inverted{% endif %}">
-                    <div class="timeline-image">
-                      <img class="img-circle img-responsive" src="" alt="">
-                    </div>
-                    <div class="timeline-panel">
-                      <div class="timeline-heading">
-                        <h4 class="subheading">{{subcategory.title}}</h4>
-                      </div>
-                      <div class="timeline-body">
-                        <p class="text-muted">
-                          <div>{{subcategory.description}}</div>
-                          <div>{{subcategory.link}}</div>
-                        </p>
-                      </div>
-                    </div>
-                  </li>
-                  {% endfor %}
-                </ul>
-              </div>
-            </div>
-          </div>
-        </section>
-        {% endfor %}
-
       {% endif %}
     {% endif %}
 

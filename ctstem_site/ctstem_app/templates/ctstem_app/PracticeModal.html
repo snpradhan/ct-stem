@@ -1,0 +1,30 @@
+{% load ctstem_extras %}
+
+<div class="modal-dialog modal-md">
+  <div class="modal-content">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal">&times;</button>
+      <h3 class="modal-title">{{category.name}}</h3>
+    </div>
+    <div class="modal-body">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for subcategory in subcategories %}
+            <tr>
+              <td>{{subcategory.title}}</td>
+              <td>{{subcategory.description}}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="modal-footer"></div>
+  </div>
+</div>
+
