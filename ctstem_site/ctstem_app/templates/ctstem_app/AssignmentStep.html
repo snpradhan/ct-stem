@@ -67,7 +67,7 @@
 
                 <div class="question_text">
                   <label> Question: </label>
-                  <div>
+                  <div class="question">
                     {{questionForm.id}}
                     {{questionObj.question_text|inline_style|safe}}
                     {{questionForm.curriculum_question.as_hidden}}
@@ -76,53 +76,67 @@
                 </div>
                 <div class="answer_field">
                   <label>Response:</label>
-                  <div>
-                    {% if field_type == 'TA' %}
-                      <textarea placeholder="Enter your response" class="form-control" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" >{{questionForm.response.value}}</textarea>
-                    {% elif field_type == 'TF' %}
-                      <input type="text" placeholder="Enter your response" class="form-control" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{questionForm.response.value}}" />
-                    {% elif field_type == 'DD' %}
-                      <select class="form-control" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}">
+                  <div class="response">
+                    {% if form.instance.instance.status == 'F' or form.instance.instance.status == 'S' or form.instance.instance.status == 'A' %}
+                      <div class="readonly">
+                      {% if field_type == 'FI' %}
+                        <div class="file">
+                        Uploaded file: <a href="{{questionForm.responseFile.value.url}}" target="_blank"><span class="glyphicon glyphicon-file" aria-hidden="true"></span></a>
+                        </div>
+                      {% else %}
+                        <div class="text">
+                          {{questionForm.response.value}}
+                        </div>
+                      {% endif %}
+                      </div>
+                    {% else %}
+                      {% if field_type == 'TA' %}
+                        <textarea placeholder="Enter your response" class="form-control" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" >{{questionForm.response.value}}</textarea>
+                      {% elif field_type == 'TF' %}
+                        <input type="text" placeholder="Enter your response" class="form-control" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{questionForm.response.value}}" />
+                      {% elif field_type == 'DD' %}
+                        <select class="form-control" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}">
+                          {% for option in questionObj.options|split:','%}
+                            {% if option == questionForm.response.value %}
+                              <option value="{{option}}" selected>{{option}}</option>
+                            {% else %}
+                              <option value="{{option}}">{{option}}</option>
+                            {% endif %}
+                          {% endfor %}
+                        </select>
+                      {% elif field_type == 'MC' %}
+                        <div class="note"> Note: Select one answer </div>
                         {% for option in questionObj.options|split:','%}
-                          {% if option == questionForm.response.value %}
-                            <option value="{{option}}" selected>{{option}}</option>
+                          {% if forloop.counter == 1 %}
+                            {% if option|slugify == questionForm.response.value|slugify %}
+                              <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}"  checked="true"/>  {{option}}<br>
+                            {% else %}
+                              <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}" />  {{option}}<br>
+                            {% endif %}
                           {% else %}
-                            <option value="{{option}}">{{option}}</option>
+                            {% if option|slugify == questionForm.response.value|slugify %}
+                              <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}" checked="true" />  {{option}}<br>
+                            {% else %}
+                              <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}"/>  {{option}}<br>
+                            {% endif %}
                           {% endif %}
                         {% endfor %}
-                      </select>
-                    {% elif field_type == 'MC' %}
-                      <div class="note"> Note: Select one answer </div>
-                      {% for option in questionObj.options|split:','%}
-                        {% if forloop.counter == 1 %}
-                          {% if option|slugify == questionForm.response.value|slugify %}
-                            <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}"  checked="true"/>  {{option}}<br>
+                      {% elif field_type == 'MS' %}
+                        <div class="note"> Note: Select all that apply </div>
+                        <input type="hidden" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{questionForm.response.value}}"/>
+                        {% with chosen=questionForm.response.value|split:',' %}
+                        {% for option in questionObj.options|split:','%}
+                          {% if option|is_in:chosen %}
+                            <input type="checkbox" name="{{questionForm.response.html_name}}_cb" id="{{questionForm.response.auto_id}}_cb" value="{{option}}" checked/>  {{option}}<br>
                           {% else %}
-                            <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}" />  {{option}}<br>
+                            <input type="checkbox" name="{{questionForm.response.html_name}}_cb" id="{{questionForm.response.auto_id}}_cb" value="{{option}}"/>  {{option}}<br>
                           {% endif %}
-                        {% else %}
-                          {% if option|slugify == questionForm.response.value|slugify %}
-                            <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}" checked="true" />  {{option}}<br>
-                          {% else %}
-                            <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}"/>  {{option}}<br>
-                          {% endif %}
-                        {% endif %}
-                      {% endfor %}
-                    {% elif field_type == 'MS' %}
-                      <div class="note"> Note: Select all that apply </div>
-                      <input type="hidden" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{questionForm.response.value}}"/>
-                      {% with chosen=questionForm.response.value|split:',' %}
-                      {% for option in questionObj.options|split:','%}
-                        {% if option|is_in:chosen %}
-                          <input type="checkbox" name="{{questionForm.response.html_name}}_cb" id="{{questionForm.response.auto_id}}_cb" value="{{option}}" checked/>  {{option}}<br>
-                        {% else %}
-                          <input type="checkbox" name="{{questionForm.response.html_name}}_cb" id="{{questionForm.response.auto_id}}_cb" value="{{option}}"/>  {{option}}<br>
-                        {% endif %}
-                      {% endfor %}
-                      {% endwith %}
-                    {% elif field_type == 'FI' %}
-                      <div class="note"> Note: Upload a file </div>
-                     {{questionForm.responseFile}}
+                        {% endfor %}
+                        {% endwith %}
+                      {% elif field_type == 'FI' %}
+                        <div class="note"> Note: Upload a file </div>
+                       {{questionForm.responseFile}}
+                      {% endif %}
                     {% endif %}
                   </div>
                 </div>
@@ -137,7 +151,7 @@
                 {% if form.instance.instance.status == 'F' or form.instance.instance.status == 'A' %}
                   <div class="feedback">
                     <label>Feedback:</label>
-                    <div>{{questionForm.instance.id|getFeedback}}</div>
+                    <div class="feedback">{{questionForm.instance.id|getFeedback}}</div>
                   </div>
                 {% endif %}
                 {% if forloop.last %}

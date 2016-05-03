@@ -20,7 +20,6 @@ CURRICULUM_TYPE_CHOICES = (
 FIELD_TYPE_CHOICES = (
     (u'TA', u'Text Area'),
     (u'TF', u'Text Field'),
-    (u'SB', u'Slider Bar'),
     (u'DD', u'Drop Down'),
     (u'MS', u'Multi-Select'),
     (u'MC', u'Multiple Choice'),
