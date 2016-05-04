@@ -4,6 +4,9 @@ from tinymce.models import HTMLField
 from slugify import slugify
 from ckeditor_uploader.fields import RichTextUploadingField
 from smart_selects.db_fields import ChainedForeignKey
+from PIL import Image
+import StringIO
+from django.core.files.uploadedfile import InMemoryUploadedFile
 
 
 CURRICULUM_STATUS_CHOICES = (
@@ -100,13 +103,24 @@ class Curriculum (models.Model):
   modified_by = models.ForeignKey(User, null=False, related_name='curriculum_modifier')
   created_date = models.DateTimeField(auto_now_add=True)
   modified_date = models.DateTimeField(auto_now=True)
-  icon = models.FileField(upload_to=upload_file_to, blank=True)
+  icon = models.ImageField(upload_to=upload_file_to, blank=True)
 
   class Meta:
       ordering = ['-id']
 
   def __unicode__(self):
       return u'%s' % (self.title)
+
+  def save(self, *args, **kwargs):
+    if self.icon:
+      image = Image.open(StringIO.StringIO(self.icon.read()))
+      image = image.resize((400,289), Image.ANTIALIAS)
+      output = StringIO.StringIO()
+      image.save(output, format='png', quality=75)
+      output.seek(0)
+      self.icon = InMemoryUploadedFile(output,'ImageField', "%s.png" %self.icon.name, 'image/png', output.len, None)
+
+    super(Curriculum, self).save(*args, **kwargs)
 
 # Curriculum Step model
 # A curriculum may have one or more step/activity
@@ -192,6 +206,17 @@ class Category(models.Model):
 
   class Meta:
       ordering = ['order']
+
+  def save(self, *args, **kwargs):
+    if self.icon:
+      image = Image.open(StringIO.StringIO(self.icon.read()))
+      image = image.resize((400,289), Image.ANTIALIAS)
+      output = StringIO.StringIO()
+      image.save(output, format='png', quality=75)
+      output.seek(0)
+      self.icon = InMemoryUploadedFile(output,'ImageField', "%s.png" %self.icon.name, 'image/png', output.len, None)
+
+    super(Category, self).save(*args, **kwargs)
 
 # Subcategory model
 class Subcategory(models.Model):
