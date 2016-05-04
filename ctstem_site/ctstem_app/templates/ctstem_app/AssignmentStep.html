@@ -28,7 +28,7 @@
               <ul class="progress-indicator">
                 {% for i in total_steps|iterate %}
                   {% if i < form.instance.step.order %}
-                    <li class="completed">
+                    <li>
                       <a href="{% url 'ctstem:resumeAssignment'  form.instance.instance.assignment.id form.instance.instance.id i %}">
                         <span class="bubble"></span> Step {{i}}.
                       </a>
@@ -37,7 +37,7 @@
                     <li class="active"> <span class="bubble"></span> Step {{i}}. </li>
                   {% else %}
                     {% if form.instance.instance.status == 'S' or form.instance.instance.status == 'F' or form.instance.instance.status == 'A' %}
-                      <li class="completed">
+                      <li>
                         <a href="{% url 'ctstem:resumeAssignment'  form.instance.instance.assignment.id form.instance.instance.id i %}">
                           <span class="bubble"></span> Step {{i}}.
                         </a>

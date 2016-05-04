@@ -305,6 +305,14 @@ div.table#assignment {
   font-size: 1.5em;
 }
 
+div.table#assignment ul.progress-indicator > li.active{
+  color: #65d074 !important;
+  border-color: #65d074 !important;
+}
+div.table#assignment ul.progress-indicator > li.active .bubble, div.table#assignment ul.progress-indicator > li.active .bubble:before, div.table#assignment ul.progress-indicator > li.active .bubble:after {
+  background-color: #65d074 !important;
+}
+
 div.table#curriculumPreview hr, div.table.stepPreview hr, div.table#assignment hr {
   border-top: 1px solid #949494;
 }
