@@ -437,27 +437,46 @@ def register(request):
         newUser.user = user
         newUser.save()
 
+      current_site = Site.objects.get_current()
+      domain = current_site.domain
+
       if request.user.is_anonymous():
         if form.cleaned_data['account_type'] in ['A', 'R', 'C']:
-          messages.info(request, 'Your account is pending admin approval.  Please contact the system administrator to request approval.')
+          messages.info(request, 'Your account is pending admin approval.  You will be notified once your account is approved.')
           #send email confirmation
           send_mail('CT-STEM Account Pending',
-                    'Welcome to Computational Thinking in STEM website.  \r\n\r\n Your account is pending approval, and you will be notified once approved.\r\n\r\n  -- CT-STEM Admin',
+                    'Welcome to Computational Thinking in STEM website http://%s.  \r\n\r\n \
+                    Your account is pending approval, and you will be notified once approved.\r\n\r\n  \
+                    -- CT-STEM Admin' % domain,
                     settings.DEFAULT_FROM_EMAIL,
                     [newUser.user.email])
           return shortcuts.redirect('ctstem:home')
+
         elif form.cleaned_data['account_type'] in ['T', 'S']:
           new_user = authenticate(username=form.cleaned_data['username'],
                                   password=form.cleaned_data['password1'], )
           login(request, new_user)
           messages.info(request, 'Your have successfully registered.')
           send_mail('CT-STEM Account Created',
-                    'Welcome to Computational Thinking in STEM website.  \r\n\r\n You can login using the credentials created during registration. \r\n\r\n -- CT-STEM Admin',
+                    'Welcome to Computational Thinking in STEM website %s.  \r\n\r\n \
+                    You can login using the credentials created during registration. \r\n\r\n \
+                    -- CT-STEM Admin' % domain,
                     settings.DEFAULT_FROM_EMAIL,
                     [newUser.user.email])
           return shortcuts.redirect('ctstem:home')
+
       else:
         messages.info(request, 'User account has been created.')
+
+        send_mail('CT-STEM Account Created',
+                    'Your user account has been created on Computational Thinking in STEM website http://%s.  \r\n\r\n \
+                     Please login to the site using the following credentials and change your password.\r\n\r\n  \
+                     Username: %s \r\n \
+                     Temporary Password: %s \r\n\r\n \
+                     -- CT-STEM Admin'%(domain, newUser.user.username, form.cleaned_data['password1']),
+                    settings.DEFAULT_FROM_EMAIL,
+                    [newUser.user.email])
+
         if form.cleaned_data['account_type'] == 'A':
           return shortcuts.redirect('ctstem:users', role='admins')
         elif form.cleaned_data['account_type'] == 'R':
