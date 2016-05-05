@@ -147,11 +147,7 @@ USE_TZ = True
 STATIC_ROOT = os.path.join(BASE_DIR, "..", "www", "static")
 STATIC_URL = '/static/'
 
-EMAIL_BACKEND = 'django_smtp_ssl.SSLEmailBackend'
-EMAIL_HOST = 'email-smtp.us-west-2.amazonaws.com'
-EMAIL_PORT = 465
-EMAIL_USE_TLS = True
-DEFAULT_FROM_EMAIL = 'sachin.pradhan@northwestern.edu'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 # Auto logout delay in minutes

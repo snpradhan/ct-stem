@@ -25,6 +25,8 @@ import csv
 from django.db.models import Q
 from django.core.files.base import ContentFile
 from django.utils import timezone
+from django.core.mail import send_mail
+from django.contrib.sites.models import Site
 
 ####################################
 # HOME
@@ -438,12 +440,21 @@ def register(request):
       if request.user.is_anonymous():
         if form.cleaned_data['account_type'] in ['A', 'R', 'C']:
           messages.info(request, 'Your account is pending admin approval.  Please contact the system administrator to request approval.')
+          #send email confirmation
+          send_mail('CT-STEM Account Pending',
+                    'Welcome to Computational Thinking in STEM website.  \r\n\r\n Your account is pending approval, and you will be notified once approved.\r\n\r\n  -- CT-STEM Admin',
+                    settings.DEFAULT_FROM_EMAIL,
+                    [newUser.user.email])
           return shortcuts.redirect('ctstem:home')
         elif form.cleaned_data['account_type'] in ['T', 'S']:
           new_user = authenticate(username=form.cleaned_data['username'],
                                   password=form.cleaned_data['password1'], )
           login(request, new_user)
           messages.info(request, 'Your have successfully registered.')
+          send_mail('CT-STEM Account Created',
+                    'Welcome to Computational Thinking in STEM website.  \r\n\r\n You can login using the credentials created during registration. \r\n\r\n -- CT-STEM Admin',
+                    settings.DEFAULT_FROM_EMAIL,
+                    [newUser.user.email])
           return shortcuts.redirect('ctstem:home')
       else:
         messages.info(request, 'User account has been created.')
@@ -1501,6 +1512,9 @@ def user_upload(request):
 
   count = 0
   added = 0
+  current_site = Site.objects.get_current()
+  domain = current_site.domain
+
   if request.method == 'POST':
     form = forms.UploadFileForm(request.POST, request.FILES)
     if form.is_valid():
@@ -1578,6 +1592,7 @@ def user_upload(request):
               #create a student
               elif account_type == 'Student' or (role == 'teacher' and (account_type is None or account_type == '')):
                 if role == 'teacher':
+                  account_type = 'Student'
                   school_obj = request.user.teacher.school
                   student = models.Student.objects.create(user=user, school=school_obj)
                   #associate student with the logged in teacher
@@ -1592,12 +1607,21 @@ def user_upload(request):
                   else:
                     user.delete()
                     messages.warning(request, 'Student on row %d not created because teacher permission code not specified' % count)
+                    continue
               #create an author
               else:
                 author = models.Author.objects.create(user=user)
 
               added += 1
-
+              #email user the  user name and password
+              send_mail('CT-STEM Account Created',
+                    'Your %s account has been created on Computational Thinking in STEM website http://%s.  \r\n\r\n \
+                     Please login to the site using the following credentials and change your password.\r\n\r\n  \
+                     Username: %s \r\n \
+                     Temporary Password: %s \r\n\r\n \
+                     -- CT-STEM Admin'%(account_type, domain, user.username, password),
+                    settings.DEFAULT_FROM_EMAIL,
+                    [user.email])
             except IntegrityError:
               messages.error(request, 'Username and/or email used on row %d already exists, so the user was not created' % count)
               continue
