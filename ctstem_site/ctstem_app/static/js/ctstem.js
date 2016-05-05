@@ -151,6 +151,12 @@ $(function (){
       cache: false,
       processData: false,
       contentType: false,
+      beforeSend: function(){
+        $('#spinner').show();
+      },
+      complete: function(){
+          $('#spinner').hide();
+      },
       success: function(data){
         if(data['result'] == 'Success'){
           window.location.reload();
