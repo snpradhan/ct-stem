@@ -274,7 +274,6 @@ def copyCurriculum(request, id=''):
           original_curriculum = models.Curriculum.objects.get(id=id)
           curriculum.title = title
           curriculum.author = request.user
-          curriculum.modified_by = request.user
           curriculum.created_date = datetime.datetime.now()
           curriculum.modified_date = datetime.datetime.now()
           curriculum.parent = original_curriculum
@@ -735,9 +734,21 @@ def standard(request, id=''):
       print formset.is_valid()
       if form.is_valid() and formset.is_valid():
         savedStandard = form.save()
-        for form in formset.ordered_forms:
-          form.instance.order = form.cleaned_data['ORDER']
-          form.save()
+        formset.save(commit=False)
+        for catform in formset.ordered_forms:
+          catform.instance.order = catform.cleaned_data['ORDER']
+          catform.instance.standard = savedStandard
+          catform.instance.save()
+          for subform in catform.nested.ordered_forms:
+            subform.instance.category = catform.instance
+            subform.instance.save()
+          for obj in catform.nested.deleted_objects:
+            obj.delete()
+        #remove deleted questions
+        for obj in formset.deleted_objects:
+          obj.delete()
+
+
         messages.success(request, "Standard Saved.")
         return shortcuts.redirect('ctstem:standard', id=savedStandard.id)
       else:
