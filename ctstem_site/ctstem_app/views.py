@@ -129,7 +129,6 @@ def curriculum(request, id=''):
         savedCurriculum = form.save(commit=False)
         if '' == id:
             savedCurriculum.author = request.user
-        savedCurriculum.modified_by = request.user
         savedCurriculum.slug = slugify(savedCurriculum.title) + '-v%s'%savedCurriculum.version
         savedCurriculum.save()
         form.save()

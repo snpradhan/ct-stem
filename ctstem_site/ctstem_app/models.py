@@ -100,7 +100,6 @@ class Curriculum (models.Model):
   slug = models.SlugField(unique=True, max_length=255)
   taxonomy = models.ManyToManyField('Subcategory')
   author = models.ForeignKey(User, null=False, related_name='curriculum_author')
-  modified_by = models.ForeignKey(User, null=False, related_name='curriculum_modifier')
   created_date = models.DateTimeField(auto_now_add=True)
   modified_date = models.DateTimeField(auto_now=True)
   icon = models.ImageField(upload_to=upload_file_to, blank=True)
