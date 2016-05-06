@@ -44,6 +44,7 @@
                 <th width="35%"> Title </th>
                 <th width="15%"> Status </th>
                 <th width="15%"> Subject </th>
+                <th width="15%"> Author </th>
                 <th width="30%"> Standards </th>
                 <th width="5%"> Icon </th>
               </tr>
@@ -51,6 +52,7 @@
                 <th> Title </th>
                 <th> Status </th>
                 <th> Subject </th>
+                <th> Author </th>
                 <th> Standards </th>
                 <th width="5%"> Icon </th>
               </tr>
@@ -99,6 +101,7 @@
                       -
                     {% endif %}
                   </td>
+                  <td>{{curriculum.author.get_full_name}}</td>
 
                   <td>
                     <ul class="standard">
