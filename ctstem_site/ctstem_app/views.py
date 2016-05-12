@@ -654,6 +654,20 @@ def deleteUser(request, id=''):
         return http.HttpResponseNotFound('<h1>You do not have the privilege to delete this user</h1>')
 
     if request.method == 'GET' or request.method == 'POST':
+      # check if the user has authored any curriculum and transfer the ownership to an admin
+      curricula = models.Curriculum.objects.all().filter(author=user)
+      if len(curricula) > 0:
+        #get an admin to transfer the curriculum ownership to
+        admin = models.Administrator.objects.all().order_by('user__date_joined')[0]
+        if admin:
+          for curriculum in curricula:
+            curriculum.author = admin.user
+            curriculum.save()
+          messages.success(request, 'Curriculum owned by %s has been trasferred to %s' % (user.username, admin.user.username))
+        else:
+          messages.success(request, 'No admins exists to transfer ownership of curriculum authored by %s. So the user cannot be deleted.' % user.username)
+          return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
       user.delete()
       messages.success(request, '%s deleted' % user.username)
       return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
