@@ -300,6 +300,9 @@ div.table.stepPreview .answer_field .input_container .circle {
   height: 20px;
   width: 20px;
 }
+div.table.stepPreview div.step_context, div.step_content div.step_context {
+  overflow-y : auto;
+}
 div.table#curriculumPreview, div.table#curriculumQuestions, div.table#curriculumPreview, div.table.stepPreview{
   font-size: 1.5em;
 }

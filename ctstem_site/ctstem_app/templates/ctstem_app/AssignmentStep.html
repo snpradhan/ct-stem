@@ -53,8 +53,8 @@
         </div>
         <input type="hidden" name="step_order" value="{{step.order}}"/>
         <hr>
-        <div class="curriculum_content">
-          <div class="curriculum_context">{{form.instance.step.content|safe}}</div>
+        <div class="step_content">
+          <div class="step_context">{{form.instance.step.content|safe}}</div>
           <div class="question_container">
             {{formset.management_form}}
             {% if formset|length %}
