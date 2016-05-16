@@ -20,20 +20,24 @@
             <th> Name </th>
             <th> Email </th>
             <th> Status </th>
-            {% if role == 'researchers' or role == 'teachers' or role == 'students' %}
-              <th> School </th>
+            {% if user.administrator %}
+              {% if role == 'researchers' or role == 'teachers' or role == 'students' %}
+                <th> School </th>
+              {% endif %}
             {% endif %}
-
+            <th> Last Login </th>
           </tr>
           <tr id="filterrow">
             <th> Username </th>
             <th> Name </th>
             <th> Email </th>
             <th> Status </th>
-            {% if role == 'researchers' or role == 'teachers' or role == 'students' %}
-              <th> School </th>
+            {% if user.administrator %}
+              {% if role == 'researchers' or role == 'teachers' or role == 'students' %}
+                <th> School </th>
+              {% endif %}
             {% endif %}
-
+            <th> Last Login </th>
           </tr>
         </thead>
         <tbody>
@@ -52,9 +56,12 @@
               <td>{{userProfile.user.get_full_name}}</td>
               <td>{{userProfile.user.email}}</td>
               <td>{{userProfile.user.is_active|yesno:"Active,Inactive"}}</td>
-              {% if role == 'researchers' or role == 'teachers' or role == 'students' %}
-                <td>{{userProfile.school}}</td>
+              {% if user.administrator %}
+                {% if role == 'researchers' or role == 'teachers' or role == 'students' %}
+                  <td>{{userProfile.school}}</td>
+                {% endif %}
               {% endif %}
+              <td> {{userProfile.user.last_login|date}} </td>
             </tr>
           {% endfor %}
         </tbody>
