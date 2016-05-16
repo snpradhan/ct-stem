@@ -24,16 +24,7 @@
         {% for field in profileform %}
           <div class="form-group">
             <label for="id_{{field.name}}">{{ field.label }} {% if field.field.required %}(<span class="required">*</span>) {% endif %} </label>
-            {% if field.name == 'user_code' %}
-              <div class="input-group">
-                {{field}}
-                <span class="input-group-btn">
-                  <input type="button" class="btn btn-info" id="generate_code" value="Generate"/>
-                </span>
-              </div>
-            {% else %}
-              {{field}}
-            {% endif %}
+            {{field}}
             <div class="error">{{ field.errors }}</div>
           </div>
         {% endfor %}

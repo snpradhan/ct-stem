@@ -253,8 +253,6 @@ class Student(models.Model):
 class Teacher(models.Model):
   user = models.OneToOneField(User, unique=True, null=False, related_name="teacher")
   school = models.ForeignKey(School)
-  students = models.ManyToManyField(Student, blank=True)
-  user_code = models.CharField(null=False, max_length=256, unique=True)
 
   def __unicode__(self):
       return u'%s' % (self.user.get_full_name())
@@ -264,8 +262,6 @@ class Teacher(models.Model):
 class Researcher(models.Model):
   user = models.OneToOneField(User, unique=True, null=False, related_name="researcher")
   school = models.ForeignKey(School)
-  teachers = models.ManyToManyField(Teacher, blank=True)
-  user_code = models.CharField(null=False, max_length=256, unique=True)
 
   def __unicode__(self):
       return u'%s' % (self.user.get_full_name())
@@ -285,16 +281,6 @@ class Administrator(models.Model):
 
   def __unicode__(self):
       return u'%s' % (self.user.get_full_name())
-
-######################################################
-# Section models
-# This models represents a class, group or a section of a teacher that has one or more students
-class Section(models.Model):
-  teacher = models.ForeignKey(Teacher)
-  subject = models.ForeignKey(Subject)
-  time = models.CharField(null=False, max_length=256)
-  students = models.ManyToManyField(Student)
-
 
 #######################################################
 # Publication model

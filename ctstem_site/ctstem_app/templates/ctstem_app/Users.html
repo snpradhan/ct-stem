@@ -23,9 +23,7 @@
             {% if role == 'researchers' or role == 'teachers' or role == 'students' %}
               <th> School </th>
             {% endif %}
-            {% if role == 'researchers' or role == 'teachers' %}
-              <th> User Code </th>
-            {% endif %}
+
           </tr>
           <tr id="filterrow">
             <th> Username </th>
@@ -35,9 +33,7 @@
             {% if role == 'researchers' or role == 'teachers' or role == 'students' %}
               <th> School </th>
             {% endif %}
-            {% if role == 'researchers' or role == 'teachers' %}
-              <th> User Code </th>
-            {% endif %}
+
           </tr>
         </thead>
         <tbody>
@@ -59,9 +55,6 @@
               {% if role == 'researchers' or role == 'teachers' or role == 'students' %}
                 <td>{{userProfile.school}}</td>
               {% endif %}
-              {% if role == 'researchers' or role == 'teachers' %}
-                <td>{{userProfile.user_code}}</td>
-              {% endif %}
             </tr>
           {% endfor %}
         </tbody>
@@ -72,44 +65,7 @@
   </div>
 
   {% block upload %}
-    <div class="modal fade" id="upload" role="dialog">
-      <div class="modal-dialog modal-sm">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
-            {% if user.administrator or user.researcher %}
-              <h3 class="modal-title">User Upload</h3>
-            {% elif user.teacher %}
-              <h3 class="modal-title">Student Upload</h3>
-            {% endif %}
-          </div>
-          <div id="uploadMsg">
-          </div>
-          <form enctype="multipart/form-data" class="form" id="formUpload" method="post">
-            {% csrf_token %}
-            <div class="modal-body">
-              <div class="form-group">
-                <label for="id_uploadFile">File</label>
-                {{uploadForm.uploadFile}}
-              </div>
-              <div id="spinner">
-                <img src="/static/img/page-loader.gif" class="icon"/>
-              </div>
-            </div>
-            <div class="modal-footer">
-              <div class="form-group button-row">
-                <button type="submit" id="btnUpload" class="btn btn-success">
-                  <span class="glyphicon glyphicon-upload" aria-hidden="true"></span>
-                  Upload
-                </button>
-                <a type="button" class="btn btn-danger" data-dismiss="modal">Cancel</a>
-              </div>
-
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
+    {% include "ctstem_app/UserUploadModal.html" %}
   {% endblock %}
 {% endblock %}
 

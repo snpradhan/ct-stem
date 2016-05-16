@@ -28,8 +28,6 @@ class RegistrationForm (forms.Form):
   email = forms.EmailField(required=True, max_length=75, label=u'Email')
   account_type = forms.ChoiceField(required=True, choices = models.USER_ROLE_CHOICES)
   school = forms.ModelChoiceField(required=False, queryset=models.School.objects.all())
-  permission_code = forms.CharField(required=False, max_length=256, label=u'Permission code', help_text='Code shared by your teacher or school admin.')
-  user_code = forms.CharField(required=False, max_length=256, label=u'User code', help_text='A unique code to share with your students or teachers')
 
   def __init__(self, *args, **kwargs):
     user = kwargs.pop('user')
@@ -71,52 +69,20 @@ class RegistrationForm (forms.Form):
     if self.cleaned_data['account_type'] == 'T':
       if self.cleaned_data['school'] is None or self.cleaned_data['school'] == '':
         error_list.append('SR');
-      if self.cleaned_data['permission_code'] is not None and self.cleaned_data['permission_code'] != '':
-        try:
-          models.Researcher.objects.get(user_code=self.cleaned_data['permission_code'], user__is_active=True)
-        except models.Researcher.DoesNotExist:
-          error_list.append('PI');
-      if self.cleaned_data['user_code'] is None or self.cleaned_data['user_code'] == '':
-        error_list.append('UR');
-      else:
-        try:
-          models.Teacher.objects.get(user_code=self.cleaned_data['user_code'])
-          error_list.append('UI');
-        except models.Teacher.DoesNotExist:
-          pass
     #check fields for Student
     elif self.cleaned_data['account_type'] == 'S':
       if self.cleaned_data['school'] is None or self.cleaned_data['school'] == '':
         error_list.append('SR');
-      if self.cleaned_data['permission_code'] is not None and self.cleaned_data['permission_code'] != '':
-        try:
-          models.Teacher.objects.get(user_code=self.cleaned_data['permission_code'], user__is_active=True)
-        except models.Teacher.DoesNotExist:
-          error_list.append('PI');
     #check fields for Researcher
     elif self.cleaned_data['account_type'] == 'R':
       if self.cleaned_data['school'] is None or self.cleaned_data['school'] == '':
         error_list.append('SR');
-      if self.cleaned_data['user_code'] is None or self.cleaned_data['user_code'] == '':
-        error_list.append('UR');
-      else:
-        try:
-          models.Researcher.objects.get(user_code=self.cleaned_data['user_code'])
-          error_list.append('UI');
-        except models.Researcher.DoesNotExist:
-          pass
     if len(error_list) > 0:
       clean = False
 
     for error in error_list:
       if error == 'SR':
         self._errors['school'] = u'School is required'
-      elif error == 'PI':
-        self._errors['permission_code'] = u'Permission code is not valid'
-      elif error == 'UR':
-        self._errors['user_code'] = u'User code is required'
-      elif error == 'UI':
-        self._errors['user_code'] = u'User code is not unique'
 
 
     return clean
@@ -182,7 +148,7 @@ class StudentForm (ModelForm):
 class TeacherForm (ModelForm):
   class Meta:
     model = models.Teacher
-    fields = ['school','students', 'user_code']
+    fields = ['school']
 
   def __init__(self, *args, **kwargs):
     super(TeacherForm, self).__init__(*args, **kwargs)
@@ -197,7 +163,7 @@ class TeacherForm (ModelForm):
 class ResearcherForm (ModelForm):
   class Meta:
     model = models.Researcher
-    fields = ['school','teachers', 'user_code']
+    fields = ['school']
   def __init__(self, *args, **kwargs):
     super(ResearcherForm, self).__init__(*args, **kwargs)
     for field_name, field in self.fields.items():
@@ -432,6 +398,7 @@ class UserGroupForm(ModelForm):
     super(UserGroupForm, self).__init__(*args, **kwargs)
 
     self.fields['time'].label = 'Time/Period'
+    #self.fields['members'].queryset = self.fields['members'].queryset.filter(~Q(school=teacher.school))
 
     for field_name, field in self.fields.items():
       field.widget.attrs['class'] = 'form-control'

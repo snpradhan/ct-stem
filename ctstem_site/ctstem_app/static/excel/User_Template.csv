@@ -1,1 +1,1 @@
-Username*,First name*,Last name*,Email*,"Account Type* (Admin, Researcher, Teacher, Student, Author)",School Code (Required if account type is Researcher or Teacher),Supervisor  Code (If account type is Teacher provide Researcher's user code; if account type is Student provide Teacher's user code.)
+Username*,First name*,Last name*,Email*,"Account Type* (Admin, Researcher, Teacher, Student, Author)","School Code (Required if you are an Admin and you are creating a Researcher, Teacher or Student account)"

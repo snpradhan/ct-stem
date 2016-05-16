@@ -91,6 +91,9 @@
       <p>No groups available.</p>
     {% endif %}
   </div>
+  {% block upload %}
+    {% include "ctstem_app/UserUploadModal.html" %}
+  {% endblock %}
 
   <script type="text/javascript">
     $(".expand_collapse2").click(function(){
