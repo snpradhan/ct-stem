@@ -25,7 +25,7 @@ import csv
 from django.db.models import Q
 from django.core.files.base import ContentFile
 from django.utils import timezone
-from django.core.mail import send_mail
+from django.core.mail import send_mail, EmailMessage
 from django.contrib.sites.models import Site
 
 ####################################
@@ -41,15 +41,61 @@ def home(request):
     practices = models.Category.objects.all().filter(standard__primary=True).select_related()
     team = models.Team.objects.all().order_by('role__order', 'order')
     publications = models.Publication.objects.all()
-    context = {'lessons': lessons, 'assessments' : assessments, 'practices': practices, 'team': team, 'publications': publications}
+
+    if request.user.is_authenticated():
+      if hasattr(request.user, 'administrator'):
+        school = None
+        requester_role = ''
+      elif hasattr(request.user, 'researcher'):
+        school = request.user.researcher.school
+        requester_role = 'R'
+      elif hasattr(request.user, 'teacher'):
+        school = request.user.teacher.school
+        requester_role = 'T'
+      else:
+        school = None
+        requester_role = ''
+
+      training_request = models.TrainingRequest(name=request.user.get_full_name(), email=request.user.email, school=school, requester_role=requester_role)
+    else:
+      training_request = models.TrainingRequest()
+
+    if request.method == 'GET':
+      request_form = forms.TrainingRequestForm(instance=training_request, prefix='training')
+    elif request.method == 'POST':
+      data = request.POST.copy()
+      request_form = forms.TrainingRequestForm(data, instance=training_request, prefix='training')
+      if request_form.is_valid():
+        training = request_form.save()
+        request_form = forms.TrainingRequestForm(instance=models.TrainingRequest(), prefix='training')
+        messages.success(request, "Your request has been sent to the site admin")
+        #send email to the admin
+        send_email('CT-STEM Training Request',
+                    '<b>Requester </b>: %s <br> \
+                    <b>Email </b>: %s <br> \
+                    <b>School </b>: %s <br> \
+                    <b>Academic Role </b>: %s <br>\
+                    <b>Notes </b>: %s' % (training.name, training.email, training.school, training.get_requester_role_display(), training.notes),
+                    settings.DEFAULT_FROM_EMAIL,
+                    ['sachin.pradhan@northwestern.edu'])
+      else:
+        print request_form.errors
+        messages.error(request, "Your request could not be sent.")
+
+    context = {'lessons': lessons, 'assessments' : assessments, 'practices': practices, 'team': team, 'publications': publications, 'form': request_form}
     return render(request, 'ctstem_app/Home.html', context)
+
+def send_email(subject, message, sender, to_list):
+    msg = EmailMessage(subject, message, sender, to_list)
+    msg.content_subtype = "html"  # Main content is now text/html
+    return msg.send()
 
 ####################################
 # ABOUT US
 ####################################
 def team(request):
-  roles = models.TeamRole.objects.all()
-  context = {'roles': roles}
+  team = models.Team.objects.all().order_by('order')
+  context = {'team': team}
   return render(request, 'ctstem_app/Team.html', context)
 
 ####################################
@@ -1839,7 +1885,7 @@ def teamMembers(request):
   if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'researcher') == False:
     return http.HttpResponseNotFound('<h1>You do not have the privilege to edit team roles</h1>')
 
-  members = models.Team.objects.all()
+  members = models.Team.objects.all().order_by('order')
   context = {'members': members}
   return render(request, 'ctstem_app/TeamMembers.html', context)
 

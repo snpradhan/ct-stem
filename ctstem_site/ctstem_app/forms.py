@@ -358,6 +358,7 @@ class CategoryForm(ModelForm):
     exclude = ('id', 'standard', 'order')
     widgets = {
       'name': forms.TextInput(attrs={'placeholder': 'Category name'}),
+      'description': forms.Textarea(attrs={'rows':0, 'cols':60}),
     }
 
   def __init__(self, *args, **kwargs):
@@ -609,3 +610,22 @@ class TeamMemberForm(ModelForm):
     for field_name, field in self.fields.items():
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['placeholder'] = field.help_text
+
+####################################
+# Training Request Form
+####################################
+class TrainingRequestForm(ModelForm):
+
+  class Meta:
+    model = models.TrainingRequest
+    exclude = ('id',)
+
+  def __init__(self, *args, **kwargs):
+    super(TrainingRequestForm, self).__init__(*args, **kwargs)
+
+    for field_name, field in self.fields.items():
+      field.widget.attrs['class'] = 'form-control'
+      field.widget.attrs['placeholder'] = field.help_text
+
+
+

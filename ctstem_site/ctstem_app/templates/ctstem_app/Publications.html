@@ -4,12 +4,14 @@
   {{ block.super }}
   {{ form.media }}
 {% endblock %}
-{% block title %}Publications |{% endblock %}
+{% block title %}Research |{% endblock %}
 
 {% block content %}
   {{block.super}}
   <div class="content">
-    <h2> Publications </h2>
+    <h2>Research</h2>
+    <p class="text-muted" style="margin: 0 10em 3em;">STEM education faces two related challenges. First, our education system is not producing enough computational professionals to fill demand. Second, women and minorities remain significantly underrepresented. We are conducting a Design-Based Implementation Research project to study a model in which computational literacy curricula are embedded throughout required biology, chemistry, physics, and mathematics coursework. This would ensure that every high school student is exposed to computational literacy activities in a context that demonstrates its relevance to real world career paths. We are interested how such curriculum affects student and teachers’ attitudes, identity, and learning. We are also working to understand individual and institutional factors that affect the success of this model in resource-constrained public schools.</p>
+
     {% if user.administrator %}
       <div class="btn-group">
         <a type="button" class="btn btn-info" href="{% url 'ctstem:newPublication' %}" title="Create new publication">Create Publication</a>
@@ -73,6 +75,7 @@
         </div>
       {% endif %}
       <div id="publications_bib">
+        <h4>Publications</h4>
         <ul id="publications">
           {% for pub in publications %}
             <li class="publication">

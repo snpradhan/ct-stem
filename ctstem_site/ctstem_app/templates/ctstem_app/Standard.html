@@ -65,6 +65,11 @@
                 <div class="error">{{ category.name.errors }}</div>
               </div>
               <div class="form-group">
+                <label for="id_{{category.description.name}}">Category Description {% if category.description.field.required %}(<span class="required">*</span>) {% endif %}</label>
+                <div id="id_{{category.description.name}}">{{category.description}}</div>
+                <div class="error">{{ category.description.errors }}</div>
+              </div>
+              <div class="form-group">
                 <label for="id_{{category.icon.name}}">Icon {% if category.icon.field.required %}(<span class="required">*</span>) {% endif %}</label>
                 <div id="id_{{category.icon.name}}">{{category.icon}}</div>
                 <div class="error">{{ category.icon.errors }}</div>

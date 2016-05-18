@@ -25,15 +25,17 @@
       <table class="table table-striped table-bordered table-condensed dt" id="team">
         <thead>
           <tr>
-            <th> Role </th>
+            <th> Order </th>
             <th> Name </th>
+            <th> Role </th>
             <th> Description </th>
             <th> Personal URL </th>
             <th> Image </th>
           </tr>
           <tr id="filterrow">
-            <th> Role </th>
+            <th> Order </th>
             <th> Name </th>
+            <th> Role </th>
             <th> Description </th>
             <th> Personal URL </th>
             <th> Image </th>
@@ -42,7 +44,7 @@
         <tbody>
           {% for member in members %}
             <tr>
-              <td>{{member.role}}</td>
+              <td>{{member.order}}</td>
               <td class="title">{{member.name}}
                 <div class="controls">
                   <a type="button" class="btn btn-success" aria-label="Edit Member" title="Edit Member" href="{% url 'ctstem:teamMember' member.id %}">
@@ -53,6 +55,7 @@
                   </a>
                 </div>
               </td>
+              <td>{{member.role}}</td>
               <td>{{member.description}}</td>
               <td>{{member.url}}</td>
               <td><img class="icon" src="{{member.image.url}}"/></td>

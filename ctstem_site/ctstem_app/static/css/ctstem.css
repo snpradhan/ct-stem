@@ -71,6 +71,13 @@ a {
  ***************************************/
 footer {
   font-size: 1.3em;
+  text-align: left;
+  color: #ddd;
+  background-color: #333;
+}
+
+footer div.footer_content {
+  margin-bottom: 2em;
 }
 /***********   FOOTER END   ************/
 
@@ -169,6 +176,11 @@ footer {
 img.icon {
   width: 20px;
   height: 20px;
+}
+img.profile {
+  width: 150px;
+  height: 200px;
+  border-radius: 15%;
 }
 
 div#spinner {
@@ -704,9 +716,8 @@ div.content {
 }
 
 div.content#home header{
-  background-image:url(/static/img/header-bg3.jpg);
+  background-image:url(/static/img/landing.png);
   position: relative;
-  background-blend-mode: ;
 }
 div.content#home header .intro-text {
   padding-top: 200px;
@@ -772,23 +783,26 @@ div.content section.portfolio.bg-light-gray .portfolio-item .portfolio-caption {
   background-color: #fff;
 }
 
-div.content#home section#services i.text-primary-red {
-  color: #FE6D36;
+div.content#home section#services i.lessons {
+  color: #FED136;
 }
-div.content#home section#services i.text-primary-green {
-  color: #C7FE36;
+div.content#home section#services i.standards {
+  color: #E7513A;
 }
-div.content#home section#services i.text-primary-blue {
-  color: #3663fe;
+div.content#home section#services i.assessments {
+  color: #8C36FE;
 }
-div.content#home section#services i.text-primary-yellow {
-  color: #fed136;
+div.content#home section#services i.training {
+  color: #26D4E7;
 }
-div.content#home section#services i.text-primary-black {
-  color: black;
+div.content#home section#services i.research {
+  color: #7BFF29;
 }
-div.content#home section#services i.text-primary-purple {
-  color: #6d36fe;
+div.content#home section#services i.tools {
+  color: #444;
+}
+div.content#home section#services p.text-muted {
+  text-align: left !important;
 }
 
 div.content#home section#research .portfolio-item .portfolio-caption{
@@ -813,7 +827,7 @@ div.content#home {
   font-size: 1.5em;
   /*background-color: rgba(204,204,204, 1);
   border-radius: 2em;*/
-  margin: 0 0 1em 0;
+  margin: 0 0 0 0;
 }
 
 div.content#home section#practices img.img-circle {
@@ -825,6 +839,12 @@ div.content#home section .explore_more {
   text-align: center;
 }
 
+div.content#home section#contact {
+  background-color: #666;
+}
+div.content#home section#contact .text-muted {
+  color: #ddd;
+}
 div.content#assignments {
   width: 80%;
 }

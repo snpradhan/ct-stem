@@ -63,6 +63,14 @@ ASSIGNMENT_SORT = (
   (u'modified', u'Last Modified')
 )
 
+REQUESTER_ROLE = (
+  (u'', u'I am:'),
+  (u'T', u'Teacher'),
+  (u'R', u'Researcher'),
+  (u'A', u'School Administrator'),
+  (u'O', u'Other'),
+)
+
 def upload_file_to(instance, filename):
   import os
   from django.utils.timezone import now
@@ -198,6 +206,7 @@ class Category(models.Model):
   standard = models.ForeignKey(Standard, related_name="category")
   name = models.CharField(null=False, max_length=256)
   icon = models.ImageField(upload_to=upload_file_to, blank=True, null=True)
+  description = models.TextField(null=True, blank=True)
   order = models.IntegerField(null=True)
 
   def __unicode__(self):
@@ -419,3 +428,10 @@ class Team(models.Model):
 
   class Meta:
       ordering = ['order']
+
+class TrainingRequest(models.Model):
+  name = models.CharField(max_length=255, blank=False, help_text="Name")
+  email = models.CharField(max_length=255, blank=False, help_text="Email")
+  school = models.CharField(max_length=255, blank=False, help_text="School Name")
+  requester_role = models.CharField(max_length=255, choices=REQUESTER_ROLE, help_text="I am:")
+  notes = models.TextField(null=False, blank=False, help_text="Notes")

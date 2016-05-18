@@ -9,34 +9,31 @@
   {{block.super}}
   <div class="content" id="home">
     <!-- Header -->
-    <header style="position: relative;">
+    <header>
       <div class="container">
         <div class="intro-text">
           <div class="intro-heading" style="font-size: 3.3em;">Computational Thinking in Science and Math</div>
           <div class="intro-lead-in" style="font-size: 1.5em; letter-spacing: 0.075em;">
-            Empowering all students to participate in a computational future by <br>
-            promoting computational literacy in high school science and mathematics.
+            Promoting computational thinking in high school science and mathematics to empower all students to participate in a computational future.
           </div>
-          <a href="#services" class="page-scroll btn btn-xl">Read More</a>
         </div>
       </div>
-      <div id="intro-image-caption">Image from Michael Wittaker: Special Snowflake. Winner Northwestern University 2015 Scientific Image Contest. Dr. Wittaker uses computational tools to freeze cells in action. Visit URL to Learn more.</div>
     </header>
 
     <!-- Services Section -->
-    <section id="services" class="bg-light-gray">
+    <section id="services">
       <div class="container">
         <div class="row">
           <div class="col-lg-12 text-center">
             <h2 class="section-heading">About Us</h2>
-            <h3 class="section-subheading text-muted" style="line-height: 150%; padding: 0 150px; font-style: normal;">We are a team of scientists, learning researchers, and educators at Northwestern University. With support from the National Science Foundation and the Spencer Foundation we seek to broaden students’ participation in a computational future through the use of innovative curriculum and assessments for high school science and mathematics. </h3>
+            <h3 class="section-subheading text-muted" style="line-height: 150%; padding: 0 150px; font-style: normal;">We are a team of scientists and educators at Northwestern University working to design and research computationally enhanced high school science and math curriculum. With support from the National Science Foundation and Spencer Foundation, our goal is to enrich science learning while developing foundational computational literacy skills for all students. </h3>
           </div>
         </div>
         <div class="row text-center">
           <div class="col-md-4">
-            <a class="page-scroll" href="#lessons">
+            <a class="page-scroll" href="{% url 'ctstem:curricula' 'lessons' %}">
               <span class="fa-stack fa-4x">
-                <i class="fa fa-circle fa-stack-2x text-primary-red"></i>
+                <i class="fa fa-circle fa-stack-2x lessons"></i>
                 <i class="fa fa-book fa-stack-1x fa-inverse"></i>
               </span>
             </a>
@@ -46,7 +43,7 @@
           <div class="col-md-4">
             <a class="page-scroll" href="#practices">
               <span class="fa-stack fa-4x">
-                <i class="fa fa-circle fa-stack-2x text-primary-green"></i>
+                <i class="fa fa-circle fa-stack-2x standards"></i>
                 <i class="fa fa-tags fa-stack-1x fa-inverse"></i>
               </span>
             </a>
@@ -56,7 +53,7 @@
           <div class="col-md-4">
             <a class="page-scroll" href="#assessments">
               <span class="fa-stack fa-4x">
-                <i class="fa fa-circle fa-stack-2x text-primary-blue"></i>
+                <i class="fa fa-circle fa-stack-2x assessments"></i>
                 <i class="fa fa-pencil fa-stack-1x fa-inverse"></i>
               </span>
             </a>
@@ -68,7 +65,7 @@
           <div class="col-md-4">
             <a class="page-scroll" href="#workshops">
               <span class="fa-stack fa-4x">
-                <i class="fa fa-circle fa-stack-2x text-primary-yellow"></i>
+                <i class="fa fa-circle fa-stack-2x training"></i>
                 <i class="fa fa-group fa-stack-1x fa-inverse"></i>
               </span>
             </a>
@@ -76,9 +73,9 @@
             <p class="text-muted">Interested in implementing computational thinking activities in your classroom? Check out our professional development workshops and resources.</p>
           </div>
           <div class="col-md-4">
-            <a class="page-scroll" href="#research">
+            <a class="page-scroll" href="{% url 'ctstem:publications' %}">
               <span class="fa-stack fa-4x">
-                <i class="fa fa-circle fa-stack-2x text-primary-black"></i>
+                <i class="fa fa-circle fa-stack-2x research"></i>
                 <i class="fa fa-laptop fa-stack-1x fa-inverse"></i>
               </span>
             </a>
@@ -88,7 +85,7 @@
           </div>
           <div class="col-md-4">
             <span class="fa-stack fa-4x">
-              <i class="fa fa-circle fa-stack-2x text-primary-purple"></i>
+              <i class="fa fa-circle fa-stack-2x tools"></i>
               <i class="fa fa-wrench fa-stack-1x fa-inverse"></i>
             </span>
             <h4 class="service-heading">Administrator Tools</h4>
@@ -98,7 +95,7 @@
       </div>
     </section>
     <!-- Portfolio Grid Section -->
-    <section id="lessons" class="portfolio">
+    <!--section id="lessons" class="portfolio">
       <div class="container">
         <div class="row">
           <div class="col-lg-12 text-center">
@@ -123,7 +120,6 @@
             </a>
             <div class="portfolio-caption bg-light-gray">
               <h5>{{lesson.title}}</h5>
-              <!--p class="text-muted">{{lesson.overview|truncatechars:50}}</p-->
             </div>
           </div>
           {% endfor %}
@@ -132,7 +128,7 @@
           <a href="{% url 'ctstem:curricula' 'lessons' %}" class="page-scroll btn btn-xl">Explore More</a>
         </div>
       </div>
-    </section>
+    </section-->
     <!-- Portfolio Grid Section -->
     <section id="assessments" class="portfolio bg-light-gray">
       <div class="container">
@@ -169,40 +165,15 @@
         </div>
       </div>
     </section>
-    <!-- Workshop Grid Section -->
-    <section id="workshops" class="portfolio">
-      <div class="container">
-        <div class="row">
-          <div class="col-lg-12 text-center">
-            <h2 class="section-heading">Professional Development Workshops</h2>
-            <h3 class="section-subheading text-muted">Interested in implementing computational thinking activities in your classroom? Check out our professional development workshops and resources.</h3>
-          </div>
-        </div>
-      </div>
-    </section>
-    <!-- Research Section -->
-    <section id="research" class="portfolio bg-light-gray">
-      <div class="container">
-        <div class="row">
-          <div class="col-lg-12 text-center">
-            <h2 class="section-heading">Research Publications</h2>
-            <h3 class="section-subheading text-muted">We are conducting ongoing research on the design and implementation of
-              computational thinking activities in science and mathematics classrooms.</h3>
-          </div>
-        </div>
-        <div class="explore_more">
-          <a href="{% url 'ctstem:publications'%}" class="page-scroll btn btn-xl">Explore Publications</a>
-        </div>
 
-      </div>
-    </section>
+
     <!-- About Section -->
     <section id="practices" class="portfolio">
       <div class="container">
         <div class="row">
           <div class="col-lg-12 text-center">
-            <h2 class="section-heading">Computational Thinking Practices</h2>
-            <h3 class="section-subheading text-muted">We have developed a taxonomy of computational thinking practices in STEM fields to guide the development of our curriculum and assessments.</h3>
+            <h2 class="section-heading">WHAT DO WE MEAN BY COMPUTATIONAL THINKING?</h2>
+            <h3 class="section-subheading text-muted">Modern scientists, engineers, and mathematicians use an array of computational tools and practices in their everyday work. It is increasingly important for high school students not just to know how to use computers but to be computationally literate. To this end we have developed a taxonomy to capture relevant computational practices and guide the design of curriculum and assessments. </h3>
           </div>
         </div>
         <div class="row">
@@ -220,93 +191,68 @@
             </a>
             <div class="portfolio-caption bg-light-gray">
               <h5>{{practice.name}}</h5>
-              <!--p class="text-muted">{{assessment.overview|truncatechars:50 }}</p-->
+              <!--p class="text-muted">{{practice.description }}</p-->
             </div>
           </div>
           {% endfor %}
+        </div>
+        <div class="explore_more">
+          <a href="http://link.springer.com/article/10.1007/s10956-015-9581-5" target="_blank" class="page-scroll btn btn-xl">Read More</a>
         </div>
 
       </div>
     </section>
 
-    <!-- Team Section -->
-    <section id="team" class="bg-light-gray">
-      <div class="container">
-        <div class="row">
-          <div class="col-lg-12 text-center">
-            <h2 class="section-heading">Our Team</h2>
-            <h3 class="section-subheading text-muted">Lorem ipsum dolor sit amet consectetur.</h3>
-          </div>
-        </div>
-        <div class="row">
-          {% for member in team %}
-          <div class="col-sm-4">
-            <div class="team-member">
-              <a data-form="{% url 'ctstem:teamProfile' member.id %}" data-toggle="modal" class="profile">
-                <img src="{{member.image.url}}" class="img-responsive img-circle" alt="">
-              </a>
-              <h4>{{member.name}}</h4>
-              <p class="text-muted">{{member.role}}</p>
-            </div>
-          </div>
-          {% endfor %}
-        </div>
-        <div class="row">
-          <div class="col-lg-8 col-lg-offset-2 text-center">
-            <p class="large text-muted">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aut eaque, laboriosam veritatis, quos non quis ad perspiciatis, totam corporis ea, alias ut unde.</p>
-          </div>
-        </div>
-      </div>
-    </section>
     <!-- Clients Aside -->
-    <aside class="clients">
-      <div class="container">
-        <div class="row">
-          <div class="col-md-2 col-sm-4">
-            <a href="#">
-              <img src="/static/img/tidal.png" class="img-responsive img-centered" alt="">
-            </a>
-          </div>
-          <div class="col-md-2 col-sm-4">
-            <a href="#">
-              <img src="/static/img/osep.png" class="img-responsive img-centered" alt="">
-            </a>
-          </div>
-          <div class="col-md-2 col-sm-4">
-            <a href="#">
-              <img src="/static/img/adler.png" class="img-responsive img-centered" alt="">
-            </a>
-          </div>
-          <div class="col-md-2 col-sm-4">
-            <a href="#">
-              <img src="/static/img/ccl.png" class="img-responsive img-centered" alt="">
-            </a>
-          </div>
-          <div class="col-md-2 col-sm-4">
-            <a href="#">
-              <img src="/static/img/NSFLogo.png" class="img-responsive img-centered" alt="">
-            </a>
-          </div>
-          <div class="col-md-2 col-sm-4">
-            <a href="#">
-              <img src="/static/img/logo.png" class="img-responsive img-centered" alt="">
-            </a>
-          </div>
-        </div>
-      </div>
-    </aside>
 
-    <!-- Contact Section -->
+
     <section id="contact">
-      <div class="container">
-        <div class="row">
-          <div class="col-lg-12 text-center">
-            <h2 class="section-heading">Contact Us</h2>
-            <h3 class="section-subheading text-muted"><a href="mailto:ct-stem@ccl.northwestern.edu">ct-stem@ccl.northwestern.edu</a></h3>
-          </div>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <h2 class="section-heading">Professional Development Workshops</h2>
+                    <h3 class="section-subheading text-muted">Interested in implementing computational thinking activities in your classroom? Our summer workshops are filling up fast. Please use this form to help us find a training that’s right for you or your teachers:</h3>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12">
+                    <form method="post" name="sentMessage" id="contactForm">
+                      {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-6">
+                              <div class="form-group">
+                                {{form.name}}
+                                <div class="error">{{ form.name.errors }}</div>
+                              </div>
+                              <div class="form-group">
+                                {{form.email}}
+                                <div class="error">{{ form.email.errors }}</div>
+                              </div>
+                              <div class="form-group">
+                                {{form.school}}
+                                <div class="error">{{ form.school.errors }}</div>
+                              </div>
+                              <div class="form-group">
+                                {{form.requester_role}}
+                                <div class="error">{{ form.requester_role.errors }}</div>
+                              </div>
+                            </div>
+                            <div class="col-md-6">
+                              <div class="form-group">
+                                {{form.notes}}
+                                <div class="error">{{ form.notes.errors }}</div>
+                              </div>
+                            </div>
+                            <div class="clearfix"></div>
+                            <div class="col-lg-12 text-center">
+                              <div id="success"></div>
+                              <button type="submit" class="btn btn-xl">Submit</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-
-      </div>
     </section>
   </div>
 
@@ -316,7 +262,7 @@
 
   <!-- Contact Form JavaScript -->
   <script src="/static/js/jqBootstrapValidation.js"></script>
-  <script src="/static/js/contact_me.js"></script>
+  <!--script src="/static/js/contact_me.js"></script-->
 
   <!-- Custom Theme JavaScript -->
   <script src="/static/js/agency.js"></script>

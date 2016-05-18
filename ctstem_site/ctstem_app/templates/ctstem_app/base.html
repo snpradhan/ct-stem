@@ -94,26 +94,25 @@
           <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
               {% if not user.student %}
+                <li class="{% navactive request 'ctstem:curricula' 'lessons'%} "><a href="{% url 'ctstem:curricula' 'lessons' %}">Lessons</a></li>
                 {% if user.is_authenticated%}
-                  <li class="{% navactive request 'ctstem:curricula' 'lessons'%} "><a href="{% url 'ctstem:curricula' 'lessons' %}">Lessons</a></li>
                   <li class="{% navactive request 'ctstem:curricula' 'assessments' %} "><a href="{% url 'ctstem:curricula' 'assessments' %}">Assessments</a></li>
-                  <li class="{% navactive request 'ctstem:events' %}"><a href="{% url 'ctstem:events' %}">Workshops</a></li>
-                  <li class="{% navactive request 'ctstem:publications' %}"><a href="{% url 'ctstem:publications' %}">Research</a></li>
                   <li class="{% navactive request 'ctstem:standards' %}"><a href="{% url 'ctstem:standards' %}">Standards</a></li>
+                  <li class="{% navactive request 'ctstem:publications' %}"><a href="{% url 'ctstem:publications' %}">Research</a></li>
+                  <li class="{% navactive request 'ctstem:events' %}"><a href="{% url 'ctstem:events' %}">Training</a></li>
+
                 {% elif request.path == '/' %}
-                  <li><a class="page-scroll" href="#lessons">Lessons</a></li>
                   <li><a class="page-scroll" href="#assessments">Assessments</a></li>
-                  <li><a class="page-scroll" href="#workshops">Workshops</a></li>
-                  <li><a class="page-scroll" href="#research">Research</a></li>
                   <li><a class="page-scroll" href="#practices">Standards</a></li>
-                  <li><a class="page-scroll" href="#team">Team</a></li>
+                  <li class="{% navactive request 'ctstem:publications' %}"><a href="{% url 'ctstem:publications' %}">Research</a></li>
+                  <li><a class="page-scroll" href="#workshops">Training</a></li>
+                  <li class="{% navactive request 'ctstem:team' %}"><a href="{% url 'ctstem:team' %}">Team</a></li>
                 {% else %}
-                  <li><a class="page-scroll" href="{% url 'ctstem:home' %}#lessons">Lessons</a></li>
                   <li><a class="page-scroll" href="{% url 'ctstem:home' %}#assessments">Assessments</a></li>
-                  <li><a class="page-scroll" href="{% url 'ctstem:home' %}#workshops">Workshops</a></li>
-                  <li><a class="page-scroll" href="{% url 'ctstem:home' %}#research">Research</a></li>
                   <li><a class="page-scroll" href="{% url 'ctstem:home' %}#practices">Standards</a></li>
-                  <li><a class="page-scroll" href="{% url 'ctstem:home' %}#team">Team</a></li>
+                  <li class="{% navactive request 'ctstem:publications' %}"><a href="{% url 'ctstem:publications' %}">Research</a></li>
+                  <li><a class="page-scroll" href="{% url 'ctstem:home' %}#workshops">Training</a></li>
+                  <li class="{% navactive request 'ctstem:team' %}"><a href="{% url 'ctstem:team' %}">Team</a></li>
                 {% endif %}
               {% endif %}
               {% if user.student %}
@@ -349,22 +348,31 @@
   <footer>
     {% block footer %}
     <div class="container">
-      <div class="row">
-        <div class="col-md-4">
-          <span class="copyright">Copyright &copy; CT-STEM 2016</span>
-        </div>
-        <div class="col-md-4">
+      <div class="footer_content">
+        All content and material (including lessons and assessments) copyright © 2016 CT-STEM Project. To inquire about using our material in your school or as part of research, please contact ct-stem@ccl.northwestern.edu.
+      </div>
+      <div class="footer_content">
+        This work was made possible through generous support from the National Science Foundation (grants CNS-1138461 and CNS 1441041) and the Spencer Foundation (Award #201600069). Any opinions, findings, or recommendations expressed in this material are those of the author(s) and do not necessarily reflect the views of the funding organizations.
+      </div>
+      <div class="row footer_content">
+        <div class="col-md-3">
+          <b>Contact Us: </b><br>
+          CT-STEM Project Investigators <br>
+          Northwestern University<br>
+          2120 Campus Drive<br>
+          Evanston, Illinois 60208<br><br>
 
+          ct-stem@ccl.northwestern.edu<br>
+          http://ct-stem.northwestern.edu<br>
         </div>
-        <div class="col-md-4">
-          <ul class="list-inline quicklinks">
-            <li><a href="#privacy" data-toggle="modal">Privacy Policy</a>
-            </li>
-            <li><a href="#terms" data-toggle="modal">Terms of Use</a>
-            </li>
-            <li><a href="#funding" data-toggle="modal">Funding Agency</a>
-            </li>
-          </ul>
+        <div class="col-md-3">
+          <img src="/static/img/NSFLogo.png" class="img-responsive img-centered" alt="">
+        </div>
+        <div class="col-md-3">
+          <img src="/static/img/nu-logo.png" class="img-responsive img-centered" alt="">
+        </div>
+        <div class="col-md-3">
+           <img src="/static/img/nu-logo.png" class="img-responsive img-centered" alt="">
         </div>
       </div>
     </div>

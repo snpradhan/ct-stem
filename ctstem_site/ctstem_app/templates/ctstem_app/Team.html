@@ -4,27 +4,51 @@
   {{block.super}}
 
   <div class="content">
-    <h2>Our Team</h2>
-
-    {% for role in roles %}
-      {% if role.members.all %}
-        <div>
-          <h3 class="page-header">{{role.role}}</h3>
-          <div class="row portfolio">
-            {% for member in role.members.all %}
-              <div class="table item" id="team">
-                <div class="tile-icon-holder">
-                  <img src="{{member.image.url}}"/>
-                </div>
-                <div class="text-holder">
-                  <h4> {{member.name}} </h4>
-                  <p>{{member.description}}</p>
-                </div>
-              </div>
-            {% endfor %}
+    <h2>OUr Team</h2>
+    <p class="text-muted" style="text-align:center;">We are a team of learning scientists, computer scientists, and educators centered at Northwestern University.</p>
+    <!-- Team Section -->
+    <section id="team">
+      <div class="container">
+        <div class="row">
+          {% for member in team %}
+          <div class="col-md-3 col-sm-6">
+            <div class="team-member">
+              <a data-form="{% url 'ctstem:teamProfile' member.id %}" data-toggle="modal" class="profile">
+                <img class="profile" src="{{member.image.url}}" class="img-responsive img-circle" alt="">
+              </a>
+              <h4>{{member.name}}</h4>
+              <p class="text-muted">{{member.role}}</p>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+    <aside class="clients">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-3">
+            <a href="#">
+              <img src="/static/img/tidal.png" class="img-responsive img-centered" alt="">
+            </a>
+          </div>
+          <div class="col-md-3">
+            <a href="#">
+              <img src="/static/img/osep.png" class="img-responsive img-centered" alt="">
+            </a>
+          </div>
+          <div class="col-md-3">
+            <a href="#">
+              <img src="/static/img/adler.png" class="img-responsive img-centered" alt="">
+            </a>
+          </div>
+          <div class="col-md-3">
+            <a href="#">
+              <img src="/static/img/ccl.png" class="img-responsive img-centered" alt="">
+            </a>
           </div>
         </div>
-      {% endif %}
-    {% endfor %}
+      </div>
+    </aside>
   </div>
 {% endblock %}
