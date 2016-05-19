@@ -10,16 +10,13 @@
       <div>
         <p>{{category.description}}</p>
       </div>
-      <table class="table table-bordered table-condensed table-striped">
-
-        <tbody>
+      <div>
+        <ul>
           {% for subcategory in subcategories %}
-            <tr>
-              <td>{{subcategory.title}}</td>
-            </tr>
+            <li><p>{{subcategory.title}}</p></li>
           {% endfor %}
-        </tbody>
-      </table>
+        </ul>
+      </div>
     </div>
     <div class="modal-footer"></div>
   </div>
