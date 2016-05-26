@@ -505,24 +505,35 @@ div.table.item .glyphicon {
 div.table.item .icon {
   height: 150px;
 }
-ul#publications{
-  font-size: 1.5em;
+
+
+/* 
+ * PUBLICATION LISTS 
+ */
+ul.publication-list {
+  font-size: 1.7em;
+  line-height: 150%;
+  color: #777;
   list-style: none;
   width: 100%;
-  margin: auto;
+  margin: 1em auto 4em auto;
+  padding: 0;
 }
 
-ul#publications li.publication{
-  margin: 1em;
+ul.publication-list li.publication {
+  margin: 1em 1em 1em 3em;
+  text-indent: -3em;
 }
 
-ul#publications li.publication span.journal {
+ul.publication-list li.publication span.journal {
   font-style: italic;
 }
 
 ul.links {
-  font-size: 1.5em;
-  line-height: 130%;
+  font-size: 1.7em;
+  line-height: 150%;
+  color: #777;
+  margin-bottom: 4em;
 }
 
 ul.links li {
@@ -1183,4 +1194,16 @@ span.ec .glyphicon-collapse-up{
   width: 5em;
 }
 /*************************************/
+
+
+.page-blurb {
+  color: #777;
+  line-height: 160%;
+  text-align: justify;
+  font-size: 1.7em;
+  margin: 4rem 12rem;
+}
+
+
+
 
