@@ -10,9 +10,9 @@
   {{block.super}}
   <div class="content">
     <h2>Research</h2>
-    <p class="text-muted" style="margin: 0 8em 3em;">STEM education faces two related challenges. First, our education system is not producing enough computational professionals to fill demand. Second, women and minorities remain significantly underrepresented. We are conducting a Design-Based Implementation Research project to study a model in which computational literacy curricula are embedded throughout required biology, chemistry, physics, and mathematics coursework. This would ensure that every high school student is exposed to computational literacy activities in a context that demonstrates its relevance to real world career paths. We are interested how such curriculum affects student and teachers’ attitudes, identity, and learning. We are also working to understand individual and institutional factors that affect the success of this model in resource-constrained public schools.</p>
+    <p class="text-muted" style="margin: 0 10em 3em;">STEM education faces two related challenges. First, our education system is not producing enough computational professionals to fill demand. Second, women and minorities remain significantly underrepresented. We are conducting a Design-Based Implementation Research project to study a model in which computational literacy curricula are embedded throughout required biology, chemistry, physics, and mathematics coursework. This would ensure that every high school student is exposed to computational literacy activities in a context that demonstrates its relevance to real world career paths. We are interested how such curriculum affects student and teachers’ attitudes, identity, and learning. We are also working to understand individual and institutional factors that affect the success of this model in resource-constrained public schools.</p>
 
-    <h2 class="left">Publications</h2>
+    <h3 class="left">Publications</h3>
     {% if user.administrator %}
       <div class="btn-group">
         <a type="button" class="btn btn-info" href="{% url 'ctstem:newPublication' %}" title="Create new publication">Create Publication</a>
@@ -76,7 +76,6 @@
         </div>
       {% endif %}
       <div id="publications_bib">
-        <h4>Publications</h4>
         <ul id="publications">
           {% for pub in publications %}
             <li class="publication">
@@ -99,43 +98,43 @@
       <p>No publications available.</p>
     {% endif %}
 
-    <h2 class="left">Computational Thinking Resources</h2>
+    <h3 class="left">Computational Thinking Resources</h3>
 
-    <h3 class="left">Tools, Software, &amp; Curricula</h3>
+    <h4 class="left">Tools, Software, &amp; Curricula</h4>
 
     <ul class="links">
-    <li><a href="http://ccl.northwestern.edu/netlogo/" target="_blank">NetLogo</a>, Northwestern CCL Lab's multi-agent programming environment. Lessons in biology, genetics, physics, chemistry, etc.</li>
+      <li><a href="http://ccl.northwestern.edu/netlogo/" target="_blank">NetLogo</a>, Northwestern CCL Lab's multi-agent programming environment. Lessons in biology, genetics, physics, chemistry, etc.</li>
 
-    <li><a href="http://www.ilabcentral.org/" target="_blank">iLab</a></span>, Northwestern's access to real physics, chemistry, and biology labs through the internet</li>
+      <li><a href="http://www.ilabcentral.org/" target="_blank">iLab</a></span>, Northwestern's access to real physics, chemistry, and biology labs through the internet</li>
 
-    <li><a href="http://www.concord.org/activities" target="_blank">Concord Consortium</a>, CT lesson plans and simulation environments for topics across STEM</li>
+      <li><a href="http://www.concord.org/activities" target="_blank">Concord Consortium</a>, CT lesson plans and simulation environments for topics across STEM</li>
 
-    <li><a href="http://mw.concord.org/modeler/showcase/index.html" target="_blank">Molecular Workbench</a>, by concord consortium</li>
+      <li><a href="http://mw.concord.org/modeler/showcase/index.html" target="_blank">Molecular Workbench</a>, by concord consortium</li>
 
-    <li><a href="http://www.kcvs.ca/site/index.html" target="_blank">The King's Centre for Visualization in Science</a> has a lot of high-quality applets covering many areas of science.</li>
+      <li><a href="http://www.kcvs.ca/site/index.html" target="_blank">The King's Centre for Visualization in Science</a> has a lot of high-quality applets covering many areas of science.</li>
 
-    <li><a href="http://phet.colorado.edu/" target="_blank">PHET</a>, has lots of high-quality applets covering many areas of science</li>
+      <li><a href="http://phet.colorado.edu/" target="_blank">PHET</a>, has lots of high-quality applets covering many areas of science</li>
 
-    <li><a href="http://www.searchingspot.com/datadiscovery/index.htm" target="_blank">Data Discovery Lessons</a>: using real-world data and computer-based technology, such as  spreadsheets and Python programs, students learn how to gather,  organize, analyze and interpret data; Python lessons guide students in  computational thinking. Lessons provide teachers and students with  instructions and guidance in using these technologies.</li>
+      <li><a href="http://www.searchingspot.com/datadiscovery/index.htm" target="_blank">Data Discovery Lessons</a>: using real-world data and computer-based technology, such as  spreadsheets and Python programs, students learn how to gather,  organize, analyze and interpret data; Python lessons guide students in  computational thinking. Lessons provide teachers and students with  instructions and guidance in using these technologies.</li>
 
-    <li><a href="http://www.merlot.org/" target="_blank">MERLOT</a></span>, repository for STEM lesson plans, applets, resources, etc.</li>
+      <li><a href="http://www.merlot.org/" target="_blank">MERLOT</a></span>, repository for STEM lesson plans, applets, resources, etc.</li>
 
-    <li><a href="http://ccl.northwestern.edu/curriculum/ConnectedChemistry/" target="_blank">Connected Chemistry</a></li>
+      <li><a href="http://ccl.northwestern.edu/curriculum/ConnectedChemistry/" target="_blank">Connected Chemistry</a></li>
 
-    <li><a rel="nofollow" href="http://CSunplugged.org" target="_blank">CSunplugged.org</a></li>
+      <li><a rel="nofollow" href="http://CSunplugged.org" target="_blank">CSunplugged.org</a></li>
 
-    <li><a href="http://www.nsf.gov/nsb/sei/edTool/" target="_blank">NSF STEM Education Data Resources</a></li>
+      <li><a href="http://www.nsf.gov/nsb/sei/edTool/" target="_blank">NSF STEM Education Data Resources</a></li>
 
     </ul>
 
-    <h3 class="left">Next Generation Science Standards (NGSS)</h3>
+    <h4 class="left">Next Generation Science Standards (NGSS)</h4>
     <ul class="links">
       <li><a href="http://www.nextgenscience.org/" target="_blank">NGSS Website</a></li>
       <li><a href="https://www.coursera.org/course/sciframework" target="_blank">Coursera Course</a> in May 2014</li>
       <li><a href="http://www.nextgenscience.org/three-dimensions" target="_blank">Computational Thinking &amp; Modeling in NGSS</a></li>
     </ul>
 
-    <h3 class="left">Other CT Articles</h3>
+    <h4 class="left">Other CT Articles</h4>
     <ul class="links">
       <li><a href="http://ccl.northwestern.edu/papers/thinking-in-levels.pdf">http://ccl.northwestern.edu/papers/thinking-in-levels.pdf</a></li>
       <li><a href="http://www.cs.cmu.edu/%7ECompThink/" target="_blank">http://www.cs.cmu.edu/%7ECompThink/</a></li>
@@ -154,7 +153,7 @@
     </ul>
 
 
-    <h3 class="left">Videos</h3>
+    <h4 class="left">Videos</h4>
     <ul class="links">
       <li><a href="http://www.cs.washington.edu/WhyCSE/" target="_blank">http://www.cs.washington.edu/WhyCSE/</a></li>
       <li><a href="http://www.youtube.com/user/ECEILLINOIS" target="_blank">http://www.youtube.com/user/ECEILLINOIS</a></li>
