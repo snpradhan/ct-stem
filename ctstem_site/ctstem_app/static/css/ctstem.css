@@ -520,6 +520,15 @@ ul#publications li.publication span.journal {
   font-style: italic;
 }
 
+ul.links {
+  font-size: 1.5em;
+  line-height: 130%;
+}
+
+ul.links li {
+  padding-bottom: 0.8em;
+}
+
 div#categories {
   margin-top: 2em;
 }
@@ -950,6 +959,10 @@ div#profile .modal-content .modal-body div {
  ***************************************/
 .h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
   text-align: center;
+}
+
+h2.left, h3.left {
+  text-align: left;
 }
 
 /*.h1, h1 {
