@@ -7,6 +7,12 @@ from smart_selects.db_fields import ChainedForeignKey
 from PIL import Image
 import StringIO
 from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.db.models import signals
+from django.dispatch import receiver
+from django.db.models.signals import pre_save, post_save
+from django.conf import settings
+from django.core.mail import send_mail
+from django.contrib.sites.models import Site
 
 
 CURRICULUM_STATUS_CHOICES = (
@@ -435,3 +441,17 @@ class TrainingRequest(models.Model):
   school = models.CharField(max_length=255, blank=False, help_text="School Name")
   requester_role = models.CharField(max_length=255, choices=REQUESTER_ROLE, help_text="I am:")
   notes = models.TextField(null=False, blank=False, help_text="Notes")
+
+#signal used for is_active=False to is_active=True
+@receiver(pre_save, sender=User, dispatch_uid='active')
+def active(sender, instance, **kwargs):
+  if instance.is_active and User.objects.filter(pk=instance.pk, is_active=False).exists():
+    current_site = Site.objects.get_current()
+    domain = current_site.domain
+
+    send_mail('CT-STEM Account Activated',
+              'Your account has been activated on Computational Thinking in STEM website http://%s.\r\n\r\n\
+               You can login using the credentials created during registration.\r\n\r\n\
+              -- CT-STEM Admin' % domain,
+              settings.DEFAULT_FROM_EMAIL,
+              [instance.email])
