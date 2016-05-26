@@ -10,7 +10,7 @@
   {{block.super}}
   <div class="content">
     <h2>Research</h2>
-    <p class="text-muted" style="margin: 0 10em 3em;">STEM education faces two related challenges. First, our education system is not producing enough computational professionals to fill demand. Second, women and minorities remain significantly underrepresented. We are conducting a Design-Based Implementation Research project to study a model in which computational literacy curricula are embedded throughout required biology, chemistry, physics, and mathematics coursework. This would ensure that every high school student is exposed to computational literacy activities in a context that demonstrates its relevance to real world career paths. We are interested how such curriculum affects student and teachers’ attitudes, identity, and learning. We are also working to understand individual and institutional factors that affect the success of this model in resource-constrained public schools.</p>
+    <p class="page-blurb">STEM education faces two related challenges. First, our education system is not producing enough computational professionals to fill demand. Second, women and minorities remain significantly underrepresented. We are conducting a Design-Based Implementation Research project to study a model in which computational literacy curricula are embedded throughout required biology, chemistry, physics, and mathematics coursework. This would ensure that every high school student is exposed to computational literacy activities in a context that demonstrates its relevance to real world career paths. We are interested how such curriculum affects student and teachers’ attitudes, identity, and learning. We are also working to understand individual and institutional factors that affect the success of this model in resource-constrained public schools.</p>
 
     <h3 class="left">Publications</h3>
     {% if user.administrator %}
@@ -76,7 +76,7 @@
         </div>
       {% endif %}
       <div id="publications_bib">
-        <ul id="publications">
+        <ul id="publications" class="publication-list">
           {% for pub in publications %}
             <li class="publication">
               <span class="authors">{{pub.authors}} </span>
@@ -98,9 +98,50 @@
       <p>No publications available.</p>
     {% endif %}
 
-    <h3 class="left">Computational Thinking Resources</h3>
 
-    <h4 class="left">Tools, Software, &amp; Curricula</h4>
+
+    <!-- EXTERNAL PUBLICATIONS -->
+    <h3 class="left">Other Useful CT Publications</h3>
+    <ul class="publication-list">
+      <li class="publication">
+        <span class="authors">Jeannette M. Wing</span>
+        <span class="year">(2006).</span>
+        <span class="title">
+          <a href="http://www.cs.cmu.edu/afs/cs/usr/wing/www/publications/Wing06.pdf" target="_blank">Computational Thinking.</a>
+        </span>
+        <span class="journal">Communications of the ACM, Vol. 49, No. 3</span>
+        <span class="pages">(33-35).</span>
+      </li>
+
+      <li class="publication">
+        <span class="authors">Mark Guzdial</span>
+        <span class="year">(2008).</span>
+        <span class="title">
+          <a href="http://dl.acm.org/citation.cfm?id=1378713" target="_blank">Education: Paving the way for computational thinking.</a>
+        </span>
+        <span class="journal">Communications of the ACM, Vol. 51, Issue 8</span>
+        <span class="pages">(25-27).</span>
+      </li>
+
+      <li class="publication">
+        <span class="authors">Jeannette M. Wing</span>
+        <span class="year">(2008).</span>
+        <span class="title">
+          <a href="http://www.cs.cmu.edu/%7Ewing/publications/Wing08a.pdf" target="_blank">Computational thinking and thinking about computing.</a>
+        </span>
+        <span class="journal">Philosophical Transactions of the Royal Society A, 366</span>
+        <span class="pages">(3717-3725).</span>
+      </li>
+
+      <li class="publication">
+        <span class="authors">Seymour Papert</span>
+        <span class="year">(1993).</span>
+        <span class="title"><i>Mindstroms: Children, Comptuers, and Powerful Ideas</i></span>. Basic Books 
+      </li>
+    </ul>
+
+
+    <h3 class="left">Tools, Software, &amp; Curricula</h3>
 
     <ul class="links">
       <li><a href="http://ccl.northwestern.edu/netlogo/" target="_blank">NetLogo</a>, Northwestern CCL Lab's multi-agent programming environment. Lessons in biology, genetics, physics, chemistry, etc.</li>
@@ -127,39 +168,24 @@
 
     </ul>
 
-    <h4 class="left">Next Generation Science Standards (NGSS)</h4>
+    <h3 class="left">Other Resources</h3>
     <ul class="links">
-      <li><a href="http://www.nextgenscience.org/" target="_blank">NGSS Website</a></li>
-      <li><a href="https://www.coursera.org/course/sciframework" target="_blank">Coursera Course</a> in May 2014</li>
-      <li><a href="http://www.nextgenscience.org/three-dimensions" target="_blank">Computational Thinking &amp; Modeling in NGSS</a></li>
-    </ul>
-
-    <h4 class="left">Other CT Articles</h4>
-    <ul class="links">
-      <li><a href="http://ccl.northwestern.edu/papers/thinking-in-levels.pdf">http://ccl.northwestern.edu/papers/thinking-in-levels.pdf</a></li>
-      <li><a href="http://www.cs.cmu.edu/%7ECompThink/" target="_blank">http://www.cs.cmu.edu/%7ECompThink/</a></li>
-      <li><a href="http://www.cs.cmu.edu/afs/cs/usr/wing/www/publications/Wing06.pdf" target="_blank">http://www.cs.cmu.edu/afs/cs/usr/wing/www/publications/Wing06.pdf</a></li>
-      <li><a href="http://www.cs.cmu.edu/%7Ewing/publications/Wing08a.pdf" target="_blank">http://www.cs.cmu.edu/%7Ewing/publications/Wing08a.pdf</a></li>
-      <li><a href="http://dl.acm.org/citation.cfm?id=1378713&amp;bnc=1" target="_blank">http://dl.acm.org/citation.cfm?id=1378713&amp;bnc=1</a></li>
-      <li><a href="http://www.collegeboard.com/html/computerscience/index.html?MTG77-ED-1-apcs" target="_blank">http://www.collegeboard.com/html/computerscience/index.html?MTG77-ED-1-apcs</a></li>
-      <li><a href="http://www.cs.washington.edu/WhyCSE/" target="_blank">http://www.cs.washington.edu/WhyCSE/</a></li>
-      <li><a href="http://women.acm.org" target="_blank">http://women.acm.org</a></li>
-      <li><a href="http://www.amazon.com/Mindstorms-Children-Computers-Powerful-Ideas/dp/0465046746/" target="_blank">http://www.amazon.com/Mindstorms-Children-Computers-Powerful-Ideas/dp/0465046746/</a></li>
-      <li><a href="http://gk12northwestern.wikispaces.com/CT+resources" target="_blank">http://gk12northwestern.wikispaces.com/CT+resources</a></li>
-      <li><a href="http://www.nsf.gov/news/news_videos.jsp?cntn_id=123607&amp;media_id=72174&amp;org=NSF" target="_blank">http://www.nsf.gov/news/news_videos.jsp?cntn_id=123607&amp;media_id=72174&amp;org=NSF</a></li>
-      <li><a href="http://www.securityweek.com/obama-administration-places-200-million-bet-big-data" target="_blank">http://www.securityweek.com/obama-administration-places-200-million-bet-big-data</a></li>
+      <li><a href="http://www.cs.cmu.edu/%7ECompThink/" target="_blank">Center for Computational Thinking at Carnegie Mellon</a></li>
+      <li><a href="https://advancesinap.collegeboard.org/stem/computer-science-principles?MTG77-ED-1-apcs=" target="_blank">AP CS Principles Course</a></li>
+      <li><a href="http://www.cs.washington.edu/WhyCSE/" target="_blank">University of Washington: Why Choose Computer Science &amp; Engineering?</a></li>
+      <li><a href="http://csta.acm.org" target="_blank">Computer Science Teachers Association</a>
+      <li><a href="http://women.acm.org" target="_blank">ACM's Women in Computing</a></li>
+      <li><a href="http://www.securityweek.com/obama-administration-places-200-million-bet-big-data" target="_blank">Obama Administration Places $200 Million Bet On Big Data</a></li>
       <li><a href="http://www.edweek.org/ew/articles/2014/02/26/22computer_ep.h33.html?cmp=ENL-CM-NEWS1" target="_blank">Computer Science: Not Just an Elective Anymore</a></li>
-      <li><a href="http://www.onlinecollege.org/2013/03/12/the-stem-jobs-everyone-wants-how-get-them/" target="_blank">http://www.onlinecollege.org/2013/03/12/the-stem-jobs-everyone-wants-how-get-them/</a></li>
+      <li><a href="http://www.code.org/" target="_blank">http://www.code.org/</a></li>
+      <li><a href="http://gk12northwestern.wikispaces.com/CT+resources" target="_blank">Other CT Resources</a></li>
     </ul>
 
 
-    <h4 class="left">Videos</h4>
+    <h3 class="left">Videos</h3>
     <ul class="links">
-      <li><a href="http://www.cs.washington.edu/WhyCSE/" target="_blank">http://www.cs.washington.edu/WhyCSE/</a></li>
-      <li><a href="http://www.youtube.com/user/ECEILLINOIS" target="_blank">http://www.youtube.com/user/ECEILLINOIS</a></li>
-      <li><a href="https://www.youtube.com/watch?v=IqJ1l02TXtA&amp;feature=player_embedded" target="_blank">https://www.youtube.com/watch?v=IqJ1l02TXtA&amp;feature=player_embedded</a></li>
-      <li><a href="http://www.csta.acm.org/Resources/sub/BrochuresPostersVideos.html" target="_blank">http://www.csta.acm.org/Resources/sub/BrochuresPostersVideos.html</a></li>
-      <li><a href="http://www.code.org/" target="_blank">http://www.code.org/</a></li>
+      <li><a href="http://www.nsf.gov/news/news_videos.jsp?cntn_id=123607&amp;media_id=72174&amp;org=NSF" target="_blank">http://www.nsf.gov/news/news_videos.jsp?cntn_id=123607&amp;media_id=72174&amp;org=NSF</a></li>
+      <li><a href="http://www.youtube.com/user/ECEILLINOIS" target="_blank">ECE Illinois Media Center</a></li>
       <li><a href="http://www.youtube.com/watch?v=qaOvHKG0Tio" target="_blank">Microsoft Super Bowl Ad - Technology Empower</a></li>
     </ul>
   </div>
