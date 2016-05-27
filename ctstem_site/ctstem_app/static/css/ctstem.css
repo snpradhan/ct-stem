@@ -511,7 +511,7 @@ div.table.item .icon {
  * PUBLICATION LISTS 
  */
 ul.publication-list {
-  font-size: 1.7em;
+  font-size: 1.7rem;
   line-height: 150%;
   color: #777;
   list-style: none;
@@ -530,7 +530,7 @@ ul.publication-list li.publication span.journal {
 }
 
 ul.links {
-  font-size: 1.7em;
+  font-size: 1.7rem;
   line-height: 150%;
   color: #777;
   margin-bottom: 4em;
@@ -1200,8 +1200,17 @@ span.ec .glyphicon-collapse-up{
   color: #777;
   line-height: 160%;
   text-align: justify;
-  font-size: 1.7em;
+  font-size: 1.7rem;
   margin: 4rem 12rem;
+}
+
+
+.service-blurb {
+  color: #777;
+  line-height: 160%;
+  text-align: justify;
+  font-size: 1.4rem;
+  margin: 1rem 1rem 3rem 1rem;
 }
 
 
