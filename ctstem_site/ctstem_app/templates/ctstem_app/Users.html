@@ -20,8 +20,8 @@
             <th> Name </th>
             <th> Email </th>
             <th> Status </th>
-            {% if user.administrator %}
-              {% if role == 'researchers' or role == 'teachers' or role == 'students' %}
+            {% if user.administrator or user.researcher %}
+              {% if role == 'school_administrators' or role == 'teachers' or role == 'students' %}
                 <th> School </th>
               {% endif %}
             {% endif %}
@@ -32,8 +32,8 @@
             <th> Name </th>
             <th> Email </th>
             <th> Status </th>
-            {% if user.administrator %}
-              {% if role == 'researchers' or role == 'teachers' or role == 'students' %}
+            {% if user.administrator or user.researcher %}
+              {% if role == 'school_administrators' or role == 'teachers' or role == 'students' %}
                 <th> School </th>
               {% endif %}
             {% endif %}
@@ -56,9 +56,9 @@
               <td>{{userProfile.user.get_full_name}}</td>
               <td>{{userProfile.user.email}}</td>
               <td>{{userProfile.user.is_active|yesno:"Active,Inactive"}}</td>
-              {% if user.administrator %}
-                {% if role == 'researchers' or role == 'teachers' or role == 'students' %}
-                  <td>{{userProfile.school}}</td>
+              {% if user.administrator or user.researcher %}
+                {% if role == 'school_administrators' or role == 'teachers' or role == 'students' %}
+                  <td> {{userProfile.school}} </td>
                 {% endif %}
               {% endif %}
               <td> {{userProfile.user.last_login|date}} </td>

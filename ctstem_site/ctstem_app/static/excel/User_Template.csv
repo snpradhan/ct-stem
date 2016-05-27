@@ -1,1 +1,1 @@
-Username*,First name*,Last name*,Email*,"Account Type* (Admin, Researcher, Teacher, Student, Author)","School Code (Required if you are an Admin and you are creating a Researcher, Teacher or Student account)"
+Username*,First name*,Last name*,Email*,"Account Type* (School Administrator, Researcher, Teacher, Student, Author)","School Code (Required if you are a Site Admin or a Researcher and you are creating a School Administrator, Teacher or Student account)"

@@ -34,9 +34,11 @@ class RegistrationForm (forms.Form):
     super(RegistrationForm, self).__init__(*args, **kwargs)
     if user.is_authenticated():
       if hasattr(user, 'researcher'):
-        self.fields['account_type'].choices = models.USER_ROLE_CHOICES[3:]
-      elif hasattr(user, 'teacher'):
+        self.fields['account_type'].choices = models.USER_ROLE_CHOICES[2:]
+      elif hasattr(user, 'school_administrator'):
         self.fields['account_type'].choices = models.USER_ROLE_CHOICES[4:]
+      elif hasattr(user, 'teacher'):
+        self.fields['account_type'].choices = models.USER_ROLE_CHOICES[5:]
     for field_name, field in self.fields.items():
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['aria-describedby'] = field.label
@@ -65,18 +67,11 @@ class RegistrationForm (forms.Form):
       error_list.append('P')
       self._errors['password1'] = u'Passwords are not identical'
       clean = False
-    #check fields for Teacher
-    if self.cleaned_data['account_type'] == 'T':
+    #check fields for Teacher, Student and School Administrator
+    if self.cleaned_data['account_type'] in ['T', 'S', 'P']:
       if self.cleaned_data['school'] is None or self.cleaned_data['school'] == '':
         error_list.append('SR');
-    #check fields for Student
-    elif self.cleaned_data['account_type'] == 'S':
-      if self.cleaned_data['school'] is None or self.cleaned_data['school'] == '':
-        error_list.append('SR');
-    #check fields for Researcher
-    elif self.cleaned_data['account_type'] == 'R':
-      if self.cleaned_data['school'] is None or self.cleaned_data['school'] == '':
-        error_list.append('SR');
+
     if len(error_list) > 0:
       clean = False
 
@@ -171,6 +166,19 @@ class ResearcherForm (ModelForm):
       field.widget.attrs['aria-describedby'] = field.label
       field.widget.attrs['placeholder'] = field.help_text
 
+####################################
+# School Administrator Form
+####################################
+class SchoolAdministratorForm (ModelForm):
+  class Meta:
+    model = models.SchoolAdministrator
+    fields = ['school']
+  def __init__(self, *args, **kwargs):
+    super(SchoolAdministratorForm, self).__init__(*args, **kwargs)
+    for field_name, field in self.fields.items():
+      field.widget.attrs['class'] = 'form-control'
+      field.widget.attrs['aria-describedby'] = field.label
+      field.widget.attrs['placeholder'] = field.help_text
 ####################################
 # Author Form
 ####################################

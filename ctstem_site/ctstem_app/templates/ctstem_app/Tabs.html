@@ -6,15 +6,18 @@
       <li {% if role == 'authors' %} class="active"{% endif %}><a href="{% url 'ctstem:users' 'authors' %}">Content Authors</a></li>
     {% endif %}
     {% if user.administrator or user.researcher %}
+      <li {% if role == 'school_administrators' %} class="active"{% endif %}><a href="{% url 'ctstem:users' 'school_administrators' %}">School Administrators</a></li>
+    {% endif %}
+    {% if user.administrator or user.researcher or user.school_administrator %}
       <li {% if role == 'teachers' %} class="active"{% endif %}><a href="{% url 'ctstem:users' 'teachers' %}">Teachers</a></li>
     {% endif %}
-    {% if user.administrator or user.researcher or user.teacher %}
+    {% if user.administrator or user.researcher or user.school_administrator or user.teacher %}
       <li {% if role == 'students' %} class="active"{% endif %}><a href="{% url 'ctstem:users' 'students' %}">{% if user.teacher %} My {% endif %} Students</a></li>
       <li {% if role == 'groups' %} class="active"{% endif %}><a href="{% url 'ctstem:groups' %}">{% if user.teacher %} My {% endif %} Student Groups</a></li>
     {% endif %}
   {% endif %}
   {% if tab == 'group' or tab == 'assignment' %}
-    {% if user.administrator or user.researcher or user.teacher %}
+    {% if user.administrator or user.researcher or user.school_administrator or user.teacher %}
       {% if group.id %}
         <li {% if role == 'group' %} class="active"{% endif %}><a href="{% url 'ctstem:group' group.id %}">Group Details</a></li>
         <li {% if role == 'group_dashboard' %} class="active"{% endif %}><a href="{% url 'ctstem:groupDashboard' group.id %}">Group Dashboard</a></li>
@@ -22,7 +25,7 @@
     {% endif %}
   {% endif %}
   {% if tab == 'assignment' %}
-    {% if user.administrator or user.researcher or user.teacher %}
+    {% if user.administrator or user.researcher or user.school_administrator or user.teacher %}
       <li {% if role == 'assignment_dashboard' %} class="active"{% endif %}><a href="{% url 'ctstem:assignmentDashboard' assignment.id %}">Assignment Dashboard</a></li>
     {% endif %}
   {% endif %}

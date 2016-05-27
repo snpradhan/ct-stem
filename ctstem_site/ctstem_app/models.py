@@ -37,7 +37,8 @@ FIELD_TYPE_CHOICES = (
 
 USER_ROLE_CHOICES = (
     (u'A', u'Site Administrator'),
-    (u'R', u'Researcher/School Admin'),
+    (u'R', u'Researcher'),
+    (u'P', u'School Administrator'),
     (u'C', u'Content Author'),
     (u'T', u'Teacher'),
     (u'S', u'Student'),
@@ -273,7 +274,7 @@ class Teacher(models.Model):
       return u'%s' % (self.user.get_full_name())
 
 # Researcher model
-# This model represents researchers, school admins and school principals
+# This model represents researchers
 class Researcher(models.Model):
   user = models.OneToOneField(User, unique=True, null=False, related_name="researcher")
   school = models.ForeignKey(School)
@@ -297,6 +298,14 @@ class Administrator(models.Model):
   def __unicode__(self):
       return u'%s' % (self.user.get_full_name())
 
+# School Administrator model
+# This model represents school administrators and school principals
+class SchoolAdministrator(models.Model):
+  user = models.OneToOneField(User, unique=True, null=False, related_name="school_administrator")
+  school = models.ForeignKey(School)
+
+  def __unicode__(self):
+      return u'%s' % (self.user.get_full_name())
 #######################################################
 # Publication model
 #######################################################
