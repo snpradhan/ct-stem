@@ -1213,6 +1213,20 @@ span.ec .glyphicon-collapse-up{
   margin: 1rem 1rem 3rem 1rem;
 }
 
+.bio {
+  color: #777;
+  line-height: 150%;
+}
+
+
+.affiliated {
+  text-align: center;
+  margin: 3rem 0;
+}
+
+.affiliated img {
+  height: 90px;
+}
 
 
 
