@@ -10,23 +10,34 @@
   <div class="content" id="home">
     <!-- Header -->
     <header>
-      <div class="container">
-        <div class="intro-text">
-          <div class="intro-heading" style="font-size: 3.3em;">Computational Thinking in Science and Math</div>
-          <div class="intro-lead-in" style="font-size: 1.5em; letter-spacing: 0.075em;">
-            Promoting computational thinking in high school science and mathematics to empower all students to participate in a computational future.
-          </div>
-        </div>
-      </div>
+      <div id="banner-image"></div>
+      <h1>
+        <div style="display: inline-block;">Computational Thinking</div> 
+        <div style="display: inline-block;">in Science and Math</div>
+      </h1>
+      <hr>
+      <h2>
+        Promoting computational thinking in high school science and mathematics<br>
+        to empower all students to participate in a computational future.
+      </h2>
+<!--      
+      <hr>
+      <img src="/static/img/northwestern_university_vertical.png" style="height: 60px; margin: 35px;">
+      <img src="/static/img/NSFLogo.png" style="height: 60px; margin: 35px;">
+      <img src="/static/img/spencer-logo.png" style="height: 60px; margin: 35px;">
+-->      
     </header>
 
-    <!-- Services Section -->
-    <section id="services">
+
+    <!-- ABOUT US -->
+    <section id="services" class="bg-light-gray">
       <div class="container">
         <div class="row">
           <div class="col-lg-12 text-center">
             <h2 class="section-heading">About Us</h2>
-            <h3 class="section-subheading text-muted" style="line-height: 150%; padding: 0 150px; font-style: normal;">We are a team of scientists and educators at Northwestern University working to design and research computationally enhanced high school science and math curriculum. With support from the National Science Foundation and Spencer Foundation, our goal is to enrich science learning while developing foundational computational literacy skills for all students. </h3>
+            <p class="page-blurb">
+            We are a team of scientists and educators at Northwestern University working to design and research computationally enhanced high school science and math curriculum. With support from the National Science Foundation and Spencer Foundation, our goal is to enrich science learning while developing foundational computational literacy skills for all students. 
+            </p>
           </div>
         </div>
         <div class="row text-center">
@@ -38,7 +49,7 @@
               </span>
             </a>
             <h4 class="service-heading">Lessons and Activities</h4>
-            <p class="text-muted">Our computational thinking lessons cover a range of science and mathematics concepts and are designed to be embedded in students' existing coursework.</p>
+            <p class="service-blurb">Our computational thinking lessons cover a range of science and math concepts and are designed to be embedded in students' existing coursework.</p>
           </div>
           <div class="col-md-4">
             <a class="page-scroll" href="#practices">
@@ -48,7 +59,7 @@
               </span>
             </a>
             <h4 class="service-heading">Standards</h4>
-            <p class="text-muted">We have developed a taxonomy of computational thinking practices in STEM fields to guide the development of our curriculum and assessments.</p>
+            <p class="service-blurb">We have developed a taxonomy of computational thinking practices in STEM fields to guide the development of our curriculum and assessments.</p>
           </div>
           <div class="col-md-4">
             <a class="page-scroll" href="#assessments">
@@ -58,7 +69,7 @@
               </span>
             </a>
             <h4 class="service-heading">Assessments</h4>
-            <p class="text-muted">Our computational thinking assessments use realistic STEM scenarios to challenge students and measure their progress in CT.</p>
+            <p class="service-blurb">Our computational thinking assessments use realistic STEM scenarios to challenge students and measure their progress in CT.</p>
           </div>
         </div>
         <div class="row text-center">
@@ -70,7 +81,7 @@
               </span>
             </a>
             <h4 class="service-heading">Professional Development</h4>
-            <p class="text-muted">Interested in implementing computational thinking activities in your classroom? Check out our professional development workshops and resources.</p>
+            <p class="service-blurb">Want to try computational thinking activities in your classroom? Check out our professional development workshops and resources.</p>
           </div>
           <div class="col-md-4">
             <a class="page-scroll" href="{% url 'ctstem:publications' %}">
@@ -80,7 +91,7 @@
               </span>
             </a>
             <h4 class="service-heading">Research</h4>
-            <p class="text-muted">We are conducting ongoing research on the design and implementation of
+            <p class="service-blurb">We are conducting ongoing research on the design and implementation of
               computational thinking activities in science and mathematics classrooms.</p>
           </div>
           <div class="col-md-4">
@@ -89,11 +100,13 @@
               <i class="fa fa-wrench fa-stack-1x fa-inverse"></i>
             </span>
             <h4 class="service-heading">Administrator Tools</h4>
-            <p class="text-muted">Check out our web based tools for teachers, administrators, and researchers. </p>
+            <p class="service-blurb">Check out our new web based tools for teachers, admins, and researchers. </p>
           </div>
         </div>
       </div>
     </section>
+
+
     <!-- Portfolio Grid Section -->
     <!--section id="lessons" class="portfolio">
       <div class="container">
@@ -129,7 +142,10 @@
         </div>
       </div>
     </section-->
-    <!-- Portfolio Grid Section -->
+
+
+    <!-- ASSESSMENTS -->
+    <!-- 
     <section id="assessments" class="portfolio bg-light-gray">
       <div class="container">
         <div class="row">
@@ -155,7 +171,7 @@
             </a>
             <div class="portfolio-caption">
               <h5>{{assessment.title}}</h5>
-              <!--p class="text-muted">{{assessment.overview|truncatechars:50 }}</p-->
+              <p class="text-muted">{{assessment.overview|truncatechars:50 }}</p>
             </div>
           </div>
           {% endfor %}
@@ -165,7 +181,7 @@
         </div>
       </div>
     </section>
-
+    -->
 
     <!-- About Section -->
     <section id="practices" class="portfolio">
@@ -173,30 +189,35 @@
         <div class="row">
           <div class="col-lg-12 text-center">
             <h2 class="section-heading">WHAT DO WE MEAN BY COMPUTATIONAL THINKING?</h2>
-            <h3 class="section-subheading text-muted">Modern scientists, engineers, and mathematicians use an array of computational tools and practices in their everyday work. It is increasingly important for high school students not just to know how to use computers but to be computationally literate. To this end we have developed a taxonomy to capture relevant computational practices and guide the design of curriculum and assessments. </h3>
+            <p class="page-blurb">
+            Modern scientists, engineers, and mathematicians use an array of computational tools and practices in their everyday work. It is increasingly important for high school students not just to know how to use computers but to be computationally literate. To this end we have developed a taxonomy to capture relevant computational practices and guide the design of curriculum and assessments. 
+            </p>
           </div>
         </div>
+
         <div class="row">
-          {% for practice in practices %}
-          <div class="col-md-3 col-sm-6 portfolio-item">
-            <a data-form="{% url 'ctstem:subcategories' practice.id %}" class="portfolio-link preview" data-toggle="modal">
-              <div class="portfolio-hover">
-                <div class="portfolio-hover-content">
-                  <i class="fa fa-plus fa-3x"></i>
+          <div class="col-lg-12 text-center">
+            {% for practice in practices %}
+            <div class="col-md-3 col-sm-6 portfolio-item" style="vertical-align: top;">
+              <a data-form="{% url 'ctstem:subcategories' practice.id %}" class="portfolio-link preview" data-toggle="modal">
+                <div class="portfolio-hover">
+                  <div class="portfolio-hover-content">
+                    <i class="fa fa-plus fa-3x"></i>
+                  </div>
                 </div>
+                {% if practice.icon %}
+                <img src="{{practice.icon.url}}" style="width: 150px; height: 150px;" alt="">
+                {% endif %}
+              </a>
+              <div class="portfolio-caption bg-light-gray">
+                <h5>{{practice.name}}</h5>
               </div>
-              {% if practice.icon %}
-                <img src="{{practice.icon.url}}" class="img-responsive" alt="">
-              {% endif %}
-            </a>
-            <div class="portfolio-caption bg-light-gray">
-              <h5>{{practice.name}}</h5>
-              <!--p class="text-muted">{{practice.description }}</p-->
             </div>
+            {% endfor %}
           </div>
-          {% endfor %}
         </div>
-        <div class="explore_more">
+
+        <div class="explore_more" style="margin-top: 35px;">
           <a href="http://link.springer.com/article/10.1007/s10956-015-9581-5" target="_blank" class="page-scroll btn btn-xl">Read More</a>
         </div>
 
@@ -205,7 +226,7 @@
 
     <!-- Clients Aside -->
 
-
+    <!--
     <section id="contact">
         <div class="container">
             <div class="row">
@@ -254,6 +275,7 @@
             </div>
         </div>
     </section>
+    -->
   </div>
 
   <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js"></script>
