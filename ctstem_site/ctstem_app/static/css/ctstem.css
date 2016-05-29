@@ -738,7 +738,6 @@ div.content {
 #home header {
   color: #333;
   margin-top: 65px;
-  margin-bottom: 80px;
 }
 
 #home header #banner-image {
@@ -751,13 +750,13 @@ div.content {
 }
 
 #home header h1 {
-  padding: 3rem 0 1rem 0;
+  padding: 5rem 0 1rem 0;
   line-height: 130%;
 }
 
 #home header h2 {
   padding-top: 2rem;
-  padding-bottom: 2rem;
+  padding-bottom: 8rem;
   font-weight: 300;
   font-size: 1.3em;
   line-height: 160%;
