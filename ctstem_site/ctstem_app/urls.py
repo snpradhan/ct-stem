@@ -24,6 +24,7 @@ urlpatterns = [
     url(r'^teamMembers/$', views.teamMembers, name='teamMembers'),
     url(r'^teamMember/(?P<id>[\d]+)/$', views.teamMember, name='teamMember'),
     url(r'^teamMember/new/$', views.teamMember, name='newMember'),
+    url(r'^training/$', views.training, name='training'),
     url(r'^deleteMember/(?P<id>[\d]+)/$', views.deleteMember, name='deleteMember'),
     url(r'^teamProfile/(?P<id>[\d]+)/$', views.teamProfile, name='teamProfile'),
     url(r'^teamRoles/$', views.teamRoles, name='teamRoles'),
