@@ -3,12 +3,13 @@
   <div class="modal-content">
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal">&times;</button>
-      <h3 class="modal-title">{{curriculum.title}} Preview</h3>
+      <h3 class="modal-title">Lesson Preview</h3>
     </div>
     <div class="modal-body">
       <!-- Project Details Go Here -->
       <form>
         <div class="table" id="curriculumPreview">
+          <h3>{{curriculum.title}}</h3>
           <hr>
           <div class="meta">
             <label>Time</label>
@@ -16,7 +17,10 @@
           </div>
           <div class="meta">
             <label>Overview</label>
-            <div>{{curriculum.overview}}</div>
+            <div>
+              {{curriculum.overview}}
+              {% if curriculum.icon %}<br><img src="{{curriculum.icon.url}}" style="margin: 15px 0;"/> {% endif %}
+            </div>
           </div>
           <div class="meta">
             <label>Standards</label>
