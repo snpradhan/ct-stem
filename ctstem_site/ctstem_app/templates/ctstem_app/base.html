@@ -99,7 +99,7 @@
                   <li class="{% navactive request 'ctstem:curricula' 'assessments' %} "><a href="{% url 'ctstem:curricula' 'assessments' %}">Assessments</a></li>
                   <li class="{% navactive request 'ctstem:standards' %}"><a href="{% url 'ctstem:standards' %}">Standards</a></li>
                   <li class="{% navactive request 'ctstem:publications' %}"><a href="{% url 'ctstem:publications' %}">Research</a></li>
-                  <li><a class="page-scroll" href="{% url 'ctstem:home' %}#contact">Training</a></li>
+                  <li><a class="page-scroll" href="{% url 'ctstem:training' %}">Training</a></li>
 
                 {% elif request.path == '/' %}
                   <li><a class="page-scroll" href="#assessments">Assessments</a></li>
@@ -111,7 +111,7 @@
                   <li><a class="page-scroll" href="{% url 'ctstem:home' %}#assessments">Assessments</a></li>
                   <li><a class="page-scroll" href="{% url 'ctstem:home' %}#practices">Standards</a></li>
                   <li class="{% navactive request 'ctstem:publications' %}"><a href="{% url 'ctstem:publications' %}">Research</a></li>
-                  <li><a class="page-scroll" href="{% url 'ctstem:home' %}#contact">Training</a></li>
+                  <li><a class="page-scroll" href="{% url 'ctstem:training' %}">Training</a></li>
                   <li class="{% navactive request 'ctstem:team' %}"><a href="{% url 'ctstem:team' %}">Team</a></li>
                 {% endif %}
               {% endif %}
