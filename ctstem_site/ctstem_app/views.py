@@ -1973,3 +1973,10 @@ def check_session(request):
 
   return http.HttpResponseNotAllowed(['GET', 'POST'])
 
+####################################
+# PROFESSIONAL DEVELOPMENT 
+####################################
+def training(request):
+  return render(request, 'ctstem_app/Training.html')
+
+
