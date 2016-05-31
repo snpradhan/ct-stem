@@ -508,8 +508,8 @@ div.table.item .icon {
 }
 
 
-/* 
- * PUBLICATION LISTS 
+/*
+ * PUBLICATION LISTS
  */
 ul.publication-list {
   font-size: 1.7rem;
@@ -734,6 +734,7 @@ div.content {
   margin-bottom: 40px;
   margin-top: 120px;
   min-height: 90%;
+  overflow: auto;
 }
 
 #home header {
