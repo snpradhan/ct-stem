@@ -1212,6 +1212,11 @@ span.ec .glyphicon-collapse-up{
   margin: 4rem 12rem;
 }
 
+img.page-blurb-image {
+  width: 600px;
+  margin: 1rem 12rem;
+}
+
 
 .service-blurb {
   color: #777;
