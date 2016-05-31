@@ -103,7 +103,7 @@
                   {% endif %}
                   <li class="{% navactive request 'ctstem:standards' %}"><a href="{% url 'ctstem:standards' %}">Standards</a></li>
                   <li class="{% navactive request 'ctstem:publications' %}"><a href="{% url 'ctstem:publications' %}">Research</a></li>
-                  <li><a class="page-scroll" href="{% url 'ctstem:training' %}">Training</a></li>
+                  <li class="{% navactive request 'ctstem:training' %}"><a href="{% url 'ctstem:training' %}">Training</a></li>
 
                 {% elif request.path == '/' %}
                   <li><a class="page-scroll" href="#assessments">Assessments</a></li>
