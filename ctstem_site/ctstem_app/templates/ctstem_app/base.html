@@ -96,7 +96,11 @@
               {% if not user.student %}
                 <li class="{% navactive request 'ctstem:curricula' 'lessons'%} "><a href="{% url 'ctstem:curricula' 'lessons' %}">Lessons</a></li>
                 {% if user.is_authenticated%}
-                  <li class="{% navactive request 'ctstem:curricula' 'assessments' %} "><a href="{% url 'ctstem:curricula' 'assessments' %}">Assessments</a></li>
+                  {% if user.administrator or user.researcher or user.author %}
+                    <li class="{% navactive request 'ctstem:curricula' 'assessments' %} "><a href="{% url 'ctstem:curricula' 'assessments' %}">Assessments</a></li>
+                  {% else %}
+                    <li><a href="http://ct-stem-assess.herokuapp.com/" target="_blank">Assessments</a></li>
+                  {% endif %}
                   <li class="{% navactive request 'ctstem:standards' %}"><a href="{% url 'ctstem:standards' %}">Standards</a></li>
                   <li class="{% navactive request 'ctstem:publications' %}"><a href="{% url 'ctstem:publications' %}">Research</a></li>
                   <li><a class="page-scroll" href="{% url 'ctstem:training' %}">Training</a></li>

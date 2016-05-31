@@ -734,7 +734,7 @@ div.content {
   margin-bottom: 40px;
   margin-top: 120px;
   min-height: 90%;
-  overflow: auto;
+  overflow-y: auto;
 }
 
 #home header {
