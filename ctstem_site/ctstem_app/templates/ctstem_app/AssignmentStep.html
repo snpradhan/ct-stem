@@ -5,7 +5,7 @@
   {{block.super}}
   <script type="text/javascript" src="//cdn.mathjax.org/mathjax/2.2-latest/MathJax.js?config=TeX-AMS_HTML"></script>
   <script type="text/javascript" src="/static/js/jquery.form.min.js"></script>
-  <link href="/static/css/progress-wizard.min.css" rel="stylesheet">
+  <link href="/static/css/progress-wizard.min.css" rel="stylesheet"/>
 {% endblock %}
 
 {% block content %}
@@ -205,75 +205,73 @@
           <input type="hidden" id="save" name="save" value="0"/>
         </div>
       </div>
+    </div>
     </form>
+  </div>
+  <script type="text/javascript">
+    $(".content input:checkbox").change(function(){
+      var selectedValues = $("input[id="+$(this).attr('id')+"]:checked").map(function() {return this.value;}).get().join(',')
+      var hiddenVar = $(this).prevAll('input:hidden');
+      $(hiddenVar).val(selectedValues);
+    });
 
-    <script type="text/javascript">
-      $(".content input:checkbox").change(function(){
-        var selectedValues = $("input[id="+$(this).attr('id')+"]:checked").map(function() {return this.value;}).get().join(',')
-        var hiddenVar = $(this).prevAll('input:hidden');
-        $(hiddenVar).val(selectedValues);
-      });
+    $(document).ready(function(){
+      var status = "{{form.instance.instance.status}}";
+      var closedStatus = ['S', 'F', 'A'];
+      if(closedStatus.indexOf(status) >= 0){
+        $(':input').attr('disabled', 'disabled');
+      }
+    });
 
-      $(document).ready(function(){
-        var status = "{{form.instance.instance.status}}";
-        var closedStatus = ['S', 'F', 'A'];
-        if(closedStatus.indexOf(status) >= 0){
-          $(':input').attr('disabled', 'disabled');
-        }
-      });
+    $('button.save').click(function(){
+      $('input:hidden[id="save"]').val(1);
+      $('input:hidden[id*="save"][id*="form"]').val('on');
+      $('form#assignmentForm').submit();
+    });
 
-      $('button.save').click(function(){
+    $('button.submit').click(function(){
+      $('input:hidden[id="save"]').val(0);
+      $('input:hidden[id*="save"][id*="form"]').val('');
+      $('form#assignmentForm').submit();
+    });
+
+    //auto submit form every 60 seconds
+    $(function(){
+      {% if form.instance.instance.status != 'S' and form.instance.instance.status != 'F' and form.instance.instance.status != 'A' %}
+      setInterval(function(){
         $('input:hidden[id="save"]').val(1);
         $('input:hidden[id*="save"][id*="form"]').val('on');
-        $('form#assignmentForm').submit();
-      });
-
-      $('button.submit').click(function(){
-        $('input:hidden[id="save"]').val(0);
-        $('input:hidden[id*="save"][id*="form"]').val('');
-        $('form#assignmentForm').submit();
-      });
-
-      //auto submit form every 60 seconds
-      $(function(){
-        {% if form.instance.instance.status != 'S' and form.instance.instance.status != 'F' and form.instance.instance.status != 'A' %}
-        setInterval(function(){
-          $('input:hidden[id="save"]').val(1);
-          $('input:hidden[id*="save"][id*="form"]').val('on');
-          $('#assignmentForm').ajaxSubmit({
-            dataType : 'json',
-            success: function(data){
-              //message at the top of the page stating responses auto saved
-              $("ul.messages li").remove();
-              $("ul.messages").html('<li class="success">'+data.message+'</li>');
-              //change the url in the browser if new assignment
-              if (history.pushState) {
-                var newurl = document.location.protocol +'//'+ document.location.host + data.url;
-                history.replaceState({},'',newurl);
-              }
-              //update question response ids for new assignment
-              $('input:hidden[id^="id_form-"][id$="-id"]').each(function(){
-                var id = $(this).attr('id');
-                if(!($(this).val())){
-                  $(this).val(data.questionResponses[id]);
-                }
-              });
-              $('input:hidden[id="id_form-INITIAL_FORMS"]').val(data.questionCount);
-            },
-            error: function(data) {
-              $("ul.messages li").remove();
-              $("ul.messages").html('<li class="error">The responses could not auto saved. Please click the Save or Save and Continue button at the bottom of the page.</li>');
+        $('#assignmentForm').ajaxSubmit({
+          dataType : 'json',
+          success: function(data){
+            //message at the top of the page stating responses auto saved
+            $("ul.messages li").remove();
+            $("ul.messages").html('<li class="success">'+data.message+'</li>');
+            //change the url in the browser if new assignment
+            if (history.pushState) {
+              var newurl = document.location.protocol +'//'+ document.location.host + data.url;
+              history.replaceState({},'',newurl);
             }
-          });
-          $('ul.messages').show();
-          $('ul.messages').delay(10000).fadeOut('slow');
-          return false;
-        }, 60000)
-        {% endif %}
-      });
+            //update question response ids for new assignment
+            $('input:hidden[id^="id_form-"][id$="-id"]').each(function(){
+              var id = $(this).attr('id');
+              if(!($(this).val())){
+                $(this).val(data.questionResponses[id]);
+              }
+            });
+            $('input:hidden[id="id_form-INITIAL_FORMS"]').val(data.questionCount);
+          },
+          error: function(data) {
+            $("ul.messages li").remove();
+            $("ul.messages").html('<li class="error">The responses could not auto saved. Please click the Save or Save and Continue button at the bottom of the page.</li>');
+          }
+        });
+        $('ul.messages').show();
+        $('ul.messages').delay(10000).fadeOut('slow');
+        return false;
+      }, 60000)
+      {% endif %}
+    });
+  </script>
 
-
-
-    </script>
-  </div>
 {% endblock %}
