@@ -19,7 +19,9 @@
   {% if tab == 'group' or tab == 'assignment' %}
     {% if user.administrator or user.researcher or user.school_administrator or user.teacher %}
       {% if group.id %}
-        <li {% if role == 'group' %} class="active"{% endif %}><a href="{% url 'ctstem:group' group.id %}">Group Details</a></li>
+        {% if not user.researcher %}
+          <li {% if role == 'group' %} class="active"{% endif %}><a href="{% url 'ctstem:group' group.id %}">Group Details</a></li>
+        {% endif %}
         <li {% if role == 'group_dashboard' %} class="active"{% endif %}><a href="{% url 'ctstem:groupDashboard' group.id %}">Group Dashboard</a></li>
       {% endif %}
     {% endif %}

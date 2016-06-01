@@ -101,7 +101,7 @@
                   {% else %}
                     <li><a href="http://ct-stem-assess.herokuapp.com/" target="_blank">Assessments</a></li>
                   {% endif %}
-                  <li class="{% navactive request 'ctstem:standards' %}"><a href="{% url 'ctstem:standards' %}">Standards</a></li>
+                  <li><a class="page-scroll" href="{% url 'ctstem:home' %}#practices">Standards</a></li>
                   <li class="{% navactive request 'ctstem:publications' %}"><a href="{% url 'ctstem:publications' %}">Research</a></li>
                   <li class="{% navactive request 'ctstem:training' %}"><a href="{% url 'ctstem:training' %}">Training</a></li>
 
@@ -153,7 +153,9 @@
                   <ul class="dropdown-menu">
                     <li class="{% navactive request 'ctstem:subjects' %}"><a href="{% url 'ctstem:subjects' %}">Subjects</a></li>
                     <li class="{% navactive request 'ctstem:schools' %}"><a href="{% url 'ctstem:schools' %}">Schools</a></li>
-                    <li class="{% navactive request 'ctstem:teamMembers' %}"><a href="{% url 'ctstem:teamMembers' %}">Team</a></li>
+                    {% if user.administrator %}
+                      <li class="{% navactive request 'ctstem:teamMembers' %}"><a href="{% url 'ctstem:teamMembers' %}">Team</a></li>
+                    {% endif %}
                   </ul>
                 </li>
               {% endif %}

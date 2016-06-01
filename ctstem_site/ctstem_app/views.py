@@ -47,7 +47,7 @@ def home(request):
         school = None
         requester_role = ''
       elif hasattr(request.user, 'researcher'):
-        school = request.user.researcher.school
+        school = None
         requester_role = 'R'
       elif hasattr(request.user, 'teacher'):
         school = request.user.teacher.school
@@ -458,7 +458,6 @@ def register(request):
 
       elif form.cleaned_data['account_type'] == 'R':
         newUser = models.Researcher()
-        newUser.school = form.cleaned_data['school']
         newUser.user = user
         newUser.save()
       elif form.cleaned_data['account_type'] == 'C':
@@ -587,9 +586,11 @@ def userProfile(request, id=''):
     elif hasattr(user, 'teacher'):
       role = 'teacher'
       teacher = models.Teacher.objects.get(user__id=id)
+      school = teacher.school
     elif hasattr(user, 'student'):
       role = 'student'
       student = models.Student.objects.get(user__id=id)
+      school = student.school
     elif hasattr(user, 'researcher'):
       role = 'researcher'
       researcher = models.Researcher.objects.get(user__id=id)
@@ -599,29 +600,56 @@ def userProfile(request, id=''):
     elif hasattr(user, 'school_administrator'):
       role = 'school_administrator'
       school_administrator = models.SchoolAdministrator.objects.get(user__id=id)
+      school = school_administrator.school
     else:
       return http.HttpResponseForbidden('<h1>User has no role</h1>')
 
+    permission = 0
+    if hasattr(request.user, 'administrator'):
+      permission = 1
+    elif hasattr(request.user, 'researcher') and role == 'researcher' and request.user.id == researcher.user.id:
+      permission = 1
+    elif hasattr(request.user, 'school_administrator'):
+      if role == 'school_administrator' and request.user.id == school_administrator.user.id:
+        permission = 1
+      elif role == 'teacher' and request.user.school_administrator.school == teacher.school:
+        permission = 1
+      elif role == 'student' and request.user.school_administrator.school == student.school:
+        permission = 1
+    elif hasattr(request.user, 'teacher'):
+      if role == 'teacher' and request.user.id == teacher.user.id:
+        permission = 1
+      elif role == 'student' and request.user.teacher.school == student.school:
+        permission = 1
+    elif hasattr(request.user, 'student') and role == 'student' and request.user.id == student.user.id:
+      permission = 1
+    elif hasattr(request.user, 'author') and role == 'author' and request.user.id == author.user.id:
+      permission = 1
+
+    if permission == 1:
+      pass
+    else:
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to view/edit this profile</h1>')
+
     if request.method == 'GET':
       userform = forms.UserProfileForm(instance=user, prefix='user')
-      if role in ['student', 'teacher', 'administrator', 'researcher', 'author', 'school_administrator']:
-        if role == 'student':
-          profileform = forms.StudentForm(instance=student, prefix='student')
-        elif role == 'teacher':
-          profileform = forms.TeacherForm(instance=teacher, prefix='teacher')
-        elif role == 'administrator':
-          profileform = None
-        elif role == 'researcher':
-          profileform = forms.ResearcherForm(instance=researcher, prefix='researcher')
-        elif role == 'author':
-          profileform = forms.AuthorForm(instance=author, prefix='author')
-        elif role == 'school_administrator':
-          profileform = forms.SchoolAdministratorForm(instance=school_administrator, prefix='school_administrator')
-        else:
-          return http.HttpResponseNotFound('<h1>Requested user does not have a role</h1>')
+      if role == 'student':
+        profileform = forms.StudentForm(user=request.user, instance=student, prefix='student')
+      elif role == 'teacher':
+        profileform = forms.TeacherForm(user=request.user, instance=teacher, prefix='teacher')
+      elif role == 'administrator':
+        profileform = None
+      elif role == 'researcher':
+        profileform = forms.ResearcherForm(instance=researcher, prefix='researcher')
+      elif role == 'author':
+        profileform = forms.AuthorForm(instance=author, prefix='author')
+      elif role == 'school_administrator':
+        profileform = forms.SchoolAdministratorForm(user=request.user, instance=school_administrator, prefix='school_administrator')
+      else:
+        return http.HttpResponseNotFound('<h1>Requested user does not have a role</h1>')
 
-        context = {'profileform': profileform, 'userform': userform, 'role': role}
-        return render(request, 'ctstem_app/UserProfile.html', context)
+      context = {'profileform': profileform, 'userform': userform, 'role': role}
+      return render(request, 'ctstem_app/UserProfile.html', context)
 
     elif request.method == 'POST':
       data = request.POST.copy()
@@ -644,15 +672,15 @@ def userProfile(request, id=''):
 
       profileform = None
       if role == 'student':
-        profileform = forms.StudentForm(data, instance=student, prefix='student')
+        profileform = forms.StudentForm(user=request.user, data=data, instance=student, prefix='student')
       elif role == 'teacher':
-        profileform = forms.TeacherForm(data, instance=teacher, prefix='teacher')
+        profileform = forms.TeacherForm(user=request.user, data=data, instance=teacher, prefix='teacher')
       elif role == 'researcher':
         profileform = forms.ResearcherForm(data, instance=researcher, prefix='researcher')
       elif role == 'author':
         profileform = forms.AuthorForm(data, instance=author, prefix='author')
       elif role == 'school_administrator':
-        profileform = forms.SchoolAdministratorForm(data, instance=school_administrator, prefix='school_administrator')
+        profileform = forms.SchoolAdministratorForm(user=request.user, data=data, instance=school_administrator, prefix='school_administrator')
 
       if userform.is_valid():
         if profileform is None:
@@ -686,18 +714,18 @@ def userProfile(request, id=''):
 ####################################
 def deleteUser(request, id=''):
   try:
-    # check if the user has permission to delete a lesson
-    if hasattr(request.user, 'author') or hasattr(request.user, 'student') or hasattr(request.user, 'school_administrator'):
+    # check if the user has permission to delete a user
+    if hasattr(request.user, 'author') or hasattr(request.user, 'student') or hasattr(request.user, 'researcher'):
       return http.HttpResponseNotFound('<h1>You do not have the privilege to delete users</h1>')
     # check if the lesson exists
     if '' != id:
       user = User.objects.get(id=id)
 
-    if hasattr(request.user, 'researcher'):
+    if hasattr(request.user, 'school_administrator'):
       if hasattr(user, 'administrator') or hasattr(user, 'researcher') or hasattr(user, 'author'):
         return http.HttpResponseNotFound('<h1>You do not have the privilege to delete this user</h1>')
     if hasattr(request.user, 'teacher'):
-      if hasattr(user, 'administrator') or hasattr(user, 'researcher') or hasattr(user, 'author') or hasattr(user, 'teacher'):
+      if hasattr(user, 'administrator') or hasattr(user, 'researcher') or hasattr(user, 'author') or hasattr(user, 'teacher') or hasattr(user, 'school_administrator'):
         return http.HttpResponseNotFound('<h1>You do not have the privilege to delete this user</h1>')
 
     if request.method == 'GET' or request.method == 'POST':
@@ -852,7 +880,7 @@ def deleteStandard(request, id=''):
 @login_required
 def searchTaxonomy(request):
   # check if the user has permission to add a question
-  if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'researcher') == False and hasattr(request.user, 'author') == False:
+  if hasattr(request.user, 'author') == False and hasattr(request.user, 'researcher') == False and  hasattr(request.user, 'administrator') == False:
     return http.HttpResponseNotFound('<h1>You do not have the privilege search taxonomy</h1>')
 
   subcategory = models.Subcategory()
@@ -890,7 +918,6 @@ def users(request, role):
     privilege = 5
   elif hasattr(request.user, 'researcher'):
     privilege = 4
-    school = request.user.researcher.school
   elif hasattr(request.user, 'school_administrator'):
     privilege = 3
     school = request.user.school_administrator.school
@@ -1026,7 +1053,7 @@ def groups(request):
 def group(request, id=''):
   try:
     # check if the user has permission to create or modify a group
-    if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'researcher') == False and hasattr(request.user, 'teacher') == False and hasattr(request.user, 'school_administrator') == False:
+    if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'school_administrator') == False and hasattr(request.user, 'teacher') == False :
       return http.HttpResponseNotFound('<h1>You do not have the privilege to create/modify a group</h1>')
     # check if the lesson exists
     if '' != id:
@@ -1081,7 +1108,7 @@ def deleteGroup(request, id=''):
       group = models.UserGroup.objects.get(id=id)
       # check if the user has permission to delete this group
       allowed = False
-      if hasattr(request.user, 'administrator') or hasattr(request.user, 'researcher'):
+      if hasattr(request.user, 'administrator'):
         allowed = True
       elif hasattr(request.user, 'school_administrator') and request.user.school_administrator.school == group.teacher.school:
         allowed = True
@@ -1426,7 +1453,7 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
 @login_required
 def feedback(request, assignment_id='', instance_id=''):
   try:
-    if hasattr(request.user, 'teacher') == False and hasattr(request.user, 'administrator') == False:
+    if hasattr(request.user, 'teacher') == False and hasattr(request.user, 'researcher') == False and hasattr(request.user, 'administrator') == False:
       return http.HttpResponseNotFound('<h1>You do not have the privilege to provide feedback</h1>')
 
     if '' != instance_id:
@@ -1615,8 +1642,6 @@ def generate_code_helper(request):
 def user_upload(request):
   if hasattr(request.user, 'administrator'):
     role = 'admin'
-  elif hasattr(request.user, 'researcher'):
-    role = 'researcher'
   elif hasattr(request.user, 'school_administrator'):
     role = 'school_administrator'
   elif hasattr(request.user, 'teacher'):
@@ -1642,11 +1667,11 @@ def user_upload(request):
           last_name = str(row[2])
           email = str(row[3])
           if role == 'teacher':
-            account_type = None
+            account_type = 'Student'
             school_code = request.user.teacher.school.school_code
           elif role == 'school_administrator':
             account_type = str(row[4])
-            school_code = request.user.researcher.school.school_code
+            school_code = request.user.school_administrator.school.school_code
           else:
             account_type = str(row[4])
             school_code = str(row[5])
@@ -1661,16 +1686,10 @@ def user_upload(request):
             messages.error(request, 'Last name is missing on row %d' % count)
           elif email is None or email == '':
             messages.error(request, 'Email is missing on row %d' % count)
-          elif role == 'admin' and account_type not in ['School Administrator', 'Researcher', 'Teacher', 'Student', 'Author']:
-            messages.error(request, 'Account Type is missing or invalid on row %d.  Account type has to be one of %s' % (count, 'School Administrator, Researcher, Teacher, Student or Author'))
-          elif role == 'researcher' and account_type not in ['School Administrator', 'Teacher', 'Student']:
-            messages.error(request, 'Account Type is missing or invalid on row %d.  Account type has to be one of %s' % (count, 'School Administrator, Teacher or Student'))
-          elif role == 'school_administrator' and account_type not in ['Teacher', 'Student']:
+          elif role in ['admin', 'school_administrator'] and account_type not in ['Teacher', 'Student']:
             messages.error(request, 'Account Type is missing or invalid on row %d.  Account type has to be one of %s' % (count, 'Teacher or Student'))
-          elif role in ['admin', 'researcher']  and account_type in ['School Administrator', 'Teacher', 'Student'] and (school_code is None or school_code == ''):
+          elif role == 'admin'  and account_type in ['Teacher', 'Student'] and (school_code is None or school_code == ''):
             messages.error(request, 'Account Type %s on row %d needs a school code.' % (account_type, count))
-          elif role == 'teacher' and account_type is not None and account_type != '' and account_type != 'Student':
-            messages.error(request, 'You do not have the privilege to add  %s on row %d.  Please use a valid Student Template' % (account_type, count))
           # everything cool so far
           else:
             try:
@@ -1685,36 +1704,20 @@ def user_upload(request):
               user.last_name = last_name
               user.save()
               #check the account type
-              #create an admin
-              if account_type == 'Admin':
-                admin = models.Administrator.objects.create(user=user)
-              #create a researcher
-              elif account_type == 'Researcher':
-                school_obj = models.School.objects.get(school_code=school_code)
-                researcher = models.Researcher.objects.create(user=user, school=school_obj)
-              #create school admin
-              elif account_type == 'School Administrator':
-                school_obj = models.School.objects.get(school_code=school_code)
-                school_administrator = models.SchoolAdministrator.objects.create(user=user, school=school_obj)
               #create a teacher
-              elif account_type == 'Teacher':
+              if account_type == 'Teacher':
                 school_obj = models.School.objects.get(school_code=school_code)
                 teacher = models.Teacher.objects.create(user=user, school=school_obj)
               #create a student
-              elif account_type == 'Student' or (role == 'teacher' and (account_type is None or account_type == '')):
-                account_type = 'Student'
+              elif account_type == 'Student':
                 school_obj = models.School.objects.get(school_code=school_code)
                 student = models.Student.objects.create(user=user, school=school_obj)
-
-              #create an author
-              else:
-                author = models.Author.objects.create(user=user)
 
               added += 1
               #email user the  user name and password
               send_mail('CT-STEM Account Created',
                     'Your %s account has been created on Computational Thinking in STEM website http://%s.  \r\n\r\n \
-                     Please login to the site using the following credentials and change your password.\r\n\r\n  \
+                     Please login to the site using the credentials below and change your password.\r\n\r\n  \
                      Username: %s \r\n \
                      Temporary Password: %s \r\n\r\n \
                      -- CT-STEM Admin'%(account_type, domain, user.username, password),
@@ -1890,7 +1893,7 @@ def deleteSubject(request, id=''):
 ####################################
 @login_required
 def teamRoles(request):
-  if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'researcher') == False:
+  if hasattr(request.user, 'administrator') == False:
     return http.HttpResponseNotFound('<h1>You do not have the privilege to edit team roles</h1>')
 
   TeamRoleFormSet = modelformset_factory(models.TeamRole, form=forms.TeamRoleForm, can_delete=True, can_order=True)
@@ -1916,7 +1919,7 @@ def teamRoles(request):
 
 @login_required
 def teamMembers(request):
-  if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'researcher') == False:
+  if hasattr(request.user, 'administrator') == False:
     return http.HttpResponseNotFound('<h1>You do not have the privilege to edit team roles</h1>')
 
   members = models.Team.objects.all().order_by('order')
@@ -1926,7 +1929,7 @@ def teamMembers(request):
 @login_required
 def teamMember(request, id=''):
   try:
-    if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'researcher') == False:
+    if hasattr(request.user, 'administrator') == False:
       return http.HttpResponseNotFound('<h1>You do not have the privilege to add/edit team members</h1>')
 
     if ''!= id:
@@ -1962,7 +1965,7 @@ def teamMember(request, id=''):
 def deleteMember(request, id=''):
   try:
     # check if the user has permission to delete a subject
-    if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'researcher') == False:
+    if hasattr(request.user, 'administrator') == False:
       return http.HttpResponseNotFound('<h1>You do not have the privilege to delete team member</h1>')
     # check if the lesson exists
     if ''!= id:
@@ -2008,7 +2011,7 @@ def check_session(request):
   return http.HttpResponseNotAllowed(['GET', 'POST'])
 
 ####################################
-# PROFESSIONAL DEVELOPMENT 
+# PROFESSIONAL DEVELOPMENT
 ####################################
 def training(request):
   return render(request, 'ctstem_app/Training.html')

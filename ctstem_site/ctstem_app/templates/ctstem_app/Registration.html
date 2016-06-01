@@ -69,30 +69,12 @@
 
       function set_user_fields(){
         var account_type = $('#id_account_type').val();
-        if(account_type === 'A'){
+        var restricted_accounts = ['A', 'R', 'C'];
+        if(restricted_accounts.indexOf(account_type) !== -1){
           $('#div_school').hide();
-          $('#div_permission_code').hide();
-          $('#div_user_code').hide();
-        }
-        else if(account_type === 'R'){
-          $('#div_school').show();
-          $('#div_permission_code').hide();
-          $('#div_user_code').show();
-        }
-        else if(account_type === 'T'){
-          $('#div_school').show();
-          $('#div_permission_code').show();
-          $('#div_user_code').show();
-        }
-        else if(account_type === 'C'){
-          $('#div_school').hide();
-          $('#div_permission_code').hide();
-          $('#div_user_code').hide();
         }
         else {
           $('#div_school').show();
-          $('#div_permission_code').show();
-          $('#div_user_code').hide();
         }
       }
 

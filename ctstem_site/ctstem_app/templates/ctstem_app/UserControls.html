@@ -1,11 +1,17 @@
 <div class="form-group">
-  {% if user.administrator or user.researcher or user.school_administrator%}
+  {% if user.administrator or user.school_administrator%}
     <a type="button" class="btn btn-info" href="{% url 'ctstem:register' %}" title="Add a new user">
       <span class="glyphicon glyphicon-user" aria-hidden="true"></span> Create User
     </a>
-    <a type="button" class="btn btn-warning" href="/static/excel/User_Template.csv" title="Download User Template">
-      <span class="glyphicon glyphicon-download" aria-hidden="true"></span> Download User Template
-    </a>
+    {% if user.administrator %}
+      <a type="button" class="btn btn-warning" href="/static/excel/User_Template.csv" title="Download User Template">
+        <span class="glyphicon glyphicon-download" aria-hidden="true"></span> Download User Template
+      </a>
+    {% else %}
+      <a type="button" class="btn btn-warning" href="/static/excel/Teacher_Student_Template.csv" title="Download User Template">
+        <span class="glyphicon glyphicon-download" aria-hidden="true"></span> Download User Template
+      </a>
+    {% endif %}
     <a type="button" class="btn btn-success" href="#" data-toggle="modal" data-target="#upload" title="Upload Users">
       <span class="glyphicon glyphicon-upload" aria-hidden="true"></span> Upload Users
     </a>
@@ -20,7 +26,7 @@
       <span class="glyphicon glyphicon-upload" aria-hidden="true"></span> Upload Student
     </a>
   {% endif %}
-  {% if user.administrator or user.researcher or user.school_administrator or user.teacher %}
+  {% if user.administrator or user.school_administrator or user.teacher %}
     <a type="button" class="btn btn-info" href="{% url 'ctstem:newGroup' %}" title="Create new group">Create Group</a>
   {% endif %}
 </div>

@@ -27,7 +27,12 @@
         </thead>
         <tbody>
           <tr>
-            <td>{{form.instance.instance.student}}</td>
+            <td>
+            {% if user.researcher %}
+              {{form.instance.instance.student.user.id}}
+            {% else %}
+              {{form.instance.instance.student}}
+            {% endif %}</td>
             <td><a href="{% url 'ctstem:groupDashboard' form.instance.instance.assignment.group.id %}">{{form.instance.instance.assignment.group}}</a></td>
             <td><a href="{% url 'ctstem:assignmentDashboard' form.instance.instance.assignment.id %}">{{form.instance.instance.assignment.curriculum.title}}</a></td>
             <td>{{form.instance.instance.assignment.assigned_date|date}}</td>

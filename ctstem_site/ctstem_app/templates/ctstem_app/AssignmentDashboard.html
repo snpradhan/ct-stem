@@ -51,7 +51,13 @@
         <tbody>
           {% for student, assignment_details in student_assignment_details.items %}
             <tr>
-              <td>{{student}}</td>
+              <td>
+                {% if user.researcher %}
+                  {{student.user.id}}
+                {% else %}
+                  {{student}}
+                {% endif %}
+              </td>
               <td> {{assignment_details.instance.created_date|date}} </td>
               <td> {{assignment_details.instance.modified_date|date}} </td>
               <td style="text-align: center;">

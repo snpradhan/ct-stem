@@ -33,12 +33,15 @@ class RegistrationForm (forms.Form):
     user = kwargs.pop('user')
     super(RegistrationForm, self).__init__(*args, **kwargs)
     if user.is_authenticated():
-      if hasattr(user, 'researcher'):
-        self.fields['account_type'].choices = models.USER_ROLE_CHOICES[2:]
-      elif hasattr(user, 'school_administrator'):
+      if hasattr(user, 'school_administrator'):
         self.fields['account_type'].choices = models.USER_ROLE_CHOICES[4:]
+        self.fields['school'].queryset = models.School.objects.filter(id=user.school_administrator.school.id)
       elif hasattr(user, 'teacher'):
         self.fields['account_type'].choices = models.USER_ROLE_CHOICES[5:]
+        self.fields['school'].queryset = models.School.objects.filter(id=user.teacher.school.id)
+    else:
+      self.fields['account_type'].choices = models.USER_ROLE_CHOICES[3:]
+
     for field_name, field in self.fields.items():
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['aria-describedby'] = field.label
@@ -131,7 +134,21 @@ class StudentForm (ModelForm):
     fields = ['school']
 
   def __init__(self, *args, **kwargs):
+    user = kwargs.pop('user')
     super(StudentForm, self).__init__(*args, **kwargs)
+    if user.is_authenticated():
+      if hasattr(user, 'school_administrator'):
+        school = user.school_administrator.school
+      elif hasattr(user, 'teacher'):
+        school = user.teacher.school
+      elif hasattr(user, 'student'):
+        school = user.student.school
+      else:
+        school = None
+
+      if school is not None:
+        self.fields['school'].queryset = models.School.objects.filter(id=school.id)
+
     for field_name, field in self.fields.items():
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['aria-describedby'] = field.label
@@ -146,7 +163,20 @@ class TeacherForm (ModelForm):
     fields = ['school']
 
   def __init__(self, *args, **kwargs):
+    user = kwargs.pop('user')
     super(TeacherForm, self).__init__(*args, **kwargs)
+
+    if user.is_authenticated():
+      if hasattr(user, 'school_administrator'):
+        school = user.school_administrator.school
+      elif hasattr(user, 'teacher'):
+        school = user.teacher.school
+      else:
+        school = None
+
+      if school is not None:
+        self.fields['school'].queryset = models.School.objects.filter(id=school.id)
+
     for field_name, field in self.fields.items():
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['aria-describedby'] = field.label
@@ -158,7 +188,7 @@ class TeacherForm (ModelForm):
 class ResearcherForm (ModelForm):
   class Meta:
     model = models.Researcher
-    fields = ['school']
+    fields = []
   def __init__(self, *args, **kwargs):
     super(ResearcherForm, self).__init__(*args, **kwargs)
     for field_name, field in self.fields.items():
@@ -174,11 +204,17 @@ class SchoolAdministratorForm (ModelForm):
     model = models.SchoolAdministrator
     fields = ['school']
   def __init__(self, *args, **kwargs):
+    user = kwargs.pop('user')
     super(SchoolAdministratorForm, self).__init__(*args, **kwargs)
+    if user.is_authenticated() and hasattr(user, 'school_administrator'):
+      school = user.school_administrator.school
+      self.fields['school'].queryset = models.School.objects.filter(id=school.id)
+
     for field_name, field in self.fields.items():
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['aria-describedby'] = field.label
       field.widget.attrs['placeholder'] = field.help_text
+
 ####################################
 # Author Form
 ####################################
