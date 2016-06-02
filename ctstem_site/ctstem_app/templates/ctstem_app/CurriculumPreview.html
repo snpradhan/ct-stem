@@ -40,7 +40,7 @@
               {% endfor %}
             </ul>
           </div>
-          {% if user.administrator or user.researcher or user.teacher or user.author %}
+          {% if user.administrator or user.researcher or user.teacher or user.author or user.school_administrator %}
             {% if attachments %}
               <div class="meta">
                 <label>Attachments</label>
@@ -63,7 +63,7 @@
             <h5><span class="label label-warning">Please login to see rest of the content</span></h5>
           {% endif %}
         </div>
-        {% if user.administrator or user.researcher or user.teacher or user.author %}
+        {% if user.administrator or user.researcher or user.teacher or user.author or user.school_administrator%}
           {% for step in steps %}
             <div class="table stepPreview">
               <div class="row header">

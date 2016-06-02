@@ -14,6 +14,7 @@ from django.forms.widgets import RadioSelect, FileInput, ClearableFileInput
 from django.utils.safestring import mark_safe
 from django.core.exceptions import ObjectDoesNotExist
 from tinymce.widgets import TinyMCE
+from django.db.models import Q
 
 ####################################
 # Registration Form
@@ -440,10 +441,15 @@ class UserGroupForm(ModelForm):
     exclude = ('id',)
 
   def __init__(self, *args, **kwargs):
+    user = kwargs.pop('user')
     super(UserGroupForm, self).__init__(*args, **kwargs)
 
     self.fields['time'].label = 'Time/Period'
-    #self.fields['members'].queryset = self.fields['members'].queryset.filter(~Q(school=teacher.school))
+    if hasattr(user, 'teacher'):
+      self.fields['members'].queryset = self.fields['members'].queryset.filter(school=user.teacher.school)
+    elif hasattr(user, 'school_administrator'):
+      self.fields['teacher'].queryset = self.fields['teacher'].queryset.filter(school=user.school_administrator.school)
+      self.fields['members'].queryset = self.fields['members'].queryset.filter(school=user.school_administrator.school)
 
     for field_name, field in self.fields.items():
       field.widget.attrs['class'] = 'form-control'
