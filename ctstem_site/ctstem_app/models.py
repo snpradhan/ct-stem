@@ -183,7 +183,7 @@ class BookmarkedCurriculum(models.Model):
 # A bank of questions that can be resued across assessments and lessons
 class Question(models.Model):
   question_text = RichTextUploadingField(null=False, blank=False, config_name='question_ckeditor')
-  answer_field_type = models.CharField(null=False, max_length=2, choices=FIELD_TYPE_CHOICES)
+  answer_field_type = models.CharField(null=False, max_length=2, choices=FIELD_TYPE_CHOICES, default='TF')
   options = models.TextField(null=True, blank=True)
   answer = models.TextField(null=True, blank=True)
 
