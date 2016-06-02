@@ -44,8 +44,10 @@ function cloneMore(selector, type) {
       //$(this).val('').removeAttr('checked');
     });
     newElement.find('a').each(function() {
-      $(this).attr('href', $(this).attr('href').replace('-' + (total-1) + '-','-' + total + '-'));
-        //$(this).val('').removeAttr('checked');
+      if($(this).attr('href')){
+        $(this).attr('href', $(this).attr('href').replace('-' + (total-1) + '-','-' + total + '-'));
+      }
+      //$(this).val('').removeAttr('checked');
     });
     newElement.find('label').each(function() {
       var newFor = $(this).attr('for').replace('-' + (total-1) + '-','-' + total + '-');
