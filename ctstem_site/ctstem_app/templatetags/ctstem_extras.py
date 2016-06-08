@@ -56,6 +56,9 @@ listsort.is_safe = True
 def split(value, arg):
     return value.split(arg)
 
+@register.filter(name='splitlines')
+def split(value):
+    return value.splitlines()
 
 @register.filter
 def format_iframe(html_string):

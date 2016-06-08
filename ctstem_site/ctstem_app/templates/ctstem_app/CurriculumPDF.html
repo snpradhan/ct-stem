@@ -209,7 +209,7 @@
                       {% elif field_type == 'DD' or field_type == 'MC' %}
                         <div class="multiplechoice">
                           <p class="note"> Note: Select one answer </p>
-                          {% for option in question.options|split:','%}
+                          {% for option in question.options|splitlines%}
                             <div class="input_container">
                               <img src="https://s3-us-west-1.amazonaws.com/ct-stem/assets/images/Circle.gif" class="circle"><span>&nbsp;&nbsp;{{option}}</span>
                             </div>
@@ -218,7 +218,7 @@
                       {% elif field_type == 'MS' %}
                         <div class="multiselect">
                           <p class="note"> Note: Select all that apply </p>
-                          {% for option in question.options|split:','%}
+                          {% for option in question.options|splitlines%}
                             <div class="input_container">
                               <img src="https://s3-us-west-1.amazonaws.com/ct-stem/assets/images/Square.gif" class="square" style="width:25px;"><span>&nbsp;&nbsp;{{option}} </span>
                             </div>

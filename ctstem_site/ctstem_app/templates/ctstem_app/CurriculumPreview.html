@@ -96,19 +96,19 @@
                         <div class="multiplechoice">
                           <div class="note"> Note: Select one answer </div>
                           <select class="form-control" disabled>
-                            {% for option in question.options|split:','%}
+                            {% for option in question.options|splitlines %}
                             <option value="{{option}}">{{option}}</option>
                             {% endfor %}
                           </select>
                         </div>
                       {% elif field_type == 'MC' %}
                         <div class="note"> Note: Select one answer </div>
-                      {% for option in question.options|split:','%}
+                      {% for option in question.options|splitlines %}
                         <input type="radio" name="{{question.id}}" id="{{question.id}}" value="{{option}}" disabled/>  {{option}}<br>
                       {% endfor %}
                       {% elif field_type == 'MS' %}
                         <div class="note"> Note: Select all that apply </div>
-                        {% for option in question.options|split:','%}
+                        {% for option in question.options|splitlines %}
                           <input type="checkbox" name="{{question.id}}_cb" id="{{question.id}}_cb" value="{{option}}" disabled/>  {{option}}<br>
                         {% endfor %}
                       {% elif field_type == 'FI' %}

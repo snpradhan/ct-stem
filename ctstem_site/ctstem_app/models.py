@@ -184,7 +184,7 @@ class BookmarkedCurriculum(models.Model):
 class Question(models.Model):
   question_text = RichTextUploadingField(null=False, blank=False, config_name='question_ckeditor')
   answer_field_type = models.CharField(null=False, max_length=2, choices=FIELD_TYPE_CHOICES, default='TF')
-  options = models.TextField(null=True, blank=True)
+  options = models.TextField(null=True, blank=True, help_text='For dropdown, multi-select and multiple choice questions provide one option per line')
   answer = models.TextField(null=True, blank=True)
 
   def __unicode__(self):
