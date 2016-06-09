@@ -258,6 +258,19 @@ class CurriculumForm(ModelForm):
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['placeholder'] = field.help_text
 
+  def is_valid(self):
+    valid = super(CurriculumForm, self).is_valid()
+
+    if self.cleaned_data['curriculum_type'] == 'L':
+      if not self.cleaned_data['subject']:
+        self._errors['subject'] = u'Subject is required'
+        valid = False
+      if self.cleaned_data['content'] == '':
+        self._errors['content'] = u'Content is required'
+        valid = False
+      return valid
+    return valid
+
 ####################################
 # Curriculum Step Form
 ####################################

@@ -166,10 +166,11 @@
         </div>
       </div>
 
-      <div class="table" id="curriculumContent">
-        <div class="label">Content</div>
-        <div>{{curriculum.content|format_iframe|safe}}</div>
-      </div>
+      {% if curriculum.curriculum_type == 'L' %}
+        <div class="table" id="curriculumContent">
+          <div>{{curriculum.content|format_iframe|safe}}</div>
+        </div>
+      {% endif %}
 
       {% if steps %}
         <div class="table" id="curriculumStep">

@@ -3,7 +3,7 @@
   <div class="modal-content">
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal">&times;</button>
-      <h3 class="modal-title">Lesson Preview</h3>
+      <h3 class="modal-title">{{curriculum.get_curriculum_type_display}} Preview</h3>
     </div>
     <div class="modal-body">
       <!-- Project Details Go Here -->
@@ -51,11 +51,10 @@
                 </ul>
               </div>
             {% endif %}
-            {% if curriculum.content %}
-            <div class="meta">
-              <label>Content</label>
-              <div>{{curriculum.content|safe}}</div>
-            </div>
+            {% if curriculum.content and curriculum.curriculum_type == 'L' %}
+              <div class="meta">
+                <div>{{curriculum.content|safe}}</div>
+              </div>
             {% endif %}
           {% endif %}
           <hr>
