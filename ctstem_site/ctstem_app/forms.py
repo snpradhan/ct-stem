@@ -260,6 +260,8 @@ class CurriculumForm(ModelForm):
 
   def is_valid(self):
     valid = super(CurriculumForm, self).is_valid()
+    if not valid:
+      return valid
 
     if self.cleaned_data['curriculum_type'] == 'L':
       if not self.cleaned_data['subject']:

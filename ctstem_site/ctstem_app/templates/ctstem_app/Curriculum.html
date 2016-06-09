@@ -44,7 +44,7 @@
                   {{field}}
                 </div>
                 <button class="btn btn-info search_taxonomy" name="search_taxonomy" data-form="{% url 'ctstem:searchTaxonomy' %}">
-                  <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                  <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
                 </button>
                 <span class="expand_collapse_other">
                   <button type="button" class="btn btn-warning" name="collapse_standards" aria-label="Collapse Standards" title="Collapse Standards">
@@ -101,6 +101,9 @@
                 <div>
                   {{field}}
                 </div>
+              {% endif %}
+              {% if field.name == 'icon' or field.name == 'subject' %}
+                <div class="help warning">{{field.help_text}}</div>
               {% endif %}
               <div class="error">{{ field.errors }}</div>
             </div>

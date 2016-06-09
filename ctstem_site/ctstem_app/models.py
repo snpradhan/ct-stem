@@ -101,15 +101,15 @@ def upload_file_to(instance, filename):
 
 class Curriculum (models.Model):
   curriculum_type = models.CharField(max_length=1, choices=CURRICULUM_TYPE_CHOICES)
-  title = models.CharField(null=False, max_length=256)
-  time = models.CharField(null=True, max_length=256)
-  level = models.TextField(null=False)
-  purpose = models.TextField(null=False)
+  title = models.CharField(null=False, max_length=256, help_text='Curriculum title')
+  time = models.CharField(null=True, max_length=256, help_text='Estimated time students would spend on this curriculum')
+  level = models.TextField(null=False, help_text="Student level")
+  purpose = models.TextField(null=False, help_text="Purpose of this curriculum")
   overview = models.TextField(null=False)
   content = RichTextUploadingField(null=True, blank=True)
   teacher_notes = RichTextUploadingField(null=True, blank=True)
   status = models.CharField(max_length=1, default='D', choices=CURRICULUM_STATUS_CHOICES)
-  subject = models.ManyToManyField('Subject', null=True, blank=True)
+  subject = models.ManyToManyField('Subject', null=True, blank=True, help_text="Select one or more subjects")
   parent = models.ForeignKey('self', null=True, on_delete=models.SET_NULL)
   version = models.IntegerField(default=1)
   slug = models.SlugField(unique=True, max_length=255)
@@ -117,7 +117,7 @@ class Curriculum (models.Model):
   author = models.ForeignKey(User, null=False, related_name='curriculum_author')
   created_date = models.DateTimeField(auto_now_add=True)
   modified_date = models.DateTimeField(auto_now=True)
-  icon = models.ImageField(upload_to=upload_file_to, blank=True)
+  icon = models.ImageField(upload_to=upload_file_to, blank=True, help_text='Upload 400x289 png image that represents this curriculum')
 
   class Meta:
       ordering = ['-id']
@@ -140,7 +140,7 @@ class Curriculum (models.Model):
 # A curriculum may have one or more step/activity
 class Step(models.Model):
   curriculum = models.ForeignKey(Curriculum, null=False, related_name="steps")
-  title = models.CharField(null=False, blank=False, max_length=256)
+  title = models.CharField(null=False, blank=False, max_length=256, help_text="Step title")
   order = models.IntegerField(null=True)
   content = RichTextUploadingField(null=False)
   teacher_notes = RichTextUploadingField(null=True, blank=True)
