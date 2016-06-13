@@ -30,7 +30,8 @@
       <script type="text/javascript" src="{% url 'admin:jsi18n' %}"></script>
 
       <script type="text/javascript" src="/static/js/ctstem.js"></script>
-
+      <link href="/static/css/default.css" rel="stylesheet">
+      <script src="/static/js/highlight.pack.js"></script>
 
       <link href="/static/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
       <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
@@ -72,6 +73,9 @@
           setInterval(check_session, 60000);
           {% endif %}
 
+          $('pre code').each(function(i, block) {
+            hljs.highlightBlock(block);
+          });
         });
       </script>
     {% endblock %}

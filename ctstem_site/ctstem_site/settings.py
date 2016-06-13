@@ -88,8 +88,9 @@ CKEDITOR_CONFIGS = {
         'width': 975,
         'allowedContent': True,
         'mathJaxLib': '//cdn.mathjax.org/mathjax/2.2-latest/MathJax.js?config=TeX-AMS_HTML',
+        'codeSnippet_theme': 'monokai_sublime',
         'extraPlugins': ','.join(
-            ['mathjax']
+            ['mathjax', 'codesnippet']
         ),
     },
     'question_ckeditor': {

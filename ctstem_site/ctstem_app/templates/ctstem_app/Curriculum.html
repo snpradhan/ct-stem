@@ -331,8 +331,9 @@
               filebrowserUploadUrl: "/ckeditor/upload/",
               filebrowserBrowseUrl: "/ckeditor/browse/",
               skin: "moono",
+              codeSnippet_theme: 'monokai_sublime',
               mathJaxLib: '//cdn.mathjax.org/mathjax/2.2-latest/MathJax.js?config=TeX-AMS_HTML',
-              extraPlugins: 'mathjax',
+              extraPlugins: 'mathjax,codesnippet',
             }
             CKEDITOR.replace($(this).attr('name'), config);
           }
