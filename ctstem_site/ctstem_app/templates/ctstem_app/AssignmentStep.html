@@ -53,6 +53,15 @@
         </div>
         <input type="hidden" name="step_order" value="{{step.order}}"/>
         <hr>
+        {% if instanceform %}
+          <div class="teammates">
+            {{instanceform.management_form}}
+            <label>If you worked in a team, select your teammates from the list below:</label>
+            {{instanceform.teammates}}
+            <div class="warning">{{instanceform.teammates.help_text}}</div>
+          </div>
+           <hr>
+        {% endif %}
         <div class="step_content">
           <div class="step_context">{{form.instance.step.content|safe}}</div>
           <div class="question_container">

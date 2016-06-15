@@ -549,7 +549,24 @@ class AssignmentForm(ModelForm):
 class UploadFileForm(forms.Form):
     uploadFile = forms.FileField()
 
+####################################
+# Instance Form
+####################################
+class AssignmentInstanceForm(ModelForm):
+  class Meta:
+    model = models.AssignmentInstance
+    fields = ['teammates']
 
+  def __init__(self, *args, **kwargs):
+    assignment = kwargs.pop('assignment')
+
+    super(AssignmentInstanceForm, self).__init__(*args, **kwargs)
+    self.fields['teammates'].queryset = assignment.group.members.order_by('user__first_name', 'user__last_name')
+
+    for field_name, field in self.fields.items():
+      field.widget.attrs['class'] = 'form-control'
+      if field.help_text:
+        field.widget.attrs['placeholder'] = field.help_text
 ####################################
 # AssignmentStepResponse Form
 ####################################

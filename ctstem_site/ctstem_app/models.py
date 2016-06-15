@@ -362,7 +362,8 @@ class Membership(models.Model):
 #######################################################
 class AssignmentInstance(models.Model):
   assignment = models.ForeignKey(Assignment)
-  student = models.ForeignKey(Student)
+  student = models.ForeignKey(Student, related_name='instance')
+  teammates = models.ManyToManyField(Student, blank=True, null=True, help_text='Use Cmd+Click to make multiple selection')
   status = models.CharField(max_length=255, choices=ASSIGNMENT_STATUS)
   last_step = models.IntegerField(null=False, blank=False, default=0)
   created_date = models.DateTimeField(auto_now_add=True)

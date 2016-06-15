@@ -1391,6 +1391,8 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
       instance = models.AssignmentInstance(assignment_id=assignment_id, student=request.user.student, status='N')
       step_order = 1
 
+    assignment = models.Assignment.objects.get(id=assignment_id)
+
     if 'GET' == request.method or 'POST' == request.method:
       steps = models.Step.objects.all().filter(curriculum=instance.assignment.curriculum)
       step = steps.get(order=step_order)
@@ -1414,20 +1416,29 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
         questionResponseFormset=inlineformset_factory(models.AssignmentStepResponse, models.QuestionResponse, form=forms.QuestionResponseForm, can_delete=False, extra=extra)
         formset = questionResponseFormset(instance=assignmentStepResponse, prefix='form')
 
+        if int(step_order) == 1 and assignment.curriculum.curriculum_type == 'L':
+          instanceform = forms.AssignmentInstanceForm(assignment=assignment, instance=instance, prefix="teammates")
+        else:
+          instanceform = None
+
         if len(initial_data):
           for subform, data in zip(formset.forms, initial_data):
             subform.initial = data
 
-        context = {'form': form, 'formset': formset, 'total_steps': total_steps}
+        context = {'instanceform': instanceform, 'form': form, 'formset': formset, 'total_steps': total_steps}
         return render(request, 'ctstem_app/AssignmentStep.html', context)
 
       elif 'POST' == request.method:
         data = request.POST.copy()
         #is this a save or a submit
         save_only = int(data['save'])
-        form = forms.AssignmentStepResponseForm(data, instance=assignmentStepResponse, prefix="step_response")
+        form = forms.AssignmentStepResponseForm(data=data, instance=assignmentStepResponse, prefix="step_response")
         questionResponseFormset=inlineformset_factory(models.AssignmentStepResponse, models.QuestionResponse, form=forms.QuestionResponseForm, can_delete=False, extra=0)
         formset = questionResponseFormset(data, request.FILES, instance=assignmentStepResponse, prefix='form')
+        if int(step_order) == 1 and assignment.curriculum.curriculum_type == 'L':
+          instanceform = forms.AssignmentInstanceForm(data=data, assignment=assignment, instance=instance, prefix="teammates")
+        else:
+          instanceform = None
 
         if form.is_valid() and formset.is_valid():
           if save_only == 1 or step.order < total_steps:
@@ -1443,6 +1454,9 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
             instance.last_step = step.order
 
           instance.save()
+          if instanceform and instanceform.is_valid():
+            instanceform.save()
+
           #save assignment step response
           assignmentStepResponse = form.save(commit=False)
           assignmentStepResponse.instance = instance
@@ -1481,7 +1495,7 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
           print formset.errors
           messages.error(request, 'Please answer all the questions on this step before continuing on to the next step')
 
-        context = {'form': form, 'formset': formset, 'total_steps': total_steps}
+        context = {'instanceform': instanceform,  'form': form, 'formset': formset, 'total_steps': total_steps}
         return render(request, 'ctstem_app/AssignmentStep.html', context)
 
     return http.HttpResponseNotAllowed(['GET', 'POST'])
