@@ -166,43 +166,59 @@
         </div>
 
         <div class="row footer">
-          <div class="col-md-6 back">
-            {% if form.instance.step.order > 1 %}
-              <a type="button" class="btn btn-warning" title="Previous Step" href="{% url 'ctstem:resumeAssignment'  form.instance.instance.assignment.id form.instance.instance.id form.instance.step.order|add:'-1' %}">
-                <span class="glyphicon glyphicon-triangle-left" aria-hidden="true"></span> Back
-              </a>
-            {% endif %}
-          </div>
-          <div class="col-md-6 next">
-            {% if form.instance.step.order != total_steps %}
-              {% if form.instance.instance.status == 'S' or form.instance.instance.status == 'F' or form.instance.instance.status == 'A' %}
-                 <a type="button" class="btn btn-info" title="Next Step" href="{% url 'ctstem:resumeAssignment'  form.instance.instance.assignment.id form.instance.instance.id form.instance.step.order|add:'1' %}">
-                  Next <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
+          {% if form.instance.step.curriculum.curriculum_type != 'S' %}
+            <div class="col-md-6 back">
+              {% if form.instance.step.order > 1 %}
+                <a type="button" class="btn btn-warning" title="Previous Step" href="{% url 'ctstem:resumeAssignment'  form.instance.instance.assignment.id form.instance.instance.id form.instance.step.order|add:'-1' %}">
+                  <span class="glyphicon glyphicon-triangle-left" aria-hidden="true"></span> Back
                 </a>
-              {% else %}
-                <button type="button" class="btn btn-info save" title="Save" >
-                  Save
-                </button>
-                <button type="button" class="btn btn-success submit" title="Next Step" >
-                  Save &amp; Continue <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
-                </button>
               {% endif %}
-            {% else %}
+            </div>
+            <div class="col-md-6 next">
+              {% if form.instance.step.order != total_steps %}
+                {% if form.instance.instance.status == 'S' or form.instance.instance.status == 'F' or form.instance.instance.status == 'A' %}
+                   <a type="button" class="btn btn-info" title="Next Step" href="{% url 'ctstem:resumeAssignment'  form.instance.instance.assignment.id form.instance.instance.id form.instance.step.order|add:'1' %}">
+                    Next <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
+                  </a>
+                {% else %}
+                  <button type="button" class="btn btn-info save" title="Save" >
+                    Save
+                  </button>
+                  <button type="button" class="btn btn-success submit" title="Next Step" >
+                    Save &amp; Continue <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
+                  </button>
+                {% endif %}
+              {% else %}
+                {% if form.instance.instance.status == 'S' or form.instance.instance.status == 'F' or form.instance.instance.status == 'A' %}
+                  <a type="button" class="btn btn-danger" title="Next Step" href="{% url 'ctstem:assignments' 'inbox' %}">
+                    Exit
+                  </a>
+                {% else %}
+                  <button type="button" class="btn btn-info save" title="Save" >
+                    Save
+                  </button>
+                  <button type="button" class="btn btn-success submit" title="Submit Assignment">
+                    Submit
+                  </button>
+                {% endif %}
+              {% endif %}
+            </div>
+            <input type="hidden" id="save" name="save" value="0"/>
+          {% else %}
+            <div class="col-md-6 back"></div>
+            <div class="col-md-6 next">
               {% if form.instance.instance.status == 'S' or form.instance.instance.status == 'F' or form.instance.instance.status == 'A' %}
-                <a type="button" class="btn btn-danger" title="Next Step" href="{% url 'ctstem:assignments' 'inbox' %}">
+                <a type="button" class="btn btn-danger" title="Exit" href="{% url 'ctstem:assignments' 'inbox' %}">
                   Exit
                 </a>
               {% else %}
-                <button type="button" class="btn btn-info save" title="Save" >
-                  Save
-                </button>
-                <button type="button" class="btn btn-success submit" title="Submit Assignment">
-                  Submit
+                <button type="button" class="btn btn-success submit" title="Close Survey">
+                  Close Survey
                 </button>
               {% endif %}
-            {% endif %}
-          </div>
-          <input type="hidden" id="save" name="save" value="0"/>
+              <input type="hidden" id="save" name="save" value="0"/>
+            </div>
+          {% endif %}
         </div>
       </div>
     </div>
@@ -237,7 +253,7 @@
 
     //auto submit form every 60 seconds
     $(function(){
-      {% if form.instance.instance.status != 'S' and form.instance.instance.status != 'F' and form.instance.instance.status != 'A' %}
+      {% if form.instance.instance.status != 'S' and form.instance.instance.status != 'F' and form.instance.instance.status != 'A' and form.instance.step.curriculum.curriculum_type != 'S'%}
       setInterval(function(){
         $('input:hidden[id="save"]').val(1);
         $('input:hidden[id*="save"][id*="form"]').val('on');
@@ -272,6 +288,15 @@
       }, 60000)
       {% endif %}
     });
+    $(function(){
+      {% if form.instance.step.curriculum.curriculum_type == 'S' %}
+        var src = $('iframe').attr('src');
+        var student_id = '{{user.student.id}}';
+        src = src.replace('element_1', 'element_1='+student_id)
+        $('iframe').attr('src', src);
+      {% endif %}
+    });
+
   </script>
 
 {% endblock %}

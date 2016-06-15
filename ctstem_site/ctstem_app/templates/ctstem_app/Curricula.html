@@ -11,12 +11,14 @@
 <div class="content">
   <div class="col-lg-12">
     {% if curriculum_type == 'L' %}
-    <h2> Lessons </h2>
-    <p class="page-blurb">
-    Our computational thinking lesson plans are designed to embed authentic CT practices into high school science and mathematics classrooms while enriching disciplinary content learning.
-    </p>
-    {% else %}
+      <h2> Lessons </h2>
+      <p class="page-blurb">
+      Our computational thinking lesson plans are designed to embed authentic CT practices into high school science and mathematics classrooms while enriching disciplinary content learning.
+      </p>
+    {% elif  curriculum_type == 'A' %}
       <h2> Assessments </h2>
+    {% elif  curriculum_type == 'S' %}
+      <h2> Surveys </h2>
     {% endif %}
     {% if user.administrator or user.researcher or user.author %}
       <div class="btn-group">

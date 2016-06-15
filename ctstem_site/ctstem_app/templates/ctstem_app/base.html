@@ -162,6 +162,7 @@
                     <li class="{% navactive request 'ctstem:schools' %}"><a href="{% url 'ctstem:schools' %}">Schools</a></li>
                     {% if user.administrator %}
                       <li class="{% navactive request 'ctstem:teamMembers' %}"><a href="{% url 'ctstem:teamMembers' %}">Team</a></li>
+                       <li class="{% navactive request 'ctstem:curricula' 'surveys' %} "><a href="{% url 'ctstem:curricula' 'surveys' %}">Surveys</a></li>
                     {% endif %}
                   </ul>
                 </li>

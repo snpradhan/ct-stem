@@ -717,7 +717,7 @@ table.table#feedback_header {
 div.form-group {
   overflow: auto;
   margin-bottom: 2.5em;
-  margin-top: 1em;
+  margin-top: 1.5em;
 }
 div.form-group label{
   font-size: 1.6em;

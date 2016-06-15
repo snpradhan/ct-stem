@@ -104,8 +104,10 @@ def team(request):
 def curricula(request, curriculum_type='', bookmark='0'):
   if curriculum_type == 'assessments':
     curr_type = 'A'
-  else:
+  elif curriculum_type == 'lessons':
     curr_type = 'L'
+  else:
+    curr_type = 'S'
 
   bookmarked = None
 
@@ -329,11 +331,12 @@ def copyCurriculum(request, id=''):
           curriculum.subject = original_curriculum.subject.all()
           curriculum.taxonomy = original_curriculum.taxonomy.all()
 
-          filecontent = ContentFile(original_curriculum.icon.file.read())
-          filename = os.path.split(original_curriculum.icon.file.name)[-1]
-          filename_array = filename.split('.')
-          filename = filename_array[0] + '-' + str(curriculum.id) + '.' + filename_array[1]
-          curriculum.icon.save(filename, filecontent)
+          if original_curriculum.icon:
+            filecontent = ContentFile(original_curriculum.icon.file.read())
+            filename = os.path.split(original_curriculum.icon.file.name)[-1]
+            filename_array = filename.split('.')
+            filename = filename_array[0] + '-' + str(curriculum.id) + '.' + filename_array[1]
+            curriculum.icon.save(filename, filecontent)
           curriculum.save()
 
           for attachment in attachments:
@@ -1263,19 +1266,32 @@ def assignments(request, bucket=''):
       archived_list = []
       new_count = 0
       serial = 1
+      percent_complete = 0
       for assignment in assignments:
         try:
           instance = models.AssignmentInstance.objects.get(assignment=assignment, student=student)
+
           if instance.status in ['P', 'S', 'F']:
             total_questions = models.CurriculumQuestion.objects.all().filter(step__curriculum=assignment.curriculum).count()
             attempted_questions = models.QuestionResponse.objects.all().filter(step_response__instance=instance).exclude(response__exact='', responseFile__exact='').count()
+            total_steps = instance.assignment.curriculum.steps.count()
+            last_step = instance.last_step
+
+            print total_questions, attempted_questions, total_steps, last_step
             if instance.status == 'P':
               status = 2
+              if total_questions > 0:
+                percent_complete = float(attempted_questions)/float(total_questions)*100
+              else:
+                percent_complete = float(last_step)/float(total_steps)*100
+              print percent_complete
             elif instance.status == 'S':
               status = 3
+              percent_complete = 100
             else:
               status = 4
-            active_list.append({'serial': serial, 'assignment': assignment, 'instance': instance, 'percent_complete': float(attempted_questions)/float(total_questions)*100, 'status': status, 'modified_date': instance.modified_date})
+              percent_complete = 100
+            active_list.append({'serial': serial, 'assignment': assignment, 'instance': instance, 'percent_complete': percent_complete, 'status': status, 'modified_date': instance.modified_date})
           else:
             archived_list.append({'serial': serial, 'assignment': assignment, 'instance': instance, 'percent_complete': 100, 'status': 5, 'modified_date': instance.modified_date})
         except models.AssignmentInstance.DoesNotExist:

@@ -263,14 +263,33 @@ class CurriculumForm(ModelForm):
     if not valid:
       return valid
 
-    if self.cleaned_data['curriculum_type'] == 'L':
-      if not self.cleaned_data['subject']:
-        self._errors['subject'] = u'Subject is required'
+    if self.cleaned_data['curriculum_type'] == 'L' or self.cleaned_data['curriculum_type'] == 'A':
+      if self.cleaned_data['title'] == '':
+        self._errors['title'] = u'Title is required'
         valid = False
-      if self.cleaned_data['content'] == '':
-        self._errors['content'] = u'Content is required'
+      if self.cleaned_data['time'] == '':
+        self._errors['time'] = u'Time is required'
         valid = False
-      return valid
+      if self.cleaned_data['level'] == '':
+        self._errors['level'] = u'Level is required'
+        valid = False
+      if self.cleaned_data['purpose'] == '':
+        self._errors['purpose'] = u'Purpose is required'
+        valid = False
+      if self.cleaned_data['overview'] == '':
+        self._errors['overview'] = u'Overview is required'
+        valid = False
+      if not self.cleaned_data['taxonomy']:
+          self._errors['taxonomy'] = u'Standards is required'
+          valid = False
+
+      if self.cleaned_data['curriculum_type'] == 'L':
+        if not self.cleaned_data['subject']:
+          self._errors['subject'] = u'Subject is required'
+          valid = False
+        if self.cleaned_data['content'] == '':
+          self._errors['content'] = u'Content is required'
+          valid = False
     return valid
 
 ####################################
@@ -292,6 +311,7 @@ class StepForm(ModelForm):
     for field_name, field in self.fields.items():
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['placeholder'] = field.help_text
+
 
 ####################################
 # Lesson Attachment Form
