@@ -1231,7 +1231,13 @@ def assignmentDashboard(request, id=''):
           instance = instances.get(student=student)
           total_questions = models.CurriculumQuestion.objects.all().filter(step__curriculum=assignment.curriculum).count()
           attempted_questions = models.QuestionResponse.objects.all().filter(step_response__instance=instance).exclude(response__exact='', responseFile__exact='').count()
-          percent_complete =  float(attempted_questions)/float(total_questions)*100
+          total_steps = instance.assignment.curriculum.steps.count()
+          last_step = instance.last_step
+          if total_questions > 0:
+            percent_complete = float(attempted_questions)/float(total_questions)*100
+          else:
+            percent_complete = float(last_step)/float(total_steps)*100
+
         except models.AssignmentInstance.DoesNotExist:
           instance = None
           percent_complete = 0
