@@ -3,50 +3,61 @@
 {% block media %}
   {{ block.super }}
   {{ form.media }}
+  <link rel="stylesheet" href="/static/css/landing.css" />
 {% endblock %}
 
 {% block content %}
   {{block.super}}
   <div class="content" id="home">
+
     <!-- Header -->
     <header>
       <div id="banner-image"></div>
-      <h1>Computational Thinking<br>in Science and Math</h1>
-      <h2>
-        Promoting computational thinking in high school science and mathematics<br>
-        to empower all students to participate in a computational future.
-      </h2>
-<!--
-      <hr>
-      <img src="/static/img/northwestern_university_vertical.png" style="height: 60px; margin: 35px;">
-      <img src="/static/img/NSFLogo.png" style="height: 60px; margin: 35px;">
-      <img src="/static/img/spencer-logo.png" style="height: 60px; margin: 35px;">
--->
+
+      <div class="ctstem-content">
+        <h1>
+          <div style="display: inline-block;">Computational Thinking
+          <div style="display: inline-block;">in Science and Math</div>
+        </h1>
+        <hr>
+        <h2>
+          Promoting computational thinking in high school science and mathematics<br>
+          to empower all students to participate in a computational future.
+        </h2>
+        <img src="/static/img/nu-seal.png" style="height: 54px; margin: 3px 20px;" alt="Northwestern University">
+        <img src="/static/img/NSFLogo.png" style="height: 60px; margin: 0 20px;" alt="National Science Foundation">
+        <img src="/static/img/spencer-logo.png" style="height: 54px; margin: 3px 20px;" alt="Spencer Foundation">
+      </div>
     </header>
 
 
     <!-- ABOUT US -->
-    <section id="services" class="bg-light-gray">
-      <div class="container">
-        <div class="row">
-          <div class="col-lg-12 text-center">
-            <h2 class="section-heading">About Us</h2>
-            <p class="page-blurb">
-            We are a team of scientists and educators at Northwestern University working to design and research computationally enhanced high school science and math curriculum. With support from the National Science Foundation and Spencer Foundation, our goal is to enrich science learning while developing foundational computational literacy skills for all students.
-            </p>
-          </div>
-        </div>
+    <section id="about-us">
+      <div class="ctstem-content">
+        <h1>About Us</h1>
+        <hr>
+        <p style="margin-bottom: 4rem;">
+          We are a team of scientists and educators at Northwestern University working to design and research computationally enhanced high school science and math curriculum. With support from the National Science Foundation and Spencer Foundation, our goal is to enrich science learning while developing foundational computational literacy skills for all students.
+        </p>
+
         <div class="row text-center">
+
+          <!-- LESSONS AND ACTIVITIES -->
           <div class="col-md-4">
-            <a class="page-scroll" href="{% url 'ctstem:curricula' 'lessons' %}">
+            <a href="{% url 'ctstem:curricula' 'lessons' %}">
               <span class="fa-stack fa-4x">
                 <i class="fa fa-circle fa-stack-2x lessons"></i>
                 <i class="fa fa-book fa-stack-1x fa-inverse"></i>
               </span>
             </a>
-            <h4 class="service-heading">Lessons and Activities</h4>
-            <p class="service-blurb">Our computational thinking lessons cover a range of science and math concepts and are designed to be embedded in students' existing coursework.</p>
+            <h4 class="service-heading"><a href="{% url 'ctstem:curricula' 'lessons' %}">Lessons and Activities</a></h4>
+            <p class="service-blurb">
+              Our CT lessons cover a range of science and math concepts and are designed to be embedded in students' existing coursework.
+            </p>
           </div>
+
+
+
           <div class="col-md-4">
             <a class="page-scroll" href="#practices">
               <span class="fa-stack fa-4x">
@@ -54,9 +65,11 @@
                 <i class="fa fa-tags fa-stack-1x fa-inverse"></i>
               </span>
             </a>
-            <h4 class="service-heading">Standards</h4>
-            <p class="service-blurb">We have developed a taxonomy of computational thinking practices in STEM fields to guide the development of our curriculum and assessments.</p>
+            <h4 class="service-heading"><a class="page-scroll" href="#practices">Standards</a></h4>
+            <p class="service-blurb">We have developed a taxonomy of computational thinking practices in STEM fields to structure our curriculum and assessments.</p>
           </div>
+
+
           <div class="col-md-4">
             <a class="page-scroll" href="#assessments">
               <span class="fa-stack fa-4x">
@@ -64,10 +77,12 @@
                 <i class="fa fa-pencil fa-stack-1x fa-inverse"></i>
               </span>
             </a>
-            <h4 class="service-heading">Assessments</h4>
-            <p class="service-blurb">Our computational thinking assessments use realistic STEM scenarios to challenge students and measure their progress in CT.</p>
+            <h4 class="service-heading"><a class="page-scroll" href="#assessments">Assessments</a></h4>
+            <p class="service-blurb">Our CT assessments use realistic STEM scenarios to challenge students and measure their progress.</p>
           </div>
         </div>
+
+
         <div class="row text-center">
           <div class="col-md-4">
             <a class="page-scroll" href="{% url 'ctstem:training' %}">
@@ -76,9 +91,11 @@
                 <i class="fa fa-group fa-stack-1x fa-inverse"></i>
               </span>
             </a>
-            <h4 class="service-heading">Professional Development</h4>
-            <p class="service-blurb">Want to try computational thinking activities in your classroom? Check out our professional development workshops and resources.</p>
+            <h4 class="service-heading"><a class="page-scroll" href="{% url 'ctstem:training' %}">Professional Development</a></h4>
+            <p class="service-blurb">Interested in trying CT activities in your classroom? Check out our professional development workshops and resources.</p>
           </div>
+
+
           <div class="col-md-4">
             <a class="page-scroll" href="{% url 'ctstem:publications' %}">
               <span class="fa-stack fa-4x">
@@ -86,17 +103,18 @@
                 <i class="fa fa-laptop fa-stack-1x fa-inverse"></i>
               </span>
             </a>
-            <h4 class="service-heading">Research</h4>
-            <p class="service-blurb">We are conducting ongoing research on the design and implementation of
-              computational thinking activities in science and mathematics classrooms.</p>
+            <h4 class="service-heading"><a class="page-scroll" href="{% url 'ctstem:publications' %}">Research</a></h4>
+            <p class="service-blurb">Our ongoing research considers the design and implementation of
+              CT activities in science and math classrooms.</p>
           </div>
+
           <div class="col-md-4">
             <span class="fa-stack fa-4x">
               <i class="fa fa-circle fa-stack-2x tools"></i>
               <i class="fa fa-wrench fa-stack-1x fa-inverse"></i>
             </span>
             <h4 class="service-heading">Administrator Tools</h4>
-            <p class="service-blurb">Check out our new web based tools for teachers, admins, and researchers. </p>
+            <p class="service-blurb">Check out our new web based tools for students, teachers, admins, and researchers. </p>
           </div>
         </div>
       </div>
