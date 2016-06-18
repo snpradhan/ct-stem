@@ -736,39 +736,6 @@ div.content {
   overflow-y: auto;
 }
 
-#home header {
-  color: #333;
-  margin-top: 65px;
-}
-
-#home header #banner-image {
-  background-image:url(/static/img/landing2.png);
-  background-repeat: repeat-x;
-  background-position: top center;
-  width: 100%;
-  height: 250px;
-  display: block;
-}
-
-#home header h1 {
-  padding: 4rem 0 0 0;
-  line-height: 130%;
-}
-
-#home header h2 {
-  padding-top: 2rem;
-  padding-bottom: 5rem;
-  font-weight: 300;
-  font-size: 1.3em;
-  line-height: 160%;
-  text-transform: none;
-}
-
-#home header hr {
-  width: 35em;
-  border-top: 1px solid #999;
-}
-
 div.content section {
   padding: 80px 0px;
 }
@@ -811,25 +778,25 @@ div.content section.portfolio.bg-light-gray .portfolio-item .portfolio-caption {
   background-color: #fff;
 }
 
-div.content#home section#services i.lessons {
+div.content#home section#about-us i.lessons {
   color: #FED136;
 }
-div.content#home section#services i.standards {
+div.content#home section#about-us i.standards {
   color: #E7513A;
 }
-div.content#home section#services i.assessments {
+div.content#home section#about-us i.assessments {
   color: #8C36FE;
 }
-div.content#home section#services i.training {
+div.content#home section#about-us i.training {
   color: #26D4E7;
 }
-div.content#home section#services i.research {
+div.content#home section#about-us i.research {
   color: #7BFF29;
 }
-div.content#home section#services i.tools {
+div.content#home section#about-us i.tools {
   color: #444;
 }
-div.content#home section#services p.text-muted {
+div.content#home section#about-us p.text-muted {
   text-align: left !important;
 }
 
