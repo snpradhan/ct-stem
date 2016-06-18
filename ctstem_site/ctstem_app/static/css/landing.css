@@ -1,0 +1,94 @@
+/*
+ * Special styles for the landing page
+ */
+#home header {
+  color: #333;
+  margin: 65px 0;
+}
+
+#home header #banner-image {
+  background-image:url(/static/img/landing2.png);
+  background-repeat: repeat-x;
+  background-position: top center;
+  width: 100%;
+  height: 250px;
+  display: block;
+}
+
+h1 { 
+  font-size: 3rem; 
+  line-height: 130%;
+  margin: 3rem 0;
+  padding: 0;
+  /* color: #015796; */ /* BLUE */
+  /* color: #FED136; */ /* YELLOW */
+  /* color: #E7513A; */ /* ORANGE */
+  /* color: #8C36FE; */ /* PURPLE */
+}
+
+#home header h1 {
+  margin-top: 6rem;
+}
+
+#home header h2 {
+  padding-top: 1.5rem;
+  padding-bottom: 2rem;
+  font-weight: 300;
+  font-size: 1.7rem;
+  line-height: 160%;
+  text-transform: none;
+}
+
+#home hr {
+  width: 35em;
+  border-top: 1px solid #999;
+}
+
+#home header hr {
+  border-top: 1px solid white;
+}
+
+#about-us {
+  background-color: #eaeaea;
+  width: 100%;
+  margin: 0;
+  padding: 3rem 0;
+}
+
+.ctstem-content {
+  height: auto;
+  margin: 0 auto;
+  min-width: 650px;
+  width: 75%;
+  color: #555;
+}
+
+.ctstem-content p {
+  font-family: Montserrat, "Helvetica Neue", Helvetica, Arial, sans-serif;  
+  font-size: 1.7rem;
+  font-weight: 300;
+  line-height: 160%;
+  text-align: justify;
+  padding: 0;
+  margin: 1rem;
+}
+
+p.service-blurb {
+  font-size: 1.4rem;
+}
+
+div.content#home section#about-us i.fa-circle {
+  color: rgb(51, 122, 183);
+}
+
+h4.service-heading {
+  font-size: 2rem;
+}
+
+h4.service-heading a {
+  text-decoration: none;
+}
+
+h4.service-heading a:hover {
+  color: #FED136;
+}
