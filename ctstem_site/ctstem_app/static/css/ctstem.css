@@ -224,8 +224,10 @@ div.table#register, div.table#userProfile, div.table#password {
 }
 div.table#curriculum, div.table.step,
 div.table#curriculumQuestions, div.table.activity, div.table#metadata, div.table#group, div.table#standard {
-  width: 70%;
+  width: 80%;
   padding: 3em 4em;
+  margin-top: 3em;
+  margin-bottom: 3em;
 }
 div.table.step, div.table.activity, div.table.ngss, div.table.taxonomy, div.table#curriculumQuestions {
   margin-top: 1em;
@@ -908,7 +910,7 @@ a.btn.pdf img {
 div.button-group-fixed {
   position: fixed;
   top: 35%;
-  left: 85%;
+  left: 90%;
 }
 
 .form-inline > * {
