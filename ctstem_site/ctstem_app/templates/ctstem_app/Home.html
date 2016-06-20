@@ -156,7 +156,7 @@
         <div class="row">
           {% for assessment in assessments %}
           <div class="col-md-3 col-sm-6 portfolio-item">
-            <a data-form="{% url 'ctstem:previewCurriculum' assessment.id %}" class="portfolio-link preview" data-toggle="modal">
+            <a href="{% url 'ctstem:previewCurriculum' assessment.id %}" class="portfolio-link" target="_blank">
               <div class="portfolio-hover">
                 <div class="portfolio-hover-content">
                   <i class="fa fa-plus fa-3x"></i>

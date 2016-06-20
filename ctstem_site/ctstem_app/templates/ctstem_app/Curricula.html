@@ -68,7 +68,10 @@
                 <tr>
                   <td class="title">{{curriculum.title}} - v{{curriculum.version}}.
                     <div class="controls">
-                      <a type="button" class="btn btn-warning preview" aria-label="Preview Curriculum" title="Preview Curriculum" data-form="{% url 'ctstem:previewCurriculum' curriculum.id %}" data-toggle="modal">
+                      <!--a type="button" class="btn btn-warning preview" aria-label="Preview Curriculum" title="Preview Curriculum" data-form="{% url 'ctstem:previewCurriculum' curriculum.id %}" data-toggle="modal">
+                        <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
+                      </a-->
+                      <a type="button" class="btn btn-warning" title="Preview Curriculum" href="{% url 'ctstem:previewCurriculum' curriculum.id %}" target="_blank">
                         <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
                       </a>
                       {% if curriculum.curriculum_type == 'L' %}
@@ -150,7 +153,7 @@
             <div class="row">
               {% for curriculum in curricula %}
               <div class="col-md-3 col-sm-6 portfolio-item">
-                <a data-form="{% url 'ctstem:previewCurriculum' curriculum.id %}" class="portfolio-link preview" data-toggle="modal">
+                <a href="{% url 'ctstem:previewCurriculum' curriculum.id %}" class="portfolio-link" target="_blank">
                   <div class="portfolio-hover">
                     <div class="portfolio-hover-content">
                       <i class="fa fa-plus fa-3x"></i>

@@ -227,14 +227,19 @@ div.table#curriculumQuestions, div.table.activity, div.table#metadata, div.table
   width: 70%;
   padding: 3em 4em;
 }
-div.table.step, div.table.activity, div.table.ngss, div.table.taxonomy, div.table#curriculumQuestions, div.table#curriculumPreview, div.table.stepPreview {
+div.table.step, div.table.activity, div.table.ngss, div.table.taxonomy, div.table#curriculumQuestions {
   margin-top: 1em;
 }
-div.table#curriculumPreview, div.table.stepPreview{
-  width: 90%;
+div.table#curriculumPreview, div.table.stepPreview, div.table#assignment{
+  width: 80%;
   text-align: left !important;
-  padding: 2em 4em;
+  padding: 3em 4em;
+  margin-top: 2em;
+  margin-bottom: 2em;
+  background-color: #eee;
+  font-size: 1.6em;
 }
+
 div.table.feedback {
   width: 85%;
   margin-left: 0;
@@ -285,9 +290,7 @@ div.table.activity .question_table {
 div.table#curriculumPreview .meta {
   margin-bottom: 1em;
 }
-div.table#curriculumPreview, div.table.stepPreview {
-  background-color: #eee;
-}
+
 div.question_table {
   margin-bottom: 1em;
 }
@@ -322,12 +325,6 @@ div.table#curriculumPreview, div.table#curriculumQuestions, div.table#curriculum
 
 div.table#curriculumPreview div.curriculum-row, div.table#curriculumQuestions div.question-row{
   margin-bottom: 2em;
-}
-
-div.table#assignment {
-  padding: 3em 4em;
-  background-color: #eee;
-  font-size: 1.5em;
 }
 
 div.table#assignment ul.progress-indicator > li.active{

@@ -362,42 +362,42 @@
     {% endblock %}
   </body>
 
-  <footer>
-    {% block footer %}
-    <div class="container">
-      <div class="footer_content">
-        All content and material (including lessons and assessments) copyright © 2016 CT-STEM Project. To inquire about using our material in your school or as part of research, please contact ct-stem@ccl.northwestern.edu.
+  {% block footer %}
+    <footer>
+      <div class="container">
+        <div class="footer_content">
+          All content and material (including lessons and assessments) copyright © 2016 CT-STEM Project. To inquire about using our material in your school or as part of research, please contact ct-stem@ccl.northwestern.edu.
+        </div>
+        <div class="footer_content">
+          This work was made possible through generous support from the National Science Foundation (grants CNS-1138461 and CNS 1441041) and the Spencer Foundation (Award #201600069). Any opinions, findings, or recommendations expressed in this material are those of the author(s) and do not necessarily reflect the views of the funding organizations.
+        </div>
+        <div class="row footer_content">
+          <div class="col-md-3">
+            <b>Contact Us: </b><br>
+            CT-STEM Project Investigators <br>
+            Northwestern University<br>
+            2120 Campus Drive<br>
+            Evanston, Illinois 60208<br><br>
+
+            ct-stem@ccl.northwestern.edu<br>
+            http://ct-stem.northwestern.edu<br>
+          </div>
+
+          <div class="col-md-3">
+            <img src="/static/img/nu-logo.png" class="img-responsive img-centered" style="opacity: 0;" alt="">
+          </div>
+
+          <div class="col-md-3">
+            <img src="/static/img/NSFLogo.png" class="img-responsive img-centered" alt="">
+          </div>
+
+          <div class="col-md-3">
+             <img src="/static/img/nu-logo.png" class="img-responsive img-centered" alt="">
+          </div>
+        </div>
       </div>
-      <div class="footer_content">
-        This work was made possible through generous support from the National Science Foundation (grants CNS-1138461 and CNS 1441041) and the Spencer Foundation (Award #201600069). Any opinions, findings, or recommendations expressed in this material are those of the author(s) and do not necessarily reflect the views of the funding organizations.
-      </div>
-      <div class="row footer_content">
-        <div class="col-md-3">
-          <b>Contact Us: </b><br>
-          CT-STEM Project Investigators <br>
-          Northwestern University<br>
-          2120 Campus Drive<br>
-          Evanston, Illinois 60208<br><br>
-
-          ct-stem@ccl.northwestern.edu<br>
-          http://ct-stem.northwestern.edu<br>
-        </div>
-
-        <div class="col-md-3">
-          <img src="/static/img/nu-logo.png" class="img-responsive img-centered" style="opacity: 0;" alt="">
-        </div>
-
-        <div class="col-md-3">
-          <img src="/static/img/NSFLogo.png" class="img-responsive img-centered" alt="">
-        </div>
-
-        <div class="col-md-3">
-           <img src="/static/img/nu-logo.png" class="img-responsive img-centered" alt="">
-        </div>
-      </div>
-    </div>
-    {% endblock %}
-  </footer>
+    </footer>
+  {% endblock %}
 
 
 </html>

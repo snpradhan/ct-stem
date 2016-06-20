@@ -30,7 +30,7 @@
         <div class="row">
           {% for assignment_details in assignment_list %}
           <div class="col-md-4 col-sm-6 portfolio-item ">
-            <a data-form="{% url 'ctstem:previewCurriculum' assignment_details.assignment.curriculum.id %}" class="portfolio-link preview" data-toggle="modal">
+            <a href="{% url 'ctstem:previewCurriculum' assignment_details.assignment.curriculum.id %}" class="portfolio-link" target="_blank">
               <div class="portfolio-hover">
                 <div class="portfolio-hover-content">
                   <i class="fa fa-plus fa-3x"></i>
