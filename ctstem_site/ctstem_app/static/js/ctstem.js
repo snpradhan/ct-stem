@@ -121,13 +121,17 @@ $(function (){
 
 
   //datatables configuration
-  $('table.table.dt thead tr#filterrow th').each( function () {
+  $('table.table.dt thead tr#filterrow th:not(.no-sort)').each( function () {
         var title = $(this).text();
         $(this).html( '<input type="text" placeholder="Search '+title+'" />' );
     } );
 
   var table = $('table.table.dt').DataTable({
-    orderCellsTop: true
+    order: [],
+    orderCellsTop: true,
+    columnDefs: [
+      { targets: 'no-sort', orderable: false }
+    ]
   });
 
   // Apply the filter

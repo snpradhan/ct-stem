@@ -179,6 +179,10 @@ img.icon {
   width: 20px;
   height: 20px;
 }
+img.big_icon {
+  width: 200px;
+  height: auto;
+}
 img.profile {
   width: 150px;
   height: 200px;
@@ -557,8 +561,24 @@ div.standards img.icon {
 table.table#assignments img.icon {
   width: 50%;
 }
+table.table#curricula td {
+  padding: 1em;
+}
+table.table#curricula td.icon,  table.table#curricula td.action{
+  text-align: center;
+}
+table.table#curricula td.action a {
+  margin: 0.25em;
+  display: inline-block;
+}
+table.table#curricula td.information div.row {
+  margin-bottom: 0.5em;
+}
+table.table#curricula td.information div.title {
+  font-weight: bold;
+}
 
-table.table#curricula img.icon, table.table#team img.icon {
+table.table#team img.icon {
   max-width: 100px;
   height: auto;
 }
@@ -573,6 +593,9 @@ div.content #curricula_tile span.status span.icon {
 }
 div.content #curricula_tile span.status span.icon.bookmarked {
   color: #fed136;
+}
+div.content #curricula_tile div.portfolio-caption h5 {
+  margin-bottom: 1.5em;
 }
 /***********   CONTENT DIV END   ************/
 
