@@ -1,0 +1,147 @@
+{% extends "ctstem_app/base.html" %}
+
+{% block media %}
+  {{ block.super }}
+  {{ form.media }}
+  <link rel="stylesheet" href="/static/css/landing.css" />
+{% endblock %}
+
+{% block content %}
+  {{block.super}}
+
+  <div class="content" id="home">
+
+    <!-- landing banner image -->
+    <img src="/static/img/landing2.png" style="width: 100%; margin-top: 60px;">
+
+
+    <!-- Header -->
+    <header>
+
+      <div class="ctstem-content">
+        <h1>
+          <div style="display: inline-block;">Computational Thinking
+          <div style="display: inline-block;">in Science and Math</div>
+        </h1>
+        <div class="tagline">
+          Promoting computational thinking in high school science and math<br>
+          to empower all students to participate in a computational future.
+        </div>
+
+        <!-- INSTITUTION LOGOS -->
+        <img src="/static/img/nu-seal.png" class="institution" alt="Northwestern University">
+        <img src="/static/img/NSFLogo.png" class="institution" alt="National Science Foundation">
+        <img src="/static/img/spencer-logo.png" class="institution" alt="Spencer Foundation">
+
+
+        <p>
+          We are a team of scientists and educators at Northwestern University working to design and research computationally enhanced high school science and math curriculum. With support from the National Science Foundation and Spencer Foundation, our goal is to enrich science learning while developing foundational computational literacy skills for all students.
+        </p>
+      </div>
+    </header>
+
+
+
+    <img src="/static/img/classroom.png" style="width: 100%;">
+
+
+
+    <!-- OFFERINGS -->
+    <section id="offerings">
+      <div class="ctstem-content">
+
+        <h2>What We Offer</h2>
+        <hr>
+        <div>
+
+          <div class="offering">
+            <h3><a href="{% url 'ctstem:curricula' 'lessons' %}">Lessons and Activities</a></h3>
+            <p>Our CT lessons cover a range of science and math concepts and are designed to be embedded in existing coursework.</p>
+          </div>
+
+
+          <div class="offering">
+            <h3><a class="page-scroll" href="#practices">Standards</a></h3>
+            <p>We have developed a taxonomy of CT practices in STEM fields to structure our curriculum and assessments.</p>
+          </div>
+
+        </div>
+
+        <div>
+
+          <div class="offering">
+            <h3><a class="page-scroll" href="#assessments">Assessments</a></h3>
+            <p>Our CT assessments use realistic STEM scenarios to challenge students and measure their progress.</p>
+          </div>
+
+          <div class="offering">
+            <h3><a class="page-scroll" href="{% url 'ctstem:training' %}">Professional Development</a></h3>
+            <p>Interested in trying CT activities in your classroom? Check out our professional development workshops and resources.</p>
+          </div>
+        </div>
+
+        <div>
+
+          <div class="offering">
+            <h3><a class="page-scroll" href="{% url 'ctstem:publications' %}">Research</a></h3>
+            <p>Our ongoing research explores the design and impact of CT activities in science and math classrooms.</p>
+          </div>
+
+          <div class="offering">
+            <h3>Administrator Tools</h3>
+            <p>Check out our new web based tools for students, teachers, admins, and researchers. </p>
+          </div>
+      </div>
+    </section>
+
+
+
+    <img src="/static/img/calculator-takeapart.png" style="width: 100%;">
+
+
+    <!-- CT Taxonomy Section -->
+    <section id="practices">
+      <div class="ctstem-content">
+
+        <h2>What do we mean by Computational Thinking?</h2>
+        <hr>
+
+        <p>
+          Modern scientists, engineers, and mathematicians use an array of computational tools and practices in their everyday work. It is increasingly important for high school students not just to know how to use computers but to be computationally <i>literate</i>. To help guide the creation of CT activities, lessons, and assessments, we have developed a taxonomy of relevant computational practices organized into four strands.
+        </p>
+  
+        {% for practice in practices %}
+        <div class="practice">
+          {% if practice.icon %}
+          <img src="{{practice.icon.url}}" style="width: 130px; height: 130px; float: right; margin: 2rem 0 1rem 1rem;">
+          {% endif %}
+          <h3>{{practice.name}}</h3>
+          <p>{{practice.description}}</p>
+        </div>
+        {% endfor %}
+
+        <div class="explore_more" style="margin-top: 35px;">
+          <a href="/static/doc/weintrop-jost-2015.pdf" target="_blank" class="btn btn-xl">Read More</a>
+        </div>
+
+      </div>
+    </section>
+
+
+
+    <img src="/static/img/papercode.png" style="width: 100%;">
+
+  </div>
+
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js"></script>
+  <script src="/static/js/classie.js"></script>
+  <script src="/static/js/cbpAnimatedHeader.js"></script>
+
+  <!-- Contact Form JavaScript -->
+  <script src="/static/js/jqBootstrapValidation.js"></script>
+  <!--script src="/static/js/contact_me.js"></script-->
+
+  <!-- Custom Theme JavaScript -->
+  <script src="/static/js/agency.js"></script>
+
+{% endblock %}
