@@ -1,94 +1,133 @@
 /*
  * Special styles for the landing page
  */
-#home header {
-  color: #333;
-  margin: 65px 0;
+* {
 }
 
-#home header #banner-image {
-  background-image:url(/static/img/landing2.png);
-  background-repeat: repeat-x;
-  background-position: top center;
-  width: 100%;
-  height: 250px;
-  display: block;
+header {
+  margin: 10rem 0;
 }
+
+
+h1, h2, h3 { color: black; }
+
 
 h1 { 
   font-size: 3rem; 
   line-height: 130%;
   margin: 3rem 0;
   padding: 0;
-  /* color: #015796; */ /* BLUE */
-  /* color: #FED136; */ /* YELLOW */
-  /* color: #E7513A; */ /* ORANGE */
-  /* color: #8C36FE; */ /* PURPLE */
 }
 
-#home header h1 {
-  margin-top: 6rem;
+
+h2 {
+  font-size: 2.6rem;
+  line-height: 130%;
+  margin: 3rem 0 1rem 0;
+  padding: 0;
 }
 
-#home header h2 {
-  padding-top: 1.5rem;
-  padding-bottom: 2rem;
-  font-weight: 300;
+
+h3 {
+  font-size: 2rem;
+  line-height: 130%;
+  text-transform: none;
+  text-align: left;
+  margin-top: 2rem;
+}
+
+
+a:hover {
+  text-decoration: none;
+}
+
+
+.tagline {
+  font-family: Montserrat, "Helvetica Neue", Helvetica, Arial, sans-serif;  
+  padding: 2rem;
   font-size: 1.7rem;
   line-height: 160%;
   text-transform: none;
+  color: black;
 }
 
-#home hr {
+
+img.institution {
+  height: 65px; 
+  margin: 20px 40px 40px 40px;
+}
+
+
+hr {
   width: 35em;
   border-top: 1px solid #999;
 }
 
-#home header hr {
-  border-top: 1px solid white;
-}
-
-#about-us {
-  background-color: #eaeaea;
-  width: 100%;
-  margin: 0;
-  padding: 3rem 0;
-}
 
 .ctstem-content {
   height: auto;
   margin: 0 auto;
   min-width: 650px;
   width: 75%;
-  color: #555;
+  color: black;
 }
 
+
 .ctstem-content p {
-  font-family: Montserrat, "Helvetica Neue", Helvetica, Arial, sans-serif;  
-  font-size: 1.7rem;
+  font-size: 1.8rem;
   font-weight: 300;
-  line-height: 160%;
+  line-height: 150%;
   text-align: justify;
-  padding: 0;
   margin: 1rem;
 }
 
-p.service-blurb {
-  font-size: 1.4rem;
+
+#offerings {
+  margin: 10rem 0;
+  padding: 0;
 }
 
-div.content#home section#about-us i.fa-circle {
-  color: rgb(51, 122, 183);
+
+.offering {
+  display: inline-block;
+  vertical-align: top;
+  width: 49%;
+  padding: 20px;
+  margin: 0;
+  text-align: left;
 }
 
-h4.service-heading {
-  font-size: 2rem;
+
+.offering p {
+  font-size: 1.5rem;
+  text-align: left;
+  margin: 0;
 }
 
-h4.service-heading a {
-  text-decoration: none;
+
+#practices {
+  margin: 10rem 0;
+  padding: 0;
 }
 
-h4.service-heading a:hover {
-  color: #FED136;
+
+.practice {
+  margin: 4rem 0 0 1rem;
+  display: block;
 }
+
+
+.practice p {
+  font-size: 1.5rem;
+  margin: 0;
+  width: 75%;
+}
+
+
+footer .footer_content {
+  color: white;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;  
+}
+
+
+
