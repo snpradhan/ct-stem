@@ -12,8 +12,8 @@ header {
 h1, h2, h3 { color: black; }
 
 
-h1 { 
-  font-size: 3rem; 
+h1 {
+  font-size: 3rem;
   line-height: 130%;
   margin: 3rem 0;
   padding: 0;
@@ -43,7 +43,7 @@ a:hover {
 
 
 .tagline {
-  font-family: Montserrat, "Helvetica Neue", Helvetica, Arial, sans-serif;  
+  font-family: Montserrat, "Helvetica Neue", Helvetica, Arial, sans-serif;
   padding: 2rem;
   font-size: 1.7rem;
   line-height: 160%;
@@ -53,7 +53,7 @@ a:hover {
 
 
 img.institution {
-  height: 65px; 
+  height: 65px;
   margin: 20px 40px 40px 40px;
 }
 
@@ -133,16 +133,3 @@ img.section-splash {
 #assessments {
   margin: 0 0 5rem 0;
 }
-
-footer {
-  padding-top: 4rem;
-}
-
-
-footer .footer_content {
-  color: white;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;  
-}
-
-
-
