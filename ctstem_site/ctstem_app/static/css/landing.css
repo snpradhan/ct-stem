@@ -123,6 +123,10 @@ hr {
   width: 75%;
 }
 
+footer {
+  padding-top: 4rem;
+}
+
 
 footer .footer_content {
   color: white;
