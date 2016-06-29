@@ -92,13 +92,14 @@
     </section>
 
 
-    <img src="/static/img/classroom.png" style="width: 100%;">
-
-    <!-- img src="/static/img/calculator-takeapart.png" style="width: 100%;" -->
 
 
     <!-- CT Taxonomy Section -->
     <section id="practices">
+
+      <img src="/static/img/classroom.png" class="section-splash">
+
+
       <div class="ctstem-content">
 
         <h2>What do we mean by Computational Thinking?</h2>
@@ -126,6 +127,49 @@
     </section>
 
 
+
+    <!-- ASSESSMENTS -->
+    <section id="assessments">
+
+      <img src="/static/img/calculator-takeapart.png" class="section-splash">
+
+      <div class="ctstem-content">
+
+        <h2>Computational Thinking Assessments</h2>
+        <hr>
+
+        <p>Our computational thinking assessments use realistic STEM scenarios to challenge students and measure their progress. We have designed assessments to cover all four strands of our computational thinking taxonomy. All of these are available through an online <a href="http://ct-stem-assess.herokuapp.com" target="_blank">assessment portal</a>.</p>
+
+        {% comment %}
+        <div class="row">
+          {% for assessment in assessments %}
+          <div class="col-md-3 col-sm-6 portfolio-item">
+            <a href="{% url 'ctstem:previewCurriculum' assessment.id %}" class="portfolio-link" target="_blank">
+              <div class="portfolio-hover">
+                <div class="portfolio-hover-content">
+                  <i class="fa fa-plus fa-3x"></i>
+                </div>
+              </div>
+              {% if assessment.icon %}
+                <img src="{{assessment.icon.url}}" class="img-responsive" alt="">
+              {% else %}
+                <img src="/static/img/assessment.png" class="img-responsive" alt="">
+              {% endif %}
+            </a>
+            <div class="portfolio-caption">
+              <h5>{{assessment.title}}</h5>
+              <p class="text-muted">{{assessment.overview|truncatechars:50 }}</p>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% endcomment %}
+        <div class="explore_more" style="margin-top: 6rem;">
+          <!--a href="{% url 'ctstem:curricula' 'assessments' %}" class="page-scroll btn btn-xl">Explore More</a-->
+          <a href="http://ct-stem-assess.herokuapp.com/" target="_blank" class="page-scroll btn btn-xl">Explore More</a>
+        </div>
+      </div>
+    </section>
 
     <img src="/static/img/papercode.png" style="width: 100%;">
 
