@@ -14,6 +14,7 @@ urlpatterns = [
     url(r'^curriculum/preview/(?P<id>[\d]+)/$', views.previewCurriculum, name='previewCurriculum'),
     url(r'^curriculum/pdf/(?P<id>[\d]+)/$', views.pdfCurriculum, name='pdfCurriculum'),
     url(r'^curriculum/copy/(?P<id>[\d]+)/$', views.copyCurriculum, name='copyCurriculum'),
+    url(r'^curriculum/assignment/(?P<id>[\d]+)/$', views.assignCurriculum, name='assignCurriculum'),
     url(r'^publication/(?P<slug>[\w-]+)/$', views.publication, name='publication'),
     url(r'^publication/delete/(?P<slug>[\w-]+)/$', views.deletePublication, name='deletePublication'),
     url(r'^publication/new/$', views.publication, name='newPublication'),

@@ -25,7 +25,7 @@
       {% if user.administrator or user.researcher or user.author %}
         <a type="button" class="btn btn-success" href="{% url 'ctstem:newCurriculum' %}" title="Create new curriculum">Create Curriculum</a>
       {% endif %}
-      {% if user.administrator or user.researcher or user.author or user.teacher %}
+      {% if user.administrator or user.researcher or user.author or user.teacher or user.school_administrator %}
         <label class="switch">
           <input class="switch-input" type="checkbox" />
           <span class="switch-label" data-on="Table" data-off="Tile"></span>
@@ -46,7 +46,7 @@
       </ul>
     {% endif %}
     {% if curricula %}
-      {% if user.administrator or user.researcher or user.author or user.teacher %}
+      {% if user.administrator or user.researcher or user.author or user.teacher or user.school_administrator %}
         <div id="curricula_table">
           <table class="table table-striped dt" id="curricula">
             <thead>
@@ -152,9 +152,9 @@
                           Copy <span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span>
                         </a>
                       {% endif %}
-                      {% if user.administrator or user.researcher or user.teacher %}
+                      {% if user.administrator or user.researcher or user.teacher or user.school_administrator %}
                         {% if curriculum.status == 'A' or curriculum.status == 'P'%}
-                          <a type="button" class="btn btn-sm btn-default assign" aria-label="Assign" title="Assign" href="#">
+                        <a type="button" class="btn btn-success btn-sm assign" name="assign" data-form="{% url 'ctstem:assignCurriculum' curriculum.id%}" aria-label="Assign Curriculum" title="Assign Curriculum">
                           Assign <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
                         </a>
                         {% endif %}
@@ -232,11 +232,11 @@
                         <span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span>
                       </a>
                     {% endif %}
-                    {% if user.administrator or user.researcher or user.teacher %}
+                    {% if user.administrator or user.researcher or user.teacher or user.school_administrator %}
                       {% if curriculum.status == 'A' or curriculum.status == 'P'%}
-                        <a type="button" class="btn btn-default btn-sm assign" aria-label="Assign" title="Assign" href="#">
-                        <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
-                      </a>
+                        <a type="button" class="btn btn-success btn-sm assign" name="assign" data-form="{% url 'ctstem:assignCurriculum' curriculum.id%}" aria-label="Assign Curriculum" title="Assign Curriculum">
+                          <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+                        </a>
                       {% endif %}
                     {% endif %}
                   </div>
@@ -254,10 +254,12 @@
       <p>No curriculums have been published.</p>
     {% endif %}
   </div>
+
+  <div class="modal fade" id="assignmentModal" role="dialog"></div>
 </div>
   <script type="text/javascript">
     $(document).ready(function(){
-      {% if user.administrator or user.researcher or user.author or user.teacher %}
+      {% if user.administrator or user.researcher or user.author or user.teacher or user.school_administrator %}
         $("div#curricula_table").show();
         $("div#curricula_tile").hide();
       {% endif %}
@@ -266,6 +268,18 @@
         $("div#curricula_table").toggle();
         $("div#curricula_tile").toggle();
       });
+
+      $("a.assign").click(function(e){
+        e.preventDefault();
+        var url = $(this).data("form");
+          $("#assignmentModal").load(url, function() {
+          $(this).modal('show');
+        });
+
+        return false;
+      });
+
+
     });
   </script>
 

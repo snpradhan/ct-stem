@@ -544,6 +544,30 @@ class AssignmentForm(ModelForm):
       return self.instance.assigned_date
 
 ####################################
+# Curriculum Assignment Form
+####################################
+class CurriculumAssignmentForm(ModelForm):
+  due_date = forms.DateField(widget=forms.DateInput(format='%b %d, %Y'), input_formats=['%b %d, %Y'])
+
+  class Meta:
+    model = models.Assignment
+    exclude = ('curriculum', )
+
+  def __init__(self, *args, **kwargs):
+    super(CurriculumAssignmentForm, self).__init__(*args, **kwargs)
+
+    for field_name, field in self.fields.items():
+      if field_name == 'due_date':
+        field.widget.attrs['class'] = 'form-control datepicker'
+      else:
+        field.widget.attrs['class'] = 'form-control'
+      field.widget.attrs['placeholder'] = field.help_text
+
+  def get_assigned_date(self):
+    if self.instance.id:
+      return self.instance.assigned_date
+
+####################################
 # CSV Upload Form
 ####################################
 class UploadFileForm(forms.Form):

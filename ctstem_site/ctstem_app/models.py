@@ -340,7 +340,7 @@ class UserGroup(models.Model):
 # Assignment model
 #######################################################
 class Assignment(models.Model):
-  curriculum = models.ForeignKey(Curriculum)
+  curriculum = models.ForeignKey(Curriculum, related_name="assignments")
   group = models.ForeignKey(UserGroup, related_name="assignments")
   assigned_date = models.DateTimeField(auto_now_add=True)
   due_date = models.DateTimeField(null=False, blank=False)

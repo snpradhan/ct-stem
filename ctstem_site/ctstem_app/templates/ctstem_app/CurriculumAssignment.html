@@ -1,0 +1,146 @@
+{% load ctstem_extras %}
+
+<div class="modal-dialog modal-lg">
+  <div class="modal-content">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal">&times;</button>
+      <h3 class="modal-title">Assign to Class</h3>
+    </div>
+    <div id="assignmentMsg">
+    </div>
+    <form class="form" id="curriculumAssignmentForm" method="post" action="{% url 'ctstem:assignCurriculum' curriculum.id%}">
+      {% csrf_token %}
+      <div class="modal-body">
+        <table class="table table-condensed table-bordered table-striped inner_table">
+         <thead>
+            <tr>
+              <th>Select</th>
+              <th>Group</th>
+              {% if user.administrator or user.researcher %}
+                <th>School</th>
+              {% endif %}
+              {% if user.administrator or user.researcher or user.school_administrator %}
+                <th>Teacher</th>
+              {% endif %}
+              <th class="date">Assigned Date</th>
+              <th class="date">Due Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for group in groups %}
+            <tr>
+              <td style="text-align:center;">
+                {% if instances|get_item:group.id == 0 %}
+                  <input type="checkbox" id="assign_{{group.id}}" name="assign_{{group.id}}" class="assign"/>
+                {% else %}
+                  <input type="checkbox" id="assign_{{group.id}}" name="assign_{{group.id}}" class="assign inwork"/>
+                {% endif %}
+              </td>
+              <td>{{group}}</td>
+              {% if user.administrator or user.researcher %}
+                <td>{{group.teacher.school}}</td>
+              {% endif %}
+              {% if user.administrator or user.researcher or user.school_administrator %}
+                <td>{{group.teacher}}</td>
+              {% endif %}
+              <td id="assigned_{{group.id}}"></td>
+              <td>
+                {% if instances|get_item:group.id == 0 %}
+                  <input type="text" class="datepicker" id="due_{{group.id}}" name="due_{{group.id}}"/>
+                {% else %}
+                  <input type="text" class="datepicker" id="due_{{group.id}}" name="due_{{group.id}}" disabled/>
+                  <input type="hidden" class="datepicker" id="due_{{group.id}}" name="due_{{group.id}}"/>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <div class="form-group button-row">
+          <button type="submit" id="saveAssignment" class="btn btn-success">
+            Assign
+          </button>
+          <a type="button" class="btn btn-danger" data-dismiss="modal">Cancel</a>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script type="text/javascript">
+  $(function(){
+
+    $('.datepicker').datepicker({dateFormat: 'MM d, yy'});
+
+    {% for assignment in assignments %}
+      $('input[type="checkbox"]#assign_{{assignment.group.id}}').prop('checked', true);
+      $('input[type="hidden"]#assign_{{assignment.group.id}}').val(true);
+      $('td#assigned_{{assignment.group.id}}').html('{{assignment.assigned_date|date}}');
+      $('input#due_{{assignment.group.id}}').val('{{assignment.due_date|date}}');
+    {% endfor %}
+
+    $('#curriculumAssignmentForm').submit(function(e){
+      e.preventDefault();
+      $.ajax({
+        type: $(this).attr('method'),
+        url: this.action,
+        data: $(this).serialize(),
+        context: this,
+        success: function(data){
+          if('error' in data){
+            $('#assignmentMsg').html(data['error']);
+          }
+          else {
+            $("#assignmentModal").modal('toggle');
+            $('ul.messages').html('<li class="success">'+data['message']+'</li>');
+            $('ul.messages').show();
+            $('ul.messages').delay(10000).fadeOut('slow');
+          }
+          return false;
+        },
+        error: function(xhr, ajaxOptions, thrownError){
+          alert(thrownError);
+        },
+      });
+    });
+
+
+    $('input.datepicker').each(function(){
+
+      var assign = $(this).closest('tr').find('input.assign');
+
+      if($(this).val() == ''){
+        $(assign).addClass('nodate');
+        $(assign).prop('checked', false);
+      }
+
+      $(this).on('change', function(){
+        if($(this).val() == ''){
+          $(assign).addClass('nodate');
+          $(assign).prop('checked', false);
+        }
+        else{
+          $(assign).removeClass('nodate');
+          $(assign).prop('checked', true);
+        }
+      });
+    });
+
+
+    $('td').on('click', 'input[type="checkbox"].assign.inwork', function(){
+      alert('Students have already started working on this assignment and so this assignment cannot be undone');
+
+      return false;
+    });
+
+    $('td').on('click', 'input[type="checkbox"].assign.nodate', function(){
+      alert('Please select a due date before assigning this curriculum');
+
+      return false;
+    });
+
+  });
+</script>
+

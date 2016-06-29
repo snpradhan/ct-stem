@@ -424,6 +424,65 @@ def removeBookmark(request, id=''):
     return http.HttpResponseNotFound('<h1>Requested curriculum not found</h1>')
   except models.BookmarkedCurriculum.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested bookmark not found</h1>')
+
+
+
+####################################
+# Assign curriculum
+####################################
+def assignCurriculum(request, id=''):
+  try:
+    # check if the user has permission to bookmark a curriculum
+    if hasattr(request.user, 'administrator') or hasattr(request.user, 'researcher'):
+      groups = models.UserGroup.objects.all()
+    elif hasattr(request.user, 'school_administrator'):
+      groups = models.UserGroup.objects.all().filter(teacher__school = request.user.school_administrator.school)
+    elif hasattr(request.user, 'teacher'):
+      groups = models.UserGroup.objects.all().filter(teacher = request.user.teacher)
+    else:
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to assign this curriculum</h1>')
+
+    curriculum = models.Curriculum.objects.get(id=id)
+    assignments = models.Assignment.objects.all().filter(curriculum=curriculum, group__in=groups)
+    instances = {}
+    for group in groups:
+      instances[group.id] = models.AssignmentInstance.objects.all().filter(assignment__curriculum=curriculum, assignment__group=group).count()
+
+    if request.method == 'GET':
+      context = {'curriculum': curriculum, 'groups': groups, 'assignments': assignments, 'instances': instances}
+      return render(request, 'ctstem_app/CurriculumAssignment.html', context)
+    elif request.method == 'POST':
+      data = request.POST.copy()
+      for group in groups:
+        assignment = assignments.filter(group=group).first()
+        assign_key = 'assign_'+str(group.id)
+        due_key = 'due_'+str(group.id)
+        if assignment:
+          if assign_key in data:
+            due_date = data[due_key]
+            date_object = datetime.datetime.strptime(due_date, '%B %d, %Y')
+            # check if due date has changed and update
+            if assignment.due_date.date() != date_object.date():
+              assignment.due_date = date_object
+              assignment.save()
+          else:
+            #assignment has been unmarked for deletion
+            assignment.delete()
+        else:
+          #check if new assignment has been made
+          if assign_key in data:
+            due_date = data[due_key]
+            date_object = datetime.datetime.strptime(due_date, '%B %d, %Y')
+            new_assignment = models.Assignment(curriculum=curriculum, group=group, due_date=date_object)
+            new_assignment.save()
+
+      response_data = {'message': 'The curriculum "%s" has been assigned' % curriculum.title}
+      return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+
+
+    return http.HttpResponseNotAllowed(['GET', 'POST'])
+  except models.Curriculum.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested curriculum not found</h1>')
 ####################################
 # REGISTER
 ####################################

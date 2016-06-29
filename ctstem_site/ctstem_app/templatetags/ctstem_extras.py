@@ -105,3 +105,7 @@ def is_bookmarked(obj, qset):
 def getFeedback(response_id):
   feedback = models.QuestionFeedback.objects.all().filter(response__id=response_id)[0]
   return feedback.feedback
+
+@register.filter
+def get_item(dictionary, key):
+  return dictionary.get(key)
