@@ -83,7 +83,7 @@ def home(request):
         messages.error(request, "Your request could not be sent.")
 
     context = {'lessons': lessons, 'assessments' : assessments, 'practices': practices, 'team': team, 'publications': publications, 'form': request_form}
-    return render(request, 'ctstem_app/Home.html', context)
+    return render(request, 'ctstem_app/Home2.html', context)
 
 def send_email(subject, message, sender, to_list):
     msg = EmailMessage(subject, message, sender, to_list)
