@@ -267,7 +267,7 @@
         $("div#curricula_tile").toggle();
       });
 
-      $("a.assign").click(function(e){
+      $('.content').on("click", "a.assign", function(e){
         e.preventDefault();
         var url = $(this).data("form");
           $("#assignmentModal").load(url, function() {
