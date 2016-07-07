@@ -168,12 +168,11 @@
         </div>
       {% endif %}
       <div id="curricula_tile">
-        {% paginate 12 curricula %}
         <section id="lessons" class="portfolio">
           <div class="container">
             <div class="row">
               {% for curriculum in curricula %}
-              <div class="col-md-3 col-sm-6 portfolio-item">
+              <div class="col-md-3 col-sm-6 portfolio-item" id="{{forloop.counter}}">
                 <a href="{% url 'ctstem:previewCurriculum' curriculum.id %}" class="portfolio-link" target="_blank">
                   <div class="portfolio-hover">
                     <div class="portfolio-hover-content">
@@ -247,7 +246,7 @@
           </div>
         </section>
         <div id="pagination">
-          {% show_pages %}
+          <!--input type="button" class="btn btn-xl" value="Explore More" id="more" style="display:none;"/-->
         </div>
       </div>
     {% else %}
@@ -258,11 +257,10 @@
   <div class="modal fade" id="assignmentModal" role="dialog"></div>
 </div>
   <script type="text/javascript">
-    $(document).ready(function(){
-      {% if user.administrator or user.researcher or user.author or user.teacher or user.school_administrator %}
-        $("div#curricula_table").show();
-        $("div#curricula_tile").hide();
-      {% endif %}
+    $(function(){
+
+      $("div#curricula_table").hide();
+      $("div#curricula_tile").show();
 
       $('.switch-input').change(function() {
         $("div#curricula_table").toggle();
@@ -275,11 +273,29 @@
           $("#assignmentModal").load(url, function() {
           $(this).modal('show');
         });
-
         return false;
       });
 
+      $('.portfolio-item').each(function(){
+        var id = $(this).attr('id');
+        var index = parseInt(id, 10);
+        if(index > 8){
+          $(this).hide();
+        }
+      });
 
+      $(window).scroll(function() {
+        var hT = $('div#pagination').offset().top,
+            hH = $('div#pagination').outerHeight(),
+            wH = $(window).height(),
+            wS = $(this).scrollTop();
+        if (wS > (hT+hH-wH)){
+          var portfolio = $('.portfolio-item:hidden:lt(4)');
+          $(portfolio).each(function(i){
+            $(this).delay(i*500).fadeIn(1000);
+          });
+        }
+      });
     });
   </script>
 
