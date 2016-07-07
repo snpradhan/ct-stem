@@ -84,7 +84,8 @@
               <hr>
             {% endif %}
             <div class="question_table">
-              {% for question in step.questions.all %}
+              {% for curriculumquestion in step.curriculumquestion_set.all %}
+                {% with question=curriculumquestion.question %}
                 <div class="question_text">
                   <label> Question: </label>
                   <div> {{question.question_text|inline_style|safe }} </div>
@@ -126,6 +127,7 @@
                 {% else %}
                   <hr class="light">
                 {% endif %}
+                {% endwith %}
               {% endfor %}
             </div>
           </div>
