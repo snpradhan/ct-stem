@@ -4,15 +4,15 @@
 * {
 }
 
-header {
+#home header {
   margin: 10rem 0;
 }
 
 
-h1, h2, h3 { color: black; }
+#home h1, #home h2, #home h3 { color: black; }
 
 
-h1 {
+#home h1 {
   font-size: 3rem;
   line-height: 130%;
   margin: 3rem 0;
@@ -20,7 +20,7 @@ h1 {
 }
 
 
-h2 {
+#home h2 {
   font-size: 2.6rem;
   line-height: 130%;
   margin: 3rem 0 1rem 0;
@@ -28,7 +28,7 @@ h2 {
 }
 
 
-h3 {
+#home h3 {
   font-size: 2rem;
   line-height: 130%;
   text-transform: none;
@@ -37,12 +37,12 @@ h3 {
 }
 
 
-a:hover {
+#home a:hover {
   text-decoration: none;
 }
 
 
-.tagline {
+#home .tagline {
   font-family: Montserrat, "Helvetica Neue", Helvetica, Arial, sans-serif;
   padding: 2rem;
   font-size: 1.7rem;
@@ -52,19 +52,19 @@ a:hover {
 }
 
 
-img.institution {
+#home img.institution {
   height: 65px;
   margin: 20px 40px 40px 40px;
 }
 
 
-hr {
+#home hr {
   width: 35em;
   border-top: 1px solid #999;
 }
 
 
-.ctstem-content {
+#home .ctstem-content {
   height: auto;
   margin: 0 auto;
   min-width: 650px;
@@ -73,7 +73,7 @@ hr {
 }
 
 
-.ctstem-content p {
+#home .ctstem-content p {
   font-size: 1.8rem;
   font-weight: 300;
   line-height: 150%;
@@ -82,20 +82,20 @@ hr {
 }
 
 
-img.section-splash {
+#home img.section-splash {
   margin: 0 0 7rem 0;
   width: 100%;
 }
 
 
-#offerings {
+#home #offerings {
   margin: 10rem 0 0 0;
   padding: 5rem 0 10rem 0;
   background-color: #eee;
 }
 
 
-.offering {
+#home .offering {
   display: inline-block;
   vertical-align: top;
   width: 49%;
@@ -105,31 +105,31 @@ img.section-splash {
 }
 
 
-.offering p {
+#home .offering p {
   font-size: 1.5rem;
   text-align: left;
   margin: 0;
 }
 
 
-#practices {
+#home #practices {
   margin: 0;
   padding: 0;
 }
 
 
-.practice {
+#home .practice {
   margin: 4rem 0 0 1rem;
   display: block;
 }
 
 
-.practice p {
+#home .practice p {
   font-size: 1.5rem;
   margin: 0;
   width: 75%;
 }
 
-#assessments {
+#home #assessments {
   margin: 0 0 5rem 0;
 }
