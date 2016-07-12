@@ -93,6 +93,14 @@
   {% block upload %}
     {% include "ctstem_app/UserUploadModal.html" %}
   {% endblock %}
+
+  <script type="text/javascript">
+    $(function(){
+      $('a.upload-modal').click(function(){
+        $("div.modal#upload select#id_group option:selected").prop('selected', false);
+      });
+    });
+  </script>
 {% endblock %}
 
 

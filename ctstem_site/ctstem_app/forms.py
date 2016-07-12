@@ -469,7 +469,7 @@ class PublicationForm(ModelForm):
 # User Group Form
 ####################################
 class UserGroupForm(ModelForm):
-  members = forms.ModelMultipleChoiceField(required=False, queryset=models.Student.objects.all(), widget=FilteredSelectMultiple(('Members'), False, attrs={'size':5}))
+  #members = forms.ModelMultipleChoiceField(required=False, queryset=models.Student.objects.all(), widget=FilteredSelectMultiple(('Members'), False, attrs={'size':5}))
 
   class Meta:
     model = models.UserGroup
@@ -571,7 +571,25 @@ class CurriculumAssignmentForm(ModelForm):
 # CSV Upload Form
 ####################################
 class UploadFileForm(forms.Form):
-    uploadFile = forms.FileField()
+  uploadFile = forms.FileField(required=True)
+  group = forms.ModelChoiceField(required=True, queryset=models.UserGroup.objects.all())
+
+  def __init__(self, *args, **kwargs):
+    user = kwargs.pop('user')
+    super(UploadFileForm, self).__init__(*args, **kwargs)
+    print 'user', user
+    if user.is_authenticated():
+      if hasattr(user, 'school_administrator'):
+        self.fields['group'].queryset = models.UserGroup.objects.all().filter(teacher__school=user.school_administrator.school)
+      elif hasattr(user, 'teacher'):
+        self.fields['group'].queryset = models.UserGroup.objects.all().filter(teacher=user.teacher)
+    else:
+      self.fields['group'].queryset = models.UserGroup.objects.none()
+
+    for field_name, field in self.fields.items():
+      field.widget.attrs['class'] = 'form-control'
+      field.widget.attrs['aria-describedby'] = field.label
+      field.widget.attrs['placeholder'] = field.help_text
 
 ####################################
 # Instance Form

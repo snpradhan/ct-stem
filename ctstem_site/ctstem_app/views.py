@@ -27,6 +27,7 @@ from django.core.files.base import ContentFile
 from django.utils import timezone
 from django.core.mail import send_mail, EmailMessage
 from django.contrib.sites.models import Site
+from django.core import serializers
 
 ####################################
 # HOME
@@ -780,7 +781,9 @@ def deleteUser(request, id=''):
 
     privilege = 1
     # check if the user has permission to delete a user
-    if hasattr(request.user, 'author') or hasattr(request.user, 'student') or hasattr(request.user, 'researcher'):
+    if request.user.is_anonymous():
+      privilege = 0
+    elif hasattr(request.user, 'author') or hasattr(request.user, 'student') or hasattr(request.user, 'researcher'):
       privilege = 0
     elif hasattr(request.user, 'school_administrator'):
       if hasattr(user, 'administrator') or hasattr(user, 'researcher') or hasattr(user, 'author'):
@@ -794,8 +797,7 @@ def deleteUser(request, id=''):
         privilege = 0
       elif hasattr(user, 'student') and user.student.school != request.user.teacher.school:
         privilege = 0
-    else:
-      privilege = 0
+
     if privilege == 0:
       return http.HttpResponseNotFound('<h1>You do not have the privilege to delete this user</h1>')
 
@@ -823,6 +825,34 @@ def deleteUser(request, id=''):
   except User.DoesNotExist:
     return http.HttpResponseNotFound('<h1>User not found</h1>')
 
+def removeUser(request, group_id='', student_id=''):
+  try:
+    # check if the user has permission to create or modify a group
+    if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'school_administrator') == False and hasattr(request.user, 'teacher') == False :
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to remove users from this group</h1>')
+    # check if the lesson exists
+
+    group = models.UserGroup.objects.get(id=group_id)
+    student = models.Student.objects.get(id=student_id)
+    if hasattr(request.user, 'teacher'):
+      if request.user.teacher != group.teacher:
+        return http.HttpResponseNotFound('<h1>You do not have the privilege to remove users from this group</h1>')
+    elif hasattr(request.user, 'school_administrator'):
+      if request.user.school_administrator.school != group.teacher.school:
+        return http.HttpResponseNotFound('<h1>You do not have the privilege to remove users from this group</h1>')
+
+    if request.method == 'GET' or request.method == 'POST':
+      membership = models.Membership.objects.get(group=group, student=student)
+      membership.delete()
+      response_data = {'result': 'Success'}
+      return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+
+    return http.HttpResponseNotAllowed(['GET', 'POST'])
+
+  except models.UserGroup.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested group not found</h1>')
+  except models.Student.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested student not found</h1>')
 
 def notimplemented(request):
   return render(request, 'ctstem_app/NotImplemented.html')
@@ -1019,7 +1049,7 @@ def users(request, role):
   else:
     return http.HttpResponseNotFound('<h1>You do not have the privilege view %s</h1>'% role)
 
-  uploadForm = forms.UploadFileForm()
+  uploadForm = forms.UploadFileForm(user=request.user)
   context = {'users': users, 'role': role, 'uploadForm': uploadForm}
   return render(request, 'ctstem_app/Users.html', context)
 
@@ -1112,7 +1142,7 @@ def groups(request):
     groups = models.UserGroup.objects.all().filter(teacher=request.user.teacher).order_by('id')
   else:
     return http.HttpResponseNotFound('<h1>You do not have the privilege to view student groups</h1>')
-  uploadForm = forms.UploadFileForm()
+  uploadForm = forms.UploadFileForm(user=request.user)
   context = {'groups': groups, 'role':'groups', 'uploadForm': uploadForm}
   return render(request, 'ctstem_app/UserGroups.html', context)
 
@@ -1142,7 +1172,8 @@ def group(request, id=''):
         form = forms.UserGroupForm(user=request.user, instance=group, prefix='group')
         assignmentFormset=inlineformset_factory(models.UserGroup, models.Assignment, form=forms.AssignmentForm, can_delete=True, extra=1)
         formset = assignmentFormset(instance=group, prefix='form')
-        context = {'form': form, 'formset': formset, 'role': 'group'}
+        uploadForm = forms.UploadFileForm(user=request.user)
+        context = {'form': form, 'formset': formset, 'role': 'group', 'uploadForm': uploadForm}
         return render(request, 'ctstem_app/UserGroup.html', context)
 
     elif request.method == 'POST':
@@ -1160,7 +1191,8 @@ def group(request, id=''):
         print form.errors
         print formset.errors
         messages.error(request, "The group could not be saved because there were errors.  Please check the errors below.")
-        context = {'form': form, 'formset':formset, 'role': 'group'}
+        uploadForm = forms.UploadFileForm(user=request.user)
+        context = {'form': form, 'formset':formset, 'role': 'group', 'uploadForm': uploadForm}
         return render(request, 'ctstem_app/UserGroup.html', context)
 
     return http.HttpResponseNotAllowed(['GET', 'POST'])
@@ -1778,13 +1810,20 @@ def user_upload(request):
 
   count = 0
   added = 0
+  created = 0
+  existing = 0
   current_site = Site.objects.get_current()
   domain = current_site.domain
+  added_students = {}
+  msg = {'error': [], 'success': []}
 
   if request.method == 'POST':
-    form = forms.UploadFileForm(request.POST, request.FILES)
+    form = forms.UploadFileForm(request.POST, request.FILES, user=request.user)
+    data = request.POST.copy()
+    print data
     if form.is_valid():
       f = request.FILES['uploadFile']
+      group = models.UserGroup.objects.get(id=data['group'])
       reader = csv.reader(f.read().splitlines(), delimiter=',')
       for row in reader:
         count += 1
@@ -1793,76 +1832,77 @@ def user_upload(request):
           first_name = str(row[1])
           last_name = str(row[2])
           email = str(row[3])
-          if role == 'teacher':
-            account_type = 'Student'
-            school_code = request.user.teacher.school.school_code
-          elif role == 'school_administrator':
-            account_type = str(row[4])
-            school_code = request.user.school_administrator.school.school_code
-          else:
-            account_type = str(row[4])
-            school_code = str(row[5])
+          print username, first_name, last_name, email
 
-          print username, first_name, last_name, email, account_type, school_code
-          # check fields are not blank
-          if username is None or username == '':
-            messages.error(request, 'Username is missing on row %d' % count)
-          elif first_name is None or first_name == '':
-            messages.error(request, 'First name is missing on row %d' % count)
-          elif last_name is None or last_name == '':
-            messages.error(request, 'Last name is missing on row %d' % count)
-          elif email is None or email == '':
+          #check if the student with the email already exists
+          #email is mandatory
+          if email is None or email == '':
+            msg['error'].append('Email is missing on row %d' % count)
             messages.error(request, 'Email is missing on row %d' % count)
-          elif role in ['admin', 'school_administrator'] and account_type not in ['Teacher', 'Student']:
-            messages.error(request, 'Account Type is missing or invalid on row %d.  Account type has to be one of %s' % (count, 'Teacher or Student'))
-          elif role == 'admin'  and account_type in ['Teacher', 'Student'] and (school_code is None or school_code == ''):
-            messages.error(request, 'Account Type %s on row %d needs a school code.' % (account_type, count))
-          # everything cool so far
           else:
-            try:
+            #check if email exists
+            if User.objects.filter(email=email).exists():
+              #check if email belongs to a student
+              if models.Student.objects.filter(user__email=email).exists():
+                #add student to group
+                #TODO
+                student = models.Student.objects.get(user__email=email)
+                membership, created = models.Membership.objects.get_or_create(student=student, group=group)
+                added_students[student.id] = {'user_id': student.user.id, 'username': student.user.username, 'full_name': student.user.get_full_name(), 'email': student.user.email, 'status': 'Active' if student.user.is_active else 'Inactive', 'last_login': student.user.last_login.strftime('%B %d, %Y') if student.user.last_login else '', 'group': group.id}
+                added += 1
+                existing += 1
+              else:
+                #error out email in use and does not belong to a student account
+                msg['error'].append('Email on row %d is in use and does not belong to a student account' % count)
+                messages.error(request, 'Email on row %d is in use and does not belong to a student account' % count)
+            else:
+              #check if all user details are provided
+              if username is None or username == '':
+                msg['error'].append('Username is missing on row %d' % count)
+                messages.error(request, 'Username is missing on row %d' % count)
+              elif first_name is None or first_name == '':
+                msg['error'].append('First name is missing on row %d' % count)
+                messages.error(request, 'First name is missing on row %d' % count)
+              elif last_name is None or last_name == '':
+                msg['error'].append('Last name is missing on row %d' % count)
+                messages.error(request, 'Last name is missing on row %d' % count)
+              #check if username exists
+              elif User.objects.filter(username=username).exists():
+                msg['error'].append('Username on row %d is already in use' % count)
+                messages.error(request, 'Username on row %d is already in use' % count)
+              else:
+                #generate a random password
+                password = User.objects.make_random_password()
+                user = User.objects.create_user(username=username, email=email, password=password)
+                user.first_name = first_name
+                user.last_name = last_name
+                user.save()
 
-              #generate a random password
-              password = User.objects.make_random_password()
-              #create the user object
-              if User.objects.filter(username=username).exists() or User.objects.filter(email=email).exists():
-                raise IntegrityError('User already exists')
-              user = User.objects.create_user(username=username, email=email, password=password)
-              user.first_name = first_name
-              user.last_name = last_name
-              user.save()
-              #check the account type
-              #create a teacher
-              if account_type == 'Teacher':
-                school_obj = models.School.objects.get(school_code=school_code)
-                teacher = models.Teacher.objects.create(user=user, school=school_obj)
-              #create a student
-              elif account_type == 'Student':
-                school_obj = models.School.objects.get(school_code=school_code)
-                student = models.Student.objects.create(user=user, school=school_obj)
+                #create student account
+                student = models.Student.objects.create(user=user, school=group.teacher.school)
+                membership, created = models.Membership.objects.get_or_create(student=student, group=group)
 
-              added += 1
-              #email user the  user name and password
-              send_mail('CT-STEM Account Created',
-                    'Your %s account has been created on Computational Thinking in STEM website http://%s.  \r\n\r\n \
-                     Please login to the site using the credentials below and change your password.\r\n\r\n  \
-                     Username: %s \r\n \
-                     Temporary Password: %s \r\n\r\n \
-                     -- CT-STEM Admin'%(account_type, domain, user.username, password),
-                    settings.DEFAULT_FROM_EMAIL,
-                    [user.email])
-            except IntegrityError:
-              messages.error(request, 'Username and/or email used on row %d already exists, so the user was not created' % count)
-              continue
-            except models.School.DoesNotExist:
-              messages.error(request, 'School %s on row %d does not exist in the system' % (school, count))
-              user.delete()
-              continue
+                added += 1
+                created += 1
+                added_students[student.id] = {'user_id': student.user.id, 'username': student.user.username, 'full_name': student.user.get_full_name(), 'email': student.user.email, 'status': 'Active' if student.user.is_active else 'Inactive', 'last_login': student.user.last_login.strftime('%B %d, %Y') if student.user.last_login else '', 'group': group.id}
 
-      messages.success(request, '%d out of %d users were added.' % (added, count-1))
-      response_data = {'result': 'Success'}
+                #email user the  user name and password
+                send_mail('CT-STEM Account Created',
+                      'Your student account has been created on Computational Thinking in STEM website http://%s.  \r\n\r\n \
+                       Please login to the site using the credentials below and change your password.\r\n\r\n  \
+                       Username: %s \r\n \
+                       Temporary Password: %s \r\n\r\n \
+                       -- CT-STEM Admin'%(domain, user.username, password),
+                      settings.DEFAULT_FROM_EMAIL,
+                      [user.email])
+
+
+      msg['success'].append('%d existing students were found, %d new student accounts were created and a total %d students where added to the group "%s".' % (existing, created, added, group.title))
+      messages.success(request, '%d existing students were found, %d new student accounts were created and a total %d students where added to the group "%s".' % (existing, created, added, group.title))
+      response_data = {'result': 'Success', 'new_students': added_students, 'messages': msg}
     else:
       print form.errors
-      response_data = {'result': 'Failure', 'message': 'The uploaded csv is not valid. Please revise the csv and upload again.'}
+      response_data = {'result': 'Failure', 'message': 'Please select a group and provide a valid student template to upload.'}
     return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 
   return http.HttpResponseNotAllowed(['POST'])

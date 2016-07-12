@@ -1,13 +1,9 @@
 <div class="modal fade" id="upload" role="dialog">
-  <div class="modal-dialog modal-sm">
+  <div class="modal-dialog modal-md">
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">&times;</button>
-        {% if user.administrator or user.school_administrator %}
-          <h3 class="modal-title">User Upload</h3>
-        {% elif user.teacher %}
-          <h3 class="modal-title">Student Upload</h3>
-        {% endif %}
+        <h3 class="modal-title">Upload Students</h3>
       </div>
       <div id="uploadMsg">
       </div>
@@ -15,7 +11,11 @@
         {% csrf_token %}
         <div class="modal-body">
           <div class="form-group">
-            <label for="id_uploadFile">File</label>
+            <label for="id_group">Group (<span class="required">*</span>)</label>
+            {{uploadForm.group}}
+          </div>
+          <div class="form-group">
+            <label for="id_uploadFile">Student Template (<span class="required">*</span>)</label>
             {{uploadForm.uploadFile}}
           </div>
           <div id="spinner">

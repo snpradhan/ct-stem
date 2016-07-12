@@ -146,7 +146,7 @@ $(function (){
   $("#formUpload").submit(function(e) {
     e.preventDefault();
     //var data = $(this).serialize();
-    var data = new FormData($('form').get(0));
+    var data = new FormData($('form#formUpload').get(0));
     var url = "/upload/users";
     $.ajax({
       type: "POST",
@@ -161,11 +161,46 @@ $(function (){
         $('#spinner').show();
       },
       complete: function(){
-          $('#spinner').hide();
+        $('#spinner').hide();
       },
       success: function(data){
         if(data['result'] == 'Success'){
-          window.location.reload();
+          if(window.location.href.indexOf('/groups/') != -1){
+            window.location.reload();
+          }
+          else if(window.location.href.indexOf('/group/') != -1){
+
+            for(var student in  data['new_students']){
+              if($('tr#'+student).length == 0){
+                var group = data['new_students'][student]['group'];
+                var user_id = data['new_students'][student]['user_id'];
+                var membership_id = data['new_students'][student]['membership_id']
+                //add student detail to the table
+                $('table.table#members tbody').append('<tr id='+student+'>\
+                  <td>'+data['new_students'][student]['username']+'\
+                    <div class="controls">\
+                      <a type="button" class="btn btn-success edit" aria-label="Edit User" title="Edit User" href="/user/'+user_id+'">\
+                        <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>\
+                      </a>\
+                      <a type="button" class="btn btn-warning removeUser" aria-label="Remove User" title="Remove User" href="/user/remove/'+group+'/'+student+'" data-id="'+student+'">\
+                        <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>\
+                      </a>\
+                    </div>\
+                  </td>\
+                  <td>'+data['new_students'][student]['full_name']+'</td>\
+                  <td>'+data['new_students'][student]['email']+'</td>\
+                  <td>'+data['new_students'][student]['status']+'</td>\
+                  <td>'+data['new_students'][student]['last_login']+'</td></tr>');
+
+                //add student membership hidden input
+                $('table.table#members').before('<input id="id_group-members_'+student+'" name="group-members" type="hidden" value="'+student+'">');
+
+              }
+            }
+            $("#upload").modal('toggle');
+            bind_user_removal();
+            display_messages(data['messages'])
+          }
         }
         else{
           $('#uploadMsg').html(data['message']);
@@ -176,6 +211,10 @@ $(function (){
       },
     });
   });
+
+
+  bind_user_removal();
+
 
   $(".expand_collapse").click(function(){
     $(this).closest('.table').children('.collapsible_content').toggle();
@@ -264,3 +303,57 @@ function check_session(){
     },
   });
 }
+
+function bind_user_removal(){
+  $('a.removeUser').click(function(e){
+    e.preventDefault();
+    var remove = confirm('Are you sure you want to remove the student from the group?');
+    var tr = $(this).closest('tr');
+    var hd_input = $('input:hidden#id_group-members_'+$(this).data('id'));
+    if(remove){
+      var url = $(this).attr('href');
+      data = {}
+      data['csrfmiddlewaretoken'] = $('#userGroupForm').find('input:hidden').eq(0).val();
+      var data = $.param(data);
+      $.ajax({
+        type: "POST",
+        url: url,
+        data: data,
+        dataType: 'json',
+        success: function(data){
+          if(data['result'] == 'Success'){
+            $(tr).remove();
+            $(hd_input).remove();
+          }
+          else{
+            $("ul.messages li").remove();
+            $("ul.messages").html('<li class="error">User could not be removed from the group</li>');
+            $('ul.messages').show();
+            $('ul.messages').delay(10000).fadeOut('slow');
+          }
+        },
+        error: function(xhr, ajaxOptions, thrownError){
+          $("ul.messages li").remove();
+          $("ul.messages").html('<li class="error">User could not be removed from the group</li>');
+          $('ul.messages').show();
+          $('ul.messages').delay(10000).fadeOut('slow');
+        },
+      });
+    }
+  });
+}
+
+function display_messages(messages){
+  $("ul.messages li").remove();
+  var html = '';
+  for(var index in messages['error']){
+    html = html + '<li class="error">'+messages['error'][index]+'</li>';
+  }
+  for(var index in messages['success']){
+    html = html + '<li class="success">'+messages['success'][index]+'</li>';
+  }
+  $("ul.messages").html(html);
+  $('ul.messages').show();
+  $('ul.messages').delay(10000).fadeOut('slow');
+}
+

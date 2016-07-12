@@ -36,6 +36,7 @@ urlpatterns = [
     url(r'^logout/$', views.user_logout, name='logout'),
     url(r'^user/(?P<id>[\d]+)/$', views.userProfile, name='userProfile'),
     url(r'^user/delete/(?P<id>[\d]+)/$', views.deleteUser, name='deleteUser'),
+    url(r'^user/remove/(?P<group_id>[\d]+)/(?P<student_id>[\d]+)$', views.removeUser, name='removeUser'),
     url(r'^taxonomy/search/$', views.searchTaxonomy, name='searchTaxonomy'),
     url(r'^standard/delete/(?P<id>[\d]+)/$', views.deleteStandard, name='deleteStandard'),
     url(r'^standard/new/$', views.standard, name='newStandard'),

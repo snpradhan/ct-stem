@@ -94,6 +94,11 @@ def getTaxonomy(value):
   return taxonomy
 
 @register.filter
+def getStudentInfo(value):
+  student = models.Student.objects.get(id=value)
+  return student
+
+@register.filter
 def iterate(value):
   return range(1, value+1)
 

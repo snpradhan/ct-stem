@@ -1,5 +1,5 @@
 {% extends "ctstem_app/base.html" %}
-
+{% load ctstem_extras %}
 {% block media %}
   {{ block.super }}
   {{ form.media }}
@@ -16,85 +16,152 @@
       <h2>Student Group</h2>
     {% endif %}
     {% include "ctstem_app/Tabs.html" with tab='group' group=form.instance role='group'%}
-    <form method="post">
+    <form method="post" id="userGroupForm">
       {% csrf_token %}
       <div class="table" id="group">
         {{form.management_form}}
-        {% for field in form %}
-          <div class="form-group">
-            {% if field.name != 'teacher' or user.teacher == '' %}
-              <label for="id_{{field.name}}">{{ field.label|title }} {% if field.field.required %}(<span class="required">*</span>){% endif %} </label>
-            {% endif %}
-            <div class="controls">
-              {% if field.name == 'teacher' %}
-                {% if user.teacher %}
-                  <input type="hidden" id="id_group-teacher" name="group-teacher" value="{{user.teacher.id}}"/>
-                {% else %}
-                  {{field}}
-                {% endif %}
-              {% else %}
-                {{field}}
-              {% endif %}
-            </div>
-            <div class="error">{{ field.errors }}</div>
-          </div>
-        {% endfor %}
 
-        <div class="form-group assignment_table">
+        <div class="form-group">
+          <label for="id_{{title}}">{{ form.title.label }} {% if form.title.field.required %}(<span class="required">*</span>){% endif %} </label>
+          <div class="controls">{{form.title}}</div>
+          <div class="error">{{ form.title.errors }}</div>
+        </div>
+        <div class="form-group">
+          <label for="id_{{title}}">{{ form.subject.label }} {% if form.subject.field.required %}(<span class="required">*</span>){% endif %} </label>
+          <div class="controls">{{form.subject}}</div>
+          <div class="error">{{ form.subject.errors }}</div>
+        </div>
+        <div class="form-group">
+          <label for="id_{{title}}">{{ form.time.label }} {% if form.time.field.required %}(<span class="required">*</span>){% endif %} </label>
+          <div class="controls">{{form.time}}</div>
+          <div class="error">{{ form.time.errors }}</div>
+        </div>
+        {% if user.teacher %}
+          <input type="hidden" id="id_group-teacher" name="group-teacher" value="{{user.teacher.id}}"/>
+        {% else %}
+          <div class="form-group">
+            <label for="id_{{title}}">{{ form.teacher.label }} {% if form.teacher.field.required %}(<span class="required">*</span>){% endif %} </label>
+            <div class="controls">{{form.teacher}}</div>
+            <div class="error">{{ form.teacher.errors }}</div>
+          </div>
+        {% endif %}
+        <div class="form-group">
+          <label for="id_{{title}}">{{ form.description.label }} {% if form.description.field.required %}(<span class="required">*</span>){% endif %} </label>
+          <div class="controls">{{form.description}}</div>
+          <div class="error">{{ form.description.errors }}</div>
+        </div>
+
+        {% if form.instance.id %}
+          <div class="form-group assignment_table">
+            {{formset.management_form}}
+            {{formset.id}}
+            <div>
+              <label for="id_assignment_table">Assignments</label>
+              <a type="button" class="btn btn-info add_assignment" name="add_assignment" title="Add Assignment" id="addAssignment">
+                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+              </a>
+            </div>
+            <table class="table table-striped table-condensed table-bordered inner_table">
+              <thead>
+                <tr>
+                  <th style="width:60%;">Lesson Plan/Assessment</th>
+                  <th>Assigned Date</th>
+                  <th>Due Date</th>
+                  <th>Delete</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for assignmentForm in formset %}
+                  <tr style="{% if forloop.last %} display:none; {% endif %}">
+                    <td class="assessment_title">
+                      {{assignmentForm.id}}
+                      {{assignmentForm.curriculum}}
+                      <div class="error">
+                        {{assignmentForm.curriculum.errors}}
+                      </div>
+                    </td>
+                    <td style="vertical-align:middle;">{{assignmentForm.get_assigned_date|date}}</td>
+                    <td>
+                      {{assignmentForm.due_date }}
+                      <div class="error">
+                        {{assignmentForm.due_date.errors }}
+                      </div>
+                    </td>
+                    <td>
+                      <button type="button" class="btn btn-danger delete_assignment" name="delete_assignment" aria-label="Delete Assignment" title="Delete Assignment">
+                        <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                      </button>
+                      {{assignmentForm.DELETE.as_hidden}}
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+          <div class="form-group">
+            <label for="id_{{title}}"> Students {% if form.members.field.required %}(<span class="required">*</span>){% endif %} </label>
+            <a type="button" class="btn btn-success upload-modal" href="#" data-toggle="modal" data-target="#upload" data-id="{{form.instance.id}}" title="Upload Students">
+              <span class="glyphicon glyphicon-upload" aria-hidden="true"></span>
+            </a>
+            <div class="controls">
+              {{form.members.as_hidden}}
+              <table class="table table-striped table-bordered table-condensed inner_table" id="members">
+                <thead>
+                  <tr>
+                    <th> Username </th>
+                    <th> Name </th>
+                    <th> Email </th>
+                    <th> Status </th>
+                    <th> Last Login </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for x in form.members.value %}
+                    {% with student=x|getStudentInfo %}
+                    <tr id="{{student.id}}">
+                      <td>{{student.user.username}}
+                      <div class="controls">
+                        <a type="button" class="btn btn-success edit" aria-label="Edit User" title="Edit User" href="{% url 'ctstem:userProfile' student.user.id %}">
+                          <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+                        </a>
+                        <a type="button" class="btn btn-warning removeUser" aria-label="Remove User" title="Remove User" href="{% url 'ctstem:removeUser' form.instance.id student.id  %}" data-id="{{forloop.counter0}}">
+                          <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                        </a>
+                      </div>
+                      </td>
+                      <td>{{student.user.get_full_name}}</td>
+                      <td>{{student.user.email}}</td>
+                      <td>{{student.user.is_active|yesno:"Active,Inactive"}}</td>
+                      <td>{{student.user.last_login|date}}</td>
+                    </tr>
+                    {% endwith %}
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            <div class="error">{{ form.members.errors }}</div>
+          </div>
+        {% else %}
+          <h4> Save the Group to add Assignments and Students </h4>
           {{formset.management_form}}
           {{formset.id}}
-          <div>
-            <label for="id_assignment_table">Assignments</label>
-            <a type="button" class="btn btn-info add_assignment" name="add_assignment" title="Add Assignment" id="addAssignment">
-              <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-            </a>
-          </div>
-          <table class="table table-striped table-condensed table-bordered inner_table">
-            <thead>
-              <tr>
-                <th style="width:60%;">Lesson Plan/Assessment</th>
-                <th>Assigned Date</th>
-                <th>Due Date</th>
-                <th>Delete</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for assignmentForm in formset %}
-                <tr style="{% if forloop.last %} display:none; {% endif %}">
-                  <td class="assessment_title">
-                    {{assignmentForm.id}}
-                    {{assignmentForm.curriculum}}
-                    <div class="error">
-                      {{assignmentForm.curriculum.errors}}
-                    </div>
-                  </td>
-                  <td style="vertical-align:middle;">{{assignmentForm.get_assigned_date|date}}</td>
-                  <td>
-                    {{assignmentForm.due_date }}
-                    <div class="error">
-                      {{assignmentForm.due_date.errors }}
-                    </div>
-                  </td>
-                  <td>
-                    <button type="button" class="btn btn-danger delete_assignment" name="delete_assignment" aria-label="Delete Assignment" title="Delete Assignment">
-                      <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-                    </button>
-                    {{assignmentForm.DELETE.as_hidden}}
-                  </td>
-                </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
+          {{formset.as_hidden}}
+        {% endif %}
+
         <div class="form-group button-group-fixed">
           <input type="submit" class="btn btn-success" id="submit" value="Save Group"/>
         </div>
       </div>
     </form>
   </div>
+
+  {% block upload %}
+    {% include "ctstem_app/UserUploadModal.html" %}
+  {% endblock %}
+
   <script type="text/javascript">
     $(function (){
-
       $('a#addAssignment').click(function() {
         cloneMore('div.assignment_table table.table tr:last', 'form');
         var new_assignment_row = $('div.assignment_table table.table tr:nth-last-child(2)');
@@ -113,6 +180,11 @@
 
       $('.datepicker').datepicker({dateFormat: 'M d, yy'});
 
+      $('a.upload-modal').click(function(){
+        $("div.modal#upload select#id_group option:selected").prop('selected', false);
+        $("div.modal#upload select#id_group option[value='"+$(this).data('id')+"']").prop('selected', true);
+        $("div.modal#upload select#id_group").closest('.form-group').hide();
+      });
     });
   </script>
 {% endblock %}
