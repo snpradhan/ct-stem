@@ -65,60 +65,64 @@
                   <td class="icon">
                     {% if curriculum.icon %}
                       <img class="big_icon" src="{{curriculum.icon.url}}"/>
-                    {% else %}
+                    {% elif curriculum.curriculum_type == 'L' %}
+                      <img class="big_icon" src="/static/img/lesson.png">
+                    {% elif curriculum.curriculum_type == 'A' %}
+                      <img class="big_icon" src="/static/img/assessment.png">
+                    {% elif curriculum.curriculum_type == 'S' %}
                       <img class="big_icon" src="/static/img/assessment.png">
                     {% endif %}
                   </td>
                   <td class="information">
                     <div class="title">{{curriculum.title}} - v{{curriculum.version}}. </div>
-                    {% if not user.teacher %}
-                    <div class="row">
-                      <div class="col-md-2 title">Status:</div>
-                      <div class="col-md-10">{{ curriculum.get_status_display }}</div>
-                    </div>
+                    {% if user.administrator or user.researcher or user.author %}
+                      <div class="row">
+                        <div class="col-md-2 title">Status:</div>
+                        <div class="col-md-10">{{ curriculum.get_status_display }}</div>
+                      </div>
                     {% endif %}
-                    <div class="row">
-                      <div class="col-md-2 title">Subject:</div>
-                      <div class="col-md-10">
-                        {% if curriculum.subject.all %}
-                          {% for subject in curriculum.subject.all %}
-                            <div>{{ subject }}</div>
-                          {% endfor %}
-                        {% else %}
-                          -
-                        {% endif %}
+                    {% if curriculum.curriculum_type|is_in:"['L', 'A']" %}
+                      <div class="row">
+                        <div class="col-md-2 title">Subject(s):</div>
+                        <div class="col-md-10">
+                          {% if curriculum.subject.all %}
+                            {{curriculum.subject.all|join:", "}}
+                          {% else %}
+                            -
+                          {% endif %}
+                        </div>
                       </div>
-                    </div>
-                    <div class="row">
-                      <div class="col-md-2 title">Standards:</div>
-                      <div class="col-md-10">
-                        <ul class="standard">
-                          {% for standard, categories in curriculum.taxonomy.all|taxonomyHelper %}
-                            <li>{{standard}}
-                              <span class="ec">
-                                <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                                <span class="glyphicon glyphicon-collapse-up" aria-hidden="true" style="display:none;"></span>
-                              </span>
-                            </li>
-                            <ul class="category" style="display:none;">
-                              {% for category, taxonomies in categories.items %}
-                                <li>{{category}}
-                                  <span class="ec">
-                                    <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                                    <span class="glyphicon glyphicon-collapse-up" aria-hidden="true" style="display:none;"></span>
-                                  </span>
-                                </li>
-                                <ul class="taxonomy" style="display:none;">
-                                {% for taxonomy in taxonomies %}
-                                  <li>{{taxonomy}} </li>
+                      <div class="row">
+                        <div class="col-md-2 title">Standards:</div>
+                        <div class="col-md-10">
+                          <ul class="standard">
+                            {% for standard, categories in curriculum.taxonomy.all|taxonomyHelper %}
+                              <li>{{standard}}
+                                <span class="ec">
+                                  <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
+                                  <span class="glyphicon glyphicon-collapse-up" aria-hidden="true" style="display:none;"></span>
+                                </span>
+                              </li>
+                              <ul class="category" style="display:none;">
+                                {% for category, taxonomies in categories.items %}
+                                  <li>{{category}}
+                                    <span class="ec">
+                                      <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
+                                      <span class="glyphicon glyphicon-collapse-up" aria-hidden="true" style="display:none;"></span>
+                                    </span>
+                                  </li>
+                                  <ul class="taxonomy" style="display:none;">
+                                  {% for taxonomy in taxonomies %}
+                                    <li>{{taxonomy}} </li>
+                                  {% endfor %}
+                                  </ul>
                                 {% endfor %}
-                                </ul>
-                              {% endfor %}
-                            </ul>
-                          {% endfor %}
-                        </ul>
+                              </ul>
+                            {% endfor %}
+                          </ul>
+                        </div>
                       </div>
-                    </div>
+                    {% endif %}
                     <div class="row">
                       <div class="col-md-2 title">Author:</div>
                       <div class="col-md-10">
