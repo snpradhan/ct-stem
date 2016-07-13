@@ -130,6 +130,7 @@ $(function (){
   var table = $('table.table.dt').DataTable({
     order: [],
     orderCellsTop: true,
+    lengthMenu: [[100, -1], [100, "All"]],
     columnDefs: [
       { targets: 'no-sort', orderable: false }
     ]
