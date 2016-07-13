@@ -45,12 +45,7 @@
               {% endif %}
               <td id="assigned_{{group.id}}"></td>
               <td>
-                {% if instances|get_item:group.id == 0 %}
-                  <input type="text" class="datepicker" id="due_{{group.id}}" name="due_{{group.id}}"/>
-                {% else %}
-                  <input type="text" class="datepicker" id="due_{{group.id}}" name="due_{{group.id}}" disabled/>
-                  <input type="hidden" class="datepicker" id="due_{{group.id}}" name="due_{{group.id}}"/>
-                {% endif %}
+                <input type="text" class="datepicker" id="due_{{group.id}}" name="due_{{group.id}}" readonly="true" />
               </td>
             </tr>
             {% endfor %}
@@ -72,11 +67,19 @@
 <script type="text/javascript">
   $(function(){
 
-    $('.datepicker').datepicker({dateFormat: 'MM d, yy'});
+    $('.datepicker').datepicker({
+      dateFormat: 'MM d, yy',
+      onClose: function(selectedDate){
+        if(selectedDate == ""){
+          var assign = $(this).closest('tr').find('input.assign');
+          $(assign).addClass('nodate');
+          $(assign).prop('checked', false);
+        }
+      }
+    });
 
     {% for assignment in assignments %}
       $('input[type="checkbox"]#assign_{{assignment.group.id}}').prop('checked', true);
-      $('input[type="hidden"]#assign_{{assignment.group.id}}').val(true);
       $('td#assigned_{{assignment.group.id}}').html('{{assignment.assigned_date|date}}');
       $('input#due_{{assignment.group.id}}').val('{{assignment.due_date|date}}');
     {% endfor %}
@@ -108,7 +111,6 @@
 
 
     $('input.datepicker').each(function(){
-
       var assign = $(this).closest('tr').find('input.assign');
 
       if($(this).val() == ''){
@@ -128,17 +130,21 @@
       });
     });
 
-
-    $('td').on('click', 'input[type="checkbox"].assign.inwork', function(){
-      alert('Students have already started working on this assignment and so this assignment cannot be undone');
-
-      return false;
-    });
-
-    $('td').on('click', 'input[type="checkbox"].assign.nodate', function(){
-      alert('Please select a due date before assigning this curriculum');
-
-      return false;
+   $('td').on('click', 'input[type="checkbox"].assign', function(){
+      var id = $(this).attr('id');
+      var due_date_id = id.replace('assign', 'due');
+      if($(this).is(':checked')){
+        $('#'+due_date_id).datepicker('show');
+      }
+      else{
+        if($(this).hasClass('inwork')){
+          alert('Students have already started working on this assignment and so this assignment cannot be undone');
+          return false;
+        }
+        else{
+          $('#'+due_date_id).val('');
+        }
+      }
     });
 
   });
