@@ -127,42 +127,35 @@
                     </div>
                   </td>
                   <td class="action">
+                    <a class="util-button fa fa-eye" aria-hidden="true" title="Preview Curriculum" href="{% url 'ctstem:previewCurriculum' curriculum.id %}" target="_blank">
+                    </a>
+                    {% if curriculum.curriculum_type == 'L' %}
+                      <a class="util-button fa fa-print" aria-hidden="true" title="Print" href="{% url 'ctstem:pdfCurriculum' curriculum.id %}"></a>
+                    {% endif %}
+                    {% if user.administrator or user.researcher or user.author %}
+                      {% if curriculum.status == 'D' or curriculum.status == 'P'%}
+                        <a class="util-button fa fa-pencil" aria-hidden="true" aria-label="Edit Curriculum" title="Edit Curriculum" href="{% url 'ctstem:curriculum' curriculum.id %}"></a>
+                        <a class="util-button fa fa-trash" aria-hidden="true" aria-label="Delete Curriculum" title="Delete Curriculum" href="{% url 'ctstem:deleteCurriculum' curriculum.id %}" onclick="return confirm('Are you sure you want to delete {{curriculum.title}}?')">
+                        </a>
+                      {% elif curriculum.status == 'A' and  user.administrator %}
+                        <a class="util-button fa fa-pencil" aria-hidden="true" aria-label="Edit Curriculum" title="Edit Curriculum" href="{% url 'ctstem:curriculum' curriculum.id %}"
+                        onclick="return confirm('This curriculum has been archived.  Are you sure you want to edit this curriculum?');">
+                        </a>
+                      {% endif %}
 
-                      <a type="button" class="btn btn-sm btn-warning" title="Preview Curriculum" href="{% url 'ctstem:previewCurriculum' curriculum.id %}" target="_blank">
-                        Preview <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
+                      <a class="util-button fa fa-files-o" aria-hidden="true" aria-label="Create New Copy" title="Create New Copy" href="{% url 'ctstem:copyCurriculum' curriculum.id %}">
                       </a>
-                      {% if curriculum.curriculum_type == 'L' %}
-                        <a type="button" class="btn btn-sm btn-default pdf" title="Download Curriculum PDF" href="{% url 'ctstem:pdfCurriculum' curriculum.id %}">
-                          Download PDF <span class="glyphicon glyphicon-save-file" aria-hidden="true"></span>
-                        </a>
+                    {% endif %}
+                    {% if user.administrator or user.researcher or user.teacher or user.school_administrator %}
+                      {% if curriculum.status == 'A' or curriculum.status == 'P'%}
+                      <a class="assign util-button fa fa-calendar-check-o" aria-hidden="true" data-form="{% url 'ctstem:assignCurriculum' curriculum.id%}" aria-label="Assign Curriculum" title="Assign Curriculum">
+                      </a>
                       {% endif %}
-                      {% if user.administrator or user.researcher or user.author %}
-                        {% if curriculum.status == 'D' or curriculum.status == 'P'%}
-                          <a type="button" class="btn btn-sm btn-success edit" aria-label="Edit Curriculum" title="Edit Curriculum" href="{% url 'ctstem:curriculum' curriculum.id %}">
-                            Edit <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
-                          </a>
-                          <a type="button" class="btn btn-sm btn-danger delete" aria-label="Delete Curriculum" title="Delete Curriculum" href="{% url 'ctstem:deleteCurriculum' curriculum.id %}" onclick="return confirm('Are you sure you want to delete {{curriculum.title}}?')">
-                            Delete <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-                          </a>
-                        {% elif curriculum.status == 'A' and  user.administrator %}
-                          <a type="button" class="btn btn-sm btn-success edit" aria-label="Edit Curriculum" title="Edit Curriculum" href="{% url 'ctstem:curriculum' curriculum.id %}"
-                          onclick="return confirm('This curriculum has been archived.  Are you sure you want to edit this curriculum?');">
-                            Edit <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
-                          </a>
-                        {% endif %}
-
-                        <a type="button" class="btn btn-sm btn-info duplicate" aria-label="Create New Copy" title="Create New Copy" href="{% url 'ctstem:copyCurriculum' curriculum.id %}">
-                          Copy <span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span>
-                        </a>
-                      {% endif %}
-                      {% if user.administrator or user.researcher or user.teacher or user.school_administrator %}
-                        {% if curriculum.status == 'A' or curriculum.status == 'P'%}
-                        <a type="button" class="btn btn-success btn-sm assign" name="assign" data-form="{% url 'ctstem:assignCurriculum' curriculum.id%}" aria-label="Assign Curriculum" title="Assign Curriculum">
-                          Assign <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
-                        </a>
-                        {% endif %}
-                      {% endif %}
-
+                    {% endif %}
+                    {% if user.teacher %}
+                      <a class="bookmark util-button fa fa-star" href="{% url 'ctstem:removeBookmark' curriculum.id %}" style="{% if curriculum|is_bookmarked:bookmarked %} display: inline-block; {% else %} display: none; {% endif %}" title="Remove from Favorites"></a>
+                      <a class="bookmark util-button fa fa-star-o" href="{% url 'ctstem:bookmarkCurriculum' curriculum.id %}" style="{% if curriculum|is_bookmarked:bookmarked %} display: none; {% else %} display: inline-block; {% endif %}" title="Add to Favorites"></a>
+                    {% endif %}
                   </td>
                 </tr>
               {% endfor %}
@@ -287,6 +280,30 @@
         if(index > 8){
           $(this).hide();
         }
+      });
+
+      $('.content').on("click", "a.bookmark", function(e){
+        e.preventDefault();
+        var url = $(this).attr('href');
+        var tr = $(this).closest('tr');
+
+        $.ajax({
+          type: "GET",
+          url: url,
+          success: function(data){
+            {% if bookmark == '1' %}
+              $(tr).hide();
+            {% else %}
+              $(tr).find('a.bookmark').each(function(){
+                $(this).toggle();
+              });
+            {% endif %}
+            return false;
+          },
+          error: function(xhr, ajaxOptions, thrownError){
+            alert("Something went wrong.  Try again later!");
+          },
+        });
       });
 
       /*$(window).scroll(function() {

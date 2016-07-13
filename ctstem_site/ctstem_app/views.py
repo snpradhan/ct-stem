@@ -393,8 +393,7 @@ def bookmarkCurriculum(request, id=''):
     if request.method == 'GET' or request.method == 'POST':
       bookmark, created = models.BookmarkedCurriculum.objects.get_or_create(curriculum=curriculum, teacher=request.user.teacher)
       bookmark.save()
-      messages.success(request, 'Curriculum %s has been bookmarked' % curriculum.title)
-      return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+      return http.HttpResponse(json.dumps({}), content_type="application/json")
 
     return http.HttpResponseNotAllowed(['GET', 'POST'])
 
@@ -416,8 +415,7 @@ def removeBookmark(request, id=''):
     if request.method == 'GET' or request.method == 'POST':
       bookmark = models.BookmarkedCurriculum.objects.get(curriculum=curriculum, teacher=request.user.teacher)
       bookmark.delete()
-      messages.success(request, 'Bookmark on curriculum %s has been removed' % curriculum.title)
-      return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+      return http.HttpResponse(json.dumps({}), content_type="application/json")
 
     return http.HttpResponseNotAllowed(['GET', 'POST'])
 
