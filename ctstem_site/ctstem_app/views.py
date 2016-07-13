@@ -1173,7 +1173,8 @@ def group(request, id=''):
         assignmentFormset=inlineformset_factory(models.UserGroup, models.Assignment, form=forms.AssignmentForm, can_delete=True, extra=1)
         formset = assignmentFormset(instance=group, prefix='form')
         uploadForm = forms.UploadFileForm(user=request.user)
-        context = {'form': form, 'formset': formset, 'role': 'group', 'uploadForm': uploadForm}
+        assignmentForm = forms.AssignmentSearchForm()
+        context = {'form': form, 'formset': formset, 'role': 'group', 'uploadForm': uploadForm, 'assignmentForm': assignmentForm}
         return render(request, 'ctstem_app/UserGroup.html', context)
 
     elif request.method == 'POST':
@@ -1185,20 +1186,47 @@ def group(request, id=''):
       if form.is_valid() and formset.is_valid():
         savedGroup = form.save()
         formset.save()
-        messages.success(request, "User Group Saved.")
+        messages.success(request, "Group Saved.")
         return shortcuts.redirect('ctstem:group', id=savedGroup.id)
       else:
         print form.errors
         print formset.errors
         messages.error(request, "The group could not be saved because there were errors.  Please check the errors below.")
         uploadForm = forms.UploadFileForm(user=request.user)
-        context = {'form': form, 'formset':formset, 'role': 'group', 'uploadForm': uploadForm}
+        assignmentForm = forms.AssignmentSearchForm()
+        context = {'form': form, 'formset':formset, 'role': 'group', 'uploadForm': uploadForm, 'assignmentForm': assignmentForm}
         return render(request, 'ctstem_app/UserGroup.html', context)
 
     return http.HttpResponseNotAllowed(['GET', 'POST'])
 
   except models.UserGroup.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested group not found</h1>')
+
+####################################
+# Search Assignment
+####################################
+@login_required
+def searchAssignment(request):
+  # check if the user has permission to add a question
+  if hasattr(request.user, 'school_administrator') == False and hasattr(request.user, 'teacher') == False and  hasattr(request.user, 'administrator') == False:
+    return http.HttpResponseNotFound('<h1>You do not have the privilege search assignments</h1>')
+
+  if 'POST' == request.method:
+    data = request.POST.copy()
+    query_filter = {}
+    if data['curriculum_type']:
+      query_filter['curriculum_type'] = str(data['curriculum_type'])
+    if data['title']:
+      query_filter['title__icontains'] = str(data['title'])
+    if data['subject']:
+      query_filter['subject__id'] = data['subject']
+
+    query_filter['status'] = 'P'
+    curriculumQueryset = models.Curriculum.objects.filter(**query_filter)
+    curriculum_list = [{'curriculum_type': curriculum.get_curriculum_type_display(), 'title': curriculum.title, 'subject': [subject.name for subject in curriculum.subject.all()], 'id': curriculum.id} for curriculum in curriculumQueryset]
+    return http.HttpResponse(json.dumps(curriculum_list), content_type="application/json")
+
+  return http.HttpResponseNotAllowed(['POST'])
 
 ####################################
 # DELETE A USER GROUP

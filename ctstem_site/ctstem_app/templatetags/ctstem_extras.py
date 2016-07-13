@@ -31,6 +31,17 @@ def get_curriculum_question(question_id):
     return None
 
 @register.filter
+def get_curriculum_title(curriculum_id):
+  try:
+    if curriculum_id != 'None':
+      title = models.Curriculum.objects.get(id=curriculum_id).title
+      return title
+    else:
+      return None
+  except models.Curriculum.DoesNotExist:
+    return None
+
+@register.filter
 def is_in(var, obj):
     return var in obj
 

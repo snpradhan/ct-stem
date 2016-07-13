@@ -101,6 +101,10 @@ $(function (){
     $(".modal-content #password").val('');
   });
 
+  $('.modal').on('hidden.bs.modal', function(){
+    $(this).find('form')[0].reset();
+  });
+
   //user code generation
   $("#generate_code").click(function(){
     var url = "/generate_code";
@@ -305,6 +309,7 @@ function check_session(){
 }
 
 function bind_user_removal(){
+  $('a.removeUser').unbind('click');
   $('a.removeUser').click(function(e){
     e.preventDefault();
     var remove = confirm('Are you sure you want to remove the student from the group?');

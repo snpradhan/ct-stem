@@ -409,6 +409,24 @@ class TaxonomySearchForm(ModelForm):
 
       if field_name == 'category':
         field.queryset = models.Category.objects.none()
+
+####################################
+# Assignment Search Form
+####################################
+class AssignmentSearchForm(forms.Form):
+  curriculum_type = forms.ChoiceField(choices=models.CURRICULUM_TYPE_CHOICES)
+  title = forms.CharField(max_length=256)
+  subject = forms.ModelChoiceField(queryset=models.Subject.objects.all())
+
+  def __init__(self, *args, **kwargs):
+    super(AssignmentSearchForm, self).__init__(*args, **kwargs)
+
+    for field_name, field in self.fields.items():
+      field.widget.attrs['class'] = 'form-control'
+      if field.help_text:
+        field.widget.attrs['placeholder'] = field.help_text
+
+
 ####################################
 # Standards Form
 ####################################
