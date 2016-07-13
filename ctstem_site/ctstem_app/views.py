@@ -985,7 +985,7 @@ def searchTaxonomy(request):
     return http.HttpResponseNotFound('<h1>You do not have the privilege search taxonomy</h1>')
 
   subcategory = models.Subcategory()
-  title = 'Search Taxonomy'
+  title = 'Search Standards'
   if 'GET' == request.method:
     form = forms.TaxonomySearchForm(instance=subcategory)
     context = {'form': form, 'title': title}

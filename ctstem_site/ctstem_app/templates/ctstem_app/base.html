@@ -237,7 +237,7 @@
               <button type="button" class="close" data-dismiss="modal">&times;</button>
               <h3 class="modal-title">Login</h3>
             </div>
-            <div id="loginMsg">
+            <div id="loginMsg" class="msg">
             </div>
             <form class="form" id="formLogin" method="post">
               {% csrf_token %}
@@ -275,7 +275,7 @@
             <div class="modal-header">
               <h3 class="modal-title">Session Expiring</h3>
             </div>
-            <div id="sessionMsg">
+            <div id="sessionMsg" class="msg">
             </div>
             <form class="form" id="formSession" method="post" action="{% url 'ctstem:check_session' %}">
               {% csrf_token %}

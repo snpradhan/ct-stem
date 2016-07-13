@@ -95,14 +95,11 @@ $(function (){
     $('div#login').hide();
   });
 
-  $('#login').on('show.bs.modal', function () {
-    $(".modal-content #loginMsg").html('');
-    $(".modal-content #username").val('');
-    $(".modal-content #password").val('');
-  });
-
   $('.modal').on('hidden.bs.modal', function(){
     $(this).find('form')[0].reset();
+    $(this).find('.msg').html('');
+    $(this).find('.results').hide();
+    $(this).find('.results tbody').html('');
   });
 
   //user code generation

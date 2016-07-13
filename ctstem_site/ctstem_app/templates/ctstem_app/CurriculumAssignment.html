@@ -6,7 +6,7 @@
       <button type="button" class="close" data-dismiss="modal">&times;</button>
       <h3 class="modal-title">Assign to Class</h3>
     </div>
-    <div id="assignmentMsg">
+    <div id="assignmentMsg" class="msg">
     </div>
     <form class="form" id="curriculumAssignmentForm" method="post" action="{% url 'ctstem:assignCurriculum' curriculum.id%}">
       {% csrf_token %}

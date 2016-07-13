@@ -5,7 +5,7 @@
       <button type="button" class="close" data-dismiss="modal">&times;</button>
       <h3 class="modal-title">{{title}}</h3>
     </div>
-    <div id="questionMsg">
+    <div id="questionMsg" class="msg">
     </div>
     <form class="form" id="questionForm" method="post" action="{% if questionForm.instance.id %} {% url 'ctstem:question' questionForm.instance.id %} {% else %} {% url 'ctstem:newQuestion' %} {% endif %}">
       {% csrf_token %}

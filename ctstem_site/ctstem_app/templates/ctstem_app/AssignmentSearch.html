@@ -8,7 +8,7 @@
         <button type="button" class="close" data-dismiss="modal">&times;</button>
         <h3 class="modal-title">Search Assignment</h3>
       </div>
-      <div id="assignmentMsg">
+      <div id="assignmentMsg" class="msg">
       </div>
       <form class="form" id="assignmentForm" method="post" action="{% url 'ctstem:searchAssignment' %}">
         {% csrf_token %}
@@ -35,7 +35,7 @@
           </div>
         </div>
       </form>
-      <div id="assignmentResults" style="display:none;">
+      <div id="assignmentResults" style="display:none;" class="results">
         <table class="table table-bordered table-striped table-condensed inner_table">
           <thead>
             <tr>
