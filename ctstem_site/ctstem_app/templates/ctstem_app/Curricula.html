@@ -25,6 +25,8 @@
       {% if user.administrator or user.researcher or user.author %}
         <a type="button" class="btn btn-success" href="{% url 'ctstem:newCurriculum' %}" title="Create new curriculum">Create Curriculum</a>
       {% endif %}
+
+      {% comment %}
       {% if user.administrator or user.researcher or user.author or user.teacher or user.school_administrator %}
         <label class="switch">
           <input class="switch-input" type="checkbox" />
@@ -32,6 +34,7 @@
           <span class="switch-handle"></span>
         </label>
       {% endif %}
+      {% endcomment %}
     </div>
 
     {% if user.teacher %}
@@ -46,7 +49,7 @@
       </ul>
     {% endif %}
     {% if curricula %}
-      {% if user.administrator or user.researcher or user.author or user.teacher or user.school_administrator %}
+
         <div id="curricula_table">
           <table class="table table-striped dt" id="curricula">
             <thead>
@@ -166,7 +169,8 @@
             </tbody>
           </table>
         </div>
-      {% endif %}
+
+      {% comment %}
       <div id="curricula_tile">
         <section id="lessons" class="portfolio">
           <div class="container">
@@ -248,6 +252,7 @@
         <div id="pagination">
           <!--input type="button" class="btn btn-xl" value="Explore More" id="more" style="display:none;"/-->
         </div>
+        {% endcomment %}
       </div>
     {% else %}
       <p>No curriculums have been published.</p>
@@ -259,13 +264,13 @@
   <script type="text/javascript">
     $(function(){
 
-      $("div#curricula_table").hide();
+      /*$("div#curricula_table").hide();
       $("div#curricula_tile").show();
 
       $('.switch-input').change(function() {
         $("div#curricula_table").toggle();
         $("div#curricula_tile").toggle();
-      });
+      });*/
 
       $('.content').on("click", "a.assign", function(e){
         e.preventDefault();
@@ -284,7 +289,7 @@
         }
       });
 
-      $(window).scroll(function() {
+      /*$(window).scroll(function() {
         var hT = $('div#pagination').offset().top,
             hH = $('div#pagination').outerHeight(),
             wH = $(window).height(),
@@ -295,7 +300,7 @@
             $(this).delay(i*500).fadeIn(1000);
           });
         }
-      });
+      });*/
     });
   </script>
 
