@@ -236,7 +236,7 @@ class CurriculumForm(ModelForm):
 
   class Meta:
     model = models.Curriculum
-    fields = ['curriculum_type', 'title', 'icon', 'time', 'level', 'purpose', 'overview', 'status', 'subject', 'taxonomy', 'content', 'teacher_notes']
+    fields = ['curriculum_type', 'title', 'icon', 'time', 'level', 'purpose', 'overview', 'status', 'subject', 'compatible_system', 'taxonomy', 'content', 'teacher_notes']
     widgets = {
       'title': forms.TextInput(attrs={'placeholder': 'Lesson Title'}),
       'time': forms.TextInput(attrs={'rows':0, 'cols':60}),
@@ -247,6 +247,7 @@ class CurriculumForm(ModelForm):
       'teacher_notes': forms.Textarea(attrs={'rows':0, 'cols':60}),
       'taxonomy': forms.SelectMultiple(attrs={'size':5}),
       'subject': forms.SelectMultiple(attrs={'size':4}),
+      'compatible_system': forms.SelectMultiple(attrs={'size':6}),
     }
 
   def __init__(self, *args, **kwargs):

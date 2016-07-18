@@ -1,0 +1,159 @@
+/***************************************
+            *   TABLE VIEW   *
+ ***************************************/
+ table.table {
+  margin: auto;
+  border-radius: 10px;
+  border-collapse:collapse;
+  border: inherit !important;
+}
+table.table thead {
+  /*font-family: 'Montserrat, sans-serif';*/ /*'QuaTrocento Regular';*/
+  font-size: 1.5em;
+  font-weight: 400;
+}
+table.table thead tr#filterrow th{
+  font-size: 1em;
+}
+table.table thead tr#filterrow th input{
+  width: 100%;
+}
+table.table tbody {
+  /*font-family: 'Roboto Condensed Light';*/
+  font-size: 1.4em;
+}
+
+table.table tr:first-child th:first-child {
+    border-top-left-radius: 10px;
+    -moz-border-top-left-radius:: 10px;
+}
+table.table tr:first-child th:last-child {
+  border-top-right-radius: 10px;
+  -moz-border-top-right-radius: 10px;
+}
+table.table tr:last-child td:first-child {
+  border-bottom-left-radius: 10px;
+  -moz-border-bottom-left-radius: 10px;
+}
+table.table tr:last-child td:last-child {
+  border-bottom-right-radius: 10px;
+  -moz-border-bottom-right-radius: 10px;
+}
+table.table td {
+  vertical-align: middle !important;
+}
+table.table td.status {
+  font-weight: bold;
+}
+table.table td > div.title {
+  font-size: 1.4em;
+  font-weight: bold;
+  margin-bottom: 1em;
+}
+
+table.table.dt thead tr:not(#filterrow), table.table.inner_table thead tr {
+  background-color: #666666;
+  color: #e5e5e5;
+}
+table.table.inner_table {
+  margin-top: 1em;
+}
+table.table.inner_table thead tr {
+  font-size: 0.9em;
+}
+
+table.table thead tr:not(#filterrow) th{
+  text-align: center;
+}
+table.table[id^='subcategory_'] thead {
+  background-color: #5a3163;
+  color: #f2f2f2;
+}
+
+table.table#assignments {
+  text-align: center;
+}
+table.table#assignments td.thumb {
+  width: 7%;
+  vertical-align: middle;
+}
+
+table.table.sub {
+  display:none;
+  max-width: 60%;
+  min-width: 40%;
+  text-align: center;
+}
+table.table.sub a:hover {
+  cursor: pointer;
+}
+
+table.table#assignment_info, table.table#feedback_header {
+  text-align: center;
+  font-size: 1.2em;
+  font-weight: bold;
+  margin-bottom: 2em;
+}
+table.table#feedback_header {
+  width: 100%;
+}
+
+table.table#subcategory_1 thead {
+  background-color: #990d00;
+  color: #f2f2f2;
+}
+
+table.table#subcategory_2 thead {
+  background-color: #20608e;
+  color: #f2f2f2;
+}
+
+table.table#subcategory_3 thead {
+  background-color: #a66806;
+  color: #f2f2f2;
+}
+
+table.table#subcategory_4 thead {
+  background-color: #5d7f19;
+  color: #f2f2f2;
+}
+
+table.table#assignments img.icon {
+  width: 50%;
+}
+table.table#curricula td {
+  padding: 1em;
+}
+table.table#curricula td.icon,  table.table#curricula td.action{
+  text-align: center;
+}
+table.table#curricula td.action a {
+  display: inline-block;
+  font-size: 2rem;
+  width: 2rem;
+  height: 2rem;
+  text-align: center;
+  margin: 0.5rem 1rem 0 0;
+  background-color: transparent;
+  color: black;
+}
+table.table#curricula td.action a:hover {
+  color: rgb(70, 160, 215);
+  text-decoration: none;
+}
+table.table#curricula td.action a.fa-trash:hover { color: red; }
+
+table.table#curricula td.action a.fa-star {
+  color: orange;
+}
+table.table#curricula td.information div.row {
+  margin-bottom: 0.5em;
+}
+table.table#curricula td.information div.title {
+  font-weight: bold;
+}
+
+table.table#team img.icon {
+  max-width: 100px;
+  height: auto;
+}

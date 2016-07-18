@@ -1,4 +1,3 @@
-from django.http import HttpResponse
 from ctstem_app import models, forms
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.decorators import login_required
@@ -28,6 +27,10 @@ from django.utils import timezone
 from django.core.mail import send_mail, EmailMessage
 from django.contrib.sites.models import Site
 from django.core import serializers
+import zipfile
+from django.core.files import File
+import urllib2
+from urllib import urlretrieve
 
 ####################################
 # HOME
@@ -225,9 +228,13 @@ def previewCurriculum(request, id=''):
     if request.method == 'GET':
       steps = models.Step.objects.all().filter(curriculum=curriculum)
       attachments = models.Attachment.objects.all().filter(curriculum=curriculum)
+      systems = models.System.objects.all()
 
-      context = {'curriculum': curriculum, 'attachments': attachments, 'steps':steps}
-      return render(request, 'ctstem_app/CurriculumPreview.html', context)
+      context = {'curriculum': curriculum, 'attachments': attachments, 'steps':steps, 'systems': systems}
+      if curriculum.curriculum_type == 'L':
+        return render(request, 'ctstem_app/lesson_template/Lesson.html', context)
+      else:
+        return render(request, 'ctstem_app/CurriculumPreview.html', context)
 
     return http.HttpResponseNotAllowed(['GET'])
 
@@ -273,7 +280,66 @@ def render_to_pdf(template_src, context_dict, request):
   pdf = pisa.pisaDocument(StringIO.StringIO(html.encode('utf-8')), dest=result, link_callback=fetch_resources, encoding='utf-8')
   if not pdf.err:
     return http.HttpResponse(result.getvalue(), content_type='application/pdf')
-  return HttpResponse('We had some errors! %s' % escape(html))
+  return http.HttpResponse('We had some errors! %s' % escape(html))
+
+
+####################################
+# Download Lesson attachments
+####################################
+def downloadAttachments(request, id=''):
+  try:
+    # check if the user has permission to delete a lesson
+    if request.user.is_anonymous() or hasattr(request.user, 'student'):
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to download attachments</h1>')
+    # check if the lesson exists
+    if '' != id:
+      curriculum = models.Curriculum.objects.get(id=id)
+    else:
+      raise models.Curriculum.DoesNotExist
+
+    if request.method == 'GET' or request.method == 'POST':
+      # Files (local path) to put in the .zip
+      # FIXME: Change this (get paths from DB etc)
+      attachments = models.Attachment.objects.all().filter(curriculum=curriculum)
+
+      # Folder name in ZIP archive which contains the above files
+      # E.g [thearchive.zip]/somefiles/file2.txt
+      # FIXME: Set this to something better
+      zip_subdir = curriculum.title
+      zip_filename = "%s.zip" % zip_subdir
+
+      # Open StringIO to grab in-memory ZIP contents
+      s = StringIO.StringIO()
+
+      # The zip compressor
+      zf = zipfile.ZipFile(s, "w")
+
+      for attachment in attachments:
+        # Calculate path for file in zip
+        file = attachment.file_object
+        fname = attachment.file_object.name.split('/')[-1]
+        urlretrieve(file.url,"/tmp/%s"%fname)
+        #fdir, fname = os.path.split(fpath)
+        zip_path = os.path.join(zip_subdir, fname)
+
+        # Add file, at correct path
+        zf.write("/tmp/%s"%fname, zip_path)
+        os.remove("/tmp/%s"%fname)
+
+      # Must close zip for all contents to be written
+      zf.close()
+
+      # Grab ZIP file from in-memory, make response with correct MIME-type
+      response = http.HttpResponse(s.getvalue(), content_type="application/x-zip-compressed")
+      # ..and correct content-disposition
+      response['Content-Disposition'] = 'attachment; filename=%s' % zip_filename
+
+      return response
+
+    return http.HttpResponseNotAllowed(['GET', 'POST'])
+
+  except models.Curriculum.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested Curriculum not found</h1>')
 ####################################
 # DELETE a curriculum
 ####################################

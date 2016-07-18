@@ -259,6 +259,15 @@ $(function (){
     });
     return false;
   });
+
+  $('body').on("click", "a.assign", function(e){
+    e.preventDefault();
+    var url = $(this).data("form");
+    $("#assignmentModal").load(url, function() {
+      $(this).modal('show');
+    });
+    return false;
+  });
 });
 
 function check_session(){

@@ -102,7 +102,7 @@
                   {{field}}
                 </div>
               {% endif %}
-              {% if field.name == 'icon' or field.name == 'subject' %}
+              {% if field.name == 'icon' or field.name == 'subject' or field.name == 'compatible_system'%}
                 <div class="help warning">{{field.help_text}}</div>
               {% endif %}
               <div class="error">{{ field.errors }}</div>

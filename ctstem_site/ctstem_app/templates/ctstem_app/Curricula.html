@@ -268,16 +268,6 @@
         $("div#curricula_table").toggle();
         $("div#curricula_tile").toggle();
       });*/
-
-      $('.content').on("click", "a.assign", function(e){
-        e.preventDefault();
-        var url = $(this).data("form");
-          $("#assignmentModal").load(url, function() {
-          $(this).modal('show');
-        });
-        return false;
-      });
-
       $('.portfolio-item').each(function(){
         var id = $(this).attr('id');
         var index = parseInt(id, 10);

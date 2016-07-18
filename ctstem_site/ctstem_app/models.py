@@ -111,6 +111,7 @@ class Curriculum (models.Model):
   teacher_notes = RichTextUploadingField(null=True, blank=True)
   status = models.CharField(max_length=1, default='D', choices=CURRICULUM_STATUS_CHOICES)
   subject = models.ManyToManyField('Subject', null=True, blank=True, help_text="Select one or more subjects")
+  compatible_system = models.ManyToManyField('System', null=True, blank=True, help_text="Select one or more compatible systems")
   parent = models.ForeignKey('self', null=True, on_delete=models.SET_NULL)
   version = models.IntegerField(default=1)
   slug = models.SlugField(unique=True, max_length=255)
@@ -195,6 +196,14 @@ class Question(models.Model):
 class Subject(models.Model):
   name = models.CharField(null=False, max_length=256)
   abbrevation = models.CharField(null=True, blank=True, max_length=10)
+
+  def __unicode__(self):
+      return u'%s' % (self.name)
+
+# Compatible devices and OS
+class System(models.Model):
+  name = models.CharField(null=False, max_length=256)
+  icon = models.CharField(null=False, max_length=256)
 
   def __unicode__(self):
       return u'%s' % (self.name)

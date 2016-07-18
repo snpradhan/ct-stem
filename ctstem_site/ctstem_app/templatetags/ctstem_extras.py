@@ -118,6 +118,10 @@ def is_bookmarked(obj, qset):
   return obj in qset
 
 @register.filter
+def is_favorite(curriculum_id, teacher_id):
+  return models.BookmarkedCurriculum.objects.all().filter(curriculum__id=curriculum_id, teacher__id=teacher_id).exists()
+
+@register.filter
 def getFeedback(response_id):
   feedback = models.QuestionFeedback.objects.all().filter(response__id=response_id)[0]
   return feedback.feedback
