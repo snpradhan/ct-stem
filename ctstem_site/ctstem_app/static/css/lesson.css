@@ -190,6 +190,30 @@ img.preview {
   margin-bottom: 2em;
 }
 
+div.modal * {
+  font-family: "Roboto Slab", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+  font-size: 0.8rem !important;
+}
+
+div.modal h3, div.modal .modal-footer .btn{
+  font-family: Montserrat, "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+  text-transform: uppercase !important;
+  font-weight: 700 !important;
+}
+div.modal h3 {
+  font-size: 24px !important;
+}
+div.modal .modal-footer .btn{
+  font-size: 14px !important;
+}
+
+div.modal button.close {
+  -webkit-appearance: none;
+  padding: 0;
+  cursor: pointer;
+  background: 0 0;
+  border: 0
+}
 /* BYLINE AND SOCIAL MEDIA */
 .byline {
   font-size: 1.1rem;

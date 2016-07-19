@@ -134,7 +134,8 @@
                     <a class="util-button fa fa-eye" aria-hidden="true" title="Preview Curriculum" href="{% url 'ctstem:previewCurriculum' curriculum.id %}" target="_blank">
                     </a>
                     {% if curriculum.curriculum_type == 'L' %}
-                      <a class="util-button fa fa-print" aria-hidden="true" title="Print" href="{% url 'ctstem:pdfCurriculum' curriculum.id %}"></a>
+                      <a class="util-button fa fa-print" aria-hidden="true" title="Print" href="{% url 'ctstem:previewCurriculum' curriculum.id %}"></a>
+                      <!--a class="util-button fa fa-print" aria-hidden="true" title="Print" href="{% url 'ctstem:pdfCurriculum' curriculum.id %}"></a-->
                     {% endif %}
                     {% if user.administrator or user.researcher or user.author %}
                       {% if curriculum.status == 'D' or curriculum.status == 'P'%}
@@ -268,6 +269,13 @@
         $("div#curricula_table").toggle();
         $("div#curricula_tile").toggle();
       });*/
+
+      $('.content').on("click", 'a.fa-print', function(e){
+        e.preventDefault();
+        var url = $(this).attr('href');
+        var W = window.open(url);
+        W.window.print();
+      });
       $('.portfolio-item').each(function(){
         var id = $(this).attr('id');
         var index = parseInt(id, 10);

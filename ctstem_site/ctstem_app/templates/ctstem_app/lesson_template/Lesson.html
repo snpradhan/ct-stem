@@ -1,7 +1,7 @@
 {% extends "ctstem_app/base.html" %}
 {% load ctstem_extras %}
 
-{% block title %} Curriculum {%endblock %}
+{% block title %} {{curriculum.title}} {%endblock %}
 
 {% block bootstrap_css %}{% endblock %}
 {% block datatable %}{% endblock %}
@@ -13,291 +13,291 @@
   <link rel="stylesheet" href="/static/css/bootstrap-modal.css">
   <link rel="stylesheet" href="/static/css/table.css">
   <link rel="stylesheet" href="/static/css/lesson.css">
-  <!-- Place this tag in your head or just before your close body tag. -->
-
 {% endblock %}
 
 {% block header %}{% endblock %}
 
 {% block content %}
   <div>
+    <!-- Facebook share js -->
+    <div id="fb-root"></div>
+    <script>(function(d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.7";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));</script>
+    <!-- Google Plus share js -->
+    <script type="text/javascript">
+      (function() {
+        var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+        po.src = 'https://apis.google.com/js/platform.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+      })();
+    </script>
 
-  <div id="fb-root"></div>
-  <script>(function(d, s, id) {
-    var js, fjs = d.getElementsByTagName(s)[0];
-    if (d.getElementById(id)) return;
-    js = d.createElement(s); js.id = id;
-    js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.7";
-    fjs.parentNode.insertBefore(js, fjs);
-  }(document, 'script', 'facebook-jssdk'));</script>
+    <!-- TOP HEADER BAR -->
+    <header>
+      <h1>CT-STEM</h1>  Computational Thinking Curriculum
+      <nav><button id="menu-button"><span class="fa fa-navicon"></span></button></nav>
+    </header>
 
+    <!-- SIDE MENU -->
+    <nav id="side-nav">
+      <ul>
+        <li><a href="#" class="lesson">View Lesson</a></li>
+        {% if user.administrator or user.researcher or user.school_administrator or user.author or user.teacher %}
+          <li><a href="#" class="notes">View Teacher Notes</a></li>
+          <li><a href="#" class="activity">View Student Activity</a></li>
+        {% endif %}
+        <li><a href="#" class="faq"">View CT FAQ</a></li>
 
-  <!-- TOP HEADER BAR -->
-  <header>
-    <h1>CT-STEM</h1>  Computational Thinking Curriculum
-    <nav><button id="menu-button"><span class="fa fa-navicon"></span></button></nav>
-  </header>
+        {% if user.teacher %}
+          {% if curriculum.id|is_favorite:user.teacher.id %}
+            <li><a id="favorites-link" class="favorites">Remove from Favorites</a></li>
+          {% else %}
+            <li><a id="favorites-link" class="favorites">Add to Favorites</a></li>
+          {% endif %}
+        {% endif %}
+        {% if user.administrator or user.school_administrator %}
+          <li><a class="assign" href="#" data-form="{% url 'ctstem:assignCurriculum' curriculum.id%}">Assign to Classes</a></li>
+        {% elif user.teacher %}
+          <li><a class="assign" href="#" data-form="{% url 'ctstem:assignCurriculum' curriculum.id%}">Assign to My Classes</a></li>
+        {% endif %}
 
+        <!-- TODO: LINK TO ATTACHMENT -->
+        {% if user.administrator or user.researcher or user.school_administrator or user.author or user.teacher %}
+          {% if attachments %}
+            <li><a href="{% url 'ctstem:downloadAttachments' curriculum.id%}">Download Attachment(s) <span class="fa fa-paperclip"></span></a></li>
+          {% endif %}
+        {% endif %}
+        <li><a href="javascript:window.print();">Print This Page <span class="fa fa-print "></span></a></li>
 
-  <!-- SIDE MENU -->
-  <nav id="side-nav">
-    <ul>
-      <li><a href="#" class="lesson">View Lesson</a></li>
-      {% if user.administrator or user.researcher or user.school_administrator or user.author or user.teacher %}
-        <li><a href="#" class="notes">View Teacher Notes</a></li>
-        <li><a href="#" class="activity">View Student Activity</a></li>
-      {% endif %}
-      <li><a href="#" class="faq"">View CT FAQ</a></li>
-
-      {% if user.teacher %}
-        {% if curriculum.id|is_favorite:user.teacher.id %}
-          <li><a id="favorites-link" class="favorites">Remove from Favorites</a></li>
+        {% if user.is_anonymous %}
+          <li><a data-toggle="modal" data-target="#login" class="login" href="#">Login</a></li>
         {% else %}
-          <li><a id="favorites-link" class="favorites">Add to Favorites</a></li>
+          <li><a href="{% url 'ctstem:logout' %}">Logout</a></li>
         {% endif %}
-      {% endif %}
-      {% if user.administrator or user.school_administrator %}
-        <li><a class="assign" href="#" data-form="{% url 'ctstem:assignCurriculum' curriculum.id%}">Assign to Classes</a></li>
-      {% elif user.teacher %}
-        <li><a class="assign" href="#" data-form="{% url 'ctstem:assignCurriculum' curriculum.id%}">Assign to My Classes</a></li>
-      {% endif %}
+        <!-- END IF -->
+      </ul>
+    </nav>
 
-      <!-- TODO: LINK TO ATTACHMENT -->
-      {% if user.administrator or user.researcher or user.school_administrator or user.author or user.teacher %}
-        {% if attachments %}
-          <li><a href="{% url 'ctstem:downloadAttachments' curriculum.id%}">Download Attachment(s) <span class="fa fa-paperclip"></span></a></li>
-        {% endif %}
-      {% endif %}
-      <li><a href="javascript:window.print();">Print This Page <span class="fa fa-print "></span></a></li>
+    <!-- MAIN CONTENT -->
+    <main>
+      <h1>{{curriculum.title|title}}</h1>
 
-      {% if user.is_anonymous %}
-        <li><a data-toggle="modal" data-target="#login" class="login" href="#">Login</a></li>
-      {% else %}
-        <li><a href="{% url 'ctstem:logout' %}">Logout</a></li>
-      {% endif %}
-      <!-- li>Sign Out</li -->
-      <!-- END IF -->
-    </ul>
-  </nav>
+      <div class="byline">
+        <!-- TODO: Need author URL field in database -->
+        <!-- TODO: Byline might also say "Curriculum adapted from XYZ" -->
+        Original curriculum by <a href="#">{{curriculum.author.get_full_name}}</a>
 
-
-  <!-- MAIN CONTENT -->
-  <main>
-    <h1>{{curriculum.title|title}}</h1>
-    <h2></h2>
-
-    <div class="byline">
-      <!-- TODO: Need author URL field in database -->
-      <!-- TODO: Byline might also say "Curriculum adapted from XYZ" -->
-      Original curriculum by <a href="#">{{curriculum.author.get_full_name}}</a>
-
-      <!-- SOCIAL MEDIA SHARE BUTTONS -->
-      <!-- TODO: Activate social media buttons -->
-      <div class="share-box">
-        <button class="share-button fa fa-twitter"></button>
-        <button class="share-button fa fa-facebook"></button>
-        <button class="share-button fa fa-pinterest-p"></button>
-        <button class="share-button fa fa-google-plus"></button>
-        <button class="share-button fa fa-envelope"></button>
-        <a class="facebook" target="_blank" onclick="return !window.open(this.href, 'Facebook', 'width=640,height=300')">Facebook</a>
-        <!-- Place this tag where you want the share button to render. -->
-
+        <!-- SOCIAL MEDIA SHARE BUTTONS -->
+        <!-- TODO: Activate social media buttons -->
+        <div class="share-box">
+          <button class="share-button fa fa-twitter"></button>
+          <button class="share-button fa fa-facebook"></button>
+          <button class="share-button fa fa-pinterest-p"></button>
+          <button class="share-button fa fa-google-plus"></button>
+          <button class="share-button fa fa-envelope"></button>
+        </div>
       </div>
-      <!-- Place this tag where you want the share button to render. -->
-<div class="g-plus" data-action="share" data-annotation="none" data-height="30"></div>
 
-<!-- Place this tag after the last share tag. -->
-<script type="text/javascript">
-  (function() {
-    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
-    po.src = 'https://apis.google.com/js/platform.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
-  })();
-</script>
-    </div>
+      <!-- LESSON META DATA -->
+      <p style="margin-bottom: 0.5rem;">
+        <b>Subject:</b> {{curriculum.subject.all|join:','}}<br>
+        <b>Time:</b> {{curriculum.time}}<br>
+        <b>Level:</b> {{curriculum.level}}<br>
+      </p>
 
-    <!-- LESSON META DATA -->
-    <p style="margin-bottom: 0.5rem;">
-      <b>Subject:</b> {{curriculum.subject.all|join:','}}<br>
-      <b>Time:</b> {{curriculum.time}}<br>
-      <b>Level:</b> {{curriculum.level}}<br>
-    </p>
-
-    <!-- UTILITY BUTTONS -->
-    <!-- TODO: IMPLEMENT ASSIGN TO STUDENTS -->
-    <div>
-      {% if user.teacher %}
-        {% if curriculum.id|is_favorite:user.teacher.id %}
-          <a class="util-button fa fa-star favorites" id="favorites-icon" title="Remove from Favorites"></a>
-        {% else %}
-          <a class="util-button fa fa-star-o favorites" id="favorites-icon" title="Add to My Favorites"></a>
+      <!-- UTILITY BUTTONS -->
+      <!-- TODO: IMPLEMENT ASSIGN TO STUDENTS -->
+      <div>
+        {% if user.teacher %}
+          {% if curriculum.id|is_favorite:user.teacher.id %}
+            <a class="util-button fa fa-star favorites" id="favorites-icon" title="Remove from Favorites"></a>
+          {% else %}
+            <a class="util-button fa fa-star-o favorites" id="favorites-icon" title="Add to My Favorites"></a>
+          {% endif %}
         {% endif %}
-      {% endif %}
-      <a class="util-button fa fa-print" href="javascript:window.print();" title="Print"></a>
-      {% if user.administrator or user.school_administrator %}
-        <a class="assign util-button fa fa-calendar-check-o" aria-hidden="true" data-form="{% url 'ctstem:assignCurriculum' curriculum.id%}" aria-label="Assign to Classes" title="Assign to Classes"></a>
-      {% elif user.teacher %}
-        <a class="assign util-button fa fa-calendar-check-o" aria-hidden="true" data-form="{% url 'ctstem:assignCurriculum' curriculum.id%}" aria-label="Assign to Classes" title="Assign to My Classes"></a>
-      {% endif %}
-    </div>
-
-    <!-- MAIN IMAGE -->
-    <!-- TODO: We might need to collect multiple resolution images for the main image and thumbnails -->
-    <figure>
-      {% if curriculum.icon %}
-        <img src="{{curriculum.icon.url}}" class="preview"/>
-      {% endif %}
-      <figcaption></figcaption>
-    </figure>
-
-
-    <!-- TODO: Think about how to implement popup glossary -->
-
-    <h3>Overview</h3>
-    {{curriculum.overview}}
-
-    {{curriculum.content|safe}}
-
-    <!-- TODO: Should this be in the database?? -->
-    <h3>Compatible With</h3>
-    <div class="compatibility">
-      {% for system in systems %}
-        <div class="compatible-item {% if system not in curriculum.compatible_system.all %} incompatible {% endif %}">
-          <span class="fa fa-{{system.icon}}"></span><br>
-          {{system.name}}
-        </div>
-      {% endfor %}
-    </div>
-
-    <!-- WHAT'S NEXT - This is the same for every lesson so it doesn't need to be dynamic -->
-    <h3>What's Next?</h3>
-    <p>
-    <ul>
-      <li><a href="#" class="notes">Read the teacher notes</a></li>
-      <li><a href="#" class="activity">Look at the student activity</a></li>
-
-      <!-- TODO: PROMPT THEM TO LOG IN FOR THIS LINK -->
-      <li><a href="#" class="assign" data-form="{% url 'ctstem:assignCurriculum' curriculum.id%}" >Assign this to my classes</a></li>
-    </ul>
-    </p>
-
-    <!-- STANDARDS BOX -->
-    <!-- TODO: Figure out how to make the links work. Not sure what they should like to?? -->
-    <h3>Standards</h3>
-    <div class="standards">
-      {% for standard, categories in curriculum.taxonomy.all|taxonomyHelper %}
-        <b>{{standard}}</b>
-        <ul>
-          {% for category, taxonomies in categories.items %}
-            <li>{{category}}</li>
-            <ul>
-              {% for taxonomy in taxonomies %}
-                <li>{% if taxonomy.code %}<a href="#">[{{taxonomy.code}}]</a>{% endif %} {{taxonomy}}</li>
-              {% endfor %}
-            </ul>
-          {% endfor %}
-        </ul>
-        {% if not forloop.last %}
-          <hr>
+        <a class="util-button fa fa-print" href="javascript:window.print();" title="Print"></a>
+        {% if user.administrator or user.school_administrator %}
+          <a class="assign util-button fa fa-calendar-check-o" aria-hidden="true" data-form="{% url 'ctstem:assignCurriculum' curriculum.id%}" aria-label="Assign to Classes" title="Assign to Classes"></a>
+        {% elif user.teacher %}
+          <a class="assign util-button fa fa-calendar-check-o" aria-hidden="true" data-form="{% url 'ctstem:assignCurriculum' curriculum.id%}" aria-label="Assign to Classes" title="Assign to My Classes"></a>
         {% endif %}
-      {% endfor %}
-    </div>
+      </div>
 
-    <!-- FACEBOOK MESSAGE BOARD -->
-    <!-- TODO: Need to figure out how to make this work for dynamically generated lessons -->
-    <h3>Comments, Feedback, and Quesitons</h3>
+      <!-- MAIN IMAGE -->
+      <!-- TODO: We might need to collect multiple resolution images for the main image and thumbnails -->
+      <figure>
+        {% if curriculum.icon %}
+          <img src="{{curriculum.icon.url}}" class="preview"/>
+        {% endif %}
+        <figcaption></figcaption>
+      </figure>
 
-    <div class="fb-comments"  data-width="600" data-numposts="5"></div>
-  </main>
+      <!-- TODO: Think about how to implement popup glossary -->
 
-  <notes style="display:none;">
-    <h1>{{curriculum.title|title}}</h1>
-    <h2>Teacher Notes</h2>
+      <h3>Overview</h3>
+      {{curriculum.overview}}
 
-    {{curriculum.teacher_notes|safe}}
-  </notes>
+      {{curriculum.content|safe}}
 
-  <activity style="display:none;">
-    <h1>{{curriculum.title|title}}</h1>
-    <h2>Student Activity</h2>
-
-    {% for step in steps %}
-      <div class="stepPreview">
-        <div class="step_title byline">
-          {{step.title}} ({{forloop.counter}}/{{steps|length}})
-        </div>
-        <div class="step_context">{{step.content|inline_style|safe}}</div>
-        {% for curriculumquestion in step.curriculumquestion_set.all %}
-          <div class="question_container">
-            {% with question=curriculumquestion.question %}
-            <div class="question_text">
-              <label> Question: </label>
-              <div> {{question.question_text|inline_style|safe }} </div>
-            </div>
-            <div class="answer_field">
-            {% with field_type=question.answer_field_type %}
-              {% if field_type == 'TA' %}
-                <br><br><br><br><br>
-              {% elif field_type == 'TF' %}
-                <br><br><br>
-              {% elif field_type == 'MC' or field_type == 'DD' %}
-                <div class="note"> Note: Select one answer </div>
-                {% for option in question.options|splitlines %}
-                  <input type="radio" name="{{question.id}}" id="{{question.id}}" value="{{option}}" disabled/>  {{option}}<br>
-                {% endfor %}
-              {% elif field_type == 'MS' %}
-                <div class="note"> Note: Select all that apply </div>
-                {% for option in question.options|splitlines %}
-                  <input type="checkbox" name="{{question.id}}_cb" id="{{question.id}}_cb" value="{{option}}" disabled/>  {{option}}<br>
-                {% endfor %}
-              {% elif field_type == 'FI' %}
-                <div class="note"> Note: Upload a file </div>
-                <input type="file" placeholder="Upload your file" class="form-control" disabled/>
-              {% endif %}
-              {% endwith %}
-            </div>
-            {% endwith %}
+      <!-- TODO: Should this be in the database?? -->
+      <h3>Compatible With</h3>
+      <div class="compatibility">
+        {% for system in systems %}
+          <div class="compatible-item {% if system not in curriculum.compatible_system.all %} incompatible {% endif %}">
+            <span class="fa fa-{{system.icon}}"></span><br>
+            {{system.name}}
           </div>
         {% endfor %}
       </div>
-    {% endfor %}
-  </activity>
 
-  <faq style="display:none;">
-    <h1>CT-STEM FAQ</h1>
+      <!-- WHAT'S NEXT - This is the same for every lesson so it doesn't need to be dynamic -->
+      <h3>What's Next?</h3>
+      <p>
+      <ul>
+        <li><a href="#" class="notes">Read the teacher notes</a></li>
+        <li><a href="#" class="activity">Look at the student activity</a></li>
 
-  </faq>
+        <!-- TODO: PROMPT THEM TO LOG IN FOR THIS LINK -->
+        <li><a href="#" class="assign" data-form="{% url 'ctstem:assignCurriculum' curriculum.id%}">Assign this to my classes</a></li>
+      </ul>
+      </p>
 
+      <!-- STANDARDS BOX -->
+      <!-- TODO: Figure out how to make the links work. Not sure what they should like to?? -->
+      <h3>Standards</h3>
+      <div class="standards">
+        {% for standard, categories in curriculum.taxonomy.all|taxonomyHelper %}
+          <b>{{standard}}</b>
+          <ul>
+            {% for category, taxonomies in categories.items %}
+              <li>{{category}}</li>
+              <ul>
+                {% for taxonomy in taxonomies %}
+                  <li>{% if taxonomy.code %}<a href="#">[{{taxonomy.code}}]</a>{% endif %} {{taxonomy}}</li>
+                {% endfor %}
+              </ul>
+            {% endfor %}
+          </ul>
+          {% if not forloop.last %}
+            <hr>
+          {% endif %}
+        {% endfor %}
+      </div>
 
+      <!-- FACEBOOK MESSAGE BOARD -->
+      <h3>Comments, Feedback, and Quesitons</h3>
+      <div class="fb-comments"  data-width="600" data-numposts="5"></div>
+    </main>
 
-  <!-- FOOTER -->
-  <footer>
-    <p>
-      <!-- TODO: Come up with terms of use page! -->
-      <a href="termsofuse.html">
-      <span class="fa fa-creative-commons fa-2x" style="position: relative; top: 5px; margin-right: 2px;"></span> 2016.
-      Some Rights Reserved</a>.
-    </p>
-    <p>
-      This material was developed by the CT-STEM Project at Northwestern University. <br>
-      To inquire about using our material in your school or as part of research, please contact
-      <a href="mailto:ct-stem@ccl.northwestern.edu">ct-stem@ccl.northwestern.edu</a>.
-    </p>
-    <p>
-      This work was made possible through generous support from the National Science Foundation (grants CNS-1138461 and CNS 1441041) and the Spencer Foundation (Award #201600069). Any opinions, findings, or recommendations expressed in this material are those of the author(s) and do not necessarily reflect the views of the funding organizations.
-    </p>
-  </footer>
+    <notes style="display:none;">
+      <h1>{{curriculum.title|title}}</h1>
+      <h2>Teacher Notes</h2>
+
+      {{curriculum.teacher_notes|safe}}
+    </notes>
+
+    <activity style="display:none;">
+      <h1>{{curriculum.title|title}}</h1>
+      <h2>Student Activity</h2>
+
+      {% for step in steps %}
+        <div class="stepPreview">
+          <div class="step_title byline">
+            {{step.title}} ({{forloop.counter}}/{{steps|length}})
+          </div>
+          <div class="step_context">{{step.content|inline_style|safe}}</div>
+          {% for curriculumquestion in step.curriculumquestion_set.all %}
+            <div class="question_container">
+              {% with question=curriculumquestion.question %}
+              <div class="question_text">
+                <label> Question: </label>
+                <div> {{question.question_text|inline_style|safe }} </div>
+              </div>
+              <div class="answer_field">
+              {% with field_type=question.answer_field_type %}
+                {% if field_type == 'TA' %}
+                  <br><br><br><br><br>
+                {% elif field_type == 'TF' %}
+                  <br><br><br>
+                {% elif field_type == 'MC' or field_type == 'DD' %}
+                  <div class="note"> Note: Select one answer </div>
+                  {% for option in question.options|splitlines %}
+                    <input type="radio" name="{{question.id}}" id="{{question.id}}" value="{{option}}" disabled/>  {{option}}<br>
+                  {% endfor %}
+                {% elif field_type == 'MS' %}
+                  <div class="note"> Note: Select all that apply </div>
+                  {% for option in question.options|splitlines %}
+                    <input type="checkbox" name="{{question.id}}_cb" id="{{question.id}}_cb" value="{{option}}" disabled/>  {{option}}<br>
+                  {% endfor %}
+                {% elif field_type == 'FI' %}
+                  <div class="note"> Note: Upload a file </div>
+                  <input type="file" placeholder="Upload your file" class="form-control" disabled/>
+                {% endif %}
+                {% endwith %}
+              </div>
+              {% endwith %}
+            </div>
+          {% endfor %}
+        </div>
+      {% endfor %}
+    </activity>
+
+    <faq style="display:none;">
+      <h1>CT-STEM FAQ</h1>
+    </faq>
+
+    <!-- FOOTER -->
+    <footer>
+      <p>
+        <!-- TODO: Come up with terms of use page! -->
+        <a href="termsofuse.html">
+        <span class="fa fa-creative-commons fa-2x" style="position: relative; top: 5px; margin-right: 2px;"></span> 2016.
+        Some Rights Reserved</a>.
+      </p>
+      <p>
+        This material was developed by the CT-STEM Project at Northwestern University. <br>
+        To inquire about using our material in your school or as part of research, please contact
+        <a href="mailto:ct-stem@ccl.northwestern.edu">ct-stem@ccl.northwestern.edu</a>.
+      </p>
+      <p>
+        This work was made possible through generous support from the National Science Foundation (grants CNS-1138461 and CNS 1441041) and the Spencer Foundation (Award #201600069). Any opinions, findings, or recommendations expressed in this material are those of the author(s) and do not necessarily reflect the views of the funding organizations.
+      </p>
+    </footer>
   </div>
-  <div>
 
+  <div>
     <div class="modal fade" id="assignmentModal" role="dialog"></div>
   </div>
 
   <script type="text/javascript">
     $(function(){
+
       $('.fb-comments').data('href', window.location.href);
-      $('a.facebook').attr('href', 'http://www.facebook.com/sharer/sharer.php?u='+window.location.href);
-      $('.g-plus').data('href', window.location.href);
+
+      $('body').on('click', 'button.fa-facebook', function(){
+        window.open('https://www.facebook.com/sharer/sharer.php?u='+window.location.href+'&title={{curriculum.title}}', 'Facebook', 'width=640,height=300');
+      });
+
+      $('body').on('click', 'button.fa-google-plus', function(){
+        window.open('https://plus.google.com/share?url='+window.location.href+'&title={{curriculum.title}}', 'Google+', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600');
+      });
+
+      $('body').on('click', 'button.fa-twitter', function(){
+        window.open('https://twitter.com/share?url='+window.location.href+'&text={{curriculum.title}}', 'Twitter', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600');
+      });
+
+      $('body').on('click', 'button.fa-pinterest-p', function(){
+        window.open('http://pinterest.com/pin/create/button/?url='+encodeURI(window.location.href)+'&media={% if curriculum.icon %}{{curriculum.icon.url}}{% endif %}&description={{curriculum.title}}', 'Pinterest', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600');
+      });
+      $('body').on('click', 'button.fa-envelope', function(){
+        window.location = 'mailto:?subject={{curriculum.title}}&body='+window.location.href;
+      });
+
 
       $('body').on('click', 'a.lesson', function(){
         $('main').show();
@@ -332,7 +332,6 @@
         //$('#side-nav').css('right', '0px');
       });
 
-
       //--------------------------------------------------------------------------
       // Toggle favorites
       // TODO -- needs to update the database in addition to updating the DOM
@@ -366,11 +365,14 @@
 
       $('body').on("click", "a.assign", function(e){
         e.preventDefault();
-        var url = $(this).data('form');
-        $("#assignmentModal").load(url, function() {
-
-          $(this).modal('show');
-        });
+        {% if user.is_anonymous %}
+          alert('Please login to assign this lesson');
+        {% else %}
+          var url = $(this).data('form');
+          $("#assignmentModal").load(url, function() {
+            $(this).modal('show');
+          });
+        {% endif %}
         return false;
       });
     });
