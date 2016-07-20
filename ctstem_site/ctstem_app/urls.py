@@ -70,7 +70,8 @@ urlpatterns = [
     url(r'^school/new/$', views.school, name='newSchool'),
     url(r'^school/delete/(?P<id>[\d]+)/$', views.deleteSchool, name='deleteSchool'),
     url(r'^check_session/$', views.check_session, name='check_session'),
-     url(r'^feedback/(?P<assignment_id>[\d]+)/(?P<instance_id>[\d]+)/$', views.feedback, name='feedback'),
+    url(r'^feedback/(?P<assignment_id>[\d]+)/(?P<instance_id>[\d]+)/$', views.feedback, name='feedback'),
+    url(r'^opt_in/$', views.opt_in, name='opt_in'),
 
 
 ]

@@ -657,6 +657,10 @@ def register(request):
       return render(request, 'ctstem_app/Registration.html', context)
 
   else:
+    if hasattr(request.user, 'researcher') or hasattr(request.user, 'author') or hasattr(request.user, 'student'):
+      messages.error(request, 'You do not have the privilege to register any other user')
+      return shortcuts.redirect('ctstem:home')
+
     form = forms.RegistrationForm(user=request.user)
     context = {'form': form}
     return render(request, 'ctstem_app/Registration.html', context)
@@ -833,6 +837,32 @@ def userProfile(request, id=''):
 
   except User.DoesNotExist:
       return http.HttpResponseNotFound('<h1>Requested user not found</h1>')
+
+####################################
+# Student opt in
+####################################
+def opt_in(request):
+  if hasattr(request.user, 'student') == False:
+    http.HttpResponseNotFound('<h1>You do not have the privilege to access this form</h1>')
+
+  student = request.user.student
+  if request.method == 'GET':
+    form = forms.OptInForm(instance=student, prefix='student')
+    context = {'form': form}
+    return render(request, 'ctstem_app/OptIn.html', context)
+  elif request.method == 'POST':
+    data = request.POST.copy()
+    form = forms.OptInForm(data, instance=student, prefix='student')
+    response_data = {}
+    if form.is_valid():
+      form.save()
+      response_data['result'] = 'Success'
+      messages.success(request, "Thank you for submitting the opt-in form")
+    else:
+      response_data['result'] = 'Failed'
+      response_data['message'] = 'Please select "Agree" or "Disagree" and submit this form'
+    return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+
 
 ####################################
 # DELETE USER
@@ -1516,9 +1546,9 @@ def assignments(request, bucket=''):
       elif sort_by == 'modified':
         assignment_list.sort(key=lambda item:item['modified_date'])
 
-      context = {'assignment_list': assignment_list, 'new': new_count, 'inbox': len(active_list), 'archived': len(archived_list), 'sort_form': sort_form}
+      context = {'assignment_list': assignment_list, 'new': new_count, 'inbox': len(active_list), 'archived': len(archived_list), 'sort_form': sort_form, 'opt_in': student.opt_in}
       return render(request, 'ctstem_app/MyAssignments.html', context)
-    return http.HttpResponseNotAllowed(['GET'])
+    return http.HttpResponseNotAllowed(['GET', 'POST'])
 
   except models.Student.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested student not found</h1>')

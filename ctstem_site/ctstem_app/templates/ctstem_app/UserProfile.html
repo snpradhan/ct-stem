@@ -15,11 +15,15 @@
         {{userform.management_form}}
         {{profileform.management_form}}
         {% for field in userform %}
-          <div class="form-group">
-            <label for="id_{{field.name}}">{{ field.label|title }} (<span class="required">*</span>)</label>
-            {{field}}
-            <div class="error">{{ field.errors }}</div>
-          </div>
+          {% if user.student and field.name == 'is_active' %}
+            {{field.as_hidden}}
+          {% else %}
+            <div class="form-group">
+              <label for="id_{{field.name}}">{{ field.label|title }} (<span class="required">*</span>)</label>
+              {{field}}
+              <div class="error">{{ field.errors }}</div>
+            </div>
+          {% endif %}
         {% endfor %}
         {% for field in profileform %}
           <div class="form-group">

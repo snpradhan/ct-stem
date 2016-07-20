@@ -121,12 +121,18 @@
       <p>You do not have any assignments.</p>
     {% endif %}
 
-    <div class="modal fade" id="assessmentModal" role="dialog">
-    </div>
+    <div class="modal fade" id="assessmentModal" role="dialog"></div>
+    <div class="modal fade" id="optin" role="dialog" data-keyboard="false" data-backdrop="static"></div>
 
   </div>
   <script type="text/javascript">
     $(function (){
+
+      {% if opt_in == 'U' %}
+        $("#optin").load("{% url 'ctstem:opt_in' %}", function() {
+          $(this).modal('show');
+        });
+      {% endif %}
 
       $("select#id_sort_by").change(function(){
         this.form.submit();

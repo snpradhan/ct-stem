@@ -132,7 +132,10 @@ class UserProfileForm(ModelForm):
 class StudentForm (ModelForm):
   class Meta:
     model = models.Student
-    fields = ['school']
+    fields = ['school', 'opt_in']
+    widgets = {
+      'opt_in': forms.RadioSelect()
+    }
 
   def __init__(self, *args, **kwargs):
     user = kwargs.pop('user')
@@ -150,10 +153,28 @@ class StudentForm (ModelForm):
       if school is not None:
         self.fields['school'].queryset = models.School.objects.filter(id=school.id)
 
+      if hasattr(user, 'student') == False:
+        del self.fields['opt_in']
+
     for field_name, field in self.fields.items():
-      field.widget.attrs['class'] = 'form-control'
-      field.widget.attrs['aria-describedby'] = field.label
-      field.widget.attrs['placeholder'] = field.help_text
+      if field_name != 'opt_in':
+        field.widget.attrs['class'] = 'form-control'
+        field.widget.attrs['aria-describedby'] = field.label
+        field.widget.attrs['placeholder'] = field.help_text
+
+
+####################################
+# Opt-in Form
+####################################
+class OptInForm (ModelForm):
+
+  class Meta:
+    model = models.Student
+    fields = ['opt_in']
+    widgets = {
+      'opt_in': forms.RadioSelect()
+    }
+
 
 ####################################
 # Teacher Form
