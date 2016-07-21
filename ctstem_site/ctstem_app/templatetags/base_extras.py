@@ -20,3 +20,6 @@ def navactive(request, urls, args=None):
   return ""
 
 
+@register.simple_tag
+def settings_value(name):
+    return getattr(settings, name, "")
