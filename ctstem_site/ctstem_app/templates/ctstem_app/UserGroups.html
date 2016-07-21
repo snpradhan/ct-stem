@@ -10,9 +10,9 @@
   {{block.super}}
   <div class="content">
     {% if user.teacher %}
-      <h2> My Student Groups </h2>
+      <h2> My Groups </h2>
     {% else %}
-      <h2> Student Groups </h2>
+      <h2> Groups </h2>
     {% endif %}
     {% include "ctstem_app/UserControls.html" %}
     {% include "ctstem_app/Tabs.html" with tab='user'%}

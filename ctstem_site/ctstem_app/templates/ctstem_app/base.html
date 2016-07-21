@@ -167,7 +167,7 @@
                 <li class="{% navactive request 'ctstem:assignments' 'inbox' %}"><a href="{% url 'ctstem:assignments' 'inbox' %}">My Assignments</a></li>
               {% endif %}
 
-              {% if user.administrator or user.researcher or user.school_administrator or user.teacher %}
+              {% if user.administrator or user.researcher or user.school_administrator %}
                 <li class="dropdown {% navactive request 'ctstem:users' 'students' %} {% navactive request 'ctstem:users' 'teachers' %} {% navactive request 'ctstem:users' 'admins' %} {% navactive request 'ctstem:users' 'researchers' %} {% navactive request 'ctstem:users' 'authors' %} {% navactive request 'ctstem:groups' %}">
                   <a href="#" class="dropdown-toggle" data-toggle="dropdown" id="users">Users  <b class="caret"></b></a>
                   <ul class="dropdown-menu">
@@ -181,14 +181,14 @@
                     {% endif %}
                     {% if user.administrator or user.researcher or user.school_administrator%}
                       <li class="{% navactive request 'ctstem:users' 'teachers' %}"><a href="{% url 'ctstem:users' 'teachers' %}">Teachers</a></li>
-                    {% endif %}
-                    {% if user.administrator or user.researcher or user.school_administrator or user.teacher %}
                       <li class="{% navactive request 'ctstem:users' 'students' %}"><a href="{% url 'ctstem:users' 'students' %}">Students</a></li>
                       <li class="divider"></li>
-                      <li class="{% navactive request 'ctstem:groups' %}"><a href="{% url 'ctstem:groups' %}">Student Groups</a></li>
+                      <li class="{% navactive request 'ctstem:groups' %}"><a href="{% url 'ctstem:groups' %}">Groups</a></li>
                     {% endif %}
                   </ul>
                 </li>
+              {% elif user.teacher %}
+                <li class="{% navactive request 'ctstem:groups' %}"><a href="{% url 'ctstem:groups' %}">My Groups</a></li>
               {% endif %}
 
               {% if user.administrator or user.researcher %}

@@ -10,10 +10,10 @@
     {% endif %}
     {% if user.administrator or user.researcher or user.school_administrator %}
       <li {% if role == 'teachers' %} class="active"{% endif %}><a href="{% url 'ctstem:users' 'teachers' %}">Teachers</a></li>
+      <li {% if role == 'students' %} class="active"{% endif %}><a href="{% url 'ctstem:users' 'students' %}">Students</a></li>
     {% endif %}
     {% if user.administrator or user.researcher or user.school_administrator or user.teacher %}
-      <li {% if role == 'students' %} class="active"{% endif %}><a href="{% url 'ctstem:users' 'students' %}">{% if user.teacher %} My {% endif %} Students</a></li>
-      <li {% if role == 'groups' %} class="active"{% endif %}><a href="{% url 'ctstem:groups' %}">{% if user.teacher %} My {% endif %} Student Groups</a></li>
+      <li {% if role == 'groups' %} class="active"{% endif %}><a href="{% url 'ctstem:groups' %}">{% if user.teacher %} My {% endif %} Groups</a></li>
     {% endif %}
   {% endif %}
   {% if tab == 'group' or tab == 'assignment' %}
