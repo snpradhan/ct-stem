@@ -27,7 +27,16 @@
         {% endfor %}
         {% for field in profileform %}
           <div class="form-group">
-            <label for="id_{{field.name}}">{{ field.label }} {% if field.field.required %}(<span class="required">*</span>) {% endif %} </label>
+            <label for="id_{{field.name}}">
+              {% if field.name == 'consent' %}
+                <a data-toggle="modal" data-target="#consent" href="#">{{ field.label }}</a>
+              {% else %}
+                {{ field.label }}
+              {% endif %}
+              {% if field.field.required %}
+                (<span class="required">*</span>)
+              {% endif %}
+            </label>
             {{field}}
             <div class="error">{{ field.errors }}</div>
           </div>
@@ -38,5 +47,8 @@
       </div>
 
     </form>
+    <div class="modal fade" id="consent" role="dialog">
+      {% include 'ctstem_app/ConsentModal.html' with parent='profile' %}
+    </div>
   </div>
 {% endblock %}

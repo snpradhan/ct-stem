@@ -78,9 +78,9 @@ REQUESTER_ROLE = (
   (u'A', u'School Administrator'),
   (u'O', u'Other'),
 )
-OPT_IN_CHOICES = (
-  (u'A', u'Agree'),
-  (u'D', u'Disagree'),
+CONSENT_CHOICES = (
+  (u'A', u'I Agree'),
+  (u'D', u'I Disagree'),
 )
 
 def upload_file_to(instance, filename):
@@ -274,7 +274,7 @@ class School(models.Model):
 class Student(models.Model):
   user = models.OneToOneField(User, unique=True, null=False, related_name="student")
   school = models.ForeignKey(School)
-  opt_in = models.CharField(null=False, max_length=1, default='U', choices=OPT_IN_CHOICES)
+  consent = models.CharField(null=False, max_length=1, default='U', choices=CONSENT_CHOICES)
 
   def __unicode__(self):
       return u'%s' % (self.user.get_full_name())

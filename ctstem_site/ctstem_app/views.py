@@ -839,20 +839,20 @@ def userProfile(request, id=''):
       return http.HttpResponseNotFound('<h1>Requested user not found</h1>')
 
 ####################################
-# Student opt in
+# Student consent
 ####################################
-def opt_in(request):
+def consent(request):
   if hasattr(request.user, 'student') == False:
     http.HttpResponseNotFound('<h1>You do not have the privilege to access this form</h1>')
 
   student = request.user.student
   if request.method == 'GET':
-    form = forms.OptInForm(instance=student, prefix='student')
+    form = forms.ConsentForm(instance=student, prefix='student')
     context = {'form': form}
-    return render(request, 'ctstem_app/OptIn.html', context)
+    return render(request, 'ctstem_app/ConsentModal.html', context)
   elif request.method == 'POST':
     data = request.POST.copy()
-    form = forms.OptInForm(data, instance=student, prefix='student')
+    form = forms.ConsentForm(data, instance=student, prefix='student')
     response_data = {}
     if form.is_valid():
       form.save()
@@ -860,7 +860,7 @@ def opt_in(request):
       messages.success(request, "Thank you for submitting the opt-in form")
     else:
       response_data['result'] = 'Failed'
-      response_data['message'] = 'Please select "Agree" or "Disagree" and submit this form'
+      response_data['message'] = 'Please select "I Agree" or "I Disagree" and submit this form to proceed'
     return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 
 
@@ -1546,7 +1546,7 @@ def assignments(request, bucket=''):
       elif sort_by == 'modified':
         assignment_list.sort(key=lambda item:item['modified_date'])
 
-      context = {'assignment_list': assignment_list, 'new': new_count, 'inbox': len(active_list), 'archived': len(archived_list), 'sort_form': sort_form, 'opt_in': student.opt_in}
+      context = {'assignment_list': assignment_list, 'new': new_count, 'inbox': len(active_list), 'archived': len(archived_list), 'sort_form': sort_form, 'consent': student.consent}
       return render(request, 'ctstem_app/MyAssignments.html', context)
     return http.HttpResponseNotAllowed(['GET', 'POST'])
 

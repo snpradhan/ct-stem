@@ -815,7 +815,7 @@ div.modal-content {
   overflow-y: scroll;
 }
 div.modal-content div#loginMsg , div.modal-content div#uploadMsg, div.modal-content div#questionMsg, div.modal-content div#subcategoryMsg,
-div.modal-content div#assignmentMsg, div.modal-content div#taxonomyMsg, div.modal-content div#optInMsg
+div.modal-content div#assignmentMsg, div.modal-content div#taxonomyMsg, div.modal-content div#consentMsg
 {
   text-align: center;
   color: red;
@@ -827,6 +827,23 @@ div.modal-content div#taxonomyResults, div.modal-content div#assignmentResults {
 div.modal-content span.time {
   color: red;
 }
+
+div.modal-content form#consentForm div.modal-body{
+  padding: 2em;
+}
+
+div.modal-content form#consentForm div.modal-body div.consent {
+  font-size: 1.5em;
+}
+
+div.modal-content form#consentForm div.modal-body div.consent div.header {
+  font-size: 1.1em;
+  font-style: italic;
+  font-weight: bold;
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+}
+
 div#profile .modal-content .modal-body {
   font-size: 1.3em;
   font-family: Montserrat, "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -838,10 +855,10 @@ div#profile .modal-content .modal-body div {
   margin-bottom: 0.5em;
 }
 
-ul#id_student-opt_in {
+ul#id_student-consent {
   list-style: none;
 }
-ul#id_student-opt_in li {
+ul#id_student-consent li {
   margin-bottom: 1em;
 }
 /***********   FORM GROUP END   ************/

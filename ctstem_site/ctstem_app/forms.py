@@ -132,9 +132,9 @@ class UserProfileForm(ModelForm):
 class StudentForm (ModelForm):
   class Meta:
     model = models.Student
-    fields = ['school', 'opt_in']
+    fields = ['school', 'consent']
     widgets = {
-      'opt_in': forms.RadioSelect()
+      'consent': forms.RadioSelect()
     }
 
   def __init__(self, *args, **kwargs):
@@ -154,25 +154,27 @@ class StudentForm (ModelForm):
         self.fields['school'].queryset = models.School.objects.filter(id=school.id)
 
       if hasattr(user, 'student') == False:
-        del self.fields['opt_in']
+        del self.fields['consent']
 
     for field_name, field in self.fields.items():
-      if field_name != 'opt_in':
+      if field_name != 'consent':
         field.widget.attrs['class'] = 'form-control'
         field.widget.attrs['aria-describedby'] = field.label
         field.widget.attrs['placeholder'] = field.help_text
+      else:
+        field.label = 'Online Consent'
 
 
 ####################################
-# Opt-in Form
+# Consent Form
 ####################################
-class OptInForm (ModelForm):
+class ConsentForm (ModelForm):
 
   class Meta:
     model = models.Student
-    fields = ['opt_in']
+    fields = ['consent']
     widgets = {
-      'opt_in': forms.RadioSelect()
+      'consent': forms.RadioSelect()
     }
 
 
