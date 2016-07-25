@@ -92,6 +92,8 @@
                         <div class="file">
                         Uploaded file: <a href="{{questionForm.responseFile.value.url}}" target="_blank"><span class="glyphicon glyphicon-file" aria-hidden="true"></span></a>
                         </div>
+                      {% elif field_type == 'MI' %}
+                        <img src="{{questionForm.response.value}}" class="image_option"/><br>
                       {% else %}
                         <div class="text">
                           {{questionForm.response.value}}
