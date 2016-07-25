@@ -229,6 +229,11 @@
                   {% for option in question.options|splitlines %}
                     <input type="radio" name="{{question.id}}" id="{{question.id}}" value="{{option}}" disabled/>  {{option}}<br>
                   {% endfor %}
+                {% elif field_type == 'MI' %}
+                  <div class="note"> Note: Select one answer </div>
+                  {% for option in question.options|splitlines %}
+                    <input type="radio" name="{{question.id}}" id="{{question.id}}" value="{{option}}" disabled/>  <img src="{{option}}" class="image_option"/><br><br>
+                  {% endfor %}
                 {% elif field_type == 'MS' %}
                   <div class="note"> Note: Select all that apply </div>
                   {% for option in question.options|splitlines %}

@@ -33,6 +33,7 @@ FIELD_TYPE_CHOICES = (
     (u'DD', u'Drop Down'),
     (u'MS', u'Multi-Select'),
     (u'MC', u'Multiple Choice'),
+    (u'MI', u'Multiple Choice w/ Images'),
     (u'FI', u'File'),
 )
 
@@ -190,7 +191,7 @@ class BookmarkedCurriculum(models.Model):
 class Question(models.Model):
   question_text = RichTextUploadingField(null=False, blank=False, config_name='question_ckeditor')
   answer_field_type = models.CharField(null=False, max_length=2, choices=FIELD_TYPE_CHOICES, default='TF')
-  options = models.TextField(null=True, blank=True, help_text='For dropdown, multi-select and multiple choice questions provide one option per line')
+  options = models.TextField(null=True, blank=True, help_text="For dropdown, multi-select and multiple choice questions provide one option per line.\n For multiple choice w/ images provide one image url per line")
   answer = models.TextField(null=True, blank=True)
 
   def __unicode__(self):

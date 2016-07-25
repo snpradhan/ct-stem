@@ -393,3 +393,8 @@ footer a {
 
   footer a { color: black; }
 }
+
+img.image_option {
+  height: 20%;
+  width: 20%;
+}

@@ -61,7 +61,11 @@
                     <label>Response: </label>
                     <div class="response">
                       {% if question.instance.response.response %}
-                        {{question.instance.response.response}}
+                        {% if question.instance.response.curriculum_question.question.answer_field_type == 'MI' %}
+                          <img src="{{question.instance.response.response}}" class="image_option"/>
+                        {% else %}
+                          {{question.instance.response.response}}
+                        {% endif %}
                       {% elif question.instance.response.responseFile %}
                         Student uploaded <a href="{{question.instance.response.responseFile.url}}" target="_blank">File</a>
                       {% else %}

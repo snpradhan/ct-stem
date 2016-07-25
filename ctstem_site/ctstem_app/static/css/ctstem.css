@@ -387,6 +387,10 @@ div.table#assignment div.question_container div.question div.answer_field textar
   color: blue;
 }
 
+img.image_option {
+  height: 20%;
+  width: 20%;
+}
 div.table.standard table.subcategories {
   font-size: 0.8em;
 }

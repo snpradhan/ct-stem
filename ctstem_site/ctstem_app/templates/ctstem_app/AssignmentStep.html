@@ -130,6 +130,23 @@
                             {% endif %}
                           {% endif %}
                         {% endfor %}
+                      {% elif field_type == 'MI' %}
+                        <div class="note"> Note: Select one answer </div>
+                        {% for option in questionObj.options|splitlines%}
+                          {% if forloop.counter == 1 %}
+                            {% if option|slugify == questionForm.response.value|slugify %}
+                              <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}"  checked="true"/>  <img src="{{option}}" class="image_option"/><br><br>
+                            {% else %}
+                              <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}" />  <img src="{{option}}" class="image_option"/><br><br>
+                            {% endif %}
+                          {% else %}
+                            {% if option|slugify == questionForm.response.value|slugify %}
+                              <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}" checked="true" />  <img src="{{option}}" class="image_option"/><br><br>
+                            {% else %}
+                              <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}"/>  <img src="{{option}}" class="image_option"/><br><br>
+                            {% endif %}
+                          {% endif %}
+                        {% endfor %}
                       {% elif field_type == 'MS' %}
                         <div class="note"> Note: Select all that apply </div>
                         <input type="hidden" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{questionForm.response.value}}"/>
