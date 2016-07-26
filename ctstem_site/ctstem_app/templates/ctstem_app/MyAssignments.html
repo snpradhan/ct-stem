@@ -30,7 +30,15 @@
         <div class="row">
           {% for assignment_details in assignment_list %}
           <div class="col-md-4 col-sm-6 portfolio-item ">
-            <a href="{% url 'ctstem:previewCurriculum' assignment_details.assignment.curriculum.id %}" class="portfolio-link" target="_blank">
+            {% if assignment_details.instance %}
+              {% if assignment_details.instance.status == 'P' %}
+                <a href="{% url 'ctstem:resumeAssignment' assignment_details.assignment.id assignment_details.instance.id assignment_details.instance.last_step|add:'1' %}" class="portfolio-link">
+              {% else %}
+                <a href="{% url 'ctstem:resumeAssignment' assignment_details.assignment.id assignment_details.instance.id 1 %}" class="portfolio-link">
+              {% endif %}
+            {% else %}
+              <a href="{% url 'ctstem:startAssignment' assignment_details.assignment.id %}" class="portfolio-link">
+            {% endif %}
               <div class="portfolio-hover">
                 <div class="portfolio-hover-content">
                   <i class="fa fa-plus fa-3x"></i>

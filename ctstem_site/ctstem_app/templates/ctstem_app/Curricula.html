@@ -151,7 +151,7 @@
                       <a class="util-button fa fa-files-o" aria-hidden="true" aria-label="Create New Copy" title="Create New Copy" href="{% url 'ctstem:copyCurriculum' curriculum.id %}">
                       </a>
                     {% endif %}
-                    {% if user.administrator or user.researcher or user.teacher or user.school_administrator %}
+                    {% if user.administrator or user.teacher or user.school_administrator %}
                       {% if curriculum.status == 'A' or curriculum.status == 'P'%}
                       <a class="assign util-button fa fa-calendar-check-o" aria-hidden="true" data-form="{% url 'ctstem:assignCurriculum' curriculum.id%}" aria-label="Assign Curriculum" title="Assign Curriculum">
                       </a>

@@ -311,16 +311,26 @@
         $('faq').hide();
       });
       $('body').on('click', 'a.notes', function(){
-        $('main').hide();
-        $('activity').hide();
-        $('notes').show();
-        $('faq').hide();
+        {% if user.is_anonymous %}
+          alert('Please login to view teacher notes');
+          return false;
+        {% else %}
+          $('main').hide();
+          $('activity').hide();
+          $('notes').show();
+          $('faq').hide();
+        {% endif %}
       });
       $('body').on('click', 'a.activity', function(){
-        $('main').hide();
-        $('activity').show();
-        $('notes').hide();
-        $('faq').hide();
+        {% if user.is_anonymous %}
+          alert('Please login to view student activity');
+          return false;
+        {% else %}
+          $('main').hide();
+          $('activity').show();
+          $('notes').hide();
+          $('faq').hide();
+        {% endif %}
       });
       $('body').on('click', 'a.faq', function(){
         $('main').hide();
@@ -370,8 +380,8 @@
 
       $('body').on("click", "a.assign", function(e){
         e.preventDefault();
-        {% if user.is_anonymous %}
-          alert('Please login to assign this lesson');
+        {% if user.is_anonymous or user.author  or user.researcher %}
+          alert('Please login as a teacher to assign this lesson');
         {% else %}
           var url = $(this).data('form');
           $("#assignmentModal").load(url, function() {

@@ -220,6 +220,9 @@ def curriculum(request, id=''):
 def previewCurriculum(request, id=''):
   try:
     # check if the lesson exists
+    if hasattr(request.user, 'student'):
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to preview this curriculum</h1>')
+
     if '' != id:
       curriculum = models.Curriculum.objects.get(id=id)
     else:
