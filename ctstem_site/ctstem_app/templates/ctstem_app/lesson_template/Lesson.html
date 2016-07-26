@@ -60,10 +60,12 @@
             <li><a id="favorites-link" class="favorites">Add to Favorites</a></li>
           {% endif %}
         {% endif %}
-        {% if user.administrator or user.school_administrator %}
-          <li><a class="assign" href="#" data-form="{% url 'ctstem:assignCurriculum' curriculum.id%}">Assign to Classes</a></li>
-        {% elif user.teacher %}
-          <li><a class="assign" href="#" data-form="{% url 'ctstem:assignCurriculum' curriculum.id%}">Assign to My Classes</a></li>
+        {% if curriculum.status == 'A' or curriculum.status == 'P'%}
+          {% if user.administrator or user.school_administrator %}
+            <li><a class="assign" href="#" data-form="{% url 'ctstem:assignCurriculum' curriculum.id%}">Assign to Classes</a></li>
+          {% elif user.teacher %}
+            <li><a class="assign" href="#" data-form="{% url 'ctstem:assignCurriculum' curriculum.id%}">Assign to My Classes</a></li>
+          {% endif %}
         {% endif %}
 
         <!-- TODO: LINK TO ATTACHMENT -->
@@ -121,10 +123,12 @@
           {% endif %}
         {% endif %}
         <a class="util-button fa fa-print" href="javascript:window.print();" title="Print"></a>
-        {% if user.administrator or user.school_administrator %}
-          <a class="assign util-button fa fa-calendar-check-o" aria-hidden="true" data-form="{% url 'ctstem:assignCurriculum' curriculum.id%}" aria-label="Assign to Classes" title="Assign to Classes"></a>
-        {% elif user.teacher %}
-          <a class="assign util-button fa fa-calendar-check-o" aria-hidden="true" data-form="{% url 'ctstem:assignCurriculum' curriculum.id%}" aria-label="Assign to Classes" title="Assign to My Classes"></a>
+        {% if curriculum.status == 'A' or curriculum.status == 'P'%}
+          {% if user.administrator or user.school_administrator %}
+            <a class="assign util-button fa fa-calendar-check-o" aria-hidden="true" data-form="{% url 'ctstem:assignCurriculum' curriculum.id%}" aria-label="Assign to Classes" title="Assign to Classes"></a>
+          {% elif user.teacher %}
+            <a class="assign util-button fa fa-calendar-check-o" aria-hidden="true" data-form="{% url 'ctstem:assignCurriculum' curriculum.id%}" aria-label="Assign to Classes" title="Assign to My Classes"></a>
+          {% endif %}
         {% endif %}
       </div>
 
@@ -161,9 +165,7 @@
       <ul>
         <li><a href="#" class="notes">Read the teacher notes</a></li>
         <li><a href="#" class="activity">Look at the student activity</a></li>
-
-        <!-- TODO: PROMPT THEM TO LOG IN FOR THIS LINK -->
-        <li><a href="#" class="assign" data-form="{% url 'ctstem:assignCurriculum' curriculum.id%}">Assign this to my classes</a></li>
+        <li><a href="#" class="assign" data-form="{% url 'ctstem:assignCurriculum' curriculum.id%}">Assign this to {% if user.teacher %}my{% endif %} classes</a></li>
       </ul>
       </p>
 
@@ -382,6 +384,8 @@
         e.preventDefault();
         {% if user.is_anonymous or user.author  or user.researcher %}
           alert('Please login as a teacher to assign this lesson');
+        {% elif curriculum.status == 'D' %}
+          alert("This lesson hasn't been published and cannot be assigned");
         {% else %}
           var url = $(this).data('form');
           $("#assignmentModal").load(url, function() {

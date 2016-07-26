@@ -511,6 +511,9 @@ def assignCurriculum(request, id=''):
       return http.HttpResponseNotFound('<h1>You do not have the privilege to assign this curriculum</h1>')
 
     curriculum = models.Curriculum.objects.get(id=id)
+    if curriculum.status == 'D':
+      return http.HttpResponseNotFound("<h1>This curriculum hasn't been published and cannot be assigned</h1>")
+
     assignments = models.Assignment.objects.all().filter(curriculum=curriculum, group__in=groups)
     instances = {}
     for group in groups:
