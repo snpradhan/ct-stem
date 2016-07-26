@@ -63,7 +63,15 @@
            <hr>
         {% endif %}
         <div class="step_content">
-          <div class="step_context">{{form.instance.step.content|safe}}</div>
+          {% if form.instance.step.curriculum.curriculum_type == 'S' %}
+            {% if form.instance.instance.status == 'S' or form.instance.instance.status == 'F' or form.instance.instance.status == 'A' %}
+              <div class="step_context">Your survey submission has been saved!</div>
+            {% else %}
+              <div class="step_context">{{form.instance.step.content|safe}}</div>
+            {% endif %}
+          {% else %}
+            <div class="step_context">{{form.instance.step.content|safe}}</div>
+          {% endif %}
           <div class="question_container">
             {{formset.management_form}}
             {% if formset|length %}
