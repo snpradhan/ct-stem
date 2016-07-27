@@ -107,29 +107,32 @@ def team(request):
 ####################################
 def curricula(request, curriculum_type='', bookmark='0'):
   if curriculum_type == 'assessments':
-    curr_type = 'A'
+    curr_type = ['A', 'S']
+    curriculum_type = 'A'
   elif curriculum_type == 'lessons':
-    curr_type = 'L'
+    curr_type = ['L']
+    curriculum_type = 'L'
   else:
-    curr_type = 'S'
+    curr_type = ['S']
+    curriculum_type = 'S'
 
   bookmarked = None
 
   if hasattr(request.user, 'administrator') or hasattr(request.user, 'researcher'):
-    curricula = models.Curriculum.objects.all().filter(curriculum_type = curr_type).order_by('id')
+    curricula = models.Curriculum.objects.all().filter(curriculum_type__in = curr_type).order_by('id')
   elif hasattr(request.user, 'author') == True:
-    curricula = models.Curriculum.objects.all().filter(Q(curriculum_type = curr_type), Q(status='P') | Q(author=request.user) ).order_by('id')
+    curricula = models.Curriculum.objects.all().filter(Q(curriculum_type__in = curr_type), Q(status='P') | Q(author=request.user) ).order_by('id')
   elif hasattr(request.user, 'teacher') == True:
     if bookmark == '1':
-      curricula = models.Curriculum.objects.all().filter(curriculum_type = curr_type, status='P', bookmarked__teacher=request.user.teacher).order_by('id')
+      curricula = models.Curriculum.objects.all().filter(curriculum_type__in = curr_type, status='P', bookmarked__teacher=request.user.teacher).order_by('id')
       bookmarked = curricula
     else:
-      curricula = models.Curriculum.objects.all().filter(curriculum_type = curr_type, status='P').order_by('id')
+      curricula = models.Curriculum.objects.all().filter(curriculum_type__in = curr_type, status='P').order_by('id')
       bookmarked = curricula.filter(bookmarked__teacher=request.user.teacher)
   else:
-    curricula = models.Curriculum.objects.all().filter(curriculum_type = curr_type, status='P').order_by('id')
+    curricula = models.Curriculum.objects.all().filter(curriculum_type__in = curr_type, status='P').order_by('id')
 
-  context = {'curricula': curricula, 'curriculum_type': curr_type, 'bookmark': bookmark, 'bookmarked': bookmarked}
+  context = {'curricula': curricula, 'curriculum_type': curriculum_type, 'bookmark': bookmark, 'bookmarked': bookmarked}
   return render(request, 'ctstem_app/Curricula.html', context)
 
 

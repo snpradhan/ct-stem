@@ -41,10 +41,10 @@
       <ul class="nav nav-tabs">
         {% if curriculum_type == 'L' %}
           <li {% if bookmark == '0' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'lessons' '0' %}">All Lessons</a></li>
-          <li {% if bookmark == '1' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'lessons' '1' %}">Bookmarked Lessons</a></li>
+          <li {% if bookmark == '1' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'lessons' '1' %}">Favorite Lessons</a></li>
         {% else %}
           <li {% if bookmark == '0' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'assessments' '0' %}">All Assessments</a></li>
-          <li {% if bookmark == '1' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'assessments' '1' %}">Bookmarked Assessments</a></li>
+          <li {% if bookmark == '1' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'assessments' '1' %}">Favorite Assessments</a></li>
         {% endif %}
       </ul>
     {% endif %}
@@ -70,7 +70,7 @@
                     {% elif curriculum.curriculum_type == 'A' %}
                       <img class="big_icon" src="/static/img/assessment.png">
                     {% elif curriculum.curriculum_type == 'S' %}
-                      <img class="big_icon" src="/static/img/assessment.png">
+                      <img class="big_icon" src="/static/img/survey.svg">
                     {% endif %}
                   </td>
                   <td class="information">
