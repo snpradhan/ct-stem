@@ -5,7 +5,7 @@
       {% if parent == 'profile' %}
         <button type="button" class="close" data-dismiss="modal">&times;</button>
       {% endif %}
-      <h3 class="modal-title">Online Consent</h3>
+      <h3 class="modal-title">Welcome to CT-STEM!</h3>
 
     </div>
     <div id="consentMsg" class="msg">
@@ -13,7 +13,13 @@
     <form class="form" id="consentForm" method="post" action="{% url 'ctstem:consent' %}">
       {% csrf_token %}
       <div class="modal-body">
+        <div class="body">
+          This website was developed by Northwestern University with funding from the National Science Foundation and the Spencer Foundation. As part of a research study, we are collecting anonymous work from students like you through this site.
+        </div>
         {% include 'ctstem_app/ConsentLanguage.html' %}
+        <div class="body">
+          If you wish to participate, please check the <b>“I Agree”</b> option. If you do not wish to participate in this study, please select <b>“I Disagree"</b>.  You may change your answer by clicking on the Edit Profile link.
+        </div>
         {% if parent != 'profile' %}
           <div class="form-group">
            {{form.consent}}
