@@ -379,6 +379,8 @@ footer a {
 
   .standards { font-size: 11px; }
 
+  .comments { display: none; }
+
   footer {
     background-color: transparent;
     padding: 0;
