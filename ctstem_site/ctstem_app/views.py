@@ -1020,7 +1020,7 @@ def createStudent(request, group_id=''):
 
         response_data = {'result': 'Success', 'student': {'user_id': user.id, 'student_id': student.id, 'username': user.username, 'name': user.get_full_name(), 'email': user.email, 'status': 'Active' if user.is_active else 'Inactive', 'last_login': user.last_login.strftime('%B %d, %Y') if user.last_login else '', 'group': group.id}}
 
-        send_account_email(user, password)
+        send_account_creation_email(user, password)
 
       return http.HttpResponse(json.dumps(response_data), content_type="application/json")
     return http.HttpResponseNotAllowed(['POST'])
