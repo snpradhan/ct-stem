@@ -985,6 +985,50 @@ def addStudent(request, group_id='', student_id=''):
   except models.Student.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested student not found</h1>')
 
+def createStudent(request, group_id=''):
+  try:
+    # check if the user has permission to create a student
+    import re
+    if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'school_administrator') == False and hasattr(request.user, 'teacher') == False :
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to create a student</h1>')
+    if request.method == 'POST':
+      data=request.POST
+      response_data = {}
+      username = data['username']
+      email = data['email']
+      first_name = data['first_name']
+      last_name = data['last_name']
+
+      if User.objects.filter(username=username).exists():
+        response_data['error'] = 'The username is already in use. Please choose another.'
+      elif User.objects.filter(email=email).exists():
+        response_data['error'] = 'The email is already in use. Please choose another.'
+      elif not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+        response_data['error'] = 'The email format in invalid'
+      else:
+        #generate a random password
+        password = User.objects.make_random_password()
+        user = User.objects.create_user(username=username, email=email, password=password)
+        user.first_name = first_name
+        user.last_name = last_name
+        user.save()
+
+        #create student account
+        group = models.UserGroup.objects.get(id=group_id)
+        student = models.Student.objects.create(user=user, school=group.teacher.school)
+        membership, created = models.Membership.objects.get_or_create(student=student, group=group)
+
+        response_data = {'result': 'Success', 'student': {'user_id': user.id, 'student_id': student.id, 'username': user.username, 'name': user.get_full_name(), 'email': user.email, 'status': 'Active' if user.is_active else 'Inactive', 'last_login': user.last_login.strftime('%B %d, %Y') if user.last_login else '', 'group': group.id}}
+
+        send_account_email(user, password)
+
+      return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+    return http.HttpResponseNotAllowed(['POST'])
+
+  except models.UserGroup.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested group not found</h1>')
+  except models.Student.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested student not found</h1>')
 
 def notimplemented(request):
   return render(request, 'ctstem_app/NotImplemented.html')
@@ -1340,12 +1384,13 @@ def group(request, id=''):
         uploadForm = forms.UploadFileForm(user=request.user)
         assignmentForm = forms.AssignmentSearchForm()
         studentSearchForm = forms.StudentSearchForm()
-        context = {'form': form, 'formset': formset, 'role': 'group', 'uploadForm': uploadForm, 'assignmentForm': assignmentForm, 'studentSearchForm': studentSearchForm}
+        studentAddForm = forms.StudentAddForm()
+        context = {'form': form, 'formset': formset, 'role': 'group', 'uploadForm': uploadForm, 'assignmentForm': assignmentForm, 'studentSearchForm': studentSearchForm, 'studentAddForm': studentAddForm}
         return render(request, 'ctstem_app/UserGroup.html', context)
 
     elif request.method == 'POST':
       data = request.POST.copy()
-      print data
+      #print data
       form = forms.UserGroupForm(user=request.user, data=data, instance=group, prefix="group")
       assignmentFormset=inlineformset_factory(models.UserGroup, models.Assignment, form=forms.AssignmentForm, can_delete=True, extra=1)
       formset = assignmentFormset(data, instance=group, prefix='form')
@@ -1361,7 +1406,7 @@ def group(request, id=''):
         uploadForm = forms.UploadFileForm(user=request.user)
         assignmentForm = forms.AssignmentSearchForm()
         studentSearchForm = forms.StudentSearchForm()
-        context = {'form': form, 'formset':formset, 'role': 'group', 'uploadForm': uploadForm, 'assignmentForm': assignmentForm, 'studentSearchForm': studentSearchForm}
+        context = {'form': form, 'formset':formset, 'role': 'group', 'uploadForm': uploadForm, 'assignmentForm': assignmentForm, 'studentSearchForm': studentSearchForm, 'studentAddForm': studentAddForm}
         return render(request, 'ctstem_app/UserGroup.html', context)
 
     return http.HttpResponseNotAllowed(['GET', 'POST'])
@@ -2007,8 +2052,6 @@ def user_upload(request):
   added = 0
   created = 0
   existing = 0
-  current_site = Site.objects.get_current()
-  domain = current_site.domain
   added_students = {}
   msg = {'error': [], 'success': []}
 
@@ -2082,14 +2125,7 @@ def user_upload(request):
                 added_students[student.id] = {'user_id': student.user.id, 'username': student.user.username, 'full_name': student.user.get_full_name(), 'email': student.user.email, 'status': 'Active' if student.user.is_active else 'Inactive', 'last_login': student.user.last_login.strftime('%B %d, %Y') if student.user.last_login else '', 'group': group.id}
 
                 #email user the  user name and password
-                send_mail('CT-STEM Account Created',
-                      'Your student account has been created on Computational Thinking in STEM website http://%s.  \r\n\r\n \
-                       Please login to the site using the credentials below and change your password.\r\n\r\n  \
-                       Username: %s \r\n \
-                       Temporary Password: %s \r\n\r\n \
-                       -- CT-STEM Admin'%(domain, user.username, password),
-                      settings.DEFAULT_FROM_EMAIL,
-                      [user.email])
+                send_account_creation_email(user, password)
 
 
       msg['success'].append('%d existing students were found, %d new student accounts were created and a total %d students where added to the group "%s".' % (existing, created, added, group.title))
@@ -2102,6 +2138,20 @@ def user_upload(request):
 
   return http.HttpResponseNotAllowed(['POST'])
 
+
+def send_account_creation_email(user, password):
+  #email user the  user name and password
+  current_site = Site.objects.get_current()
+  domain = current_site.domain
+
+  send_mail('CT-STEM Account Created',
+        'Your student account has been created on Computational Thinking in STEM website http://%s.  \r\n\r\n \
+         Please login to the site using the credentials below and change your password.\r\n\r\n  \
+         Username: %s \r\n \
+         Temporary Password: %s \r\n\r\n \
+         -- CT-STEM Admin'%(domain, user.username, password),
+        settings.DEFAULT_FROM_EMAIL,
+        [user.email])
 ####################################
 # Schools
 ####################################

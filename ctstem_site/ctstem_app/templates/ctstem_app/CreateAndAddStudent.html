@@ -1,0 +1,92 @@
+<div class="modal fade" id="addStudent" role="dialog">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h3 class="modal-title">Create New Student</h3>
+      </div>
+      <div id="studentAddMsg" class="msg">
+      </div>
+      <form class="form" id="studentAddForm" method="post" action="{% url 'ctstem:createStudent' form.instance.id %}">
+        {% csrf_token %}
+        <input type="hidden" name="group_id" value="{{form.instance.id}}"/>
+        <div class="modal-body">
+          {% for field in studentAddForm %}
+            <div class="form-group">
+              <label for="id_{{field.name}}">{{ field.label|title }} (<span class="required">*</span>)</label>
+              {{field}}
+              <div class="error">{{ field.errors }}</div>
+            </div>
+          {% endfor %}
+          <div id="spinner">
+            <img src="/static/img/page-loader.gif" class="icon"/>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <div class="form-group button-row">
+            <button type="submit" id="add" class="btn btn-success">
+              Add
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+<script type="text/javascript">
+  $(function (){
+    $("#studentAddForm").submit(function(e) {
+      e.preventDefault();
+      $.ajax({
+        type: $(this).attr('method'),
+        url: this.action,
+        data: $(this).serialize(),
+        context: this,
+        beforeSend: function(){
+          $('form#studentAddForm #spinner').show();
+        },
+        complete: function(){
+          $('form#studentAddForm #spinner').hide();
+        },
+        success: function(data){
+          if('error' in data){
+            $('#studentAddMsg').html(data['error']);
+          }
+          else if(data['result'] == 'Success') {
+            $("#addStudent").modal('toggle');
+
+            $("ul.messages li").remove();
+            $("ul.messages").html('<li class="success">Student created and add to the group</li>');
+            $('ul.messages').show();
+            $('ul.messages').delay(10000).fadeOut('slow');
+
+            add_student_to_data_table(data['student']);
+          }
+          return false;
+        },
+        error: function(xhr, ajaxOptions, thrownError){
+          alert(thrownError);
+        },
+      });
+    });
+
+    $('#add').prop('disabled', true);
+
+    $('input:required').keyup(function() {
+      var empty = false;
+      $('input:required').each(function() {
+        if ($(this).val() === '') {
+          empty = true;
+        }
+      });
+
+      if (empty) {
+        $('#add').prop('disabled', true);
+      } else {
+        $('#add').prop('disabled', false);
+      }
+    });
+  });
+</script>

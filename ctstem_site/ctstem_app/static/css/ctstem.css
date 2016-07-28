@@ -819,7 +819,7 @@ div.modal-content {
   overflow-y: scroll;
 }
 div.modal-content div#loginMsg , div.modal-content div#uploadMsg, div.modal-content div#questionMsg, div.modal-content div#subcategoryMsg,
-div.modal-content div#assignmentMsg, div.modal-content div#taxonomyMsg, div.modal-content div#consentMsg, div.modal-content div#studentMsg
+div.modal-content div#assignmentMsg, div.modal-content div#taxonomyMsg, div.modal-content div#consentMsg, div.modal-content div#studentMsg,  div.modal-content div#studentAddMsg
 {
   text-align: center;
   color: red;

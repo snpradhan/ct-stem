@@ -110,11 +110,14 @@
 
           <div class="form-group">
             <label for="id_{{title}}"> Students {% if form.members.field.required %}(<span class="required">*</span>){% endif %} </label>
+            <a type="button" class="btn btn-info upload-modal" href="#" data-toggle="modal" data-target="#studentSearch" data-id="{{form.instance.id}}" title="Search Students">
+              <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+            </a>
             <a type="button" class="btn btn-success upload-modal" href="#" data-toggle="modal" data-target="#upload" data-id="{{form.instance.id}}" title="Upload Students">
               <span class="glyphicon glyphicon-upload" aria-hidden="true"></span>
             </a>
-            <a type="button" class="btn btn-info upload-modal" href="#" data-toggle="modal" data-target="#studentSearch" data-id="{{form.instance.id}}" title="Search Students">
-              <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+            <a type="button" class="btn btn-info upload-modal" href="#" data-toggle="modal" data-target="#addStudent" data-id="{{form.instance.id}}" title="Add Student">
+              <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
             </a>
             <div class="controls table_container">
               {{form.members.as_hidden}}
@@ -176,9 +179,14 @@
     {% include "ctstem_app/AssignmentSearch.html" %}
   {% endblock %}
 
-  {% block student %}
+  {% block search_and_add_students %}
     {% include "ctstem_app/StudentSearch.html" %}
   {% endblock %}
+
+  {% block create_and_add_student %}
+    {% include "ctstem_app/CreateAndAddStudent.html" %}
+  {% endblock %}
+
   <script type="text/javascript">
     $(function (){
       function add_assignment(){

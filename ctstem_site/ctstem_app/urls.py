@@ -39,6 +39,7 @@ urlpatterns = [
     url(r'^user/delete/(?P<id>[\d]+)/$', views.deleteUser, name='deleteUser'),
     url(r'^student/remove/(?P<group_id>[\d]+)/(?P<student_id>[\d]+)$', views.removeStudent, name='removeStudent'),
     url(r'^student/add/(?P<group_id>[\d]+)/(?P<student_id>[\d]+)$', views.addStudent, name='addStudent'),
+    url(r'^student/create/(?P<group_id>[\d]+)/$', views.createStudent, name='createStudent'),
     url(r'^taxonomy/search/$', views.searchTaxonomy, name='searchTaxonomy'),
     url(r'^standard/delete/(?P<id>[\d]+)/$', views.deleteStandard, name='deleteStandard'),
     url(r'^standard/new/$', views.standard, name='newStandard'),

@@ -160,10 +160,10 @@ $(function (){
       processData: false,
       contentType: false,
       beforeSend: function(){
-        $('#spinner').show();
+        $('#formUpload #spinner').show();
       },
       complete: function(){
-        $('#spinner').hide();
+        $('#formUpload #spinner').hide();
       },
       success: function(data){
         if(data['result'] == 'Success'){
@@ -369,3 +369,25 @@ function display_messages(messages){
   $('ul.messages').delay(10000).fadeOut('slow');
 }
 
+
+function add_student_to_data_table(value){
+  //add student detail to the table
+  $('table.table#members tbody').append('<tr id='+value['student_id']+'>\
+    <td>'+value['username']+'\
+      <div class="controls">\
+        <a type="button" class="btn btn-success edit" aria-label="Edit User" title="Edit User" href="/user/'+value['user_id']+'">\
+          <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>\
+        </a>\
+        <a type="button" class="btn btn-warning removeUser" aria-label="Remove Student" title="Remove Student" href="/student/remove/'+value['group']+'/'+value['student_id']+'" data-id="'+value['student_id']+'">\
+          <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>\
+        </a>\
+      </div>\
+    </td>\
+    <td>'+value['name']+'</td>\
+    <td>'+value['email']+'</td>\
+    <td>'+value['status']+'</td>\
+    <td>'+value['last_login']+'</td></tr>');
+
+  //add student membership hidden input
+  $('table.table#members').before('<input id="id_group-members_'+value['student_id']+'" name="group-members" type="hidden" value="'+value['student_id']+'">');
+}

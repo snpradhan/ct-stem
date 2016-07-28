@@ -451,6 +451,28 @@ class StudentSearchForm(forms.Form):
       if field.help_text:
         field.widget.attrs['placeholder'] = field.help_text
 
+
+####################################
+# Create and Add Student Form
+####################################
+class StudentAddForm(forms.Form):
+
+  username = forms.RegexField(required=True, regex=r'^\w+$', max_length=30, label=u'Username',
+                              error_messages={'invalid': 'Usernames may only contain letters, numbers, and underscores (_)'})
+  first_name = forms.CharField(required=True, max_length=30, label=u'First name')
+  last_name = forms.CharField(required=True, max_length=30, label=u'Last name')
+  email = forms.EmailField(required=True, max_length=75, label=u'Email')
+
+  def __init__(self, *args, **kwargs):
+    super(StudentAddForm, self).__init__(*args, **kwargs)
+
+    for field_name, field in self.fields.items():
+      field.widget.attrs['class'] = 'form-control'
+      if field.required:
+        field.widget.attrs['required'] = 'required'
+      if field.help_text:
+        field.widget.attrs['placeholder'] = field.help_text
+
 ####################################
 # Assignment Search Form
 ####################################
