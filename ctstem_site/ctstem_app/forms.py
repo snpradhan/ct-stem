@@ -435,6 +435,23 @@ class TaxonomySearchForm(ModelForm):
         field.queryset = models.Category.objects.none()
 
 ####################################
+# Student Search Form
+####################################
+class StudentSearchForm(forms.Form):
+  username = forms.CharField(required=False, max_length=30, label=u'Username')
+  first_name = forms.CharField(required=False, max_length=30, label=u'First name')
+  last_name = forms.CharField(required=False, max_length=30, label=u'Last name')
+  email = forms.EmailField(required=False, max_length=75, label=u'Email')
+
+  def __init__(self, *args, **kwargs):
+    super(StudentSearchForm, self).__init__(*args, **kwargs)
+
+    for field_name, field in self.fields.items():
+      field.widget.attrs['class'] = 'form-control'
+      if field.help_text:
+        field.widget.attrs['placeholder'] = field.help_text
+
+####################################
 # Assignment Search Form
 ####################################
 class AssignmentSearchForm(forms.Form):

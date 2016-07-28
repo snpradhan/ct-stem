@@ -184,7 +184,7 @@ $(function (){
                       <a type="button" class="btn btn-success edit" aria-label="Edit User" title="Edit User" href="/user/'+user_id+'">\
                         <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>\
                       </a>\
-                      <a type="button" class="btn btn-warning removeUser" aria-label="Remove User" title="Remove User" href="/user/remove/'+group+'/'+student+'" data-id="'+student+'">\
+                      <a type="button" class="btn btn-warning removeUser" aria-label="Remove Student" title="Remove Student" href="/student/remove/'+group+'/'+student+'" data-id="'+student+'">\
                         <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>\
                       </a>\
                     </div>\

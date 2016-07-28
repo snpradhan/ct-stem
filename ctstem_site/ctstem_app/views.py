@@ -928,7 +928,7 @@ def deleteUser(request, id=''):
   except User.DoesNotExist:
     return http.HttpResponseNotFound('<h1>User not found</h1>')
 
-def removeUser(request, group_id='', student_id=''):
+def removeStudent(request, group_id='', student_id=''):
   try:
     # check if the user has permission to create or modify a group
     if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'school_administrator') == False and hasattr(request.user, 'teacher') == False :
@@ -956,6 +956,35 @@ def removeUser(request, group_id='', student_id=''):
     return http.HttpResponseNotFound('<h1>Requested group not found</h1>')
   except models.Student.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested student not found</h1>')
+
+def addStudent(request, group_id='', student_id=''):
+  try:
+    # check if the user has permission to create or modify a group
+    if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'school_administrator') == False and hasattr(request.user, 'teacher') == False :
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to add users from this group</h1>')
+    # check if the lesson exists
+
+    group = models.UserGroup.objects.get(id=group_id)
+    student = models.Student.objects.get(id=student_id)
+    if hasattr(request.user, 'teacher'):
+      if request.user.teacher != group.teacher:
+        return http.HttpResponseNotFound('<h1>You do not have the privilege to remove users from this group</h1>')
+    elif hasattr(request.user, 'school_administrator'):
+      if request.user.school_administrator.school != group.teacher.school:
+        return http.HttpResponseNotFound('<h1>You do not have the privilege to remove users from this group</h1>')
+
+    if request.method == 'POST':
+      membership = models.Membership.objects.get_or_create(group=group, student=student)
+      response_data = {'result': 'Success'}
+      return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+
+    return http.HttpResponseNotAllowed(['POST'])
+
+  except models.UserGroup.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested group not found</h1>')
+  except models.Student.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested student not found</h1>')
+
 
 def notimplemented(request):
   return render(request, 'ctstem_app/NotImplemented.html')
@@ -1112,6 +1141,39 @@ def searchTaxonomy(request):
 
   return http.HttpResponseNotAllowed(['GET', 'POST'])
 
+####################################
+# Search Students
+####################################
+@login_required
+def searchStudents(request):
+  # check if the user has permission to add a question
+  if hasattr(request.user, 'teacher') == False and hasattr(request.user, 'school_administrator') == False and  hasattr(request.user, 'administrator') == False:
+    return http.HttpResponseNotFound('<h1>You do not have the privilege search students</h1>')
+
+  if 'POST' == request.method:
+    data = request.POST.copy()
+    print data
+    query_filter = {}
+    if data['username']:
+      query_filter['user__username__icontains'] = str(data['username'])
+    if data['first_name']:
+      query_filter['user__first_name__icontains'] = str(data['first_name'])
+    if data['last_name']:
+      query_filter['user__last_name__icontains'] = str(data['last_name'])
+    if data['email']:
+      query_filter['user__email__icontains'] = str(data['email'])
+
+    group = models.UserGroup.objects.get(id=int(data['group_id']))
+    school = group.teacher.school
+    query_filter['school__id'] = school.id
+
+    print query_filter
+    studentList = models.Student.objects.filter(**query_filter)
+    student_list = [{'user_id': student.user.id, 'student_id': student.id, 'username': student.user.username, 'name': student.user.get_full_name(), 'email': student.user.email, 'status': 'Active' if student.user.is_active else 'Inactive', 'last_login': student.user.last_login.strftime('%B %d, %Y') if student.user.last_login else '', 'group': group.id}
+                for student in studentList]
+    return http.HttpResponse(json.dumps(student_list), content_type="application/json")
+
+  return http.HttpResponseNotAllowed(['POST'])
 ####################################
 # USER LIST
 ####################################
@@ -1277,7 +1339,8 @@ def group(request, id=''):
         formset = assignmentFormset(instance=group, prefix='form')
         uploadForm = forms.UploadFileForm(user=request.user)
         assignmentForm = forms.AssignmentSearchForm()
-        context = {'form': form, 'formset': formset, 'role': 'group', 'uploadForm': uploadForm, 'assignmentForm': assignmentForm}
+        studentSearchForm = forms.StudentSearchForm()
+        context = {'form': form, 'formset': formset, 'role': 'group', 'uploadForm': uploadForm, 'assignmentForm': assignmentForm, 'studentSearchForm': studentSearchForm}
         return render(request, 'ctstem_app/UserGroup.html', context)
 
     elif request.method == 'POST':
@@ -1297,7 +1360,8 @@ def group(request, id=''):
         messages.error(request, "The group could not be saved because there were errors.  Please check the errors below.")
         uploadForm = forms.UploadFileForm(user=request.user)
         assignmentForm = forms.AssignmentSearchForm()
-        context = {'form': form, 'formset':formset, 'role': 'group', 'uploadForm': uploadForm, 'assignmentForm': assignmentForm}
+        studentSearchForm = forms.StudentSearchForm()
+        context = {'form': form, 'formset':formset, 'role': 'group', 'uploadForm': uploadForm, 'assignmentForm': assignmentForm, 'studentSearchForm': studentSearchForm}
         return render(request, 'ctstem_app/UserGroup.html', context)
 
     return http.HttpResponseNotAllowed(['GET', 'POST'])
