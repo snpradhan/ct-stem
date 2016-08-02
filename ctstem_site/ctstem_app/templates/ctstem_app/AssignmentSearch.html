@@ -14,17 +14,19 @@
         {% csrf_token %}
 
         <div class="modal-body">
-          <div class="form-group">
-            <label for="id_curriculum_type">Curriculum Type</label>
-            <div>{{assignmentForm.curriculum_type}}</div>
-          </div>
-          <div class="form-group">
-            <label for="id_title">Title</label>
-            <div>{{assignmentForm.title}}</div>
-          </div>
-          <div class="form-group">
-            <label for="id_subject">Subject</label>
-            <div>{{assignmentForm.subject}}</div>
+          <div class="form-inline">
+            <div class="form-group">
+              <label for="id_curriculum_type">Curriculum Type</label>
+              <div>{{assignmentForm.curriculum_type}}</div>
+            </div>
+            <div class="form-group">
+              <label for="id_title">Title</label>
+              <div>{{assignmentForm.title}}</div>
+            </div>
+            <div class="form-group">
+              <label for="id_subject">Subject</label>
+              <div>{{assignmentForm.subject}}</div>
+            </div>
           </div>
         </div>
         <div class="modal-footer">
