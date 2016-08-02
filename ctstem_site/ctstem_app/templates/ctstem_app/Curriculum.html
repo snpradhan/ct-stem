@@ -127,6 +127,7 @@
                 <tr>
                   <th style="width:40%;">Title</th>
                   <th>File</th>
+                  <th>Teacher Only?</th>
                   <th>Delete</th>
                 </tr>
               </thead>
@@ -143,6 +144,10 @@
                     <td class="attached_file">
                       <div>{{attachmentForm.file_object}}</div>
                       <div class="error">{{ attachmentForm.file_object.errors }}</div>
+                    </td>
+                     <td class="teacher_only">
+                      <div>{{attachmentForm.teacher_only}}</div>
+                      <div class="error">{{ attachmentForm.teacher_only.errors }}</div>
                     </td>
                     <td class="attachment_edit">
                       <button type="button" class="btn btn-danger delete_attachment" name="delete_attachment" aria-label="Delete Attachment" title="Delete Attachment">

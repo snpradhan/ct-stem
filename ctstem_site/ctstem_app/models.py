@@ -174,7 +174,9 @@ class CurriculumQuestion(models.Model):
 class Attachment(models.Model):
   curriculum = models.ForeignKey(Curriculum, null=False)
   title = models.CharField(null=False, blank=False, max_length=256)
-  file_object = models.FileField(upload_to=upload_file_to, blank=True)
+  file_object = models.FileField(upload_to=upload_file_to, null=False)
+  teacher_only = models.BooleanField(choices=((True, 'Yes'), (False, 'No')))
+
 
   class Meta:
       ordering = ['title']

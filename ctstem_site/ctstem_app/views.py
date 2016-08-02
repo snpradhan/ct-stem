@@ -179,8 +179,7 @@ def curriculum(request, id=''):
 
       formset = StepFormSet(data, instance=curriculum, prefix='form')
       attachment_formset = AttachmentFormSet(data, request.FILES, instance=curriculum, prefix='attachment_form')
-      print form.is_valid()
-      print formset.is_valid()
+
       if form.is_valid() and formset.is_valid() and attachment_formset.is_valid():
         savedCurriculum = form.save(commit=False)
         if '' == id:
@@ -209,6 +208,7 @@ def curriculum(request, id=''):
       else:
         print form.errors
         print formset.errors
+        print attachment_formset.errors
         messages.error(request, "The curriculum could not be saved because there were errors.  Please check the errors below.")
         context = {'form': form, 'attachment_formset': attachment_formset, 'formset':formset, 'newQuestionForm': newQuestionForm}
         return render(request, 'ctstem_app/Curriculum.html', context)
@@ -295,9 +295,6 @@ def render_to_pdf(template_src, context_dict, request):
 ####################################
 def downloadAttachments(request, id=''):
   try:
-    # check if the user has permission to delete a lesson
-    if request.user.is_anonymous() or hasattr(request.user, 'student'):
-      return http.HttpResponseNotFound('<h1>You do not have the privilege to download attachments</h1>')
     # check if the lesson exists
     if '' != id:
       curriculum = models.Curriculum.objects.get(id=id)
@@ -307,7 +304,11 @@ def downloadAttachments(request, id=''):
     if request.method == 'GET' or request.method == 'POST':
       # Files (local path) to put in the .zip
       # FIXME: Change this (get paths from DB etc)
-      attachments = models.Attachment.objects.all().filter(curriculum=curriculum)
+      # check if the user has permission to delete a lesson
+      if request.user.is_anonymous() or hasattr(request.user, 'student'):
+        attachments = models.Attachment.objects.all().filter(curriculum=curriculum, teacher_only=False)
+      else:
+        attachments = models.Attachment.objects.all().filter(curriculum=curriculum)
 
       # Folder name in ZIP archive which contains the above files
       # E.g [thearchive.zip]/somefiles/file2.txt

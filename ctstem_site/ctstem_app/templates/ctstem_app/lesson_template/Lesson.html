@@ -69,11 +69,10 @@
         {% endif %}
 
         <!-- TODO: LINK TO ATTACHMENT -->
-        {% if user.administrator or user.researcher or user.school_administrator or user.author or user.teacher %}
-          {% if attachments %}
-            <li><a href="{% url 'ctstem:downloadAttachments' curriculum.id%}">Download Attachment(s) <span class="fa fa-paperclip"></span></a></li>
-          {% endif %}
+        {% if attachments %}
+          <li><a href="{% url 'ctstem:downloadAttachments' curriculum.id%}">Download Attachment(s) <span class="fa fa-paperclip"></span></a></li>
         {% endif %}
+
         <li><a href="javascript:window.print();">Print This Page <span class="fa fa-print "></span></a></li>
 
         {% if user.is_anonymous %}
