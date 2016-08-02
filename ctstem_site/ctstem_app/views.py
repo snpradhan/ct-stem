@@ -149,6 +149,7 @@ def curriculum(request, id=''):
       curriculum = models.Curriculum.objects.get(id=id)
     else:
       curriculum = models.Curriculum()
+      curriculum.author = request.user
 
     newQuestionForm = forms.QuestionForm()
 

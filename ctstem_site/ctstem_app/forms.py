@@ -259,7 +259,7 @@ class CurriculumForm(ModelForm):
 
   class Meta:
     model = models.Curriculum
-    fields = ['curriculum_type', 'title', 'icon', 'time', 'level', 'purpose', 'overview', 'status', 'subject', 'compatible_system', 'taxonomy', 'content', 'teacher_notes']
+    fields = ['curriculum_type', 'author', 'title', 'icon', 'time', 'level', 'purpose', 'overview', 'status', 'subject', 'compatible_system', 'taxonomy', 'content', 'teacher_notes']
     widgets = {
       'title': forms.TextInput(attrs={'placeholder': 'Lesson Title'}),
       'time': forms.TextInput(attrs={'rows':0, 'cols':60}),
@@ -277,6 +277,7 @@ class CurriculumForm(ModelForm):
     super(CurriculumForm, self).__init__(*args, **kwargs)
     forms.ModelForm.__init__(self, *args, **kwargs)
     self.fields['taxonomy'].label = "Standards"
+    self.fields['author'].choices = [(user.pk, user.get_full_name()) for user in models.User.objects.all().filter(Q(administrator__isnull=False) | Q(researcher__isnull=False) | Q(author__isnull=False))]
 
     for field_name, field in self.fields.items():
       field.widget.attrs['class'] = 'form-control'
