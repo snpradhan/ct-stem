@@ -89,7 +89,14 @@ header h1 {
 
 #side-nav li a:hover { text-decoration: underline; }
 
-
+#side-nav li.divider {
+  height: 1px;
+  margin: 9px 0;
+  overflow: hidden;
+  background-color: #e5e5e5;
+  width: 90%;
+  padding: 0.05rem;
+}
 
 /* MAIN SECTION AND BASIC ELEMENTS */
 main, notes, activity, faq {
