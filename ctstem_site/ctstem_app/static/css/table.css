@@ -157,3 +157,22 @@ table.table#team img.icon {
   max-width: 100px;
   height: auto;
 }
+
+table.mc_horiz_question_table {
+  width: 100%;
+  font-size: 0.8em;
+}
+table.mc_horiz_question_table:nth-of-type(odd){
+  background-color: white;
+}
+table.mc_horiz_question_table td {
+  padding: 0.5em;
+}
+table.mc_horiz_question_table  td.mc_horiz_question {
+  width: 70%;
+}
+table.mc_horiz_question_table  td:not(.mc_horiz_question) {
+  width: 6%;
+  text-align: center;
+}
+

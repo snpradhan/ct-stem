@@ -34,6 +34,7 @@ FIELD_TYPE_CHOICES = (
     (u'MS', u'Multi-Select'),
     (u'MC', u'Multiple Choice'),
     (u'MI', u'Multiple Choice w/ Images'),
+    (u'MH', u'Multiple Choice w/ Horizontal Layout'),
     (u'FI', u'File'),
 )
 

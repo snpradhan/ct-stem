@@ -79,62 +79,76 @@
           </div>
           <hr>
           <div class="step_context">{{step.content|inline_style|safe}}</div>
-          <div class="question_container">
-            {% if step.questions.count %}
-              <hr>
-            {% endif %}
-            <div class="question_table">
-              {% for curriculumquestion in step.curriculumquestion_set.all %}
-                {% with question=curriculumquestion.question %}
-                <div class="question_text">
-                  <label> Question: </label>
-                  <div> {{question.question_text|inline_style|safe }} </div>
-                </div>
-                <div class="answer_field">
-                {% with field_type=question.answer_field_type %}
-                  {% if field_type == 'TA' %}
-                    <textarea placeholder="Enter your response" class="form-control" disabled></textarea>
-                  {% elif field_type == 'TF' %}
-                    <input type="text" placeholder="Enter your response" class="form-control" disabled/>
-                  {% elif field_type == 'DD' %}
-                    <div class="multiplechoice">
+          <hr>
+          {% for curriculumquestion in step.curriculumquestion_set.all %}
+            {% with question=curriculumquestion.question %}
+            {% with field_type=question.answer_field_type %}
+              {% if field_type != 'MH' %}
+                <hr>
+                <div class="question_container">
+                  <div class="question_text">
+                    <div> {{question.question_text|inline_style|safe }} </div>
+                  </div>
+                  <div class="answer_field">
+                    {% if field_type == 'TA' %}
+                      <textarea placeholder="Enter your response" class="form-control" disabled></textarea>
+                    {% elif field_type == 'TF' %}
+                      <input type="text" placeholder="Enter your response" class="form-control" disabled/>
+                    {% elif field_type == 'DD' %}
+                      <div class="multiplechoice">
+                        <div class="note"> Note: Select one answer </div>
+                        <select class="form-control" disabled>
+                          {% for option in question.options|splitlines %}
+                          <option value="{{option}}">{{option}}</option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                    {% elif field_type == 'MC' %}
                       <div class="note"> Note: Select one answer </div>
-                      <select class="form-control" disabled>
-                        {% for option in question.options|splitlines %}
-                        <option value="{{option}}">{{option}}</option>
-                        {% endfor %}
-                      </select>
-                    </div>
-                  {% elif field_type == 'MC' %}
-                    <div class="note"> Note: Select one answer </div>
-                    {% for option in question.options|splitlines %}
-                      <input type="radio" name="{{question.id}}" id="{{question.id}}" value="{{option}}" disabled/>  {{option}}<br>
-                    {% endfor %}
-                  {% elif field_type == 'MI' %}
-                    <div class="note"> Note: Select one answer </div>
-                    {% for option in question.options|splitlines %}
-                      <input type="radio" name="{{question.id}}" id="{{question.id}}" value="{{option}}" disabled/>  <img src="{{option}}" class="image_option"/><br><br>
-                    {% endfor %}
-                  {% elif field_type == 'MS' %}
-                    <div class="note"> Note: Select all that apply </div>
-                    {% for option in question.options|splitlines %}
-                      <input type="checkbox" name="{{question.id}}_cb" id="{{question.id}}_cb" value="{{option}}" disabled/>  {{option}}<br>
-                    {% endfor %}
-                  {% elif field_type == 'FI' %}
-                    <div class="note"> Note: Upload a file </div>
-                    <input type="file" placeholder="Upload your file" class="form-control" disabled/>
+                      {% for option in question.options|splitlines %}
+                        <input type="radio" name="{{question.id}}" id="{{question.id}}" value="{{option}}" disabled/>  {{option}}<br>
+                      {% endfor %}
+                    {% elif field_type == 'MI' %}
+                      <div class="note"> Note: Select one answer </div>
+                      {% for option in question.options|splitlines %}
+                        <input type="radio" name="{{question.id}}" id="{{question.id}}" value="{{option}}" disabled/>  <img src="{{option}}" class="image_option"/><br><br>
+                      {% endfor %}
+                    {% elif field_type == 'MS' %}
+                      <div class="note"> Note: Select all that apply </div>
+                      {% for option in question.options|splitlines %}
+                        <input type="checkbox" name="{{question.id}}_cb" id="{{question.id}}_cb" value="{{option}}" disabled/>  {{option}}<br>
+                      {% endfor %}
+                    {% elif field_type == 'FI' %}
+                      <div class="note"> Note: Upload a file </div>
+                      <input type="file" placeholder="Upload your file" class="form-control" disabled/>
+                    {% endif %}
+                  </div>
+                  <div class="error"></div>
+                  {% if forloop.last %}
+                    <hr>
                   {% endif %}
-                  {% endwith %}
                 </div>
-                <div class="error"></div>
-                {% if forloop.last %}
-                  <hr>
-                {% else %}
-                  <hr class="light">
-                {% endif %}
-                {% endwith %}
-              {% endfor %}
-            </div>
+              {% else %}
+                <table class="mc_horiz_question_table">
+                  <tbody>
+                    <tr>
+                      <td class="mc_horiz_question">
+                        <div>
+                          {{question.question_text|inline_style|safe }}
+                        </div>
+                      </td>
+                      {% for option in question.options|splitlines %}
+                        <td>
+                          <input type="radio" name="{{question.id}}" id="{{question.id}}" value="{{option}}"/>
+                        </td>
+                      {% endfor %}
+                    </tr>
+                  </tbody>
+                </table>
+              {% endif %}
+            {% endwith %}
+            {% endwith %}
+          {% endfor %}
           </div>
           <div class="row footer">
             {% if curriculum.curriculum_type == 'L' or curriculum.curriculum_type == 'A' %}
