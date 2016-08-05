@@ -394,6 +394,9 @@
           $('textarea#id_curriculum-level').closest('.form-group').show();
           $('textarea#id_curriculum-level').closest('.form-group').find('label:first').html('Level (<span class="required">*</span>)');
 
+          $('textarea#id_curriculum-overview').closest('.form-group').show();
+          $('textarea#id_curriculum-overview').closest('.form-group').find('label:first').html('Overview (<span class="required">*</span>)');
+
           $('textarea#id_curriculum-purpose').closest('.form-group').show();
           $('textarea#id_curriculum-purpose').closest('.form-group').find('label:first').html('Purpose (<span class="required">*</span>)');
 
@@ -426,6 +429,7 @@
           //hide the metadata fields
           $('input#id_curriculum-time').closest('.form-group').hide();
           $('textarea#id_curriculum-level').closest('.form-group').hide();
+          $('textarea#id_curriculum-overview').closest('.form-group').hide();
           $('textarea#id_curriculum-purpose').closest('.form-group').hide();
           $('select#id_curriculum-subject').closest('.form-group').hide();
           $('select#id_curriculum-taxonomy').closest('.form-group').hide();

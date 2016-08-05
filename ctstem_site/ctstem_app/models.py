@@ -112,7 +112,7 @@ class Curriculum (models.Model):
   time = models.CharField(null=True, blank=True, max_length=256, help_text='Estimated time students would spend on this curriculum')
   level = models.TextField(null=True, blank=True, help_text="Student level")
   purpose = models.TextField(null=True, blank=True, help_text="Purpose of this curriculum")
-  overview = models.TextField(null=False)
+  overview = models.TextField(null=True, blank=True, help_text="Curriculum overview")
   content = RichTextUploadingField(null=True, blank=True)
   teacher_notes = RichTextUploadingField(null=True, blank=True)
   status = models.CharField(max_length=1, default='D', choices=CURRICULUM_STATUS_CHOICES)
