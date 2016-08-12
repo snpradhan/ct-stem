@@ -1718,118 +1718,132 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
         messages.error(request, 'Please use the buttons below to navigate between steps')
         return shortcuts.redirect('ctstem:resumeAssignment', assignment_id=assignment_id, instance_id=instance.id, step_order=last_step)
       if int(step_order) == 0:
-        step_order = 1
+        if instance.assignment.curriculum.curriculum_type == 'S':
+          step_order = 1
+        else:
+          step_order = 0
     #starting a new assignment
     else:
       instance = models.AssignmentInstance(assignment_id=assignment_id, student=request.user.student, status='N')
-      step_order = 1
+      instance.save()
+      if instance.assignment.curriculum.curriculum_type == 'S':
+        step_order = 1
+      else:
+        step_order = 0
 
     assignment = models.Assignment.objects.get(id=assignment_id)
+    curriculum = assignment.curriculum
 
     if 'GET' == request.method or 'POST' == request.method:
-      steps = models.Step.objects.all().filter(curriculum=instance.assignment.curriculum)
-      step = steps.get(order=step_order)
+      steps = models.Step.objects.all().filter(curriculum=curriculum)
       total_steps = steps.count()
-      initial_data = []
+      if step_order == 0:
+        context = {'curriculum': curriculum, 'instance': instance, 'total_steps': total_steps, 'step_order': step_order}
+        return render(request, 'ctstem_app/AssignmentStep2.html', context)
+      else:
+        step = steps.get(order=step_order)
+        initial_data = []
 
-      try:
-        assignmentStepResponse = models.AssignmentStepResponse.objects.get(instance=instance, step=step)
-        extra = 0
-      except models.AssignmentStepResponse.DoesNotExist:
-        #unsaved object
-        assignmentStepResponse = models.AssignmentStepResponse(instance=instance, step=step)
-        curriculumQuestions = models.CurriculumQuestion.objects.all().filter(step=step).order_by('order')
-        extra = curriculumQuestions.count()
-        for curriculumQuestion in curriculumQuestions:
-          initial_data.append({'curriculum_question': curriculumQuestion.id, 'response': ''})
+        try:
+          assignmentStepResponse = models.AssignmentStepResponse.objects.get(instance=instance, step=step)
+          extra = 0
+        except models.AssignmentStepResponse.DoesNotExist:
+          #unsaved object
+          assignmentStepResponse = models.AssignmentStepResponse(instance=instance, step=step)
+          curriculumQuestions = models.CurriculumQuestion.objects.all().filter(step=step).order_by('order')
+          extra = curriculumQuestions.count()
+          for curriculumQuestion in curriculumQuestions:
+            initial_data.append({'curriculum_question': curriculumQuestion.id, 'response': ''})
 
-      if 'GET' == request.method:
-        #get the assignment step
-        form = forms.AssignmentStepResponseForm(instance=assignmentStepResponse, prefix="step_response")
-        questionResponseFormset=inlineformset_factory(models.AssignmentStepResponse, models.QuestionResponse, form=forms.QuestionResponseForm, can_delete=False, extra=extra)
-        formset = questionResponseFormset(instance=assignmentStepResponse, prefix='form')
+        if 'GET' == request.method:
+          #get the assignment step
+          form = forms.AssignmentStepResponseForm(instance=assignmentStepResponse, prefix="step_response")
+          questionResponseFormset=inlineformset_factory(models.AssignmentStepResponse, models.QuestionResponse, form=forms.QuestionResponseForm, can_delete=False, extra=extra)
+          formset = questionResponseFormset(instance=assignmentStepResponse, prefix='form')
 
-        if int(step_order) == 1 and assignment.curriculum.curriculum_type == 'L':
-          instanceform = forms.AssignmentInstanceForm(assignment=assignment, instance=instance, prefix="teammates")
-        else:
-          instanceform = None
+          if int(step_order) == 1 and assignment.curriculum.curriculum_type == 'L':
+            instanceform = forms.AssignmentInstanceForm(assignment=assignment, instance=instance, prefix="teammates")
+          else:
+            instanceform = None
 
-        if len(initial_data):
-          for subform, data in zip(formset.forms, initial_data):
-            subform.initial = data
+          if len(initial_data):
+            for subform, data in zip(formset.forms, initial_data):
+              subform.initial = data
 
-        context = {'instanceform': instanceform, 'form': form, 'formset': formset, 'total_steps': total_steps}
-        return render(request, 'ctstem_app/AssignmentStep.html', context)
+          context = {'curriculum': curriculum, 'instance': instance, 'instanceform': instanceform, 'form': form, 'formset': formset, 'total_steps': total_steps, 'step_order': step_order}
+          return render(request, 'ctstem_app/AssignmentStep2.html', context)
 
-      elif 'POST' == request.method:
-        data = request.POST.copy()
-        #is this a save or a submit
-        save_only = int(data['save'])
-        form = forms.AssignmentStepResponseForm(data=data, instance=assignmentStepResponse, prefix="step_response")
-        questionResponseFormset=inlineformset_factory(models.AssignmentStepResponse, models.QuestionResponse, form=forms.QuestionResponseForm, can_delete=False, extra=0)
-        formset = questionResponseFormset(data, request.FILES, instance=assignmentStepResponse, prefix='form')
-        if int(step_order) == 1 and assignment.curriculum.curriculum_type == 'L':
-          instanceform = forms.AssignmentInstanceForm(data=data, assignment=assignment, instance=instance, prefix="teammates")
-        else:
-          instanceform = None
+        elif 'POST' == request.method:
+          data = request.POST.copy()
+          #is this a save or a submit
+          print data
+          save_only = int(data['save'])
+          form = forms.AssignmentStepResponseForm(data=data, instance=assignmentStepResponse, prefix="step_response")
+          questionResponseFormset=inlineformset_factory(models.AssignmentStepResponse, models.QuestionResponse, form=forms.QuestionResponseForm, can_delete=False, extra=0)
+          formset = questionResponseFormset(data, request.FILES, instance=assignmentStepResponse, prefix='form')
+          if int(step_order) == 1 and assignment.curriculum.curriculum_type == 'L':
+            instanceform = forms.AssignmentInstanceForm(data=data, assignment=assignment, instance=instance, prefix="teammates")
+          else:
+            instanceform = None
 
-        if form.is_valid() and formset.is_valid():
-          if save_only == 1 or step.order < total_steps:
-            instance.status = 'P'
-            # if submit then increase the last step completed counter
-            if save_only == 0:
+          if form.is_valid() and formset.is_valid():
+            if save_only == 1 or step.order < total_steps:
+              instance.status = 'P'
+              # if submit then increase the last step completed counter
+              if save_only == 0:
+                instance.last_step = step.order
+              # if save then set the last step completed to the previous step
+              else:
+                instance.last_step = step.order - 1
+            else:
+              instance.status = 'S'
               instance.last_step = step.order
-            # if save then set the last step completed to the previous step
+
+            instance.save()
+            if instanceform and instanceform.is_valid():
+              instanceform.save()
+
+            #save assignment step response
+            assignmentStepResponse = form.save(commit=False)
+            assignmentStepResponse.instance = instance
+            assignmentStepResponse.save()
+            #save the question response formset
+            questionResponseObjects = formset.save()
+            questionResponses = {}
+            # get the question response ids to update the front end
+            for questionResponse in questionResponseObjects:
+              print 'question order ', questionResponse.curriculum_question.order
+              questionResponses['id_form-%d-id'%(questionResponse.curriculum_question.order-1)] = questionResponse.id
+
+            #update the instance
+            #submission
+            if instance.status == 'S':
+              messages.success(request, 'Your assignment has been submitted')
+              return shortcuts.redirect('ctstem:assignments', bucket='inbox')
+            #Save or Save & Continue
             else:
-              instance.last_step = step.order - 1
+              if save_only == 1:
+                if not request.is_ajax():
+                  messages.success(request, 'Your responses have been saved')
+                next_step = step.order
+              else:
+                messages.success(request, 'Your previous steps have been saved')
+                next_step = step.order + 1
+
+              if request.is_ajax():
+                url = '/assignment/%s/%s/%s/' % (assignment_id, instance.id, step_order)
+                response_data = {'message': 'Your responses were auto saved at %s' % datetime.datetime.now().time().strftime('%r'), 'url': url, 'questionResponses': questionResponses, 'questionCount': len(questionResponses)}
+                return http.HttpResponse(json.dumps(response_data), content_type = 'application/json')
+              else:
+                return shortcuts.redirect('ctstem:resumeAssignment', assignment_id=assignment_id, instance_id=instance.id, step_order=next_step)
+
           else:
-            instance.status = 'S'
-            instance.last_step = step.order
+            print form.errors
+            print formset.errors
+            messages.error(request, 'Please answer all the questions on this step before continuing on to the next step')
 
-          instance.save()
-          if instanceform and instanceform.is_valid():
-            instanceform.save()
-
-          #save assignment step response
-          assignmentStepResponse = form.save(commit=False)
-          assignmentStepResponse.instance = instance
-          assignmentStepResponse.save()
-          #save the question response formset
-          questionResponseObjects = formset.save()
-          questionResponses = {}
-          # get the question response ids to update the front end
-          for questionResponse in questionResponseObjects:
-            questionResponses['id_form-%d-id'%(questionResponse.curriculum_question.order-1)] = questionResponse.id
-
-          #update the instance
-          #submission
-          if instance.status == 'S':
-            messages.success(request, 'Your assignment has been submitted')
-            return shortcuts.redirect('ctstem:assignments', bucket='inbox')
-          #Save or Save & Continue
-          else:
-            if save_only == 1:
-              if not request.is_ajax():
-                messages.success(request, 'Your responses have been saved')
-              next_step = step.order
-            else:
-              messages.success(request, 'Your previous steps have been saved')
-              next_step = step.order + 1
-
-            if request.is_ajax():
-              url = '/assignment/%s/%s/%s/' % (assignment_id, instance.id, step_order)
-              response_data = {'message': 'Your responses were auto saved at %s' % datetime.datetime.now().time().strftime('%r'), 'url': url, 'questionResponses': questionResponses, 'questionCount': len(questionResponses)}
-              return http.HttpResponse(json.dumps(response_data), content_type = 'application/json')
-            else:
-              return shortcuts.redirect('ctstem:resumeAssignment', assignment_id=assignment_id, instance_id=instance.id, step_order=next_step)
-
-        else:
-          print form.errors
-          print formset.errors
-          messages.error(request, 'Please answer all the questions on this step before continuing on to the next step')
-
-        context = {'instanceform': instanceform,  'form': form, 'formset': formset, 'total_steps': total_steps}
-        return render(request, 'ctstem_app/AssignmentStep.html', context)
+          context = {'curriculum': curriculum, 'instance': instance, 'instanceform': instanceform,  'form': form, 'formset': formset, 'total_steps': total_steps, 'step_order': step_order}
+          return render(request, 'ctstem_app/AssignmentStep2.html', context)
 
     return http.HttpResponseNotAllowed(['GET', 'POST'])
   except models.AssignmentInstance.DoesNotExist:

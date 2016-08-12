@@ -1,0 +1,264 @@
+* {
+  font-size: 18px; /* All REM units relative to this */
+  box-sizing: border-box;
+  font-family: 'Maitree', serif;
+  text-rendering: optimizeLegibility;
+}
+
+body { margin: 0; }
+
+
+/* TOP HEADER BAR */
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: block;
+  border-bottom: 1px solid white;
+  background-color: rgb(70, 160, 215);
+  color: white;
+  width: 100%;
+  height: 55px;
+  line-height: 55px;
+  padding: 1px 25px 0 50px;
+  font-family: 'Roboto Condensed', sans-serif;
+  vertical-align: middle;
+  font-size: 1.1rem;
+  z-index: 5;  /* Make sure it's above the side bar */
+}
+
+
+header h1 {
+  font-size: 1.6rem;
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 1rem;
+}
+
+
+/* MAIN SECTION AND BASIC ELEMENTS */
+main {
+  display: block;
+  max-width: 1000px;
+  min-width: 500px;
+  margin: 120px 5% 0 10%;
+}
+
+p {
+  font-size: 1rem;
+  line-height: 160%;
+  font-family: inherit;
+  margin: 0 0 1rem 0;
+}
+
+h1, h2, h3, h4, .byline, .page-type {
+  font-family: 'Roboto Condensed', sans-serif;
+}
+
+h1 {
+  font-size: 2.6rem;
+  font-weight: 700;
+  font-style: italic;
+  margin: 0;
+}
+
+h2 {
+  font-size: 1.5rem;
+  font-weight: 400;
+  margin: 0.5rem 0 0.5rem 0;
+}
+
+h3 {
+  font-size: 1.2rem;
+  font-weight: 400;
+  margin: 2rem 0 0.5rem 0;
+}
+
+h4 {
+  font-size: 1rem;
+  font-weight: 400;
+  margin: 0.5rem 0;
+}
+
+b, ul, ol, li {
+  font-size: inherit;
+  font-family: inherit;
+  line-height: inherit;
+  color: inherit;
+}
+
+ol li {
+  margin-bottom: 1rem;
+}
+
+a {
+  font-family: inherit;
+  font-size: inherit;
+  color: rgb(70, 160, 215);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: none;
+  color: red;
+}
+
+
+.save-buttons {
+  margin: 2rem 0;
+  width: 85%;
+  text-align: right;
+}
+
+.save-buttons button {
+  width: auto;
+  padding: 10px 20px;
+  background-color: rgb(70, 160, 215);
+  color: white;
+  border-radius: 5px;
+  outline: none;
+  border: none;
+  font-family: 'Roboto Condensed', sans-serif;
+}
+
+.save-buttons button:active { background-color: rgba(70, 160, 215, 0.7); }
+.save-buttons button.save { background-color: rgb(153, 153, 153); }
+.save-buttons button.save:active { background-color: rgba(153, 153, 153, 0.7); }
+
+
+
+/* FORM ELEMENTS */
+.open-question {
+  margin-top: 40px;
+}
+
+textarea {
+  width: 85%;
+  height: 7rem;
+  background-color: #fffffa;
+  font-size: 0.9rem;
+  border: 1px solid #888;
+  padding: 1rem;
+  font-family: sans-serif;
+}
+
+
+/* LIKERT ITEM SET */
+table.likert {
+  border-collapse: collapse;
+  border-top: 1px solid #888;
+  border-bottom: 1px solid #888;
+}
+
+table.likert td, th {
+  font-size: 16px;
+  font-family: 'Roboto Condensed', sans-serif;
+}
+
+table.likert tr:nth-child(even) {
+  background-color: #eee;
+}
+
+td.likert-prompt {
+  padding-right: 1.5em;
+  padding-bottom: 1em;
+  padding-top: 1em;
+  vertical-align: middle;
+}
+
+td.likert-number {
+  vertical-align: top;
+  text-align: left;
+  padding: 1em 0.3em;
+}
+
+.likert-option {
+  font-weight: normal;
+  font-size: 0.7em;
+  vertical-align: middle;
+  width: 3em;
+  text-align: center;
+  padding: 0.5em;
+}
+
+td.likert-option {
+  font-size: 1em;
+}
+
+th.likert-instructions {
+  font-weight: 700;
+  font-style: italic;
+  text-align: left;
+  vertical-align: top;
+  padding: 1.2em 0.5em 1.2em 0;
+}
+
+
+/* FOOTER */
+footer {
+  display: block;
+  width: 100%;
+  height: auto;
+  background-color: #666;
+  margin: 3rem 0 0 0;
+  padding: 2rem 80px 2rem 10%;
+}
+
+footer p {
+  font-size: 14px;
+  font-weight: 200;
+  letter-spacing: 0.5px;
+  line-height: 150%;
+  color: rgba(255, 255, 255, 0.6);
+  font-family: Helvetica, sans-serif;
+}
+
+footer a {
+  color: white;
+}
+
+
+/* STYLES FOR NICE PRINTING */
+@media print {
+  * { font-size: 13px; }
+
+  header { display: none; }
+
+  #side-nav { display: none; }
+
+  main {
+    margin-left: 0;
+    margin-top: 0;
+  }
+
+  table.likert td, th { font-size: 11px; }
+
+  td.likert-prompt {
+    padding: 0.7em 1.5em 0.7em 0;
+  }
+
+  td.likert-number {
+    padding: 0.7em 0.3em;
+  }
+
+  textarea {
+    background-color: transparent;
+    height: 9rem;
+  }
+
+  .standards { font-size: 11px; }
+
+  footer {
+    background-color: transparent;
+    padding: 0;
+    margin: 0.5in 0 0 0;
+    border-top: 1px solid #999;
+  }
+
+  footer p {
+    color: black;
+    font-size: 11px;
+  }
+
+  footer a { color: black; }
+}

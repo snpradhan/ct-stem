@@ -1,0 +1,361 @@
+{% extends "ctstem_app/base.html" %}
+{% load ctstem_extras %}
+
+{% block title %} {{curriculum.title}} {%endblock %}
+
+{% block bootstrap_css %}{% endblock %}
+{% block datatable %}{% endblock %}
+{% block django_admin %}{% endblock %}
+{% block misc %}{% endblock %}
+{% block agency %}{% endblock %}
+{% block ctstem %}{% endblock %}
+{% block custom_media %}
+  <link href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Maitree:400,700|Roboto+Condensed:300,400,700italic" rel="stylesheet">
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/3.0.0/jquery.min.js"></script>
+  <script src="http://canvasjs.com//assets/script/canvasjs.min.js"></script>
+  <link rel="stylesheet" href="/static/css/bootstrap-modal.css">
+  <link rel="stylesheet" href="/static/css/table.css">
+  <link rel="stylesheet" href="/static/css/messages.css">
+  <link rel="stylesheet" href="/static/css/assignment.css">
+  <script type="text/javascript" src="/static/js/jquery.form.min.js"></script>
+
+{% endblock %}
+
+{% block header %}{% endblock %}
+
+{% block content %}
+  <header>
+    <div class="header-box">
+      <h1>CT-STEM</h1>
+      {{curriculum.title|title}}
+      <nav>
+        Page &nbsp;
+        {% if step_order  == 0 %}
+          <a class="page-link selected" href="#">{{1}}</a>
+        {% else %}
+          <a class="page-link" href="{% url 'ctstem:resumeAssignment'  instance.assignment.id instance.id 0 %}">{{1}}</a>
+        {% endif %}
+        {% for i in total_steps|iterate %}
+          {% if instance.status == 'S' or instance.status == 'F' or instance.status == 'A' %}
+            {% if i|add:0 == step_order|add:0 %}
+              <a class="page-link selected" href="{% url 'ctstem:resumeAssignment'  instance.assignment.id instance.id i %}">{{i|add:1}}</a>
+            {% else %}
+              <a class="page-link" href="{% url 'ctstem:resumeAssignment'  instance.assignment.id instance.id i %}">{{i|add:1}}</a>
+            {% endif %}
+          {% else %}
+            {% if i|add:0 < step_order|add:0 %}
+              <a class="page-link" href="{% url 'ctstem:resumeAssignment'  instance.assignment.id instance.id i %}">{{i|add:1}}</a>
+            {% elif i|add:0 == step_order|add:0 %}
+              <a class="page-link selected" href="#">{{i|add:1}}</a>
+            {% else %}
+              <a class="page-link" href="#">{{i|add:1}}</a>
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+      </nav>
+    </div>
+  </header>
+  {{block.super}}
+  <main>
+    <div class="page">
+      {% if step_order == 0 %}
+        <h2>Computational Thinking in Science and Math</h2>
+        <h1>{{curriculum.title}}</h1>
+        <hr>
+        <p class="item">
+          {% if curriculum.curriculum_type == 'A' %}
+            Thank you for taking this assessment!
+            Please do the best that you can, and don't worry if you don't know all of the answers.
+            Your responses will help us develop better curriculum and activities for high school students.
+          {% elif curriculum.curriculum_type == 'L' %}
+            {{curriculum.overview}}
+          {% endif %}
+        </p>
+        <div class="save-buttons" style="text-align: center; margin-bottom: 150px; margin-top: 80px;">
+          <a href="{% url 'ctstem:resumeAssignment'  instance.assignment.id instance.id 1 %}">
+            <button class="continue">
+              {% if instance.status == 'N' %}
+                Start!
+              {% else %}
+                Continue
+              {% endif %}
+            </button>
+          </a>
+        </div>
+      {% else %}
+        <h2>{{form.instance.step.title}}</h2>
+        <hr>
+        <form method="post" enctype="multipart/form-data" id="assignmentForm">
+          {% csrf_token %}
+          {{form.management_form}}
+          <input type="hidden" name="step_order" value="{{step.order}}"/>
+          {% if instanceform %}
+            <div class="teammates">
+              {{instanceform.management_form}}
+              <label>If you worked in a team, select your teammates from the list below:</label>
+              {{instanceform.teammates}}
+              <div class="warning">{{instanceform.teammates.help_text}}</div>
+            </div>
+          {% endif %}
+          <div class="step_context">{{form.instance.step.content|safe}}</div>
+          <hr>
+          <div class="question_container">
+            {{formset.management_form}}
+            <div class="question_table">
+              {% for questionForm in formset %}
+                {% with questionObj=questionForm.curriculum_question.value|get_curriculum_question %}
+                {% with field_type=questionObj.answer_field_type %}
+                {% if field_type != 'MH' %}
+                  <div class="question_text">
+                    <div class="question">
+                      {{questionForm.id}}
+                      {{questionObj.question_text|inline_style|safe}}
+                      {{questionForm.curriculum_question.as_hidden}}
+                      {{questionForm.save.as_hidden}}
+                    </div>
+                  </div>
+                  <div class="answer_field">
+                    <div class="response">
+                      {% if instance.status == 'F' or instance.status == 'S' or instance.status == 'A' %}
+                        <div class="readonly">
+                        {% if field_type == 'FI' %}
+                          <div class="file">
+                          Uploaded file: <a href="{{questionForm.responseFile.value.url}}" target="_blank"><span class="glyphicon glyphicon-file" aria-hidden="true"></span></a>
+                          </div>
+                        {% elif field_type == 'MI' %}
+                          <img src="{{questionForm.response.value}}" class="image_option"/><br>
+                        {% else %}
+                          <div class="text">
+                            {{questionForm.response.value}}
+                          </div>
+                        {% endif %}
+                        </div>
+                      {% else %}
+                        {% if field_type == 'TA' %}
+                          <textarea placeholder="Enter your response" class="form-control" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" >{{questionForm.response.value}}</textarea>
+                        {% elif field_type == 'TF' %}
+                          <input type="text" placeholder="Enter your response" class="form-control" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{questionForm.response.value}}" />
+                        {% elif field_type == 'DD' %}
+                          <select class="form-control" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}">
+                            {% for option in questionObj.options|splitlines%}
+                              {% if option == questionForm.response.value %}
+                                <option value="{{option}}" selected>{{option}}</option>
+                              {% else %}
+                                <option value="{{option}}">{{option}}</option>
+                              {% endif %}
+                            {% endfor %}
+                          </select>
+                        {% elif field_type == 'MC' %}
+                          <div class="note"> Note: Select one answer </div>
+                          {% for option in questionObj.options|splitlines%}
+                            {% if option|slugify == questionForm.response.value|slugify %}
+                              <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}"  checked="true"/>  {{option}}<br>
+                            {% else %}
+                              <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}" />  {{option}}<br>
+                            {% endif %}
+                          {% endfor %}
+                        {% elif field_type == 'MI' %}
+                          <div class="note"> Note: Select one answer </div>
+                          {% for option in questionObj.options|splitlines%}
+                            {% if option|slugify == questionForm.response.value|slugify %}
+                              <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}" checked="true" />  <img src="{{option}}" class="image_option"/><br><br>
+                            {% else %}
+                              <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}"/>  <img src="{{option}}" class="image_option"/><br><br>
+                            {% endif %}
+                          {% endfor %}
+                        {% elif field_type == 'MS' %}
+                          <div class="note"> Note: Select all that apply </div>
+                          <input type="hidden" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{questionForm.response.value}}"/>
+                          {% with chosen=questionForm.response.value|split:',' %}
+                          {% for option in questionObj.options|splitlines%}
+                            {% if option|is_in:chosen %}
+                              <input type="checkbox" name="{{questionForm.response.html_name}}_cb" id="{{questionForm.response.auto_id}}_cb" value="{{option}}" checked/>  {{option}}<br>
+                            {% else %}
+                              <input type="checkbox" name="{{questionForm.response.html_name}}_cb" id="{{questionForm.response.auto_id}}_cb" value="{{option}}"/>  {{option}}<br>
+                            {% endif %}
+                          {% endfor %}
+                          {% endwith %}
+                        {% elif field_type == 'FI' %}
+                          <div class="note"> Note: Upload a file </div>
+                         {{questionForm.responseFile}}
+                        {% endif %}
+                      {% endif %}
+                    </div>
+                  </div>
+                  <div class="error">
+                    {% if field_type == 'FI' %}
+                      {{questionForm.responseFile.errors}}
+                    {% else %}
+                      {{questionForm.response.errors}}
+                    {% endif %}
+                  </div>
+
+                  {% if instance.status == 'F' or instance.status == 'A' %}
+                    <div class="feedback">
+                      <label>Feedback:</label>
+                      <div class="feedback">{{questionForm.instance.id|getFeedback}}</div>
+                    </div>
+                  {% endif %}
+                  {% if forloop.last %}
+                    <hr>
+                  {% endif %}
+                {% else %}
+                  <table class="mc_horiz_question_table">
+                    <tbody>
+                      <tr>
+                        <td class="mc_horiz_question">
+                          <div>
+                            {{questionForm.id}}
+                            {{questionObj.question_text|inline_style|safe}}
+                            {{questionForm.curriculum_question.as_hidden}}
+                            {{questionForm.save.as_hidden}}
+                          </div>
+                        </td>
+                        {% for option in questionObj.options|splitlines%}
+                          <td>
+                            {% if option|slugify == questionForm.response.value|slugify %}
+                              <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}"  checked="true"/>
+                            {% else %}
+                              <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}" />
+                            {% endif %}
+                          </td>
+                        {% endfor %}
+                      </tr>
+                    </tbody>
+                  </table>
+                {% endif %}
+              {% endwith %}
+              {% endwith %}
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="save-buttons">
+          {% if form.instance.step.order > 1 %}
+            <a href="{% url 'ctstem:resumeAssignment'  form.instance.instance.assignment.id form.instance.instance.id form.instance.step.order|add:'-1' %}">
+              <button type="button" class="light back">Back</button>
+            </a>
+          {% endif %}
+
+          {% if form.instance.step.order != total_steps %}
+            {% if instance.status == 'S' or instance.status == 'F' or instance.status == 'A' %}
+              <a href="{% url 'ctstem:resumeAssignment' form.instance.instance.assignment.id form.instance.instance.id form.instance.step.order|add:'1' %}">
+                <button type="button" class="bright next">Next</button>
+              </a>
+            {% else %}
+              <button type="button" class="light save" title="Save" >
+                Save
+              </button>
+              <button type="button" class="bright submit" title="Next Step" >
+                Save &amp; Continue
+              </button>
+            {% endif %}
+          {% else %}
+            {% if instance.status == 'S' or instance.status == 'F' or instance.status == 'A' %}
+              <a title="Next Step" href="{% url 'ctstem:home' %}">
+                <button type="button" class="bright">Exit</button>
+              </a>
+            {% else %}
+              <button class="light save" title="Save" >
+                Save
+              </button>
+              <button class="bright submit" title="Submit Assignment">
+                Submit
+              </button>
+            {% endif %}
+          {% endif %}
+          <input type="hidden" id="save" name="save" value="0"/>
+        </div>
+
+        </form>
+      {% endif %}
+    </div>
+  </main>
+  <!-- FOOTER -->
+  <footer>
+    <p>
+      <!-- TODO: Come up with terms of use page! -->
+      <a data-toggle="modal" data-target="#terms" class="terms" href="#">
+      <span class="fa fa-creative-commons fa-2x" style="position: relative; top: 5px; margin-right: 2px;"></span> 2016.
+      Some Rights Reserved</a>.
+    </p>
+    <p>
+      This material was developed by the <a href="{% url 'ctstem:home' %}"> CT-STEM Project</a> at Northwestern University. <br>
+      To inquire about using our material in your school or as part of research, please contact
+      <a href="mailto:ct-stem@ccl.northwestern.edu">ct-stem@ccl.northwestern.edu</a>.
+    </p>
+    <p>
+      This work was made possible through generous support from the National Science Foundation (grants CNS-1138461 and CNS 1441041) and the Spencer Foundation (Award #201600069). Any opinions, findings, or recommendations expressed in this material are those of the author(s) and do not necessarily reflect the views of the funding organizations.
+    </p>
+  </footer>
+  <script type="text/javascript">
+    $("#assignmentForm input:checkbox").change(function(){
+      var selectedValues = $("input[id="+$(this).attr('id')+"]:checked").map(function() {return this.value;}).get().join(',')
+      var hiddenVar = $(this).prevAll('input:hidden');
+      $(hiddenVar).val(selectedValues);
+    });
+
+    $(document).ready(function(){
+      var status = "{{form.instance.instance.status}}";
+      var closedStatus = ['S', 'F', 'A'];
+      if(closedStatus.indexOf(status) >= 0){
+        $(':input:not(:button)').attr('disabled', 'disabled');
+      }
+    });
+
+    $('button.save').click(function(){
+      $('input:hidden[id="save"]').val(1);
+      $('input:hidden[id*="save"][id*="form"]').val('on');
+      $('form#assignmentForm').submit();
+    });
+
+    $('button.submit').click(function(){
+      $('input:hidden[id="save"]').val(0);
+      $('input:hidden[id*="save"][id*="form"]').val('');
+      $('form#assignmentForm').submit();
+    });
+
+    //auto submit form every 60 seconds
+    $(function(){
+      {% if form.instance.instance.status != 'S' and form.instance.instance.status != 'F' and form.instance.instance.status != 'A' and form.instance.step.curriculum.curriculum_type != 'S'%}
+      setInterval(function(){
+        $('input:hidden[id="save"]').val(1);
+        $('input:hidden[id*="save"][id*="form"]').val('on');
+        $('#assignmentForm').ajaxSubmit({
+          dataType : 'json',
+          success: function(data){
+            //message at the top of the page stating responses auto saved
+            $("ul.messages li").remove();
+            $("ul.messages").html('<li class="success">'+data.message+'</li>');
+            //change the url in the browser if new assignment
+            if (history.pushState) {
+              var newurl = document.location.protocol +'//'+ document.location.host + data.url;
+              history.replaceState({},'',newurl);
+            }
+            //update question response ids for new assignment
+            $('input:hidden[id^="id_form-"][id$="-id"]').each(function(){
+              var id = $(this).attr('id');
+              if(!($(this).val())){
+                $(this).val(data.questionResponses[id]);
+              }
+            });
+            $('input:hidden[id="id_form-INITIAL_FORMS"]').val(data.questionCount);
+          },
+          error: function(data) {
+            $("ul.messages li").remove();
+            $("ul.messages").html('<li class="error">The responses could not auto saved. Please click the Save or Save and Continue button at the bottom of the page.</li>');
+          }
+        });
+        $('ul.messages').show();
+        $('ul.messages').delay(10000).fadeOut('slow');
+        return false;
+      }, 60000)
+      {% endif %}
+    });
+  </script>
+
+{% endblock %}
+
+{% block footer %} {% endblock %}
+

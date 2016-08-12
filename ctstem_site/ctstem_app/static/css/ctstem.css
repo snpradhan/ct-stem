@@ -1,4 +1,5 @@
 @import url("table.css");
+@import url("messages.css");
 /* Page Element Styles */
 html {
   height: 100%;
@@ -902,40 +903,6 @@ h2.left, h3.left, h4.left {
   font-size: 36px;
 }*/
 /***********   HEADINGS END   ************/
-
-/***************************************
-            *   MESSAGES AND COLORS   *
- ***************************************/
-ul.messages {
-  list-style-type: none;
-  font-size: 1.5em;
-  width: 100%;
-  position: fixed;
-  top: 90px;
-  z-index: 99;
-}
-
-ul.messages li {
-  text-align: center;
-  padding: 0.5em 0;
-}
-.error {
-  color: red;
-}
-.success {
-  color: green;
-}
-.warning {
-  color: orange;
-}
-.info {
-  color: blue;
-}
-.help {
-  font-size: 1.2em;
-  font-style: italic;
-}
-/***********   MESSAGES AND COLORS END   ************/
 
 /***************************************
             *   MULTISELECT WIDGET   *

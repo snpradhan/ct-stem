@@ -129,3 +129,7 @@ def getFeedback(response_id):
 @register.filter
 def get_item(dictionary, key):
   return dictionary.get(key)
+
+@register.filter
+def get_type(value):
+  return type(value)
