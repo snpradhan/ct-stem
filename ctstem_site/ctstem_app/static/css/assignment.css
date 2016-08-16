@@ -187,7 +187,7 @@ table.data-table {
   vertical-align: text-top;
 }
 
-table.data-table td, th {
+table.data-table td, table.data-table th {
   font-family: monospace;
   font-size: 0.9rem;
   text-align: right;
@@ -299,6 +299,72 @@ ul.messages {
   top: 45px;
 }
 
+div.question_text {
+  margin-top: 2em;
+}
+
+/* LIKERT ITEM SET */
+table.likert {
+  border-collapse: collapse;
+  width: 100%;
+  /*border-top: 1px solid #888;
+  border-bottom: 1px solid #888;*/
+}
+table.likert:nth-of-type(odd){
+  background-color: #eee;
+}
+
+table.likert td, table.likert th {
+  font-size: 16px;
+  font-family: 'Roboto Condensed', sans-serif;
+}
+
+table.likert tr:nth-child(even) {
+  background-color: #eee;
+}
+
+table.likert td {
+  padding: 0.5em;
+}
+
+td.likert-prompt {
+  padding-right: 1.5em;
+  padding-bottom: 1em;
+  padding-top: 1em;
+  vertical-align: middle;
+  width: 60%;
+
+}
+
+td.likert-number {
+  vertical-align: middle;
+  text-align: left;
+  padding: 1em 0.3em;
+  width: 5%;
+}
+
+table.likert .likert-option {
+  font-weight: normal;
+  font-size: 0.7em;
+  vertical-align: middle;
+  width: 7%;
+  text-align: center;
+  padding: 0.5em;
+}
+
+td.likert-option {
+  font-size: 1em;
+}
+
+th.likert-instructions {
+  font-weight: 700;
+  font-style: italic;
+  text-align: left;
+  vertical-align: top;
+  padding: 1.2em 0.5em 1.2em 0;
+  width: 65%;
+}
+
 /* STYLES FOR NICE PRINTING */
 @media print {
   * { font-size: 13px; }
@@ -312,6 +378,16 @@ ul.messages {
   main {
     margin-left: 0;
     margin-top: 1in;
+  }
+
+  table.likert td, th { font-size: 11px; }
+
+  td.likert-prompt {
+    padding: 0.7em 1.5em 0.7em 0;
+  }
+
+  td.likert-number {
+    padding: 0.7em 0.3em;
   }
 
   .page  { margin: 0; }

@@ -1408,6 +1408,7 @@ def group(request, id=''):
         uploadForm = forms.UploadFileForm(user=request.user)
         assignmentForm = forms.AssignmentSearchForm()
         studentSearchForm = forms.StudentSearchForm()
+        studentAddForm = forms.StudentAddForm()
         context = {'form': form, 'formset':formset, 'role': 'group', 'uploadForm': uploadForm, 'assignmentForm': assignmentForm, 'studentSearchForm': studentSearchForm, 'studentAddForm': studentAddForm}
         return render(request, 'ctstem_app/UserGroup.html', context)
 
@@ -1717,19 +1718,20 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
       if int(step_order) > last_step + 1:
         messages.error(request, 'Please use the buttons below to navigate between steps')
         return shortcuts.redirect('ctstem:resumeAssignment', assignment_id=assignment_id, instance_id=instance.id, step_order=last_step)
-      if int(step_order) == 0:
+      '''if int(step_order) == 0:
         if instance.assignment.curriculum.curriculum_type == 'S':
           step_order = 1
         else:
-          step_order = 0
+          step_order = 0'''
     #starting a new assignment
     else:
       instance = models.AssignmentInstance(assignment_id=assignment_id, student=request.user.student, status='N')
       instance.save()
-      if instance.assignment.curriculum.curriculum_type == 'S':
+      step_order = 0
+      '''if instance.assignment.curriculum.curriculum_type == 'S':
         step_order = 1
       else:
-        step_order = 0
+        step_order = 0'''
 
     assignment = models.Assignment.objects.get(id=assignment_id)
     curriculum = assignment.curriculum
@@ -1737,7 +1739,7 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
     if 'GET' == request.method or 'POST' == request.method:
       steps = models.Step.objects.all().filter(curriculum=curriculum)
       total_steps = steps.count()
-      if step_order == 0:
+      if int(step_order) == 0:
         context = {'curriculum': curriculum, 'instance': instance, 'total_steps': total_steps, 'step_order': step_order}
         return render(request, 'ctstem_app/AssignmentStep2.html', context)
       else:
@@ -1758,7 +1760,7 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
         if 'GET' == request.method:
           #get the assignment step
           form = forms.AssignmentStepResponseForm(instance=assignmentStepResponse, prefix="step_response")
-          questionResponseFormset=inlineformset_factory(models.AssignmentStepResponse, models.QuestionResponse, form=forms.QuestionResponseForm, can_delete=False, extra=extra)
+          questionResponseFormset=inlineformset_factory(models.AssignmentStepResponse, models.QuestionResponse, form=forms.QuestionResponseForm, can_delete=False, can_order=True, extra=extra)
           formset = questionResponseFormset(instance=assignmentStepResponse, prefix='form')
 
           if int(step_order) == 1 and assignment.curriculum.curriculum_type == 'L':
@@ -1779,7 +1781,7 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
           print data
           save_only = int(data['save'])
           form = forms.AssignmentStepResponseForm(data=data, instance=assignmentStepResponse, prefix="step_response")
-          questionResponseFormset=inlineformset_factory(models.AssignmentStepResponse, models.QuestionResponse, form=forms.QuestionResponseForm, can_delete=False, extra=0)
+          questionResponseFormset=inlineformset_factory(models.AssignmentStepResponse, models.QuestionResponse, form=forms.QuestionResponseForm, can_delete=False, can_order=True, extra=0)
           formset = questionResponseFormset(data, request.FILES, instance=assignmentStepResponse, prefix='form')
           if int(step_order) == 1 and assignment.curriculum.curriculum_type == 'L':
             instanceform = forms.AssignmentInstanceForm(data=data, assignment=assignment, instance=instance, prefix="teammates")

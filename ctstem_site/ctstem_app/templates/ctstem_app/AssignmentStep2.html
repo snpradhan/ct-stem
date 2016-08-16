@@ -8,7 +8,10 @@
 {% block django_admin %}{% endblock %}
 {% block misc %}{% endblock %}
 {% block agency %}{% endblock %}
-{% block ctstem %}{% endblock %}
+{% block ctstem %}
+  <script type="text/javascript" src="/static/js/session.js"></script>
+{% endblock %}
+
 {% block custom_media %}
   <link href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css?family=Maitree:400,700|Roboto+Condensed:300,400,700italic" rel="stylesheet">
@@ -31,7 +34,7 @@
       {{curriculum.title|title}}
       <nav>
         Page &nbsp;
-        {% if step_order  == 0 %}
+        {% if step_order|add:0  == 0 %}
           <a class="page-link selected" href="#">{{1}}</a>
         {% else %}
           <a class="page-link" href="{% url 'ctstem:resumeAssignment'  instance.assignment.id instance.id 0 %}">{{1}}</a>
@@ -59,12 +62,15 @@
   {{block.super}}
   <main>
     <div class="page">
-      {% if step_order == 0 %}
+      {% if step_order|add:0 == 0 %}
         <h2>Computational Thinking in Science and Math</h2>
         <h1>{{curriculum.title}}</h1>
         <hr>
         <p class="item">
-          {% if curriculum.curriculum_type == 'A' %}
+          {% if curriculum.curriculum_type == 'S' %}
+            Thanks for taking this survey about computational thinking!
+            There are no right or wrong answers to these questions, we just want to know what you think.
+          {% elif curriculum.curriculum_type == 'A' %}
             Thank you for taking this assessment!
             Please do the best that you can, and don't worry if you don't know all of the answers.
             Your responses will help us develop better curriculum and activities for high school students.
@@ -98,8 +104,12 @@
               <div class="warning">{{instanceform.teammates.help_text}}</div>
             </div>
           {% endif %}
-          <div class="step_context">{{form.instance.step.content|safe}}</div>
-          <hr>
+          <div class="step_context">
+            {% if form.instance.step.content %}
+              {{form.instance.step.content|safe}}
+              <hr>
+            {% endif %}
+          </div>
           <div class="question_container">
             {{formset.management_form}}
             <div class="question_table">
@@ -147,7 +157,6 @@
                             {% endfor %}
                           </select>
                         {% elif field_type == 'MC' %}
-                          <div class="note"> Note: Select one answer </div>
                           {% for option in questionObj.options|splitlines%}
                             {% if option|slugify == questionForm.response.value|slugify %}
                               <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}"  checked="true"/>  {{option}}<br>
@@ -156,7 +165,6 @@
                             {% endif %}
                           {% endfor %}
                         {% elif field_type == 'MI' %}
-                          <div class="note"> Note: Select one answer </div>
                           {% for option in questionObj.options|splitlines%}
                             {% if option|slugify == questionForm.response.value|slugify %}
                               <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}" checked="true" />  <img src="{{option}}" class="image_option"/><br><br>
@@ -165,7 +173,6 @@
                             {% endif %}
                           {% endfor %}
                         {% elif field_type == 'MS' %}
-                          <div class="note"> Note: Select all that apply </div>
                           <input type="hidden" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{questionForm.response.value}}"/>
                           {% with chosen=questionForm.response.value|split:',' %}
                           {% for option in questionObj.options|splitlines%}
@@ -201,19 +208,20 @@
                     <hr>
                   {% endif %}
                 {% else %}
-                  <table class="mc_horiz_question_table">
+                  <table class="likert">
                     <tbody>
-                      <tr>
-                        <td class="mc_horiz_question">
-                          <div>
-                            {{questionForm.id}}
+                      <tr class="likert-item">
+                        <td class="likert-number">
+                          {{questionForm.id}}
+                          {{forloop.counter}}.
+                        </td>
+                        <td class="likert-prompt">
                             {{questionObj.question_text|inline_style|safe}}
                             {{questionForm.curriculum_question.as_hidden}}
                             {{questionForm.save.as_hidden}}
-                          </div>
                         </td>
                         {% for option in questionObj.options|splitlines%}
-                          <td>
+                          <td class="likert-option">
                             {% if option|slugify == questionForm.response.value|slugify %}
                               <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}"  checked="true"/>
                             {% else %}
@@ -232,13 +240,13 @@
         </div>
 
         <div class="save-buttons">
-          {% if form.instance.step.order > 1 %}
+          {% if form and form.instance.step.order > 1 %}
             <a href="{% url 'ctstem:resumeAssignment'  form.instance.instance.assignment.id form.instance.instance.id form.instance.step.order|add:'-1' %}">
               <button type="button" class="light back">Back</button>
             </a>
           {% endif %}
 
-          {% if form.instance.step.order != total_steps %}
+          {% if form and form.instance.step.order != total_steps %}
             {% if instance.status == 'S' or instance.status == 'F' or instance.status == 'A' %}
               <a href="{% url 'ctstem:resumeAssignment' form.instance.instance.assignment.id form.instance.instance.id form.instance.step.order|add:'1' %}">
                 <button type="button" class="bright next">Next</button>
