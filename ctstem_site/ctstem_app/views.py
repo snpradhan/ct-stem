@@ -221,7 +221,7 @@ def curriculum(request, id=''):
 ####################################
 # PREVIEW A Curriculum
 ####################################
-def previewCurriculum(request, id=''):
+def previewCurriculum(request, id='', step_order=0):
   try:
     # check if the lesson exists
     if hasattr(request.user, 'student'):
@@ -237,11 +237,19 @@ def previewCurriculum(request, id=''):
       attachments = models.Attachment.objects.all().filter(curriculum=curriculum)
       systems = models.System.objects.all()
 
-      context = {'curriculum': curriculum, 'attachments': attachments, 'steps':steps, 'systems': systems}
       if curriculum.curriculum_type == 'L':
+        context = {'curriculum': curriculum, 'attachments': attachments, 'steps':steps, 'systems': systems}
         return render(request, 'ctstem_app/lesson_template/Lesson.html', context)
       else:
-        return render(request, 'ctstem_app/CurriculumPreview.html', context)
+        #return render(request, 'ctstem_app/CurriculumPreview.html', context)
+        total_steps = len(steps)
+        context = {'curriculum': curriculum, 'attachments': attachments, 'systems': systems, 'total_steps': total_steps, 'step_order': step_order}
+
+        if int(step_order) > 0:
+          step = steps.get(order=int(step_order))
+          context['step'] = step
+
+        return render(request, 'ctstem_app/AssignmentStepPreview.html', context)
 
     return http.HttpResponseNotAllowed(['GET'])
 
