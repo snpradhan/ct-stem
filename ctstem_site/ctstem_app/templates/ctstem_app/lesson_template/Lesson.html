@@ -47,7 +47,18 @@
     <nav id="side-nav">
       <ul>
         <li><a href="#" class="lesson">View Lesson Summary</a></li>
-
+        {% if user.administrator or user.researcher or user.school_administrator or user.author or user.teacher %}
+          <li><a href="#" class="notes">View Teacher Notes</a></li>
+          <li><a href="#" class="activity">View Student Activity</a></li>
+        {% elif user.is_anonymous %}
+          <li><a data-toggle="modal" data-target="#login" class="login" href="#">View Teacher Notes</a></li>
+          <li><a data-toggle="modal" data-target="#login" class="login" href="#">View Student Activity </a></li>
+        {% endif %}
+        <!-- TODO: LINK TO ATTACHMENT -->
+        {% if attachments %}
+          <li><a href="{% url 'ctstem:downloadAttachments' curriculum.id%}">Download Attachment(s) <span class="fa fa-paperclip"></span></a></li>
+        {% endif %}
+        <li class="divider"></li>
         {% if curriculum.status == 'A' or curriculum.status == 'P'%}
           {% if user.administrator or user.school_administrator %}
             <li><a class="assign" href="#" data-form="{% url 'ctstem:assignCurriculum' curriculum.id%}">Assign to Classes</a></li>
@@ -63,24 +74,10 @@
             <li><a id="favorites-link" class="favorites">Add to Favorites</a></li>
           {% endif %}
         {% endif %}
-        <li class="divider"></li>
-        {% if user.administrator or user.researcher or user.school_administrator or user.author or user.teacher %}
-          <li><a href="#" class="notes">View Teacher Notes</a></li>
-          <li><a href="#" class="activity">View Student Activity</a></li>
-        {% elif user.is_anonymous %}
-          <li><a data-toggle="modal" data-target="#login" class="login" href="#">View Teacher Notes</a></li>
-          <li><a data-toggle="modal" data-target="#login" class="login" href="#">View Student Activity </a></li>
-        {% endif %}
-
-        <!-- TODO: LINK TO ATTACHMENT -->
-        {% if attachments %}
-          <li><a href="{% url 'ctstem:downloadAttachments' curriculum.id%}">Download Attachment(s) <span class="fa fa-paperclip"></span></a></li>
-        {% endif %}
-
-        <li><a href="#" class="faq"">View CT FAQ</a></li>
 
         <li><a href="javascript:window.print();">Print This Page <span class="fa fa-print "></span></a></li>
-
+        <li class="divider"></li>
+        <li><a href="#" class="faq"">View CT FAQ</a></li>
         {% if user.is_anonymous %}
           <li><a data-toggle="modal" data-target="#login" class="login" href="#">Login</a></li>
         {% else %}
