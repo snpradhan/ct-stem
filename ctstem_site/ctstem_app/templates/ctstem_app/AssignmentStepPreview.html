@@ -120,19 +120,19 @@
                         </select>
                       {% elif field_type == 'MC' %}
                         {% for option in question.options|splitlines%}
-                          <input type="radio" name="{{forloop.counter}}" id="{{forloop.counter}}" value="{{option}}" />  {{option}}<br>
+                          <input type="radio" name="{{question.id}}_mc" id="{{question.id}}_mc" value="{{option}}" />  {{option}}<br>
                         {% endfor %}
                       {% elif field_type == 'MI' %}
                         {% for option in question.options|splitlines%}
-                          <input type="radio" name="{{forloop.counter}}" id="{{forloop.counter}}" value="{{option}}"/>  <img src="{{option}}" class="image_option"/><br><br>
+                          <input type="radio" name="{{question.id}}_mi" id="{{question.id}}_mi" value="{{option}}"/>  <img src="{{option}}" class="image_option"/><br><br>
                         {% endfor %}
                       {% elif field_type == 'MS' %}
                         {% for option in question.options|splitlines%}
-                          <input type="checkbox" name="{{forloop.counter}}_cb" id="{{forloop.counter}}_cb" value="{{option}}"/>  {{option}}<br>
+                          <input type="checkbox" name="{{question.id}}_cb" id="{{question.id}}_cb" value="{{option}}"/>  {{option}}<br>
                         {% endfor %}
                       {% elif field_type == 'FI' %}
                         <div class="note"> Note: Upload a file </div>
-                       <input type="file" name="{{forloop.counter}}_file" id="{{forloop.counter}}_file"/> <br>
+                       <input type="file" name="{{question.id}}_file" id="{{question.id}}_file"/> <br>
                       {% endif %}
                     </div>
                   </div>
@@ -151,7 +151,7 @@
                         </td>
                         {% for option in question.options|splitlines%}
                           <td class="likert-option">
-                              <input type="radio" name="{{forloop.counter}}" id="{{forloop.counter}}" value="{{option}}" />
+                              <input type="radio" name="{{question.id}}_s" id="{{question.id}}_s" value="{{option}}" />
                           </td>
                         {% endfor %}
                       </tr>
