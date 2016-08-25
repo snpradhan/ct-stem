@@ -171,21 +171,23 @@
     </form>
   </div>
 
-  {% block upload %}
-    {% include "ctstem_app/UserUploadModal.html" %}
-  {% endblock %}
+  {% if form.instance.id %}
+    {% block upload %}
+      {% include "ctstem_app/UserUploadModal.html" %}
+    {% endblock %}
 
-  {% block assignment %}
-    {% include "ctstem_app/AssignmentSearch.html" %}
-  {% endblock %}
+    {% block assignment %}
+      {% include "ctstem_app/AssignmentSearch.html" %}
+    {% endblock %}
 
-  {% block search_and_add_students %}
-    {% include "ctstem_app/StudentSearch.html" %}
-  {% endblock %}
+    {% block search_and_add_students %}
+      {% include "ctstem_app/StudentSearch.html" %}
+    {% endblock %}
 
-  {% block create_and_add_student %}
-    {% include "ctstem_app/CreateAndAddStudent.html" %}
-  {% endblock %}
+    {% block create_and_add_student %}
+      {% include "ctstem_app/CreateAndAddStudent.html" %}
+    {% endblock %}
+  {% endif %}
 
   <script type="text/javascript">
     $(function (){
