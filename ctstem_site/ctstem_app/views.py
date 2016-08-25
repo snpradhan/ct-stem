@@ -857,20 +857,43 @@ def userProfile(request, id=''):
   except User.DoesNotExist:
       return http.HttpResponseNotFound('<h1>Requested user not found</h1>')
 
+#####################################################
+# Check if the consent popup needs to be loaded
+#####################################################
+def load_consent(request):
+  load = False
+  if hasattr(request.user, 'student'):
+    if request.user.student.consent == 'U':
+      load = True
+  elif hasattr(request.user, 'teacher'):
+    if request.user.teacher.consent == 'U':
+      teacher = models.Teacher.objects.get(user=request.user)
+      teacher.consent = 'A'
+      teacher.save()
+      load = True
+
+  response_data = {}
+  response_data['load'] = load
+  return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+
 ####################################
-# Student consent
+# Student/Teacher consent
 ####################################
 def consent(request):
-  if hasattr(request.user, 'student') == False:
+  if hasattr(request.user, 'student') == False and hasattr(request.user, 'teacher') == False:
     http.HttpResponseNotFound('<h1>You do not have the privilege to access this form</h1>')
 
-  student = request.user.student
   if request.method == 'GET':
-    form = forms.ConsentForm(instance=student, prefix='student')
-    context = {'form': form}
+    if hasattr(request.user, 'student'):
+      student = request.user.student
+      form = forms.ConsentForm(instance=student, prefix='student')
+      context = {'form': form}
+    else:
+      context = {}
     return render(request, 'ctstem_app/ConsentModal.html', context)
   elif request.method == 'POST':
     data = request.POST.copy()
+    student = request.user.student
     form = forms.ConsentForm(data, instance=student, prefix='student')
     response_data = {}
     if form.is_valid():

@@ -130,17 +130,13 @@
     {% endif %}
 
     <div class="modal fade" id="assessmentModal" role="dialog"></div>
-    <div class="modal fade" id="consent" role="dialog" data-keyboard="false" data-backdrop="static"></div>
+
 
   </div>
   <script type="text/javascript">
     $(function (){
 
-      {% if consent == 'U' %}
-        $("#consent").load("{% url 'ctstem:consent' %}", function() {
-          $(this).modal('show');
-        });
-      {% endif %}
+
 
       $("select#id_sort_by").change(function(){
         this.form.submit();

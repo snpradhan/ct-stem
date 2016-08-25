@@ -288,6 +288,7 @@ class Student(models.Model):
 class Teacher(models.Model):
   user = models.OneToOneField(User, unique=True, null=False, related_name="teacher")
   school = models.ForeignKey(School)
+  consent = models.CharField(null=False, max_length=1, default='U', choices=CONSENT_CHOICES)
 
   def __unicode__(self):
       return u'%s' % (self.user.get_full_name())

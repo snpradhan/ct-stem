@@ -13,31 +13,41 @@
     <form class="form" id="consentForm" method="post" action="{% url 'ctstem:consent' %}">
       {% csrf_token %}
       <div class="modal-body">
-        <div class="body">
-          This website was developed by Northwestern University with funding from the National Science Foundation and the Spencer Foundation. As part of a research study, we are collecting anonymous work from students like you through this site.
-        </div>
-        {% include 'ctstem_app/ConsentLanguage.html' %}
-        <div class="body">
-          If you wish to participate, please check the <b>“I Agree”</b> option. If you do not wish to participate in this study, please select <b>“I Disagree"</b>.  You may change your answer by clicking on the Edit Profile link.
-        </div>
-        {% if parent != 'profile' %}
-          <div class="form-group">
-           {{form.consent}}
+        {% if user.student %}
+          <div class="body">
+            This website was developed by Northwestern University with funding from the National Science Foundation and the Spencer Foundation. As part of a research study, we are collecting anonymous work from students like you through this site.
           </div>
+          {% include 'ctstem_app/ConsentLanguage.html' %}
+          <div class="body">
+            If you wish to participate, please check the <b>“I Agree”</b> option. If you do not wish to participate in this study, please select <b>“I Disagree"</b>.  You may change your answer by clicking on the Edit Profile link.
+          </div>
+          {% if parent != 'profile' %}
+            <div class="form-group">
+             {{form.consent}}
+            </div>
+          {% endif %}
+        {% elif user.teacher %}
+          {% include 'ctstem_app/TeacherResearchLetter.html' %}
         {% endif %}
       </div>
 
       <div class="modal-footer">
         <div class="form-group button-row">
-          <button type="button" class="btn btn-default" id="print">Print</button>
-          {% if parent != 'profile' %}
-            <button type="submit" id="saveConsent" class="btn btn-success">
-              Submit
-            </button>
-          {% else %}
+          {% if user.student %}
+            <button type="button" class="btn btn-default" id="print">Print</button>
+            {% if parent != 'profile' %}
+              <button type="submit" id="saveConsent" class="btn btn-success">
+                Submit
+              </button>
+            {% else %}
+              <button type="button" class="btn btn-danger" data-dismiss="modal">
+                Close
+              </button>
+            {% endif %}
+          {% elif user.teacher %}
             <button type="button" class="btn btn-danger" data-dismiss="modal">
-              Close
-            </button>
+                Close
+              </button>
           {% endif %}
         </div>
       </div>

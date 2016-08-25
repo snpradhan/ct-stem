@@ -113,6 +113,21 @@
           $('pre code').each(function(i, block) {
             hljs.highlightBlock(block);
           });
+          {% if user.student or user.teacher %}
+            var url = "{% url 'ctstem:load_consent' %}";
+            $.ajax({
+              type: "GET",
+              url: url,
+              dataType: 'json',
+              success: function(data){
+                if(data['load'] == true){
+                  $("#consent").load("{% url 'ctstem:consent' %}", function() {
+                    $(this).modal('show');
+                  });
+                }
+              },
+            });
+          {% endif %}
         });
       </script>
       {% endblock %}
@@ -396,6 +411,7 @@
       </div>
       <div class="modal fade" id="profile" role="dialog">
       </div>
+      <div class="modal fade" id="consent" role="dialog" data-keyboard="false" data-backdrop="static"></div>
     {% endblock %}
   </body>
 
