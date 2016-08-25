@@ -45,7 +45,7 @@
                   {% endif %}
                 </span>
                 <div class="controls">
-                  <a type="button" class="btn btn-warning preview" aria-label="Preview Assignment" title="Preview Assignment" data-form="{% url 'ctstem:previewCurriculum' assignment.assignment.curriculum.id %}" data-toggle="modal">
+                  <a type="button" class="btn btn-warning" title="Preview Assignment" href="{% url 'ctstem:previewCurriculum' assignment.assignment.curriculum.id %}" target="_blank">
                     <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
                   </a>
                 </div>
