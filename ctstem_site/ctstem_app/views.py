@@ -1985,7 +1985,7 @@ def export_response(request, assignment_id='', student_id=''):
       if assignment.group.teacher != request.user.teacher:
         return http.HttpResponseNotFound('<h1>You do not have the privilege to export student responses for this assignment</h1>')
 
-    response = HttpResponse(content_type='text/csv')
+    response = http.HttpResponse(content_type='text/csv')
     if '' != student_id:
       student = models.Student.objects.get(id=student_id)
       instances = models.AssignmentInstance.objects.all().filter(assignment=assignment, student=student)
