@@ -697,7 +697,10 @@ def user_login(request):
     if user is not None and user.is_active:
       login(request, user)
       response_data['result'] = 'Success'
-      messages.success(request, "You have logged in")
+      if user.teacher:
+        messages.success(request, "Welcome to the CT-STEM website.  If you need help with using the site, you can checkout the help videos on the Training page <a href='/training#help_videos'>here</a>", extra_tags='safe');
+      else:
+        messages.success(request, "You have logged in")
     else:
       response_data['result'] = 'Failed'
       if user and user.is_active == False:

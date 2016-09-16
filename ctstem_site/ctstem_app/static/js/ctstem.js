@@ -241,7 +241,7 @@ $(function (){
   //add form-control class to ORDER fields
   $('input[id$=ORDER]').addClass('form-control');
 
-  $('ul.messages').delay(10000).fadeOut('slow');
+  $('ul.messages').delay(30000).fadeOut('slow');
 
   $("a.preview").click(function(e){
     e.preventDefault();
@@ -298,14 +298,14 @@ function bind_user_removal(){
             $("ul.messages li").remove();
             $("ul.messages").html('<li class="error">User could not be removed from the group</li>');
             $('ul.messages').show();
-            $('ul.messages').delay(10000).fadeOut('slow');
+            $('ul.messages').delay(30000).fadeOut('slow');
           }
         },
         error: function(xhr, ajaxOptions, thrownError){
           $("ul.messages li").remove();
           $("ul.messages").html('<li class="error">User could not be removed from the group</li>');
           $('ul.messages').show();
-          $('ul.messages').delay(10000).fadeOut('slow');
+          $('ul.messages').delay(30000).fadeOut('slow');
         },
       });
     }
@@ -323,7 +323,7 @@ function display_messages(messages){
   }
   $("ul.messages").html(html);
   $('ul.messages').show();
-  $('ul.messages').delay(10000).fadeOut('slow');
+  $('ul.messages').delay(30000).fadeOut('slow');
 }
 
 
