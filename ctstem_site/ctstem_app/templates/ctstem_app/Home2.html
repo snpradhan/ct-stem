@@ -108,7 +108,7 @@
         <p>
           Modern scientists, engineers, and mathematicians use an array of computational tools and practices in their everyday work. It is increasingly important for high school students not just to know how to use computers but to be computationally <i>literate</i>. To help guide the creation of CT activities, lessons, and assessments, we have developed a taxonomy of relevant computational practices organized into four strands.
         </p>
-  
+
         {% for practice in practices %}
         <div class="practice">
           {% if practice.icon %}
@@ -138,7 +138,7 @@
         <h2>Computational Thinking Assessments</h2>
         <hr>
 
-        <p>Our computational thinking assessments use realistic STEM scenarios to challenge students and measure their progress. We have designed assessments to cover all four strands of our computational thinking taxonomy. These are available through our online <a href="http://ct-stem-assess.herokuapp.com" target="_blank">assessment portal</a>.</p>
+        <p>Our computational thinking assessments use realistic STEM scenarios to challenge students and measure their progress. We have designed assessments to cover all four strands of our computational thinking taxonomy. These are available through our online <a href="{% url 'ctstem:curricula' 'assessments' %}">assessment portal</a>.</p>
 
         {% comment %}
         <div class="row">
@@ -166,7 +166,8 @@
         {% endcomment %}
         <div class="explore_more" style="margin-top: 6rem;">
           <!--a href="{% url 'ctstem:curricula' 'assessments' %}" class="page-scroll btn btn-xl">Explore More</a-->
-          <a href="http://ct-stem-assess.herokuapp.com/" target="_blank" class="page-scroll btn btn-xl">Explore More</a>
+          <a href="{% url 'ctstem:curricula' 'assessments' %}" class="page-scroll btn btn-xl">Explore More</a>
+          <!--a href="http://ct-stem-assess.herokuapp.com/" target="_blank" class="page-scroll btn btn-xl">Explore More</a-->
         </div>
       </div>
     </section>
