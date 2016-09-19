@@ -73,7 +73,7 @@
           {% elif curriculum.curriculum_type == 'A' %}
             Thank you for taking this assessment!
             Please do the best that you can, and don't worry if you don't know all of the answers.
-            Your responses will help us develop better curriculum and activities for high school students.
+
           {% elif curriculum.curriculum_type == 'L' %}
             {{curriculum.overview}}
           {% endif %}
@@ -143,7 +143,7 @@
                         </div>
                       {% else %}
                         {% if field_type == 'TA' %}
-                          <textarea placeholder="Enter your response" class="form-control" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" >{{questionForm.response.value}}</textarea>
+                          <textarea placeholder="Enter your response" class="form-control assignment_textarea" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" >{{questionForm.response.value}}</textarea>
                         {% elif field_type == 'TF' %}
                           <input type="text" placeholder="Enter your response" class="form-control" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{questionForm.response.value}}" />
                         {% elif field_type == 'DD' %}
@@ -167,9 +167,12 @@
                         {% elif field_type == 'MI' %}
                           {% for option in questionObj.options|splitlines%}
                             {% if option|slugify == questionForm.response.value|slugify %}
-                              <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}" checked="true" />  <img src="{{option}}" class="image_option"/><br><br>
+                              <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}" checked="true" />
+                              <img src="{{option}}" class="image_option"/><br><br>
                             {% else %}
-                              <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}"/>  <img src="{{option}}" class="image_option"/><br><br>
+                              <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}"/>
+                              <span>{{forloop.counter0|get_ascii_char}}.</span>
+                              <img src="{{option}}" class="image_option"/><br><br>
                             {% endif %}
                           {% endfor %}
                         {% elif field_type == 'MS' %}

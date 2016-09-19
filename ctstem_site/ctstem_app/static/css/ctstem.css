@@ -391,6 +391,7 @@ div.table#assignment div.question_container div.question div.answer_field textar
 img.image_option {
   height: 20%;
   width: 20%;
+  vertical-align: top !important;
 }
 div.table.standard table.subcategories {
   font-size: 0.8em;

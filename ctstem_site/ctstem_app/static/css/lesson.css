@@ -406,4 +406,5 @@ footer a {
 img.image_option {
   height: 20%;
   width: 20%;
+  vertical-align: top !important;
 }

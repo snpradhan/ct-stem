@@ -109,7 +109,7 @@
                     <div class="response">
 
                       {% if field_type == 'TA' %}
-                        <textarea placeholder="Enter your response" class="form-control" name="{{forloop.counter}}" id="{{forloop.counter}}" ></textarea>
+                        <textarea placeholder="Enter your response" class="form-control assignment_textarea" name="{{forloop.counter}}" id="{{forloop.counter}}" ></textarea>
                       {% elif field_type == 'TF' %}
                         <input type="text" placeholder="Enter your response" class="form-control" name="{{forloop.counter}}" id="{{forloop.counter}}"/>
                       {% elif field_type == 'DD' %}
@@ -124,7 +124,9 @@
                         {% endfor %}
                       {% elif field_type == 'MI' %}
                         {% for option in question.options|splitlines%}
-                          <input type="radio" name="{{question.id}}_mi" id="{{question.id}}_mi" value="{{option}}"/>  <img src="{{option}}" class="image_option"/><br><br>
+                          <input type="radio" name="{{question.id}}_mi" id="{{question.id}}_mi" value="{{option}}"/>
+                          <span>{{forloop.counter0|get_ascii_char}}.</span>
+                          <img src="{{option}}" class="image_option"/><br><br>
                         {% endfor %}
                       {% elif field_type == 'MS' %}
                         {% for option in question.options|splitlines%}

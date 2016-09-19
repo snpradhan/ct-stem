@@ -133,3 +133,7 @@ def get_item(dictionary, key):
 @register.filter
 def get_type(value):
   return type(value)
+
+@register.filter
+def get_ascii_char(value):
+  return [chr(i) for i in xrange(65,91)][int(value)]

@@ -218,7 +218,7 @@ div.data-graph {
 /* FORM ELEMENTS */
 textarea {
   width: 100%;
-  height: 7rem;
+  height: 8rem !important;
   background-color: #fffffa;
   font-size: 0.8rem;
   margin-bottom: 1.5rem;
@@ -245,6 +245,9 @@ input[type="text"] {
 .image-option img {
   vertical-align: text-top;
   max-width: 400px;
+}
+img.image_option {
+  vertical-align: top !important;
 }
 
 /* FIGURES */
