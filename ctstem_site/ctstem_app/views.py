@@ -45,7 +45,6 @@ def home(request):
     practices = models.Category.objects.all().filter(standard__primary=True).select_related()
     team = models.Team.objects.all().order_by('role__order', 'order')
     publications = models.Publication.objects.all()
-    Site.objects.clear_cache()
     if request.user.is_authenticated():
       if hasattr(request.user, 'administrator'):
         school = None
