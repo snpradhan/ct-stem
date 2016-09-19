@@ -168,12 +168,11 @@
                           {% for option in questionObj.options|splitlines%}
                             {% if option|slugify == questionForm.response.value|slugify %}
                               <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}" checked="true" />
-                              <img src="{{option}}" class="image_option"/><br><br>
                             {% else %}
                               <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}"/>
-                              <span>{{forloop.counter0|get_ascii_char}}.</span>
-                              <img src="{{option}}" class="image_option"/><br><br>
                             {% endif %}
+                            <span>{{forloop.counter0|get_ascii_char}}.</span>
+                            <img src="{{option}}" class="image_option"/><br><br>
                           {% endfor %}
                         {% elif field_type == 'MS' %}
                           <input type="hidden" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{questionForm.response.value}}"/>
