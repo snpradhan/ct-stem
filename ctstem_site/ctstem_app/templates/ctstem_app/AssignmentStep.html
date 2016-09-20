@@ -1,80 +1,122 @@
 {% extends "ctstem_app/base.html" %}
 {% load ctstem_extras %}
-{% block title %}Assignment |{% endblock %}
-{% block media %}
-  {{block.super}}
-  <script type="text/javascript" src="//cdn.mathjax.org/mathjax/2.2-latest/MathJax.js?config=TeX-AMS_HTML"></script>
-  <script type="text/javascript" src="/static/js/jquery.form.min.js"></script>
-  <link href="/static/css/progress-wizard.min.css" rel="stylesheet"/>
+
+{% block title %} {{curriculum.title}} {%endblock %}
+
+{% block bootstrap_css %}{% endblock %}
+{% block datatable %}{% endblock %}
+{% block django_admin %}{% endblock %}
+{% block misc %}{% endblock %}
+{% block agency %}{% endblock %}
+{% block ctstem %}
+  <script type="text/javascript" src="/static/js/session.js"></script>
 {% endblock %}
 
+{% block custom_media %}
+  <link href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Maitree:400,700|Roboto+Condensed:300,400,700italic" rel="stylesheet">
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/3.0.0/jquery.min.js"></script>
+  <script src="http://canvasjs.com//assets/script/canvasjs.min.js"></script>
+  <link rel="stylesheet" href="/static/css/bootstrap-modal.css">
+  <link rel="stylesheet" href="/static/css/table.css">
+  <link rel="stylesheet" href="/static/css/messages.css">
+  <link rel="stylesheet" href="/static/css/assignment.css">
+  <script type="text/javascript" src="/static/js/jquery.form.min.js"></script>
+
+{% endblock %}
+
+{% block header %}{% endblock %}
+
 {% block content %}
-  {{block.super}}
-  <div class="content" id="assignment">
-    <form method="post" enctype="multipart/form-data" id="assignmentForm">
-      {% csrf_token %}
-      <div class="table" id="assignment">
-        {{form.management_form}}
-        <div class="row header">
-          <div class="col-md-12 title">
-            <div class="curriculum_title">
-              {{form.instance.step.curriculum.title|title}}
-            </div>
-            <div class="step_title">
-              <span>{{form.instance.step.title}}</span>
-              <span>({{form.instance.step.order}}/{{total_steps}})</span>
-            </div>
-            <div>
-              <ul class="progress-indicator">
-                {% for i in total_steps|iterate %}
-                  {% if i < form.instance.step.order %}
-                    <li>
-                      <a href="{% url 'ctstem:resumeAssignment'  form.instance.instance.assignment.id form.instance.instance.id i %}">
-                        <span class="bubble"></span> Step {{i}}.
-                      </a>
-                    </li>
-                  {% elif i == form.instance.step.order %}
-                    <li class="active"> <span class="bubble"></span> Step {{i}}. </li>
-                  {% else %}
-                    {% if form.instance.instance.status == 'S' or form.instance.instance.status == 'F' or form.instance.instance.status == 'A' %}
-                      <li>
-                        <a href="{% url 'ctstem:resumeAssignment'  form.instance.instance.assignment.id form.instance.instance.id i %}">
-                          <span class="bubble"></span> Step {{i}}.
-                        </a>
-                      </li>
-                    {% else %}
-                      <li> <span class="bubble"></span> Step {{i}}. </li>
-                    {% endif %}
-                  {% endif %}
-                {% endfor %}
-              </ul>
-            </div>
-          </div>
-        </div>
-        <input type="hidden" name="step_order" value="{{step.order}}"/>
-        <hr>
-        {% if instanceform %}
-          <div class="teammates">
-            {{instanceform.management_form}}
-            <label>If you worked in a team, select your teammates from the list below:</label>
-            {{instanceform.teammates}}
-            <div class="warning">{{instanceform.teammates.help_text}}</div>
-          </div>
-           <hr>
+  <header>
+    <div class="header-box">
+      <h1>CT-STEM</h1>
+      {{curriculum.title|title}}
+      <nav>
+        Page &nbsp;
+        {% if step_order|add:0  == 0 %}
+          <a class="page-link selected">{{1}}</a>
+        {% else %}
+          <a class="page-link" href="{% url 'ctstem:resumeAssignment'  instance.assignment.id instance.id 0 %}">{{1}}</a>
         {% endif %}
-        <div class="step_content">
-          <div class="step_context">{{form.instance.step.content|safe}}</div>
-          <div class="question_container">
-            {{formset.management_form}}
-            {% if formset|length %}
+        {% for i in total_steps|iterate %}
+          {% if instance.status == 'S' or instance.status == 'F' or instance.status == 'A' %}
+            {% if i|add:0 == step_order|add:0 %}
+              <a class="page-link selected" href="{% url 'ctstem:resumeAssignment'  instance.assignment.id instance.id i %}">{{i|add:1}}</a>
+            {% else %}
+              <a class="page-link" href="{% url 'ctstem:resumeAssignment'  instance.assignment.id instance.id i %}">{{i|add:1}}</a>
+            {% endif %}
+          {% else %}
+            {% if i|add:0 < step_order|add:0 %}
+              <a class="page-link" href="{% url 'ctstem:resumeAssignment'  instance.assignment.id instance.id i %}">{{i|add:1}}</a>
+            {% elif i|add:0 == step_order|add:0 %}
+              <a class="page-link selected">{{i|add:1}}</a>
+            {% else %}
+              <a class="page-link">{{i|add:1}}</a>
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+      </nav>
+    </div>
+  </header>
+  {{block.super}}
+  <main>
+    <div class="page">
+      {% if step_order|add:0 == 0 %}
+        <h2>Computational Thinking in Science and Math</h2>
+        <h1>{{curriculum.title}}</h1>
+        <hr>
+        <p class="item">
+          {% if curriculum.curriculum_type == 'S' %}
+            Thanks for taking this survey about computational thinking!
+            There are no right or wrong answers to these questions, we just want to know what you think.
+          {% elif curriculum.curriculum_type == 'A' %}
+            Thank you for taking this assessment!
+            Please do the best that you can, and don't worry if you don't know all of the answers.
+
+          {% elif curriculum.curriculum_type == 'L' %}
+            {{curriculum.overview}}
+          {% endif %}
+        </p>
+        <div class="save-buttons" style="text-align: center; margin-bottom: 150px; margin-top: 80px;">
+          <a href="{% url 'ctstem:resumeAssignment'  instance.assignment.id instance.id 1 %}">
+            <button class="continue">
+              {% if instance.status == 'N' %}
+                Start!
+              {% else %}
+                Continue
+              {% endif %}
+            </button>
+          </a>
+        </div>
+      {% else %}
+        <h2>{{form.instance.step.title}}</h2>
+        <hr>
+        <form method="post" enctype="multipart/form-data" id="assignmentForm">
+          {% csrf_token %}
+          {{form.management_form}}
+          <input type="hidden" name="step_order" value="{{step.order}}"/>
+          {% if instanceform %}
+            <div class="teammates">
+              {{instanceform.management_form}}
+              <label>If you worked in a team, select your teammates from the list below:</label>
+              {{instanceform.teammates}}
+              <div class="warning">{{instanceform.teammates.help_text}}</div>
+            </div>
+          {% endif %}
+          <div class="step_context">
+            {% if form.instance.step.content %}
+              {{form.instance.step.content|safe}}
               <hr>
             {% endif %}
+          </div>
+          <div class="question_container">
+            {{formset.management_form}}
             <div class="question_table">
               {% for questionForm in formset %}
                 {% with questionObj=questionForm.curriculum_question.value|get_curriculum_question %}
                 {% with field_type=questionObj.answer_field_type %}
                 {% if field_type != 'MH' %}
-                  <hr>
                   <div class="question_text">
                     <div class="question">
                       {{questionForm.id}}
@@ -85,7 +127,7 @@
                   </div>
                   <div class="answer_field">
                     <div class="response">
-                      {% if form.instance.instance.status == 'F' or form.instance.instance.status == 'S' or form.instance.instance.status == 'A' %}
+                      {% if instance.status == 'F' or instance.status == 'S' or instance.status == 'A' %}
                         <div class="readonly">
                         {% if field_type == 'FI' %}
                           <div class="file">
@@ -101,7 +143,7 @@
                         </div>
                       {% else %}
                         {% if field_type == 'TA' %}
-                          <textarea placeholder="Enter your response" class="form-control" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" >{{questionForm.response.value}}</textarea>
+                          <textarea placeholder="Enter your response" class="form-control assignment_textarea" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" >{{questionForm.response.value}}</textarea>
                         {% elif field_type == 'TF' %}
                           <input type="text" placeholder="Enter your response" class="form-control" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{questionForm.response.value}}" />
                         {% elif field_type == 'DD' %}
@@ -115,7 +157,6 @@
                             {% endfor %}
                           </select>
                         {% elif field_type == 'MC' %}
-                          <div class="note"> Note: Select one answer </div>
                           {% for option in questionObj.options|splitlines%}
                             {% if option|slugify == questionForm.response.value|slugify %}
                               <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}"  checked="true"/>  {{option}}<br>
@@ -124,16 +165,16 @@
                             {% endif %}
                           {% endfor %}
                         {% elif field_type == 'MI' %}
-                          <div class="note"> Note: Select one answer </div>
                           {% for option in questionObj.options|splitlines%}
                             {% if option|slugify == questionForm.response.value|slugify %}
-                              <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}" checked="true" />  <img src="{{option}}" class="image_option"/><br><br>
+                              <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}" checked="true" />
                             {% else %}
-                              <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}"/>  <img src="{{option}}" class="image_option"/><br><br>
+                              <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}"/>
                             {% endif %}
+                            <span>{{forloop.counter0|get_ascii_char}}.</span>
+                            <img src="{{option}}" class="image_option"/><br><br>
                           {% endfor %}
                         {% elif field_type == 'MS' %}
-                          <div class="note"> Note: Select all that apply </div>
                           <input type="hidden" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{questionForm.response.value}}"/>
                           {% with chosen=questionForm.response.value|split:',' %}
                           {% for option in questionObj.options|splitlines%}
@@ -159,7 +200,7 @@
                     {% endif %}
                   </div>
 
-                  {% if form.instance.instance.status == 'F' or form.instance.instance.status == 'A' %}
+                  {% if instance.status == 'F' or instance.status == 'A' %}
                     <div class="feedback">
                       <label>Feedback:</label>
                       <div class="feedback">{{questionForm.instance.id|getFeedback}}</div>
@@ -169,19 +210,20 @@
                     <hr>
                   {% endif %}
                 {% else %}
-                  <table class="mc_horiz_question_table">
+                  <table class="likert">
                     <tbody>
-                      <tr>
-                        <td class="mc_horiz_question">
-                          <div>
-                            {{questionForm.id}}
+                      <tr class="likert-item">
+                        <td class="likert-number">
+                          {{questionForm.id}}
+                          {{forloop.counter}}.
+                        </td>
+                        <td class="likert-prompt">
                             {{questionObj.question_text|inline_style|safe}}
                             {{questionForm.curriculum_question.as_hidden}}
                             {{questionForm.save.as_hidden}}
-                          </div>
                         </td>
                         {% for option in questionObj.options|splitlines%}
-                          <td>
+                          <td class="likert-option">
                             {% if option|slugify == questionForm.response.value|slugify %}
                               <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}"  checked="true"/>
                             {% else %}
@@ -199,51 +241,66 @@
           </div>
         </div>
 
-        <div class="row footer">
-          <div class="col-md-6 back">
-            {% if form.instance.step.order > 1 %}
-              <a type="button" class="btn btn-warning" title="Previous Step" href="{% url 'ctstem:resumeAssignment'  form.instance.instance.assignment.id form.instance.instance.id form.instance.step.order|add:'-1' %}">
-                <span class="glyphicon glyphicon-triangle-left" aria-hidden="true"></span> Back
+        <div class="save-buttons">
+          {% if form and form.instance.step.order > 1 %}
+            <a class="back" href="{% url 'ctstem:resumeAssignment'  form.instance.instance.assignment.id form.instance.instance.id form.instance.step.order|add:'-1' %}" onclick="saveStep('{{form.instance.instance.status}}');">
+              <button type="button" class="light back">Back</button>
+            </a>
+          {% endif %}
+
+          {% if form and form.instance.step.order != total_steps %}
+            {% if instance.status == 'S' or instance.status == 'F' or instance.status == 'A' %}
+              <a href="{% url 'ctstem:resumeAssignment' form.instance.instance.assignment.id form.instance.instance.id form.instance.step.order|add:'1' %}">
+                <button type="button" class="bright next">Next</button>
               </a>
-            {% endif %}
-          </div>
-          <div class="col-md-6 next">
-            {% if form.instance.step.order != total_steps %}
-              {% if form.instance.instance.status == 'S' or form.instance.instance.status == 'F' or form.instance.instance.status == 'A' %}
-                 <a type="button" class="btn btn-info" title="Next Step" href="{% url 'ctstem:resumeAssignment'  form.instance.instance.assignment.id form.instance.instance.id form.instance.step.order|add:'1' %}">
-                  Next <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
-                </a>
-              {% else %}
-                <button type="button" class="btn btn-info save" title="Save" >
-                  Save
-                </button>
-                <button type="button" class="btn btn-success submit" title="Next Step" >
-                  Save &amp; Continue <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
-                </button>
-              {% endif %}
             {% else %}
-              {% if form.instance.instance.status == 'S' or form.instance.instance.status == 'F' or form.instance.instance.status == 'A' %}
-                <a type="button" class="btn btn-danger" title="Next Step" href="{% url 'ctstem:assignments' 'inbox' %}">
-                  Exit
-                </a>
-              {% else %}
-                <button type="button" class="btn btn-info save" title="Save" >
-                  Save
-                </button>
-                <button type="button" class="btn btn-success submit" title="Submit Assignment">
-                  Submit
-                </button>
-              {% endif %}
+              <button type="button" class="light save" title="Save" >
+                Save
+              </button>
+              <button type="button" class="bright submit" title="Next Step" >
+                Save &amp; Continue
+              </button>
             {% endif %}
-          </div>
+          {% else %}
+            {% if instance.status == 'S' or instance.status == 'F' or instance.status == 'A' %}
+              <a title="Next Step" href="{% url 'ctstem:home' %}">
+                <button type="button" class="bright">Exit</button>
+              </a>
+            {% else %}
+              <button class="light save" title="Save" >
+                Save
+              </button>
+              <button class="bright submit" title="Submit Assignment">
+                Submit
+              </button>
+            {% endif %}
+          {% endif %}
           <input type="hidden" id="save" name="save" value="0"/>
         </div>
-      </div>
+
+        </form>
+      {% endif %}
     </div>
-    </form>
-  </div>
+  </main>
+  <!-- FOOTER -->
+  <footer>
+    <p>
+      <!-- TODO: Come up with terms of use page! -->
+      <a data-toggle="modal" data-target="#terms" class="terms" href="#">
+      <span class="fa fa-creative-commons fa-2x" style="position: relative; top: 5px; margin-right: 2px;"></span> 2016.
+      Some Rights Reserved</a>.
+    </p>
+    <p>
+      This material was developed by the <a href="{% url 'ctstem:home' %}"> CT-STEM Project</a> at Northwestern University. <br>
+      To inquire about using our material in your school or as part of research, please contact
+      <a href="mailto:ct-stem@ccl.northwestern.edu">ct-stem@ccl.northwestern.edu</a>.
+    </p>
+    <p>
+      This work was made possible through generous support from the National Science Foundation (grants CNS-1138461 and CNS 1441041) and the Spencer Foundation (Award #201600069). Any opinions, findings, or recommendations expressed in this material are those of the author(s) and do not necessarily reflect the views of the funding organizations.
+    </p>
+  </footer>
   <script type="text/javascript">
-    $(".content input:checkbox").change(function(){
+    $("#assignmentForm input:checkbox").change(function(){
       var selectedValues = $("input[id="+$(this).attr('id')+"]:checked").map(function() {return this.value;}).get().join(',')
       var hiddenVar = $(this).prevAll('input:hidden');
       $(hiddenVar).val(selectedValues);
@@ -253,7 +310,7 @@
       var status = "{{form.instance.instance.status}}";
       var closedStatus = ['S', 'F', 'A'];
       if(closedStatus.indexOf(status) >= 0){
-        $(':input').attr('disabled', 'disabled');
+        $(':input:not(:button)').attr('disabled', 'disabled');
       }
     });
 
@@ -269,9 +326,23 @@
       $('form#assignmentForm').submit();
     });
 
+    function saveStep(status){
+      if(status != 'S' && status != 'F' && status != 'A'){
+        $('input:hidden[id="save"]').val(1);
+        $('input:hidden[id*="save"][id*="form"]').val('on');
+        $('#assignmentForm').ajaxSubmit({
+           dataType : 'json',
+           success: function(data){
+            return false;
+           },
+        });
+      }
+      return true;
+    }
+
     //auto submit form every 60 seconds
     $(function(){
-      {% if form.instance.instance.status != 'S' and form.instance.instance.status != 'F' and form.instance.instance.status != 'A' and form.instance.step.curriculum.curriculum_type != 'S'%}
+      {% if form.instance.instance.status != 'S' and form.instance.instance.status != 'F' and form.instance.instance.status != 'A'%}
       setInterval(function(){
         $('input:hidden[id="save"]').val(1);
         $('input:hidden[id*="save"][id*="form"]').val('on');
@@ -306,15 +377,9 @@
       }, 60000)
       {% endif %}
     });
-    $(function(){
-      {% if form.instance.step.curriculum.curriculum_type == 'S' %}
-        var src = $('iframe').attr('src');
-        var student_id = '{{user.student.id}}';
-        src = src.replace('element_1', 'element_1='+student_id)
-        $('iframe').attr('src', src);
-      {% endif %}
-    });
-
   </script>
 
 {% endblock %}
+
+{% block footer %} {% endblock %}
+

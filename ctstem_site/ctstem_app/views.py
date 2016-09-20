@@ -1774,7 +1774,7 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
       total_steps = steps.count()
       if int(step_order) == 0:
         context = {'curriculum': curriculum, 'instance': instance, 'total_steps': total_steps, 'step_order': step_order}
-        return render(request, 'ctstem_app/AssignmentStep2.html', context)
+        return render(request, 'ctstem_app/AssignmentStep.html', context)
       else:
         step = steps.get(order=step_order)
         initial_data = []
@@ -1806,7 +1806,7 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
               subform.initial = data
 
           context = {'curriculum': curriculum, 'instance': instance, 'instanceform': instanceform, 'form': form, 'formset': formset, 'total_steps': total_steps, 'step_order': step_order}
-          return render(request, 'ctstem_app/AssignmentStep2.html', context)
+          return render(request, 'ctstem_app/AssignmentStep.html', context)
 
         elif 'POST' == request.method:
           data = request.POST.copy()
@@ -1878,7 +1878,7 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
             messages.error(request, 'Please answer all the questions on this step before continuing on to the next step')
 
           context = {'curriculum': curriculum, 'instance': instance, 'instanceform': instanceform,  'form': form, 'formset': formset, 'total_steps': total_steps, 'step_order': step_order}
-          return render(request, 'ctstem_app/AssignmentStep2.html', context)
+          return render(request, 'ctstem_app/AssignmentStep.html', context)
 
     return http.HttpResponseNotAllowed(['GET', 'POST'])
   except models.AssignmentInstance.DoesNotExist:
