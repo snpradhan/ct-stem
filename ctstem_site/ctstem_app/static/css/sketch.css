@@ -1,0 +1,17 @@
+canvas {
+  border: 1px solid #ccc;
+}
+.sketch_tools { margin-bottom: 10px; }
+.sketch_tools a {
+  border: 1px solid black;
+  height: 30px;
+  line-height: 30px;
+  padding: 0 10px;
+  vertical-align: middle;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  color: black;
+  font-weight: bold;
+}
+

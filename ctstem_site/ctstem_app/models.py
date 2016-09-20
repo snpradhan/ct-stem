@@ -36,6 +36,8 @@ FIELD_TYPE_CHOICES = (
     (u'MI', u'Multiple Choice w/ Images'),
     (u'MH', u'Multiple Choice w/ Horizontal Layout'),
     (u'FI', u'File'),
+    (u'SK', u'Sketch'),
+
 )
 
 USER_ROLE_CHOICES = (

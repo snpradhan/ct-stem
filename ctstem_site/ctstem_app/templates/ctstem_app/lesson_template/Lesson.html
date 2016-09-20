@@ -13,6 +13,9 @@
   <link rel="stylesheet" href="/static/css/bootstrap-modal.css">
   <link rel="stylesheet" href="/static/css/table.css">
   <link rel="stylesheet" href="/static/css/lesson.css">
+  <link rel="stylesheet" href="/static/css/sketch.css">
+  <script type="text/javascript" src="/static/js/sketch.min.js"></script>
+  <script type="text/javascript" src="/static/js/sketch_custom.js"></script>
 {% endblock %}
 
 {% block header %}{% endblock %}
@@ -239,7 +242,9 @@
                   {% elif field_type == 'MI' %}
                     <div class="note"> Note: Select one answer </div>
                     {% for option in question.options|splitlines %}
-                      <input type="radio" name="{{question.id}}" id="{{question.id}}" value="{{option}}" disabled/>  <img src="{{option}}" class="image_option"/><br><br>
+                      <input type="radio" name="{{question.id}}" id="{{question.id}}" value="{{option}}" disabled/>
+                      <span>{{forloop.counter0|get_ascii_char}}.</span>
+                      <img src="{{option}}" class="image_option"/><br><br>
                     {% endfor %}
                   {% elif field_type == 'MS' %}
                     <div class="note"> Note: Select all that apply </div>
@@ -249,6 +254,14 @@
                   {% elif field_type == 'FI' %}
                     <div class="note"> Note: Upload a file </div>
                     <input type="file" placeholder="Upload your file" class="form-control" disabled/>
+                  {% elif field_type == 'SK' %}
+                    <div class="note"> Note: Draw your sketch in the sketchpad below </div>
+                    <div id="{{question.id}}_sketch_tools" class="sketch_tools"></div>
+                    <canvas id="{{question.id}}_sketch" width="800" height="300" class="assignment_sketch"></canvas>
+                    <input type="button" class="btn btn-default save" value="Save"/>
+                    <input type="button" class="btn btn-default load" value="Load"/>
+                    <input type="hidden" id="{{question.id}}_sketch_object"/>
+                    <!--input type="file" name="{{question.id}}_file" id="{{question.id}}_file"/--> <br>
                   {% endif %}
                 </div>
               </div>
@@ -307,6 +320,27 @@
   <script type="text/javascript">
     $(function(){
 
+      $('input.save').on('click', function(){
+        var id = $(this).prev('canvas').attr('id');
+        var format = "image/#png";
+        var sketch_object = ($("#"+id)[0]).toDataURL(format);
+        $("#"+id+"_object").val(sketch_object);
+        var ctx = $("#"+id)[0].getContext('2d');
+        ctx.clearRect(0, 0, $("#"+id)[0].width, $("#"+id)[0].height);
+      });
+      $('input.load').on('click', function(){
+        var canvas = $(this).closest('.answer_field').find('canvas')[0];
+        var id = $(canvas).attr('id');
+        alert(id);
+        var format = "image/#png";
+        var sketch_object = $("#"+id+"_object").val();
+        var ctx = ($(canvas)[0]).getContext('2d');
+        var img = new Image();
+        img.onload = function(){
+          ctx.drawImage(img,0,0); // Or at whatever offset you like
+        };
+        img.src = sketch_object;
+      });
       $('.fb-comments').data('href', window.location.href);
 
       $('body').on('click', 'button.fa-facebook', function(){

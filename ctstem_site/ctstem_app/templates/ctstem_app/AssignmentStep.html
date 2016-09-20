@@ -22,7 +22,9 @@
   <link rel="stylesheet" href="/static/css/messages.css">
   <link rel="stylesheet" href="/static/css/assignment.css">
   <script type="text/javascript" src="/static/js/jquery.form.min.js"></script>
-
+  <link rel="stylesheet" href="/static/css/sketch.css">
+  <script type="text/javascript" src="/static/js/sketch.min.js"></script>
+  <script type="text/javascript" src="/static/js/sketch_custom.js"></script>
 {% endblock %}
 
 {% block header %}{% endblock %}
@@ -135,6 +137,9 @@
                           </div>
                         {% elif field_type == 'MI' %}
                           <img src="{{questionForm.response.value}}" class="image_option"/><br>
+                        {% elif field_type == 'SK' %}
+                          <canvas id="{{questionForm.response.auto_id}}_sketch" width="800" height="300" class="assignment_sketch" disabled></canvas>
+                          <input type="hidden" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{questionForm.response.value}}"/><br>
                         {% else %}
                           <div class="text">
                             {{questionForm.response.value}}
@@ -188,6 +193,12 @@
                         {% elif field_type == 'FI' %}
                           <div class="note"> Note: Upload a file </div>
                          {{questionForm.responseFile}}
+                        {% elif field_type == 'SK' %}
+                          <div class="note"> Note: Draw your sketch in the sketchpad below </div>
+                          <div id="{{questionForm.response.auto_id}}_sketch_tools" class="sketch_tools"></div>
+                          <canvas id="{{questionForm.response.auto_id}}_sketch" width="800" height="300" class="assignment_sketch"></canvas>
+                          <input type="hidden" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{questionForm.response.value}}"/>
+                          <!--input type="file" name="{{question.id}}_file" id="{{question.id}}_file"/--> <br>
                         {% endif %}
                       {% endif %}
                     </div>
@@ -312,15 +323,18 @@
       if(closedStatus.indexOf(status) >= 0){
         $(':input:not(:button)').attr('disabled', 'disabled');
       }
+      loadCanvasData();
     });
 
     $('button.save').click(function(){
+      setCanvasData();
       $('input:hidden[id="save"]').val(1);
       $('input:hidden[id*="save"][id*="form"]').val('on');
       $('form#assignmentForm').submit();
     });
 
     $('button.submit').click(function(){
+      setCanvasData();
       $('input:hidden[id="save"]').val(0);
       $('input:hidden[id*="save"][id*="form"]').val('');
       $('form#assignmentForm').submit();
@@ -328,6 +342,7 @@
 
     function saveStep(status){
       if(status != 'S' && status != 'F' && status != 'A'){
+        setCanvasData();
         $('input:hidden[id="save"]').val(1);
         $('input:hidden[id*="save"][id*="form"]').val('on');
         $('#assignmentForm').ajaxSubmit({
@@ -339,11 +354,34 @@
       }
       return true;
     }
+    function setCanvasData(){
+      var format = "image/#png";
+      $('canvas').each(function(){
+        var id = $(this).attr('id');
+        var sketch_object = ($("#"+id)[0]).toDataURL(format);
+        $(this).next().val(sketch_object);
+      });
+    }
+
+    function loadCanvasData(){
+      var format = "image/#png";
+      $('canvas').each(function(){
+        var id = $(this).attr('id');
+        var sketch_object = $(this).next().val();
+        var ctx = ($(this)[0]).getContext('2d');
+        var img = new Image();
+        img.onload = function(){
+          ctx.drawImage(img,0,0); // Or at whatever offset you like
+        };
+        img.src = sketch_object;
+      });
+    }
 
     //auto submit form every 60 seconds
     $(function(){
       {% if form.instance.instance.status != 'S' and form.instance.instance.status != 'F' and form.instance.instance.status != 'A'%}
       setInterval(function(){
+        setCanvasData();
         $('input:hidden[id="save"]').val(1);
         $('input:hidden[id*="save"][id*="form"]').val('on');
         $('#assignmentForm').ajaxSubmit({

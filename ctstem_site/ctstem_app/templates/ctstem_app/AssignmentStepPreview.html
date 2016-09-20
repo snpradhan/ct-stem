@@ -22,6 +22,9 @@
   <link rel="stylesheet" href="/static/css/messages.css">
   <link rel="stylesheet" href="/static/css/assignment.css">
   <script type="text/javascript" src="/static/js/jquery.form.min.js"></script>
+  <link rel="stylesheet" href="/static/css/sketch.css">
+  <script type="text/javascript" src="/static/js/sketch.min.js"></script>
+  <script type="text/javascript" src="/static/js/sketch_custom.js"></script>
 
 {% endblock %}
 
@@ -133,7 +136,15 @@
                         {% endfor %}
                       {% elif field_type == 'FI' %}
                         <div class="note"> Note: Upload a file </div>
-                       <input type="file" name="{{question.id}}_file" id="{{question.id}}_file"/> <br>
+                        <input type="file" name="{{question.id}}_file" id="{{question.id}}_file"/> <br>
+                      {% elif field_type == 'SK' %}
+                        <div class="note"> Note: Draw your sketch in the sketchpad below </div>
+                        <div id="{{question.id}}_sketch_tools" class="sketch_tools"></div>
+                        <canvas id="{{question.id}}_sketch" width="800" height="300" class="assignment_sketch"></canvas>
+                        <input type="button" class="btn btn-default save" value="Save"/>
+                        <input type="button" class="btn btn-default load" value="Load"/>
+                        <input type="hidden" id="{{question.id}}_sketch_object"/>
+                        <!--input type="file" name="{{question.id}}_file" id="{{question.id}}_file"/--> <br>
                       {% endif %}
                     </div>
                   </div>
