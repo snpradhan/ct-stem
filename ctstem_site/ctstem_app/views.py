@@ -1645,14 +1645,17 @@ def assignments(request, bucket=''):
         try:
           instance = models.AssignmentInstance.objects.get(assignment=assignment, student=student)
 
-          if instance.status in ['P', 'S', 'F']:
+          if instance.status in ['N', 'P', 'S', 'F']:
             total_questions = models.CurriculumQuestion.objects.all().filter(step__curriculum=assignment.curriculum).count()
             attempted_questions = models.QuestionResponse.objects.all().filter(step_response__instance=instance).exclude(response__exact='', responseFile__exact='').count()
             total_steps = instance.assignment.curriculum.steps.count()
             last_step = instance.last_step
 
             print total_questions, attempted_questions, total_steps, last_step
-            if instance.status == 'P':
+            if instance.status == 'N':
+              status = 1
+              percent_complete = 0
+            elif instance.status == 'P':
               status = 2
               if total_questions > 0:
                 percent_complete = float(attempted_questions)/float(total_questions)*100
