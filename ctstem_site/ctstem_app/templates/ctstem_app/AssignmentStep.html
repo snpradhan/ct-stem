@@ -15,7 +15,7 @@
 {% block custom_media %}
   <link href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css?family=Maitree:400,700|Roboto+Condensed:300,400,700italic" rel="stylesheet">
-  <script src="http://ajax.googleapis.com/ajax/libs/jquery/3.0.0/jquery.min.js"></script>
+  <!--script src="http://ajax.googleapis.com/ajax/libs/jquery/3.0.0/jquery.min.js"></script-->
   <script src="http://canvasjs.com//assets/script/canvasjs.min.js"></script>
   <link rel="stylesheet" href="/static/css/bootstrap-modal.css">
   <link rel="stylesheet" href="/static/css/table.css">
@@ -133,13 +133,13 @@
                         <div class="readonly">
                         {% if field_type == 'FI' %}
                           <div class="file">
-                          Uploaded file: <a href="{{questionForm.responseFile.value.url}}" target="_blank"><span class="glyphicon glyphicon-file" aria-hidden="true"></span></a>
+                          Uploaded file: <a href="{{questionForm.responseFile.value.url}}" target="_blank"><span class="glyphicon glyphicon-file" aria-hidden="true">File</span></a>
                           </div>
                         {% elif field_type == 'MI' %}
                           <img src="{{questionForm.response.value}}" class="image_option"/><br>
                         {% elif field_type == 'SK' %}
-                          <canvas id="{{questionForm.response.auto_id}}_sketch" width="800" height="300" class="assignment_sketch" disabled></canvas>
-                          <input type="hidden" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{questionForm.response.value}}"/><br>
+                          <canvas id="{{questionForm.response.auto_id}}_sketch" width="800" height="300" class="assignment_sketch_disabled"></canvas>
+                          <input type="hidden" name="{{questionForm.responseFile.html_name}}" id="{{questionForm.responseFile.auto_id}}" value="{% if questionForm.responseFile.value %} {{questionForm.responseFile.value.url}} {% endif %}"/><br>
                         {% else %}
                           <div class="text">
                             {{questionForm.response.value}}
@@ -197,8 +197,9 @@
                           <div class="note"> Note: Draw your sketch in the sketchpad below </div>
                           <div id="{{questionForm.response.auto_id}}_sketch_tools" class="sketch_tools"></div>
                           <canvas id="{{questionForm.response.auto_id}}_sketch" width="800" height="300" class="assignment_sketch"></canvas>
-                          <input type="hidden" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{questionForm.response.value}}"/>
-                          <!--input type="file" name="{{question.id}}_file" id="{{question.id}}_file"/--> <br>
+                          <input type="hidden" name="{{questionForm.responseFile.html_name}}" id="{{questionForm.responseFile.auto_id}}" value="{% if questionForm.responseFile.value %} {{questionForm.responseFile.value.url}} {% endif %}"/>
+                          <input type="hidden" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}"/>
+                         <br>
                         {% endif %}
                       {% endif %}
                     </div>
@@ -327,24 +328,24 @@
     });
 
     $('button.save').click(function(){
-      setCanvasData();
       $('input:hidden[id="save"]').val(1);
       $('input:hidden[id*="save"][id*="form"]').val('on');
+      setCanvasData();
       $('form#assignmentForm').submit();
     });
 
     $('button.submit').click(function(){
-      setCanvasData();
       $('input:hidden[id="save"]').val(0);
       $('input:hidden[id*="save"][id*="form"]').val('');
+      setCanvasData();
       $('form#assignmentForm').submit();
     });
 
     function saveStep(status){
       if(status != 'S' && status != 'F' && status != 'A'){
-        setCanvasData();
         $('input:hidden[id="save"]').val(1);
         $('input:hidden[id*="save"][id*="form"]').val('on');
+        setCanvasData();
         $('#assignmentForm').ajaxSubmit({
            dataType : 'json',
            success: function(data){
@@ -357,62 +358,72 @@
     function setCanvasData(){
       var format = "image/#png";
       $('canvas').each(function(){
-        var id = $(this).attr('id');
-        var sketch_object = ($("#"+id)[0]).toDataURL(format);
-        $(this).next().val(sketch_object);
+        //var id = $(this).attr('id');
+        var sketch_object = ($(this)[0]).toDataURL(format);
+        $(this).next().next().val(sketch_object);
       });
     }
 
     function loadCanvasData(){
       var format = "image/#png";
       $('canvas').each(function(){
-        var id = $(this).attr('id');
-        var sketch_object = $(this).next().val();
-        var ctx = ($(this)[0]).getContext('2d');
-        var img = new Image();
-        img.onload = function(){
-          ctx.drawImage(img,0,0); // Or at whatever offset you like
-        };
-        img.src = sketch_object;
+        var canvas = $(this);
+        var id = $(canvas).attr('id');
+        var url = $(canvas).next().val();
+
+        if(url){
+          console.log('loading :'+url);
+          var ctx = ($(canvas)[0]).getContext('2d');
+          var img = new Image();
+          img.crossOrigin = '';
+          img.onload = function(){
+            ctx.drawImage(img,0,0); // Or at whatever offset you like
+          };
+          img.src = url;
+        }
       });
     }
 
     //auto submit form every 60 seconds
     $(function(){
       {% if form.instance.instance.status != 'S' and form.instance.instance.status != 'F' and form.instance.instance.status != 'A'%}
-      setInterval(function(){
-        setCanvasData();
-        $('input:hidden[id="save"]').val(1);
-        $('input:hidden[id*="save"][id*="form"]').val('on');
-        $('#assignmentForm').ajaxSubmit({
-          dataType : 'json',
-          success: function(data){
-            //message at the top of the page stating responses auto saved
-            $("ul.messages li").remove();
-            $("ul.messages").html('<li class="success">'+data.message+'</li>');
-            //change the url in the browser if new assignment
-            if (history.pushState) {
-              var newurl = document.location.protocol +'//'+ document.location.host + data.url;
-              history.replaceState({},'',newurl);
-            }
-            //update question response ids for new assignment
-            $('input:hidden[id^="id_form-"][id$="-id"]').each(function(){
-              var id = $(this).attr('id');
-              if(!($(this).val())){
-                $(this).val(data.questionResponses[id]);
+        setInterval(function(){
+          $('input:hidden[id="save"]').val(1);
+          $('input:hidden[id*="save"][id*="form"]').val('on');
+          setCanvasData();
+          $('#assignmentForm').ajaxSubmit({
+            dataType : 'json',
+            success: function(data){
+              //message at the top of the page stating responses auto saved
+              $("ul.messages li").remove();
+              $("ul.messages").html('<li class="success">'+data.message+'</li>');
+              //change the url in the browser if new assignment
+              if (history.pushState) {
+                var newurl = document.location.protocol +'//'+ document.location.host + data.url;
+                history.replaceState({},'',newurl);
               }
-            });
-            $('input:hidden[id="id_form-INITIAL_FORMS"]').val(data.questionCount);
-          },
-          error: function(data) {
-            $("ul.messages li").remove();
-            $("ul.messages").html('<li class="error">The responses could not auto saved. Please click the Save or Save and Continue button at the bottom of the page.</li>');
-          }
+              //update question response ids for new assignment
+              $('input:hidden[id^="id_form-"][id$="-id"]').each(function(){
+                var id = $(this).attr('id');
+                if(!($(this).val())){
+                  $(this).val(data.questionResponses[id]);
+                }
+              });
+              $('input:hidden[id="id_form-INITIAL_FORMS"]').val(data.questionCount);
+            },
+            error: function(data) {
+              $("ul.messages li").remove();
+              $("ul.messages").html('<li class="error">The responses could not auto saved. Please click the Save or Save and Continue button at the bottom of the page.</li>');
+            }
+          });
+          $('ul.messages').show();
+          $('ul.messages').delay(30000).fadeOut('slow');
+          return false;
+        }, 60000)
+      {% else %}
+        $('canvas').each(function(){
+          $(this)[0].removeEventListener('click');
         });
-        $('ul.messages').show();
-        $('ul.messages').delay(30000).fadeOut('slow');
-        return false;
-      }, 60000)
       {% endif %}
     });
   </script>

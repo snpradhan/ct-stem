@@ -31,6 +31,7 @@ import zipfile
 from django.core.files import File
 import urllib2
 from urllib import urlretrieve
+import base64
 
 ####################################
 # HOME
@@ -1811,7 +1812,7 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
         elif 'POST' == request.method:
           data = request.POST.copy()
           #is this a save or a submit
-          print data
+          #print data
           save_only = int(data['save'])
           form = forms.AssignmentStepResponseForm(data=data, instance=assignmentStepResponse, prefix="step_response")
           questionResponseFormset=inlineformset_factory(models.AssignmentStepResponse, models.QuestionResponse, form=forms.QuestionResponseForm, can_delete=False, can_order=True, extra=0)
@@ -1843,10 +1844,20 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
             assignmentStepResponse.instance = instance
             assignmentStepResponse.save()
             #save the question response formset
-            questionResponseObjects = formset.save()
+            questionResponseObjects = formset.save(commit=False)
             questionResponses = {}
             # get the question response ids to update the front end
             for questionResponse in questionResponseObjects:
+              if questionResponse.curriculum_question.question.answer_field_type == 'SK':
+                if questionResponse.response is not None and questionResponse.response != '':
+                  base64String = questionResponse.response.split(',')[1]
+                  sketch = base64.b64decode(base64String)
+                  image = ContentFile(sketch, 'sketch.png')
+                  questionResponse.responseFile = image
+                  questionResponse.response = None
+
+              questionResponse.save()
+
               print 'question order ', questionResponse.curriculum_question.order
               questionResponses['id_form-%d-id'%(questionResponse.curriculum_question.order-1)] = questionResponse.id
 

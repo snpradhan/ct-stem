@@ -258,8 +258,6 @@
                     <div class="note"> Note: Draw your sketch in the sketchpad below </div>
                     <div id="{{question.id}}_sketch_tools" class="sketch_tools"></div>
                     <canvas id="{{question.id}}_sketch" width="800" height="300" class="assignment_sketch"></canvas>
-                    <input type="button" class="btn btn-default save" value="Save"/>
-                    <input type="button" class="btn btn-default load" value="Load"/>
                     <input type="hidden" id="{{question.id}}_sketch_object"/>
                     <!--input type="file" name="{{question.id}}_file" id="{{question.id}}_file"/--> <br>
                   {% endif %}
@@ -319,28 +317,6 @@
 
   <script type="text/javascript">
     $(function(){
-
-      $('input.save').on('click', function(){
-        var id = $(this).prev('canvas').attr('id');
-        var format = "image/#png";
-        var sketch_object = ($("#"+id)[0]).toDataURL(format);
-        $("#"+id+"_object").val(sketch_object);
-        var ctx = $("#"+id)[0].getContext('2d');
-        ctx.clearRect(0, 0, $("#"+id)[0].width, $("#"+id)[0].height);
-      });
-      $('input.load').on('click', function(){
-        var canvas = $(this).closest('.answer_field').find('canvas')[0];
-        var id = $(canvas).attr('id');
-        alert(id);
-        var format = "image/#png";
-        var sketch_object = $("#"+id+"_object").val();
-        var ctx = ($(canvas)[0]).getContext('2d');
-        var img = new Image();
-        img.onload = function(){
-          ctx.drawImage(img,0,0); // Or at whatever offset you like
-        };
-        img.src = sketch_object;
-      });
       $('.fb-comments').data('href', window.location.href);
 
       $('body').on('click', 'button.fa-facebook', function(){

@@ -6,6 +6,7 @@ from ckeditor_uploader.fields import RichTextUploadingField
 from smart_selects.db_fields import ChainedForeignKey
 from PIL import Image
 import StringIO
+import datetime
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db.models import signals
 from django.dispatch import receiver
@@ -89,22 +90,23 @@ CONSENT_CHOICES = (
 
 def upload_file_to(instance, filename):
   import os
-  from django.utils.timezone import now
+  now = datetime.datetime.now()
+  dt = now.strftime("%Y-%m-%d-%H-%M-%S-%f")
   filename_base, filename_ext = os.path.splitext(filename)
-  print filename
+  print filename, now
   if isinstance(instance, Curriculum):
-    return 'curriculum/%s%s' % (slugify(instance.title), filename_ext.lower(),)
+    return 'curriculum/%s_%s%s' % (slugify(instance.title), dt, filename_ext.lower(),)
   elif isinstance(instance, Publication):
-      return 'publications/%s%s' % (slugify(instance.title), filename_ext.lower(),)
+      return 'publications/%s_%s%s' % (slugify(instance.title), dt, filename_ext.lower(),)
   elif isinstance(instance, Team):
-    return 'team/%s%s' % (slugify(instance.name), filename_ext.lower(),)
+    return 'team/%s_%s%s' % (slugify(instance.name), dt, filename_ext.lower(),)
   elif isinstance(instance, Attachment):
-    return 'attachment/%s%s' % (filename_base.lower(), filename_ext.lower(),)
+    return 'attachment/%s_%s%s' % (filename_base.lower(), dt, filename_ext.lower(),)
   elif isinstance(instance, Category):
-    return 'standard/%s%s' % (filename_base.lower(), filename_ext.lower(),)
+    return 'standard/%s_%s%s' % (filename_base.lower(), dt, filename_ext.lower(),)
   elif isinstance(instance, QuestionResponse):
-    return 'questionResponse/%s/%s%s' % (instance.step_response.instance.student.user, filename_base.lower(), filename_ext.lower(),)
-  return 'misc/%s%s' % (instance.id,filename_ext.lower(),)
+    return 'questionResponse/%s/%s_%s%s' % (instance.step_response.instance.student.user, filename_base.lower(), dt, filename_ext.lower(),)
+  return 'misc/%s_%s%s' % (filename_base.lower(), dt, filename_ext.lower(),)
 
 # Create your models here.
 
