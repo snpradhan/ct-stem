@@ -80,8 +80,8 @@
 
     {% for assignment in assignments %}
       $('input[type="checkbox"]#assign_{{assignment.group.id}}').prop('checked', true);
-      $('td#assigned_{{assignment.group.id}}').html('{{assignment.assigned_date|date}}');
-      $('input#due_{{assignment.group.id}}').val('{{assignment.due_date|date}}');
+      $('td#assigned_{{assignment.group.id}}').html('{{assignment.assigned_date|date:"F j, Y"}}');
+      $('input#due_{{assignment.group.id}}').val('{{assignment.due_date|date:"F j, Y"}}');
     {% endfor %}
 
     $('#curriculumAssignmentForm').submit(function(e){
