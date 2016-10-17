@@ -8,7 +8,7 @@ from django.forms.models import inlineformset_factory
 from django.forms.models import BaseInlineFormSet
 from django.forms.models import modelformset_factory
 from django.forms.formsets import formset_factory
-from datetime import datetime
+from datetime import datetime, date
 from django.contrib.admin.widgets import FilteredSelectMultiple
 from django.forms.widgets import RadioSelect, FileInput, ClearableFileInput
 from django.utils.safestring import mark_safe
@@ -606,6 +606,7 @@ class UserGroupForm(ModelForm):
 ####################################
 class AssignmentForm(ModelForm):
   due_date = forms.DateField(widget=forms.DateInput(format='%b %d, %Y'), input_formats=['%b %d, %Y'])
+  assigned_date = forms.DateField(widget=forms.DateInput(format='%b %d, %Y'), input_formats=['%b %d, %Y'])
 
   class Meta:
     model = models.Assignment
@@ -618,9 +619,16 @@ class AssignmentForm(ModelForm):
     for field_name, field in self.fields.items():
       if field_name == 'due_date':
         field.widget.attrs['class'] = 'form-control datepicker'
+        field.widget.attrs['readonly'] = True
+      elif field_name =='assigned_date':
+        if self.instance.id and self.instance.assigned_date.date() <= date.today():
+          field.widget.attrs['class'] = 'form-control'
+        else:
+          field.widget.attrs['class'] = 'form-control datepicker'
+        field.widget.attrs['readonly'] = True
       else:
         field.widget.attrs['class'] = 'form-control'
-      field.widget.attrs['placeholder'] = field.help_text
+        field.widget.attrs['placeholder'] = field.help_text
 
   def get_assigned_date(self):
     if self.instance.id:
@@ -631,6 +639,7 @@ class AssignmentForm(ModelForm):
 ####################################
 class CurriculumAssignmentForm(ModelForm):
   due_date = forms.DateField(widget=forms.DateInput(format='%b %d, %Y'), input_formats=['%b %d, %Y'])
+  assigned_date = forms.DateField(widget=forms.DateInput(format='%b %d, %Y'), input_formats=['%b %d, %Y'])
 
   class Meta:
     model = models.Assignment
@@ -642,6 +651,13 @@ class CurriculumAssignmentForm(ModelForm):
     for field_name, field in self.fields.items():
       if field_name == 'due_date':
         field.widget.attrs['class'] = 'form-control datepicker'
+        field.widget.attrs['readonly'] = True
+      elif field_name =='assigned_date':
+        if self.instance.id and self.instance.assigned_date.date() <= date.today():
+          field.widget.attrs['class'] = 'form-control'
+        else:
+          field.widget.attrs['class'] = 'form-control datepicker'
+        field.widget.attrs['readonly'] = True
       else:
         field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['placeholder'] = field.help_text

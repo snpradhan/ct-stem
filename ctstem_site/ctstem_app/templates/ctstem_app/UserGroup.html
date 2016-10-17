@@ -88,9 +88,18 @@
                           {{assignmentForm.curriculum.errors}}
                         </div>
                       </td>
-                      <td style="vertical-align:middle;">{{assignmentForm.get_assigned_date|date}}</td>
+                      <td style="vertical-align:middle;">
+
+                          {{assignmentForm.assigned_date }}
+                          <div class="error">
+                            {{assignmentForm.assigned_date.errors }}
+                          </div>
+
+                        </td>
                       <td>
-                        {{assignmentForm.due_date }}
+                        <div>
+                          {{assignmentForm.due_date }}
+                        </div>
                         <div class="error">
                           {{assignmentForm.due_date.errors }}
                         </div>
@@ -195,8 +204,10 @@
         cloneMore('div.assignment_table table.table tr:last', 'form');
         var new_assignment_row = $('div.assignment_table table.table tr:nth-last-child(2)');
         $(new_assignment_row).toggle();
-        $(new_assignment_row).find('.datepicker').removeClass('hasDatepicker');
-        $(new_assignment_row).find('.datepicker').datepicker({dateFormat: 'M d, yy'});
+        $(new_assignment_row).find('.datepicker').each(function(){
+          $(this).removeClass('hasDatepicker');
+          $(this).datepicker({dateFormat: 'M d, yy'});
+        });
       }
 
       $('button.delete_assignment').click(function(){
@@ -207,8 +218,9 @@
         }
       });
 
-      $('.datepicker').datepicker({dateFormat: 'M d, yy'});
-
+      $('.datepicker').each(function(){
+        $(this).datepicker({dateFormat: 'M d, yy'});
+      });
       $('a.upload-modal').click(function(){
         $("div.modal#upload select#id_group option:selected").prop('selected', false);
         $("div.modal#upload select#id_group option[value='"+$(this).data('id')+"']").prop('selected', true);

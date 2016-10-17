@@ -540,14 +540,22 @@ def assignCurriculum(request, id=''):
       for group in groups:
         assignment = assignments.filter(group=group).first()
         assign_key = 'assign_'+str(group.id)
-        due_key = 'due_'+str(group.id)
+        assigned_date_key = 'assigned_'+str(group.id)
+        due_date_key = 'due_'+str(group.id)
         if assignment:
           if assign_key in data:
-            due_date = data[due_key]
-            date_object = datetime.datetime.strptime(due_date, '%B %d, %Y')
+            due_date = data[due_date_key]
+            if assigned_date_key in data and data[assigned_date_key]:
+              assigned_date = data[assigned_date_key]
+              assigned_date_object = datetime.datetime.strptime(assigned_date, '%B %d, %Y')
+            else:
+              assigned_date_object = datetime.datetime.now()
+            due_date_object = datetime.datetime.strptime(due_date, '%B %d, %Y')
+
             # check if due date has changed and update
-            if assignment.due_date.date() != date_object.date():
-              assignment.due_date = date_object
+            if assignment.due_date.date() != due_date_object.date() or assignment.assigned_date.date() != assigned_date_object.date():
+              assignment.due_date = due_date_object
+              assignment.assigned_date = assigned_date_object
               assignment.save()
           else:
             #assignment has been unmarked for deletion
@@ -555,14 +563,18 @@ def assignCurriculum(request, id=''):
         else:
           #check if new assignment has been made
           if assign_key in data:
-            due_date = data[due_key]
-            date_object = datetime.datetime.strptime(due_date, '%B %d, %Y')
-            new_assignment = models.Assignment(curriculum=curriculum, group=group, due_date=date_object)
+            due_date = data[due_date_key]
+            if assigned_date_key in data and data[assigned_date_key]:
+              assigned_date = data[assigned_date_key]
+              assigned_date_object = datetime.datetime.strptime(assigned_date, '%B %d, %Y')
+            else:
+              assigned_date_object = datetime.datetime.now()
+            due_date_object = datetime.datetime.strptime(due_date, '%B %d, %Y')
+            new_assignment = models.Assignment(curriculum=curriculum, group=group, due_date=due_date_object, assigned_date=assigned_date_object)
             new_assignment.save()
 
       response_data = {'message': 'The curriculum "%s" has been assigned' % curriculum.title}
       return http.HttpResponse(json.dumps(response_data), content_type="application/json")
-
 
     return http.HttpResponseNotAllowed(['GET', 'POST'])
   except models.Curriculum.DoesNotExist:
@@ -1634,7 +1646,8 @@ def assignments(request, bucket=''):
     if request.method == 'GET' or request.method == 'POST':
       groups = models.Membership.objects.all().filter(student=student).values_list('group', flat=True)
       #for each group
-      assignments = models.Assignment.objects.all().filter(group__in=groups)
+      tomorrow = datetime.date.today() + datetime.timedelta(days=1)
+      assignments = models.Assignment.objects.all().filter(group__in=groups, assigned_date__lt=tomorrow)
       assignment_list = []
       active_list = []
       archived_list = []

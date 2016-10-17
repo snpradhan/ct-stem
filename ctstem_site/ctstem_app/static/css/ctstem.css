@@ -190,7 +190,11 @@ img.profile {
   height: 200px;
   border-radius: 15%;
 }
-
+input.datepicker {
+  background: url(/static/img/calendar.png) no-repeat right center;
+  background-size: 30px;
+  background-color: #fff !important;
+}
 div#spinner {
   display:none;
   text-align: center;

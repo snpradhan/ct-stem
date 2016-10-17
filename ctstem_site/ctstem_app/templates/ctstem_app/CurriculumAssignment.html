@@ -43,9 +43,11 @@
               {% if user.administrator or user.researcher or user.school_administrator %}
                 <td>{{group.teacher}}</td>
               {% endif %}
-              <td id="assigned_{{group.id}}"></td>
               <td>
-                <input type="text" class="datepicker" id="due_{{group.id}}" name="due_{{group.id}}" readonly="true" />
+                <input type="text" class="datepicker assigned" id="assigned_{{group.id}}" name="assigned_{{group.id}}" readonly="true" />
+              </td>
+              <td>
+                <input type="text" class="datepicker due" id="due_{{group.id}}" name="due_{{group.id}}" readonly="true" />
               </td>
             </tr>
             {% endfor %}
@@ -67,7 +69,13 @@
 <script type="text/javascript">
   $(function(){
 
-    $('.datepicker').datepicker({
+    {% for assignment in assignments %}
+      $('input[type="checkbox"]#assign_{{assignment.group.id}}').prop('checked', true);
+      $('input#assigned_{{assignment.group.id}}').val('{{assignment.assigned_date|date:"F j, Y"}}');
+      $('input#due_{{assignment.group.id}}').val('{{assignment.due_date|date:"F j, Y"}}');
+    {% endfor %}
+
+    $('.datepicker.due').datepicker({
       dateFormat: 'MM d, yy',
       onClose: function(selectedDate){
         if(selectedDate == ""){
@@ -78,11 +86,22 @@
       }
     });
 
-    {% for assignment in assignments %}
-      $('input[type="checkbox"]#assign_{{assignment.group.id}}').prop('checked', true);
-      $('td#assigned_{{assignment.group.id}}').html('{{assignment.assigned_date|date:"F j, Y"}}');
-      $('input#due_{{assignment.group.id}}').val('{{assignment.due_date|date:"F j, Y"}}');
-    {% endfor %}
+    $('.datepicker.assigned').each(function(){
+      var editable = true;
+      var assigned_value = $(this).val();
+      if(assigned_value){
+        var assigned_date = new Date(assigned_value);
+        var today = new Date();
+        if(assigned_date < today){
+          editable = false;
+          $(this).removeClass('hasDatepicker');
+          $(this).removeClass('datepicker');
+        }
+      }
+      if(editable){
+        $(this).datepicker({dateFormat: 'MM d, yy',});
+      }
+    });
 
     $('#curriculumAssignmentForm').submit(function(e){
       e.preventDefault();
@@ -110,7 +129,7 @@
     });
 
 
-    $('input.datepicker').each(function(){
+    $('input.datepicker.due').each(function(){
       var assign = $(this).closest('tr').find('input.assign');
 
       if($(this).val() == ''){
@@ -133,6 +152,7 @@
    $('td').on('click', 'input[type="checkbox"].assign', function(){
       var id = $(this).attr('id');
       var due_date_id = id.replace('assign', 'due');
+      var assigned_date_id = id.replace('assign', 'assigned');
       if($(this).is(':checked')){
         $('#'+due_date_id).datepicker('show');
       }
@@ -143,6 +163,7 @@
         }
         else{
           $('#'+due_date_id).val('');
+          $('#'+assigned_date_id).val('');
         }
       }
     });

@@ -365,7 +365,7 @@ class UserGroup(models.Model):
 class Assignment(models.Model):
   curriculum = models.ForeignKey(Curriculum, related_name="assignments")
   group = models.ForeignKey(UserGroup, related_name="assignments")
-  assigned_date = models.DateTimeField(auto_now_add=True)
+  assigned_date = models.DateTimeField(default=datetime.datetime.now(), blank=False)
   due_date = models.DateTimeField(null=False, blank=False)
 
   def __unicode__(self):
