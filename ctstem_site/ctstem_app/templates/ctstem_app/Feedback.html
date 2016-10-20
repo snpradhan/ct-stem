@@ -101,13 +101,21 @@
       <div>
         <input type="hidden" name="save_and_send" id="save_and_send" value="false" />
       </div>
-      {% if form.instance.instance.status == 'S' %}
-        <div class="form-group button-group-fixed">
+      <div class="form-group button-group-fixed">
+        {% if form.instance.instance.status == 'S' %}
           <input type="submit" class="btn btn-info" id="save" value="Save"/>
           <br><br>
           <input type="button" class="btn btn-success" id="send" value="Save and Send"/>
-        </div>
-      {% endif %}
+          <br><br>
+        {% endif %}
+        {% if prevInstance %}
+          <a type="button" class="btn btn-warning" id="prev" href="{% url 'ctstem:feedback' form.instance.instance.assignment.id prevInstance.id %}"> Previous Student </a>
+          <br><br>
+        {% endif %}
+        {% if nextInstance %}
+          <a type="button" class="btn btn-warning" id="prev" href="{% url 'ctstem:feedback' form.instance.instance.assignment.id nextInstance.id %}"> Next Student </a>
+        {% endif %}
+      </div>
     </form>
   </div>
   <script type="text/javascript">

@@ -1921,7 +1921,21 @@ def feedback(request, assignment_id='', instance_id=''):
   try:
 
     if '' != instance_id:
-      instance = models.AssignmentInstance.objects.get(assignment_id=assignment_id, id=instance_id)
+      instance = models.AssignmentInstance.objects.get(assignment__id=assignment_id, id=instance_id)
+      #get the previous and next student instances
+      groupInstances = models.AssignmentInstance.objects.all().filter(assignment__id=assignment_id)
+      count = groupInstances.count()
+      prevIdx = nextIdx = 0
+      prevInstance = nextInstance = None
+      for idx, inst in enumerate(groupInstances):
+        if instance == inst:
+          prevIdx = idx - 1
+          nextIdx = idx + 1
+      if prevIdx >= 0 and prevIdx < count:
+        prevInstance = groupInstances[prevIdx]
+      if nextIdx >= 0 and nextIdx < count:
+        nextInstance = groupInstances[nextIdx]
+
       school = instance.student.school
       group = instance.assignment.group
       privilege = 0
@@ -1955,7 +1969,7 @@ def feedback(request, assignment_id='', instance_id=''):
 
         formset = StepFeedbackFormSet(instance=feedback, prefix='form')
 
-        context = {'form': form, 'formset': formset}
+        context = {'form': form, 'formset': formset, 'nextInstance': nextInstance, 'prevInstance': prevInstance}
         return render(request, 'ctstem_app/Feedback.html', context)
       elif 'POST' == request.method:
         data = request.POST.copy()
@@ -1978,7 +1992,7 @@ def feedback(request, assignment_id='', instance_id=''):
             instance.status = 'F'
             instance.save()
             messages.success(request, 'Your feedback has been saved and sent to the student')
-            return shortcuts.redirect('ctstem:assignmentDashboard', id=assignment_id)
+            #return shortcuts.redirect('ctstem:assignmentDashboard', id=assignment_id)
           else:
             messages.success(request, 'Your feedback has been saved')
         else:
@@ -1986,7 +2000,7 @@ def feedback(request, assignment_id='', instance_id=''):
           print formset.errors
           messages.error(request, 'Your feedback could not be saved')
 
-        context = {'form': form, 'formset': formset}
+        context = {'form': form, 'formset': formset, 'nextInstance': nextInstance, 'prevInstance': prevInstance}
         return render(request, 'ctstem_app/Feedback.html', context)
     else:
       raise models.AssignmentInstance.DoesNotExist

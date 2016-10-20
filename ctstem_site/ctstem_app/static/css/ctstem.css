@@ -567,6 +567,10 @@ div.content #curricula_tile span.status img.icon , div.content #curricula_tile s
   width: auto;
   float: right;
 }
+div.content#dashboard div.highcharts-container {
+  text-align: center !important;
+  width: auto !important;
+}
 div.content #curricula_tile span.status span.icon {
   font-size: 1.2em;
   color: gray;
