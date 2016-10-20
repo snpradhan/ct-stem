@@ -32,6 +32,7 @@ from django.core.files import File
 import urllib2
 from urllib import urlretrieve
 import base64
+from django.utils.encoding import smart_str, smart_unicode
 
 ####################################
 # HOME
@@ -2051,7 +2052,7 @@ def export_response(request, assignment_id='', student_id=''):
         questionResponses = models.QuestionResponse.objects.all().filter(step_response=stepResponse)
         for questionResponse in questionResponses:
           if questionResponse.response:
-            response_text = questionResponse.response
+            response_text = smart_str(questionResponse.response)
           elif questionResponse.responseFile:
             response_text = questionResponse.responseFile.url
           else:
