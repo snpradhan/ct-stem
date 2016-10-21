@@ -148,11 +148,11 @@
                         </div>
                       {% else %}
                         {% if field_type == 'TA' %}
-                          <textarea placeholder="Enter your response" class="form-control assignment_textarea" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" >{{questionForm.response.value}}</textarea>
+                          <textarea placeholder="Enter your response" class="form-control assignment_textarea assignment_input" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" >{{questionForm.response.value}}</textarea>
                         {% elif field_type == 'TF' %}
-                          <input type="text" placeholder="Enter your response" class="form-control" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{questionForm.response.value}}" />
+                          <input type="text" placeholder="Enter your response" class="form-control assignment_input" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{questionForm.response.value}}" />
                         {% elif field_type == 'DD' %}
-                          <select class="form-control" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}">
+                          <select class="form-control assignment_input" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}">
                             {% for option in questionObj.options|splitlines%}
                               {% if option == questionForm.response.value %}
                                 <option value="{{option}}" selected>{{option}}</option>
@@ -162,43 +162,53 @@
                             {% endfor %}
                           </select>
                         {% elif field_type == 'MC' %}
-                          {% for option in questionObj.options|splitlines%}
-                            {% if option|slugify == questionForm.response.value|slugify %}
-                              <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}"  checked="true"/>  {{option}}<br>
-                            {% else %}
-                              <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}" />  {{option}}<br>
-                            {% endif %}
-                          {% endfor %}
+                          <div class="assignment_input" tabindex="-1">
+                            {% for option in questionObj.options|splitlines%}
+                              {% if option|slugify == questionForm.response.value|slugify %}
+                                <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}"  checked="true"/>  {{option}}<br>
+                              {% else %}
+                                <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}" />  {{option}}<br>
+                              {% endif %}
+                            {% endfor %}
+                          </div>
                         {% elif field_type == 'MI' %}
-                          {% for option in questionObj.options|splitlines%}
-                            {% if option|slugify == questionForm.response.value|slugify %}
-                              <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}" checked="true" />
-                            {% else %}
-                              <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}"/>
-                            {% endif %}
-                            <span>{{forloop.counter0|get_ascii_char}}.</span>
-                            <img src="{{option}}" class="image_option"/><br><br>
-                          {% endfor %}
+                          <div class="assignment_input" tabindex="-1">
+                            {% for option in questionObj.options|splitlines%}
+                              {% if option|slugify == questionForm.response.value|slugify %}
+                                <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}" checked="true" />
+                              {% else %}
+                                <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}"/>
+                              {% endif %}
+                              <span>{{forloop.counter0|get_ascii_char}}.</span>
+                              <img src="{{option}}" class="image_option"/><br><br>
+                            {% endfor %}
+                          </div>
                         {% elif field_type == 'MS' %}
-                          <input type="hidden" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{questionForm.response.value}}"/>
-                          {% with chosen=questionForm.response.value|split:',' %}
-                          {% for option in questionObj.options|splitlines%}
-                            {% if option|is_in:chosen %}
-                              <input type="checkbox" name="{{questionForm.response.html_name}}_cb" id="{{questionForm.response.auto_id}}_cb" value="{{option}}" checked/>  {{option}}<br>
-                            {% else %}
-                              <input type="checkbox" name="{{questionForm.response.html_name}}_cb" id="{{questionForm.response.auto_id}}_cb" value="{{option}}"/>  {{option}}<br>
-                            {% endif %}
-                          {% endfor %}
-                          {% endwith %}
+                          <div class="assignment_input" tabindex="-1">
+                            <input type="hidden" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{questionForm.response.value}}"/>
+                            {% with chosen=questionForm.response.value|split:',' %}
+                            {% for option in questionObj.options|splitlines%}
+                              {% if option|is_in:chosen %}
+                                <input type="checkbox" name="{{questionForm.response.html_name}}_cb" id="{{questionForm.response.auto_id}}_cb" value="{{option}}" checked/>  {{option}}<br>
+                              {% else %}
+                                <input type="checkbox" name="{{questionForm.response.html_name}}_cb" id="{{questionForm.response.auto_id}}_cb" value="{{option}}"/>  {{option}}<br>
+                              {% endif %}
+                            {% endfor %}
+                            {% endwith %}
+                          </div>
                         {% elif field_type == 'FI' %}
-                          <div class="note"> Note: Upload a file </div>
-                         {{questionForm.responseFile}}
+                          <div class="assignment_input" tabindex="-1">
+                            <div class="note"> Note: Upload a file </div>
+                           {{questionForm.responseFile}}
+                          </div>
                         {% elif field_type == 'SK' %}
-                          <div class="note"> Note: Draw your sketch in the sketchpad below </div>
-                          <div id="{{questionForm.response.auto_id}}_sketch_tools" class="sketch_tools"></div>
-                          <canvas id="{{questionForm.response.auto_id}}_sketch" width="800" height="300" class="assignment_sketch"></canvas>
-                          <input type="hidden" name="{{questionForm.responseFile.html_name}}" id="{{questionForm.responseFile.auto_id}}" value="{% if questionForm.responseFile.value %} {{questionForm.responseFile.value.url}} {% endif %}"/>
-                          <input type="hidden" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}"/>
+                          <div class="assignment_input" tabindex="-1">
+                            <div class="note"> Note: Draw your sketch in the sketchpad below </div>
+                            <div id="{{questionForm.response.auto_id}}_sketch_tools" class="sketch_tools"></div>
+                            <canvas id="{{questionForm.response.auto_id}}_sketch" width="800" height="300" class="assignment_sketch"></canvas>
+                            <input type="hidden" name="{{questionForm.responseFile.html_name}}" id="{{questionForm.responseFile.auto_id}}" value="{% if questionForm.responseFile.value %} {{questionForm.responseFile.value.url}} {% endif %}"/>
+                            <input type="hidden" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}"/>
+                          </div>
                          <br>
                         {% endif %}
                       {% endif %}
@@ -224,7 +234,7 @@
                 {% else %}
                   <table class="likert">
                     <tbody>
-                      <tr class="likert-item">
+                      <tr class="likert-item assignment_input" tabindex="-1">
                         <td class="likert-number">
                           {{questionForm.id}}
                           {{forloop.counter}}.
@@ -406,7 +416,9 @@
     //auto submit form every 60 seconds
     $(function(){
       {% if form.instance.instance.status != 'S' and form.instance.instance.status != 'F' and form.instance.instance.status != 'A'%}
-        setInterval(function(){
+        //setInterval(function(){
+        $('.assignment_input').focusout(function(){
+          //alert('focus out');
           $('input:hidden[id="save"]').val(1);
           $('input:hidden[id*="save"][id*="form"]').val('on');
           setCanvasData();
@@ -438,7 +450,8 @@
           $('ul.messages').show();
           $('ul.messages').delay(30000).fadeOut('slow');
           return false;
-        }, 60000)
+        //}, 60000)
+        });
       {% else %}
         $('canvas').each(function(){
           $(this)[0].removeEventListener('click');
