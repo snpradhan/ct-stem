@@ -732,10 +732,10 @@ class QuestionResponseForm(ModelForm):
     response = cleaned_data.get('response').strip()
     responseFile = cleaned_data.get('responseFile')
     save = cleaned_data.get('save')
-    if save == False and response is None and responseFile is None:
+    if save == False and not response and not responseFile:
       self.add_error('response', 'Please answer this question')
       self.add_error('responseFile', 'Please upload a file for this question')
-    if responseFile is not None and responseFile.size >  5*1024*1024:
+    if not response and responseFile and responseFile.size >  5*1024*1024:
       self.add_error('responseFile', 'Uploaded file cannot be bigger than 5MB')
 
 ####################################
