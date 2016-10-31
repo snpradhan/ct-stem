@@ -19,10 +19,13 @@
             <th> Username </th>
             <th> Name </th>
             <th> Email </th>
-            <th> Status </th>
+            <th> Account Status </th>
             {% if user.administrator or user.researcher %}
               {% if role == 'school_administrators' or role == 'teachers' or role == 'students' %}
                 <th> School </th>
+              {% endif %}
+              {% if role == 'students' %}
+                <th> Consent Status </th>
               {% endif %}
             {% endif %}
             <th> Last Login </th>
@@ -31,10 +34,13 @@
             <th> Username </th>
             <th> Name </th>
             <th> Email </th>
-            <th> Status </th>
+            <th> Account Status </th>
             {% if user.administrator or user.researcher %}
               {% if role == 'school_administrators' or role == 'teachers' or role == 'students' %}
                 <th> School </th>
+              {% endif %}
+              {% if role == 'students' %}
+                <th> Consent Status </th>
               {% endif %}
             {% endif %}
             <th> Last Login </th>
@@ -78,6 +84,19 @@
               {% if user.administrator or user.researcher %}
                 {% if role == 'school_administrators' or role == 'teachers' or role == 'students' %}
                   <td> {{userProfile.school}} </td>
+                {% endif %}
+                {% if role == 'students' %}
+                  {% with consent=userProfile.consent %}
+                  <td>
+                    {% if consent == 'A' %}
+                      Agree
+                    {% elif consent == 'D' %}
+                      Disagree
+                    {% else %}
+                      Unknown
+                    {% endif %}
+                  </td>
+                  {% endwith %}
                 {% endif %}
               {% endif %}
               <td> {{userProfile.user.last_login|date}} </td>
