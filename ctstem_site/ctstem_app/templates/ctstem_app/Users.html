@@ -25,7 +25,8 @@
                 <th> School </th>
               {% endif %}
               {% if role == 'students' %}
-                <th> Consent Status </th>
+                <th> Student Consent </th>
+                <th> Parental Consent </th>
               {% endif %}
             {% endif %}
             <th> Last Login </th>
@@ -40,7 +41,8 @@
                 <th> School </th>
               {% endif %}
               {% if role == 'students' %}
-                <th> Consent Status </th>
+                <th> Student Consent </th>
+                <th> Parental Consent </th>
               {% endif %}
             {% endif %}
             <th> Last Login </th>
@@ -97,6 +99,7 @@
                     {% endif %}
                   </td>
                   {% endwith %}
+                  <td>{{userProfile.get_parental_consent_display}}</td>
                 {% endif %}
               {% endif %}
               <td> {{userProfile.user.last_login|date}} </td>

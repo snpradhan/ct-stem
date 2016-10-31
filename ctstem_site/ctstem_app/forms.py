@@ -132,7 +132,7 @@ class UserProfileForm(ModelForm):
 class StudentForm (ModelForm):
   class Meta:
     model = models.Student
-    fields = ['school', 'consent']
+    fields = ['school', 'consent', 'parental_consent']
     widgets = {
       'consent': forms.RadioSelect()
     }
@@ -155,6 +155,8 @@ class StudentForm (ModelForm):
 
       if hasattr(user, 'student') == False:
         del self.fields['consent']
+      if hasattr(user, 'administrator') == False:
+        del self.fields['parental_consent']
 
     for field_name, field in self.fields.items():
       if field_name != 'consent':

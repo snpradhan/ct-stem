@@ -87,6 +87,11 @@ CONSENT_CHOICES = (
   (u'A', u'I Agree'),
   (u'D', u'I Disagree'),
 )
+PARENTAL_CONSENT_CHOICES = (
+  (u'U', u'Unknown'),
+  (u'A', u'Agree'),
+  (u'D', u'Disagree'),
+)
 
 def upload_file_to(instance, filename):
   import os
@@ -283,6 +288,7 @@ class Student(models.Model):
   user = models.OneToOneField(User, unique=True, null=False, related_name="student")
   school = models.ForeignKey(School)
   consent = models.CharField(null=False, max_length=1, default='U', choices=CONSENT_CHOICES)
+  parental_consent = models.CharField(null=False, max_length=1, default='U', choices=PARENTAL_CONSENT_CHOICES)
 
   def __unicode__(self):
       return u'%s' % (self.user.get_full_name())
