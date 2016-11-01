@@ -86,10 +86,14 @@
                     <div class="feedback">
                       {% if form.instance.instance.status == 'S' %}
                         {{question.feedback}}
+                        <a data-toggle="modal" data-target="#emojis" class="emoji-modal" href="#" data-id="{{question.feedback.auto_id}}">
+                          <i class="fa fa-smile-o" aria-hidden="true"></i>
+                        </a>
                       {% elif form.instance.instance.status == 'F' %}
                         {{question.feedback.value}}
                       {% endif %}
                     </div>
+
                   {% endif %}
                 </div>
               </div>
@@ -117,11 +121,21 @@
         {% endif %}
       </div>
     </form>
+    {% include "ctstem_app/EmojiModal.html" %}
+
   </div>
   <script type="text/javascript">
     $('#send').click(function(){
       $("input#save_and_send").val('true');
       this.form.submit();
+    });
+    $('a.emoji-modal').click(function(){
+      $("div.modal#emojis input#emoji_feedback_area").val($(this).data('id'));
+    });
+    $('div.emoji').click(function(){
+      var id = $('input#emoji_feedback_area').val();
+      var val = $('textarea#'+id).val();
+      $('textarea#'+id).val(val + $(this).html());
     });
   </script>
 {% endblock %}

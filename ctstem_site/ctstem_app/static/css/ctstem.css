@@ -1148,3 +1148,15 @@ img.page-blurb-image {
   min-height: 75px;
 }
 
+div.emoji {
+  font-size: 3rem;
+  height: 1.5em;
+  cursor: pointer;
+}
+
+a.emoji-modal {
+  float: right;
+  font-size: 1.5em;
+  margin-top:.5em;
+}
+
