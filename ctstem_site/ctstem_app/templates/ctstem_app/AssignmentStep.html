@@ -266,7 +266,7 @@
         <div class="save-buttons">
           {% if form and form.instance.step.order > 1 %}
             <a class="back" href="{% url 'ctstem:resumeAssignment'  form.instance.instance.assignment.id form.instance.instance.id form.instance.step.order|add:'-1' %}" onclick="saveStep('{{form.instance.instance.status}}');">
-              <button type="button" class="light back">Back</button>
+              <button type="button" class="light back" id="bk">Back</button>
             </a>
           {% endif %}
 
@@ -276,10 +276,10 @@
                 <button type="button" class="bright next">Next</button>
               </a>
             {% else %}
-              <button type="button" class="light save" title="Save" >
+              <button type="button" class="light save" id="sv" title="Save" >
                 Save
               </button>
-              <button type="button" class="bright submit" title="Next Step" >
+              <button type="button" class="bright submit" id="sc" title="Next Step" >
                 Save &amp; Continue
               </button>
             {% endif %}
@@ -289,10 +289,10 @@
                 <button type="button" class="bright">Exit</button>
               </a>
             {% else %}
-              <button class="light save" title="Save" >
+              <button class="light save" id="sv" title="Save" >
                 Save
               </button>
-              <button class="bright submit" title="Submit Assignment">
+              <button class="bright submit" id="sc" title="Submit Assignment">
                 Submit
               </button>
             {% endif %}
@@ -322,6 +322,13 @@
     </p>
   </footer>
   <script type="text/javascript">
+
+    var evt;
+    document.onmousemove = function (e) {
+      e = e || window.event;
+      evt = e;
+    }
+
     $("#assignmentForm input:checkbox").change(function(){
       var selectedValues = $("input[id="+$(this).attr('id')+"]:checked").map(function() {return this.value;}).get().join(',')
       var hiddenVar = $(this).prevAll('input:hidden');
@@ -416,41 +423,45 @@
     //auto submit form every 60 seconds
     $(function(){
       {% if form.instance.instance.status != 'S' and form.instance.instance.status != 'F' and form.instance.instance.status != 'A'%}
-        //setInterval(function(){
-        $('.assignment_input').focusout(function(){
-          //alert('focus out');
-          $('input:hidden[id="save"]').val(1);
-          $('input:hidden[id*="save"][id*="form"]').val('on');
-          setCanvasData();
-          $('#assignmentForm').ajaxSubmit({
-            dataType : 'json',
-            success: function(data){
-              //message at the top of the page stating responses auto saved
-              $("ul.messages li").remove();
-              $("ul.messages").html('<li class="success">'+data.message+'</li>');
-              //change the url in the browser if new assignment
-              if (history.pushState) {
-                var newurl = document.location.protocol +'//'+ document.location.host + data.url;
-                history.replaceState({},'',newurl);
-              }
-              //update question response ids for new assignment
-              $('input:hidden[id^="id_form-"][id$="-id"]').each(function(){
-                var id = $(this).attr('id');
-                if(!($(this).val())){
-                  $(this).val(data.questionResponses[id]);
+        $('.assignment_input').focusout(function(e){
+          if(evt.target.id == 'sv' ||  evt.target.id == 'sc'){
+            console.log('manual save');
+            return false;
+          }
+          else{
+            //alert('focus out');
+            $('input:hidden[id="save"]').val(1);
+            $('input:hidden[id*="save"][id*="form"]').val('on');
+            setCanvasData();
+            $('#assignmentForm').ajaxSubmit({
+              dataType : 'json',
+              success: function(data){
+                //message at the top of the page stating responses auto saved
+                $("ul.messages li").remove();
+                $("ul.messages").html('<li class="success">'+data.message+'</li>');
+                //change the url in the browser if new assignment
+                if (history.pushState) {
+                  var newurl = document.location.protocol +'//'+ document.location.host + data.url;
+                  history.replaceState({},'',newurl);
                 }
-              });
-              $('input:hidden[id="id_form-INITIAL_FORMS"]').val(data.questionCount);
-            },
-            error: function(data) {
-              $("ul.messages li").remove();
-              $("ul.messages").html('<li class="error">The responses could not auto saved. Please click the Save or Save and Continue button at the bottom of the page.</li>');
-            }
-          });
-          $('ul.messages').show();
-          $('ul.messages').delay(30000).fadeOut('slow');
-          return false;
-        //}, 60000)
+                //update question response ids for new assignment
+                $('input:hidden[id^="id_form-"][id$="-id"]').each(function(){
+                  var id = $(this).attr('id');
+                  if(!($(this).val())){
+                    $(this).val(data.questionResponses[id]);
+                  }
+                });
+                $('input:hidden[id="id_form-INITIAL_FORMS"]').val(data.questionCount);
+              },
+              error: function(data) {
+                $("ul.messages li").remove();
+                $("ul.messages").html('<li class="error">The responses could not auto saved. Please click the Save or Save and Continue button at the bottom of the page.</li>');
+              }
+            });
+            $('ul.messages').show();
+            $('ul.messages').delay(30000).fadeOut('slow');
+            return false;
+          }
         });
       {% else %}
         $('canvas').each(function(){
