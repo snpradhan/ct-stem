@@ -61,7 +61,7 @@ def home(request):
         school = None
         requester_role = ''
 
-      training_request = models.TrainingRequest(name=request.user.get_full_name(), email=request.user.email, school=school, requester_role=requester_role)
+      '''training_request = models.TrainingRequest(name=request.user.get_full_name(), email=request.user.email, school=school, requester_role=requester_role)
     else:
       training_request = models.TrainingRequest()
 
@@ -86,9 +86,12 @@ def home(request):
       else:
         print request_form.errors
         messages.error(request, "Your request could not be sent.")
+    '''
+    if request.method == 'GET':
+      context = {'lessons': lessons, 'assessments' : assessments, 'practices': practices, 'team': team, 'publications': publications}
+      return render(request, 'ctstem_app/Home.html', context)
 
-    context = {'lessons': lessons, 'assessments' : assessments, 'practices': practices, 'team': team, 'publications': publications, 'form': request_form}
-    return render(request, 'ctstem_app/Home2.html', context)
+    return http.HttpResponseNotAllowed(['GET'])
 
 def send_email(subject, message, sender, to_list):
     msg = EmailMessage(subject, message, sender, to_list)
