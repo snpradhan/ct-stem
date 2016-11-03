@@ -50,7 +50,7 @@
             {% endif %}
           {% else %}
             {% if i|add:0 < step_order|add:0 %}
-              <a class="page-link linked" href="{% url 'ctstem:resumeAssignment'  instance.assignment.id instance.id i %}" onclick="saveStep('{{form.instance.instance.status}}');">{{i|add:1}}</a>
+              <a class="page-link linked" href="javascript:waitForSave('{% url 'ctstem:resumeAssignment'  instance.assignment.id instance.id i %}')" onclick="return saveStep('{{form.instance.instance.status}}');">{{i|add:1}}</a>
             {% elif i|add:0 == step_order|add:0 %}
               <a class="page-link selected">{{i|add:1}}</a>
             {% else %}
@@ -265,7 +265,7 @@
 
         <div class="save-buttons">
           {% if form and form.instance.step.order > 1 %}
-            <a class="back" href="{% url 'ctstem:resumeAssignment'  form.instance.instance.assignment.id form.instance.instance.id form.instance.step.order|add:'-1' %}" onclick="saveStep('{{form.instance.instance.status}}');">
+            <a class="back" href="javascript:waitForSave('{% url 'ctstem:resumeAssignment'  form.instance.instance.assignment.id form.instance.instance.id form.instance.step.order|add:'-1' %}')" onclick="return saveStep('{{form.instance.instance.status}}');">
               <button type="button" class="light back" id="bk">Back</button>
             </a>
           {% endif %}
@@ -377,6 +377,9 @@
       $('form#assignmentForm').submit();
     });
 
+    function waitForSave(URL){
+      setTimeout( function() { window.location = URL }, 1000 );
+    }
     function saveStep(status){
       if(status != 'S' && status != 'F' && status != 'A'){
         $('input:hidden[id="save"]').val(1);
@@ -424,7 +427,7 @@
     $(function(){
       {% if form.instance.instance.status != 'S' and form.instance.instance.status != 'F' and form.instance.instance.status != 'A'%}
         $('.assignment_input').focusout(function(e){
-          if(evt.target.id == 'sv' ||  evt.target.id == 'sc'){
+          if(evt.target.id == 'sv' ||  evt.target.id == 'sc' || evt.target.id == 'bk'){
             console.log('manual save');
             return false;
           }

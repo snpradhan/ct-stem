@@ -1,6 +1,7 @@
 from django import template
 from django.utils.encoding import force_unicode
 from ctstem_app import models
+import datetime
 
 register = template.Library()
 
@@ -137,3 +138,11 @@ def get_type(value):
 @register.filter
 def get_ascii_char(value):
   return [chr(i) for i in xrange(65,91)][int(value)]
+
+@register.filter
+def format_time(value):
+  if value:
+    time = datetime.timedelta(seconds=int(value))
+    return str(time)
+  else:
+    return ''

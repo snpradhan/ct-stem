@@ -1772,20 +1772,12 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
       if int(step_order) > last_step + 1:
         messages.error(request, 'Please use the buttons below to navigate between steps')
         return shortcuts.redirect('ctstem:resumeAssignment', assignment_id=assignment_id, instance_id=instance.id, step_order=last_step)
-      '''if int(step_order) == 0:
-        if instance.assignment.curriculum.curriculum_type == 'S':
-          step_order = 1
-        else:
-          step_order = 0'''
+
     #starting a new assignment
     else:
       instance = models.AssignmentInstance(assignment_id=assignment_id, student=request.user.student, status='N')
       instance.save()
       step_order = 0
-      '''if instance.assignment.curriculum.curriculum_type == 'S':
-        step_order = 1
-      else:
-        step_order = 0'''
 
     assignment = models.Assignment.objects.get(id=assignment_id)
     curriculum = assignment.curriculum
@@ -1826,6 +1818,8 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
             for subform, data in zip(formset.forms, initial_data):
               subform.initial = data
 
+          if instance.status == 'N' or instance.status == 'P':
+            instance.save()
           context = {'curriculum': curriculum, 'instance': instance, 'instanceform': instanceform, 'form': form, 'formset': formset, 'total_steps': total_steps, 'step_order': step_order}
           return render(request, 'ctstem_app/AssignmentStep.html', context)
 
@@ -1855,7 +1849,15 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
               instance.status = 'S'
               instance.last_step = step.order
 
+            #find the delta between the last save and current time and update the instance
+            last_save = instance.modified_date
+            current_time = datetime.datetime.now(timezone.utc)
+            delta = current_time - last_save
+            old_time_spent = instance.time_spent
+            new_time_spent = old_time_spent + delta.total_seconds()
+            instance.time_spent = new_time_spent
             instance.save()
+
             if instanceform and instanceform.is_valid():
               instanceform.save()
 

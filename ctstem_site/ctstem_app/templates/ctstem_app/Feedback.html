@@ -23,6 +23,7 @@
             <th>Assigned Date</th>
             <th>Due Date </th>
             <th>Status</th>
+            <th>Time Spent(hh:mm:ss)</th>
             <th>Last Modified</th>
           </tr>
         </thead>
@@ -44,6 +45,7 @@
             <td>{{form.instance.instance.assignment.assigned_date|date}}</td>
             <td>{{form.instance.instance.assignment.due_date|date}}</td>
             <td>{{form.instance.instance.get_status_display}}</td>
+            <td>{{form.instance.instance.time_spent|format_time}}</td>
             <td>{{form.instance.instance.modified_date|date}}</td>
           </tr>
         </tbody>

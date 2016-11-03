@@ -1,4 +1,5 @@
 {% extends "ctstem_app/base.html" %}
+{% load ctstem_extras %}
 
 {% block media %}
   {{ block.super }}
@@ -38,6 +39,7 @@
             <th width="20%"> Teammates </th>
             <th width="15%"> Start Date </th>
             <th width="15%"> Last Modified </th>
+            <th> Time Spent (hh:mm:ss) </th>
             <th width="10%"> Status </th>
             <th width="10%"> % Complete </th>
           </tr>
@@ -46,6 +48,7 @@
             <th> Teammates </th>
             <th> Start Date </th>
             <th> Last Modified </th>
+            <th> Time Spent </th>
             <th> Status </th>
             <th> % Complete </th>
           </tr>
@@ -67,6 +70,7 @@
               </td>
               <td> {{assignment_details.instance.created_date|date}} </td>
               <td> {{assignment_details.instance.modified_date|date}} </td>
+              <td> {{assignment_details.instance.time_spent|format_time}} </td>
               <td style="text-align: center;">
                 {% if assignment_details.instance.status == 'P' %}
                   <div> In Progress </div>
