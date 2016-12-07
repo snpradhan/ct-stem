@@ -586,7 +586,11 @@ def assignCurriculum(request, id=''):
 ####################################
 # REGISTER
 ####################################
-def register(request):
+def register(request, group_id=''):
+  if group_id:
+    group = models.UserGroup.objects.get(id=group_id)
+    school = group.teacher.school
+
   if request.method == 'POST':
     form = forms.RegistrationForm(user=request.user, data=request.POST)
     if form.is_valid():
@@ -609,9 +613,14 @@ def register(request):
 
       elif form.cleaned_data['account_type'] == 'S':
         newUser = models.Student()
-        newUser.school = form.cleaned_data['school']
+        if group_id:
+          newUser.school = school
+        else:
+          newUser.school = form.cleaned_data['school']
         newUser.user = user
         newUser.save()
+        if group_id:
+          membership, created = models.Membership.objects.get_or_create(student=newUser, group=group)
 
       elif form.cleaned_data['account_type'] == 'A':
           newUser = models.Administrator()
@@ -688,7 +697,9 @@ def register(request):
 
     else:
       print form.errors
-      context = {'form': form}
+      context = {'form': form, 'group_id': group_id}
+      if group_id:
+        context['school_id'] = school.id
       return render(request, 'ctstem_app/Registration.html', context)
 
   else:
@@ -697,7 +708,9 @@ def register(request):
       return shortcuts.redirect('ctstem:home')
 
     form = forms.RegistrationForm(user=request.user)
-    context = {'form': form}
+    context = {'form': form, 'group_id': group_id}
+    if group_id:
+      context['school_id'] = school.id
     return render(request, 'ctstem_app/Registration.html', context)
 
 ####################################
@@ -1072,7 +1085,7 @@ def createStudent(request, group_id=''):
 
         response_data = {'result': 'Success', 'student': {'user_id': user.id, 'student_id': student.id, 'username': user.username, 'name': user.get_full_name(), 'email': user.email, 'status': 'Active' if user.is_active else 'Inactive', 'last_login': user.last_login.strftime('%B %d, %Y') if user.last_login else '', 'group': group.id}}
 
-        send_account_creation_email(user, password)
+        send_account_confirmation_email(user, password)
 
       return http.HttpResponse(json.dumps(response_data), content_type="application/json")
     return http.HttpResponseNotAllowed(['POST'])
@@ -2148,8 +2161,7 @@ def user_upload(request):
 
   count = 0
   added = 0
-  created = 0
-  existing = 0
+  new = 0
   added_students = {}
   msg = {'error': [], 'success': []}
 
@@ -2163,12 +2175,9 @@ def user_upload(request):
       reader = csv.reader(f.read().splitlines(), delimiter=',')
       for row in reader:
         count += 1
-        if row[0] != 'Username*':
-          username = str(row[0])
-          first_name = str(row[1])
-          last_name = str(row[2])
-          email = str(row[3])
-          print username, first_name, last_name, email
+        if row[0] != 'Email*':
+          email = str(row[0])
+          print email
 
           #check if the student with the email already exists
           #email is mandatory
@@ -2186,48 +2195,18 @@ def user_upload(request):
                 membership, created = models.Membership.objects.get_or_create(student=student, group=group)
                 added_students[student.id] = {'user_id': student.user.id, 'username': student.user.username, 'full_name': student.user.get_full_name(), 'email': student.user.email, 'status': 'Active' if student.user.is_active else 'Inactive', 'last_login': student.user.last_login.strftime('%B %d, %Y') if student.user.last_login else '', 'group': group.id}
                 added += 1
-                existing += 1
               else:
                 #error out email in use and does not belong to a student account
-                msg['error'].append('Email on row %d is in use and does not belong to a student account' % count)
-                messages.error(request, 'Email on row %d is in use and does not belong to a student account' % count)
+                msg['error'].append('Email on row %d does not belong to a student account' % count)
+                messages.error(request, 'Email on row %d does not belong to a student account' % count)
             else:
-              #check if all user details are provided
-              if username is None or username == '':
-                msg['error'].append('Username is missing on row %d' % count)
-                messages.error(request, 'Username is missing on row %d' % count)
-              elif first_name is None or first_name == '':
-                msg['error'].append('First name is missing on row %d' % count)
-                messages.error(request, 'First name is missing on row %d' % count)
-              elif last_name is None or last_name == '':
-                msg['error'].append('Last name is missing on row %d' % count)
-                messages.error(request, 'Last name is missing on row %d' % count)
-              #check if username exists
-              elif User.objects.filter(username=username).exists():
-                msg['error'].append('Username on row %d is already in use' % count)
-                messages.error(request, 'Username on row %d is already in use' % count)
-              else:
-                #generate a random password
-                password = User.objects.make_random_password()
-                user = User.objects.create_user(username=username, email=email, password=password)
-                user.first_name = first_name
-                user.last_name = last_name
-                user.save()
-
-                #create student account
-                student = models.Student.objects.create(user=user, school=group.teacher.school)
-                membership, created = models.Membership.objects.get_or_create(student=student, group=group)
-
-                added += 1
-                created += 1
-                added_students[student.id] = {'user_id': student.user.id, 'username': student.user.username, 'full_name': student.user.get_full_name(), 'email': student.user.email, 'status': 'Active' if student.user.is_active else 'Inactive', 'last_login': student.user.last_login.strftime('%B %d, %Y') if student.user.last_login else '', 'group': group.id}
-
-                #email user the  user name and password
-                send_account_creation_email(user, password)
+              #email does not exist.  Send and email with registration link
+              send_account_creation_email(email, group)
+              new += 1
 
 
-      msg['success'].append('%d existing students were found, %d new student accounts were created and a total %d students where added to the group "%s".' % (existing, created, added, group.title))
-      messages.success(request, '%d existing students were found, %d new student accounts were created and a total %d students where added to the group "%s".' % (existing, created, added, group.title))
+      msg['success'].append('%d existing students were found and added to the group, %d new students were requested to create an account.' % (added, new))
+      messages.success(request, '%d existing students were found and added to the group, %d new students were requested to create an account.' % (added, new))
       response_data = {'result': 'Success', 'new_students': added_students, 'messages': msg}
     else:
       print form.errors
@@ -2237,7 +2216,7 @@ def user_upload(request):
   return http.HttpResponseNotAllowed(['POST'])
 
 
-def send_account_creation_email(user, password):
+def send_account_confirmation_email(user, password):
   #email user the  user name and password
   current_site = Site.objects.get_current()
   domain = current_site.domain
@@ -2250,6 +2229,19 @@ def send_account_creation_email(user, password):
          -- CT-STEM Admin'%(domain, user.username, password),
         settings.DEFAULT_FROM_EMAIL,
         [user.email])
+
+def send_account_creation_email(email, group):
+  #email user the  user name and password
+  current_site = Site.objects.get_current()
+  domain = current_site.domain
+
+  send_mail('CT-STEM Account Signup',
+        'Your teacher has requested you to create an account on Computational Thinking in STEM website \r\n\r\n \
+         Please click the link below to create an account.\r\n\r\n  \
+         http://%s/register/%d.  \r\n\r\n \
+         -- CT-STEM Admin'%(domain, group.id),
+        settings.DEFAULT_FROM_EMAIL,
+        [email])
 ####################################
 # Schools
 ####################################

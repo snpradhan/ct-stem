@@ -24,22 +24,28 @@
         <fieldset>
           {{form.management_form}}
           {% for field in form %}
-            <div class="form-group" id="div_{{field.name}}">
-              <label for="id_{{field.name}}">{{ field.label|title }}
-                {% if field.field.required  or field.name == 'user_code' %}(<span class="required">*</span>) {% endif %}
-              </label>
-              {% if field.name == 'user_code' %}
-                <div class="input-group">
+            {% if group_id and field.name == 'account_type' %}
+              <input id="id_account_type" name="account_type" type="hidden" value="S">
+            {% elif group_id and field.name == 'school' %}
+              <input id="id_school" name="school" type="hidden" value="{{school_id}}">
+            {% else %}
+              <div class="form-group" id="div_{{field.name}}">
+                <label for="id_{{field.name}}">{{ field.label|title }}
+                  {% if field.field.required  or field.name == 'user_code' %}(<span class="required">*</span>) {% endif %}
+                </label>
+                {% if field.name == 'user_code' %}
+                  <div class="input-group">
+                    {{field}}
+                    <span class="input-group-btn">
+                      <input type="button" class="btn btn-default" id="generate_code" value="Generate"/>
+                    </span>
+                  </div>
+                {% else %}
                   {{field}}
-                  <span class="input-group-btn">
-                    <input type="button" class="btn btn-default" id="generate_code" value="Generate"/>
-                  </span>
-                </div>
-              {% else %}
-                {{field}}
-              {% endif %}
-              <div class="error">{{ field.errors }}</div>
-            </div>
+                {% endif %}
+                <div class="error">{{ field.errors }}</div>
+              </div>
+            {% endif %}
           {% endfor %}
           {% if user.is_authenticated %}
             <div class="form-group button-group">
