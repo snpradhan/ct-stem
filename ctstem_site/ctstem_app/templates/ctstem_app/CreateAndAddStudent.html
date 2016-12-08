@@ -62,7 +62,7 @@
             $('ul.messages').show();
             $('ul.messages').delay(30000).fadeOut('slow');
 
-            add_student_to_data_table(data['student']);
+            add_student_to_data_table(data['student'], '{{csrf_token}}');
           }
           return false;
         },

@@ -4,7 +4,7 @@
 {% endblocktrans %}
 
 {% blocktrans with domain=site.domain %}
-  You recently requested a password reset on {{ domain }}.
+You recently requested a password reset on {{ domain }}.
 {% endblocktrans %}
 
 {% trans "You can set your new password by following this link:" %}

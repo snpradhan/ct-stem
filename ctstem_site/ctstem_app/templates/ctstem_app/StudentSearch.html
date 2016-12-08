@@ -111,11 +111,10 @@ $(function (){
 
               $("#studentResults table tbody").append(student_row);
               $("#studentResults button.select_student#"+value["student_id"]).click(function(){
-
-                add_student_to_data_table(value);
                 // ajax add student to group
                 var data = {};
                 data['csrfmiddlewaretoken'] = $('#studentForm').find('input:hidden').eq(0).val();
+                add_student_to_data_table(value, data['csrfmiddlewaretoken']);
                 $.ajax({
                   type: 'POST',
                   url: '/student/add/'+value['group']+'/'+value['student_id'],

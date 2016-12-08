@@ -152,6 +152,9 @@
                         <a type="button" class="btn btn-warning removeUser" aria-label="Remove Student from this group" title="Remove Student from this group" href="{% url 'ctstem:removeStudent' form.instance.id student.id  %}" data-id="{{forloop.counter0}}">
                           <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
                         </a>
+                        <button type="button" class="btn btn-info reset" aria-label="Reset User Password" title="Reset User Password" onclick="return reset_password('{{student.user.username}}','{{csrf_token}}')">
+                          <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+                        </button>
                       </div>
                       </td>
                       <td>{{student.user.get_full_name}}</td>

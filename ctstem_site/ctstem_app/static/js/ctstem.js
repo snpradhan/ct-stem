@@ -85,6 +85,31 @@ function cloneMore(selector, type) {
     $(selector).after(newElement);
 }
 
+function reset_password(username, csrf_token){
+  data = {}
+  data['csrfmiddlewaretoken'] = csrf_token;
+  data['username_or_email'] = username;
+  var data = $.param(data);
+  $.ajax({
+    type: "POST",
+    url: '/password_reset/recover/',
+    data: data,
+    success: function(data){
+      $("ul.messages li").remove();
+      $("ul.messages").html('<li class="success">Password reset email sent to user</li>');
+      $('ul.messages').show();
+      $('ul.messages').delay(30000).fadeOut('slow');
+    },
+    error: function(xhr, ajaxOptions, thrownError){
+      $("ul.messages li").remove();
+      $("ul.messages").html('<li class="error">Password reset email could not be sent to user</li>');
+      $('ul.messages').show();
+      $('ul.messages').delay(30000).fadeOut('slow');
+    },
+  });
+  return false;
+}
+
 $(function (){
   //login modal
   $('#navLogin').click(function(){
@@ -327,7 +352,7 @@ function display_messages(messages){
 }
 
 
-function add_student_to_data_table(value){
+function add_student_to_data_table(value, csrf){
   //add student detail to the table
   $('table.table#members tbody').append('<tr id='+value['student_id']+'>\
     <td>'+value['username']+'\
@@ -338,6 +363,9 @@ function add_student_to_data_table(value){
         <a type="button" class="btn btn-warning removeUser" aria-label="Remove Student" title="Remove Student" href="/student/remove/'+value['group']+'/'+value['student_id']+'" data-id="'+value['student_id']+'">\
           <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>\
         </a>\
+        <button type="button" class="btn btn-info reset" aria-label="Reset User Password" title="Reset User Password" onclick="return reset_password(&apos;'+value['username']+'&apos;,&apos;'+csrf+'&apos;)">\
+          <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>\
+        </button>\
       </div>\
     </td>\
     <td>'+value['name']+'</td>\

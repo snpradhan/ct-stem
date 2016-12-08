@@ -2015,6 +2015,8 @@ def feedback(request, assignment_id='', instance_id=''):
             instance.status = 'F'
             instance.save()
             messages.success(request, 'Your feedback has been saved and sent to the student')
+            #notify student via email that feedback is ready
+            send_feedback_ready_email(instance.student.user.email, instance.assignment.curriculum)
             #return shortcuts.redirect('ctstem:assignmentDashboard', id=assignment_id)
           else:
             messages.success(request, 'Your feedback has been saved')
@@ -2244,6 +2246,17 @@ def send_account_creation_email(email, group):
   Please click the link below to create an account.\r\n  \
   http://%s/register/group/%d?email=%s.  \r\n\r\n \
   -- CT-STEM Admin'%(domain, group.id, email),
+        settings.DEFAULT_FROM_EMAIL,
+        [email])
+
+def send_feedback_ready_email(email, curriculum):
+  current_site = Site.objects.get_current()
+  domain = current_site.domain
+
+  send_mail('CT-STEM Assignment Feedback Ready',
+  'Your teacher has provided feedback on the assignment %s. \r\n\r\n \
+  Please login to our website http://%s to review the feedback. \r\n\r\n  \
+  -- CT-STEM Admin'%(curriculum.title, domain),
         settings.DEFAULT_FROM_EMAIL,
         [email])
 ####################################
