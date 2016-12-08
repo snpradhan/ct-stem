@@ -649,9 +649,9 @@ def register(request, group_id=''):
           messages.info(request, 'Your account is pending admin approval.  You will be notified once your account is approved.')
           #send email confirmation
           send_mail('CT-STEM Account Pending',
-                    'Welcome to Computational Thinking in STEM website http://%s.  \r\n\r\n \
-                    Your account is pending approval, and you will be notified once approved.\r\n\r\n  \
-                    -- CT-STEM Admin' % domain,
+          'Welcome to Computational Thinking in STEM website http://%s.  \r\n\r\n \
+          Your account is pending approval, and you will be notified once approved.\r\n\r\n  \
+          -- CT-STEM Admin' % domain,
                     settings.DEFAULT_FROM_EMAIL,
                     [newUser.user.email])
           return shortcuts.redirect('ctstem:home')
@@ -662,9 +662,9 @@ def register(request, group_id=''):
           login(request, new_user)
           messages.info(request, 'Your have successfully registered.')
           send_mail('CT-STEM Account Created',
-                    'Welcome to Computational Thinking in STEM website %s.  \r\n\r\n \
-                    You can login using the credentials created during registration. \r\n\r\n \
-                    -- CT-STEM Admin' % domain,
+          'Welcome to Computational Thinking in STEM website http://%s.  \r\n\r\n \
+          You can login using the credentials created during registration. \r\n\r\n \
+          -- CT-STEM Admin' % domain,
                     settings.DEFAULT_FROM_EMAIL,
                     [newUser.user.email])
           return shortcuts.redirect('ctstem:home')
@@ -673,11 +673,11 @@ def register(request, group_id=''):
         messages.info(request, 'User account has been created.')
 
         send_mail('CT-STEM Account Created',
-                    'Your user account has been created on Computational Thinking in STEM website http://%s.  \r\n\r\n \
-                     Please login to the site using the following credentials and change your password.\r\n\r\n  \
-                     Username: %s \r\n \
-                     Temporary Password: %s \r\n\r\n \
-                     -- CT-STEM Admin'%(domain, newUser.user.username, form.cleaned_data['password1']),
+        'Your user account has been created on Computational Thinking in STEM website http://%s.  \r\n\r\n \
+         Please login to the site using the following credentials and change your password.\r\n\r\n  \
+         Username: %s \r\n \
+         Temporary Password: %s \r\n\r\n \
+         -- CT-STEM Admin'%(domain, newUser.user.username, form.cleaned_data['password1']),
                     settings.DEFAULT_FROM_EMAIL,
                     [newUser.user.email])
 
@@ -707,10 +707,14 @@ def register(request, group_id=''):
       messages.error(request, 'You do not have the privilege to register any other user')
       return shortcuts.redirect('ctstem:home')
 
-    form = forms.RegistrationForm(user=request.user)
+    if 'email' in request.GET:
+      form = forms.RegistrationForm(initial={'email': request.GET['email']}, user=request.user)
+    else:
+      form = forms.RegistrationForm(user=request.user)
     context = {'form': form, 'group_id': group_id}
     if group_id:
       context['school_id'] = school.id
+
     return render(request, 'ctstem_app/Registration.html', context)
 
 ####################################
@@ -2222,11 +2226,11 @@ def send_account_confirmation_email(user, password):
   domain = current_site.domain
 
   send_mail('CT-STEM Account Created',
-        'Your student account has been created on Computational Thinking in STEM website http://%s.  \r\n\r\n \
-         Please login to the site using the credentials below and change your password.\r\n\r\n  \
-         Username: %s \r\n \
-         Temporary Password: %s \r\n\r\n \
-         -- CT-STEM Admin'%(domain, user.username, password),
+  'Your student account has been created on Computational Thinking in STEM website http://%s.  \r\n\r\n \
+   Please login to the site using the credentials below and change your password.\r\n  \
+   Username: %s \r\n \
+   Temporary Password: %s \r\n\r\n \
+   -- CT-STEM Admin'%(domain, user.username, password),
         settings.DEFAULT_FROM_EMAIL,
         [user.email])
 
@@ -2236,10 +2240,10 @@ def send_account_creation_email(email, group):
   domain = current_site.domain
 
   send_mail('CT-STEM Account Signup',
-        'Your teacher has requested you to create an account on Computational Thinking in STEM website \r\n\r\n \
-         Please click the link below to create an account.\r\n\r\n  \
-         http://%s/register/%d.  \r\n\r\n \
-         -- CT-STEM Admin'%(domain, group.id),
+  'Your teacher has requested you to create an account on Computational Thinking in STEM website \r\n\r\n \
+  Please click the link below to create an account.\r\n  \
+  http://%s/register/group/%d?email=%s.  \r\n\r\n \
+  -- CT-STEM Admin'%(domain, group.id, email),
         settings.DEFAULT_FROM_EMAIL,
         [email])
 ####################################
