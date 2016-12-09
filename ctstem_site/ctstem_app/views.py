@@ -2071,6 +2071,10 @@ def export_response(request, assignment_id='', student_id=''):
     writer.writerow([])
     writer.writerow(['Student', 'Step Title', 'Question', 'Options', 'Response'])
     for instance in instances:
+      if hasattr(request.user, 'researcher'):
+        student = instance.student.user.id
+      else:
+        student = instance.student
       stepResponses = models.AssignmentStepResponse.objects.all().filter(instance=instance)
       for stepResponse in stepResponses:
         questionResponses = models.QuestionResponse.objects.all().filter(step_response=stepResponse)
@@ -2081,7 +2085,7 @@ def export_response(request, assignment_id='', student_id=''):
             response_text = questionResponse.responseFile.url
           else:
             response_text = ''
-          writer.writerow([instance.student, stepResponse.step.title, questionResponse.curriculum_question.question, questionResponse.curriculum_question.question.options, response_text])
+          writer.writerow([student, stepResponse.step.title, questionResponse.curriculum_question.question, questionResponse.curriculum_question.question.options, response_text])
 
     return response
 
