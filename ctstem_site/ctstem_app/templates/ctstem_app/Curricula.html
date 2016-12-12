@@ -167,6 +167,14 @@
                       <a class="bookmark util-button fa fa-star" href="{% url 'ctstem:removeBookmark' curriculum.id %}" style="{% if curriculum|is_bookmarked:bookmarked %} display: inline-block; {% else %} display: none; {% endif %}" title="Remove from Favorites"></a>
                       <a class="bookmark util-button fa fa-star-o" href="{% url 'ctstem:bookmarkCurriculum' curriculum.id %}" style="{% if curriculum|is_bookmarked:bookmarked %} display: none; {% else %} display: inline-block; {% endif %}" title="Add to Favorites"></a>
                     {% endif %}
+                    {% if user.administrator or user.researcher or user.teacher or user.school_administrator %}
+                      {% if curriculum.status == 'A' or curriculum.status == 'P'%}
+                        {% if curriculum|has_response:request.user %}
+                          <a class="util-button fa fa-external-link" aria-hidden="true" aria-label="Export Student Response" title="Export Student Response" href="{% url 'ctstem:export_all_response' curriculum.id %}">
+                          </a>
+                        {% endif %}
+                      {% endif %}
+                    {% endif %}
                   </td>
                 </tr>
               {% endfor %}

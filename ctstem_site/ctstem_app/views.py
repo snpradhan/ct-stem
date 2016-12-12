@@ -2096,6 +2096,55 @@ def export_response(request, assignment_id='', student_id=''):
 
 
 ####################################
+# Export Student Responses
+####################################
+@login_required
+def export_all_response(request, curriculum_id=''):
+  # check if the user has permission to add a question
+  try:
+    curriculum = models.Curriculum.objects.get(id=curriculum_id)
+    if hasattr(request.user, 'administrator') == True or hasattr(request.user, 'researcher') == True:
+      assignments = models.Assignment.objects.all().filter(curriculum__id = curriculum_id)
+    elif hasattr(request.user, 'school_administrator') == True:
+      assignments = models.Assignment.objects.all().filter(curriculum__id = curriculum_id, group__teacher__school = request.user.school_administrator.school)
+    elif hasattr(request.user, 'teacher') == True:
+      assignments = models.Assignment.objects.all().filter(curriculum__id = curriculum_id, group__teacher = request.user.teacher)
+    else:
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to export student response for the selected curriculum</h1>')
+
+    response = http.HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="%s.csv"'%curriculum.title
+    instances = models.AssignmentInstance.objects.all().filter(assignment__in=assignments)
+
+    writer = csv.writer(response)
+    writer.writerow(['Assignment', curriculum.title])
+    writer.writerow([])
+    if instances:
+      writer.writerow(['Group', 'Assigned Date', 'Due Date', 'Student', 'Step Title', 'Question', 'Options', 'Response'])
+      for instance in instances:
+        if hasattr(request.user, 'researcher'):
+          student = instance.student.user.id
+        else:
+          student = instance.student
+        stepResponses = models.AssignmentStepResponse.objects.all().filter(instance=instance)
+        for stepResponse in stepResponses:
+          questionResponses = models.QuestionResponse.objects.all().filter(step_response=stepResponse)
+          for questionResponse in questionResponses:
+            if questionResponse.response:
+              response_text = smart_str(questionResponse.response)
+            elif questionResponse.responseFile:
+              response_text = questionResponse.responseFile.url
+            else:
+              response_text = ''
+            writer.writerow([instance.assignment.group, instance.assignment.assigned_date, instance.assignment.due_date, student, stepResponse.step.title, questionResponse.curriculum_question.question, questionResponse.curriculum_question.question.options, response_text])
+    else:
+      writer.writerow(['There are no student response for this assignment'])
+    return response
+
+  except models.Curriculum.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested curriculum not found</h1>')
+
+####################################
 # ADD/EDIT QUESTION
 ####################################
 @login_required

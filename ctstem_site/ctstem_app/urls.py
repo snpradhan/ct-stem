@@ -64,6 +64,7 @@ urlpatterns = [
     url(r'^assignment/search/$', views.searchAssignment, name='searchAssignment'),
     url(r'^export_response/(?P<assignment_id>[\d]+)/$', views.export_response, name='export_group_response'),
     url(r'^export_response/(?P<assignment_id>[\d]+)/(?P<student_id>[\d]+)/$', views.export_response, name='export_student_response'),
+    url(r'^export_all_response/(?P<curriculum_id>[\d]+)/$', views.export_all_response, name='export_all_response'),
     url(r'^dashboard/group/(?P<id>[\d]+)/$', views.groupDashboard, name='groupDashboard'),
     url(r'^dashboard/assignment/(?P<id>[\d]+)/$', views.assignmentDashboard, name='assignmentDashboard'),
     url(r'^subjects/$', views.subjects, name='subjects'),

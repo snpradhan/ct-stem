@@ -146,3 +146,20 @@ def format_time(value):
     return str(time)
   else:
     return ''
+
+@register.filter
+def has_response(curriculum, user):
+  if hasattr(user, 'administrator') == True or hasattr(user, 'researcher') == True:
+    assignments = models.Assignment.objects.all().filter(curriculum__id = curriculum.id)
+  elif hasattr(user, 'school_administrator') == True:
+    assignments = models.Assignment.objects.all().filter(curriculum__id = curriculum.id, group__teacher__school = user.school_administrator.school)
+  elif hasattr(user, 'teacher') == True:
+    assignments = models.Assignment.objects.all().filter(curriculum__id = curriculum.id, group__teacher = user.teacher)
+  else:
+    return False
+
+  instances = models.AssignmentInstance.objects.all().filter(assignment__in=assignments)
+  if instances:
+    return True
+  else:
+    return False
