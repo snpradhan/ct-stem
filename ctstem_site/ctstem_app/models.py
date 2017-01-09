@@ -100,17 +100,17 @@ def upload_file_to(instance, filename):
   filename_base, filename_ext = os.path.splitext(filename)
   print filename, now
   if isinstance(instance, Curriculum):
-    return 'curriculum/%s_%s%s' % (slugify(instance.title), dt, filename_ext.lower(),)
+    return 'curriculum/%s_%s%s' % (slugify(instance.title[:40]), dt, filename_ext.lower(),)
   elif isinstance(instance, Publication):
-      return 'publications/%s_%s%s' % (slugify(instance.title), dt, filename_ext.lower(),)
+      return 'publications/%s_%s%s' % (slugify(instance.title[:40]), dt, filename_ext.lower(),)
   elif isinstance(instance, Team):
-    return 'team/%s_%s%s' % (slugify(instance.name), dt, filename_ext.lower(),)
+    return 'team/%s_%s%s' % (slugify(instance.name[:40]), dt, filename_ext.lower(),)
   elif isinstance(instance, Attachment):
-    return 'attachment/%s_%s%s' % (filename_base.lower(), dt, filename_ext.lower(),)
+    return 'attachment/%s_%s%s' % (slugify(filename_base.lower()[:40]), dt, filename_ext.lower(),)
   elif isinstance(instance, Category):
-    return 'standard/%s_%s%s' % (filename_base.lower(), dt, filename_ext.lower(),)
+    return 'standard/%s_%s%s' % (slugify(filename_base.lower()[:40]), dt, filename_ext.lower(),)
   elif isinstance(instance, QuestionResponse):
-    return 'questionResponse/%s/%s_%s%s' % (instance.step_response.instance.student.user, filename_base.lower(), dt, filename_ext.lower(),)
+    return 'questionResponse/%s/%s_%s%s' % (instance.step_response.instance.student.user, slugify(filename_base.lower()[:10]), dt, filename_ext.lower(),)
   return 'misc/%s_%s%s' % (filename_base.lower(), dt, filename_ext.lower(),)
 
 # Create your models here.
