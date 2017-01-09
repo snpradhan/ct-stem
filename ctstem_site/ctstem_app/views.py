@@ -33,6 +33,8 @@ import urllib2
 from urllib import urlretrieve
 import base64
 from django.utils.encoding import smart_str, smart_unicode
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
 
 ####################################
 # HOME
@@ -2204,6 +2206,7 @@ def generate_code_helper(request):
     schools = models.School.objects.all().filter(school_code=code)
 
   return code
+
 ####################################
 # UPLOAD USERS
 ####################################
@@ -2221,58 +2224,138 @@ def user_upload(request):
   count = 0
   added = 0
   new = 0
+  invalid = 0
   added_students = {}
   msg = {'error': [], 'success': []}
 
   if request.method == 'POST':
-    form = forms.UploadFileForm(request.POST, request.FILES, user=request.user)
+    form = forms.UploadFileForm(request.POST, user=request.user)
     data = request.POST.copy()
-    print data
     if form.is_valid():
-      f = request.FILES['uploadFile']
       group = models.UserGroup.objects.get(id=data['group'])
-      reader = csv.reader(f.read().splitlines(), delimiter=',')
-      for row in reader:
+      emails = data['emails'].split(",")
+      for email in emails:
         count += 1
-        if row[0] != 'Email*':
-          email = str(row[0])
-          print email
+        #check email format
+        try:
+          validate_email(email)
+          valid_email = True
+        except ValidationError:
+          valid_email = False
 
-          #check if the student with the email already exists
-          #email is mandatory
-          if email is None or email == '':
-            msg['error'].append('Email is missing on row %d' % count)
-            messages.error(request, 'Email is missing on row %d' % count)
-          else:
-            #check if email exists
-            if User.objects.filter(email=email).exists():
-              #check if email belongs to a student
-              if models.Student.objects.filter(user__email=email).exists():
-                #add student to group
-                #TODO
-                student = models.Student.objects.get(user__email=email)
-                membership, created = models.Membership.objects.get_or_create(student=student, group=group)
-                added_students[student.id] = {'user_id': student.user.id, 'username': student.user.username, 'full_name': student.user.get_full_name(), 'email': student.user.email, 'status': 'Active' if student.user.is_active else 'Inactive', 'last_login': student.user.last_login.strftime('%B %d, %Y') if student.user.last_login else '', 'group': group.id}
-                added += 1
-              else:
-                #error out email in use and does not belong to a student account
-                msg['error'].append('Email on row %d does not belong to a student account' % count)
-                messages.error(request, 'Email on row %d does not belong to a student account' % count)
+        if not valid_email:
+          msg['error'].append('Email %d is invalid' % count)
+          messages.error(request, 'Email %d is invalid' % count)
+          invalid +=1
+        else:
+          #check if email exists
+          if User.objects.filter(email=email).exists():
+            #check if email belongs to a student
+            if models.Student.objects.filter(user__email=email).exists():
+              #add student to group
+              #TODO
+              student = models.Student.objects.get(user__email=email)
+              membership, created = models.Membership.objects.get_or_create(student=student, group=group)
+              added_students[student.id] = {'user_id': student.user.id, 'username': student.user.username, 'full_name': student.user.get_full_name(), 'email': student.user.email, 'status': 'Active' if student.user.is_active else 'Inactive', 'last_login': student.user.last_login.strftime('%B %d, %Y') if student.user.last_login else '', 'group': group.id}
+              added += 1
             else:
-              #email does not exist.  Send and email with registration link
-              send_account_creation_email(email, group)
-              new += 1
+              #error out email in use and does not belong to a student account
+              msg['error'].append('Email %d does not belong to a student account' % count)
+              messages.error(request, 'Email %d does not belong to a student account' % count)
+              invalid += 1
+          else:
+            #email does not exist.  Send and email with registration link
+            send_account_creation_email(email, group)
+            new += 1
 
+      if added:
+        msg['success'].append('Existing students added to the group: %d' % (added))
+        messages.success(request, 'Existing students added to the group: %d' % (added))
+      if new:
+        msg['success'].append('Email sent to new students to create an account: %d' % (new))
+        messages.success(request, 'Email sent to new students to create an account: %d' % (new))
+      if invalid:
+        msg['error'].append('Invalid emails found: %d' % (invalid))
+        messages.error(request, 'Invalid emails found: %d' % (invalid))
 
-      msg['success'].append('%d existing students were found and added to the group, %d new students were requested to create an account.' % (added, new))
-      messages.success(request, '%d existing students were found and added to the group, %d new students were requested to create an account.' % (added, new))
       response_data = {'result': 'Success', 'new_students': added_students, 'messages': msg}
     else:
       print form.errors
-      response_data = {'result': 'Failure', 'message': 'Please select a group and provide a valid student template to upload.'}
+      response_data = {'result': 'Failure', 'message': 'Please select a group and a comma separated list of student emails to upload.'}
     return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 
   return http.HttpResponseNotAllowed(['POST'])
+
+####################################
+# UPLOAD USERS
+####################################
+
+# @login_required
+# def user_upload_csv(request):
+#   if hasattr(request.user, 'administrator'):
+#     role = 'admin'
+#   elif hasattr(request.user, 'school_administrator'):
+#     role = 'school_administrator'
+#   elif hasattr(request.user, 'teacher'):
+#     role = 'teacher'
+#   else:
+#     return http.HttpResponseNotFound('<h1>You do not have the privilege to upload users</h1>')
+
+#   count = 0
+#   added = 0
+#   new = 0
+#   added_students = {}
+#   msg = {'error': [], 'success': []}
+
+#   if request.method == 'POST':
+#     form = forms.UploadFileForm(request.POST, request.FILES, user=request.user)
+#     data = request.POST.copy()
+#     print data
+#     if form.is_valid():
+#       f = request.FILES['uploadFile']
+#       group = models.UserGroup.objects.get(id=data['group'])
+#       reader = csv.reader(f.read().splitlines(), delimiter=',')
+#       for row in reader:
+#         count += 1
+#         if row[0] != 'Email*':
+#           email = str(row[0])
+#           print email
+
+#           #check if the student with the email already exists
+#           #email is mandatory
+#           if email is None or email == '':
+#             msg['error'].append('Email is missing on row %d' % count)
+#             messages.error(request, 'Email is missing on row %d' % count)
+#           else:
+#             #check if email exists
+#             if User.objects.filter(email=email).exists():
+#               #check if email belongs to a student
+#               if models.Student.objects.filter(user__email=email).exists():
+#                 #add student to group
+#                 #TODO
+#                 student = models.Student.objects.get(user__email=email)
+#                 membership, created = models.Membership.objects.get_or_create(student=student, group=group)
+#                 added_students[student.id] = {'user_id': student.user.id, 'username': student.user.username, 'full_name': student.user.get_full_name(), 'email': student.user.email, 'status': 'Active' if student.user.is_active else 'Inactive', 'last_login': student.user.last_login.strftime('%B %d, %Y') if student.user.last_login else '', 'group': group.id}
+#                 added += 1
+#               else:
+#                 #error out email in use and does not belong to a student account
+#                 msg['error'].append('Email on row %d does not belong to a student account' % count)
+#                 messages.error(request, 'Email on row %d does not belong to a student account' % count)
+#             else:
+#               #email does not exist.  Send and email with registration link
+#               send_account_creation_email(email, group)
+#               new += 1
+
+
+#       msg['success'].append('%d existing students were found and added to the group, %d new students were requested to create an account.' % (added, new))
+#       messages.success(request, '%d existing students were found and added to the group, %d new students were requested to create an account.' % (added, new))
+#       response_data = {'result': 'Success', 'new_students': added_students, 'messages': msg}
+#     else:
+#       print form.errors
+#       response_data = {'result': 'Failure', 'message': 'Please select a group and provide a valid student template to upload.'}
+#     return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+
+#   return http.HttpResponseNotAllowed(['POST'])
 
 
 def send_account_confirmation_email(user, password):
