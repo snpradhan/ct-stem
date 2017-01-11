@@ -7,14 +7,14 @@
     </div>
     <div id="questionMsg" class="msg">
     </div>
-    <form class="form" id="questionForm" method="post" action="{% if questionForm.instance.id %} {% url 'ctstem:question' questionForm.instance.id %} {% else %} {% url 'ctstem:newQuestion' %} {% endif %}">
+    <form class="form" id="questionForm" method="post" enctype="multipart/form-data" action="{% if questionForm.instance.id %} {% url 'ctstem:question' questionForm.instance.id %} {% else %} {% url 'ctstem:newQuestion' %} {% endif %}">
       {% csrf_token %}
       {{questionForm.media}}
       <input id="id_question" type="hidden" value="{{questionForm.instance.id}}"/>
       <input id="id_step" type="hidden" value=""/>
       <div class="modal-body">
         {% for field in questionForm %}
-          <div class="form-group">
+          <div class="form-group {% if field.name == 'sketch_background' %} sketch {% endif %}" style="{% if field.name == 'sketch_background' %} display: none; {% endif %}" >
             <label for="id_{{field.name}}">{{ field.label|title }} {% if field.field.required %} (*) {% endif %}</label>
             <div>
               {{field}}
@@ -40,17 +40,36 @@
 <script type="text/javascript">
 $(function (){
 
+  $('select#id_answer_field_type').on('change', function(){
+    if($(this).val() == 'SK'){
+      $('div.form-group.sketch').show();
+    }
+    else{
+      $('div.form-group.sketch').hide();
+    }
+  });
+
+  if($('select#id_answer_field_type').val() =='SK'){
+    $('div.form-group.sketch').show();
+  }
+
   $("#questionForm").submit(function(e) {
 
     e.preventDefault();
     var question_text = CKEDITOR.instances.id_question_text.getData(); //tinymce.get('id_question_text').getContent();
-    data = {}
+    /*data = {}
     data['question_text'] = question_text;
     data['answer_field_type'] = $("#id_answer_field_type").val();
     data['options'] = $("#id_options").val();
     data['answer'] = $("#id_answer").val();
     data['csrfmiddlewaretoken'] = $('#questionForm').find('input:hidden').eq(0).val();
-    var data = $.param(data);
+    var data = $.param(data); */
+    var formData = new FormData(this);
+    formData.append('question_text', question_text);
+
+    if($("#id_answer_field_type").val() != 'SK'){
+      formData.append('sketch_background-clear', 'on');
+    }
     var question_id = $("#id_question").val();
     var id_step = $("#questionForm input[id='id_step']").val();
 
@@ -58,8 +77,11 @@ $(function (){
     $.ajax({
       type: $(this).attr('method'),
       url: this.action,
-      data: data,
+      data: formData,
       context: this,
+      cache:false,
+      contentType: false,
+      processData: false,
       success: function(data){
         if('error' in data){
           $('#questionMsg').html(data['error']);

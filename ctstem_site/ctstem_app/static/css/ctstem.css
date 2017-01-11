@@ -397,6 +397,10 @@ img.image_option {
   width: 20%;
   vertical-align: top !important;
 }
+img.sketch {
+  background-size: 100% 100% !important;
+  max-width: 100%;
+}
 div.table.standard table.subcategories {
   font-size: 0.8em;
 }

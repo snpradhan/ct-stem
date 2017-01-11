@@ -257,7 +257,7 @@
                   {% elif field_type == 'SK' %}
                     <div class="note"> Note: Draw your sketch in the sketchpad below </div>
                     <div id="{{question.id}}_sketch_tools" class="sketch_tools"></div>
-                    <canvas id="{{question.id}}_sketch" width="800" height="300" class="assignment_sketch"></canvas>
+                    <canvas id="{{question.id}}_sketch" width="800" height="500" class="assignment_sketch" style="{% if question.sketch_background %} background: url({{question.sketch_background.url}}) no-repeat;{% endif %}"></canvas>
                     <input type="hidden" id="{{question.id}}_sketch_object"/>
                     <!--input type="file" name="{{question.id}}_file" id="{{question.id}}_file"/--> <br>
                   {% endif %}

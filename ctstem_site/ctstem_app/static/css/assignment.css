@@ -248,6 +248,7 @@ input[type="text"] {
 }
 img.image_option {
   vertical-align: top !important;
+  max-width: 100%;
 }
 
 /* FIGURES */

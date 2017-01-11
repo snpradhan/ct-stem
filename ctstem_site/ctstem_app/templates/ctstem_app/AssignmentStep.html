@@ -205,7 +205,7 @@
                           <div class="assignment_input" tabindex="-1">
                             <div class="note"> Note: Draw your sketch in the sketchpad below </div>
                             <div id="{{questionForm.response.auto_id}}_sketch_tools" class="sketch_tools"></div>
-                            <canvas id="{{questionForm.response.auto_id}}_sketch" width="800" height="300" class="assignment_sketch"></canvas>
+                            <canvas id="{{questionForm.response.auto_id}}_sketch" width="800" height="500" class="assignment_sketch" style="{% if questionObj.sketch_background %} background: url({{questionObj.sketch_background.url}}) no-repeat;{% endif %}"></canvas>
                             <input type="hidden" name="{{questionForm.responseFile.html_name}}" id="{{questionForm.responseFile.auto_id}}" value="{% if questionForm.responseFile.value %} {{questionForm.responseFile.value.url}} {% endif %}"/>
                             <input type="hidden" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}"/>
                           </div>

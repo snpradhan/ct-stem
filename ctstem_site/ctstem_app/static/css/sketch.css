@@ -1,6 +1,7 @@
 canvas {
   border: 1px solid #ccc;
-}
+  background-size: 100% 100% !important;
+ }
 .sketch_tools { margin-bottom: 10px; }
 .sketch_tools a {
   border: 1px solid black;

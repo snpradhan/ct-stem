@@ -2168,7 +2168,8 @@ def question(request, id=''):
 
   elif 'POST' == request.method:
     data = request.POST.copy()
-    questionForm = forms.QuestionForm(data, instance=question)
+    print data
+    questionForm = forms.QuestionForm(data, request.FILES, instance=question)
     if questionForm.is_valid():
       question = questionForm.save()
       response_data = {'question_id': question.id, 'question_text': question.question_text}

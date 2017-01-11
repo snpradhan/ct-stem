@@ -111,6 +111,8 @@ def upload_file_to(instance, filename):
     return 'standard/%s_%s%s' % (slugify(filename_base.lower()[:40]), dt, filename_ext.lower(),)
   elif isinstance(instance, QuestionResponse):
     return 'questionResponse/%s/%s_%s%s' % (instance.step_response.instance.student.user, slugify(filename_base.lower()[:10]), dt, filename_ext.lower(),)
+  elif isinstance(instance, Question):
+    return 'question/%s_%s%s' % (slugify(filename_base.lower()[:40]), dt, filename_ext.lower(),)
   return 'misc/%s_%s%s' % (filename_base.lower(), dt, filename_ext.lower(),)
 
 # Create your models here.
@@ -205,6 +207,7 @@ class Question(models.Model):
   answer_field_type = models.CharField(null=False, max_length=2, choices=FIELD_TYPE_CHOICES, default='TF')
   options = models.TextField(null=True, blank=True, help_text="For dropdown, multi-select and multiple choice questions provide one option per line.\n For multiple choice w/ images provide one image url per line")
   answer = models.TextField(null=True, blank=True)
+  sketch_background = models.ImageField(upload_to=upload_file_to, blank=True, null=True)
 
   def __unicode__(self):
       return u'%s' % (self.question_text)

@@ -75,7 +75,11 @@
                           {{question.instance.response.response}}
                         {% endif %}
                       {% elif question.instance.response.responseFile %}
-                        Student uploaded <a href="{{question.instance.response.responseFile.url}}" target="_blank">File</a>
+                        {% if question.instance.response.curriculum_question.question.answer_field_type == 'SK' %}
+                          <img style="{% if question.instance.response.curriculum_question.question.sketch_background %} background: url({{question.instance.response.curriculum_question.question.sketch_background.url}}); {% endif %}" src="{{question.instance.response.responseFile.url}}" class="sketch"/>
+                        {% else %}
+                          Student uploaded <a href="{{question.instance.response.responseFile.url}}" target="_blank">File</a>
+                        {% endif %}
                       {% else %}
                         <span style="font-style: italic;">No response yet</span>
                       {% endif %}
