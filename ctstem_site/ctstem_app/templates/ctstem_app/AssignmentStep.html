@@ -23,7 +23,7 @@
   <link rel="stylesheet" href="/static/css/assignment.css">
   <script type="text/javascript" src="/static/js/jquery.form.min.js"></script>
   <link rel="stylesheet" href="/static/css/sketch.css">
-  <script type="text/javascript" src="/static/js/sketch.min.js"></script>
+  <script type="text/javascript" src="/static/js/sketch.js"></script>
   <script type="text/javascript" src="/static/js/sketch_custom.js"></script>
 {% endblock %}
 
@@ -138,8 +138,8 @@
                         {% elif field_type == 'MI' %}
                           <img src="{{questionForm.response.value}}" class="image_option"/><br>
                         {% elif field_type == 'SK' %}
-                          <canvas id="{{questionForm.response.auto_id}}_sketch" width="800" height="300" class="assignment_sketch_disabled"></canvas>
-                          <input type="hidden" name="{{questionForm.responseFile.html_name}}" id="{{questionForm.responseFile.auto_id}}" value="{% if questionForm.responseFile.value %} {{questionForm.responseFile.value.url}} {% endif %}"/><br>
+                          <canvas id="{{questionForm.response.auto_id}}_sketch" width="800" height="500" class="assignment_sketch" style="{% if questionObj.sketch_background %} background: url({{questionObj.sketch_background.url}}) no-repeat;{% endif %}"></canvas>
+                          <input type="hidden" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value='{{questionForm.response.value}}'/>
                         {% else %}
                           <div class="text">
                             {{questionForm.response.value}}
@@ -206,8 +206,7 @@
                             <div class="note"> Note: Draw your sketch in the sketchpad below </div>
                             <div id="{{questionForm.response.auto_id}}_sketch_tools" class="sketch_tools"></div>
                             <canvas id="{{questionForm.response.auto_id}}_sketch" width="800" height="500" class="assignment_sketch" style="{% if questionObj.sketch_background %} background: url({{questionObj.sketch_background.url}}) no-repeat;{% endif %}"></canvas>
-                            <input type="hidden" name="{{questionForm.responseFile.html_name}}" id="{{questionForm.responseFile.auto_id}}" value="{% if questionForm.responseFile.value %} {{questionForm.responseFile.value.url}} {% endif %}"/>
-                            <input type="hidden" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}"/>
+                            <input type="hidden" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value='{{questionForm.response.value}}'/>
                           </div>
                          <br>
                         {% endif %}
@@ -395,6 +394,26 @@
       return true;
     }
     function setCanvasData(){
+      $('canvas.assignment_sketch').each(function(){
+        var actions = $(this).sketch().actions;
+        $(this).next().val(JSON.stringify(actions));
+      });
+    }
+
+    function loadCanvasData(){
+      $('canvas.assignment_sketch').each(function(){
+        var id = '#'+$(this).attr('id');
+        var actions = $(id).next().val();
+        if(actions){
+          var actions_json = JSON.parse(actions);
+          $.each(actions_json, function (i, val) {
+            $(id).sketch().actions.push(val);
+            $(id).sketch().redraw();
+          });
+        }
+      });
+    }
+    /*function setCanvasData(){
       var format = "image/#png";
       $('canvas').each(function(){
         //var id = $(this).attr('id');
@@ -402,14 +421,12 @@
         $(this).next().next().val(sketch_object);
       });
     }
-
     function loadCanvasData(){
       var format = "image/#png";
       $('canvas').each(function(){
         var canvas = $(this);
         var id = $(canvas).attr('id');
         var url = $(canvas).next().val();
-
         if(url){
           console.log('loading :'+url);
           var ctx = ($(canvas)[0]).getContext('2d');
@@ -421,9 +438,9 @@
           img.src = url;
         }
       });
-    }
+    }*/
 
-    //auto submit form every 60 seconds
+    //auto submit on focusout
     $(function(){
       {% if form.instance.instance.status != 'S' and form.instance.instance.status != 'F' and form.instance.instance.status != 'A'%}
         $('.assignment_input').focusout(function(e){

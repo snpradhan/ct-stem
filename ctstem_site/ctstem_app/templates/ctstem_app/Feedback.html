@@ -3,6 +3,12 @@
 
 {% block title %}Feedback |{% endblock %}
 
+{% block custom_media %}
+  <link rel="stylesheet" href="/static/css/sketch.css">
+  <script type="text/javascript" src="/static/js/sketch.js"></script>
+  <script type="text/javascript" src="/static/js/sketch_custom.js"></script>
+{% endblock %}
+
 {% block content %}
   {{block.super}}
   <div class="content">
@@ -71,6 +77,9 @@
                       {% if question.instance.response.response %}
                         {% if question.instance.response.curriculum_question.question.answer_field_type == 'MI' %}
                           <img src="{{question.instance.response.response}}" class="image_option"/>
+                        {% elif question.instance.response.curriculum_question.question.answer_field_type == 'SK' %}
+                          <canvas id="{{question.instance.id}}_sketch" width="800" height="500" class="assignment_sketch" style="{% if question.instance.response.curriculum_question.question.sketch_background %} background: url({{question.instance.response.curriculum_question.question.sketch_background.url}}) no-repeat;{% endif %}"></canvas>
+                          <input type="hidden" name="{{question.instance.id}}_sketch_response" id="{{question.instance.id}}_sketch_response" value="{{question.instance.response.response}}"/>
                         {% else %}
                           {{question.instance.response.response}}
                         {% endif %}
@@ -131,17 +140,31 @@
 
   </div>
   <script type="text/javascript">
-    $('#send').click(function(){
-      $("input#save_and_send").val('true');
-      this.form.submit();
+    $(function(){
+      $('#send').click(function(){
+        $("input#save_and_send").val('true');
+        this.form.submit();
+      });
+      $('a.emoji-modal').click(function(){
+        $("div.modal#emojis input#emoji_feedback_area").val($(this).data('id'));
+      });
+      $('div.emoji').click(function(){
+        var id = $('input#emoji_feedback_area').val();
+        var val = $('textarea#'+id).val();
+        $('textarea#'+id).val(val + $(this).html());
+      });
+      $('canvas.assignment_sketch').each(function(){
+        var id = '#'+$(this).attr('id');
+        var actions = $(id).next().val();
+        if(actions){
+          var actions_json = JSON.parse(actions);
+          $.each(actions_json, function (i, val) {
+            $(id).sketch().actions.push(val);
+            $(id).sketch().redraw();
+          });
+        }
+      });
     });
-    $('a.emoji-modal').click(function(){
-      $("div.modal#emojis input#emoji_feedback_area").val($(this).data('id'));
-    });
-    $('div.emoji').click(function(){
-      var id = $('input#emoji_feedback_area').val();
-      var val = $('textarea#'+id).val();
-      $('textarea#'+id).val(val + $(this).html());
-    });
+
   </script>
 {% endblock %}
