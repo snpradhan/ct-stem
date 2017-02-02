@@ -607,6 +607,10 @@ input[type="tel"], input[type="color"], .uneditable-input {
 select {
   width: auto !important;
 }
+
+input.form-control.captcha {
+  width: auto;
+}
 /***************** end input *******************/
 
 

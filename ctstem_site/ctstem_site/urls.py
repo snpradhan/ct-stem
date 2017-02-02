@@ -27,6 +27,7 @@ urlpatterns = [
     url(r'^ckeditor/upload/', views.upload, name='ckeditor_upload'),
     url(r'^ckeditor/browse/', views.browse, name='ckeditor_browse'),
     url(r'^chaining/', include('smart_selects.urls')),
+    url(r'^captcha/', include('captcha.urls')),
 
 ]
 

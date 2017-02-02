@@ -56,6 +56,7 @@ INSTALLED_APPS = (
     'smart_selects',
     'django_cleanup',
     'endless_pagination',
+    'captcha',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -154,3 +155,5 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 # Auto logout delay in minutes
 AUTO_LOGOUT_DELAY = 30
 
+CAPTCHA_IMAGE_SIZE = (150,40)
+CAPTCHA_FONT_SIZE = 36

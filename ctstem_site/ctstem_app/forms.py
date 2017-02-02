@@ -15,6 +15,7 @@ from django.utils.safestring import mark_safe
 from django.core.exceptions import ObjectDoesNotExist
 from tinymce.widgets import TinyMCE
 from django.db.models import Q
+from captcha.fields import CaptchaField
 
 ####################################
 # Registration Form
@@ -29,6 +30,7 @@ class RegistrationForm (forms.Form):
   email = forms.EmailField(required=True, max_length=75, label=u'Email')
   account_type = forms.ChoiceField(required=True, choices = models.USER_ROLE_CHOICES)
   school = forms.ModelChoiceField(required=False, queryset=models.School.objects.all())
+  captcha = CaptchaField()
 
   def __init__(self, *args, **kwargs):
     user = kwargs.pop('user')
@@ -40,8 +42,12 @@ class RegistrationForm (forms.Form):
       elif hasattr(user, 'teacher'):
         self.fields['account_type'].choices = models.USER_ROLE_CHOICES[5:]
         self.fields['school'].queryset = models.School.objects.filter(id=user.teacher.school.id)
+
+      self.fields.pop('captcha')
+
     else:
       self.fields['account_type'].choices = models.USER_ROLE_CHOICES[3:]
+      self.fields['captcha'].help_text = u'Type the text from the image to the right'
 
     for field_name, field in self.fields.items():
       field.widget.attrs['class'] = 'form-control'
