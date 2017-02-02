@@ -594,7 +594,10 @@ def register(request, group_id=''):
     school = group.teacher.school
 
   if request.method == 'POST':
-    form = forms.RegistrationForm(user=request.user, data=request.POST)
+    if group_id:
+      form = forms.RegistrationForm(user=request.user, data=request.POST, group_id=group_id)
+    else:
+      form = forms.RegistrationForm(user=request.user, data=request.POST)
     if form.is_valid():
       user = User.objects.create_user(form.cleaned_data['username'],
                                       form.cleaned_data['email'],
@@ -2381,7 +2384,7 @@ def send_account_creation_email(email, group):
   send_mail('CT-STEM Account Signup',
   'Your teacher has requested you to create an account on Computational Thinking in STEM website \r\n\r\n \
   Please click the link below to create an account.\r\n  \
-  http://%s/register/group/%d?email=%s.  \r\n\r\n \
+  http://%s/register/group/%d?email=%s  \r\n\r\n \
   -- CT-STEM Admin'%(domain, group.id, email),
         settings.DEFAULT_FROM_EMAIL,
         [email])

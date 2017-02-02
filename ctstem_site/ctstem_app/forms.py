@@ -30,10 +30,13 @@ class RegistrationForm (forms.Form):
   email = forms.EmailField(required=True, max_length=75, label=u'Email')
   account_type = forms.ChoiceField(required=True, choices = models.USER_ROLE_CHOICES)
   school = forms.ModelChoiceField(required=False, queryset=models.School.objects.all())
-  captcha = CaptchaField()
+  captcha = CaptchaField(help_text=u'Type the word that appears to the right')
 
   def __init__(self, *args, **kwargs):
     user = kwargs.pop('user')
+    group_id = None
+    if 'group_id' in kwargs:
+      group_id = kwargs.pop('group_id')
     super(RegistrationForm, self).__init__(*args, **kwargs)
     if user.is_authenticated():
       if hasattr(user, 'school_administrator'):
@@ -45,9 +48,10 @@ class RegistrationForm (forms.Form):
 
       self.fields.pop('captcha')
 
-    else:
+    elif group_id:
       self.fields['account_type'].choices = models.USER_ROLE_CHOICES[3:]
-      self.fields['captcha'].help_text = u'Type the text from the image to the right'
+    else:
+      self.fields['account_type'].choices = models.USER_ROLE_CHOICES[3:5]
 
     for field_name, field in self.fields.items():
       field.widget.attrs['class'] = 'form-control'
