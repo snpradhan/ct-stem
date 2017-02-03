@@ -69,6 +69,11 @@
           {% elif curriculum.curriculum_type == 'L' %}
             {{curriculum.overview}}
           {% endif %}
+          {% if attachments %}
+            <div>
+              You will need additional resources to complete this assignment.  Please download them from this link <a href="{% url 'ctstem:downloadAttachments' curriculum.id%}" target="_blank">Download Attachment(s) <span class="fa fa-paperclip"></span></a>
+            </div>
+          {% endif %}
         </p>
         <div class="save-buttons" style="text-align: center; margin-bottom: 150px; margin-top: 80px;">
           <a href="{% url 'ctstem:previewCurriculum'  curriculum.id 1 %}">

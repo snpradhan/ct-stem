@@ -249,6 +249,7 @@ def previewCurriculum(request, id='', step_order=0):
       else:
         #return render(request, 'ctstem_app/CurriculumPreview.html', context)
         total_steps = len(steps)
+        attachments = models.Attachment.objects.all().filter(curriculum=curriculum, teacher_only=False)
         context = {'curriculum': curriculum, 'attachments': attachments, 'systems': systems, 'total_steps': total_steps, 'step_order': step_order}
 
         if int(step_order) > 0:
@@ -1808,7 +1809,8 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
       steps = models.Step.objects.all().filter(curriculum=curriculum)
       total_steps = steps.count()
       if int(step_order) == 0:
-        context = {'curriculum': curriculum, 'instance': instance, 'total_steps': total_steps, 'step_order': step_order}
+        attachments = models.Attachment.objects.all().filter(curriculum=curriculum, teacher_only=False)
+        context = {'curriculum': curriculum, 'instance': instance, 'total_steps': total_steps, 'step_order': step_order, 'attachments': attachments}
         return render(request, 'ctstem_app/AssignmentStep.html', context)
       else:
         step = steps.get(order=step_order)
