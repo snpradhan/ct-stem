@@ -121,9 +121,9 @@ class Curriculum (models.Model):
   curriculum_type = models.CharField(max_length=1, choices=CURRICULUM_TYPE_CHOICES)
   title = models.CharField(null=False, max_length=256, help_text='Curriculum title')
   time = models.CharField(null=True, blank=True, max_length=256, help_text='Estimated time students would spend on this curriculum')
-  level = models.TextField(null=True, blank=True, help_text="Student level")
-  purpose = models.TextField(null=True, blank=True, help_text="Purpose of this curriculum")
-  overview = models.TextField(null=True, blank=True, help_text="Curriculum overview")
+  level = RichTextUploadingField(null=True, blank=True, help_text="Student level")
+  purpose = RichTextUploadingField(null=True, blank=True, help_text="Purpose of this curriculum")
+  overview = RichTextUploadingField(null=True, blank=True, help_text="Curriculum overview")
   content = RichTextUploadingField(null=True, blank=True)
   teacher_notes = RichTextUploadingField(null=True, blank=True)
   status = models.CharField(max_length=1, default='D', choices=CURRICULUM_STATUS_CHOICES)
@@ -374,7 +374,7 @@ class UserGroup(models.Model):
 class Assignment(models.Model):
   curriculum = models.ForeignKey(Curriculum, related_name="assignments")
   group = models.ForeignKey(UserGroup, related_name="assignments")
-  assigned_date = models.DateTimeField(default=datetime.datetime.now(), blank=False)
+  assigned_date = models.DateTimeField(default=datetime.datetime.now, blank=False)
   due_date = models.DateTimeField(null=False, blank=False)
 
   def __unicode__(self):

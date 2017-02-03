@@ -77,7 +77,7 @@
             Please do the best that you can, and don't worry if you don't know all of the answers.
 
           {% elif curriculum.curriculum_type == 'L' %}
-            {{curriculum.overview}}
+            {{curriculum.overview|safe}}
           {% endif %}
         </p>
         <div class="save-buttons" style="text-align: center; margin-bottom: 150px; margin-top: 80px;">
