@@ -91,17 +91,17 @@ CKEDITOR_CONFIGS = {
         'mathJaxLib': '//cdn.mathjax.org/mathjax/2.2-latest/MathJax.js?config=TeX-AMS_HTML',
         'codeSnippet_theme': 'monokai_sublime',
         'extraPlugins': ','.join(
-            ['mathjax', 'codesnippet']
+            ['mathjax', 'codesnippet', 'scayt']
         ),
     },
     'question_ckeditor': {
         'removePlugins': 'stylesheetparser',
-        'toolbar': 'Full',  # put selected toolbar config here
+        'toolbar': None,  # put selected toolbar config here
         'height': 100,
-        'width': '105%',
+        'width': '98%',
         'mathJaxLib': '//cdn.mathjax.org/mathjax/2.2-latest/MathJax.js?config=TeX-AMS_HTML',
         'extraPlugins': ','.join(
-            ['mathjax']
+            ['mathjax', 'scayt']
         ),
     },
 }
