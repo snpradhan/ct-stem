@@ -50,6 +50,7 @@ class RegistrationForm (forms.Form):
 
     elif group_id:
       self.fields['account_type'].choices = models.USER_ROLE_CHOICES[3:]
+      self.fields['email'].widget.attrs['readonly'] = True
     else:
       self.fields['account_type'].choices = models.USER_ROLE_CHOICES[3:5]
 

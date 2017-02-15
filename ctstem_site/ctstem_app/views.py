@@ -678,9 +678,10 @@ def register(request, group_id=''):
 
     else:
       print form.errors
-      context = {'form': form, 'group_id': group_id}
       if group_id:
-        context['school_id'] = school.id
+        context = {'form': form, 'group_id': group_id, 'school_id': school.id}
+      else:
+        context = {'form': form }
       return render(request, 'ctstem_app/Registration.html', context)
 
   else:
@@ -688,13 +689,13 @@ def register(request, group_id=''):
       messages.error(request, 'You do not have the privilege to register any other user')
       return shortcuts.redirect('ctstem:home')
 
-    if 'email' in request.GET:
-      form = forms.RegistrationForm(initial={'email': request.GET['email']}, user=request.user)
+    if group_id and 'email' in request.GET:
+      email = request.GET['email']
+      form = forms.RegistrationForm(initial={'email': email}, user=request.user, group_id=group_id)
+      context = {'form': form, 'group_id': group_id, 'school_id': school.id}
     else:
       form = forms.RegistrationForm(user=request.user)
-    context = {'form': form, 'group_id': group_id}
-    if group_id:
-      context['school_id'] = school.id
+      context = {'form': form}
 
     return render(request, 'ctstem_app/Registration.html', context)
 
