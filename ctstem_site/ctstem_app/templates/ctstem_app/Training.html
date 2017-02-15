@@ -12,8 +12,16 @@
   <div class="col-lg-12">
 
     <h2>Professional Development Training</h2>
-    <h4><a href="/static/doc/CTSTEM_Flyer_2016PD.pdf" target="_blank">SUMMER TRAINING</a> DATES: AUGUST 10-11 or 22-23</h4>
-    <h4>NORTHWESTERN UNIVERSITY</h4>
+    {% if user.is_authenticated and user.administrator %}
+      <h4><a href="{% url 'ctstem:training_requests' %}" >View Training Requests</a></h4>
+    {% endif %}
+
+    {% if user.is_anonymous or user.teacher %}
+      <div class="request_training">
+        <button class="btn btn-success btn-lg request_training" name="request_training" data-form="{% url 'ctstem:request_training' %}" aria-label=" Request Training" title="Request Training"> Register for Training </button>
+      </div>
+      <div class="modal fade" id="trainingModal" role="dialog"></div>
+    {% endif %}
     <p class="page-blurb">
       From spreadsheets to high-performance simulations, computational thinking (CT) tools permeate the way that scientists, engineers, and mathematicians conduct research and make sense of the world. CT has allowed for breakthroughs in sequencing the human genome, predicting hurricane paths, modeling black holes, and optimizing food pantry routes.
       Support your students in acquiring these essential 21st century skills by attending Northwestern’s “Computational Thinking in STEM” summer workshop and our continuing education Saturday workshops. Fill out this form to join our mailing list and receive updates about future workshops.
@@ -51,48 +59,23 @@
     <div class="page-blurb">
       For more information, contact <a href="mailto:ctstem@northwestern.edu">ctstem@northwestern.edu</a>.
     </div>
-
-<!--
-  <div class="col-lg-12">
-    <form method="post" name="sentMessage" id="contactForm">
-      {% csrf_token %}
-      <div class="row">
-        <div class="col-md-6">
-          <div class="form-group">
-            {{form.name}}
-            <div class="error">{{ form.name.errors }}</div>
-          </div>
-          <div class="form-group">
-            {{form.email}}
-            <div class="error">{{ form.email.errors }}</div>
-          </div>
-          <div class="form-group">
-            {{form.school}}
-            <div class="error">{{ form.school.errors }}</div>
-          </div>
-          <div class="form-group">
-            {{form.requester_role}}
-            <div class="error">{{ form.requester_role.errors }}</div>
-          </div>
-        </div>
-        <div class="col-md-6">
-          <div class="form-group">
-          {{form.notes}}
-          <div class="error">{{ form.notes.errors }}</div>
-        </div>
-      </div>
-      <div class="clearfix"></div>
-        <div class="col-lg-12 text-center">
-        <div id="success"></div>
-          <button type="submit" class="btn btn-xl">Submit</button>
-        </div>
-      </div>
-    </form>
-  </div>
--->
   </div>
 </div>
 <br clear="all">
+
+<script type="text/javascript">
+$(function(){
+  $("button.request_training").click(function(e){
+    e.preventDefault();
+    var url = $(this).data("form");
+    $("#trainingModal").load(url, function() {
+      $(this).modal('show');
+    });
+
+    return false;
+  });
+});
+</script>
 {% endblock %}
 
 

@@ -164,7 +164,17 @@
                   {% endif %}
 
                   <li class="{% navactive request 'ctstem:publications' %}"><a href="{% url 'ctstem:publications' %}">Research</a></li>
-                  <li class="{% navactive request 'ctstem:training' %}"><a href="{% url 'ctstem:training' %}">Training</a></li>
+                  {% if user.administrator %}
+                    <li class="dropdown {% navactive request 'ctstem:training'%} {% navactive request 'ctstem:training_requests'%}">
+                      <a href="#" class="dropdown-toggle" data-toggle="dropdown" id="training">Training  <b class="caret"></b></a>
+                      <ul class="dropdown-menu">
+                        <li class="{% navactive request 'ctstem:training' %}"><a href="{% url 'ctstem:training' %}">Training Page</a></li>
+                        <li class="{% navactive request 'ctstem:training_requests' %}"><a href="{% url 'ctstem:training_requests' %}">Training Requests</a></li>
+                      </ul>
+                    </li>
+                  {% else %}
+                    <li class="{% navactive request 'ctstem:training' %}"><a href="{% url 'ctstem:training' %}">Training</a></li>
+                  {% endif %}
                   <li class="{% navactive request 'ctstem:team' %}"><a href="{% url 'ctstem:team' %}">Team</a></li>
 
                 {% elif request.path == '/' %}

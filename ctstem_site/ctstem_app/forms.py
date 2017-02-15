@@ -868,6 +868,7 @@ class TeamMemberForm(ModelForm):
 # Training Request Form
 ####################################
 class TrainingRequestForm(ModelForm):
+  captcha = CaptchaField(help_text=u'Type the word that appears to the right')
 
   class Meta:
     model = models.TrainingRequest
@@ -880,5 +881,7 @@ class TrainingRequestForm(ModelForm):
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['placeholder'] = field.help_text
 
-
+  def is_valid(self):
+    valid = super(TrainingRequestForm, self).is_valid()
+    return valid
 

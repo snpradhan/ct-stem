@@ -1,0 +1,101 @@
+
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h3 class="modal-title">CT-STEM Training</h3>
+      </div>
+      <div id="trainingMsg" class="msg">
+      </div>
+      <form class="form" id="trainingForm" method="post" action="{% url 'ctstem:request_training' %}">
+        {% csrf_token %}
+        <div class="modal-body">
+          {{form.management_form}}
+          {% for field in form %}
+            <div class="form-group">
+              <label for="id_{{field.name}}">{{ field.label|title }} {% if field.field.required %}(<span class="required">*</span>){% endif %} </label>
+              {% if field.name == 'captcha' %}
+                <div>
+                  {{field}}
+                  <a type="button" class='js-captcha-refresh btn btn-default'><i class="fa fa-refresh" aria-hidden="true"></i></a>
+                </div>
+                <div class="help warning">{{field.help_text}}</div>
+              {% else %}
+                <div>
+                  {{field}}
+                </div>
+              {% endif %}
+              <div class="error" id="{{field.name}}_error">{{ field.errors }}</div>
+            </div>
+          {% endfor %}
+          <div id="spinner">
+            <img src="/static/img/page-loader.gif" class="icon"/>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <div class="form-group button-row">
+            <button type="submit" class="btn btn-success">
+              Submit
+            </button>
+            <button type="button" class="btn btn-danger" data-dismiss="modal">
+              Close
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+<script type="text/javascript">
+  $(function (){
+
+    $("#trainingForm").submit(function(e) {
+      e.preventDefault();
+      $.ajax({
+        type: $(this).attr('method'),
+        url: this.action,
+        data: $(this).serialize(),
+        context: this,
+        beforeSend: function(){
+          $('#trainingForm #spinner').show();
+        },
+        complete: function(){
+          $('#trainingForm #spinner').hide();
+        },
+        success: function(data){
+          if(data['result'] == 'Success'){
+            window.location.reload();
+          }
+          else{
+            $(".error").empty();
+            for(var field in data['errors']){
+              $("#"+field+"_error").html(data['errors'][field]);
+            }
+          }
+          return false;
+        },
+        error: function(xhr, ajaxOptions, thrownError){
+          alert(thrownError);
+        },
+      });
+    });
+
+    $('.js-captcha-refresh').click(function(){
+      $form = $(this).parents('form');
+
+      var url = location.protocol + "//" + window.location.hostname + ":"
+                + location.port + "/captcha/refresh/";
+
+      // Make the AJAX-call
+      $.getJSON(url, {}, function(json) {
+          $form.find('input[name="captcha_0"]').val(json.key);
+          $form.find('img.captcha').attr('src', json.image_url);
+      });
+
+      return false;
+    });
+  });
+  </script>
+

@@ -35,6 +35,7 @@ import base64
 from django.utils.encoding import smart_str, smart_unicode
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
+from django.http import JsonResponse
 
 ####################################
 # HOME
@@ -63,32 +64,6 @@ def home(request):
         school = None
         requester_role = ''
 
-      '''training_request = models.TrainingRequest(name=request.user.get_full_name(), email=request.user.email, school=school, requester_role=requester_role)
-    else:
-      training_request = models.TrainingRequest()
-
-    if request.method == 'GET':
-      request_form = forms.TrainingRequestForm(instance=training_request, prefix='training')
-    elif request.method == 'POST':
-      data = request.POST.copy()
-      request_form = forms.TrainingRequestForm(data, instance=training_request, prefix='training')
-      if request_form.is_valid():
-        training = request_form.save()
-        request_form = forms.TrainingRequestForm(instance=models.TrainingRequest(), prefix='training')
-        messages.success(request, "Your request has been sent to the site admin")
-        #send email to the admin
-        send_email('CT-STEM Training Request',
-                    '<b>Requester </b>: %s <br> \
-                    <b>Email </b>: %s <br> \
-                    <b>School </b>: %s <br> \
-                    <b>Academic Role </b>: %s <br>\
-                    <b>Notes </b>: %s' % (training.name, training.email, training.school, training.get_requester_role_display(), training.notes),
-                    settings.DEFAULT_FROM_EMAIL,
-                    ['sachin.pradhan@northwestern.edu'])
-      else:
-        print request_form.errors
-        messages.error(request, "Your request could not be sent.")
-    '''
     if request.method == 'GET':
       context = {'lessons': lessons, 'assessments' : assessments, 'practices': practices, 'team': team, 'publications': publications}
       return render(request, 'ctstem_app/Home.html', context)
@@ -2672,9 +2647,70 @@ def check_session(request):
   return http.HttpResponseNotAllowed(['GET', 'POST'])
 
 ####################################
-# PROFESSIONAL DEVELOPMENT
+# PROFESSIONAL DEVELOPMENT PAGE
 ####################################
 def training(request):
   return render(request, 'ctstem_app/Training.html')
 
 
+####################################
+# LIST OF PROFESSIONAL DEVELOPMENT REQUESTS
+####################################
+@login_required
+def training_requests(request):
+  if hasattr(request.user, 'administrator') == False:
+    return http.HttpResponseNotFound('<h1>You do not have the privilege to view this page</h1>')
+
+  if request.method == "GET" or request.method == "POST":
+    trainingRequests = models.TrainingRequest.objects.all()
+    print trainingRequests
+    context = {'trainingRequests': trainingRequests}
+    return render(request, 'ctstem_app/TrainingRequests.html', context)
+  return http.HttpResponseNotAllowed(['GET', 'POST'])
+
+####################################
+# RECORD PD REQUESTS
+####################################
+def request_training(request):
+
+  training = models.TrainingRequest()
+  if request.method == 'GET':
+    if request.user.is_authenticated():
+      initial= {'name': request.user.get_full_name(), 'email': request.user.email}
+      if hasattr(request.user, 'teacher'):
+        initial['school'] = request.user.teacher.school
+      form = forms.TrainingRequestForm(initial=initial, instance=training)
+    else:
+      form = forms.TrainingRequestForm(instance=training)
+    context = {'form': form}
+    return render(request, 'ctstem_app/TrainingRequestModal.html', context)
+
+  elif request.method == 'POST':
+    response_data = {}
+    data = request.POST.copy()
+    form = forms.TrainingRequestForm(data, instance=training)
+    if form.is_valid():
+      training = form.save()
+      messages.success(request, "Your request has been sent to the site admin")
+      response_data['result'] = 'Success'
+      #send email to the admin
+      send_email('CT-STEM Training Request',
+                  '<b>Name </b>: %s <br> \
+                  <b>Email </b>: %s <br> \
+                  <b>School </b>: %s <br> \
+                  <b>Subject </b>: %s <br><br> \
+                  Thank you for your interest in attending our training session.  We will communicate \
+                  the date, place and other details about the event shortly. <br> \
+                  <br> \
+                  -CT-STEM Admin' % (training.name, training.email, training.school, training.subject),
+                  settings.DEFAULT_FROM_EMAIL,
+                  [training.email])
+      return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+    else:
+      print form.errors
+      return JsonResponse({
+          'result': 'Failed',
+          'errors': dict(form.errors.items()),
+      })
+
+  return http.HttpResponseNotAllowed(['GET', 'POST'])

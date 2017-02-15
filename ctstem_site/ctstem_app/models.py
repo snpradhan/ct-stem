@@ -480,10 +480,11 @@ class Team(models.Model):
 
 class TrainingRequest(models.Model):
   name = models.CharField(max_length=255, blank=False, help_text="Name")
-  email = models.CharField(max_length=255, blank=False, help_text="Email")
+  email = models.EmailField(max_length=255, blank=False, help_text="Email")
   school = models.CharField(max_length=255, blank=False, help_text="School Name")
-  requester_role = models.CharField(max_length=255, choices=REQUESTER_ROLE, help_text="I am:")
-  notes = models.TextField(null=False, blank=False, help_text="Notes")
+  subject = models.CharField(max_length=255, blank=False, help_text="Subject")
+  created_date = models.DateTimeField(auto_now_add=True)
+
 
 #signal used for is_active=False to is_active=True
 @receiver(pre_save, sender=User, dispatch_uid='active')
