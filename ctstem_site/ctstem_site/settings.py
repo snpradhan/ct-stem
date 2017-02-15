@@ -83,7 +83,7 @@ CKEDITOR_RESTRICT_BY_USER = True
 CKEDITOR_IMAGE_BACKEND = "pillow"
 CKEDITOR_CONFIGS = {
     'default': {
-        'removePlugins': 'stylesheetparser',
+        'removePlugins': 'stylesheetparser, contextmenu',
         'toolbar': None,  # put selected toolbar config here
         'height': 100,
         'width': '115%',
@@ -93,9 +93,12 @@ CKEDITOR_CONFIGS = {
         'extraPlugins': ','.join(
             ['mathjax', 'codesnippet', 'scayt']
         ),
+        'scayt_autoStartup': True,
+        'scayt_sLang': 'en_US',
+        'disableNativeSpellChecker': False,
     },
     'question_ckeditor': {
-        'removePlugins': 'stylesheetparser',
+        'removePlugins': 'stylesheetparser, contextmenu',
         'toolbar': None,  # put selected toolbar config here
         'height': 100,
         'width': '98%',
@@ -103,6 +106,9 @@ CKEDITOR_CONFIGS = {
         'extraPlugins': ','.join(
             ['mathjax', 'scayt']
         ),
+        'scayt_autoStartup': True,
+        'scayt_sLang': 'en_US',
+        'disableNativeSpellChecker': False,
     },
 }
 
