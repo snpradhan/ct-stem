@@ -25,6 +25,7 @@
   <link rel="stylesheet" href="/static/css/sketch.css">
   <script type="text/javascript" src="/static/js/sketch.js"></script>
   <script type="text/javascript" src="/static/js/sketch_custom.js"></script>
+  <script type="text/javascript" src="/static/js/clone_more.js"></script>
 {% endblock %}
 
 {% block header %}{% endblock %}
@@ -127,6 +128,8 @@
                       {{questionObj.question_text|inline_style|safe}}
                       {{questionForm.curriculum_question.as_hidden}}
                       {{questionForm.save.as_hidden}}
+                      {{questionForm.nested.management_form}}
+                      {{questionForm.nested.id}}
                     </div>
                   </div>
                   <div class="answer_field">
@@ -199,9 +202,43 @@
                             {% endwith %}
                           </div>
                         {% elif field_type == 'FI' %}
-                          <div class="assignment_input" tabindex="-1">
+                          <div  tabindex="-1">
                             <div class="note"> Note: Upload a file </div>
-                           {{questionForm.responseFile}}
+                            {{questionForm.responseFile}}
+
+                            <table class="table table-striped table-condensed table-bordered inner_table collapsible_content">
+                              <thead>
+                                <tr>
+                                  <th>File</th>
+                                  <th>Delete</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {% for fileform in questionForm.nested %}
+                                  <tr style="{% if forloop.last %} display:none; {% endif %}">
+                                    <td class="attached_file">
+                                      {{fileform.id}}
+                                      {% if fileform.instance.file %}
+                                        <a href="{{fileform.instance.file.url}}">{{fileform.file.value}}</a>
+                                        {{fileform.file.as_hidden}}
+                                      {% else %}
+                                        {{fileform.file}}
+                                      {% endif %}
+                                    </td>
+
+                                    <td class="attachment_edit">
+                                      <button type="button" class="btn btn-danger delete_attachment" name="delete_attachment" aria-label="Delete Attachment" title="Delete Attachment">
+                                        Delete
+                                      </button>
+                                      {{fileform.DELETE.as_hidden}}
+                                    </td>
+                                  </tr>
+                                {% endfor %}
+                              </tbody>
+                            </table>
+                            <a type="button" class="btn btn-info add_attachment" id="form-{{forloop.counter0}}-response_file" title="Add New Attachment">
+                              Add More
+                            </a>
                           </div>
                         {% elif field_type == 'SK' %}
                           <div class="assignment_input" tabindex="-1">
@@ -233,6 +270,7 @@
                     <hr>
                   {% endif %}
                 {% else %}
+                <!-- SURVEY SECTION -->
                   <table class="likert">
                     <tbody>
                       <tr class="likert-item assignment_input" tabindex="-1">
@@ -378,6 +416,28 @@
       $('form#assignmentForm').submit();
     });
 
+    $('a.add_attachment').click(function() {
+      var tr = $("tr:last", $(this).prev());
+      cloneMore($(tr), $(this).attr('id'));
+      //var new_row = $('div.attachment_table table.table tr:nth-last-child(2)');
+      $(tr).toggle();
+    });
+
+    $('input[type="file"][id="selectedFile"]').change(function(){
+      $("ul.messages li").remove();
+      $("ul.messages").html('<li class="warning">Click the Save button below to Save the uploaded files</li>');
+    })
+
+    $('button.delete_attachment').click(function(){
+      var r = confirm("Are you sure you want to delete this attachment?");
+      if (r == true) {
+        $(this).next('input').val('on');
+        $(this).closest('tr').hide();
+        $("ul.messages li").remove();
+        $("ul.messages").html('<li class="warning">Click the Save button below to Delete the uploaded files</li>');
+      }
+    });
+
     function waitForSave(URL){
       setTimeout( function() { window.location = URL }, 1000 );
     }
@@ -415,32 +475,6 @@
         }
       });
     }
-    /*function setCanvasData(){
-      var format = "image/#png";
-      $('canvas').each(function(){
-        //var id = $(this).attr('id');
-        var sketch_object = ($(this)[0]).toDataURL(format);
-        $(this).next().next().val(sketch_object);
-      });
-    }
-    function loadCanvasData(){
-      var format = "image/#png";
-      $('canvas').each(function(){
-        var canvas = $(this);
-        var id = $(canvas).attr('id');
-        var url = $(canvas).next().val();
-        if(url){
-          console.log('loading :'+url);
-          var ctx = ($(canvas)[0]).getContext('2d');
-          var img = new Image();
-          img.crossOrigin = '';
-          img.onload = function(){
-            ctx.drawImage(img,0,0); // Or at whatever offset you like
-          };
-          img.src = url;
-        }
-      });
-    }*/
 
     //auto submit on focusout
     $(function(){
@@ -474,6 +508,7 @@
                   }
                 });
                 $('input:hidden[id="id_form-INITIAL_FORMS"]').val(data.questionCount);
+
               },
               error: function(data) {
                 $("ul.messages li").remove();

@@ -751,6 +751,22 @@ class QuestionResponseForm(ModelForm):
     if not response and responseFile and responseFile.size >  5*1024*1024:
       self.add_error('responseFile', 'Uploaded file cannot be bigger than 5MB')
 
+
+class QuestionResponseFileForm(ModelForm):
+  class Meta:
+    model = models.QuestionResponseFile
+    fields = ['file']
+    widgets = {
+      'file': widgets.NotClearableFileInput,
+    }
+
+  def __init__(self, *args, **kwargs):
+    super(QuestionResponseFileForm, self).__init__(*args, **kwargs)
+    self.fields['file'].widget.attrs = {'id':'selectedFile'}
+    for field_name, field in self.fields.items():
+      field.widget.attrs['class'] = 'form-control'
+      field.widget.attrs['placeholder'] = field.help_text
+
 ####################################
 # Feedback Form
 ####################################

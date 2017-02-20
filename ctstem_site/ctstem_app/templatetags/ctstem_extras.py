@@ -133,7 +133,7 @@ def get_item(dictionary, key):
 
 @register.filter
 def get_type(value):
-  return type(value)
+  return type(value).__name__
 
 @register.filter
 def get_ascii_char(value):

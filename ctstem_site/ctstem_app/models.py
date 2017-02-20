@@ -113,6 +113,9 @@ def upload_file_to(instance, filename):
     return 'questionResponse/%s/%s_%s%s' % (instance.step_response.instance.student.user, slugify(filename_base.lower()[:10]), dt, filename_ext.lower(),)
   elif isinstance(instance, Question):
     return 'question/%s_%s%s' % (slugify(filename_base.lower()[:40]), dt, filename_ext.lower(),)
+  elif isinstance(instance, QuestionResponseFile):
+    return 'questionResponse/%s/%s_%s%s' % (instance.question_response.step_response.instance.student.user, slugify(filename_base.lower()[:10]), dt, filename_ext.lower(),)
+
   return 'misc/%s_%s%s' % (filename_base.lower(), dt, filename_ext.lower(),)
 
 # Create your models here.
@@ -429,6 +432,11 @@ class QuestionResponse(models.Model):
 
   class Meta:
     unique_together = ('step_response', 'curriculum_question')
+
+
+class QuestionResponseFile(models.Model):
+  question_response = models.ForeignKey(QuestionResponse, related_name='response_file', null=False)
+  file = models.FileField(upload_to=upload_file_to, null=False, blank=False)
 
 #######################################################
 # Assignment Feedback Model

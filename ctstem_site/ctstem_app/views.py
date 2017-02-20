@@ -1817,7 +1817,11 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
         if 'GET' == request.method:
           #get the assignment step
           form = forms.AssignmentStepResponseForm(instance=assignmentStepResponse, prefix="step_response")
-          questionResponseFormset=inlineformset_factory(models.AssignmentStepResponse, models.QuestionResponse, form=forms.QuestionResponseForm, can_delete=False, can_order=True, extra=extra)
+          questionResponseFormset = nestedformset_factory(models.AssignmentStepResponse, models.QuestionResponse, form=forms.QuestionResponseForm,
+                                                    nested_formset=inlineformset_factory(models.QuestionResponse, models.QuestionResponseFile, form=forms.QuestionResponseFileForm, can_delete=True, extra=2),
+                                                    can_delete=False, can_order=True, extra=extra)
+
+          #questionResponseFormset=inlineformset_factory(models.AssignmentStepResponse, models.QuestionResponse, form=forms.QuestionResponseForm, can_delete=False, can_order=True, extra=extra)
           formset = questionResponseFormset(instance=assignmentStepResponse, prefix='form')
 
           if int(step_order) == 1 and assignment.curriculum.curriculum_type == 'L':
@@ -1840,8 +1844,12 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
           #print data
           save_only = int(data['save'])
           form = forms.AssignmentStepResponseForm(data=data, instance=assignmentStepResponse, prefix="step_response")
-          questionResponseFormset=inlineformset_factory(models.AssignmentStepResponse, models.QuestionResponse, form=forms.QuestionResponseForm, can_delete=False, can_order=True, extra=0)
+          #questionResponseFormset=inlineformset_factory(models.AssignmentStepResponse, models.QuestionResponse, form=forms.QuestionResponseForm, can_delete=False, can_order=True, extra=0)
+          questionResponseFormset = nestedformset_factory(models.AssignmentStepResponse, models.QuestionResponse, form=forms.QuestionResponseForm,
+                                                    nested_formset=inlineformset_factory(models.QuestionResponse, models.QuestionResponseFile, form=forms.QuestionResponseFileForm, can_delete=True, extra=2),
+                                                    can_delete=False, can_order=True, extra=0)
           formset = questionResponseFormset(data, request.FILES, instance=assignmentStepResponse, prefix='form')
+
           if int(step_order) == 1 and assignment.curriculum.curriculum_type == 'L':
             instanceform = forms.AssignmentInstanceForm(data=data, assignment=assignment, instance=instance, prefix="teammates")
           else:
@@ -1876,23 +1884,29 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
             assignmentStepResponse = form.save(commit=False)
             assignmentStepResponse.instance = instance
             assignmentStepResponse.save()
-            #save the question response formset
-            questionResponseObjects = formset.save(commit=False)
-            questionResponses = {}
-            # get the question response ids to update the front end
-            for questionResponse in questionResponseObjects:
-              # if questionResponse.curriculum_question.question.answer_field_type == 'SK':
-              #   if questionResponse.response is not None and questionResponse.response != '':
-              #     base64String = questionResponse.response.split(',')[1]
-              #     sketch = base64.b64decode(base64String)
-              #     image = ContentFile(sketch, 'sketch.png')
-              #     questionResponse.responseFile = image
-              #     questionResponse.response = None
 
-              questionResponse.save()
-
-              print 'question order ', questionResponse.curriculum_question.order
-              questionResponses['id_form-%d-id'%(questionResponse.curriculum_question.order-1)] = questionResponse.id
+            questionCount = 0
+            if request.is_ajax():
+              formset.save(commit=False)
+              questionResponses = {}
+              # get the question response ids to update the front end
+              for questionform in formset:
+                questionCount = questionCount + 1
+                # if questionResponse.curriculum_question.question.answer_field_type == 'SK':
+                #   if questionResponse.response is not None and questionResponse.response != '':
+                #     base64String = questionResponse.response.split(',')[1]
+                #     sketch = base64.b64decode(base64String)
+                #     image = ContentFile(sketch, 'sketch.png')
+                #     questionResponse.responseFile = image
+                #     questionResponse.response = None
+                if questionform.instance.curriculum_question.question.answer_field_type != 'FI':
+                  questionResponse = questionform.save()
+                else:
+                  questionform.instance.save()
+                print 'question order ', questionform.instance.curriculum_question.order
+                questionResponses['id_form-%d-id'%(questionform.instance.curriculum_question.order-1)] = questionform.instance.id
+            else: # non ajax post
+              formset.save()
 
             #update the instance
             #submission
@@ -1911,7 +1925,7 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
 
               if request.is_ajax():
                 url = '/assignment/%s/%s/%s/' % (assignment_id, instance.id, step_order)
-                response_data = {'message': 'Your responses were auto saved at %s' % datetime.datetime.now().time().strftime('%r'), 'url': url, 'questionResponses': questionResponses, 'questionCount': len(questionResponses)}
+                response_data = {'message': 'Your responses were auto saved at %s' % datetime.datetime.now().time().strftime('%r'), 'url': url, 'questionResponses': questionResponses, 'questionCount': questionCount}
                 return http.HttpResponse(json.dumps(response_data), content_type = 'application/json')
               else:
                 return shortcuts.redirect('ctstem:resumeAssignment', assignment_id=assignment_id, instance_id=instance.id, step_order=next_step)
@@ -1919,6 +1933,11 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
           else:
             print form.errors
             print formset.errors
+            print 'total errors', formset.total_error_count
+            for f in formset.forms:
+              print 'subform error', f.errors
+              print 'subform non field error', f.non_field_errors
+
             messages.error(request, 'Please answer all the questions on this step before continuing on to the next step')
 
           context = {'curriculum': curriculum, 'instance': instance, 'instanceform': instanceform,  'form': form, 'formset': formset, 'total_steps': total_steps, 'step_order': step_order}
