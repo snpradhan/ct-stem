@@ -30,7 +30,7 @@ class RegistrationForm (forms.Form):
   email = forms.EmailField(required=True, max_length=75, label=u'Email')
   account_type = forms.ChoiceField(required=True, choices = models.USER_ROLE_CHOICES)
   school = forms.ModelChoiceField(required=False, queryset=models.School.objects.all())
-  captcha = CaptchaField(help_text=u'Type the word that appears to the right')
+  captcha = CaptchaField(help_text=u'Solve the equation to the right')
 
   def __init__(self, *args, **kwargs):
     user = kwargs.pop('user')
@@ -869,7 +869,7 @@ class TeamMemberForm(ModelForm):
 # Training Request Form
 ####################################
 class TrainingRequestForm(ModelForm):
-  captcha = CaptchaField(help_text=u'Type the word that appears to the right')
+  captcha = CaptchaField(help_text=u'Solve the equation to the right')
 
   class Meta:
     model = models.TrainingRequest
