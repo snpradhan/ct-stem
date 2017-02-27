@@ -51,9 +51,14 @@
               <input type="submit" class="btn btn-success" id="submit" value="Add User"/>
             </div>
           {% else %}
-            <div class="form-group">
+            <div class="form-group" id="div_terms">
               <label>
-                <input type="checkbox" id="agree"/> I agree to the <a data-toggle="modal" data-target="#terms" class="terms" href="#">Terms of Use</a>
+                <input type="checkbox" id="agree" name="agree"/> I agree to the <a data-toggle="modal" data-target="#terms" class="terms" href="#">Terms of Use</a>
+              </label>
+            </div>
+            <div class="form-group" id="div_conditions">
+              <label>
+                <input type="checkbox" id="conditions" name="condition"/> I agree to the <a data-toggle="modal" data-target="#terms" class="terms" href="#">Conditions</a>
               </label>
             </div>
             <div class="form-group button-group">

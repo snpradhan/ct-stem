@@ -570,119 +570,130 @@ def register(request, group_id=''):
     school = group.teacher.school
 
   if request.method == 'POST':
-    if group_id:
-      form = forms.RegistrationForm(user=request.user, data=request.POST, group_id=group_id)
+    # checking for bot signup
+    #Agree checkbox is visible to the user while condition checkbox is hidden.
+    #The user needs to check the Agree checkbox to enable the Register button
+    #Ensure the agree checkbox is checked and the condition checkbox is unchecked to verify the request is sent by a real person
+    if 'agree' not in request.POST or 'condition' in request.POST:
+      #this is a bot
+      #do not sign them up but show a deceiving message that they are signed up and redirect them to the homepage
+      messages.info(request, 'Thank you for registering')
+      return shortcuts.redirect('ctstem:home')
     else:
-      form = forms.RegistrationForm(user=request.user, data=request.POST)
-    if form.is_valid():
-      user = User.objects.create_user(form.cleaned_data['username'],
-                                      form.cleaned_data['email'],
-                                      form.cleaned_data['password1'])
-      user.first_name = form.cleaned_data['first_name']
-      user.last_name = form.cleaned_data['last_name']
-      if form.cleaned_data['account_type'] in  ['A', 'R', 'C', 'P'] and request.user.is_anonymous():
-          user.is_active = False
+      if group_id:
+        form = forms.RegistrationForm(user=request.user, data=request.POST, group_id=group_id)
       else:
-          user.is_active = True
-      user.save()
-
-      if form.cleaned_data['account_type'] == 'T':
-        newUser = models.Teacher()
-        newUser.school = form.cleaned_data['school']
-        newUser.user = user
-        newUser.save()
-
-      elif form.cleaned_data['account_type'] == 'S':
-        newUser = models.Student()
-        if group_id:
-          newUser.school = school
+        form = forms.RegistrationForm(user=request.user, data=request.POST)
+      if form.is_valid():
+        print form.cleaned_data
+        user = User.objects.create_user(form.cleaned_data['username'],
+                                        form.cleaned_data['email'],
+                                        form.cleaned_data['password1'])
+        user.first_name = form.cleaned_data['first_name']
+        user.last_name = form.cleaned_data['last_name']
+        if form.cleaned_data['account_type'] in  ['A', 'R', 'C', 'P'] and request.user.is_anonymous():
+            user.is_active = False
         else:
-          newUser.school = form.cleaned_data['school']
-        newUser.user = user
-        newUser.save()
-        if group_id:
-          membership, created = models.Membership.objects.get_or_create(student=newUser, group=group)
+            user.is_active = True
+        user.save()
 
-      elif form.cleaned_data['account_type'] == 'A':
-          newUser = models.Administrator()
+        if form.cleaned_data['account_type'] == 'T':
+          newUser = models.Teacher()
+          newUser.school = form.cleaned_data['school']
           newUser.user = user
           newUser.save()
 
-      elif form.cleaned_data['account_type'] == 'R':
-        newUser = models.Researcher()
-        newUser.user = user
-        newUser.save()
-      elif form.cleaned_data['account_type'] == 'C':
-        newUser = models.Author()
-        newUser.user = user
-        newUser.save()
-      elif form.cleaned_data['account_type'] == 'P':
-        newUser = models.SchoolAdministrator()
-        newUser.school = form.cleaned_data['school']
-        newUser.user = user
-        newUser.save()
-
-      current_site = Site.objects.get_current()
-      domain = current_site.domain
-
-      if request.user.is_anonymous():
-        if form.cleaned_data['account_type'] in ['A', 'R', 'C', 'P']:
-          messages.info(request, 'Your account is pending admin approval.  You will be notified once your account is approved.')
-          #send email confirmation
-          send_mail('CT-STEM Account Pending',
-          'Welcome to Computational Thinking in STEM website http://%s.  \r\n\r\n \
-          Your account is pending approval, and you will be notified once approved.\r\n\r\n  \
-          -- CT-STEM Admin' % domain,
-                    settings.DEFAULT_FROM_EMAIL,
-                    [newUser.user.email])
-          return shortcuts.redirect('ctstem:home')
-
-        elif form.cleaned_data['account_type'] in ['T', 'S']:
-          new_user = authenticate(username=form.cleaned_data['username'],
-                                  password=form.cleaned_data['password1'], )
-          login(request, new_user)
-          messages.info(request, 'Your have successfully registered.')
-          send_mail('CT-STEM Account Created',
-          'Welcome to Computational Thinking in STEM website http://%s.  \r\n\r\n \
-          You can login using the credentials created during registration. \r\n\r\n \
-          -- CT-STEM Admin' % domain,
-                    settings.DEFAULT_FROM_EMAIL,
-                    [newUser.user.email])
-          return shortcuts.redirect('ctstem:home')
-
-      else:
-        messages.info(request, 'User account has been created.')
-
-        send_mail('CT-STEM Account Created',
-        'Your user account has been created on Computational Thinking in STEM website http://%s.  \r\n\r\n \
-         Please login to the site using the following credentials and change your password.\r\n\r\n  \
-         Username: %s \r\n \
-         Temporary Password: %s \r\n\r\n \
-         -- CT-STEM Admin'%(domain, newUser.user.username, form.cleaned_data['password1']),
-                    settings.DEFAULT_FROM_EMAIL,
-                    [newUser.user.email])
-
-        if form.cleaned_data['account_type'] == 'A':
-          return shortcuts.redirect('ctstem:users', role='admins')
-        elif form.cleaned_data['account_type'] == 'R':
-          return shortcuts.redirect('ctstem:users', role='researchers')
-        elif form.cleaned_data['account_type'] == 'P':
-          return shortcuts.redirect('ctstem:users', role='school_administrators')
-        elif form.cleaned_data['account_type'] == 'C':
-          return shortcuts.redirect('ctstem:users', role='authors')
-        elif form.cleaned_data['account_type'] == 'T':
-          return shortcuts.redirect('ctstem:users', role='teachers')
         elif form.cleaned_data['account_type'] == 'S':
-          return shortcuts.redirect('ctstem:users', role='students')
-        return render(request, 'ctstem_app/About_us.html')
+          newUser = models.Student()
+          if group_id:
+            newUser.school = school
+          else:
+            newUser.school = form.cleaned_data['school']
+          newUser.user = user
+          newUser.save()
+          if group_id:
+            membership, created = models.Membership.objects.get_or_create(student=newUser, group=group)
 
-    else:
-      print form.errors
-      if group_id:
-        context = {'form': form, 'group_id': group_id, 'school_id': school.id}
+        elif form.cleaned_data['account_type'] == 'A':
+            newUser = models.Administrator()
+            newUser.user = user
+            newUser.save()
+
+        elif form.cleaned_data['account_type'] == 'R':
+          newUser = models.Researcher()
+          newUser.user = user
+          newUser.save()
+        elif form.cleaned_data['account_type'] == 'C':
+          newUser = models.Author()
+          newUser.user = user
+          newUser.save()
+        elif form.cleaned_data['account_type'] == 'P':
+          newUser = models.SchoolAdministrator()
+          newUser.school = form.cleaned_data['school']
+          newUser.user = user
+          newUser.save()
+
+        current_site = Site.objects.get_current()
+        domain = current_site.domain
+
+        if request.user.is_anonymous():
+          if form.cleaned_data['account_type'] in ['A', 'R', 'C', 'P']:
+            messages.info(request, 'Your account is pending admin approval.  You will be notified once your account is approved.')
+            #send email confirmation
+            send_mail('CT-STEM Account Pending',
+            'Welcome to Computational Thinking in STEM website http://%s.  \r\n\r\n \
+            Your account is pending approval, and you will be notified once approved.\r\n\r\n  \
+            -- CT-STEM Admin' % domain,
+                      settings.DEFAULT_FROM_EMAIL,
+                      [newUser.user.email])
+            return shortcuts.redirect('ctstem:home')
+
+          elif form.cleaned_data['account_type'] in ['T', 'S']:
+            new_user = authenticate(username=form.cleaned_data['username'],
+                                    password=form.cleaned_data['password1'], )
+            login(request, new_user)
+            messages.info(request, 'Your have successfully registered.')
+            send_mail('CT-STEM Account Created',
+            'Welcome to Computational Thinking in STEM website http://%s.  \r\n\r\n \
+            You can login using the credentials created during registration. \r\n\r\n \
+            -- CT-STEM Admin' % domain,
+                      settings.DEFAULT_FROM_EMAIL,
+                      [newUser.user.email])
+            return shortcuts.redirect('ctstem:home')
+
+        else:
+          messages.info(request, 'User account has been created.')
+
+          send_mail('CT-STEM Account Created',
+          'Your user account has been created on Computational Thinking in STEM website http://%s.  \r\n\r\n \
+           Please login to the site using the following credentials and change your password.\r\n\r\n  \
+           Username: %s \r\n \
+           Temporary Password: %s \r\n\r\n \
+           -- CT-STEM Admin'%(domain, newUser.user.username, form.cleaned_data['password1']),
+                      settings.DEFAULT_FROM_EMAIL,
+                      [newUser.user.email])
+
+          if form.cleaned_data['account_type'] == 'A':
+            return shortcuts.redirect('ctstem:users', role='admins')
+          elif form.cleaned_data['account_type'] == 'R':
+            return shortcuts.redirect('ctstem:users', role='researchers')
+          elif form.cleaned_data['account_type'] == 'P':
+            return shortcuts.redirect('ctstem:users', role='school_administrators')
+          elif form.cleaned_data['account_type'] == 'C':
+            return shortcuts.redirect('ctstem:users', role='authors')
+          elif form.cleaned_data['account_type'] == 'T':
+            return shortcuts.redirect('ctstem:users', role='teachers')
+          elif form.cleaned_data['account_type'] == 'S':
+            return shortcuts.redirect('ctstem:users', role='students')
+          return render(request, 'ctstem_app/About_us.html')
+
       else:
-        context = {'form': form }
-      return render(request, 'ctstem_app/Registration.html', context)
+        print form.errors
+        if group_id:
+          context = {'form': form, 'group_id': group_id, 'school_id': school.id}
+        else:
+          context = {'form': form }
+        return render(request, 'ctstem_app/Registration.html', context)
 
   else:
     if hasattr(request.user, 'researcher') or hasattr(request.user, 'author') or hasattr(request.user, 'student'):
@@ -2689,29 +2700,35 @@ def request_training(request):
   elif request.method == 'POST':
     response_data = {}
     data = request.POST.copy()
-    form = forms.TrainingRequestForm(data, instance=training)
-    if form.is_valid():
-      training = form.save()
+    #checking for bots
+    if 'condition' in data:
       messages.success(request, "Your request has been sent to the site admin")
       response_data['result'] = 'Success'
-      #send email to the admin
-      send_email('CT-STEM Training Request',
-                  '<b>Name </b>: %s <br> \
-                  <b>Email </b>: %s <br> \
-                  <b>School </b>: %s <br> \
-                  <b>Subject </b>: %s <br><br> \
-                  Thank you for your interest in attending our training session.  We will communicate \
-                  the date, place and other details about the event shortly. <br> \
-                  <br> \
-                  -CT-STEM Admin' % (training.name, training.email, training.school, training.subject),
-                  settings.DEFAULT_FROM_EMAIL,
-                  [training.email])
       return http.HttpResponse(json.dumps(response_data), content_type="application/json")
     else:
-      print form.errors
-      return JsonResponse({
-          'result': 'Failed',
-          'errors': dict(form.errors.items()),
-      })
+      form = forms.TrainingRequestForm(data, instance=training)
+      if form.is_valid():
+        training = form.save()
+        messages.success(request, "Your request has been sent to the site admin")
+        response_data['result'] = 'Success'
+        #send email to the admin
+        send_email('CT-STEM Training Request',
+                    '<b>Name </b>: %s <br> \
+                    <b>Email </b>: %s <br> \
+                    <b>School </b>: %s <br> \
+                    <b>Subject </b>: %s <br><br> \
+                    Thank you for your interest in attending our training session.  We will communicate \
+                    the date, place and other details about the event shortly. <br> \
+                    <br> \
+                    -CT-STEM Admin' % (training.name, training.email, training.school, training.subject),
+                    settings.DEFAULT_FROM_EMAIL,
+                    [training.email])
+        return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+      else:
+        print form.errors
+        return JsonResponse({
+            'result': 'Failed',
+            'errors': dict(form.errors.items()),
+        })
 
   return http.HttpResponseNotAllowed(['GET', 'POST'])

@@ -237,6 +237,10 @@ div.table#register, div.table#userProfile, div.table#password {
   width: 50%;
   padding: 3em 4em;
 }
+div#div_conditions {
+  display: none;
+}
+
 div.table#curriculum, div.table.step,
 div.table#curriculumQuestions, div.table.activity, div.table#metadata, div.table#group, div.table#standard {
   width: 80%;
