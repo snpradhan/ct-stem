@@ -742,16 +742,21 @@ class QuestionResponseForm(ModelForm):
 
   def clean(self):
     cleaned_data = super(QuestionResponseForm, self).clean()
+    uploaded_files = 0
+    for form in self.nested:
+      if form['id'].data or form['file'].data:
+        if not form['DELETE'].data:
+          uploaded_files += 1
+
     response = cleaned_data.get('response').strip()
-    responseFile = cleaned_data.get('responseFile')
     save = cleaned_data.get('save')
-    if save == False and not response and not responseFile:
+    if save == False and not response and uploaded_files == 0:
       self.add_error('response', 'Please answer this question')
-      self.add_error('responseFile', 'Please upload a file for this question')
-    if not response and responseFile and responseFile.size >  5*1024*1024:
-      self.add_error('responseFile', 'Uploaded file cannot be bigger than 5MB')
+      self.nested[0].add_error('file', 'Please upload at least one file')
 
-
+####################################
+# QuestionResponseFile Form
+####################################
 class QuestionResponseFileForm(ModelForm):
   class Meta:
     model = models.QuestionResponseFile
@@ -766,6 +771,14 @@ class QuestionResponseFileForm(ModelForm):
     for field_name, field in self.fields.items():
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['placeholder'] = field.help_text
+
+  def clean(self):
+    cleaned_data = super(QuestionResponseFileForm, self).clean()
+    print cleaned_data
+    file = cleaned_data.get('file')
+    delete = cleaned_data.get('DELETE')
+    if not delete and file.size > 5*1024*1024:
+      self.add_error('file', 'Uploaded file cannot be bigger than 5MB')
 
 ####################################
 # Feedback Form

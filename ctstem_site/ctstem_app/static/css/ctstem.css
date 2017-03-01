@@ -802,8 +802,8 @@ a.btn.pdf img {
 
 div.button-group-fixed {
   position: fixed;
-  top: 35%;
-  left: 90%;
+  top: 50%;
+  right: 2em;
 }
 
 .form-inline > * {

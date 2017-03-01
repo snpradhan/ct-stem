@@ -178,7 +178,23 @@ a:hover {
 .save-buttons button.back {
   float: left;
 }
+button.add_attachment, button.delete_attachment {
+  width: auto;
+  padding: 5px 12px;
+  color: white;
+  border-radius: 5px;
+  outline: none;
+  border: none;
+  font-family: 'Roboto Condensed', sans-serif;
+}
+button.delete_attachment {
+  background-color: #d9534f;
+}
 
+button.add_attachment {
+  background-color: #2aabd2;
+  margin-top: 1em;
+}
 
 /* DATA TABLE */
 table.data-table {
@@ -249,6 +265,7 @@ input[type="text"] {
 img.image_option {
   vertical-align: top !important;
   max-width: 100%;
+  width: 20em;
 }
 
 /* FIGURES */
@@ -303,8 +320,19 @@ ul.messages {
   top: 45px;
 }
 
-div.question_text {
-  margin-top: 2em;
+div.question_response_feedback {
+  margin: 1em 0;
+  padding: 1em 2em;
+}
+
+div.question_response_feedback.odd{
+  background-color: #f9f9f9;
+}
+div.question_response_feedback div.text {
+  margin-left: 2em;
+}
+hr.light {
+  border-top:  1px solid #eee;
 }
 
 /* LIKERT ITEM SET */
@@ -367,6 +395,9 @@ th.likert-instructions {
   vertical-align: top;
   padding: 1.2em 0.5em 1.2em 0;
   width: 65%;
+}
+a.add_attachment {
+  margin-top: 1em;
 }
 
 /* STYLES FOR NICE PRINTING */
