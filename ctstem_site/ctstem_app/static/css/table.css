@@ -50,6 +50,11 @@ table.table td > div.title {
   font-weight: bold;
   margin-bottom: 1em;
 }
+div.dt_input {
+  display: block;
+  max-width: 100%;
+  overflow-x: scroll;
+}
 
 table.table.dt thead tr:not(#filterrow), table.table.inner_table thead tr {
   background-color: #666666;
@@ -59,6 +64,9 @@ table.table.inner_table {
   margin-top: 1em;
 }
 table.table.inner_table thead tr {
+  font-size: 0.9em;
+}
+table.table.inner_table tbody tr {
   font-size: 0.9em;
 }
 

@@ -26,6 +26,7 @@
   <script type="text/javascript" src="/static/js/sketch.js"></script>
   <script type="text/javascript" src="/static/js/sketch_custom.js"></script>
   <script type="text/javascript" src="/static/js/clone_more.js"></script>
+  <script type="text/javascript" src="/static/js/assignment.js"></script>
 {% endblock %}
 
 {% block header %}{% endblock %}
@@ -158,6 +159,17 @@
                           {% elif field_type == 'SK' %}
                             <canvas id="{{questionForm.response.auto_id}}_sketch" width="800" height="500" class="assignment_sketch" style="{% if questionObj.sketch_background %} background: url({{questionObj.sketch_background.url}}) no-repeat;{% endif %}"></canvas>
                             <input type="hidden" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value='{{questionForm.response.value}}'/>
+                          {% elif field_type == 'DT' %}
+                            <div class="assignment_input dt_input" id="dt_input_{{forloop.counter}}">
+                              <input type="hidden" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value='{{questionForm.response.value}}'/>
+                              <input type="hidden" name="column_headers" id="dt_col_headers_{{forloop.counter}}" value="{{questionObj.options}}"/>
+                              <table class="table table-condensed table-bordered inner_table" id="dt_table_{{forloop.counter}}">
+                                <thead>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                              </table>
+                            </div>
                           {% else %}
                             <div>
                               {{questionForm.response.value}}
@@ -253,7 +265,6 @@
                             <button type="button" class="add_attachment" id="form-{{forloop.counter0}}-response_file" title="Add New Attachment">
                                 Upload more
                             </button>
-
                           </div>
                         {% elif field_type == 'SK' %}
                           <div class="assignment_input" tabindex="-1">
@@ -263,6 +274,18 @@
                             <input type="hidden" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value='{{questionForm.response.value}}'/>
                           </div>
                          <br>
+                        <!-- Data table -->
+                        {% elif field_type == 'DT' %}
+                          <div class="assignment_input dt_input" id="dt_input_{{forloop.counter}}">
+                            <input type="hidden" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value='{{questionForm.response.value}}'/>
+                            <input type="hidden" name="column_headers" id="dt_col_headers_{{forloop.counter}}" value="{{questionObj.options}}"/>
+                            <table class="table table-condensed table-bordered inner_table" id="dt_table_{{forloop.counter}}">
+                              <thead>
+                              </thead>
+                              <tbody>
+                              </tbody>
+                            </table>
+                          </div>
                         {% endif %}
                       {% endif %}
                     </div>
@@ -295,6 +318,8 @@
                       <tr class="likert-item assignment_input" tabindex="-1">
                         <td class="likert-number">
                           {{questionForm.id}}
+                          {{questionForm.nested.management_form}}
+                          {{questionForm.nested.id}}
                           {{forloop.counter}}.
                         </td>
                         <td class="likert-prompt">
@@ -412,6 +437,7 @@
         };
       }
       loadCanvasData();
+      loadDataTable();
     });
 
     $('a.page-link.linked').click(function(){
@@ -421,17 +447,21 @@
       allowPrompt = false;
     });
 
+    //manual save
     $('button.save').click(function(){
       $('input:hidden[id="save"]').val(1);
       $('input:hidden[id*="save"][id*="form"]').val('on');
       setCanvasData();
+      setDataTable();
       $('form#assignmentForm').submit();
     });
 
+    //manual submit
     $('button.submit').click(function(){
       $('input:hidden[id="save"]').val(0);
       $('input:hidden[id*="save"][id*="form"]').val('');
       setCanvasData();
+      setDataTable();
       $('form#assignmentForm').submit();
     });
 
@@ -460,11 +490,13 @@
     function waitForSave(URL){
       setTimeout( function() { window.location = URL }, 1000 );
     }
+    //ajax save on clicking the Back button or Page number
     function saveStep(status){
       if(status != 'S' && status != 'F' && status != 'A'){
         $('input:hidden[id="save"]').val(1);
         $('input:hidden[id*="save"][id*="form"]').val('on');
         setCanvasData();
+        setDataTable();
         $('#assignmentForm').ajaxSubmit({
            dataType : 'json',
            success: function(data){
@@ -474,6 +506,7 @@
       }
       return true;
     }
+
     function setCanvasData(){
       $('canvas.assignment_sketch').each(function(){
         var actions = $(this).sketch().actions;
@@ -494,6 +527,36 @@
         }
       });
     }
+    function setDataTable(){
+      $('div.dt_input').each(function(){
+        var tableId = $(this).children('table:first').attr('id');
+        console.log('setting '+tableId);
+        dtmSaveTable(tableId);
+      });
+    }
+    function loadDataTable(){
+      $('div.dt_input').each(function(){
+        var divId = $(this).attr('id');
+        var tableId = $(this).children('table:first').attr('id');
+        //get row data
+        var rowInput = $(this).children('input[type=hidden]:first').val();
+        if (rowInput) {
+          rowInput = JSON.parse(rowInput);
+        }
+        else {
+          rowInput = '';
+        }
+        var colInput = $(this).children('input[type=hidden]:nth-of-type(2)').val().split('\n');
+        var status = "{{form.instance.instance.status}}";
+        var closedStatus = ['S', 'F', 'A'];
+        var editFlag = true;
+        if(closedStatus.indexOf(status) >= 0){
+          editFlag = false;
+        }
+        dtmBuildHtmlTable(divId, tableId, colInput, rowInput, editFlag);
+      });
+    }
+
 
     //auto submit on focusout
     $(function(){
@@ -508,6 +571,7 @@
             $('input:hidden[id="save"]').val(1);
             $('input:hidden[id*="save"][id*="form"]').val('on');
             setCanvasData();
+            setDataTable();
             $('#assignmentForm').ajaxSubmit({
               dataType : 'json',
               success: function(data){

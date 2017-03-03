@@ -75,7 +75,7 @@ header {
 /* MAIN SECTION AND BASIC ELEMENTS */
 main {
   display: block;
-  max-width: 1000px;
+  max-width: 1200px;
   min-width: 600px;
 }
 
@@ -178,6 +178,14 @@ a:hover {
 .save-buttons button.back {
   float: left;
 }
+
+td.add_delete_buttons {
+  width: 5em;
+  text-align: center;
+}
+td.add_delete_buttons button {
+  margin: 0 0.1em;
+}
 button.add_attachment, button.delete_attachment {
   width: auto;
   padding: 5px 12px;
@@ -245,7 +253,6 @@ input[type="text"] {
   height: 2rem;
   background-color: #fffffa;
   font-size: 0.8rem;
-  margin-bottom: 1.5rem;
 }
 
 .mc-options {

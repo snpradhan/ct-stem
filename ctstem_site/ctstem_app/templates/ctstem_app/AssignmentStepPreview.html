@@ -107,50 +107,106 @@
                 {% with question=curriculumquestion.question %}
                 {% with field_type=question.answer_field_type %}
                 {% if field_type != 'MH' %}
-                  <div class="question_text">
+                  <div class="question_response_feedback {% if forloop.counter|divisibleby:2 %} even {% else %} odd {% endif %}">
                     <div class="question">
-                      {{question|safe}}
+                      <label>Question:</label>
+                      <div class="text">
+                        {{question|safe}}
+                      </div>
                     </div>
-                  </div>
-                  <div class="answer_field">
-                    <div class="response">
 
-                      {% if field_type == 'TA' %}
-                        <textarea placeholder="Enter your response" class="form-control assignment_textarea" name="{{forloop.counter}}" id="{{forloop.counter}}" ></textarea>
-                      {% elif field_type == 'TF' %}
-                        <input type="text" placeholder="Enter your response" class="form-control" name="{{forloop.counter}}" id="{{forloop.counter}}"/>
-                      {% elif field_type == 'DD' %}
-                        <select class="form-control" name="{{forloop.counter}}" id="{{forloop.counter}}">
+                    <div class="response">
+                      <label>Response:</label>
+                      <div class="text">
+                        {% if field_type == 'TA' %}
+                          <textarea placeholder="Enter your response" class="form-control assignment_textarea" name="{{forloop.counter}}" id="{{forloop.counter}}" ></textarea>
+                        {% elif field_type == 'TF' %}
+                          <input type="text" placeholder="Enter your response" class="form-control" name="{{forloop.counter}}" id="{{forloop.counter}}"/>
+                        {% elif field_type == 'DD' %}
+                          <select class="form-control" name="{{forloop.counter}}" id="{{forloop.counter}}">
+                            {% for option in question.options|splitlines%}
+                              <option value="{{option}}">{{option}}</option>
+                            {% endfor %}
+                          </select>
+                        {% elif field_type == 'MC' %}
                           {% for option in question.options|splitlines%}
-                            <option value="{{option}}">{{option}}</option>
+                            <input type="radio" name="{{question.id}}_mc" id="{{question.id}}_mc" value="{{option}}" />  {{option}}<br>
                           {% endfor %}
-                        </select>
-                      {% elif field_type == 'MC' %}
-                        {% for option in question.options|splitlines%}
-                          <input type="radio" name="{{question.id}}_mc" id="{{question.id}}_mc" value="{{option}}" />  {{option}}<br>
-                        {% endfor %}
-                      {% elif field_type == 'MI' %}
-                        {% for option in question.options|splitlines%}
-                          <input type="radio" name="{{question.id}}_mi" id="{{question.id}}_mi" value="{{option}}"/>
-                          <span>{{forloop.counter0|get_ascii_char}}.</span>
-                          <img src="{{option}}" class="image_option"/><br><br>
-                        {% endfor %}
-                      {% elif field_type == 'MS' %}
-                        {% for option in question.options|splitlines%}
-                          <input type="checkbox" name="{{question.id}}_cb" id="{{question.id}}_cb" value="{{option}}"/>  {{option}}<br>
-                        {% endfor %}
-                      {% elif field_type == 'FI' %}
-                        <div class="note"> Note: Upload a file </div>
-                        <input type="file" name="{{question.id}}_file" id="{{question.id}}_file"/> <br>
-                      {% elif field_type == 'SK' %}
-                        <div class="note"> Note: Draw your sketch in the sketchpad below </div>
-                        <div id="{{question.id}}_sketch_tools" class="sketch_tools"></div>
-                        <canvas id="{{question.id}}_sketch" width="800" height="500" class="assignment_sketch" style="{% if question.sketch_background %} background: url({{question.sketch_background.url}}) no-repeat;{% endif %}"></canvas>
-                      {% endif %}
+                        {% elif field_type == 'MI' %}
+                          {% for option in question.options|splitlines%}
+                            <input type="radio" name="{{question.id}}_mi" id="{{question.id}}_mi" value="{{option}}"/>
+                            <span>{{forloop.counter0|get_ascii_char}}.</span>
+                            <img src="{{option}}" class="image_option"/><br><br>
+                          {% endfor %}
+                        {% elif field_type == 'MS' %}
+                          {% for option in question.options|splitlines%}
+                            <input type="checkbox" name="{{question.id}}_cb" id="{{question.id}}_cb" value="{{option}}"/>  {{option}}<br>
+                          {% endfor %}
+                        {% elif field_type == 'FI' %}
+                          <div>
+                            <table class="table table-striped table-condensed table-bordered inner_table collapsible_content">
+                              <thead>
+                                <tr>
+                                  <th>File</th>
+                                  <th>Delete</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                  <tr>
+                                    <td class="attached_file">
+                                      <input type="file"/>
+                                    </td>
+                                    <td class="attachment_edit">
+                                      <button type="button" class="delete_attachment" name="delete_attachment" aria-label="Delete Attachment" title="Delete Attachment">
+                                        <i class="fa fa-trash" aria-hidden="true"></i>
+                                      </button>
+                                    </td>
+                                  </tr>
+
+                              </tbody>
+                            </table>
+                            <button type="button" class="add_attachment" id="form-response_file" title="Add New Attachment">
+                                Upload more
+                            </button>
+                          </div>
+                        {% elif field_type == 'SK' %}
+                          <div class="note"> Note: Draw your sketch in the sketchpad below </div>
+                          <div id="{{question.id}}_sketch_tools" class="sketch_tools"></div>
+                          <canvas id="{{question.id}}_sketch" width="800" height="500" class="assignment_sketch" style="{% if question.sketch_background %} background: url({{question.sketch_background.url}}) no-repeat;{% endif %}"></canvas>
+                        {% elif field_type == 'DT' %}
+                          <table class="table table-condensed table-bordered inner_table">
+                            <thead>
+                              <tr>
+                                {% for header in question.options|splitlines%}
+                                  <th>{{header}}</th>
+                                {% endfor %}
+                                <th></th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {% for i in '123' %}
+                                <tr>
+                                  {% for header in question.options|splitlines%}
+                                    <td> <input type="text" name="dt_{{forloop.parent.counter}}_{{forloop.counter}}" id="dt_{{forloop.parent.counter}}_{{forloop.counter}}"/></td>
+                                  {% endfor %}
+                                  <td class="add_delete_buttons">
+                                    <button type="button" class="btn btn-success" title="Add Row">+</button>
+                                    {% if forloop.counter0 > 0 %}
+                                      <button type="button" class="btn btn-danger" title="Delete Row">-</button>
+                                    {% endif %}
+                                  </td>
+                                </tr>
+                              {% endfor %}
+                            </tbody>
+                          </table>
+                        {% endif %}
+                      </div>
                     </div>
                   </div>
                   {% if forloop.last %}
                     <hr>
+                  {% else %}
+                    <hr class="light">
                   {% endif %}
                 {% else %}
                   <table class="likert">
