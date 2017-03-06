@@ -3,21 +3,26 @@
 
 {% block title %} {{curriculum.title}} {%endblock %}
 
-{% block bootstrap_css %}{% endblock %}
+{% block bootstrap_css %}
+  <link rel="stylesheet" href="/static/css/bootstrap-modal.css">
+{% endblock %}
 {% block datatable %}{% endblock %}
 {% block django_admin %}{% endblock %}
-{% block misc %}{% endblock %}
+{% block misc %}
+ <script src="http://canvasjs.com//assets/script/canvasjs.min.js"></script>
+ <script src="/static/js/highlight.pack.js"></script>
+{% endblock %}
 {% block agency %}{% endblock %}
 {% block ctstem %}
   <script type="text/javascript" src="/static/js/session.js"></script>
+  <script type="text/javascript" src="/static/js/clone_more.js"></script>
+  <script type="text/javascript" src="/static/js/assignment.js"></script>
 {% endblock %}
 
 {% block custom_media %}
   <link href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css?family=Maitree:400,700|Roboto+Condensed:300,400,700italic" rel="stylesheet">
   <!--script src="http://ajax.googleapis.com/ajax/libs/jquery/3.0.0/jquery.min.js"></script-->
-  <script src="http://canvasjs.com//assets/script/canvasjs.min.js"></script>
-  <link rel="stylesheet" href="/static/css/bootstrap-modal.css">
   <link rel="stylesheet" href="/static/css/table.css">
   <link rel="stylesheet" href="/static/css/messages.css">
   <link rel="stylesheet" href="/static/css/assignment.css">
@@ -25,8 +30,6 @@
   <link rel="stylesheet" href="/static/css/sketch.css">
   <script type="text/javascript" src="/static/js/sketch.js"></script>
   <script type="text/javascript" src="/static/js/sketch_custom.js"></script>
-  <script type="text/javascript" src="/static/js/clone_more.js"></script>
-  <script type="text/javascript" src="/static/js/assignment.js"></script>
 {% endblock %}
 
 {% block header %}{% endblock %}
