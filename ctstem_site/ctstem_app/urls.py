@@ -55,6 +55,7 @@ urlpatterns = [
     url(r'^students/search/$', views.searchStudents, name='searchStudents'),
     url(r'^question/new/$', views.question, name='newQuestion'),
     url(r'^question/(?P<id>[\d]+)/$', views.question, name='question'),
+    url(r'^response/(?P<instance_id>[\d]+)/(?P<response_id>[\d]+)/$', views.questionResponse, name='questionResponse'),
     url(r'^group/(?P<id>[\d]+)/$', views.group, name='group'),
     url(r'^group/delete/(?P<id>[\d]+)/$', views.deleteGroup, name='deleteGroup'),
     url(r'^groups/$', views.groups, name='groups'),

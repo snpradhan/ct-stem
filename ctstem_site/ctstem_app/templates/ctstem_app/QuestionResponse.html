@@ -1,0 +1,49 @@
+{% extends "ctstem_app/base.html" %}
+
+{% block title %}Question Response |{% endblock %}
+
+{% block custom_media %}
+   <link rel="stylesheet" href="/static/css/sketch.css">
+  <script type="text/javascript" src="/static/js/sketch.js"></script>
+  <script type="text/javascript" src="/static/js/sketch_custom.js"></script>
+  <script type="text/javascript" src="/static/js/assignment.js"></script>
+{% endblock %}
+{% block content %}
+  {{block.super}}
+  <div class="content">
+    <h2>Question Response</h2>
+    <div class="form-group">
+      <label>Question:</label>
+      <div class="text">
+        {{question.question_text|safe}}
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Response:</label>
+      <div>
+        {% if question.answer_field_type == 'SK' %}
+          <canvas id="sketch" width="800" height="500" class="assignment_sketch" style="{% if question.sketch_background %} background: url({{question.sketch_background.url}}) no-repeat;{% endif %}"></canvas>
+          <input type="hidden" name="sketch_response" id="sketch_response" value="{{question_response.response}}"/>
+        {% elif question.answer_field_type == 'DT' %}
+          <div class="dt_input" id="dt_input">
+            <input type="hidden" name="dt_response}}" id="dt_response}}" value='{{question_response.response}}'/>
+            <input type="hidden" name="column_headers" id="dt_col_headers" value="{{question.options}}"/>
+            <table class="table table-condensed table-bordered inner_table" id="dt_table">
+              <thead>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <script type="text/javascript">
+    $(function(){
+      loadCanvasData();
+      loadDataTable(false);
+    });
+  </script>
+{% endblock %}

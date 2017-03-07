@@ -1903,7 +1903,7 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
                   questionResponse = questionform.save()
                 else:
                   questionform.instance.save()
-                print 'question order ', questionform.instance.curriculum_question.order
+                #print 'question order ', questionform.instance.curriculum_question.order
                 questionResponses['id_form-%d-id'%(questionform.instance.curriculum_question.order-1)] = questionform.instance.id
             else: # non ajax post
               formset.save()
@@ -2024,6 +2024,7 @@ def feedback(request, assignment_id='', instance_id=''):
         if form.is_valid() and formset.is_valid():
           form.save()
           formset.save()
+
           if data['save_and_send'] == 'true':
             instance.status = 'F'
             instance.save()
@@ -2092,12 +2093,7 @@ def export_response(request, assignment_id='', student_id=''):
       for stepResponse in stepResponses:
         questionResponses = models.QuestionResponse.objects.all().filter(step_response=stepResponse)
         for questionResponse in questionResponses:
-          if questionResponse.response:
-            response_text = smart_str(questionResponse.response)
-          elif questionResponse.responseFile:
-            response_text = questionResponse.responseFile.url
-          else:
-            response_text = ''
+          response_text = get_response_text(request, instance.id, questionResponse)
           writer.writerow([student, stepResponse.step.title, questionResponse.curriculum_question.question, questionResponse.curriculum_question.question.options, response_text])
 
     return response
@@ -2143,12 +2139,7 @@ def export_all_response(request, curriculum_id=''):
         for stepResponse in stepResponses:
           questionResponses = models.QuestionResponse.objects.all().filter(step_response=stepResponse)
           for questionResponse in questionResponses:
-            if questionResponse.response:
-              response_text = smart_str(questionResponse.response)
-            elif questionResponse.responseFile:
-              response_text = questionResponse.responseFile.url
-            else:
-              response_text = ''
+            response_text = get_response_text(request, instance.id, questionResponse)
             writer.writerow([instance.assignment.group, instance.assignment.assigned_date, instance.assignment.due_date, student, stepResponse.step.title, questionResponse.curriculum_question.question, questionResponse.curriculum_question.question.options, response_text])
     else:
       writer.writerow(['There are no student response for this assignment'])
@@ -2156,6 +2147,31 @@ def export_all_response(request, curriculum_id=''):
 
   except models.Curriculum.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested curriculum not found</h1>')
+
+####################################
+# Get question response
+# If the question type is Text return the text response
+# If the question type is Sketch or Data Table return the url that will display the Sketch or Data Table
+# If the question type is File, return the url(s) of the user uploaded files
+####################################
+@login_required
+def get_response_text(request, instance_id, questionResponse):
+  response_text = ''
+  answer_field_type = questionResponse.curriculum_question.question.answer_field_type
+  if answer_field_type == 'SK' or answer_field_type == 'DT':
+    current_site = Site.objects.get_current()
+    domain = current_site.domain
+    response_text = 'http://%s/response/%d/%d'%(domain, instance_id, questionResponse.id)
+  elif answer_field_type == 'FI':
+    uploaded_files = questionResponse.response_file.all()
+    response_text = ''
+    for uploaded_file in uploaded_files:
+      response_text = response_text + uploaded_file.file.url + '\n'
+  else:
+    if questionResponse.response:
+      response_text = smart_str(questionResponse.response)
+
+  return response_text
 
 ####################################
 # ADD/EDIT QUESTION
@@ -2192,6 +2208,47 @@ def question(request, id=''):
 
   return http.HttpResponseNotAllowed(['GET', 'POST'])
 
+####################################
+# Display the question response based on the answer field type
+####################################
+def questionResponse(request, instance_id='', response_id=''):
+  try:
+    if request.user.is_anonymous():
+      messages.info(request, 'Please login to view the link')
+      return shortcuts.redirect('ctstem:home')
+    # check if the user has permission to view student response
+    if '' != instance_id and '' != response_id:
+      instance = models.AssignmentInstance.objects.get(id=instance_id)
+      print 'instance', instance
+      school = instance.student.school
+      group = instance.assignment.group
+      privilege = 0
+      if hasattr(request.user, 'researcher') or hasattr(request.user, 'administrator'):
+        privilege = 1
+      elif hasattr(request.user, 'teacher') and request.user.teacher == group.teacher:
+          privilege = 1
+      elif hasattr(request.user, 'school_administrator') and request.user.school_administrator.school == school:
+        privilege = 1
+
+      if privilege == 0:
+        return http.HttpResponseNotFound('<h1>You do not have the privilege to view this page</h1>')
+
+      if 'GET' == request.method:
+        #get the question response
+        question_response = models.QuestionResponse.objects.get(id=response_id, step_response__instance__id=instance_id)
+        print 'response', question_response
+        question = question_response.curriculum_question.question
+        question_response_files = question_response.response_file.all()
+        context = {'question': question, 'question_response': question_response, 'response_files': question_response_files}
+        return render(request, 'ctstem_app/QuestionResponse.html', context)
+
+      return http.HttpResponseNotAllowed(['GET'])
+    else:
+      return http.HttpResponseNotFound('<h1>Requested response not found</h1>')
+  except models.AssignmentInstance.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested response not found</h1>')
+  except models.QuestionResponse.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested response not found</h1>')
 
 ####################################
 # GENERATE UNIQUE USER CODE
