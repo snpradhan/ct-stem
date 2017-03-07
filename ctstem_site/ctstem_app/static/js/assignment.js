@@ -138,3 +138,33 @@ function dtmAddAllColumnHeaders(selector, colInput, editFlag) {
   }
   $(selector).append(headerTr$);
 }
+
+/*
+ * Load existing data in the data table
+ */
+function loadDataTable(status){
+  $('div.dt_input').each(function(){
+    var divId = $(this).attr('id');
+    var tableId = $(this).children('table:first').attr('id');
+    //get row data
+    var rowInput = $(this).children('input[type=hidden]:first').val();
+    if (rowInput) {
+      rowInput = JSON.parse(rowInput);
+    }
+    else {
+      rowInput = '';
+    }
+    var colInput = $(this).children('input[type=hidden]:nth-of-type(2)').val().split('\n');
+    dtmBuildHtmlTable(divId, tableId, colInput, rowInput, status);
+  });
+}
+
+/*
+ * Set the data in the data tables for save
+ */
+function setDataTable(){
+  $('div.dt_input').each(function(){
+    var tableId = $(this).children('table:first').attr('id');
+    dtmSaveTable(tableId);
+  });
+}

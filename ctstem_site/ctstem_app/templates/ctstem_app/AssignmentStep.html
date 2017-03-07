@@ -415,17 +415,13 @@
       evt = e;
     }
 
-    $("#assignmentForm input:checkbox").change(function(){
-      var selectedValues = $("input[id="+$(this).attr('id')+"]:checked").map(function() {return this.value;}).get().join(',')
-      var hiddenVar = $(this).prevAll('input:hidden');
-      $(hiddenVar).val(selectedValues);
-    });
+    $(function(){
 
-    var allowPrompt = true;
-    $(document).ready(function(){
+      var allowPrompt = true;
       var status = "{{form.instance.instance.status}}";
       var closedStatus = ['S', 'F', 'A'];
-      if(closedStatus.indexOf(status) >= 0){
+      var closed = closedStatus.indexOf(status) >= 0;
+      if(closed){
         $(':input:not(:button)').attr('disabled', 'disabled');
       }
       else{
@@ -439,55 +435,63 @@
           }
         };
       }
+
       loadCanvasData();
-      loadDataTable();
-    });
+      loadDataTable(!closed);
+      bindFocusOutSave(!closed);
 
-    $('a.page-link.linked').click(function(){
-      allowPrompt = false;
-    });
-    $('div.save-buttons button').click(function(){
-      allowPrompt = false;
-    });
+      $("#assignmentForm input:checkbox").change(function(){
+        var selectedValues = $("input[id="+$(this).attr('id')+"]:checked").map(function() {return this.value;}).get().join(',')
+        var hiddenVar = $(this).prevAll('input:hidden');
+        $(hiddenVar).val(selectedValues);
+      });
 
-    //manual save
-    $('button.save').click(function(){
-      $('input:hidden[id="save"]').val(1);
-      $('input:hidden[id*="save"][id*="form"]').val('on');
-      setCanvasData();
-      setDataTable();
-      $('form#assignmentForm').submit();
-    });
+      $('a.page-link.linked').click(function(){
+        allowPrompt = false;
+      });
+      $('div.save-buttons button').click(function(){
+        allowPrompt = false;
+      });
 
-    //manual submit
-    $('button.submit').click(function(){
-      $('input:hidden[id="save"]').val(0);
-      $('input:hidden[id*="save"][id*="form"]').val('');
-      setCanvasData();
-      setDataTable();
-      $('form#assignmentForm').submit();
-    });
+      //manual save
+      $('button.save').click(function(){
+        $('input:hidden[id="save"]').val(1);
+        $('input:hidden[id*="save"][id*="form"]').val('on');
+        setCanvasData();
+        setDataTable();
+        $('form#assignmentForm').submit();
+      });
 
-    $('button.add_attachment').click(function() {
-      var tr = $("tr:last", $(this).prev());
-      cloneMore($(tr), $(this).attr('id'));
-      //var new_row = $('div.attachment_table table.table tr:nth-last-child(2)');
-      $(tr).toggle();
-    });
+      //manual submit
+      $('button.submit').click(function(){
+        $('input:hidden[id="save"]').val(0);
+        $('input:hidden[id*="save"][id*="form"]').val('');
+        setCanvasData();
+        setDataTable();
+        $('form#assignmentForm').submit();
+      });
 
-    $('input[type="file"][id="selectedFile"]').change(function(){
-      $("ul.messages li").remove();
-      $("ul.messages").html('<li class="warning">Click the Save button below to Save the uploaded files</li>');
-    })
+      $('button.add_attachment').click(function() {
+        var tr = $("tr:last", $(this).prev());
+        cloneMore($(tr), $(this).attr('id'));
+        //var new_row = $('div.attachment_table table.table tr:nth-last-child(2)');
+        $(tr).toggle();
+      });
 
-    $('button.delete_attachment').click(function(){
-      var r = confirm("Are you sure you want to delete this attachment?");
-      if (r == true) {
-        $(this).next('input').val('on');
-        $(this).closest('tr').hide();
+      $('input[type="file"][id="selectedFile"]').change(function(){
         $("ul.messages li").remove();
-        $("ul.messages").html('<li class="warning">Click the Save button below to Delete the uploaded files</li>');
-      }
+        $("ul.messages").html('<li class="warning">Click the Save button below to Save the uploaded files</li>');
+      })
+
+      $('button.delete_attachment').click(function(){
+        var r = confirm("Are you sure you want to delete this attachment?");
+        if (r == true) {
+          $(this).next('input').val('on');
+          $(this).closest('tr').hide();
+          $("ul.messages li").remove();
+          $("ul.messages").html('<li class="warning">Click the Save button below to Delete the uploaded files</li>');
+        }
+      });
     });
 
     function waitForSave(URL){
@@ -510,60 +514,9 @@
       return true;
     }
 
-    function setCanvasData(){
-      $('canvas.assignment_sketch').each(function(){
-        var actions = $(this).sketch().actions;
-        $(this).next().val(JSON.stringify(actions));
-      });
-    }
-
-    function loadCanvasData(){
-      $('canvas.assignment_sketch').each(function(){
-        var id = '#'+$(this).attr('id');
-        var actions = $(id).next().val();
-        if(actions){
-          var actions_json = JSON.parse(actions);
-          $.each(actions_json, function (i, val) {
-            $(id).sketch().actions.push(val);
-            $(id).sketch().redraw();
-          });
-        }
-      });
-    }
-    function setDataTable(){
-      $('div.dt_input').each(function(){
-        var tableId = $(this).children('table:first').attr('id');
-        console.log('setting '+tableId);
-        dtmSaveTable(tableId);
-      });
-    }
-    function loadDataTable(){
-      $('div.dt_input').each(function(){
-        var divId = $(this).attr('id');
-        var tableId = $(this).children('table:first').attr('id');
-        //get row data
-        var rowInput = $(this).children('input[type=hidden]:first').val();
-        if (rowInput) {
-          rowInput = JSON.parse(rowInput);
-        }
-        else {
-          rowInput = '';
-        }
-        var colInput = $(this).children('input[type=hidden]:nth-of-type(2)').val().split('\n');
-        var status = "{{form.instance.instance.status}}";
-        var closedStatus = ['S', 'F', 'A'];
-        var editFlag = true;
-        if(closedStatus.indexOf(status) >= 0){
-          editFlag = false;
-        }
-        dtmBuildHtmlTable(divId, tableId, colInput, rowInput, editFlag);
-      });
-    }
-
-
     //auto submit on focusout
-    $(function(){
-      {% if form.instance.instance.status != 'S' and form.instance.instance.status != 'F' and form.instance.instance.status != 'A'%}
+    function bindFocusOutSave(status) {
+      if (status) {
         $('.assignment_input').focusout(function(e){
           if(evt.target.id == 'sv' ||  evt.target.id == 'sc' || evt.target.id == 'bk'){
             console.log('manual save');
@@ -606,12 +559,14 @@
             return false;
           }
         });
-      {% else %}
+      }
+      else {
         $('canvas').each(function(){
           $(this)[0].removeEventListener('click');
         });
-      {% endif %}
-    });
+      }
+    }
+
   </script>
 
 {% endblock %}

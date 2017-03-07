@@ -774,7 +774,6 @@ class QuestionResponseFileForm(ModelForm):
 
   def clean(self):
     cleaned_data = super(QuestionResponseFileForm, self).clean()
-    print cleaned_data
     file = cleaned_data.get('file')
     delete = cleaned_data.get('DELETE')
     if not delete and file.size > 5*1024*1024:

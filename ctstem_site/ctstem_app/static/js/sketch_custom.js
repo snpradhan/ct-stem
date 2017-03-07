@@ -13,3 +13,30 @@ $(function(){
     $('#'+id+'').sketch();
   });
 });
+
+/*
+ * Load existing canvas data
+ */
+function loadCanvasData(){
+  $('canvas.assignment_sketch').each(function(){
+    var id = '#'+$(this).attr('id');
+    var actions = $(id).next().val();
+    if(actions){
+      var actions_json = JSON.parse(actions);
+      $.each(actions_json, function (i, val) {
+        $(id).sketch().actions.push(val);
+        $(id).sketch().redraw();
+      });
+    }
+  });
+}
+
+/*
+ * Set canvas data for save
+ */
+function setCanvasData(){
+  $('canvas.assignment_sketch').each(function(){
+    var actions = $(this).sketch().actions;
+    $(this).next().val(JSON.stringify(actions));
+  });
+}

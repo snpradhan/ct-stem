@@ -83,7 +83,7 @@
                           <input type="hidden" name="{{question.instance.id}}_sketch_response" id="{{question.instance.id}}_sketch_response" value="{{question.instance.response.response}}"/>
                         {% elif question.instance.response.curriculum_question.question.answer_field_type == 'DT' %}
                           <div class="dt_input" id="dt_input_{{forloop.counter}}">
-                            <input type="hidden" name="{{question.instance.id}}_dt_response}}" id="{{question.instance.id}}_dt_response}}" value='{{question.instance.response.response}}'/>
+                            <input type="hidden" name="{{question.instance.id}}_dt_response" id="{{question.instance.id}}_dt_response" value='{{question.instance.response.response}}'/>
                             <input type="hidden" name="column_headers" id="dt_col_headers_{{forloop.counter}}" value="{{question.instance.response.curriculum_question.question.options}}"/>
                             <table class="table table-condensed table-bordered inner_table" id="dt_table_{{forloop.counter}}">
                               <thead>
@@ -166,32 +166,9 @@
         var val = $('textarea#'+id).val();
         $('textarea#'+id).val(val + $(this).html());
       });
-      $('canvas.assignment_sketch').each(function(){
-        var id = '#'+$(this).attr('id');
-        var actions = $(id).next().val();
-        if(actions){
-          var actions_json = JSON.parse(actions);
-          $.each(actions_json, function (i, val) {
-            $(id).sketch().actions.push(val);
-            $(id).sketch().redraw();
-          });
-        }
-      });
 
-      $('div.dt_input').each(function(){
-        var divId = $(this).attr('id');
-        var tableId = $(this).children('table:first').attr('id');
-        //get row data
-        var rowInput = $(this).children('input[type=hidden]:first').val();
-        if (rowInput) {
-          rowInput = JSON.parse(rowInput);
-        }
-        else {
-          rowInput = '';
-        }
-        var colInput = $(this).children('input[type=hidden]:nth-of-type(2)').val().split('\n');
-        dtmBuildHtmlTable(divId, tableId, colInput, rowInput, false);
-      });
+      loadCanvasData();
+      loadDataTable(false);
 
     });
 
