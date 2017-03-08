@@ -2094,7 +2094,7 @@ def export_response(request, assignment_id='', student_id=''):
         questionResponses = models.QuestionResponse.objects.all().filter(step_response=stepResponse)
         for questionResponse in questionResponses:
           response_text = get_response_text(request, instance.id, questionResponse)
-          writer.writerow([student, stepResponse.step.title, questionResponse.curriculum_question.question, questionResponse.curriculum_question.question.options, response_text])
+          writer.writerow([student, stepResponse.step.title, smart_str(questionResponse.curriculum_question.question), smart_str(questionResponse.curriculum_question.question.options), response_text])
 
     return response
 
@@ -2140,7 +2140,7 @@ def export_all_response(request, curriculum_id=''):
           questionResponses = models.QuestionResponse.objects.all().filter(step_response=stepResponse)
           for questionResponse in questionResponses:
             response_text = get_response_text(request, instance.id, questionResponse)
-            writer.writerow([instance.assignment.group, instance.assignment.assigned_date, instance.assignment.due_date, student, stepResponse.step.title, questionResponse.curriculum_question.question, questionResponse.curriculum_question.question.options, response_text])
+            writer.writerow([instance.assignment.group, instance.assignment.assigned_date, instance.assignment.due_date, student, stepResponse.step.title, smart_str(questionResponse.curriculum_question.question), smart_str(questionResponse.curriculum_question.question.options), response_text])
     else:
       writer.writerow(['There are no student response for this assignment'])
     return response
