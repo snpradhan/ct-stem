@@ -574,7 +574,7 @@ def register(request, group_id=''):
     #Agree checkbox is visible to the user while condition checkbox is hidden.
     #The user needs to check the Agree checkbox to enable the Register button
     #Ensure the agree checkbox is checked and the condition checkbox is unchecked to verify the request is sent by a real person
-    if 'agree' not in request.POST or 'condition' in request.POST:
+    if 'condition' in request.POST:
       #this is a bot
       #do not sign them up but show a deceiving message that they are signed up and redirect them to the homepage
       messages.info(request, 'Thank you for registering')
