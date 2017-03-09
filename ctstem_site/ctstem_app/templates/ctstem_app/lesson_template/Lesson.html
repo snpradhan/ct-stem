@@ -114,7 +114,7 @@
       <p style="margin-bottom: 0.5rem;">
         <b>Subject:</b> {{curriculum.subject.all|join:','}}<br>
         <b>Time:</b> {{curriculum.time}}<br>
-        <b>Level:</b> {{curriculum.level}}<br>
+        <b>Level:</b> {{curriculum.level|safe}}<br>
       </p>
 
       <!-- UTILITY BUTTONS -->
@@ -149,7 +149,7 @@
       <!-- TODO: Think about how to implement popup glossary -->
 
       <h3>Overview</h3>
-      {{curriculum.overview}}
+      {{curriculum.overview|safe}}
 
       {{curriculum.content|safe}}
 
