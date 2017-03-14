@@ -57,6 +57,7 @@ INSTALLED_APPS = (
     'django_cleanup',
     'endless_pagination',
     'captcha',
+    'django_crontab',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -164,3 +165,9 @@ AUTO_LOGOUT_DELAY = 30
 CAPTCHA_IMAGE_SIZE = (150,40)
 CAPTCHA_FONT_SIZE = 36
 CAPTCHA_CHALLENGE_FUNCT = 'captcha.helpers.math_challenge'
+
+#Cron jobs
+CRONJOBS = [
+    # run cron at midnight to clean up inactive teacher accounts
+    ('0 0 * * *', 'ctstem_app.cron.cleanup_teacher_accounts', '>> /srv/project/logs/cron.log'),
+]

@@ -8,6 +8,7 @@ Django==1.8.4
 django-braces==1.8.1
 django-ckeditor==5.0.2
 django-cleanup==0.4.2
+django-crontab==0.7.1
 django-dia==0.2
 django-el-pagination==2.1.2
 django-endless-pagination==2.0
