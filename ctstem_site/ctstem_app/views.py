@@ -36,6 +36,7 @@ from django.utils.encoding import smart_str, smart_unicode
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.http import JsonResponse
+from django.utils.crypto import get_random_string
 
 ####################################
 # HOME
@@ -591,7 +592,8 @@ def register(request, group_id=''):
                                         form.cleaned_data['password1'])
         user.first_name = form.cleaned_data['first_name']
         user.last_name = form.cleaned_data['last_name']
-        if form.cleaned_data['account_type'] in  ['A', 'R', 'C', 'P'] and request.user.is_anonymous():
+        #Admin, Researcher, Author, School Admin or Teacher account created by anonymous user is set as inactive
+        if form.cleaned_data['account_type'] in  ['A', 'R', 'C', 'P', 'T'] and request.user.is_anonymous():
             user.is_active = False
         else:
             user.is_active = True
@@ -601,6 +603,8 @@ def register(request, group_id=''):
           newUser = models.Teacher()
           newUser.school = form.cleaned_data['school']
           newUser.user = user
+          #generate validation code
+          newUser.validation_code = get_random_string(length=5)
           newUser.save()
 
         elif form.cleaned_data['account_type'] == 'S':
@@ -647,8 +651,23 @@ def register(request, group_id=''):
                       settings.DEFAULT_FROM_EMAIL,
                       [newUser.user.email])
             return shortcuts.redirect('ctstem:home')
+          #teacher account
+          elif form.cleaned_data['account_type'] == 'T':
+            #send an email with the username and validation code to validate the account
+            messages.info(request, 'An email has been sent to %s to validate your account.  Please validate your account with in 24 hours.' % newUser.user.email)
+            send_mail('CT-STEM Account Validation',
+          ' \r\n \
+          Welcome to Computational Thinking in STEM \r\n\r\n \
+          Please validate your account here http://%s/validate  and use the credentials below.\r\n\r\n \
+          Username: %s \r\n\r\n \
+          Validation code: %s \r\n\r\n \
+          -- CT-STEM Admin' % (domain, user.username, newUser.validation_code),
+                      settings.DEFAULT_FROM_EMAIL,
+                      [newUser.user.email])
+            return shortcuts.redirect('ctstem:home')
 
-          elif form.cleaned_data['account_type'] in ['T', 'S']:
+          #student account
+          elif form.cleaned_data['account_type'] == 'S':
             new_user = authenticate(username=form.cleaned_data['username'],
                                     password=form.cleaned_data['password1'], )
             login(request, new_user)
@@ -2806,5 +2825,32 @@ def request_training(request):
             'result': 'Failed',
             'errors': dict(form.errors.items()),
         })
+
+  return http.HttpResponseNotAllowed(['GET', 'POST'])
+
+####################################
+# Validate account
+####################################
+def validate(request):
+  if request.method == 'GET':
+    form = forms.ValidationForm()
+    context = {'form': form}
+    return render(request, 'ctstem_app/Validation.html', context)
+  elif request.method == 'POST':
+    data = request.POST.copy()
+    form = forms.ValidationForm(data)
+    if form.is_valid():
+      username = form.cleaned_data['username']
+      password = form.cleaned_data['password']
+      user = authenticate(username=username, password=password)
+      user.is_active = True
+      user.save()
+      login(request, user)
+      messages.success(request, "Your account has been validated")
+      return shortcuts.redirect('ctstem:home')
+    else:
+      context = {'form': form}
+      return render(request, 'ctstem_app/Validation.html', context)
+
 
   return http.HttpResponseNotAllowed(['GET', 'POST'])

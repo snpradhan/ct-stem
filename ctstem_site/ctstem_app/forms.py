@@ -98,6 +98,47 @@ class RegistrationForm (forms.Form):
     return clean
 
 ####################################
+# Validation Form
+####################################
+class ValidationForm (forms.Form):
+  username = forms.RegexField(required=True, regex=r'^\w+$', max_length=30, label=u'Username')
+  password = forms.CharField(required=True, widget=forms.PasswordInput(render_value=False), label=u'Password')
+  validation_code = forms.CharField(required=True, label=u'Validation Code')
+
+  def __init__(self, *args, **kwargs):
+    super(ValidationForm, self).__init__(*args, **kwargs)
+
+    for field_name, field in self.fields.items():
+      field.widget.attrs['class'] = 'form-control'
+      field.widget.attrs['aria-describedby'] = field.label
+      field.widget.attrs['placeholder'] = field.help_text
+
+  def is_valid(self):
+    valid = super(ValidationForm, self).is_valid()
+    if not valid:
+      return valid
+
+    username = self.cleaned_data['username']
+    password = self.cleaned_data['password']
+    validation_code = self.cleaned_data['validation_code']
+    try:
+      user = User.objects.get(username=username)
+      teacher = models.Teacher.objects.get(user=user)
+    except (User.DoesNotExist, models.Teacher.DoesNotExist):
+      self.errors['username'] = u'Username is invalid'
+      return False
+
+    if not user.check_password(password):
+      self.errors['password'] = u'Password is invalid'
+      return False
+
+    if teacher.validation_code != validation_code:
+      self.errors['validation_code'] = u'Validation Code is invalid'
+      return False
+
+    return True
+
+####################################
 # UserProfile Form
 ####################################
 class UserProfileForm(ModelForm):

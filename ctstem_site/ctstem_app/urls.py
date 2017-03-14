@@ -82,6 +82,7 @@ urlpatterns = [
     url(r'^feedback/(?P<assignment_id>[\d]+)/(?P<instance_id>[\d]+)/$', views.feedback, name='feedback'),
     url(r'^consent/$', views.consent, name='consent'),
     url(r'^load_consent/$', views.load_consent, name='load_consent'),
+    url(r'^validate/$', views.validate, name='validate'),
 
 
 ]
