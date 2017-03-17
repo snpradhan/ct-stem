@@ -1,0 +1,12 @@
+<div id="changelist-filter">
+  <h2>Filter Students</h2>
+{% for filter in student_filters %}
+  <h3>By {{ filter.title }}</h3>
+  <ul>
+  {% for choice in filter.choices %}
+    <li{% if choice.selected %} class="selected"{% endif %}>
+    <a href="{{ choice.query_string|iriencode }}">{{ choice.display }}</a></li>
+  {% endfor %}
+  </ul>
+{% endfor %}
+</div>

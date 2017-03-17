@@ -1,3 +1,4 @@
+{% load ctstem_extras %}
 <div class="form-group">
   {% if user.administrator or user.school_administrator%}
     <a type="button" class="btn btn-info" href="{% url 'ctstem:register' %}" title="Add a new user">
@@ -12,6 +13,11 @@
       <span class="glyphicon glyphicon-upload" aria-hidden="true"></span> Upload Students
     </a>
     <a type="button" class="btn btn-info" href="{% url 'ctstem:newGroup' %}" title="Create new group">Create Group</a>
+    {% if role == 'students' %}
+      {% student_actions %}
+    {% else %}
+      {% user_actions %}
+    {% endif %}
   {% endif %}
 </div>
 

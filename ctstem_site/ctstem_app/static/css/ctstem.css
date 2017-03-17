@@ -1176,3 +1176,16 @@ a.emoji-modal {
 div.request_training {
   text-align: center;
 }
+
+span.bulk_actions {
+  float: right;
+}
+span.bulk_actions select#action{
+  display: inline-block;
+  vertical-align: middle;
+}
+
+span.bulk_actions select#subaction{
+  display: none;
+  vertical-align: middle;
+}

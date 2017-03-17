@@ -118,21 +118,27 @@
           </div>
 
           <div class="form-group">
-            <label for="id_{{title}}"> Students {% if form.members.field.required %}(<span class="required">*</span>){% endif %} </label>
-            <a type="button" class="btn btn-info upload-modal" href="#" data-toggle="modal" data-target="#studentSearch" data-id="{{form.instance.id}}" title="Search and Add existing Students to this group">
-              <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
-            </a>
-            <a type="button" class="btn btn-success upload-modal" href="#" data-toggle="modal" data-target="#upload" data-id="{{form.instance.id}}" title="Upload new and existing Students to this group">
-              <span class="glyphicon glyphicon-upload" aria-hidden="true"></span>
-            </a>
-            <a type="button" class="btn btn-info upload-modal" href="#" data-toggle="modal" data-target="#addStudent" data-id="{{form.instance.id}}" title="Create and Add new Student to this group">
-              <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-            </a>
+            <div>
+              <label for="id_{{title}}"> Students {% if form.members.field.required %}(<span class="required">*</span>){% endif %} </label>
+            </div>
+            <div>
+              <a type="button" class="btn btn-info upload-modal" href="#" data-toggle="modal" data-target="#studentSearch" data-id="{{form.instance.id}}" title="Search and Add existing Students to this group">
+                <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+              </a>
+              <a type="button" class="btn btn-success upload-modal" href="#" data-toggle="modal" data-target="#upload" data-id="{{form.instance.id}}" title="Upload new and existing Students to this group">
+                <span class="glyphicon glyphicon-upload" aria-hidden="true"></span>
+              </a>
+              <a type="button" class="btn btn-info upload-modal" href="#" data-toggle="modal" data-target="#addStudent" data-id="{{form.instance.id}}" title="Create and Add new Student to this group">
+                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+              </a>
+              {% student_in_group_actions %}
+            </div>
             <div class="controls table_container">
               {{form.members.as_hidden}}
               <table class="table table-striped table-bordered table-condensed inner_table" id="members">
                 <thead>
                   <tr>
+                    <th width="3%" class="no-sort"><input id="select-all" type="checkbox" value="0" name="select-all"/></th>
                     <th> Username </th>
                     <th> Name </th>
                     <th> Email </th>
@@ -144,6 +150,9 @@
                   {% for x in form.members.value %}
                     {% with student=x|getStudentInfo %}
                     <tr id="{{student.id}}">
+                      <td>
+                        <input id="student_{{student.id}}" type="checkbox" class="action-select" value="{{student.id}}" name="student_{{student.id}}" />
+                      </td>
                       <td>{{student.user.username}}
                       <div class="controls">
                         <a type="button" class="btn btn-success edit" aria-label="Edit Student profile" title="Edit Student profile" href="{% url 'ctstem:userProfile' student.user.id %}">

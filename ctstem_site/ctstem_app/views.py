@@ -1305,43 +1305,97 @@ def searchStudents(request):
 @login_required
 def users(request, role):
 
-  if hasattr(request.user, 'administrator'):
-    privilege = 5
-  elif hasattr(request.user, 'researcher'):
-    privilege = 4
-  elif hasattr(request.user, 'school_administrator'):
-    privilege = 3
-    school = request.user.school_administrator.school
-  elif hasattr(request.user, 'teacher'):
-    privilege = 2
-    school = request.user.teacher.school
-  elif hasattr(request.user, 'student') or hasattr(request.user, 'author'):
-    privilege = 1
+  if request.method == 'GET' or request.method == 'POST':
 
-  if role == 'students':
-    if privilege > 3:
-      users = models.Student.objects.all()
-    elif privilege > 1:
-      users = models.Student.objects.all().filter(school=school)
-  elif role == 'teachers':
-    if privilege > 3:
-      users = models.Teacher.objects.all()
-    elif privilege > 1:
-      users = models.Teacher.objects.all().filter(school=school)
-  elif role == 'admins' and privilege > 4:
-    users = models.Administrator.objects.all()
-  elif role == 'researchers' and privilege > 4:
-    users = models.Researcher.objects.all()
-  elif role == 'authors' and privilege > 4:
-    users = models.Author.objects.all()
-  elif role == 'school_administrators' and privilege > 3:
-    users = models.SchoolAdministrator.objects.all()
+    if request.method == 'POST':
+      data = request.POST.copy()
+      id_list = []
+      for key in data:
+        if 'user_' in key:
+          id_list.append(data[key])
+      _do_action(request, id_list, 'user')
+
+    privilege = 0
+    if hasattr(request.user, 'administrator'):
+      privilege = 5
+    elif hasattr(request.user, 'researcher'):
+      privilege = 4
+    elif hasattr(request.user, 'school_administrator'):
+      privilege = 3
+      school = request.user.school_administrator.school
+    elif hasattr(request.user, 'teacher'):
+      privilege = 2
+      school = request.user.teacher.school
+    elif hasattr(request.user, 'student') or hasattr(request.user, 'author'):
+      privilege = 1
+
+    if role == 'students':
+      if privilege > 3:
+        users = models.Student.objects.all()
+      elif privilege > 1:
+        users = models.Student.objects.all().filter(school=school)
+    elif role == 'teachers':
+      if privilege > 3:
+        users = models.Teacher.objects.all()
+      elif privilege > 1:
+        users = models.Teacher.objects.all().filter(school=school)
+    elif role == 'admins' and privilege > 4:
+      users = models.Administrator.objects.all()
+    elif role == 'researchers' and privilege > 4:
+      users = models.Researcher.objects.all()
+    elif role == 'authors' and privilege > 4:
+      users = models.Author.objects.all()
+    elif role == 'school_administrators' and privilege > 3:
+      users = models.SchoolAdministrator.objects.all()
+    else:
+      return http.HttpResponseNotFound('<h1>You do not have the privilege view %s</h1>'% role)
+
+    uploadForm = forms.UploadFileForm(user=request.user)
+    context = {'users': users, 'role': role, 'uploadForm': uploadForm}
+
+    return render(request, 'ctstem_app/Users.html', context)
+
+  return http.HttpResponseNotAllowed(['GET', 'POST'])
+
+####################################
+# BULK ACTION FOR ALL MODELS
+####################################
+@login_required
+def _do_action(request, id_list, model):
+  action_params = request.POST
+  if u'' == action_params.get('action') or len(id_list) == 0:
+    return True
+  if model == 'user':
+    users = User.objects.filter(id__in=id_list)
+    if u'delete_selected' == action_params.get(u'action'):
+      users.delete()
+      messages.success(request, "Selected user(s) deleted.")
+      return True
+    elif u'activate_selected' == action_params.get(u'action'):
+      for user in users:
+        user.is_active = True
+        user.save()
+      messages.success(request, "Selected user(s) activated.")
+      return True
+    elif u'inactivate_selected' == action_params.get(u'action'):
+      for user in users:
+        user.is_active = False
+        user.save()
+      messages.success(request, "Selected user(s) inactivated.")
+      return True
+    elif u'parental_consent_selected' == action_params.get(u'action'):
+      if u'subaction' in action_params:
+        consent = action_params.get(u'subaction')
+        for user in users:
+          student = user.student
+          student.parental_consent = consent
+          student.save()
+        messages.success(request, "Selected students' parental consent saved.")
+        return True
+      else:
+        return False
   else:
-    return http.HttpResponseNotFound('<h1>You do not have the privilege view %s</h1>'% role)
-
-  uploadForm = forms.UploadFileForm(user=request.user)
-  context = {'users': users, 'role': role, 'uploadForm': uploadForm}
-  return render(request, 'ctstem_app/Users.html', context)
+    return False
 
 ####################################
 # PUBLICATIONS TABLE VIEW

@@ -1,0 +1,14 @@
+<span class="bulk_actions">
+    <select id="action" name="action" class="form-control" onchange='update_subaction($("option:selected", this).attr("value"), $("form").find("input:hidden").eq(0).val())'>
+      {% for action in actions %}
+        <option value="{{action.value}}">{{action.description}}</option>
+      {% endfor %}
+    </select>
+
+    <select id="subaction" name="subaction" class="form-control">
+        <option value="">---------</option>
+    </select>
+    <input class="btn btn-success" name="index" title="Perform en masse the selected action" type="submit" onClick="return confirmAction()" value="Go">
+</span>
+
+

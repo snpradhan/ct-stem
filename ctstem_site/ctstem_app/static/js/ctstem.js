@@ -75,12 +75,20 @@ $(function (){
   });
 
   // Apply the filter
-  $("table.table.dt thead input").on( 'keyup change', function () {
+  $("table.table.dt thead tr#filterrow input").on( 'keyup change', function () {
       table
           .column( $(this).parent().index()+':visible' )
           .search( this.value )
           .draw();
-  } );
+  });
+
+  $('#select-all').click(function(event) {
+    var $that = $(this);
+    // Iterate each checkbox
+    $('.action-select:checkbox').each(function() {
+        this.checked = $that.is(':checked');
+    });
+  });
 
   //csv upload
   $("#formUpload").submit(function(e) {
@@ -268,6 +276,7 @@ function display_messages(messages){
 function add_student_to_data_table(value, csrf){
   //add student detail to the table
   $('table.table#members tbody').append('<tr id='+value['student_id']+'>\
+    <td width="3%"><input id="student_'+value['student_id']+'" type="checkbox" class="action-select" value="'+value['student_id']+'" name="student_'+value['student_id']+'" /></td>\
     <td>'+value['username']+'\
       <div class="controls">\
         <a type="button" class="btn btn-success edit" aria-label="Edit User" title="Edit User" href="/user/'+value['user_id']+'">\
@@ -288,4 +297,45 @@ function add_student_to_data_table(value, csrf){
 
   //add student membership hidden input
   $('table.table#members').before('<input id="id_group-members_'+value['student_id']+'" name="group-members" type="hidden" value="'+value['student_id']+'">');
+}
+
+function update_subaction( action, csrftoken ) {
+
+  var action_id = 0;
+  if ('parental_consent_selected' == action) {
+    action_id = 1;
+  }
+
+  if (action_id > 0) {
+    $("select#subaction").empty();
+    $("select#subaction").append('<option value="A">Agree</option');
+    $("select#subaction").append('<option value="D">Disagree</option');
+    $("select#subaction").show();
+  }
+  else {
+    if ( ! $("select#subaction").is(":disabled") ) {
+      $("#subaction").hide();
+      $("select#subaction").empty();
+      $("select#subaction").append("<option value=\"\">---------</option>");
+      $("input#duedate").hide();
+    }
+  }
+}
+
+function confirmAction(){
+  var actionElement = window.document.getElementById("action");
+  var action = actionElement.options[actionElement.selectedIndex].value;
+  if(action == "delete_selected"){
+    var sure = confirm("Do you want to mass delete selected users?");
+    if(sure == true){
+        return true;
+    }
+    else{
+        return false;
+    }
+  }
+  else if(action == ""){
+    return false;
+  }
+  return true;
 }

@@ -163,3 +163,62 @@ def has_response(curriculum, user):
     return True
   else:
     return False
+
+
+bulk_header = 'Select Bulk Action'
+
+def StudentFilters(context):
+    groups = context.get('groups')
+    journals = context.get('journals')
+    request = context.get('request')
+    group_choices = [{'display':'All','query_string':'?','selected':request=={},}]
+    for group in groups:
+        group_choices.append({'display':group.title,'query_string':'?f=groups__in:'+str(group.id),'selected':request.get('f')=='groups__in:'+str(group.id),})
+    group_choices.append({'display':'(none)','query_string':'?f=groups__isnull:True','selected':request.get('f')=='groups__isnull:True',})
+    journal_choices = [{'display':'All','query_string':'?','selected':request=={},}]
+    for journal in journals:
+        journal_choices.append({'display':journal.title,'query_string':'?f=assignment__id__exact:'+str(journal.id),'selected':request.get('f')=='assignment__id__exact:'+str(journal.id),})
+    journal_choices.append({'display':'(unassigned)','query_string':'?f=assignment__isnull:True','selected':request.get('f')=='assignment__isnull:True',})
+    return [{'title':'Group','choices':group_choices},{'title':'Assignment','choices':journal_choices},]
+
+@register.inclusion_tag("ctstem_app/admin/filter.html", takes_context=True)
+def student_filters(context):
+
+    return {'student_filters':StudentFilters(context)}
+
+#################################################################################
+# currently only using the following
+
+def UserActions(context):
+    return [{'description':bulk_header,'value':''},
+        {'description':'Delete selected users','value':'delete_selected'},
+        {'description':'Activate selected users','value':'activate_selected'},
+        {'description':'Inactivate selected users','value':'inactivate_selected'},]
+
+@register.inclusion_tag("ctstem_app/admin/actions.html", takes_context=True)
+def user_actions(context):
+    return {'actions':UserActions(context)}
+
+def StudentActions(context):
+    return [{'description':bulk_header,'value':''},
+        {'description':'Delete Selected Students','value':'delete_selected'},
+        {'description':'Activate Selected Students','value':'activate_selected'},
+        {'description':'Inactivate Selected Students','value':'inactivate_selected'},
+        {'description':'Update Parental Consent','value':'parental_consent_selected'},]
+
+@register.inclusion_tag("ctstem_app/admin/actions.html", takes_context=True)
+def student_actions(context):
+    return {'actions':StudentActions(context)}
+
+def StudentInGroupActions(context):
+    return [{'description':bulk_header,'value':''},
+        {'description':'Remove Selected Students','value':'remove_selected'},
+        {'description':'Activate Selected Students','value':'activate_selected'},
+        {'description':'Inactivate Selected Students','value':'inactivate_selected'},
+        {'description':'Update Parental Consent','value':'parental_consent_selected'},]
+
+@register.inclusion_tag("ctstem_app/admin/actions.html", takes_context=True)
+def student_in_group_actions(context):
+    return {'actions':StudentInGroupActions(context)}
+
+
