@@ -988,27 +988,36 @@ def deleteUser(request, id=''):
 
     if request.method == 'GET' or request.method == 'POST':
       # check if the user has authored any curriculum and transfer the ownership to an admin
-      curricula = models.Curriculum.objects.all().filter(author=user)
-      if len(curricula) > 0:
-        #get an admin to transfer the curriculum ownership to
-        admin = models.Administrator.objects.all().order_by('user__date_joined')[0]
-        if admin:
-          for curriculum in curricula:
-            curriculum.author = admin.user
-            curriculum.save()
-          messages.success(request, 'Curriculum owned by %s has been trasferred to %s' % (user.username, admin.user.username))
-        else:
-          messages.success(request, 'No admins exists to transfer ownership of curriculum authored by %s. So the user cannot be deleted.' % user.username)
-          return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-
-      user.delete()
-      messages.success(request, '%s deleted' % user.username)
+      flag = transferCurriculum(request, user)
+      if flag:
+        user.delete()
+        messages.success(request, '%s deleted' % user.username)
       return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
     return http.HttpResponseNotAllowed(['GET', 'POST'])
 
   except User.DoesNotExist:
     return http.HttpResponseNotFound('<h1>User not found</h1>')
+
+####################################
+# When deleting a user, transfer the curriculum
+# authored by this user to an admin
+####################################
+def transferCurriculum(request, user):
+  curricula = models.Curriculum.objects.all().filter(author=user)
+  flag = True
+  if len(curricula) > 0:
+    #get an admin to transfer the curriculum ownership to
+    admin = models.Administrator.objects.all().order_by('user__date_joined')[0]
+    if admin:
+      for curriculum in curricula:
+        curriculum.author = admin.user
+        curriculum.save()
+      messages.success(request, 'Curriculum owned by %s has been trasferred to %s' % (user.username, admin.user.username))
+    else:
+      messages.success(request, 'No admins exists to transfer ownership of curriculum authored by %s. So the user cannot be deleted.' % user.username)
+      flag = False
+  return flag
 
 def removeStudent(request, group_id='', student_id=''):
   try:
@@ -1381,6 +1390,8 @@ def _do_action(request, id_list, model, object_id=None):
       users = User.objects.filter(student__id__in=id_list)
 
     if u'delete_selected' == action_params.get(u'action'):
+      for user in users:
+        transferCurriculum(request, user)
       users.delete()
       messages.success(request, "Selected user(s) deleted.")
       return True
