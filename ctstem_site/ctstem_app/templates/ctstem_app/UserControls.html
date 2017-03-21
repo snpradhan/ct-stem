@@ -15,7 +15,7 @@
     <a type="button" class="btn btn-info" href="{% url 'ctstem:newGroup' %}" title="Create new group">Create Group</a>
     {% if role == 'students' %}
       {% student_actions %}
-    {% else %}
+    {% elif tab == 'user' %}
       {% user_actions %}
     {% endif %}
   {% endif %}

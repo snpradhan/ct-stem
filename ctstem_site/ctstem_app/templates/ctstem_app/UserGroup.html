@@ -20,7 +20,6 @@
       {% csrf_token %}
       <div class="table" id="group">
         {{form.management_form}}
-
         <div class="form-group">
           <label for="id_{{title}}">{{ form.title.label }} {% if form.title.field.required %}(<span class="required">*</span>){% endif %} </label>
           <div class="controls">{{form.title}}</div>
@@ -143,6 +142,9 @@
                     <th> Name </th>
                     <th> Email </th>
                     <th> Status </th>
+                    <th> Student Consent </th>
+                    <th> Parental Consent </th>
+                    <th> Member Since</th>
                     <th> Last Login </th>
                   </tr>
                 </thead>
@@ -169,6 +171,17 @@
                       <td>{{student.user.get_full_name}}</td>
                       <td>{{student.user.email}}</td>
                       <td>{{student.user.is_active|yesno:"Active,Inactive"}}</td>
+                      <td>
+                        {% if student.consent == 'A' %}
+                          Agree
+                        {% elif consent == 'D' %}
+                          Disagree
+                        {% else %}
+                          Unknown
+                        {% endif %}
+                      </td>
+                      <td>{{student.get_parental_consent_display}}</td>
+                      <td>{{student.user.date_joined|date}} </td>
                       <td>{{student.user.last_login|date}}</td>
                     </tr>
                     {% endwith %}

@@ -293,6 +293,9 @@ function add_student_to_data_table(value, csrf){
     <td>'+value['name']+'</td>\
     <td>'+value['email']+'</td>\
     <td>'+value['status']+'</td>\
+    <td>'+value['student_consent']+'</td>\
+    <td>'+value['parental_consent']+'</td>\
+    <td>'+value['member_since']+'</td>\
     <td>'+value['last_login']+'</td></tr>');
 
   //add student membership hidden input

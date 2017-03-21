@@ -300,6 +300,22 @@ class Student(models.Model):
   def __unicode__(self):
       return u'%s' % (self.user.get_full_name())
 
+  def get_consent(self):
+    if self.consent == 'A':
+      return 'Agree'
+    elif self.consent == 'D':
+      return 'Disagree'
+    else:
+      return 'Unknown'
+
+  def get_parental_consent(self):
+    if self.parental_consent == 'A':
+      return 'Agree'
+    elif self.parental_consent == 'D':
+      return 'Disagree'
+    else:
+      return 'Unknown'
+
 # Teacher models
 # This is a user class model
 class Teacher(models.Model):

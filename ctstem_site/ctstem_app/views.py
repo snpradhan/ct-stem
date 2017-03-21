@@ -893,8 +893,9 @@ def userProfile(request, id=''):
           messages.error(request, "User profile could not be saved. Please check the errors below.")
           context = {'profileform': profileform, 'userform': userform, 'role': role}
       else:
-        print profileform.errors
         print userform.errors
+        if profileform:
+          print profileform.errors
         messages.error(request, "User profile could not be saved. Please check the errors below.")
         context = {'profileform': profileform, 'userform': userform, 'role': role}
 
@@ -1099,7 +1100,11 @@ def createStudent(request, group_id=''):
         student = models.Student.objects.create(user=user, school=group.teacher.school)
         membership, created = models.Membership.objects.get_or_create(student=student, group=group)
 
-        response_data = {'result': 'Success', 'student': {'user_id': user.id, 'student_id': student.id, 'username': user.username, 'name': user.get_full_name(), 'email': user.email, 'status': 'Active' if user.is_active else 'Inactive', 'last_login': user.last_login.strftime('%B %d, %Y') if user.last_login else '', 'group': group.id}}
+        response_data = {'result': 'Success', 'student': {'user_id': user.id, 'student_id': student.id, 'username': user.username,
+                          'name': user.get_full_name(), 'email': user.email, 'status': 'Active' if user.is_active else 'Inactive',
+                          'last_login': user.last_login.strftime('%B %d, %Y') if user.last_login else '', 'group': group.id,
+                          'student_consent': student.get_consent(), 'parental_consent': student.get_parental_consent(), 'member_since': user.date_joined.strftime('%B %d, %Y')}
+                        }
 
         send_account_confirmation_email(user, password)
 
@@ -1294,7 +1299,11 @@ def searchStudents(request):
 
     print query_filter
     studentList = models.Student.objects.filter(**query_filter)
-    student_list = [{'user_id': student.user.id, 'student_id': student.id, 'username': student.user.username, 'name': student.user.get_full_name(), 'email': student.user.email, 'status': 'Active' if student.user.is_active else 'Inactive', 'last_login': student.user.last_login.strftime('%B %d, %Y') if student.user.last_login else '', 'group': group.id}
+    student_list = [{'user_id': student.user.id, 'student_id': student.id, 'username': student.user.username, 'name': student.user.get_full_name(),
+                     'email': student.user.email, 'status': 'Active' if student.user.is_active else 'Inactive',
+                     'last_login': student.user.last_login.strftime('%B %d, %Y') if student.user.last_login else '',
+                     'group': group.id, 'student_consent': student.get_consent(), 'parental_consent': student.get_parental_consent(),
+                     'member_since': student.user.date_joined.strftime('%B %d, %Y')}
                 for student in studentList]
     return http.HttpResponse(json.dumps(student_list), content_type="application/json")
 
@@ -1361,15 +1370,24 @@ def users(request, role):
 # BULK ACTION FOR ALL MODELS
 ####################################
 @login_required
-def _do_action(request, id_list, model):
+def _do_action(request, id_list, model, object_id=None):
   action_params = request.POST
   if u'' == action_params.get('action') or len(id_list) == 0:
     return True
-  if model == 'user':
-    users = User.objects.filter(id__in=id_list)
+  if model == 'user' or model == 'student':
+    if model == 'user':
+      users = User.objects.filter(id__in=id_list)
+    elif model == 'student':
+      users = User.objects.filter(student__id__in=id_list)
+
     if u'delete_selected' == action_params.get(u'action'):
       users.delete()
       messages.success(request, "Selected user(s) deleted.")
+      return True
+    if u'remove_selected' == action_params.get(u'action'):
+      for user in users:
+        removeStudent(request, object_id, user.student.id)
+      messages.success(request, "Selected student(s) removed from group.")
       return True
     elif u'activate_selected' == action_params.get(u'action'):
       for user in users:
@@ -1532,6 +1550,11 @@ def group(request, id=''):
       if form.is_valid() and formset.is_valid():
         savedGroup = form.save()
         formset.save()
+        id_list = []
+        for key in data:
+          if 'student_' in key:
+            id_list.append(data[key])
+        _do_action(request, id_list, 'student', id)
         messages.success(request, "Group Saved.")
         return shortcuts.redirect('ctstem:group', id=savedGroup.id)
       else:

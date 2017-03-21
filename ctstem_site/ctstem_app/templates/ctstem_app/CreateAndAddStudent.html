@@ -63,6 +63,7 @@
             $('ul.messages').delay(30000).fadeOut('slow');
 
             add_student_to_data_table(data['student'], '{{csrf_token}}');
+            bind_user_removal();
           }
           return false;
         },
