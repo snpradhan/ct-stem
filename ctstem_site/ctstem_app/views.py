@@ -203,7 +203,7 @@ def curriculum(request, id=''):
 ####################################
 # PREVIEW A Curriculum
 ####################################
-def previewCurriculum(request, id='', step_order=0):
+def previewCurriculum(request, id='', step_order=-1):
   try:
     # check if the lesson exists
     if hasattr(request.user, 'student'):
@@ -218,21 +218,19 @@ def previewCurriculum(request, id='', step_order=0):
       steps = models.Step.objects.all().filter(curriculum=curriculum)
       attachments = models.Attachment.objects.all().filter(curriculum=curriculum)
       systems = models.System.objects.all()
+      total_steps = len(steps)
 
-      if curriculum.curriculum_type == 'L':
-        context = {'curriculum': curriculum, 'attachments': attachments, 'steps':steps, 'systems': systems}
-        return render(request, 'ctstem_app/lesson_template/Lesson.html', context)
-      else:
-        #return render(request, 'ctstem_app/CurriculumPreview.html', context)
-        total_steps = len(steps)
-        attachments = models.Attachment.objects.all().filter(curriculum=curriculum, teacher_only=False)
-        context = {'curriculum': curriculum, 'attachments': attachments, 'systems': systems, 'total_steps': total_steps, 'step_order': step_order}
+      # for assessment and survey go to the first step
+      if curriculum.curriculum_type != 'L' and step_order == -1:
+        step_order = 0
 
-        if int(step_order) > 0:
-          step = steps.get(order=int(step_order))
-          context['step'] = step
+      context = {'curriculum': curriculum, 'attachments': attachments, 'systems': systems, 'total_steps': total_steps, 'step_order': step_order}
 
-        return render(request, 'ctstem_app/AssignmentStepPreview.html', context)
+      if int(step_order) > 0:
+        step = steps.get(order=int(step_order))
+        context['step'] = step
+
+      return render(request, 'ctstem_app/CurriculumPreview.html', context)
 
     return http.HttpResponseNotAllowed(['GET'])
 

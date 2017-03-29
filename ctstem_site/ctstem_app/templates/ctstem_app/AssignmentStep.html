@@ -36,35 +36,33 @@
 
 {% block content %}
   <header>
-    <div class="header-box">
-      <h1>CT-STEM</h1>
-      {{curriculum.title|title}}
-      <nav>
-        Page &nbsp;
-        {% if step_order|add:0  == 0 %}
-          <a class="page-link selected">{{1}}</a>
-        {% else %}
-          <a class="page-link linked" href="{% url 'ctstem:resumeAssignment'  instance.assignment.id instance.id 0 %}">{{1}}</a>
-        {% endif %}
-        {% for i in total_steps|iterate %}
-          {% if instance.status == 'S' or instance.status == 'F' or instance.status == 'A' %}
-            {% if i|add:0 == step_order|add:0 %}
-              <a class="page-link selected linked" href="{% url 'ctstem:resumeAssignment'  instance.assignment.id instance.id i %}">{{i|add:1}}</a>
-            {% else %}
-              <a class="page-link linked" href="{% url 'ctstem:resumeAssignment'  instance.assignment.id instance.id i %}">{{i|add:1}}</a>
-            {% endif %}
+    <h1>CT-STEM</h1>
+    {{curriculum.title|title}}
+    <nav>
+      Page &nbsp;
+      {% if step_order|add:0  == 0 %}
+        <a class="page-link selected">{{1}}</a>
+      {% else %}
+        <a class="page-link linked" href="{% url 'ctstem:resumeAssignment'  instance.assignment.id instance.id 0 %}">{{1}}</a>
+      {% endif %}
+      {% for i in total_steps|iterate %}
+        {% if instance.status == 'S' or instance.status == 'F' or instance.status == 'A' %}
+          {% if i|add:0 == step_order|add:0 %}
+            <a class="page-link selected linked" href="{% url 'ctstem:resumeAssignment'  instance.assignment.id instance.id i %}">{{i|add:1}}</a>
           {% else %}
-            {% if i|add:0 < step_order|add:0 %}
-              <a class="page-link linked" href="javascript:waitForSave('{% url 'ctstem:resumeAssignment'  instance.assignment.id instance.id i %}')" onclick="return saveStep('{{form.instance.instance.status}}');">{{i|add:1}}</a>
-            {% elif i|add:0 == step_order|add:0 %}
-              <a class="page-link selected">{{i|add:1}}</a>
-            {% else %}
-              <a class="page-link">{{i|add:1}}</a>
-            {% endif %}
+            <a class="page-link linked" href="{% url 'ctstem:resumeAssignment'  instance.assignment.id instance.id i %}">{{i|add:1}}</a>
           {% endif %}
-        {% endfor %}
-      </nav>
-    </div>
+        {% else %}
+          {% if i|add:0 < step_order|add:0 %}
+            <a class="page-link linked" href="javascript:waitForSave('{% url 'ctstem:resumeAssignment'  instance.assignment.id instance.id i %}')" onclick="return saveStep('{{form.instance.instance.status}}');">{{i|add:1}}</a>
+          {% elif i|add:0 == step_order|add:0 %}
+            <a class="page-link selected">{{i|add:1}}</a>
+          {% else %}
+            <a class="page-link">{{i|add:1}}</a>
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+    </nav>
   </header>
   {{block.super}}
   <main>
