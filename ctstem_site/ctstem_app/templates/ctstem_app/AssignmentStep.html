@@ -348,7 +348,7 @@
         </div>
 
         <div class="save-buttons">
-          {% if form and form.instance.step.order > 1 %}
+          {% if form and form.instance.step.order > 0 %}
             <a class="back" href="javascript:waitForSave('{% url 'ctstem:resumeAssignment'  form.instance.instance.assignment.id form.instance.instance.id form.instance.step.order|add:'-1' %}')" onclick="return saveStep('{{form.instance.instance.status}}');">
               <button type="button" class="light back" id="bk">Back</button>
             </a>

@@ -164,26 +164,22 @@
       </div>
 
       <div class="save-buttons">
-        {% if step_order|add:0 > 1 %}
+        {% if step_order|add:0 > 0 %}
           <a href="{% url 'ctstem:previewCurriculum'  curriculum.id step_order|add:'-1' %}">
             <button type="button" class="light back">Back</button>
           </a>
         {% endif %}
-          <button type="button" class="light save" title="Save" >
-            Save
-          </button>
+
         {% if step_order|add:0 != total_steps %}
           <a href="{% url 'ctstem:previewCurriculum'  curriculum.id step_order|add:'1' %}">
             <button type="button" class="bright submit" title="Next Step" >
-              Save &amp; Continue
+              Forward
             </button>
           </a>
         {% else %}
-          <a href="{% url 'ctstem:previewCurriculum'  curriculum.id step_order|add:'0' %}">
-            <button type="button" class="bright save" title="Submit Assignment">
-              Submit
-            </button>
-          </a>
+          <button type="button" class="bright save" title="Submit Assignment" onclick="window.close()">
+            Exit
+          </button>
         {% endif %}
       </div>
     </form>
