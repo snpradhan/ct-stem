@@ -2700,7 +2700,8 @@ def school(request, id=''):
         #notify the school creator that they can now validate their account
         if not was_active and is_active:
           school_creator = school.created_by
-          if school_creator.teacher and not school_creator.is_active:
+
+          if hasattr(school_creator, 'teacher') and not school_creator.is_active:
             # update teacher's joined date to current date
             school_creator.date_joined = datetime.datetime.now()
             school_creator.save()
