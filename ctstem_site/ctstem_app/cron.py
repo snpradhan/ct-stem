@@ -4,16 +4,16 @@ from django.core.mail import send_mail, EmailMessage
 from django.conf import settings
 
 def cleanup_teacher_accounts():
-  #get a list of teacher account created between 24-48 hr window and are still inactive
-  regStart = datetime.today() - timedelta(hours = 48)
+  #get a list of teacher account created prior to 24 hrs and still inactive
   regEnd = datetime.today() - timedelta(hours = 24)
-  print 'finding teachers registered between ', regStart, 'and', regEnd
-  teachers = models.Teacher.objects.all().filter(user__is_active = False, user__date_joined__range=(regStart, regEnd))
+  print 'finding teachers registered before ', regEnd
+  teachers = models.Teacher.objects.all().filter(user__is_active = False, school__is_active = True, user__date_joined__lt=regEnd)
+  count = len(teachers)
   for teacher in teachers:
     print 'deleting', teacher
     send_deletion_email(teacher.user)
     teacher.user.delete()
-  print 'done teacher cleanup'
+  print 'done cleaning up %d teacher accounts' % count
 
 def send_deletion_email(user):
   send_mail('CT-STEM Account Deletion',

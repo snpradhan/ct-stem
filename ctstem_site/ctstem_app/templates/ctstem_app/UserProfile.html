@@ -37,7 +37,19 @@
                 (<span class="required">*</span>)
               {% endif %}
             </label>
-            {{field}}
+            <!-- do not allow school admin, teacher and student to modify the school in their or their subordinates profile -->
+            {% if user.school_administrator or user.teacher or user.student %}
+              {% if field.name == 'school' %}
+                {{field.as_hidden}}
+                <div class="disabled">
+                  {{field}}
+                </div>
+              {% else %}
+                {{field}}
+              {% endif %}
+            {% else %}
+              {{field}}
+            {% endif %}
             <div class="error">{{ field.errors }}</div>
           </div>
         {% endfor %}

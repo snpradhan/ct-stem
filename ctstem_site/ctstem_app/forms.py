@@ -29,7 +29,7 @@ class RegistrationForm (forms.Form):
   password2 = forms.CharField(required=True, widget=forms.PasswordInput(render_value=False), label=u'Confirm Password')
   email = forms.EmailField(required=True, max_length=75, label=u'Email')
   account_type = forms.ChoiceField(required=True, choices = models.USER_ROLE_CHOICES)
-  school = forms.ModelChoiceField(required=False, queryset=models.School.objects.all())
+  school = forms.ModelChoiceField(required=False, queryset=models.School.objects.all().filter(is_active=True).order_by('name'))
   captcha = CaptchaField(help_text=u'Solve the equation to the right')
 
   def __init__(self, *args, **kwargs):
@@ -45,6 +45,8 @@ class RegistrationForm (forms.Form):
       elif hasattr(user, 'teacher'):
         self.fields['account_type'].choices = models.USER_ROLE_CHOICES[5:]
         self.fields['school'].queryset = models.School.objects.filter(id=user.teacher.school.id)
+      elif hasattr(user, 'administrator'):
+        self.fields['school'].queryset = models.School.objects.filter(~Q(school_code='OTHER'), is_active=True)
 
       self.fields.pop('captcha')
 
@@ -52,7 +54,7 @@ class RegistrationForm (forms.Form):
       self.fields['account_type'].choices = models.USER_ROLE_CHOICES[3:]
       self.fields['email'].widget.attrs['readonly'] = True
     else:
-      self.fields['account_type'].choices = models.USER_ROLE_CHOICES[3:5]
+      self.fields['account_type'].choices = models.USER_ROLE_CHOICES[4:5]
 
     for field_name, field in self.fields.items():
       field.widget.attrs['class'] = 'form-control'
@@ -204,6 +206,8 @@ class StudentForm (ModelForm):
 
       if school is not None:
         self.fields['school'].queryset = models.School.objects.filter(id=school.id)
+      else:
+        self.fields['school'].queryset = models.School.objects.filter(~Q(school_code='OTHER'), is_active=True)
 
       if hasattr(user, 'student') == False:
         del self.fields['consent']
@@ -254,6 +258,11 @@ class TeacherForm (ModelForm):
 
       if school is not None:
         self.fields['school'].queryset = models.School.objects.filter(id=school.id)
+      else:
+        self.fields['school'].queryset = models.School.objects.filter(~Q(school_code='OTHER'), is_active=True)
+
+    else:
+      self.fields['school'].queryset = models.School.objects.all().filter(is_active=True)
 
     for field_name, field in self.fields.items():
       field.widget.attrs['class'] = 'form-control'
@@ -287,6 +296,8 @@ class SchoolAdministratorForm (ModelForm):
     if user.is_authenticated() and hasattr(user, 'school_administrator'):
       school = user.school_administrator.school
       self.fields['school'].queryset = models.School.objects.filter(id=school.id)
+    else:
+      self.fields['school'].queryset = models.School.objects.filter(~Q(school_code='OTHER'), is_active=True)
 
     for field_name, field in self.fields.items():
       field.widget.attrs['class'] = 'form-control'
@@ -877,7 +888,7 @@ class SchoolForm(ModelForm):
 
   class Meta:
     model = models.School
-    exclude = ('id',)
+    exclude = ('id', 'created_by', 'created_date')
 
   def __init__(self, *args, **kwargs):
     super(SchoolForm, self).__init__(*args, **kwargs)

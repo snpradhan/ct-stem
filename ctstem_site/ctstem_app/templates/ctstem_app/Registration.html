@@ -28,6 +28,10 @@
               <input id="id_account_type" name="account_type" type="hidden" value="S">
             {% elif group_id and field.name == 'school' %}
               <input id="id_school" name="school" type="hidden" value="{{school_id}}">
+            {% elif user.school_administrator and field.name == 'school' %}
+              <input id="id_school" name="school" type="hidden" value="{{school_id}}">
+            {% elif user.teacher and field.name == 'school' %}
+              <input id="id_school" name="school" type="hidden" value="{{school_id}}">
             {% else %}
               <div class="form-group" id="div_{{field.name}}">
                 <label for="id_{{field.name}}">{{ field.label|title }}
@@ -39,6 +43,37 @@
                     <button class='js-captcha-refresh btn btn-default'><i class="fa fa-refresh" aria-hidden="true"></i></button>
                   </div>
                   <div class="help warning">{{field.help_text}}</div>
+                {% elif field.name == 'school' and school_form %}
+                  {{field}}
+                  <div id="school_form" style="display:none;">
+                    {% for field in school_form %}
+                      <div class="form-group">
+                        {% if field.name == 'school_code' %}
+                          <div class="input-group" style="display:none;">
+                            {{field}}
+                            <span class="input-group-btn">
+                              <input type="button" class="btn btn-info" id="generate_code" value="Generate"/>
+                            </span>
+                          </div>
+                        {% elif field.name == "is_active" %}
+                          {{field.as_hidden}}
+                        {% else %}
+                          <label for="id_{{field.name}}">{{ field.label|title }} {% if field.field.required %}(<span class="required">*</span>){% endif %} </label>
+                          <div>
+                            {{field}}
+                          </div>
+                          <div class="error">{{ field.errors }}</div>
+                        {% endif %}
+                      </div>
+                    {% endfor %}
+                  </div>
+                {% elif user.is_anonymous and field.name == 'account_type' %}
+                  <div>
+                    {{field}}
+                    <span data-toggle="tooltip" data-placement="top" title="If you need to create some other account type such as Researcher, Author, School Administrator, please contact the site admin.">
+                    <i class="fa fa-info-circle" aria-hidden="true"></i>
+                    </span>
+                  </div>
                 {% else %}
                   {{field}}
                 {% endif %}
@@ -70,66 +105,77 @@
     </form>
 
     <script type="text/javascript">
-      $(document).ready(function(){
+      $(function(){
         set_user_fields();
-      });
-      $('#id_account_type').change(function() {
-        set_user_fields();
-      });
 
-      function set_user_fields(){
-        var account_type = $('#id_account_type').val();
-        var restricted_accounts = ['A', 'R', 'C'];
-        if(restricted_accounts.indexOf(account_type) !== -1){
-          $('#div_school').hide();
-        }
-        else {
-          $('#div_school').show();
-        }
-      }
-
-      $("#signupTerms").popover({
-          placement: 'right',
-          title: 'Terms of Use',
-          html: true ,
-          content: ''
-       });
-
-      // popoverPropogationEvent(){
-      $("#signupTerms").click(function (e) {
-          e.stopPropagation();
-      });
-      /**************************/
-
-      // closePopoverEvent(){
-      $(document).click(function (e) {
-        if (($('.popover').has(e.target).length == 0) || $(e.target).is('.close')) {
-          $("#signupTerms").popover('hide');
-        }
-      });
-
-      $('#agree').change(function(){
-          if( $(this).is(':checked') ){
-            $('#submit').removeAttr('disabled');
-          } else {
-            $('#submit').attr("disabled","disabled");
-          }
-      });
-      /**************************/
-
-      $('.js-captcha-refresh').click(function(){
-        $form = $(this).parents('form');
-
-        var url = location.protocol + "//" + window.location.hostname + ":"
-                  + location.port + "/captcha/refresh/";
-
-        // Make the AJAX-call
-        $.getJSON(url, {}, function(json) {
-            $form.find('input[name="captcha_0"]').val(json.key);
-            $form.find('img.captcha').attr('src', json.image_url);
+        $('#id_account_type').change(function() {
+          set_user_fields();
         });
 
-        return false;
+        function set_user_fields(){
+          var account_type = $('#id_account_type').val();
+          var restricted_accounts = ['A', 'R', 'C'];
+          if(restricted_accounts.indexOf(account_type) !== -1){
+            $('#div_school').hide();
+          }
+          else {
+            $('#div_school').show();
+          }
+        }
+
+        $("#signupTerms").popover({
+            placement: 'right',
+            title: 'Terms of Use',
+            html: true ,
+            content: ''
+         });
+
+        // popoverPropogationEvent(){
+        $("#signupTerms").click(function (e) {
+            e.stopPropagation();
+        });
+        /**************************/
+
+        // closePopoverEvent(){
+        $(document).click(function (e) {
+          if (($('.popover').has(e.target).length == 0) || $(e.target).is('.close')) {
+            $("#signupTerms").popover('hide');
+          }
+        });
+
+        $('#agree').change(function(){
+            if( $(this).is(':checked') ){
+              $('#submit').removeAttr('disabled');
+            } else {
+              $('#submit').attr("disabled","disabled");
+            }
+        });
+        /**************************/
+
+        $('.js-captcha-refresh').click(function(){
+          $form = $(this).parents('form');
+
+          var url = location.protocol + "//" + window.location.hostname + ":"
+                    + location.port + "/captcha/refresh/";
+
+          // Make the AJAX-call
+          $.getJSON(url, {}, function(json) {
+              $form.find('input[name="captcha_0"]').val(json.key);
+              $form.find('img.captcha').attr('src', json.image_url);
+          });
+
+          return false;
+        });
+        $('select#id_school').on('change', function(){
+          if($(this).val() == "{{other_school.id}}"){
+            $("div#school_form").show();
+            $("div#school_form input#generate_code").trigger('click');
+          }
+          else{
+            $("div#school_form").hide();
+          }
+        });
+        $('select#id_school').trigger('change');
       });
     </script>
   </div>

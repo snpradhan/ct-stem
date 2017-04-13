@@ -567,6 +567,13 @@ def register(request, group_id=''):
   if group_id:
     group = models.UserGroup.objects.get(id=group_id)
     school = group.teacher.school
+  elif hasattr(request.user, 'school_administrator'):
+    school = request.user.school_administrator.school
+  elif hasattr(request.user, 'teacher'):
+    school = request.user.teacher.school
+  else:
+    school = models.School()
+    other_school = models.School.objects.get(school_code='OTHER')
 
   if request.method == 'POST':
     # checking for bot signup
@@ -579,10 +586,16 @@ def register(request, group_id=''):
       messages.info(request, 'Thank you for registering')
       return shortcuts.redirect('ctstem:home')
     else:
+      #print request.POST.copy()
+      school_form = None
+      new_school = None
       if group_id:
         form = forms.RegistrationForm(user=request.user, data=request.POST, group_id=group_id)
       else:
         form = forms.RegistrationForm(user=request.user, data=request.POST)
+        if request.user.is_anonymous():
+          school_form = forms.SchoolForm(data=request.POST, instance=school, prefix="school")
+
       if form.is_valid():
         print form.cleaned_data
         user = User.objects.create_user(form.cleaned_data['username'],
@@ -597,12 +610,32 @@ def register(request, group_id=''):
             user.is_active = True
         user.save()
 
-        if form.cleaned_data['account_type'] == 'T':
-          newUser = models.Teacher()
-          newUser.school = form.cleaned_data['school']
+        if form.cleaned_data['account_type'] == 'T' or form.cleaned_data['account_type'] == 'P':
+          if form.cleaned_data['account_type'] == 'T':
+            newUser = models.Teacher()
+            #generate validation code
+            newUser.validation_code = get_random_string(length=5)
+          else:
+            newUser = models.SchoolAdministrator()
+
+          #get the school id
+          selected_school = form.cleaned_data['school']
+          if selected_school.school_code == 'OTHER':
+            if school_form.is_valid():
+              #create a new school entry
+              new_school = school_form.save(commit=False)
+              new_school.created_by = user
+              new_school.save()
+              newUser.school = new_school
+            else:
+              print school_form.errors
+              user.delete()
+              context = {'form': form, 'school_form': school_form, 'other_school': other_school }
+              return render(request, 'ctstem_app/Registration.html', context)
+
+          else:
+            newUser.school = form.cleaned_data['school']
           newUser.user = user
-          #generate validation code
-          newUser.validation_code = get_random_string(length=5)
           newUser.save()
 
         elif form.cleaned_data['account_type'] == 'S':
@@ -629,17 +662,17 @@ def register(request, group_id=''):
           newUser = models.Author()
           newUser.user = user
           newUser.save()
-        elif form.cleaned_data['account_type'] == 'P':
-          newUser = models.SchoolAdministrator()
-          newUser.school = form.cleaned_data['school']
-          newUser.user = user
-          newUser.save()
+
 
         current_site = Site.objects.get_current()
         domain = current_site.domain
+        school_approval = ''
+        if new_school:
+          school_approval = 'Please verify and approve the new school: '+ new_school.name
 
         if request.user.is_anonymous():
           if form.cleaned_data['account_type'] in ['A', 'R', 'C', 'P']:
+            #send an email to the registering user
             messages.info(request, 'Your account is pending admin approval.  You will be notified once your account is approved.')
             #send email confirmation
             send_mail('CT-STEM Account Pending',
@@ -648,20 +681,39 @@ def register(request, group_id=''):
             -- CT-STEM Admin' % domain,
                       settings.DEFAULT_FROM_EMAIL,
                       [newUser.user.email])
+
+            #send an email to the site admin
+            send_mail('CT-STEM Account Approval Request',
+            'Please approve the user account for %s on http://%s.  \r\n\r\n \
+            %s \r\n\r\n  \
+            -- CT-STEM Admin' % (user.username, domain, school_approval),
+                      settings.DEFAULT_FROM_EMAIL,
+                      [settings.DEFAULT_FROM_EMAIL])
             return shortcuts.redirect('ctstem:home')
           #teacher account
           elif form.cleaned_data['account_type'] == 'T':
-            #send an email with the username and validation code to validate the account
-            messages.info(request, 'An email has been sent to %s to validate your account.  Please validate your account with in 24 hours.' % newUser.user.email)
-            send_mail('CT-STEM Account Validation',
-          ' \r\n \
-          Welcome to Computational Thinking in STEM \r\n\r\n \
-          Please validate your account here http://%s/validate  and use the credentials below.\r\n\r\n \
-          Username: %s \r\n\r\n \
-          Validation code: %s \r\n\r\n \
-          -- CT-STEM Admin' % (domain, user.username, newUser.validation_code),
-                      settings.DEFAULT_FROM_EMAIL,
-                      [newUser.user.email])
+            #if new school added
+            if new_school:
+              #send an email with the username and validation code to validate the account
+              messages.info(request, 'Your request for a new school is pending admin approval.  Once the school is approved, an email will be sent to %s to validate your account.' % newUser.user.email)
+              send_mail('CT-STEM New School Request',
+              ' \r\n \
+              Thank you for your account and new school request \r\n\r\n \
+              Once your school is approved, another email will be sent to this address to validate your account.\r\n\r\n \
+              -- CT-STEM Admin', settings.DEFAULT_FROM_EMAIL, [newUser.user.email])
+
+              #email the site admin for school approval
+              send_mail('CT-STEM School Approval',
+              '%s on http://%s.  \r\n\r\n \
+              -- CT-STEM Admin' % (school_approval, domain),
+                        settings.DEFAULT_FROM_EMAIL,
+                        [settings.DEFAULT_FROM_EMAIL])
+
+            else:
+              #send an email with the username and validation code to validate the account
+              messages.info(request, 'An email has been sent to %s to validate your account.  Please validate your account with in 24 hours.' % newUser.user.email)
+              send_account_validation_email(newUser)
+
             return shortcuts.redirect('ctstem:home')
 
           #student account
@@ -709,10 +761,13 @@ def register(request, group_id=''):
         if group_id:
           context = {'form': form, 'group_id': group_id, 'school_id': school.id}
         else:
-          context = {'form': form }
+          context = {'form': form, 'school_form': school_form, 'other_school': other_school }
+
         return render(request, 'ctstem_app/Registration.html', context)
 
   else:
+    print request.user
+
     if hasattr(request.user, 'researcher') or hasattr(request.user, 'author') or hasattr(request.user, 'student'):
       messages.error(request, 'You do not have the privilege to register any other user')
       return shortcuts.redirect('ctstem:home')
@@ -721,6 +776,19 @@ def register(request, group_id=''):
       email = request.GET['email']
       form = forms.RegistrationForm(initial={'email': email}, user=request.user, group_id=group_id)
       context = {'form': form, 'group_id': group_id, 'school_id': school.id}
+    elif request.user.is_anonymous():
+      form = forms.RegistrationForm(user=request.user)
+      school_form = forms.SchoolForm(instance=school, prefix='school')
+      context = {'form': form, 'school_form': school_form, 'other_school': other_school}
+    elif hasattr(request.user, 'school_administrator'):
+      school = request.user.school_administrator.school
+      print school.id
+      form = forms.RegistrationForm(user=request.user)
+      context = {'form': form, 'school_id': school.id}
+    elif hasattr(request.user, 'teacher'):
+      school = request.user.teacher.school
+      form = forms.RegistrationForm(user=request.user)
+      context = {'form': form, 'school_id': school.id}
     else:
       form = forms.RegistrationForm(user=request.user)
       context = {'form': form}
@@ -2369,14 +2437,10 @@ def generate_code(request):
 def generate_code_helper(request):
   allowed_chars = ''.join((string.uppercase, string.digits))
   code = get_random_string(length=5, allowed_chars=allowed_chars)
-  teachers = models.Teacher.objects.all().filter(user_code=code)
-  researchers = models.Researcher.objects.all().filter(user_code=code)
   schools = models.School.objects.all().filter(school_code=code)
   # ensure the user code is unique across teachers and researchers
-  while teachers.count() > 0 or researchers.count() > 0 or schools.count() > 0:
+  while schools.count() > 0:
     code = get_random_string(length=5, allowed_chars=allowed_chars)
-    teachers = models.Teacher.objects.all().filter(user_code=code)
-    researchers = models.Researcher.objects.all().filter(user_code=code)
     schools = models.School.objects.all().filter(school_code=code)
 
   return code
@@ -2569,6 +2633,32 @@ def send_feedback_ready_email(email, curriculum):
   -- CT-STEM Admin'%(curriculum.title, domain),
         settings.DEFAULT_FROM_EMAIL,
         [email])
+
+def send_account_validation_email(teacher):
+  current_site = Site.objects.get_current()
+  domain = current_site.domain
+
+  send_mail('CT-STEM Account Validation',
+    ' \r\n \
+    Welcome to Computational Thinking in STEM \r\n\r\n \
+    Please validate your account here http://%s/validate  and use the credentials below.\r\n\r\n \
+    Username: %s \r\n\r\n \
+    Validation code: %s \r\n\r\n \
+    -- CT-STEM Admin' % (domain, teacher.user.username, teacher.validation_code),
+              settings.DEFAULT_FROM_EMAIL,
+              [teacher.user.email])
+
+def send_account_approval_email(user):
+  current_site = Site.objects.get_current()
+  domain = current_site.domain
+
+  send_mail('CT-STEM Account Approval',
+  'Your account has been approved on Computational Thinking in STEM website http://%s.  \r\n\r\n \
+   Please login to the site using the the credentials created during registration.\r\n\r\n  \
+   -- CT-STEM Admin'%(domain) ,
+              settings.DEFAULT_FROM_EMAIL,
+              [user.email])
+
 ####################################
 # Schools
 ####################################
@@ -2601,11 +2691,21 @@ def school(request, id=''):
         return render(request, 'ctstem_app/School.html', context)
 
     elif request.method == 'POST':
+      was_active = school.is_active
       data = request.POST.copy()
-
       form = forms.SchoolForm(data, instance=school, prefix="school")
       if form.is_valid():
-        form.save()
+        school = form.save()
+        is_active = school.is_active
+        #notify the school creator that they can now validate their account
+        if not was_active and is_active:
+          school_creator = school.created_by
+          if school_creator.teacher and not school_creator.is_active:
+            # update teacher's joined date to current date
+            school_creator.date_joined = datetime.datetime.now()
+            school_creator.save()
+            send_account_validation_email(school_creator.teacher)
+
         messages.success(request, "School Saved.")
         return shortcuts.redirect('ctstem:schools',)
       else:
@@ -2634,6 +2734,7 @@ def deleteSchool(request, id=''):
       raise models.School.DoesNotExist
 
     if request.method == 'GET' or request.method == 'POST':
+      print school
       school.delete()
       messages.success(request, '%s deleted' % school.name)
       return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))

@@ -22,11 +22,13 @@
             <th> School </th>
             <th> City </th>
             <th> School Code </th>
+            <th> Status </th>
           </tr>
           <tr id="filterrow">
             <th> School </th>
             <th> City </th>
             <th> School Code </th>
+            <th> Status </th>
           </tr>
         </thead>
         <tbody>
@@ -48,6 +50,7 @@
               <td>
                 {{ school.school_code}}
               </td>
+              <td> {{school.is_active|yesno:"Active,Inactive"}}</td>
             </tr>
           {% endfor %}
         </tbody>

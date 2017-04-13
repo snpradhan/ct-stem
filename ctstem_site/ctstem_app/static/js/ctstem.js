@@ -214,6 +214,8 @@ $(function (){
     });
     return false;
   });
+  //disable a field if it is inside a div with class disabled
+  $('div#userProfile div.disabled select').prop('disabled', true);
 });
 
 
