@@ -284,8 +284,6 @@ class School(models.Model):
   city = models.CharField(null=False, max_length=256)
   school_code = models.CharField(null=False, max_length=10, unique=True)
   is_active = models.BooleanField(null=False, blank=False, default=False)
-  created_by = models.ForeignKey(User, null=False, related_name='school_creator')
-  created_date = models.DateTimeField(auto_now_add=True)
 
   def __unicode__(self):
       return u'%s' % (self.name)

@@ -67,12 +67,14 @@
                       </div>
                     {% endfor %}
                   </div>
-                {% elif user.is_anonymous and field.name == 'account_type' %}
+                {% elif field.name == 'account_type' %}
                   <div>
                     {{field}}
-                    <span data-toggle="tooltip" data-placement="top" title="If you need to create some other account type such as Researcher, Author, School Administrator, please contact the site admin.">
-                    <i class="fa fa-info-circle" aria-hidden="true"></i>
-                    </span>
+                    {% if user.is_anonymous %}
+                      <span data-toggle="tooltip" data-placement="top" title="If you need to create some other account type such as Researcher, Author, School Administrator, please contact the site admin.">
+                      <i class="fa fa-info-circle" aria-hidden="true"></i>
+                      </span>
+                    {% endif %}
                   </div>
                 {% else %}
                   {{field}}

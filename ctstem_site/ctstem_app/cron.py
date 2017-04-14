@@ -7,10 +7,14 @@ def cleanup_teacher_accounts():
   #get a list of teacher account created prior to 24 hrs and still inactive
   regEnd = datetime.today() - timedelta(hours = 24)
   print 'finding teachers registered before ', regEnd
-  teachers = models.Teacher.objects.all().filter(user__is_active = False, school__is_active = True, user__date_joined__lt=regEnd)
+  teachers = models.Teacher.objects.all().filter(user__is_active = False, user__date_joined__lt=regEnd)
   count = len(teachers)
   for teacher in teachers:
     print 'deleting', teacher
+    #check if this teacher created a new school, if so delete the school as well
+    school = models.School.objects.get(id=teacher.school.id)
+    if not school.is_active:
+      school.delete()
     send_deletion_email(teacher.user)
     teacher.user.delete()
   print 'done cleaning up %d teacher accounts' % count

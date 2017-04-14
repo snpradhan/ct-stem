@@ -888,7 +888,7 @@ class SchoolForm(ModelForm):
 
   class Meta:
     model = models.School
-    exclude = ('id', 'created_by', 'created_date')
+    exclude = ('id',)
 
   def __init__(self, *args, **kwargs):
     super(SchoolForm, self).__init__(*args, **kwargs)
@@ -896,6 +896,9 @@ class SchoolForm(ModelForm):
     for field_name, field in self.fields.items():
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['placeholder'] = field.help_text
+
+      if field_name == 'name':
+        field.label = 'School Name'
 
 ####################################
 # Subject Form

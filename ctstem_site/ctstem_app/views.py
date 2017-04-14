@@ -610,13 +610,10 @@ def register(request, group_id=''):
             user.is_active = True
         user.save()
 
-        if form.cleaned_data['account_type'] == 'T' or form.cleaned_data['account_type'] == 'P':
-          if form.cleaned_data['account_type'] == 'T':
-            newUser = models.Teacher()
-            #generate validation code
-            newUser.validation_code = get_random_string(length=5)
-          else:
-            newUser = models.SchoolAdministrator()
+        if form.cleaned_data['account_type'] == 'T':
+          newUser = models.Teacher()
+          #generate validation code
+          newUser.validation_code = get_random_string(length=5)
 
           #get the school id
           selected_school = form.cleaned_data['school']
@@ -624,7 +621,6 @@ def register(request, group_id=''):
             if school_form.is_valid():
               #create a new school entry
               new_school = school_form.save(commit=False)
-              new_school.created_by = user
               new_school.save()
               newUser.school = new_school
             else:
@@ -649,6 +645,11 @@ def register(request, group_id=''):
           if group_id:
             membership, created = models.Membership.objects.get_or_create(student=newUser, group=group)
 
+        elif form.cleaned_data['account_type'] == 'P':
+            newUser = models.SchoolAdministrator()
+            newUser.user = user
+            newUser.save()
+
         elif form.cleaned_data['account_type'] == 'A':
             newUser = models.Administrator()
             newUser.user = user
@@ -666,9 +667,6 @@ def register(request, group_id=''):
 
         current_site = Site.objects.get_current()
         domain = current_site.domain
-        school_approval = ''
-        if new_school:
-          school_approval = 'Please verify and approve the new school: '+ new_school.name
 
         if request.user.is_anonymous():
           if form.cleaned_data['account_type'] in ['A', 'R', 'C', 'P']:
@@ -685,34 +683,15 @@ def register(request, group_id=''):
             #send an email to the site admin
             send_mail('CT-STEM Account Approval Request',
             'Please approve the user account for %s on http://%s.  \r\n\r\n \
-            %s \r\n\r\n  \
-            -- CT-STEM Admin' % (user.username, domain, school_approval),
+            -- CT-STEM Admin' % (user.username, domain),
                       settings.DEFAULT_FROM_EMAIL,
                       [settings.DEFAULT_FROM_EMAIL])
             return shortcuts.redirect('ctstem:home')
           #teacher account
           elif form.cleaned_data['account_type'] == 'T':
-            #if new school added
-            if new_school:
-              #send an email with the username and validation code to validate the account
-              messages.info(request, 'Your request for a new school is pending admin approval.  Once the school is approved, an email will be sent to %s to validate your account.' % newUser.user.email)
-              send_mail('CT-STEM New School Request',
-              ' \r\n \
-              Thank you for your account and new school request \r\n\r\n \
-              Once your school is approved, another email will be sent to this address to validate your account.\r\n\r\n \
-              -- CT-STEM Admin', settings.DEFAULT_FROM_EMAIL, [newUser.user.email])
-
-              #email the site admin for school approval
-              send_mail('CT-STEM School Approval',
-              '%s on http://%s.  \r\n\r\n \
-              -- CT-STEM Admin' % (school_approval, domain),
-                        settings.DEFAULT_FROM_EMAIL,
-                        [settings.DEFAULT_FROM_EMAIL])
-
-            else:
-              #send an email with the username and validation code to validate the account
-              messages.info(request, 'An email has been sent to %s to validate your account.  Please validate your account with in 24 hours.' % newUser.user.email)
-              send_account_validation_email(newUser)
+            #send an email with the username and validation code to validate the account
+            messages.info(request, 'An email has been sent to %s to validate your account.  Please validate your account with in 24 hours.' % newUser.user.email)
+            send_account_validation_email(newUser)
 
             return shortcuts.redirect('ctstem:home')
 
@@ -2691,22 +2670,10 @@ def school(request, id=''):
         return render(request, 'ctstem_app/School.html', context)
 
     elif request.method == 'POST':
-      was_active = school.is_active
       data = request.POST.copy()
       form = forms.SchoolForm(data, instance=school, prefix="school")
       if form.is_valid():
         school = form.save()
-        is_active = school.is_active
-        #notify the school creator that they can now validate their account
-        if not was_active and is_active:
-          school_creator = school.created_by
-
-          if hasattr(school_creator, 'teacher') and not school_creator.is_active:
-            # update teacher's joined date to current date
-            school_creator.date_joined = datetime.datetime.now()
-            school_creator.save()
-            send_account_validation_email(school_creator.teacher)
-
         messages.success(request, "School Saved.")
         return shortcuts.redirect('ctstem:schools',)
       else:
@@ -3033,6 +3000,13 @@ def validate(request):
       user = authenticate(username=username, password=password)
       user.is_active = True
       user.save()
+      #check if this user added a new school
+      if hasattr(user, 'teacher'):
+        school = models.School.objects.get(id=user.teacher.school.id)
+        if not school.is_active:
+          school.is_active = True
+          school.save()
+
       login(request, user)
       messages.success(request, "Your account has been validated")
       return shortcuts.redirect('ctstem:home')
