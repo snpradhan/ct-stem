@@ -930,7 +930,13 @@ def userProfile(request, id=''):
           context = {'userform': userform, 'role': role}
         elif profileform.is_valid():
           userform.save()
-          profileform.save()
+          profile = profileform.save()
+          if role == 'teacher':
+            new_school = profile.school
+            # if school has changes update teacher's school
+            # as well as the associated students' school
+            if new_school != school:
+              update_school(request, profile, new_school)
           messages.success(request, "User profile saved successfully")
           context = {'profileform': profileform, 'userform': userform, 'role': role}
         else:
@@ -1464,12 +1470,55 @@ def _do_action(request, id_list, model, object_id=None):
           student = user.student
           student.parental_consent = consent
           student.save()
-        messages.success(request, "Selected students' parental consent saved.")
+        messages.success(request, "Selected students' parental consent updated.")
+        return True
+      else:
+        return False
+    elif u'school_selected' == action_params.get(u'action'):
+      if u'subaction' in action_params:
+        school_id = action_params.get(u'subaction')
+        school = models.School.objects.get(id=school_id)
+        for user in users:
+          if hasattr(user, 'school_administrator'):
+            school_admin = models.SchoolAdministrator.objects.get(user=user)
+            update_school(request, school_admin, school)
+          elif hasattr(user, 'teacher'):
+            teacher = models.Teacher.objects.get(user=user)
+            update_school(request, teacher, school)
+          elif hasattr(user, 'student'):
+            student = models.Student.objects.get(user=user)
+            update_school(request, student, school)
+        messages.success(request, "Selected users' school updated.")
         return True
       else:
         return False
   else:
     return False
+
+####################################
+# Update school for the given user.
+# If the user is a teacher, also update the
+# school of students associated via group
+####################################
+def update_school(request, user, school):
+
+  if isinstance(user, models.SchoolAdministrator):
+    user.school = school
+    user.save()
+  elif isinstance(user, models.Teacher):
+    user.school = school
+    user.save()
+    #find all the groups this teacher owns
+    groups = models.UserGroup.objects.all().filter(teacher=user)
+    for group in groups:
+      for membership in group.group_members.all():
+        student = models.Student.objects.get(id=membership.student.id)
+        student.school = school
+        student.save()
+  elif isinstance(user, models.Student):
+    user.school = school
+    user.save()
+
 
 ####################################
 # PUBLICATIONS TABLE VIEW
@@ -3016,3 +3065,16 @@ def validate(request):
 
 
   return http.HttpResponseNotAllowed(['GET', 'POST'])
+
+@login_required
+def subaction(request, action=1):
+  if request.is_ajax():
+    action = int(action)
+    if 2 == action:
+        data = models.School.objects.filter(~Q(school_code='OTHER'), is_active=True).order_by('name')
+    else:
+        return http.HttpResponse(status=400)
+    data = [{'id': d['id'], 'name': d['name']} for d in data.values('id', 'name')]
+    return http.HttpResponse(json.dumps(data, ensure_ascii=False), content_type='application/javascript')
+  else:
+    return http.HttpResponse(status=400)

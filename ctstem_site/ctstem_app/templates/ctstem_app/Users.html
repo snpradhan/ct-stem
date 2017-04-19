@@ -1,9 +1,9 @@
 {% extends "ctstem_app/base.html" %}
-
+{% load ctstem_extras %}
 {% block content %}
   {{block.super}}
   <div class="content">
-    <h2> {{role|title}} </h2>
+    <h2> {{role|split:"_"|join:" "|title}} </h2>
 
     <form method="post">
       {% csrf_token %}
@@ -18,6 +18,9 @@
               <th> Name </th>
               <th> Email </th>
               <th> Account Status </th>
+              {% if role == 'students' or role == 'teachers' %}
+                <th> Group(s) </th>
+              {% endif %}
               {% if user.administrator or user.researcher %}
                 {% if role == 'school_administrators' or role == 'teachers' or role == 'students' %}
                   <th> School </th>
@@ -36,6 +39,9 @@
               <th> Name </th>
               <th> Email </th>
               <th> Account Status </th>
+              {% if role == 'students' or role == 'teachers' %}
+                <th> Group(s) </th>
+              {% endif %}
               {% if user.administrator or user.researcher %}
                 {% if role == 'school_administrators' or role == 'teachers' or role == 'students' %}
                   <th> School </th>
@@ -88,8 +94,23 @@
                   {% else %}
                     {{userProfile.user.email}}
                   {% endif %}
-                  </td>
+                </td>
                 <td>{{userProfile.user.is_active|yesno:"Active,Inactive"}}</td>
+                {% if role == 'students' or role == 'teachers' %}
+                  <td>
+                    <ul>
+                    {% if role == 'students' %}
+                      {% for membership in userProfile.id|get_student_groups %}
+                        <li>{{membership.group}}</li>
+                      {% endfor %}
+                    {% else %}
+                      {% for group in userProfile.id|get_teacher_groups %}
+                        <li>{{group}}</li>
+                      {% endfor %}
+                    {% endif %}
+                    </ul>
+                  </td>
+                {% endif %}
                 {% if user.administrator or user.researcher %}
                   {% if role == 'school_administrators' or role == 'teachers' or role == 'students' %}
                     <td> {{userProfile.school}} </td>

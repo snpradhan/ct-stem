@@ -310,12 +310,38 @@ function update_subaction( action, csrftoken ) {
   if ('parental_consent_selected' == action) {
     action_id = 1;
   }
+  else if ('school_selected' == action) {
+    action_id = 2;
+  }
 
-  if (action_id > 0) {
+  if (action_id == 1) {
     $("select#subaction").empty();
     $("select#subaction").append('<option value="A">Agree</option');
     $("select#subaction").append('<option value="D">Disagree</option');
     $("select#subaction").show();
+  }
+  else if (action_id == 2) {
+    var data = {csrfmiddlewaretoken: csrftoken};
+    $.ajax({
+        url: "/subaction/"+action_id+"/",
+        type: "POST",
+        data: data,
+        success: function(data) {
+            console.log(data);
+            $("select#subaction").empty();
+            $("#subaction").append($.parseJSON(data)
+                .map(function(x){return "<option value=\""+x.id+"\">"+x.name+"</option>";})
+                .reduce(function(a,b) { return a + b; } ));
+
+            $("#subaction").show();
+
+
+        },
+        error: function(xhr, status, error) {
+            alert("Error updating");
+            if ( !$("#subaction").attr("disabled") ) { $("#subaction").attr("disabled", true); } },
+        complete: function() { }
+    });
   }
   else {
     if ( ! $("select#subaction").is(":disabled") ) {

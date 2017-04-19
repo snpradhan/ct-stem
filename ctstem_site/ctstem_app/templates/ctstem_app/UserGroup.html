@@ -130,7 +130,11 @@
               <a type="button" class="btn btn-info upload-modal" href="#" data-toggle="modal" data-target="#addStudent" data-id="{{form.instance.id}}" title="Create and Add new Student to this group">
                 <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
               </a>
-              {% student_in_group_actions %}
+              {% if user.administrator %}
+                {% student_actions %}
+              {% else %}
+                {% user_actions %}
+              {% endif %}
             </div>
             <div class="controls table_container">
               {{form.members.as_hidden}}

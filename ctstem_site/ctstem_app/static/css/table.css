@@ -183,4 +183,6 @@ table.mc_horiz_question_table  td:not(.mc_horiz_question) {
   width: 6%;
   text-align: center;
 }
-
+table.table ul {
+  padding-left: 1em;
+}

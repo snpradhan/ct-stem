@@ -164,7 +164,6 @@ def has_response(curriculum, user):
   else:
     return False
 
-
 bulk_header = 'Select Bulk Action'
 
 def StudentFilters(context):
@@ -191,34 +190,40 @@ def student_filters(context):
 
 def UserActions(context):
     return [{'description':bulk_header,'value':''},
-        {'description':'Delete selected users','value':'delete_selected'},
-        {'description':'Activate selected users','value':'activate_selected'},
-        {'description':'Inactivate selected users','value':'inactivate_selected'},]
+        {'description':'Delete Selected Users','value':'delete_selected'},
+        {'description':'Activate Selected Users','value':'activate_selected'},
+        {'description':'Inactivate Selected Users','value':'inactivate_selected'},]
 
 @register.inclusion_tag("ctstem_app/admin/actions.html", takes_context=True)
 def user_actions(context):
     return {'actions':UserActions(context)}
 
+def TeacherActions(context):
+  actions = UserActions(context)
+  actions.append({'description': 'Update School', 'value': 'school_selected'})
+  return actions
+
+@register.inclusion_tag("ctstem_app/admin/actions.html", takes_context=True)
+def teacher_actions(context):
+  return {'actions':TeacherActions(context)}
+
 def StudentActions(context):
-    return [{'description':bulk_header,'value':''},
-        {'description':'Delete Selected Students','value':'delete_selected'},
-        {'description':'Activate Selected Students','value':'activate_selected'},
-        {'description':'Inactivate Selected Students','value':'inactivate_selected'},
-        {'description':'Update Parental Consent','value':'parental_consent_selected'},]
+  actions = TeacherActions(context)
+  actions.append({'description':'Update Parental Consent','value':'parental_consent_selected'})
+  return actions
 
 @register.inclusion_tag("ctstem_app/admin/actions.html", takes_context=True)
 def student_actions(context):
     return {'actions':StudentActions(context)}
 
-def StudentInGroupActions(context):
-    return [{'description':bulk_header,'value':''},
-        {'description':'Remove Selected Students','value':'remove_selected'},
-        {'description':'Activate Selected Students','value':'activate_selected'},
-        {'description':'Inactivate Selected Students','value':'inactivate_selected'},
-        {'description':'Update Parental Consent','value':'parental_consent_selected'},]
+@register.filter
+def get_student_groups(id):
+  student = models.Student.objects.get(id=id)
+  memberships = student.student_membership.all()
+  return memberships
 
-@register.inclusion_tag("ctstem_app/admin/actions.html", takes_context=True)
-def student_in_group_actions(context):
-    return {'actions':StudentInGroupActions(context)}
-
-
+@register.filter
+def get_teacher_groups(id):
+  teacher = models.Teacher.objects.get(id=id)
+  groups = teacher.groups.all()
+  return groups

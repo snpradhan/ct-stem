@@ -406,7 +406,7 @@ class Assignment(models.Model):
 # Membership model
 #######################################################
 class Membership(models.Model):
-  student = models.ForeignKey(Student)
+  student = models.ForeignKey(Student, related_name="student_membership")
   group = models.ForeignKey(UserGroup, related_name="group_members")
   joined_on = models.DateTimeField(auto_now_add=True)
 

@@ -13,10 +13,18 @@
       <span class="glyphicon glyphicon-upload" aria-hidden="true"></span> Upload Students
     </a>
     <a type="button" class="btn btn-info" href="{% url 'ctstem:newGroup' %}" title="Create new group">Create Group</a>
-    {% if role == 'students' %}
-      {% student_actions %}
-    {% elif tab == 'user' %}
-      {% user_actions %}
+    {% if user.administrator %}
+      {% if role == 'students' %}
+        {% student_actions %}
+      {% elif role == 'teachers' or role == 'school_administrators' %}
+        {% teacher_actions %}
+      {% elif tab == 'user' %}
+        {% user_actions %}
+      {% endif %}
+    {% else %}
+      {% if tab == 'user' %}
+        {% user_actions %}
+      {% endif %}
     {% endif %}
   {% endif %}
 </div>

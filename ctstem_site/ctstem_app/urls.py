@@ -83,6 +83,7 @@ urlpatterns = [
     url(r'^consent/$', views.consent, name='consent'),
     url(r'^load_consent/$', views.load_consent, name='load_consent'),
     url(r'^validate/$', views.validate, name='validate'),
+    url(r'^subaction/(?P<action>[\d]+)/$', views.subaction, name='subaction'),
 
 
 ]
