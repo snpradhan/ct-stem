@@ -2,6 +2,7 @@ from ctstem_app import models
 from datetime import datetime, timedelta
 from django.core.mail import send_mail, EmailMessage
 from django.conf import settings
+from django.core import management
 
 def cleanup_teacher_accounts():
   #get a list of teacher account created prior to 24 hrs and still inactive
@@ -27,3 +28,9 @@ def send_deletion_email(user):
     -- CT-STEM Admin',
     settings.DEFAULT_FROM_EMAIL,
     [user.email])
+
+
+def backup_db():
+  print 'start db backup', datetime.today()
+  management.call_command('dbbackup')
+  print 'end db backup', datetime.today()

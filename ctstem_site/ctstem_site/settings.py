@@ -180,4 +180,6 @@ CAPTCHA_CHALLENGE_FUNCT = 'captcha.helpers.math_challenge'
 CRONJOBS = [
     # run cron at midnight to clean up inactive teacher accounts
     ('0 0 * * *', 'ctstem_app.cron.cleanup_teacher_accounts', '>> /srv/project/logs/cron.log'),
+    # run cron at 1 am to backup database
+    ('0 1 * * *', 'ctstem_app.cron.backup_db', '>> /srv/project/logs/cron.log'),
 ]
