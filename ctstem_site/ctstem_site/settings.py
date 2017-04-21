@@ -83,7 +83,8 @@ DBBACKUP_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
 DBBACKUP_STORAGE_OPTIONS = {
     'access_key': AWS_ACCESS_KEY_ID,
     'secret_key': AWS_SECRET_ACCESS_KEY,
-    'bucket_name': 'ct-stem-db-backup'
+    'bucket_name': 'ct-stem-db-backup',
+    'host': 's3-us-west-1.amazonaws.com'
 }
 
 #CKEDITOR_JQUERY_URL = 'https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js'
