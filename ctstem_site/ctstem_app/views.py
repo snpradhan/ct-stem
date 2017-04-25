@@ -574,12 +574,14 @@ def register(request, group_id=''):
   if group_id:
     group = models.UserGroup.objects.get(id=group_id)
     school = group.teacher.school
-  elif hasattr(request.user, 'school_administrator'):
-    school = request.user.school_administrator.school
-  elif hasattr(request.user, 'teacher'):
-    school = request.user.teacher.school
   else:
-    school = models.School()
+    if hasattr(request.user, 'school_administrator'):
+      school = request.user.school_administrator.school
+    elif hasattr(request.user, 'teacher'):
+      school = request.user.teacher.school
+    else:
+      school = models.School()
+
     other_school = models.School.objects.get(school_code='OTHER')
 
   if request.method == 'POST':
