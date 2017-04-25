@@ -133,8 +133,8 @@
                   <td class="action">
                     {% if curriculum.curriculum_type == 'L' %}
                       <a class="util-button fa fa-eye" aria-hidden="true" title="Preview Curriculum" href="{% url 'ctstem:previewCurriculum' curriculum.id %}" target="_blank">
-                    </a>
-                    {% elif user.administrator or user.researcher or user.author or user.teacher %}
+                      </a>
+                    {% elif user.administrator or user.researcher or user.author or user.school_administrator or user.teacher %}
                       <a class="util-button fa fa-eye" aria-hidden="true" title="Preview Curriculum" href="{% url 'ctstem:previewCurriculum' curriculum.id %}" target="_blank">
                     </a>
                     {% endif %}
