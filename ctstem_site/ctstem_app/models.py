@@ -23,6 +23,7 @@ CURRICULUM_STATUS_CHOICES = (
 )
 
 CURRICULUM_TYPE_CHOICES = (
+    (u'U', u'Unit'),
     (u'L', u'Lesson Plan'),
     (u'A', u'Assessment'),
     (u'S', u'Survey'),
@@ -133,7 +134,7 @@ class Curriculum (models.Model):
   status = models.CharField(max_length=1, default='D', choices=CURRICULUM_STATUS_CHOICES)
   subject = models.ManyToManyField('Subject', null=True, blank=True, help_text="Select one or more subjects")
   compatible_system = models.ManyToManyField('System', null=True, blank=True, help_text="Select one or more compatible systems")
-  parent = models.ForeignKey('self', null=True, on_delete=models.SET_NULL)
+  parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL, related_name="children")
   version = models.IntegerField(default=1)
   slug = models.SlugField(unique=True, max_length=255)
   taxonomy = models.ManyToManyField('Subcategory', null=True, blank=True)
@@ -142,6 +143,7 @@ class Curriculum (models.Model):
   modified_date = models.DateTimeField(auto_now=True)
   icon = models.ImageField(upload_to=upload_file_to, blank=True, help_text='Upload 400x289 png image that represents this curriculum')
   shared_with = models.ManyToManyField('Teacher', null=True, blank=True, help_text='Select teachers to share this curriculum with before it is published.' )
+  unit = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL, related_name="underlying_curriculum", help_text="Select a unit if this lesson is part of one")
 
   class Meta:
       ordering = ['-id']

@@ -35,10 +35,17 @@
               {% else %}
                 <div class="form-group">
               {% endif %}
+            {% elif field.name == 'unit' %}
+              <div class="form-group" style="display:none;">
             {% else %}
               <div class="form-group">
             {% endif %}
+<<<<<<< HEAD
               <label for="id_{{field.name}}">{{ field.label|title }} {% if field.field.required %}(<span class="required">*</span>) {% endif %}</label>
+=======
+
+              <label for="id_{{field.name}}">{{ field.label }} {% if field.field.required %}(<span class="required">*</span>) {% endif %}</label>
+>>>>>>> d9f0e2f... units WIP
               {% if field.name == 'taxonomy' %}
                 <div style="display:none;">
                   {{field}}
@@ -84,19 +91,34 @@
                     </tbody>
                   </table>
                 </div>
-              {% elif field.name == 'teacher_notes'%}
-                <span class="expand_collapse_other">
-                  <button type="button" class="btn btn-warning" style="display:none;" name="collapse_notes" aria-label="Collapse Notes" title="Collapse Notes">
-                    <span class="glyphicon glyphicon-collapse-up" aria-hidden="true"></span>
-                  </button>
-                  <button type="button" class="btn btn-success"  name="expand_notes" aria-label="Expand Notes" title="Expand Notes">
-                    <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                  </button>
-                </span>
-                <div style="display:none; margin-top: 1em;">
-                  {{field}}
-                </div>
+                {% elif field.name == 'teacher_notes'%}
+                  <span class="expand_collapse_other">
+                    <button type="button" class="btn btn-warning" style="display:none;" name="collapse_notes" aria-label="Collapse Notes" title="Collapse Notes">
+                      <span class="glyphicon glyphicon-collapse-up" aria-hidden="true"></span>
+                    </button>
+                    <button type="button" class="btn btn-success"  name="expand_notes" aria-label="Expand Notes" title="Expand Notes">
+                      <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
+                    </button>
+                  </span>
+                  <div style="display:none; margin-top: 1em;">
+                    {{field}}
+                  </div>
+                  <div class="error">{{ field.errors }}</div>
+                {% else %}
+                  <div>
+                    {{field}}
+                    {% if field.name == 'curriculum_type' and form.instance.id %}
+                      {{field.as_hidden}}
+                    {% elif field.name == 'unit' and form.instance.id %}
+                      {{field.as_hidden}}
+                    {% endif %}
+                  </div>
+                {% endif %}
+                {% if field.name == 'icon' or field.name == 'subject' or field.name == 'compatible_system' or field.name == 'unit'%}
+                  <div class="help warning">{{field.help_text}}</div>
+                {% endif %}
                 <div class="error">{{ field.errors }}</div>
+<<<<<<< HEAD
               {% elif field.name == 'shared_with' %}
                 <button class="btn btn-info search_teachers" name="search_teachers" data-form="{% url 'ctstem:searchTeachers' %}">
                   <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
@@ -142,6 +164,9 @@
               {% endif %}
               <div class="error">{{ field.errors }}</div>
             </div>
+=======
+              </div>
+>>>>>>> d9f0e2f... units WIP
           {% endfor %}
           <div class="form-group attachment_table">
             {{attachment_formset.management_form}}
@@ -320,7 +345,7 @@
       <div class="form-group button-group-fixed">
         <input type="submit" class="btn btn-success" id="submit" value="Save"/>
         <br><br>
-        <input type="button" class="btn btn-info" id="addStep" value="Add Step"/>
+        <input type="button" class="btn btn-info" id="addStep" value="Add Step" style="display:none;"/>
       </div>
     </form>
     <div class="modal fade" id="questionModal" role="dialog"></div>
@@ -441,7 +466,7 @@
       });
       $('select#id_curriculum-curriculum_type').bind('change', (function(){
 
-        if($(this).val() == 'L' || $(this).val() == 'A'){
+        if($(this).val() == 'U' || $(this).val() == 'L' || $(this).val() == 'A'){
 
           $('input#id_curriculum-time').closest('.form-group').show();
           $('input#id_curriculum-time').closest('.form-group').find('label:first').html('Time (<span class="required">*</span>)');
@@ -466,7 +491,7 @@
 
           $('div.form-group.attachment_table').show();
 
-          if($(this).val() == 'L'){
+          if($(this).val() == 'U' || $(this).val() == 'L'){
             $('textarea#id_curriculum-content').closest('.form-group').show();
             $('textarea#id_curriculum-content').closest('.form-group').find('label:first').html('Content (<span class="required">*</span>)');
 
@@ -476,14 +501,27 @@
             $('textarea#id_curriculum-content').closest('.form-group').hide();
             $('select#id_curriculum-subject').closest('.form-group').find('label:first').html('Subject');
           }
+          if($(this).val() == 'L' || $(this).val() == 'A'){
+            $('div.table.step div.form-group.order').show();
+            $('div.table.step div.form-group.step_title').show();
+            $('div.table.step div.form-group.teacher_notes').show();
+            $('div.table.step div.form-group.question_table').show();
+            $('#addStep').show();
+          }
+          else{
+            $('#addStep').hide();
+          }
 
-          $('div.table.step div.form-group.order').show();
-          $('div.table.step div.form-group.step_title').show();
-          $('div.table.step div.form-group.teacher_notes').show();
-          $('div.table.step div.form-group.question_table').show();
+          if($(this).val() == 'L' ){
+            $('select#id_curriculum-unit').closest('.form-group').show();
+          }
+          else {
+            $('select#id_curriculum-unit').closest('.form-group').hide();
+          }
         }
         else{
           //hide the metadata fields
+          //this is for survey
           $('input#id_curriculum-time').closest('.form-group').hide();
           $('textarea#id_curriculum-level').closest('.form-group').hide();
           $('textarea#id_curriculum-overview').closest('.form-group').hide();
@@ -500,6 +538,9 @@
           //$('div.table.step div.form-group.step_title').hide();
           $('div.table.step div.form-group.teacher_notes').hide();
           //$('div.table.step div.form-group.question_table').hide();
+          if($(this).val() == 'S'){
+            $('#addStep').show();
+          }
         }
       }));
       $('select#id_curriculum-curriculum_type').trigger('change');

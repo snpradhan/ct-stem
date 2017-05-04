@@ -94,6 +94,9 @@ def curricula(request, curriculum_type='', bookmark='0'):
   elif curriculum_type == 'lessons':
     curr_type = ['L']
     curriculum_type = 'L'
+  elif curriculum_type == 'units':
+    curr_type = ['U']
+    curriculum_type = 'U'
   else:
     curr_type = ['S']
     curriculum_type = 'S'

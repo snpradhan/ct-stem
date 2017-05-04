@@ -324,7 +324,8 @@ class CurriculumForm(ModelForm):
 
   class Meta:
     model = models.Curriculum
-    fields = ['curriculum_type', 'author', 'title', 'icon', 'time', 'level', 'purpose', 'overview', 'status', 'subject', 'compatible_system', 'taxonomy', 'content', 'teacher_notes', 'shared_with']
+    fields = ['curriculum_type', 'unit', 'author', 'title', 'icon', 'time', 'level', 'purpose', 'overview', 'status', 'subject', 'compatible_system', 'taxonomy', 'content', 'teacher_notes', 'shared_with']
+
     widgets = {
       'title': forms.TextInput(attrs={'placeholder': 'Lesson Title'}),
       'time': forms.TextInput(attrs={'rows':0, 'cols':60}),
@@ -344,6 +345,11 @@ class CurriculumForm(ModelForm):
     forms.ModelForm.__init__(self, *args, **kwargs)
     self.fields['taxonomy'].label = "Standards"
     self.fields['author'].choices = [(user.pk, user.get_full_name()) for user in models.User.objects.all().filter(Q(administrator__isnull=False) | Q(researcher__isnull=False) | Q(author__isnull=False))]
+    self.fields['unit'].queryset = models.Curriculum.objects.filter(curriculum_type='U')
+
+    if self.instance.id:
+      self.fields['curriculum_type'].widget.attrs['disabled'] = True
+      self.fields['unit'].widget.attrs['disabled'] = True
 
     for field_name, field in self.fields.items():
       field.widget.attrs['class'] = 'form-control'
@@ -370,7 +376,7 @@ class CurriculumForm(ModelForm):
       if self.cleaned_data['overview'] == '':
         self._errors['overview'] = u'Overview is required'
         valid = False
-      if not self.cleaned_data['taxonomy']:
+      if not self.cleaned_data['taxonomy'] and not self.cleaned_data['unit']:
           self._errors['taxonomy'] = u'Standards is required'
           valid = False
 

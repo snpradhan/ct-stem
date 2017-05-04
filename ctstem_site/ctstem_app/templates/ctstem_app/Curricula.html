@@ -10,8 +10,12 @@
   {{block.super}}
 <div class="content">
   <div class="col-lg-12">
-    {% if curriculum_type == 'L' %}
-      <h2> Lessons </h2>
+    {% if curriculum_type == 'L' or curriculum_type == 'U' %}
+      {% if curriculum_type == 'L' %}
+        <h2> Lessons </h2>
+      {% else %}
+        <h2> Units </h2>
+      {% endif %}
       <p class="page-blurb">
       Our computational thinking lesson plans are designed to embed authentic CT practices into high school science and mathematics classrooms while enriching disciplinary content learning.
       </p>
@@ -39,12 +43,20 @@
 
     {% if user.teacher %}
       <ul class="nav nav-tabs">
-        {% if curriculum_type == 'L' %}
-          <li {% if bookmark == '0' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'lessons' '0' %}">All Lessons</a></li>
-          <li {% if bookmark == '1' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'lessons' '1' %}">Favorite Lessons</a></li>
+        {% if curriculum_type == 'L' or curriculum_type == 'U' %}
+          <li {% if curriculum_type == 'L' and bookmark == '0' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'lessons' '0' %}">All Lessons</a></li>
+          <li {% if curriculum_type == 'L' and bookmark == '1' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'lessons' '1' %}">Favorite Lessons</a></li>
+          <li {% if curriculum_type == 'U' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'units' %}">Units</a></li>
         {% else %}
           <li {% if bookmark == '0' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'assessments' '0' %}">All Assessments</a></li>
           <li {% if bookmark == '1' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'assessments' '1' %}">Favorite Assessments</a></li>
+        {% endif %}
+      </ul>
+    {% else %}
+      <ul class="nav nav-tabs">
+        {% if curriculum_type == 'L' or curriculum_type == 'U' %}
+          <li {% if curriculum_type == 'L' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'lessons' %}">Lessons</a></li>
+          <li {% if curriculum_type == 'U' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'units' %}">Units</a></li>
         {% endif %}
       </ul>
     {% endif %}
@@ -81,7 +93,7 @@
                         <div class="col-md-10">{{ curriculum.get_status_display }}</div>
                       </div>
                     {% endif %}
-                    {% if curriculum.curriculum_type|is_in:"['L', 'A']" %}
+                    {% if curriculum.curriculum_type|is_in:"['U', L', 'A']" %}
                       <div class="row">
                         <div class="col-md-2 title">Subject(s):</div>
                         <div class="col-md-10">
@@ -129,54 +141,43 @@
                         {{curriculum.author.get_full_name}}
                       </div>
                     </div>
+                    {% if curriculum.curriculum_type == 'U' and curriculum.underlying_curriculum.all %}
+                      <div class="title">Lessons
+                        <span class="ec">
+                          <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
+                          <span class="glyphicon glyphicon-collapse-up" aria-hidden="true" style="display:none;"></span>
+                        </span>
+                      </div>
+                      <table class="table table-condensed table-striped table-bordered inner_table">
+                        <thead>
+                          <tr>
+                            <th>Name</th>
+                            {% if user.administrator or user.researcher or user.author %}
+                            <th>Status</th>
+                            {% endif %}
+                            <th>Author</th>
+                            <th>Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                        {% for curr in curriculum.underlying_curriculum.all %}
+                          <tr>
+                            <td class="title">{{curr.title}} - v{{curr.version}}. </td>
+                            {% if user.administrator or user.researcher or user.author %}
+                              <td>{{ curr.get_status_display }}</td>
+                            {% endif %}
+                            <td> {{curr.author.get_full_name}}</td>
+                            <td class="action">
+                              {% include "ctstem_app/CurriculaActions.html" with curriculum=curr %}
+                            </td>
+                          </tr>
+                        {% endfor %}
+                        </tbody>
+                      </table>
+                    {% endif %}
                   </td>
                   <td class="action">
-                    {% if curriculum.curriculum_type == 'L' %}
-                      <a class="util-button fa fa-eye" aria-hidden="true" title="Preview Curriculum" href="{% url 'ctstem:previewCurriculum' curriculum.id %}" target="_blank">
-                      </a>
-                    {% elif user.administrator or user.researcher or user.author or user.school_administrator or user.teacher %}
-                      <a class="util-button fa fa-eye" aria-hidden="true" title="Preview Curriculum" href="{% url 'ctstem:previewCurriculum' curriculum.id %}" target="_blank">
-                    </a>
-                    {% endif %}
-
-                    {% if curriculum.curriculum_type == 'L' %}
-                      <a class="util-button fa fa-print" aria-hidden="true" title="Print" href="{% url 'ctstem:previewCurriculum' curriculum.id %}"></a>
-                      <!--a class="util-button fa fa-print" aria-hidden="true" title="Print" href="{% url 'ctstem:pdfCurriculum' curriculum.id %}"></a-->
-                    {% endif %}
-                    {% if user.administrator or user.researcher or user.author %}
-                      {% if curriculum.status == 'D' or curriculum.status == 'P'%}
-                        <a class="util-button fa fa-pencil" aria-hidden="true" aria-label="Edit Curriculum" title="Edit Curriculum" href="{% url 'ctstem:curriculum' curriculum.id %}"></a>
-                        <a class="util-button fa fa-trash" aria-hidden="true" aria-label="Delete Curriculum" title="Delete Curriculum" href="{% url 'ctstem:deleteCurriculum' curriculum.id %}" onclick="return confirm('Are you sure you want to delete {{curriculum.title}}?')">
-                        </a>
-                      {% elif curriculum.status == 'A' and  user.administrator %}
-                        <a class="util-button fa fa-pencil" aria-hidden="true" aria-label="Edit Curriculum" title="Edit Curriculum" href="{% url 'ctstem:curriculum' curriculum.id %}"
-                        onclick="return confirm('This curriculum has been archived.  Are you sure you want to edit this curriculum?');">
-                        </a>
-                      {% endif %}
-
-                      <a class="util-button fa fa-files-o" aria-hidden="true" aria-label="Create New Copy" title="Create New Copy" href="{% url 'ctstem:copyCurriculum' curriculum.id %}">
-                      </a>
-                    {% endif %}
-                    {% if user.administrator or user.teacher or user.school_administrator %}
-                      {% if curriculum.status == 'A' or curriculum.status == 'P'%}
-                      <a class="assign util-button fa fa-calendar-check-o" aria-hidden="true" data-form="{% url 'ctstem:assignCurriculum' curriculum.id%}" aria-label="Assign Curriculum" title="Assign Curriculum">
-                      </a>
-                      {% endif %}
-                    {% endif %}
-                    {% if user.teacher %}
-                      {% if curriculum.status == 'A' or curriculum.status == 'P'%}
-                        <a class="bookmark util-button fa fa-star" href="{% url 'ctstem:removeBookmark' curriculum.id %}" style="{% if curriculum|is_bookmarked:bookmarked %} display: inline-block; {% else %} display: none; {% endif %}" title="Remove from Favorites"></a>
-                        <a class="bookmark util-button fa fa-star-o" href="{% url 'ctstem:bookmarkCurriculum' curriculum.id %}" style="{% if curriculum|is_bookmarked:bookmarked %} display: none; {% else %} display: inline-block; {% endif %}" title="Add to Favorites"></a>
-                      {% endif %}
-                    {% endif %}
-                    {% if user.administrator or user.researcher or user.teacher or user.school_administrator %}
-                      {% if curriculum.status == 'A' or curriculum.status == 'P'%}
-                        {% if curriculum|has_response:request.user %}
-                          <a class="util-button fa fa-external-link" aria-hidden="true" aria-label="Export Student Response" title="Export Student Response" href="{% url 'ctstem:export_all_response' curriculum.id %}">
-                          </a>
-                        {% endif %}
-                      {% endif %}
-                    {% endif %}
+                    {% include "ctstem_app/CurriculaActions.html" with curriculum=curriculum %}
                   </td>
                 </tr>
               {% endfor %}
@@ -193,14 +194,6 @@
 </div>
   <script type="text/javascript">
     $(function(){
-
-      /*$("div#curricula_table").hide();
-      $("div#curricula_tile").show();
-
-      $('.switch-input').change(function() {
-        $("div#curricula_table").toggle();
-        $("div#curricula_tile").toggle();
-      });*/
 
       $('.content').on("click", 'a.fa-print', function(e){
         e.preventDefault();
