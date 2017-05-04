@@ -158,7 +158,7 @@
                           {% elif field_type == 'MI' %}
                             <img src="{{questionForm.response.value}}" class="image_option"/><br>
                           {% elif field_type == 'SK' %}
-                            <canvas id="{{questionForm.response.auto_id}}_sketch" width="800" height="500" class="assignment_sketch" style="{% if questionObj.sketch_background %} background: url({{questionObj.sketch_background.url}}) no-repeat;{% endif %}"></canvas>
+                            <canvas id="{{questionForm.response.auto_id}}_sketch" width="900" height="500" class="assignment_sketch" style="{% if questionObj.sketch_background %} background: url({{questionObj.sketch_background.url}}) no-repeat;{% endif %}"></canvas>
                             <input type="hidden" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value='{{questionForm.response.value}}'/>
                           {% elif field_type == 'DT' %}
                             <div class="assignment_input dt_input" id="dt_input_{{forloop.counter}}">
@@ -271,7 +271,7 @@
                           <div class="assignment_input" tabindex="-1">
                             <div class="note"> Note: Draw your sketch in the sketchpad below </div>
                             <div id="{{questionForm.response.auto_id}}_sketch_tools" class="sketch_tools"></div>
-                            <canvas id="{{questionForm.response.auto_id}}_sketch" width="800" height="500" class="assignment_sketch" style="{% if questionObj.sketch_background %} background: url({{questionObj.sketch_background.url}}) no-repeat;{% endif %}"></canvas>
+                            <canvas id="{{questionForm.response.auto_id}}_sketch" width="900" height="500" class="assignment_sketch" style="{% if questionObj.sketch_background %} background: url({{questionObj.sketch_background.url}}) no-repeat;{% endif %}"></canvas>
                             <input type="hidden" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value='{{questionForm.response.value}}'/>
                           </div>
                          <br>

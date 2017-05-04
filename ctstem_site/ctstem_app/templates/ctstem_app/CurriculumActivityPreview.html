@@ -117,7 +117,7 @@
                     {% elif field_type == 'SK' %}
                       <div class="note"> Note: Draw your sketch in the sketchpad below </div>
                       <div id="{{question.id}}_sketch_tools" class="sketch_tools"></div>
-                      <canvas id="{{question.id}}_sketch" width="800" height="500" class="assignment_sketch" style="{% if question.sketch_background %} background: url({{question.sketch_background.url}}) no-repeat;{% endif %}"></canvas>
+                      <canvas id="{{question.id}}_sketch" width="900" height="500" class="assignment_sketch" style="{% if question.sketch_background %} background: url({{question.sketch_background.url}}) no-repeat;{% endif %}"></canvas>
                     {% elif field_type == 'DT' %}
                       <div class="assignment_input dt_input" id="dt_input_{{forloop.counter}}">
                         <input type="hidden" name="dt_response_{{forloop.counter}}" id="dt_response_{{forloop.counter}}" value=''/>

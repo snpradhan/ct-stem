@@ -1,6 +1,10 @@
 var __slice = Array.prototype.slice;
+
+
 (function($) {
   var Sketch;
+
+  // sketch
   $.fn.sketch = function() {
     var args, key, sketch;
     key = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
@@ -27,10 +31,14 @@ var __slice = Array.prototype.slice;
       return this;
     }
   };
+
+
   Sketch = (function() {
+
     function Sketch(el, opts) {
-      this.el = el;
-      this.canvas = $(el);
+
+      this.el = el;           // link to the HTML canvas element
+      this.canvas = $(el);    // link to the jquery canvas
       this.context = el.getContext('2d');
       this.options = $.extend({
         toolLinks: true,
@@ -38,13 +46,19 @@ var __slice = Array.prototype.slice;
         defaultColor: '#000000',
         defaultSize: 5
       }, opts);
-      this.painting = false;
+      this.painting = false;    // internal state variable
       this.color = this.options.defaultColor;
       this.size = this.options.defaultSize;
       this.tool = this.options.defaultTool;
-      this.actions = [];
+
+
+      this.actions = [];      // history of drawing commands
       this.action = [];
+
+      // all mouse events got to onEvent
       this.canvas.bind('click mousedown mouseup mousemove mouseleave mouseout touchstart touchmove touchend touchcancel', this.onEvent);
+
+
       if (this.options.toolLinks) {
         $('body').delegate("a[href=\"#" + (this.canvas.attr('id')) + "\"]", 'click', function(e) {
           var $canvas, $this, key, sketch, _i, _len, _ref;
@@ -65,6 +79,8 @@ var __slice = Array.prototype.slice;
         });
       }
     }
+
+    // function to save drawing as a PNG
     Sketch.prototype.download = function(format) {
       var mime;
       format || (format = "png");
@@ -74,12 +90,16 @@ var __slice = Array.prototype.slice;
       mime = "image/" + format;
       return window.open(this.el.toDataURL(mime));
     };
+
+    // no idea what this does???
     Sketch.prototype.set = function(key, value) {
       this[key] = value;
       return this.canvas.trigger("sketch.change" + key, value);
     };
+
     Sketch.prototype.startPainting = function() {
       this.painting = true;
+
       return this.action = {
         tool: this.tool,
         color: this.color,
@@ -87,6 +107,7 @@ var __slice = Array.prototype.slice;
         events: []
       };
     };
+
     Sketch.prototype.stopPainting = function() {
       if (this.action) {
         this.actions.push(this.action);
@@ -95,6 +116,7 @@ var __slice = Array.prototype.slice;
       this.action = null;
       return this.redraw();
     };
+
     Sketch.prototype.onEvent = function(e) {
       if (e.originalEvent && e.originalEvent.targetTouches) {
         e.pageX = e.originalEvent.targetTouches[0].pageX;
@@ -104,13 +126,21 @@ var __slice = Array.prototype.slice;
       e.preventDefault();
       return false;
     };
+
     Sketch.prototype.redraw = function() {
       var sketch;
-      this.el.width = this.canvas.width();
+      this.el.width = this.canvas.width();   //  this line triggers an erase event for the canvas
       this.context = this.el.getContext('2d');
       sketch = this;
       $.each(this.actions, function() {
-        if (this.tool) {
+        if (this.tool === "text") {
+          // textX, textY, color, font, textValue, alignment
+          sketch.context.fillStyle = this.color;
+          sketch.context.font = this.font;
+          sketch.context.textAlign = this.alignment;
+          sketch.context.fillText(this.textValue, this.textX, this.textY);
+        }
+        else if (this.tool) {
           return $.sketch.tools[this.tool].draw.call(sketch, this);
         }
       });
@@ -118,8 +148,24 @@ var __slice = Array.prototype.slice;
         return $.sketch.tools[this.action.tool].draw.call(sketch, this.action);
       }
     };
+
+    Sketch.prototype.addText = function(color, fontsize, textX, textY, textValue) {
+      this.actions.push(
+      {
+        tool: "text",
+        textX: textX,
+        textY: textY,
+    color: color,
+        font: fontsize + "px sans-serif",
+
+        textValue: textValue,
+        alignment: "left"
+      });
+    };
+
     return Sketch;
   })();
+
   $.sketch = {
     tools: {}
   };
@@ -198,7 +244,7 @@ var __slice = Array.prototype.slice;
     }
   };
 
-  return $.sketch.tools.rect = {
+  $.sketch.tools.rect = {
     onEvent: function(e) {
       return $.sketch.tools.marker.onEvent.call(this, e);
     },
@@ -219,5 +265,13 @@ var __slice = Array.prototype.slice;
     }
   };
 
+  $.sketch.tools.text = {
+    onEvent: function(e) {
+      return $.sketch.tools.marker.onEvent.call(this, e);
+    },
+    draw: function(action) {
+      return textArea(action, this.el.id);
+    }
+  };
 
 })(jQuery);

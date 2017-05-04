@@ -23,7 +23,7 @@
       <label>Response:</label>
       <div>
         {% if question.answer_field_type == 'SK' %}
-          <canvas id="sketch" width="800" height="500" class="assignment_sketch" style="{% if question.sketch_background %} background: url({{question.sketch_background.url}}) no-repeat;{% endif %}"></canvas>
+          <canvas id="sketch" width="900" height="500" class="assignment_sketch" style="{% if question.sketch_background %} background: url({{question.sketch_background.url}}) no-repeat;{% endif %}"></canvas>
           <input type="hidden" name="sketch_response" id="sketch_response" value="{{question_response.response}}"/>
         {% elif question.answer_field_type == 'DT' %}
           <div class="dt_input" id="dt_input">

@@ -79,7 +79,7 @@
                         {% if question.instance.response.curriculum_question.question.answer_field_type == 'MI' %}
                           <img src="{{question.instance.response.response}}" class="image_option"/>
                         {% elif question.instance.response.curriculum_question.question.answer_field_type == 'SK' %}
-                          <canvas id="{{question.instance.id}}_sketch" width="800" height="500" class="assignment_sketch" style="{% if question.instance.response.curriculum_question.question.sketch_background %} background: url({{question.instance.response.curriculum_question.question.sketch_background.url}}) no-repeat;{% endif %}"></canvas>
+                          <canvas id="{{question.instance.id}}_sketch" width="900" height="500" class="assignment_sketch" style="{% if question.instance.response.curriculum_question.question.sketch_background %} background: url({{question.instance.response.curriculum_question.question.sketch_background.url}}) no-repeat;{% endif %}"></canvas>
                           <input type="hidden" name="{{question.instance.id}}_sketch_response" id="{{question.instance.id}}_sketch_response" value="{{question.instance.response.response}}"/>
                         {% elif question.instance.response.curriculum_question.question.answer_field_type == 'DT' %}
                           <div class="dt_input" id="dt_input_{{forloop.counter}}">
