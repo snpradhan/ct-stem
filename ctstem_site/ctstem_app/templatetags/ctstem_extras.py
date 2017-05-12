@@ -232,3 +232,13 @@ def get_teacher_groups(id):
   teacher = models.Teacher.objects.get(id=id)
   groups = teacher.groups.all()
   return groups
+
+@register.filter
+def get_underlying_curriculum(curriculum, user):
+  if curriculum.curriculum_type != 'U':
+    return False
+
+  if hasattr(user, 'administrator') == True or hasattr(user, 'researcher') == True or hasattr(user, 'author') == True:
+    return curriculum.underlying_curriculum.all()
+  else:
+    return curriculum.underlying_curriculum.all().filter(status='P')

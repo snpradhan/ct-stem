@@ -178,10 +178,15 @@ $(function (){
   });
 
   $(".ec").click(function(){
+    //expand/collapse the standards ul
     $(this).closest('li').next('ul').toggle();
     $(this).children().each(function(){
       $(this).toggle();
     });
+
+    //expand/collapse the unit lessons
+    $(this).closest('.row').next('.row').toggle();
+
   });
 
   //add form-control class to ORDER fields

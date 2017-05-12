@@ -229,7 +229,7 @@ def previewCurriculum(request, id='', step_order=-1):
       total_steps = len(steps)
 
       # for assessment and survey go to the first step
-      if curriculum.curriculum_type != 'L' and step_order == -1:
+      if curriculum.curriculum_type != 'U' and curriculum.curriculum_type != 'L' and step_order == -1:
         step_order = 0
 
       context = {'curriculum': curriculum, 'attachments': attachments, 'systems': systems, 'total_steps': total_steps, 'step_order': step_order}

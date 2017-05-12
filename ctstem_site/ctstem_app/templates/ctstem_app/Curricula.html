@@ -141,39 +141,49 @@
                         {{curriculum.author.get_full_name}}
                       </div>
                     </div>
-                    {% if curriculum.curriculum_type == 'U' and curriculum.underlying_curriculum.all %}
-                      <div class="title">Lessons
-                        <span class="ec">
-                          <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                          <span class="glyphicon glyphicon-collapse-up" aria-hidden="true" style="display:none;"></span>
-                        </span>
+                    {% if curriculum.curriculum_type == 'U' and curriculum|get_underlying_curriculum:user %}
+                      {% with underlying_curriculum=curriculum|get_underlying_curriculum:user %}
+                      <div class="row">
+                        <div class="col-md-2 title">Lessons:</div>
+                        <div class="col-md-10">
+                          {{underlying_curriculum|length}}
+                          <span class="ec">
+                            <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
+                            <span class="glyphicon glyphicon-collapse-up" aria-hidden="true" style="display:none;"></span>
+                          </span>
+                        </div>
                       </div>
-                      <table class="table table-condensed table-striped table-bordered inner_table">
-                        <thead>
-                          <tr>
-                            <th>Name</th>
-                            {% if user.administrator or user.researcher or user.author %}
-                            <th>Status</th>
-                            {% endif %}
-                            <th>Author</th>
-                            <th>Actions</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                        {% for curr in curriculum.underlying_curriculum.all %}
-                          <tr>
-                            <td class="title">{{curr.title}} - v{{curr.version}}. </td>
-                            {% if user.administrator or user.researcher or user.author %}
-                              <td>{{ curr.get_status_display }}</td>
-                            {% endif %}
-                            <td> {{curr.author.get_full_name}}</td>
-                            <td class="action">
-                              {% include "ctstem_app/CurriculaActions.html" with curriculum=curr %}
-                            </td>
-                          </tr>
-                        {% endfor %}
-                        </tbody>
-                      </table>
+                      <div class="row" style="display:none;">
+                        <div class="col-md-12">
+                          <table class="table table-condensed table-striped table-bordered unit_lesson">
+                            <thead>
+                              <tr>
+                                <th>Name</th>
+                                {% if user.administrator or user.researcher or user.author %}
+                                  <th>Status</th>
+                                {% endif %}
+                                <th>Author</th>
+                                <th>Actions</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                            {% for curr in underlying_curriculum %}
+                              <tr>
+                                <td class="title">{{curr.title}} - v{{curr.version}}. </td>
+                                {% if user.administrator or user.researcher or user.author %}
+                                  <td>{{ curr.get_status_display }}</td>
+                                {% endif %}
+                                <td> {{curr.author.get_full_name}}</td>
+                                <td class="action">
+                                  {% include "ctstem_app/CurriculaActions.html" with curriculum=curr %}
+                                </td>
+                              </tr>
+                            {% endfor %}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                      {% endwith %}
                     {% endif %}
                   </td>
                   <td class="action">

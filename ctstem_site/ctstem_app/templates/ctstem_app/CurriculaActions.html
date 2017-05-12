@@ -1,19 +1,21 @@
 {% load ctstem_extras %}
-{% if curriculum.curriculum_type == 'L' %}
+<!-- Preview -->
+{% if curriculum.curriculum_type == 'L' or curriculum.curriculum_type == 'U'%}
   <a class="util-button fa fa-eye" aria-hidden="true" title="Preview Curriculum" href="{% url 'ctstem:previewCurriculum' curriculum.id %}" target="_blank">
   </a>
-{% elif curriculum.curriculum_type != 'U' %}
+{% else %}
   {% if user.administrator or user.researcher or user.author or user.school_administrator or user.teacher %}
     <a class="util-button fa fa-eye" aria-hidden="true" title="Preview Curriculum" href="{% url 'ctstem:previewCurriculum' curriculum.id %}" target="_blank">
   </a>
   {% endif %}
 {% endif %}
-
+<!-- Print -->
 {% if curriculum.curriculum_type == 'L' %}
   <a class="util-button fa fa-print" aria-hidden="true" title="Print" href="{% url 'ctstem:previewCurriculum' curriculum.id %}"></a>
   <!--a class="util-button fa fa-print" aria-hidden="true" title="Print" href="{% url 'ctstem:pdfCurriculum' curriculum.id %}"></a-->
 {% endif %}
 {% if user.administrator or user.researcher or user.author %}
+  <!-- Edit and Delete -->
   {% if curriculum.status == 'D' or curriculum.status == 'P'%}
     <a class="util-button fa fa-pencil" aria-hidden="true" aria-label="Edit Curriculum" title="Edit Curriculum" href="{% url 'ctstem:curriculum' curriculum.id %}"></a>
     <a class="util-button fa fa-trash" aria-hidden="true" aria-label="Delete Curriculum" title="Delete Curriculum" href="{% url 'ctstem:deleteCurriculum' curriculum.id %}" onclick="return confirm('Are you sure you want to delete {{curriculum.title}}?')">
@@ -23,26 +25,31 @@
     onclick="return confirm('This curriculum has been archived.  Are you sure you want to edit this curriculum?');">
     </a>
   {% endif %}
+  <!-- Copy -->
   {% if curriculum.curriculum_type != 'U' %}
     <a class="util-button fa fa-files-o" aria-hidden="true" aria-label="Create New Copy" title="Create New Copy" href="{% url 'ctstem:copyCurriculum' curriculum.id %}">
     </a>
   {% endif %}
 {% endif %}
+<!-- Assign -->
 {% if user.administrator or user.teacher or user.school_administrator %}
   {% if curriculum.status == 'A' or curriculum.status == 'P'%}
   <a class="assign util-button fa fa-calendar-check-o" aria-hidden="true" data-form="{% url 'ctstem:assignCurriculum' curriculum.id%}" aria-label="Assign Curriculum" title="Assign Curriculum">
   </a>
   {% endif %}
 {% endif %}
-{% if user.teacher %}
-  <a class="bookmark util-button fa fa-star" href="{% url 'ctstem:removeBookmark' curriculum.id %}" style="{% if curriculum|is_bookmarked:bookmarked %} display: inline-block; {% else %} display: none; {% endif %}" title="Remove from Favorites"></a>
-  <a class="bookmark util-button fa fa-star-o" href="{% url 'ctstem:bookmarkCurriculum' curriculum.id %}" style="{% if curriculum|is_bookmarked:bookmarked %} display: none; {% else %} display: inline-block; {% endif %}" title="Add to Favorites"></a>
-{% endif %}
-{% if user.administrator or user.researcher or user.teacher or user.school_administrator %}
-  {% if curriculum.status == 'A' or curriculum.status == 'P'%}
-    {% if curriculum|has_response:request.user %}
-      <a class="util-button fa fa-external-link" aria-hidden="true" aria-label="Export Student Response" title="Export Student Response" href="{% url 'ctstem:export_all_response' curriculum.id %}">
-      </a>
+{% if curriculum.curriculum_type != 'U' %}
+  {% if user.teacher %}
+    <a class="bookmark util-button fa fa-star" href="{% url 'ctstem:removeBookmark' curriculum.id %}" style="{% if curriculum|is_bookmarked:bookmarked %} display: inline-block; {% else %} display: none; {% endif %}" title="Remove from Favorites"></a>
+    <a class="bookmark util-button fa fa-star-o" href="{% url 'ctstem:bookmarkCurriculum' curriculum.id %}" style="{% if curriculum|is_bookmarked:bookmarked %} display: none; {% else %} display: inline-block; {% endif %}" title="Add to Favorites"></a>
+  {% endif %}
+  {% if user.administrator or user.researcher or user.teacher or user.school_administrator %}
+    {% if curriculum.status == 'A' or curriculum.status == 'P'%}
+      {% if curriculum|has_response:request.user %}
+        <a class="util-button fa fa-external-link" aria-hidden="true" aria-label="Export Student Response" title="Export Student Response" href="{% url 'ctstem:export_all_response' curriculum.id %}">
+        </a>
+      {% endif %}
     {% endif %}
   {% endif %}
 {% endif %}
+
