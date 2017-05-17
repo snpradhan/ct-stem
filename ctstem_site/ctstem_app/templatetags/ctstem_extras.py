@@ -235,10 +235,14 @@ def get_teacher_groups(id):
 
 @register.filter
 def get_underlying_curriculum(curriculum, user):
-  if curriculum.curriculum_type != 'U':
+  if curriculum.curriculum_type == 'U':
+    unit = curriculum
+  elif curriculum.curriculum_type == 'L' and curriculum.unit:
+    unit = curriculum.unit
+  else:
     return False
 
   if hasattr(user, 'administrator') == True or hasattr(user, 'researcher') == True or hasattr(user, 'author') == True:
-    return curriculum.underlying_curriculum.all()
+    return unit.underlying_curriculum.all()
   else:
-    return curriculum.underlying_curriculum.all().filter(status='P')
+    return unit.underlying_curriculum.all().filter(status='P')

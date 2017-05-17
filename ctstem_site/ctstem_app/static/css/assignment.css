@@ -79,6 +79,20 @@ header nav#side-nav.activated { right: 0px; }
 header nav#side-nav ul { list-style: none; }
 header nav#side-nav ul li { padding: 0 0 0.5rem 0; }
 
+header nav#side-nav ul.underlying_curriculum {
+  -webkit-padding-start: 1em;
+}
+header nav#side-nav ul.underlying_curriculum li {
+  padding: 0;
+  line-height: 1.25em;
+}
+header nav#side-nav ul.underlying_curriculum li a {
+  font-size: 0.9em;
+  padding: 0em;
+}
+header nav#side-nav ul li a.active {
+  text-decoration: underline;
+}
 header nav#side-nav li a {
   padding: 0.5rem;
   color: white;

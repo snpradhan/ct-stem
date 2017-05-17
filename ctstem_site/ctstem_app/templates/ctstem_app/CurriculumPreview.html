@@ -1,5 +1,6 @@
 {% extends "ctstem_app/base.html" %}
 {% load ctstem_extras %}
+{% load base_extras %}
 
 {% block title %} {{curriculum.title}} Preview{%endblock %}
 
@@ -37,7 +38,7 @@
 
 {% block content %}
   <div>
-    {% if curriculum.curriculum_type == 'L' %}
+    {% if curriculum.curriculum_type == 'L' or curriculum.curriculum_type == 'U' %}
       <!-- Facebook share js -->
       <div id="fb-root"></div>
       <script>(function(d, s, id) {
@@ -59,7 +60,13 @@
     <!-- TOP HEADER BAR -->
     <header>
       <h1>CT-STEM</h1>
-      {{curriculum.title|title}}
+
+      {% if curriculum.unit %}
+        {{curriculum.unit.title|title}}
+      {% else %}
+        {{curriculum.title|title}}
+      {% endif %}
+
       <nav>
         <span id="activity-nav">
         {% if step_order|add:0 >= 0 %}
@@ -78,22 +85,59 @@
           {% endfor %}
         {% endif %}
         </span>
-        {% if curriculum.curriculum_type == 'L' %}
+        {% if curriculum.curriculum_type == 'L' or curriculum.curriculum_type == 'U' %}
           &nbsp;
           <button id="menu-button"><span class="fa fa-navicon"></span></button>
         {% endif %}
       </nav>
-      {% if curriculum.curriculum_type == 'L' %}
+      {% if curriculum.curriculum_type == 'L' or curriculum.curriculum_type == 'U' %}
         <!-- SIDE MENU -->
         <nav id="side-nav">
           <ul>
-            <li><a href="#" class="lesson">View Lesson Summary</a></li>
+            <li><a href="#" class="lesson">
+              View
+              {% if curriculum.curriculum_type == 'L' %}
+                {% if curriculum.unit %} Unit {% else %} Lesson {% endif %}
+              {% else %}
+                Unit
+              {% endif %}
+              Summary</a></li>
             {% if user.administrator or user.researcher or user.school_administrator or user.author or user.teacher %}
               <li><a href="#" class="notes">View Teacher Notes</a></li>
-              <li><a href="{% url 'ctstem:previewCurriculum'  curriculum.id 0 %}" class="activity">View Student Activity</a></li>
+              {% if curriculum.curriculum_type == 'L' and curriculum.unit|slugify == 'None'|slugify %}
+                <li>
+                  <a href="{% url 'ctstem:previewCurriculum'  curriculum.id 0 %}" class="activity">View Student Activity</a></li>
+
+              {% else %}
+                <li>
+                  <a href="#" class="list_underlying_curriculum">Underlying Lessons</a>
+                  <i class="fa fa-caret-square-o-down underlying_curriculum" aria-hidden="true"></i>
+                  <i class="fa fa-caret-square-o-up underlying_curriculum" aria-hidden="true" style="display:none;"></i>
+                  <ul class="underlying_curriculum" style="display:none;">
+                    {% for curr in curriculum|get_underlying_curriculum:user %}
+                      <li><a href="{% url 'ctstem:previewCurriculum'  curr.id 0 %}" class="activity"> {{curr.title}}</a></li>
+                    {% endfor %}
+                   </ul>
+                </li>
+              {% endif %}
             {% elif user.is_anonymous %}
               <li><a data-toggle="modal" data-target="#login" class="login" href="#">View Teacher Notes</a></li>
-              <li><a data-toggle="modal" data-target="#login" class="login" href="#">View Student Activity </a></li>
+              {% if curriculum.curriculum_type == 'L' and curriculum.unit|slugify == 'None'|slugify %}
+                <li><a data-toggle="modal" data-target="#login" class="login" href="#">View Student Activity </a></li>
+              {% else %}
+                <li>
+                  <a href="#" class="list_underlying_curriculum">
+                    Underlying Lessons
+                    <i class="fa fa-caret-square-o-down underlying_curriculum" aria-hidden="true"></i>
+                    <i class="fa fa-caret-square-o-up underlying_curriculum" aria-hidden="true" style="display:none;"></i>
+                  </a>
+                  <ul class="underlying_curriculum" style="display:none;">
+                    {% for curr in curriculum|get_underlying_curriculum:user %}
+                      <li><a data-toggle="modal" data-target="#login" class="login" href="#">{{curr.title}}</a></li>
+                    {% endfor %}
+                   </ul>
+                </li>
+              {% endif %}
             {% endif %}
             <!-- TODO: LINK TO ATTACHMENT -->
             {% if attachments %}
@@ -131,7 +175,8 @@
 
     <!-- MAIN CONTENT -->
     <main>
-      {% if curriculum.curriculum_type == 'L' %}
+      {% if curriculum.curriculum_type == 'L' or curriculum.curriculum_type == 'U' %}
+        {% with curr_unit=curriculum.unit|default:curriculum %}
         <lesson-summary style="{%if step_order|add:0 >= 0 %} display: none; {% endif %}">
           <div class="page">
             <h1>{{curriculum.title|title}}</h1>
@@ -154,9 +199,9 @@
 
             <!-- LESSON META DATA -->
             <p style="margin-bottom: 0.5rem;">
-              <b>Subject:</b> {{curriculum.subject.all|join:','}}<br>
-              <b>Time:</b> {{curriculum.time}}<br>
-              <b>Level:</b> {{curriculum.level|safe}}<br>
+              <b>Subject:</b> {{curr_unit.subject.all|join:','}}<br>
+              <b>Time:</b> {{curr_unit.time}}<br>
+              <b>Level:</b> {{curr_unit.level|safe}}<br>
             </p>
 
             <!-- UTILITY BUTTONS -->
@@ -184,8 +229,8 @@
             <!-- MAIN IMAGE -->
             <!-- TODO: We might need to collect multiple resolution images for the main image and thumbnails -->
             <figure>
-              {% if curriculum.icon %}
-                <img src="{{curriculum.icon.url}}" class="preview"/>
+              {% if curr_unit.icon %}
+                <img src="{{curr_unit.icon.url}}" class="preview"/>
               {% endif %}
               <figcaption></figcaption>
             </figure>
@@ -193,15 +238,14 @@
             <!-- TODO: Think about how to implement popup glossary -->
 
             <h3>Overview</h3>
-            {{curriculum.overview|safe}}
-
-            {{curriculum.content|safe}}
+            {{curr_unit.overview|safe}}
+            {{curr_unit.content|safe}}
 
             <!-- TODO: Should this be in the database?? -->
             <h3>Compatible With</h3>
             <div class="compatibility">
               {% for system in systems %}
-                <div class="compatible-item {% if system not in curriculum.compatible_system.all %} incompatible {% endif %}">
+                <div class="compatible-item {% if system not in curr_unit.compatible_system.all %} incompatible {% endif %}">
                   <span class="fa fa-{{system.icon}}"></span><br>
                   {{system.name}}
                 </div>
@@ -222,7 +266,7 @@
             <!-- TODO: Figure out how to make the links work. Not sure what they should like to?? -->
             <h3>Standards</h3>
             <div class="standards">
-              {% for standard, categories in curriculum.taxonomy.all|taxonomyHelper %}
+              {% for standard, categories in curr_unit.taxonomy.all|taxonomyHelper %}
                 <b>{{standard}}</b>
                 <ul>
                   {% for category, taxonomies in categories.items %}
@@ -247,6 +291,22 @@
             </div>
           </div>
         </lesson-summary>
+
+        <notes style="display:none;">
+          <div class="page">
+            <h1>{{curr_unit.title|title}}</h1>
+            <h2>Teacher Notes</h2>
+
+            {{curr_unit.teacher_notes|safe}}
+          </div>
+        </notes>
+
+        <faq style="display:none;">
+          <div class="page">
+            <h1>CT-STEM FAQ</h1>
+          </div>
+        </faq>
+        {% endwith %}
       {% endif %}
 
       {% if step_order >= 0 %}
@@ -254,21 +314,6 @@
           {% include 'ctstem_app/CurriculumActivityPreview.html' %}
         </activity>
       {% endif %}
-
-      <notes style="display:none;">
-        <div class="page">
-          <h1>{{curriculum.title|title}}</h1>
-          <h2>Teacher Notes</h2>
-
-          {{curriculum.teacher_notes|safe}}
-        </div>
-      </notes>
-
-      <faq style="display:none;">
-        <div class="page">
-          <h1>CT-STEM FAQ</h1>
-        </div>
-      </faq>
 
     </main>
 
@@ -358,6 +403,21 @@
         $('faq').show();
         $('nav span#activity-nav').hide();
       });
+      $('body').on('click', 'a.list_underlying_curriculum', function(){
+        $('.underlying_curriculum').toggle();
+      });
+
+      /*$('body').on('click', 'nav#side-nav ul li a', function(){
+        $('nav#side-nav ul li a').removeClass('active');
+        $(this).addClass('active');
+      });*/
+      $('a.activity').each(function(){
+        var url = $(this).attr('href');
+        var path = window.location.pathname;
+        if(path == url) {
+          $(this).addClass('active');
+        }
+      })
       //--------------------------------------------------------------------------
       // right menu box animation
       //--------------------------------------------------------------------------

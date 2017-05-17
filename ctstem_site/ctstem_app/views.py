@@ -115,6 +115,7 @@ def curricula(request, curriculum_type='', bookmark='0'):
   else:
     curricula = models.Curriculum.objects.all().filter(curriculum_type__in = curr_type, status='P').order_by('id')
 
+  curricula = curricula.filter(unit__isnull=True)
   context = {'curricula': curricula, 'curriculum_type': curriculum_type, 'bookmark': bookmark, 'bookmarked': bookmarked}
   return render(request, 'ctstem_app/Curricula.html', context)
 
