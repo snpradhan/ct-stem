@@ -523,52 +523,62 @@ def assignCurriculum(request, id=''):
     curriculum = models.Curriculum.objects.get(id=id)
     if curriculum.status == 'D':
       return http.HttpResponseNotFound("<h1>This curriculum hasn't been published and cannot be assigned</h1>")
+    #check if curriculum is stand alone or a unit
+    if curriculum.curriculum_type == 'U':
+      curriculum_list = models.Curriculum.objects.all().filter(unit=curriculum, status='P')
+    else:
+      curriculum_list = models.Curriculum.objects.all().filter(id=curriculum.id)
 
-    assignments = models.Assignment.objects.all().filter(curriculum=curriculum, group__in=groups)
+    assignments = models.Assignment.objects.all().filter(curriculum__in=curriculum_list, group__in=groups)
     instances = {}
     for group in groups:
-      instances[group.id] = models.AssignmentInstance.objects.all().filter(assignment__curriculum=curriculum, assignment__group=group).count()
+      instances[group.id] = {}
+      for curr in curriculum_list:
+        instances[group.id][curr.id] = models.AssignmentInstance.objects.all().filter(assignment__curriculum=curr, assignment__group=group).count()
 
     if request.method == 'GET':
-      context = {'curriculum': curriculum, 'groups': groups, 'assignments': assignments, 'instances': instances}
+      context = {'curriculum': curriculum, 'curriculum_list': curriculum_list, 'groups': groups, 'assignments': assignments, 'instances': instances}
       return render(request, 'ctstem_app/CurriculumAssignment.html', context)
     elif request.method == 'POST':
       data = request.POST.copy()
+      #iterate over all possible (group, curriculum) assignment combinations
       for group in groups:
-        assignment = assignments.filter(group=group).first()
-        assign_key = 'assign_'+str(group.id)
-        assigned_date_key = 'assigned_'+str(group.id)
-        due_date_key = 'due_'+str(group.id)
-        if assignment:
-          if assign_key in data:
-            due_date = data[due_date_key]
-            if assigned_date_key in data and data[assigned_date_key]:
-              assigned_date = data[assigned_date_key]
-              assigned_date_object = datetime.datetime.strptime(assigned_date, '%B %d, %Y')
-            else:
-              assigned_date_object = datetime.datetime.now()
-            due_date_object = datetime.datetime.strptime(due_date, '%B %d, %Y')
+        for curr in curriculum_list:
+          #check if an assignment already exists
+          assignment = assignments.filter(group=group, curriculum=curr).first()
+          assigned_date_key = 'assigned_%s_%s'%(str(group.id), str(curr.id))
+          due_date_key = 'due_%s_%s'%(str(group.id), str(curr.id))
+          #if assignment already exists, check if the dates have changed
+          if assignment:
+            if due_date_key in data and data[due_date_key]:
+              due_date = data[due_date_key]
+              if assigned_date_key in data and data[assigned_date_key]:
+                assigned_date = data[assigned_date_key]
+                assigned_date_object = datetime.datetime.strptime(assigned_date, '%B %d, %Y')
+              else:
+                assigned_date_object = datetime.datetime.now()
+              due_date_object = datetime.datetime.strptime(due_date, '%B %d, %Y')
 
-            # check if due date has changed and update
-            if assignment.due_date.date() != due_date_object.date() or assignment.assigned_date.date() != assigned_date_object.date():
-              assignment.due_date = due_date_object
-              assignment.assigned_date = assigned_date_object
-              assignment.save()
-          else:
-            #assignment has been unmarked for deletion
-            assignment.delete()
-        else:
-          #check if new assignment has been made
-          if assign_key in data:
-            due_date = data[due_date_key]
-            if assigned_date_key in data and data[assigned_date_key]:
-              assigned_date = data[assigned_date_key]
-              assigned_date_object = datetime.datetime.strptime(assigned_date, '%B %d, %Y')
+              # check if due date has changed and update
+              if assignment.due_date.date() != due_date_object.date() or assignment.assigned_date.date() != assigned_date_object.date():
+                assignment.due_date = due_date_object
+                assignment.assigned_date = assigned_date_object
+                assignment.save()
             else:
-              assigned_date_object = datetime.datetime.now()
-            due_date_object = datetime.datetime.strptime(due_date, '%B %d, %Y')
-            new_assignment = models.Assignment(curriculum=curriculum, group=group, due_date=due_date_object, assigned_date=assigned_date_object)
-            new_assignment.save()
+              #assignment has been unmarked for deletion
+              assignment.delete()
+          else:
+            #check if new assignment has been made
+            if due_date_key in data and data[due_date_key]:
+              due_date = data[due_date_key]
+              if assigned_date_key in data and data[assigned_date_key]:
+                assigned_date = data[assigned_date_key]
+                assigned_date_object = datetime.datetime.strptime(assigned_date, '%B %d, %Y')
+              else:
+                assigned_date_object = datetime.datetime.now()
+              due_date_object = datetime.datetime.strptime(due_date, '%B %d, %Y')
+              new_assignment = models.Assignment(curriculum=curr, group=group, due_date=due_date_object, assigned_date=assigned_date_object)
+              new_assignment.save()
 
       response_data = {'message': 'The curriculum "%s" has been assigned' % curriculum.title}
       return http.HttpResponse(json.dumps(response_data), content_type="application/json")
@@ -576,6 +586,7 @@ def assignCurriculum(request, id=''):
     return http.HttpResponseNotAllowed(['GET', 'POST'])
   except models.Curriculum.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested curriculum not found</h1>')
+
 ####################################
 # REGISTER
 ####################################

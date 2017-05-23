@@ -1,8 +1,13 @@
 {% load ctstem_extras %}
 <!-- Preview -->
-{% if curriculum.curriculum_type == 'L' or curriculum.curriculum_type == 'U'%}
+{% if curriculum.curriculum_type == 'U'%}
   <a class="util-button fa fa-eye" aria-hidden="true" title="Preview Curriculum" href="{% url 'ctstem:previewCurriculum' curriculum.id %}" target="_blank">
   </a>
+{% elif curriculum.curriculum_type == 'L' %}
+  {% if curriculum.unit|slugify == 'None'|slugify %}
+    <a class="util-button fa fa-eye" aria-hidden="true" title="Preview Curriculum" href="{% url 'ctstem:previewCurriculum' curriculum.id %}" target="_blank">
+    </a>
+  {% endif %}
 {% else %}
   {% if user.administrator or user.researcher or user.author or user.school_administrator or user.teacher %}
     <a class="util-button fa fa-eye" aria-hidden="true" title="Preview Curriculum" href="{% url 'ctstem:previewCurriculum' curriculum.id %}" target="_blank">

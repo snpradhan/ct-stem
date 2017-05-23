@@ -14,7 +14,6 @@
         <table class="table table-condensed table-bordered table-striped inner_table">
          <thead>
             <tr>
-              <th>Select</th>
               <th>Group</th>
               {% if user.administrator or user.researcher %}
                 <th>School</th>
@@ -22,34 +21,57 @@
               {% if user.administrator or user.researcher or user.school_administrator %}
                 <th>Teacher</th>
               {% endif %}
+              {% if curriculum.curriculum_type|slugify == 'U'|slugify %}
+                <th>Curriculum</th>
+              {% endif %}
               <th class="date">Scheduled Start Date <i class="fa fa-info-circle" aria-hidden="true" title="The date when the assignment is first available to students"></i></th>
               <th class="date">Due Date</th>
+              <th>Clear</th>
             </tr>
           </thead>
           <tbody>
             {% for group in groups %}
-            <tr>
-              <td style="text-align:center;">
-                {% if instances|get_item:group.id == 0 %}
-                  <input type="checkbox" id="assign_{{group.id}}" name="assign_{{group.id}}" class="assign"/>
-                {% else %}
-                  <input type="checkbox" id="assign_{{group.id}}" name="assign_{{group.id}}" class="assign inwork"/>
+              <tr>
+                <td rowspan="{{curriculum_list|length}}">{{group}}</td>
+                {% if user.administrator or user.researcher %}
+                  <td rowspan="{{curriculum_list|length}}">{{group.teacher.school}}</td>
                 {% endif %}
-              </td>
-              <td>{{group}}</td>
-              {% if user.administrator or user.researcher %}
-                <td>{{group.teacher.school}}</td>
-              {% endif %}
-              {% if user.administrator or user.researcher or user.school_administrator %}
-                <td>{{group.teacher}}</td>
-              {% endif %}
-              <td>
-                <input type="text" class="datepicker assigned" id="assigned_{{group.id}}" name="assigned_{{group.id}}" readonly="true" />
-              </td>
-              <td>
-                <input type="text" class="datepicker due" id="due_{{group.id}}" name="due_{{group.id}}" readonly="true" />
-              </td>
-            </tr>
+                {% if user.administrator or user.researcher or user.school_administrator %}
+                  <td rowspan="{{curriculum_list|length}}">{{group.teacher}}</td>
+                {% endif %}
+                {% if curriculum.curriculum_type|slugify == 'U'|slugify %}
+                  <td>{{curriculum_list.first.title}}</td>
+                {% endif %}
+                <td>
+                  <input type="text" class="datepicker assigned" id="assigned_{{group.id}}_{{curriculum_list.first.id}}" name="assigned_{{group.id}}_{{curriculum_list.first.id}}" readonly="true" /></td>
+                <td>
+                  <input type="text" class="datepicker due" id="due_{{group.id}}_{{curriculum_list.first.id}}" name="due_{{group.id}}_{{curriculum_list.first.id}}" readonly="true" /></td>
+                <td>
+                  {% if instances|get_item:group.id|get_item:curriculum_list.first.id == 0 %}
+                    <input type="button" class="btn btn-danger clear" id="clear_{{group.id}}_{{curriculum_list.first.id}}" name="clear_{{group.id}}_{{curriculum_list.first.id}}" value="Clear"/>
+                  {% endif %}
+                </td>
+              </tr>
+              {% for curr in curriculum_list %}
+                {% if forloop.counter > 1 %}
+                <tr>
+                  {% if curriculum.curriculum_type|slugify == 'U'|slugify %}
+                    <td>{{curr.title}}</td>
+                  {% endif %}
+                  <td>
+                    <input type="text" class="datepicker assigned" id="assigned_{{group.id}}_{{curr.id}}" name="assigned_{{group.id}}_{{curr.id}}" readonly="true" />
+                  </td>
+                  <td>
+                    <input type="text" class="datepicker due" id="due_{{group.id}}_{{curr.id}}" name="due_{{group.id}}_{{curr.id}}" readonly="true" />
+                  </td>
+                  <td>
+                    {% if instances|get_item:group.id|get_item:curr.id == 0 %}
+                      <input type="button" class="btn btn-danger clear" id="clear_{{group.id}}_{{curr.id}}" name="clear_{{group.id}}_{{curr.id}}" value="Clear"/>
+                    {% endif %}
+                  </td>
+                </tr>
+                {% endif %}
+              {% endfor %}
             {% endfor %}
           </tbody>
         </table>
@@ -70,18 +92,18 @@
   $(function(){
 
     {% for assignment in assignments %}
-      $('input[type="checkbox"]#assign_{{assignment.group.id}}').prop('checked', true);
-      $('input#assigned_{{assignment.group.id}}').val('{{assignment.assigned_date|date:"F j, Y"}}');
-      $('input#due_{{assignment.group.id}}').val('{{assignment.due_date|date:"F j, Y"}}');
+      $('input#assigned_{{assignment.group.id}}_{{assignment.curriculum.id}}').val('{{assignment.assigned_date|date:"F j, Y"}}');
+      $('input#due_{{assignment.group.id}}_{{assignment.curriculum.id}}').val('{{assignment.due_date|date:"F j, Y"}}');
     {% endfor %}
 
     $('.datepicker.due').datepicker({
       dateFormat: 'MM d, yy',
       onClose: function(selectedDate){
-        if(selectedDate == ""){
-          var assign = $(this).closest('tr').find('input.assign');
-          $(assign).addClass('nodate');
-          $(assign).prop('checked', false);
+        if(selectedDate != ""){
+          var assigned = $(this).closest('tr').find('input.assigned');
+          if($(assigned).val() == ""){
+            $(assigned).datepicker('show');
+          }
         }
       }
     });
@@ -99,7 +121,17 @@
         }
       }
       if(editable){
-        $(this).datepicker({dateFormat: 'MM d, yy',});
+        $(this).datepicker({
+          dateFormat: 'MM d, yy',
+          onClose: function(selectedDate){
+            if(selectedDate != ""){
+              var due = $(this).closest('tr').find('input.due');
+              if($(due).val() == ""){
+                $(due).datepicker('show');
+              }
+            }
+          }
+        });
       }
     });
 
@@ -128,44 +160,13 @@
       });
     });
 
-
-    $('input.datepicker.due').each(function(){
-      var assign = $(this).closest('tr').find('input.assign');
-
-      if($(this).val() == ''){
-        $(assign).addClass('nodate');
-        $(assign).prop('checked', false);
-      }
-
-      $(this).on('change', function(){
-        if($(this).val() == ''){
-          $(assign).addClass('nodate');
-          $(assign).prop('checked', false);
-        }
-        else{
-          $(assign).removeClass('nodate');
-          $(assign).prop('checked', true);
-        }
-      });
-    });
-
-   $('td').on('click', 'input[type="checkbox"].assign', function(){
+   $('td').on('click', 'input[type="button"].clear', function(){
+      var clear = confirm('Are you sure you want to clear the assignment dates?');
       var id = $(this).attr('id');
-      var due_date_id = id.replace('assign', 'due');
-      var assigned_date_id = id.replace('assign', 'assigned');
-      if($(this).is(':checked')){
-        $('#'+due_date_id).datepicker('show');
-      }
-      else{
-        if($(this).hasClass('inwork')){
-          alert('Students have already started working on this assignment and so this assignment cannot be undone');
-          return false;
-        }
-        else{
-          $('#'+due_date_id).val('');
-          $('#'+assigned_date_id).val('');
-        }
-      }
+      var due_date_id = id.replace('clear', 'due');
+      var assigned_date_id = id.replace('clear', 'assigned');
+      $('#'+due_date_id).val('');
+      $('#'+assigned_date_id).val('');
     });
 
   });
