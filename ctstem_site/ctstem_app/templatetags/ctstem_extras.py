@@ -246,3 +246,7 @@ def get_underlying_curriculum(curriculum, user):
     return unit.underlying_curriculum.all()
   else:
     return unit.underlying_curriculum.all().filter(status='P')
+
+@register.filter
+def get_curriculum_count(queryset, status):
+  return queryset.filter(status=status).count()

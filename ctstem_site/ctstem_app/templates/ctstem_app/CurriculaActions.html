@@ -39,11 +39,13 @@
 <!-- Assign -->
 {% if user.administrator or user.teacher or user.school_administrator %}
   {% if curriculum.status == 'A' or curriculum.status == 'P'%}
-  <a class="assign util-button fa fa-calendar-check-o" aria-hidden="true" data-form="{% url 'ctstem:assignCurriculum' curriculum.id%}" aria-label="Assign Curriculum" title="Assign Curriculum">
+    {% if curriculum.curriculum_type != 'U' or curriculum|get_underlying_curriculum:request.user|get_curriculum_count:'P' > 0 %}
+      <a class="assign util-button fa fa-calendar-check-o" aria-hidden="true" data-form="{% url 'ctstem:assignCurriculum' curriculum.id%}" aria-label="Assign Curriculum" title="Assign Curriculum">
+    {% endif %}
   </a>
   {% endif %}
 {% endif %}
-{% if curriculum.curriculum_type != 'U' %}
+{% if curriculum.curriculum_type != 'U' and curriculum.unit|slugify == 'None'|slugify%}
   {% if user.teacher %}
     <a class="bookmark util-button fa fa-star" href="{% url 'ctstem:removeBookmark' curriculum.id %}" style="{% if curriculum|is_bookmarked:bookmarked %} display: inline-block; {% else %} display: none; {% endif %}" title="Remove from Favorites"></a>
     <a class="bookmark util-button fa fa-star-o" href="{% url 'ctstem:bookmarkCurriculum' curriculum.id %}" style="{% if curriculum|is_bookmarked:bookmarked %} display: none; {% else %} display: inline-block; {% endif %}" title="Add to Favorites"></a>

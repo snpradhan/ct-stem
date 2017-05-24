@@ -43,7 +43,9 @@
                   <td>{{curriculum_list.first.title}}</td>
                 {% endif %}
                 <td>
-                  <input type="text" class="datepicker assigned" id="assigned_{{group.id}}_{{curriculum_list.first.id}}" name="assigned_{{group.id}}_{{curriculum_list.first.id}}" readonly="true" /></td>
+                  <input type="text" class="datepicker assigned" id="assigned_{{group.id}}_{{curriculum_list.first.id}}" name="assigned_{{group.id}}_{{curriculum_list.first.id}}" readonly="true" />
+                  <input type="hidden" id="instance_{{group.id}}_{{curriculum_list.first.id}}" class="instance_count" value="{{instances|get_item:group.id|get_item:curriculum_list.first.id}}"/>
+                </td>
                 <td>
                   <input type="text" class="datepicker due" id="due_{{group.id}}_{{curriculum_list.first.id}}" name="due_{{group.id}}_{{curriculum_list.first.id}}" readonly="true" /></td>
                 <td>
@@ -60,6 +62,7 @@
                   {% endif %}
                   <td>
                     <input type="text" class="datepicker assigned" id="assigned_{{group.id}}_{{curr.id}}" name="assigned_{{group.id}}_{{curr.id}}" readonly="true" />
+                    <input type="hidden" id="instance_{{group.id}}_{{curr.id}}" class="instance_count" value="{{instances|get_item:group.id|get_item:curr.id}}"/>
                   </td>
                   <td>
                     <input type="text" class="datepicker due" id="due_{{group.id}}_{{curr.id}}" name="due_{{group.id}}_{{curr.id}}" readonly="true" />
@@ -110,16 +113,15 @@
 
     $('.datepicker.assigned').each(function(){
       var editable = true;
-      var assigned_value = $(this).val();
-      if(assigned_value){
-        var assigned_date = new Date(assigned_value);
-        var today = new Date();
-        if(assigned_date < today){
-          editable = false;
-          $(this).removeClass('hasDatepicker');
-          $(this).removeClass('datepicker');
-        }
+      //check if assignment has started
+      //if assignment has started make the assigned date field uneditable
+      var instance_count = $(this).closest('td').find('input.instance_count').val();
+      if(parseInt(instance_count) > 0){
+        editable = false;
+        $(this).removeClass('hasDatepicker');
+        $(this).removeClass('datepicker');
       }
+
       if(editable){
         $(this).datepicker({
           dateFormat: 'MM d, yy',
@@ -162,11 +164,13 @@
 
    $('td').on('click', 'input[type="button"].clear', function(){
       var clear = confirm('Are you sure you want to clear the assignment dates?');
-      var id = $(this).attr('id');
-      var due_date_id = id.replace('clear', 'due');
-      var assigned_date_id = id.replace('clear', 'assigned');
-      $('#'+due_date_id).val('');
-      $('#'+assigned_date_id).val('');
+      if(clear){
+        var id = $(this).attr('id');
+        var due_date_id = id.replace('clear', 'due');
+        var assigned_date_id = id.replace('clear', 'assigned');
+        $('#'+due_date_id).val('');
+        $('#'+assigned_date_id).val('');
+      }
     });
 
   });

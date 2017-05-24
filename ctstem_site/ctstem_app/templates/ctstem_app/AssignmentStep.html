@@ -79,7 +79,11 @@
             Thank you for taking this assessment!
             Please do the best that you can, and don't worry if you don't know all of the answers.
           {% elif curriculum.curriculum_type == 'L' %}
-            {{curriculum.overview|safe}}
+            {% if curriculum.unit %}
+              {{curriculum.unit.overview|safe}}
+            {% else %}
+              {{curriculum.overview|safe}}
+            {% endif %}
           {% endif %}
           {% if attachments %}
             <div>You will need additional resources to complete this assignment.  Please download them from this link <a href="{% url 'ctstem:downloadAttachments' curriculum.id%}" target="_blank">Download Attachment(s) <span class="fa fa-paperclip"></span></a></div>
