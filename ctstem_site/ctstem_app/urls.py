@@ -16,6 +16,7 @@ urlpatterns = [
     url(r'^curriculum/pdf/(?P<id>[\d]+)/$', views.pdfCurriculum, name='pdfCurriculum'),
     url(r'^curriculum/copy/(?P<id>[\d]+)/$', views.copyCurriculum, name='copyCurriculum'),
     url(r'^curriculum/assignment/(?P<id>[\d]+)/$', views.assignCurriculum, name='assignCurriculum'),
+    url(r'^curriculum/underlying/(?P<id>[\d]+)/$', views.underlyingCurriculum, name='underlyingCurriculum'),
     url(r'^curriculum/attachments/(?P<id>[\d]+)/$', views.downloadAttachments, name='downloadAttachments'),
     url(r'^publication/(?P<slug>[\w-]+)/$', views.publication, name='publication'),
     url(r'^publication/delete/(?P<slug>[\w-]+)/$', views.deletePublication, name='deletePublication'),

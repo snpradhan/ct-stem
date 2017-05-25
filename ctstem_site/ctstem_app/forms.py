@@ -707,13 +707,13 @@ class AssignmentForm(ModelForm):
 
     for field_name, field in self.fields.items():
       if field_name == 'due_date':
-        field.widget.attrs['class'] = 'form-control datepicker'
+        field.widget.attrs['class'] = 'form-control datepicker due'
         field.widget.attrs['readonly'] = True
       elif field_name =='assigned_date':
         if self.instance.id and self.instance.assigned_date.date() <= date.today():
           field.widget.attrs['class'] = 'form-control'
         else:
-          field.widget.attrs['class'] = 'form-control datepicker'
+          field.widget.attrs['class'] = 'form-control datepicker assigned'
         field.widget.attrs['readonly'] = True
       else:
         field.widget.attrs['class'] = 'form-control'

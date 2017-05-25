@@ -1765,10 +1765,34 @@ def searchAssignment(request):
 
     query_filter['status'] = 'P'
     curriculumQueryset = models.Curriculum.objects.filter(**query_filter)
-    curriculum_list = [{'curriculum_type': curriculum.get_curriculum_type_display(), 'title': curriculum.title, 'subject': [subject.name for subject in curriculum.subject.all()], 'id': curriculum.id} for curriculum in curriculumQueryset]
+    curriculumList = []
+    if data['curriculum_type'] == 'U':
+      for curriculum in curriculumQueryset:
+        if curriculum.underlying_curriculum.all().filter(status='P').count() > 0:
+          curriculumList.append(curriculum)
+    else:
+      curriculumList = curriculumQueryset
+    curriculum_list = [{'curriculum_type': curriculum.get_curriculum_type_display(), 'title': curriculum.title, 'subject': [subject.name for subject in curriculum.subject.all()], 'id': curriculum.id} for curriculum in curriculumList]
     return http.HttpResponse(json.dumps(curriculum_list), content_type="application/json")
 
   return http.HttpResponseNotAllowed(['POST'])
+
+####################################
+# Get underlying lessons when assigning a Unit
+####################################
+@login_required
+def underlyingCurriculum(request, id=''):
+  if hasattr(request.user, 'school_administrator') == False and hasattr(request.user, 'teacher') == False and  hasattr(request.user, 'administrator') == False:
+    return http.HttpResponseNotFound('<h1>You do not have the privilege search assignments</h1>')
+
+  if 'GET' == request.method:
+    curriculum = models.Curriculum.objects.get(id=id)
+    underlying_curriculum = curriculum.underlying_curriculum.all().filter(status='P')
+    curriculum_list = [{'id': curr.id, 'title': curr.title} for curr in underlying_curriculum]
+    print curriculum_list
+    return http.HttpResponse(json.dumps(curriculum_list), content_type="application/json")
+
+  return http.HttpResponseNotAllowed(['GET'])
 
 ####################################
 # DELETE A USER GROUP

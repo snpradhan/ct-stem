@@ -79,7 +79,11 @@ $(function (){
         else {
           var assignment = "";
           $.each(data, function(key, value){
-            assignment += "<tr><td>"+value['curriculum_type']+"</td><td>"+value['title']+"</td><td>"+value['subject']+"</td><td><button type='button' class='btn btn-info select_assignment' id='"+value['id']+"' name='"+value['title']+"'>Assign</a></td></tr>";
+            var curriculum_type = '';
+            if(value['curriculum_type'] == "Unit"){
+              curriculum_type = 'unit';
+            }
+            assignment += "<tr><td>"+value['curriculum_type']+"</td><td>"+value['title']+"</td><td>"+value['subject']+"</td><td><button type='button' class='btn btn-info select_assignment "+curriculum_type+"' id='"+value['id']+"' name='"+value['title']+"'>Assign</a></td></tr>";
           });
           if(assignment.length == 0){
             $('#assignmentMsg').html('No matching assignments found');
@@ -90,15 +94,37 @@ $(function (){
             $("#assignmentResults table tbody").html(assignment);
             $("#assignmentResults").show();
             $("#assignmentResults button.select_assignment").click(function(){
-
-              cloneMore('div.assignment_table table.table tr:last', 'form');
-              var new_assignment_row = $('div.assignment_table table.table tr:nth-last-child(2)');
-              $("input:hidden[id^='id_form'][id$='curriculum']", new_assignment_row).val($(this).attr('id'));
-              $("div.assignment_title", new_assignment_row).html($(this).attr('name'));
-              $(new_assignment_row).toggle();
-              $(new_assignment_row).find('.datepicker').removeClass('hasDatepicker');
-              $(new_assignment_row).find('.datepicker').datepicker({dateFormat: 'M d, yy'});
-
+              //if assigning a Unit get and assign all the underlying published lessons
+              var curriculum_assigned = {};
+              if($(this).hasClass('unit')){
+                $.ajax({
+                  type: 'GET',
+                  url: '/curriculum/underlying/'+$(this).attr('id'),
+                  success: function(data){
+                    $.each(data, function(key, value){
+                      cloneMore('div.assignment_table table.table tr:last', 'form');
+                      var new_assignment_row = $('div.assignment_table table.table tr:nth-last-child(2)');
+                      $("input:hidden[id^='id_form'][id$='curriculum']", new_assignment_row).val(value['id']);
+                      $("div.assignment_title", new_assignment_row).html(value['title']);
+                      $(new_assignment_row).toggle();
+                      $(new_assignment_row).find('.datepicker').removeClass('hasDatepicker');
+                      $(new_assignment_row).find('.datepicker').datepicker({dateFormat: 'M d, yy'});
+                    });
+                  },
+                  error: function(xhr, ajaxOptions, thrownError){
+                    alert(thrownError);
+                  },
+                });
+              }
+              else{
+                cloneMore('div.assignment_table table.table tr:last', 'form');
+                var new_assignment_row = $('div.assignment_table table.table tr:nth-last-child(2)');
+                $("input:hidden[id^='id_form'][id$='curriculum']", new_assignment_row).val($(this).attr('id'));
+                $("div.assignment_title", new_assignment_row).html($(this).attr('name'));
+                $(new_assignment_row).toggle();
+                $(new_assignment_row).find('.datepicker').removeClass('hasDatepicker');
+                $(new_assignment_row).find('.datepicker').datepicker({dateFormat: 'M d, yy'});
+              }
             });
           }
           //$("#taxonomyForm")[0].reset();
