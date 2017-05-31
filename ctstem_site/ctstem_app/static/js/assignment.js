@@ -72,7 +72,7 @@ function dtmSaveTable(tableId) {
   parentId, tableId as a separator
   rowInput contains the row data array as defined above, can be an empty array
 **/
-function dtmBuildHtmlTable(parentId, tableId, colInput, rowInput, editFlag) {
+function dtmBuildHtmlTable(parentId, tableId, colHeaders, rowHeaders, rowInput, editFlag) {
 
   console.log('building table');
 
@@ -80,24 +80,35 @@ function dtmBuildHtmlTable(parentId, tableId, colInput, rowInput, editFlag) {
   var headSelector = selector +" > thead";
   var bodySelector = selector +" > tbody";
 
+  console.log(rowInput);
   //create the headers
-  if (colInput){
-    dtmAddAllColumnHeaders( headSelector, colInput, editFlag);
+  if (colHeaders.length > 0){
+    dtmAddColumnAllHeaders( headSelector, colHeaders, rowHeaders, editFlag);
   }
   var rowLen;
-  if ( rowInput != null && rowInput != ''){
+  if (rowHeaders.length > 0) {
+    rowLen = rowHeaders.length
+  }
+  else if ( rowInput != null && rowInput != ''){
     rowLen = rowInput.length
   } else{
     rowLen = 3;
   }
   for (var i = 0; i < rowLen; i++) {
     var row$ = $('<tr/>');
-    for (var colIndex = 0; colIndex < colInput.length; colIndex++) {
+    if (rowHeaders && rowHeaders[i]) {
+      row$.append($('<th>'+rowHeaders[i]+'</th>'));
+    }
+    for (var colIndex = 0; colIndex < colHeaders.length; colIndex++) {
       var cellValue = "";
       if ( rowInput != null && rowInput != ''){
-        var cellValue = rowInput[i][colIndex];
+        if (i in rowInput && colIndex in rowInput[i]){
+          cellValue = rowInput[i][colIndex];
+        }
       }
-      if (cellValue == null ) cellValue = "";
+      if (cellValue == null ) {
+        cellValue = "";
+      }
       if (editFlag){
         row$.append($('<td><input type="text" value="'+cellValue+'"/> </td>'));
       }
@@ -106,7 +117,7 @@ function dtmBuildHtmlTable(parentId, tableId, colInput, rowInput, editFlag) {
       }
     }
     // last action cell
-    if (editFlag) {
+    if (editFlag && rowHeaders.length == 0) {
       var buttons$ = $('<td class="add_delete_buttons" />');
       buttons$.append($('<button type="button" class="btn btn-success" title="Add Row" onclick="dtmInsertRow(\''+ tableId +'\', this)">+</button>'));
       //do not allow the first row to be deleted
@@ -127,13 +138,16 @@ function dtmBuildHtmlTable(parentId, tableId, colInput, rowInput, editFlag) {
   colInput contains the header array
 **********************/
 
-function dtmAddAllColumnHeaders(selector, colInput, editFlag) {
+function dtmAddColumnAllHeaders(selector, colHeaders, rowHeaders, editFlag) {
   var headerTr$ = $('<tr bgcolor=#ff9966 class="eachRow" />');
-  for (var i = 0; i < colInput.length; i++) {
-    var key= colInput[i];
+  if(rowHeaders.length > 0){
+    headerTr$.append($('<th class="eachHdr"/>'));
+  }
+  for (var i = 0; i < colHeaders.length; i++) {
+    var key= colHeaders[i];
     headerTr$.append($('<th class="eachHdr"/>').html(key));
   }
-  if (editFlag){
+  if (editFlag && rowHeaders.length == 0){
     headerTr$.append($('<th class="eachHdr"/>'));
   }
   $(selector).append(headerTr$);
@@ -154,8 +168,25 @@ function loadDataTable(status){
     else {
       rowInput = '';
     }
-    var colInput = $(this).children('input[type=hidden]:nth-of-type(2)').val().split('\n');
-    dtmBuildHtmlTable(divId, tableId, colInput, rowInput, status);
+    var headers = $(this).children('input[type=hidden]:nth-of-type(2)').val().split('\n');
+    var colHeaders = [], rowHeaders = [];
+    for (var i=0; i< headers.length; i++){
+      header = headers[i].split('|');
+      if(header.length == 2){
+        if(header[0] != ""){
+          colHeaders.push(header[0]);
+        }
+        if(header[1] != ""){
+          rowHeaders.push(header[1]);
+        }
+      }
+      else if (header.length == 1){
+        if(header[0] != ""){
+          colHeaders.push(header[0]);
+        }
+      }
+    }
+    dtmBuildHtmlTable(divId, tableId, colHeaders, rowHeaders, rowInput, status);
   });
 }
 

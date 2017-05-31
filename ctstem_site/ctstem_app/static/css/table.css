@@ -23,19 +23,19 @@ table.table tbody {
   font-size: 1.4em;
 }
 
-table.table tr:first-child th:first-child {
+table.table thead tr:first-child th:first-child {
     border-top-left-radius: 10px;
     -moz-border-top-left-radius:: 10px;
 }
-table.table tr:first-child th:last-child {
+table.table thead tr:first-child th:last-child {
   border-top-right-radius: 10px;
   -moz-border-top-right-radius: 10px;
 }
-table.table tr:last-child td:first-child {
+table.table tbody tr:last-child td:first-child {
   border-bottom-left-radius: 10px;
   -moz-border-bottom-left-radius: 10px;
 }
-table.table tr:last-child td:last-child {
+table.table tbody tr:last-child td:last-child {
   border-bottom-right-radius: 10px;
   -moz-border-bottom-right-radius: 10px;
 }
@@ -56,7 +56,9 @@ div.dt_input {
   overflow-x: scroll;
 }
 
-table.table.dt thead tr:not(#filterrow), table.table.inner_table thead tr {
+table.table.dt thead tr:not(#filterrow),
+table.table.inner_table thead tr,
+table.table.inner_table tbody tr th {
   background-color: #666666;
   color: #e5e5e5;
 }

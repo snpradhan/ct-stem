@@ -15,7 +15,14 @@
       <div class="modal-body">
         {% for field in questionForm %}
           <div class="form-group {% if field.name == 'sketch_background' %} sketch {% endif %}" style="{% if field.name == 'sketch_background' %} display: none; {% endif %}" >
-            <label for="id_{{field.name}}">{{ field.label|title }} {% if field.field.required %} (*) {% endif %}</label>
+            <label for="id_{{field.name}}">
+              {{ field.label|title }} {% if field.field.required %} (*) {% endif %}
+              {% if field.name = 'options' %}
+                <a href="#" class="options_info" rel="popover" data-content="">
+                  <i class="fa fa-info-circle" aria-hidden="true" />
+                </a>
+              {% endif %}
+            </label>
             <div>
               {{field}}
               {% if field.name == 'question_text' %}
@@ -39,6 +46,47 @@
 
 <script type="text/javascript">
 $(function (){
+  $(".options_info").popover({
+    placement: 'right',
+    title: 'Options Guide',
+    html: true ,
+    content: function(){
+      return '<ul> \
+                <li><b>Dropdown, Multi-Select, Multiple Choice</b></li> \
+                <p> Provide one option per line. </p> \
+                <li><b>Multiple Choice w/Images</b></li> \
+                <p> Provide one image url per line. </p> \
+                <li><b>Multiple Choice w/Horizontal Layout</b></li> \
+                <p> Provide one option per line.  Radio buttons will be displayed horizontally. </p> \
+                <li><b>Sketch</b></li> \
+                <p> You may optionally provide a background image for the sketch pad in the Sketch Background field. </p> \
+                <li><b>Data Table</b></li> \
+                <ul> \
+                 <li>Data Table w/fixed columns and variable rows </li> \
+                 <p>Provide one column header per line. </p> \
+                 <li>Data Table w/fixed columns and rows </li>\
+                 <p>Provide one column header and one row header per line separated by |.  <br> \
+                 See example below. </br> \
+                   Col 1 | Row 1 <br> \
+                   Col 2 | Row 2 <br> \
+                   Col 3 | Row 3 <br> \
+                   Col 4 | \
+                 </p> \
+                </ul>\
+              </ul>';
+
+    }
+  });
+
+  $(".options_info").click(function (e) {
+    e.stopPropagation();
+  });
+
+  $(document).click(function (e) {
+    if (($('.popover').has(e.target).length == 0) || $(e.target).is('.close')) {
+      $(".options_info").popover('hide');
+    }
+  });
 
   $('select#id_answer_field_type').on('change', function(){
     if($(this).val() == 'SK'){

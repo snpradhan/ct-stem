@@ -923,6 +923,33 @@ ul#id_student-consent {
 ul#id_student-consent li {
   margin-bottom: 1em;
 }
+
+.popover {
+    max-width: 80%;
+    width: auto;
+    position: absolute;
+    z-index: 1030;
+    display: block;
+    line-height: 1.4;
+    opacity: 0;
+    filter: alpha(opacity=0);
+    visibility: visible;
+}
+
+.popover-title, .popover-content {
+    padding: 8px;
+    color: #ffffff;
+    text-align: left;
+    text-decoration: none;
+    background-image: linear-gradient(to bottom, #353535, #414141);
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+}
+
+.popover-title {
+    text-align: center;
+}
 /***********   FORM GROUP END   ************/
 
 /***************************************
