@@ -100,11 +100,9 @@ def curricula(request, curriculum_type='', bookmark='0'):
 
   bookmarked = None
 
-  if hasattr(request.user, 'administrator') or hasattr(request.user, 'researcher'):
+  if hasattr(request.user, 'administrator') or hasattr(request.user, 'researcher') or hasattr(request.user, 'author'):
     curricula = models.Curriculum.objects.all().filter(curriculum_type__in = curr_type).order_by('id')
-  elif hasattr(request.user, 'author') == True:
-    curricula = models.Curriculum.objects.all().filter(Q(curriculum_type__in = curr_type), Q(status='P') | Q(author=request.user) ).order_by('id')
-  elif hasattr(request.user, 'teacher') == True:
+  elif hasattr(request.user, 'teacher'):
     if bookmark == '1':
       curricula = models.Curriculum.objects.all().filter(curriculum_type__in = curr_type, status='P', bookmarked__teacher=request.user.teacher).order_by('id')
       bookmarked = curricula
