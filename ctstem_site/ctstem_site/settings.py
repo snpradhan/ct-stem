@@ -94,7 +94,7 @@ CKEDITOR_RESTRICT_BY_USER = True
 CKEDITOR_IMAGE_BACKEND = "pillow"
 CKEDITOR_CONFIGS = {
     'default': {
-        'removePlugins': 'stylesheetparser, contextmenu',
+        'removePlugins': 'stylesheetparser',
         'toolbar': None,  # put selected toolbar config here
         'height': 100,
         'width': '115%',
@@ -109,7 +109,7 @@ CKEDITOR_CONFIGS = {
         'disableNativeSpellChecker': False,
     },
     'question_ckeditor': {
-        'removePlugins': 'stylesheetparser, contextmenu',
+        'removePlugins': 'stylesheetparser',
         'toolbar': None,  # put selected toolbar config here
         'height': 100,
         'width': '98%',

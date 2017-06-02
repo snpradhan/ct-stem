@@ -863,7 +863,7 @@ div.modal-content div.msg {
   color: red;
   font-size: 1.4em;
 }
-div.modal-content div#taxonomyResults, div.modal-content div#assignmentResults, div.modal-content div#studentResults{
+div.modal-content div.results{
   padding: 0 2em 1em 2em;
 }
 div.modal-content span.time {

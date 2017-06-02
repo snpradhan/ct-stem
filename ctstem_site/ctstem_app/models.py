@@ -141,6 +141,7 @@ class Curriculum (models.Model):
   created_date = models.DateTimeField(auto_now_add=True)
   modified_date = models.DateTimeField(auto_now=True)
   icon = models.ImageField(upload_to=upload_file_to, blank=True, help_text='Upload 400x289 png image that represents this curriculum')
+  shared_with = models.ManyToManyField('Teacher', null=True, blank=True, help_text='Select teachers to share this curriculum with before it is published.' )
 
   class Meta:
       ordering = ['-id']

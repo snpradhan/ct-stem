@@ -61,30 +61,6 @@
 <script type="text/javascript">
 $(function (){
 
-  $("#id_standard").change(function(){
-    var html = "<option value 'selected'>----------</option>";
-    if($(this).val() != ''){
-      var url = "{% url 'ctstem:categories' 0 %}".replace('0', $(this).val());
-      $.ajax({
-        type: 'GET',
-        url: url,
-        context: this,
-        success: function(data){
-          data['category_list'].forEach(function(element, index, array){
-            html += "<option value='"+element['id']+"'>"+element['category']+"</option>";
-          });
-          $('select#id_category').html(html);
-        },
-        error: function(xhr, ajaxOptions, thrownError){
-          alert(thrownError);
-        },
-      });
-    }
-    else{
-      $('select#id_category').html(html);
-    }
-  });
-
   $("#studentForm").submit(function(e) {
 
     e.preventDefault();

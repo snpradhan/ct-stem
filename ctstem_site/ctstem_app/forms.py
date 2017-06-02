@@ -324,7 +324,7 @@ class CurriculumForm(ModelForm):
 
   class Meta:
     model = models.Curriculum
-    fields = ['curriculum_type', 'author', 'title', 'icon', 'time', 'level', 'purpose', 'overview', 'status', 'subject', 'compatible_system', 'taxonomy', 'content', 'teacher_notes']
+    fields = ['curriculum_type', 'author', 'title', 'icon', 'time', 'level', 'purpose', 'overview', 'status', 'subject', 'compatible_system', 'taxonomy', 'content', 'teacher_notes', 'shared_with']
     widgets = {
       'title': forms.TextInput(attrs={'placeholder': 'Lesson Title'}),
       'time': forms.TextInput(attrs={'rows':0, 'cols':60}),
@@ -336,6 +336,7 @@ class CurriculumForm(ModelForm):
       'taxonomy': forms.SelectMultiple(attrs={'size':5}),
       'subject': forms.SelectMultiple(attrs={'size':4}),
       'compatible_system': forms.SelectMultiple(attrs={'size':6}),
+      'shared_with': forms.SelectMultiple(attrs={'size':10}),
     }
 
   def __init__(self, *args, **kwargs):
@@ -518,7 +519,22 @@ class StudentSearchForm(forms.Form):
       if field.help_text:
         field.widget.attrs['placeholder'] = field.help_text
 
+####################################
+# Teacher Search Form
+####################################
+class TeacherSearchForm(forms.Form):
+  username = forms.CharField(required=False, max_length=30, label=u'Username')
+  first_name = forms.CharField(required=False, max_length=30, label=u'First name')
+  last_name = forms.CharField(required=False, max_length=30, label=u'Last name')
+  email = forms.EmailField(required=False, max_length=75, label=u'Email')
 
+  def __init__(self, *args, **kwargs):
+    super(TeacherSearchForm, self).__init__(*args, **kwargs)
+
+    for field_name, field in self.fields.items():
+      field.widget.attrs['class'] = 'form-control'
+      if field.help_text:
+        field.widget.attrs['placeholder'] = field.help_text
 ####################################
 # Create and Add Student Form
 ####################################

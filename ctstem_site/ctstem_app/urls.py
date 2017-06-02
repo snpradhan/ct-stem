@@ -53,6 +53,7 @@ urlpatterns = [
     url(r'^subcategories/(?P<category_id>[\d]+)/$', views.subcategories, name='subcategories'),
     url(r'^users/(?P<role>[a-zA-Z0-9_]+)/$', views.users, name='users'),
     url(r'^students/search/$', views.searchStudents, name='searchStudents'),
+    url(r'^teachers/search/$', views.searchTeachers, name='searchTeachers'),
     url(r'^question/new/$', views.question, name='newQuestion'),
     url(r'^question/(?P<id>[\d]+)/$', views.question, name='question'),
     url(r'^response/(?P<instance_id>[\d]+)/(?P<response_id>[\d]+)/$', views.questionResponse, name='questionResponse'),

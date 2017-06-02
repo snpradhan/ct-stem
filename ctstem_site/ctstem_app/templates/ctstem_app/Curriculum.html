@@ -38,7 +38,7 @@
             {% else %}
               <div class="form-group">
             {% endif %}
-              <label for="id_{{field.name}}">{{ field.label }} {% if field.field.required %}(<span class="required">*</span>) {% endif %}</label>
+              <label for="id_{{field.name}}">{{ field.label|title }} {% if field.field.required %}(<span class="required">*</span>) {% endif %}</label>
               {% if field.name == 'taxonomy' %}
                 <div style="display:none;">
                   {{field}}
@@ -97,13 +97,48 @@
                   {{field}}
                 </div>
                 <div class="error">{{ field.errors }}</div>
+              {% elif field.name == 'shared_with' %}
+                <button class="btn btn-info search_teachers" name="search_teachers" data-form="{% url 'ctstem:searchTeachers' %}">
+                  <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                </button>
+                <div class="controls table_container">
+                  <div style="display:none;">
+                    {{field}}
+                  </div>
+                  <table class="table table-striped table-bordered table-condensed inner_table" id="teachers">
+                    <thead>
+                      <tr>
+                        <th> Username </th>
+                        <th> Name </th>
+                        <th> Email </th>
+                        <th> Unshare </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for x in field.value %}
+                        {% with teacher=x|getTeacherInfo %}
+                        <tr id="{{teacher.id}}">
+                          <td>{{teacher.user.username}}</td>
+                          <td>{{teacher.user.get_full_name}}</td>
+                          <td>{{teacher.user.email}}</td>
+                          <td>
+                            <button type="button" class="btn btn-warning unshare" aria-label="Unshare curriculum with this teacher" title="Unshare curriculum with this teacher" href="#">
+                              <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                            </button>
+                          </td>
+                        </tr>
+                        {% endwith %}
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
               {% else %}
                 <div>
                   {{field}}
                 </div>
               {% endif %}
-              {% if field.name == 'icon' or field.name == 'subject' or field.name == 'compatible_system'%}
-                <div class="help warning">{{field.help_text}}</div>
+              {% if field.name == 'icon' or field.name == 'subject' or field.name == 'compatible_system' or field.name == 'shared_with' %}
+                <div class="help warning">{{field.help_text|safe}}</div>
               {% endif %}
               <div class="error">{{ field.errors }}</div>
             </div>
@@ -290,6 +325,8 @@
     </form>
     <div class="modal fade" id="questionModal" role="dialog"></div>
     <div class="modal fade" id="taxonomyModal" role="dialog"></div>
+    <div class="modal fade" id="teacherModal" role="dialog"></div>
+
   </div>
   <script type="text/javascript">
     $(function (){
@@ -315,10 +352,25 @@
         return false;
       });
 
+      $("button.search_teachers").click(function(e){
+        e.preventDefault();
+        var url = $(this).data("form");
+        $("#teacherModal").load(url, function() {
+          $(this).modal('show');
+        });
+        return false;
+      });
+
       $("button.remove_taxonomy").click(function(e){
         var taxonomy_id = $(this).closest('tr').attr('id');
         $('#id_curriculum-taxonomy option[value="'+taxonomy_id+'"]').prop('selected', false);
         $('div.curriculum_content div#taxonomy_div table#taxonomy tbody tr#'+taxonomy_id).remove();
+      });
+      //bind remove function
+      $("button.unshare").click(function(e){
+        var teacher_id = $(this).closest('tr').attr('id');
+        $('select[id^="id"][id$="shared_with"] option[value="'+teacher_id+'"]').prop('selected', false);
+        $('div.curriculum_content table#teachers tbody tr#'+teacher_id).remove();
       });
 
       $('#addStep').click(function() {
@@ -410,6 +462,8 @@
 
           $('textarea#id_curriculum-teacher_notes').closest('.form-group').show();
 
+          $('select#id_curriculum-shared_with').closest('.form-group').show();
+
           $('div.form-group.attachment_table').show();
 
           if($(this).val() == 'L'){
@@ -438,6 +492,7 @@
           $('select#id_curriculum-taxonomy').closest('.form-group').hide();
           $('textarea#id_curriculum-content').closest('.form-group').hide();
           $('textarea#id_curriculum-teacher_notes').closest('.form-group').hide();
+          $('select#id_curriculum-shared_with').closest('.form-group').hide();
           $('div.form-group.attachment_table').hide();
 
           //hide step order, teacher notes and questions

@@ -111,6 +111,11 @@ def getStudentInfo(value):
   return student
 
 @register.filter
+def getTeacherInfo(value):
+  teacher = models.Teacher.objects.get(id=value)
+  return teacher
+
+@register.filter
 def iterate(value):
   return range(1, value+1)
 

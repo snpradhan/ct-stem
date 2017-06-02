@@ -106,16 +106,15 @@
               {% elif user.teacher %}
                 <li><a class="assign" href="#" data-form="{% url 'ctstem:assignCurriculum' curriculum.id%}">Assign to My Classes</a></li>
               {% endif %}
-            {% endif %}
 
-            {% if user.teacher %}
-              {% if curriculum.id|is_favorite:user.teacher.id %}
-                <li><a id="favorites-link" class="favorites">Remove from Favorites</a></li>
-              {% else %}
-                <li><a id="favorites-link" class="favorites">Add to Favorites</a></li>
+              {% if user.teacher %}
+                {% if curriculum.id|is_favorite:user.teacher.id %}
+                  <li><a id="favorites-link" class="favorites">Remove from Favorites</a></li>
+                {% else %}
+                  <li><a id="favorites-link" class="favorites">Add to Favorites</a></li>
+                {% endif %}
               {% endif %}
             {% endif %}
-
             <li><a href="javascript:window.print();">Print This Page <span class="fa fa-print "></span></a></li>
             <li class="divider"></li>
             <li><a href="#" class="faq"">View CT FAQ</a></li>
@@ -163,11 +162,13 @@
             <!-- UTILITY BUTTONS -->
             <!-- TODO: IMPLEMENT ASSIGN TO STUDENTS -->
             <div>
-              {% if user.teacher %}
-                {% if curriculum.id|is_favorite:user.teacher.id %}
-                  <a class="util-button fa fa-star favorites" id="favorites-icon" title="Remove from Favorites"></a>
-                {% else %}
-                  <a class="util-button fa fa-star-o favorites" id="favorites-icon" title="Add to My Favorites"></a>
+              {% if curriculum.status == 'A' or curriculum.status == 'P'%}
+                {% if user.teacher %}
+                  {% if curriculum.id|is_favorite:user.teacher.id %}
+                    <a class="util-button fa fa-star favorites" id="favorites-icon" title="Remove from Favorites"></a>
+                  {% else %}
+                    <a class="util-button fa fa-star-o favorites" id="favorites-icon" title="Add to My Favorites"></a>
+                  {% endif %}
                 {% endif %}
               {% endif %}
               <a class="util-button fa fa-print" href="javascript:window.print();" title="Print"></a>

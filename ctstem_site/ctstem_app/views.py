@@ -107,7 +107,7 @@ def curricula(request, curriculum_type='', bookmark='0'):
       curricula = models.Curriculum.objects.all().filter(curriculum_type__in = curr_type, status='P', bookmarked__teacher=request.user.teacher).order_by('id')
       bookmarked = curricula
     else:
-      curricula = models.Curriculum.objects.all().filter(curriculum_type__in = curr_type, status='P').order_by('id')
+      curricula = models.Curriculum.objects.all().filter(Q(curriculum_type__in = curr_type), Q(status='P') | Q(shared_with=request.user.teacher)).order_by('id')
       bookmarked = curricula.filter(bookmarked__teacher=request.user.teacher)
   else:
     curricula = models.Curriculum.objects.all().filter(curriculum_type__in = curr_type, status='P').order_by('id')
@@ -211,6 +211,13 @@ def previewCurriculum(request, id='', step_order=-1):
       curriculum = models.Curriculum.objects.get(id=id)
     else:
       curriculum = models.Curriculum()
+
+    #teachers are only allowed to preview published or shared curriculum
+    if curriculum.status == 'D':
+      if hasattr(request.user, 'teacher') and curriculum.shared_with.all().filter(id=request.user.teacher.id).exists() == False:
+        return http.HttpResponseNotFound('<h1>You do not have the privilege to preview this curriculum</h1>')
+      elif hasattr(request.user, 'school_administrator'):
+        return http.HttpResponseNotFound('<h1>You do not have the privilege to preview this curriculum</h1>')
 
     if request.method == 'GET':
       steps = models.Step.objects.all().filter(curriculum=curriculum)
@@ -1375,6 +1382,43 @@ def searchStudents(request):
     return http.HttpResponse(json.dumps(student_list), content_type="application/json")
 
   return http.HttpResponseNotAllowed(['POST'])
+
+####################################
+# Search Teachers
+####################################
+@login_required
+def searchTeachers(request):
+  # check if the user has permission to add a question
+  if hasattr(request.user, 'author') == False and hasattr(request.user, 'researcher') == False and  hasattr(request.user, 'administrator') == False:
+    return http.HttpResponseNotFound('<h1>You do not have the privilege search teachers</h1>')
+
+  if 'GET' == request.method:
+    teacherSearchForm = forms.TeacherSearchForm()
+    context = {'teacherSearchForm': teacherSearchForm}
+    return render(request, 'ctstem_app/TeacherSearch.html', context)
+
+  elif 'POST' == request.method:
+    data = request.POST.copy()
+    print data
+    query_filter = {}
+    if data['username']:
+      query_filter['user__username__icontains'] = str(data['username'])
+    if data['first_name']:
+      query_filter['user__first_name__icontains'] = str(data['first_name'])
+    if data['last_name']:
+      query_filter['user__last_name__icontains'] = str(data['last_name'])
+    if data['email']:
+      query_filter['user__email__icontains'] = str(data['email'])
+
+    print query_filter
+    teacherList = models.Teacher.objects.filter(**query_filter)
+    print teacherList
+    teacher_list = [{'user_id': teacher.user.id, 'teacher_id': teacher.id, 'username': teacher.user.username, 'name': teacher.user.get_full_name(),
+                     'email': teacher.user.email}
+                for teacher in teacherList]
+    return http.HttpResponse(json.dumps(teacher_list), content_type="application/json")
+
+  return http.HttpResponseNotAllowed(['GET', 'POST'])
 ####################################
 # USER LIST
 ####################################
