@@ -70,13 +70,13 @@
           {% if step_order|add:0  == 0 %}
             <a class="page-link selected" href="#">{{1}}</a>
           {% else %}
-            <a class="page-link" href="{% url 'ctstem:previewCurriculum'  curr_unit.id 0 %}">{{1}}</a>
+            <a class="page-link" href="{% url 'ctstem:previewCurriculum'  curriculum.id 0 %}">{{1}}</a>
           {% endif %}
           {% for i in total_steps|iterate %}
             {% if i|add:0 == step_order|add:0 %}
-              <a class="page-link selected" href="{% url 'ctstem:previewCurriculum'  curr_unit.id i %}">{{i|add:1}}</a>
+              <a class="page-link selected" href="{% url 'ctstem:previewCurriculum'  curriculum.id i %}">{{i|add:1}}</a>
             {% else %}
-              <a class="page-link" href="{% url 'ctstem:previewCurriculum'  curr_unit.id i %}">{{i|add:1}}</a>
+              <a class="page-link" href="{% url 'ctstem:previewCurriculum'  curriculum.id i %}">{{i|add:1}}</a>
             {% endif %}
           {% endfor %}
         {% endif %}
