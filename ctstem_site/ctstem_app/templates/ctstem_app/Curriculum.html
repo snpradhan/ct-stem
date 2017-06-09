@@ -89,6 +89,41 @@
                     {{field}}
                   </div>
                   <div class="error">{{ field.errors }}</div>
+                {% elif field.name == 'shared_with' %}
+                  <button class="btn btn-info search_teachers" name="search_teachers" data-form="{% url 'ctstem:searchTeachers' %}">
+                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                  </button>
+                  <div class="controls table_container">
+                    <div style="display:none;">
+                      {{field}}
+                    </div>
+                    <table class="table table-striped table-bordered table-condensed inner_table" id="teachers">
+                      <thead>
+                        <tr>
+                          <th> Username </th>
+                          <th> Name </th>
+                          <th> Email </th>
+                          <th> Unshare </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for x in field.value %}
+                          {% with teacher=x|getTeacherInfo %}
+                          <tr id="{{teacher.id}}">
+                            <td>{{teacher.user.username}}</td>
+                            <td>{{teacher.user.get_full_name}}</td>
+                            <td>{{teacher.user.email}}</td>
+                            <td>
+                              <button type="button" class="btn btn-warning unshare" aria-label="Unshare curriculum with this teacher" title="Unshare curriculum with this teacher" href="#">
+                                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                              </button>
+                            </td>
+                          </tr>
+                          {% endwith %}
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
                 {% else %}
                   <div>
                     {{field}}
@@ -99,51 +134,7 @@
                     {% endif %}
                   </div>
                 {% endif %}
-                {% if field.name == 'icon' or field.name == 'subject' or field.name == 'compatible_system' or field.name == 'unit'%}
-                  <div class="help warning">{{field.help_text}}</div>
-                {% endif %}
-                <div class="error">{{ field.errors }}</div>
-              {% elif field.name == 'shared_with' %}
-                <button class="btn btn-info search_teachers" name="search_teachers" data-form="{% url 'ctstem:searchTeachers' %}">
-                  <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-                </button>
-                <div class="controls table_container">
-                  <div style="display:none;">
-                    {{field}}
-                  </div>
-                  <table class="table table-striped table-bordered table-condensed inner_table" id="teachers">
-                    <thead>
-                      <tr>
-                        <th> Username </th>
-                        <th> Name </th>
-                        <th> Email </th>
-                        <th> Unshare </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {% for x in field.value %}
-                        {% with teacher=x|getTeacherInfo %}
-                        <tr id="{{teacher.id}}">
-                          <td>{{teacher.user.username}}</td>
-                          <td>{{teacher.user.get_full_name}}</td>
-                          <td>{{teacher.user.email}}</td>
-                          <td>
-                            <button type="button" class="btn btn-warning unshare" aria-label="Unshare curriculum with this teacher" title="Unshare curriculum with this teacher" href="#">
-                              <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-                            </button>
-                          </td>
-                        </tr>
-                        {% endwith %}
-                      {% endfor %}
-                    </tbody>
-                  </table>
-                </div>
-              {% else %}
-                <div>
-                  {{field}}
-                </div>
-              {% endif %}
-              {% if field.name == 'icon' or field.name == 'subject' or field.name == 'compatible_system' or field.name == 'shared_with' %}
+                {% if field.name == 'icon' or field.name == 'subject' or field.name == 'compatible_system' or field.name == 'unit' or field.name == 'shared_with' %}
                 <div class="help warning">{{field.help_text|safe}}</div>
               {% endif %}
               <div class="error">{{ field.errors }}</div>
@@ -456,17 +447,17 @@
           $('#id_curriculum-title').closest('.form-group').show();
           $('#id_curriculum-status').closest('.form-group').show();
 
-          $('select#id_curriculum-shared_with').closest('.form-group').show();
-
           $('div.form-group.attachment_table').show();
           //display unit for lesson only
           if($(this).val() == 'L') {
             $('#id_curriculum-unit').closest('.form-group').show();
+            $('select#id_curriculum-shared_with').closest('.form-group').show();
           }
           else{
             //reset the unit field
             $('#id_curriculum-unit').prop('selectedIndex', 0);
             $('#id_curriculum-unit').closest('.form-group').hide();
+            $('select#id_curriculum-shared_with').closest('.form-group').hide();
           }
           //display icon, level, purpose, overview, compatible systems and standards for unit, stand-alone lesson and assessment
           if($(this).val() == 'U' || ($(this).val() == 'L' &&  $('select#id_curriculum-unit').val() == '' )|| $(this).val() == 'A'){

@@ -2,6 +2,7 @@ from django import template
 from django.utils.encoding import force_unicode
 from ctstem_app import models
 import datetime
+from django.db.models import Q
 
 register = template.Library()
 
@@ -244,6 +245,8 @@ def get_underlying_curriculum(curriculum, user):
 
   if hasattr(user, 'administrator') == True or hasattr(user, 'researcher') == True or hasattr(user, 'author') == True:
     return unit.underlying_curriculum.all()
+  elif hasattr(user, 'teacher') == True:
+    return unit.underlying_curriculum.all().filter(Q(status='P') | Q(shared_with=user.teacher))
   else:
     return unit.underlying_curriculum.all().filter(status='P')
 
