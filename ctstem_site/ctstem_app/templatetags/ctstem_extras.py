@@ -155,12 +155,17 @@ def format_time(value):
 
 @register.filter
 def has_response(curriculum, user):
+  if curriculum.curriculum_type != 'U':
+    curricula = models.Curriculum.objects.all().filter(id=curriculum.id)
+  else:
+    curricula = curriculum.underlying_curriculum.all().filter(Q(status='P') | Q(status='A'))
+
   if hasattr(user, 'administrator') == True or hasattr(user, 'researcher') == True:
-    assignments = models.Assignment.objects.all().filter(curriculum__id = curriculum.id)
+    assignments = models.Assignment.objects.all().filter(curriculum__in=curricula)
   elif hasattr(user, 'school_administrator') == True:
-    assignments = models.Assignment.objects.all().filter(curriculum__id = curriculum.id, group__teacher__school = user.school_administrator.school)
+    assignments = models.Assignment.objects.all().filter(curriculum__in=curricula, group__teacher__school = user.school_administrator.school)
   elif hasattr(user, 'teacher') == True:
-    assignments = models.Assignment.objects.all().filter(curriculum__id = curriculum.id, group__teacher = user.teacher)
+    assignments = models.Assignment.objects.all().filter(curriculum__in=curricula, group__teacher = user.teacher)
   else:
     return False
 

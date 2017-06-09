@@ -49,3 +49,4 @@ virtualenvwrapper==4.7.1
 wcwidth==0.1.5
 websocket-client==0.34.0
 xhtml2pdf==0.0.6
+xlwt==1.2.0

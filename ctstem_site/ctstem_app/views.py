@@ -21,6 +21,7 @@ import datetime
 from django.utils.crypto import get_random_string
 import string
 import csv
+import xlwt
 from django.db.models import Q
 from django.core.files.base import ContentFile
 from django.utils import timezone
@@ -2358,23 +2359,53 @@ def export_response(request, assignment_id='', student_id=''):
       if assignment.group.teacher != request.user.teacher:
         return http.HttpResponseNotFound('<h1>You do not have the privilege to export student responses for this assignment</h1>')
 
-    response = http.HttpResponse(content_type='text/csv')
+    response = http.HttpResponse(content_type='application/ms-excel')
     if '' != student_id:
       student = models.Student.objects.get(id=student_id)
       instances = models.AssignmentInstance.objects.all().filter(assignment=assignment, student=student)
-      response['Content-Disposition'] = 'attachment; filename="%s-%s.csv"'% (assignment, student)
+      response['Content-Disposition'] = 'attachment; filename="%s-%s.xls"'% (assignment, student)
     else:
       instances = models.AssignmentInstance.objects.all().filter(assignment=assignment)
-      response['Content-Disposition'] = 'attachment; filename="%s.csv"'%assignment
+      response['Content-Disposition'] = 'attachment; filename="%s.xls"'%assignment
 
 
-    writer = csv.writer(response)
+    wb = xlwt.Workbook(encoding='utf-8')
+    ws = wb.add_sheet('Responses')
+
+    row_num = 0
+    bold_font_style = xlwt.XFStyle()
+    bold_font_style.font.bold = True
+    font_style = xlwt.XFStyle()
+    date_format = xlwt.XFStyle()
+    date_format.num_format_str = 'mm/dd/yyyy'
+
+    ws.write(row_num, 0, 'Group', bold_font_style)
+    ws.write(row_num, 1, assignment.group.title, font_style)
+    row_num += 1
+    ws.write(row_num, 0, 'Assignment', bold_font_style)
+    ws.write(row_num, 1, assignment.curriculum.title, font_style)
+    row_num += 1
+    ws.write(row_num, 0, 'Assigned Date', bold_font_style)
+    ws.write(row_num, 1, assignment.assigned_date.replace(tzinfo=None), date_format)
+    row_num += 1
+    ws.write(row_num, 0, 'Due Date', bold_font_style)
+    ws.write(row_num, 1, assignment.due_date.replace(tzinfo=None), date_format)
+    row_num += 1
+    ws.write(row_num, 0, '')
+
+    columns = ['Student', 'Step Title', 'Question', 'Options', 'Response', ]
+    row_num += 1
+    for col_num in range(len(columns)):
+      ws.write(row_num, col_num, columns[col_num], bold_font_style)
+
+    '''writer = csv.writer(response)
     writer.writerow(['Group', assignment.group])
     writer.writerow(['Assignment', assignment])
     writer.writerow(['Assigned Date', assignment.assigned_date])
     writer.writerow(['Due Date', assignment.due_date])
     writer.writerow([])
-    writer.writerow(['Student', 'Step Title', 'Question', 'Options', 'Response'])
+    writer.writerow(['Student', 'Step Title', 'Question', 'Options', 'Response'])'''
+
     for instance in instances:
       if hasattr(request.user, 'researcher'):
         student = instance.student.user.id
@@ -2385,8 +2416,12 @@ def export_response(request, assignment_id='', student_id=''):
         questionResponses = models.QuestionResponse.objects.all().filter(step_response=stepResponse)
         for questionResponse in questionResponses:
           response_text = get_response_text(request, instance.id, questionResponse)
-          writer.writerow([student, stepResponse.step.title, smart_str(questionResponse.curriculum_question.question), smart_str(questionResponse.curriculum_question.question.options), response_text])
+          row = [student.user.get_full_name(), stepResponse.step.title, smart_str(questionResponse.curriculum_question.question), smart_str(questionResponse.curriculum_question.question.options), response_text]
+          row_num += 1
+          for col_num in range(len(row)):
+            ws.write(row_num, col_num, row[col_num], font_style)
 
+    wb.save(response)
     return response
 
   except models.Assignment.DoesNotExist:
@@ -2403,37 +2438,62 @@ def export_all_response(request, curriculum_id=''):
   # check if the user has permission to add a question
   try:
     curriculum = models.Curriculum.objects.get(id=curriculum_id)
-    if hasattr(request.user, 'administrator') == True or hasattr(request.user, 'researcher') == True:
-      assignments = models.Assignment.objects.all().filter(curriculum__id = curriculum_id)
-    elif hasattr(request.user, 'school_administrator') == True:
-      assignments = models.Assignment.objects.all().filter(curriculum__id = curriculum_id, group__teacher__school = request.user.school_administrator.school)
-    elif hasattr(request.user, 'teacher') == True:
-      assignments = models.Assignment.objects.all().filter(curriculum__id = curriculum_id, group__teacher = request.user.teacher)
-    else:
-      return http.HttpResponseNotFound('<h1>You do not have the privilege to export student response for the selected curriculum</h1>')
+    response = http.HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename="%s.xls"'%curriculum.title
+    wb = xlwt.Workbook(encoding='utf-8')
+    bold_font_style = xlwt.XFStyle()
+    bold_font_style.font.bold = True
+    font_style = xlwt.XFStyle()
+    date_format = xlwt.XFStyle()
+    date_format.num_format_str = 'mm/dd/yyyy'
+    columns = ['Group', 'Curriculum', 'Assigned Date', 'Due Date', 'Student', 'Step Title', 'Question', 'Options', 'Response']
+    font_styles = [font_style, font_style, date_format, date_format, font_style, font_style, font_style, font_style, font_style]
 
-    response = http.HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="%s.csv"'%curriculum.title
-    instances = models.AssignmentInstance.objects.all().filter(assignment__in=assignments)
+    curricula = []
 
-    writer = csv.writer(response)
-    writer.writerow(['Assignment', curriculum.title])
-    writer.writerow([])
-    if instances:
-      writer.writerow(['Group', 'Assigned Date', 'Due Date', 'Student', 'Step Title', 'Question', 'Options', 'Response'])
-      for instance in instances:
-        if hasattr(request.user, 'researcher'):
-          student = instance.student.user.id
-        else:
-          student = instance.student
-        stepResponses = models.AssignmentStepResponse.objects.all().filter(instance=instance)
-        for stepResponse in stepResponses:
-          questionResponses = models.QuestionResponse.objects.all().filter(step_response=stepResponse)
-          for questionResponse in questionResponses:
-            response_text = get_response_text(request, instance.id, questionResponse)
-            writer.writerow([instance.assignment.group, instance.assignment.assigned_date, instance.assignment.due_date, student, stepResponse.step.title, smart_str(questionResponse.curriculum_question.question), smart_str(questionResponse.curriculum_question.question.options), response_text])
+    if curriculum.curriculum_type != 'U':
+      curricula.append(curriculum)
     else:
-      writer.writerow(['There are no student response for this assignment'])
+      curricula = curriculum.underlying_curriculum.all().filter(Q(status='P')|Q(status='A'))
+
+    for curr in curricula:
+      if hasattr(request.user, 'administrator') == True or hasattr(request.user, 'researcher') == True:
+        assignments = models.Assignment.objects.all().filter(curriculum__id = curr.id)
+      elif hasattr(request.user, 'school_administrator') == True:
+        assignments = models.Assignment.objects.all().filter(curriculum__id = curr.id, group__teacher__school = request.user.school_administrator.school)
+      elif hasattr(request.user, 'teacher') == True:
+        assignments = models.Assignment.objects.all().filter(curriculum__id = curr.id, group__teacher = request.user.teacher)
+      else:
+        return http.HttpResponseNotFound('<h1>You do not have the privilege to export student response for the selected curriculum</h1>')
+
+      instances = models.AssignmentInstance.objects.all().filter(assignment__in=assignments)
+      ws = wb.add_sheet(curr.title)
+      row_num = 0
+      #write the headers
+      for col_num in range(len(columns)):
+        ws.write(row_num, col_num, columns[col_num], bold_font_style)
+
+      if instances:
+        for instance in instances:
+          if hasattr(request.user, 'researcher'):
+            student = instance.student.user.id
+          else:
+            student = instance.student.user.get_full_name()
+          stepResponses = models.AssignmentStepResponse.objects.all().filter(instance=instance)
+          print stepResponses
+          for stepResponse in stepResponses:
+            questionResponses = models.QuestionResponse.objects.all().filter(step_response=stepResponse)
+            for questionResponse in questionResponses:
+              response_text = get_response_text(request, instance.id, questionResponse)
+              row = [instance.assignment.group.title, instance.assignment.curriculum.title, instance.assignment.assigned_date.replace(tzinfo=None), instance.assignment.due_date.replace(tzinfo=None), student, stepResponse.step.title, smart_str(questionResponse.curriculum_question.question), smart_str(questionResponse.curriculum_question.question.options), response_text]
+              row_num += 1
+              for col_num in range(len(row)):
+                ws.write(row_num, col_num, row[col_num], font_styles[col_num])
+      else:
+        row_num += 1
+        ws.write(row_num, 0, 'There are no student response for this assignment', font_style)
+
+    wb.save(response)
     return response
 
   except models.Curriculum.DoesNotExist:
