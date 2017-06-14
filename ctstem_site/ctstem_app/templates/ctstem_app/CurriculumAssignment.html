@@ -1,6 +1,6 @@
 {% load ctstem_extras %}
 
-<div class="modal-dialog modal-lg">
+<div class="modal-dialog {% if curriculum.curriculum_type|slugify == 'U'|slugify %} modal-xlg {% else %} modal-lg {% endif %}">
   <div class="modal-content">
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -11,70 +11,78 @@
     <form class="form" id="curriculumAssignmentForm" method="post" action="{% url 'ctstem:assignCurriculum' curriculum.id%}">
       {% csrf_token %}
       <div class="modal-body">
-        <table class="table table-condensed table-bordered table-striped inner_table">
+        <table class="table table-condensed table-bordered inner_table">
          <thead>
             <tr>
-              <th>Group</th>
+              <th width="20%">Group</th>
               {% if user.administrator or user.researcher %}
-                <th>School</th>
+                <th width="15%">School</th>
               {% endif %}
               {% if user.administrator or user.researcher or user.school_administrator %}
-                <th>Teacher</th>
+                <th width="10%">Teacher</th>
               {% endif %}
               {% if curriculum.curriculum_type|slugify == 'U'|slugify %}
-                <th>Curriculum</th>
+                <th width="20%">Curriculum</th>
               {% endif %}
-              <th class="date">Scheduled Start Date <i class="fa fa-info-circle" aria-hidden="true" title="The date when the assignment is first available to students"></i></th>
-              <th class="date">Due Date</th>
-              <th>Clear</th>
+              <th width="15%" class="date">Scheduled Start Date <i class="fa fa-info-circle" aria-hidden="true" title="The date when the assignment is first available to students"></i></th>
+              <th width="15%" class="date">Due Date</th>
+              <th width="5%">Clear</th>
             </tr>
           </thead>
           <tbody>
             {% for group in groups %}
-              <tr>
-                <td rowspan="{{curriculum_list|length}}">{{group}}</td>
+              <tr class="unit group_{{group.id}} {% if forloop.counter|divisibleby:2 %} even {% else %} odd {% endif %}" >
+                <td rowspan="{% if curriculum_list|length > 1%} {{curriculum_list|length|add:1}} {% endif %}">{{group}}</td>
                 {% if user.administrator or user.researcher %}
-                  <td rowspan="{{curriculum_list|length}}">{{group.teacher.school}}</td>
+                  <td rowspan="{% if curriculum_list|length > 1%} {{curriculum_list|length|add:1}} {% endif %}">{{group.teacher.school}}</td>
                 {% endif %}
                 {% if user.administrator or user.researcher or user.school_administrator %}
-                  <td rowspan="{{curriculum_list|length}}">{{group.teacher}}</td>
+                  <td rowspan="{% if curriculum_list|length > 1%} {{curriculum_list|length|add:1}} {% endif %}">{{group.teacher}}</td>
                 {% endif %}
                 {% if curriculum.curriculum_type|slugify == 'U'|slugify %}
-                  <td>{{curriculum_list.first.title}}</td>
+                  <td>
+                    {{curriculum.title}}
+                    <span class="ec_lessons" id="group_{{group.id}}">
+                      <span><i class="fa fa-caret-square-o-down" aria-hidden="true"></i></span>
+                      <span style="display:none;"><i class="fa fa-caret-square-o-up" aria-hidden="true"></i></span>
+                    </span>
+                  </td>
                 {% endif %}
                 <td>
-                  <input type="text" class="datepicker assigned" id="assigned_{{group.id}}_{{curriculum_list.first.id}}" name="assigned_{{group.id}}_{{curriculum_list.first.id}}" readonly="true" />
-                  <input type="hidden" id="instance_{{group.id}}_{{curriculum_list.first.id}}" class="instance_count" value="{{instances|get_item:group.id|get_item:curriculum_list.first.id}}"/>
+                  <input type="text" class="datepicker assigned" id="assigned_{{group.id}}_{{curriculum.id}}" name="assigned_{{group.id}}_{{curriculum.id}}" readonly="true" value="{{assignment_dates|get_item:group.id|get_item:curriculum.id|get_item:'assigned_date'|date:'F j, Y'}}"/>
+
+                  <input type="hidden" id="instance_{{group.id}}_{{curriculum.id}}" class="instance_count" value="{{instances|get_item:group.id|get_item:curriculum.id}}"/>
                 </td>
                 <td>
-                  <input type="text" class="datepicker due" id="due_{{group.id}}_{{curriculum_list.first.id}}" name="due_{{group.id}}_{{curriculum_list.first.id}}" readonly="true" /></td>
+                  <input type="text" class="datepicker due" id="due_{{group.id}}_{{curriculum.id}}" name="due_{{group.id}}_{{curriculum.id}}" readonly="true" value="{{assignment_dates|get_item:group.id|get_item:curriculum.id|get_item:'due_date'|date:'F j, Y'}}"/></td>
                 <td>
-                  {% if instances|get_item:group.id|get_item:curriculum_list.first.id == 0 %}
-                    <input type="button" class="btn btn-danger clear" id="clear_{{group.id}}_{{curriculum_list.first.id}}" name="clear_{{group.id}}_{{curriculum_list.first.id}}" value="Clear"/>
+                  {% if instances|get_item:group.id|get_item:curriculum.id == 0 %}
+                    <button type="button" class="btn btn-danger clear" id="clear_{{group.id}}_{{curriculum.id}}" name="clear_{{group.id}}_{{curriculum.id}}">Clear</button>
                   {% endif %}
                 </td>
               </tr>
-              {% for curr in curriculum_list %}
-                {% if forloop.counter > 1 %}
-                <tr>
-                  {% if curriculum.curriculum_type|slugify == 'U'|slugify %}
-                    <td>{{curr.title}}</td>
-                  {% endif %}
-                  <td>
-                    <input type="text" class="datepicker assigned" id="assigned_{{group.id}}_{{curr.id}}" name="assigned_{{group.id}}_{{curr.id}}" readonly="true" />
-                    <input type="hidden" id="instance_{{group.id}}_{{curr.id}}" class="instance_count" value="{{instances|get_item:group.id|get_item:curr.id}}"/>
-                  </td>
-                  <td>
-                    <input type="text" class="datepicker due" id="due_{{group.id}}_{{curr.id}}" name="due_{{group.id}}_{{curr.id}}" readonly="true" />
-                  </td>
-                  <td>
-                    {% if instances|get_item:group.id|get_item:curr.id == 0 %}
-                      <input type="button" class="btn btn-danger clear" id="clear_{{group.id}}_{{curr.id}}" name="clear_{{group.id}}_{{curr.id}}" value="Clear"/>
+              {% if curriculum_list|length > 1 %}
+                {% for curr in curriculum_list %}
+                  <tr class="lesson group_{{group.id}} {% if forloop.parentloop.counter|divisibleby:2 %} even {% else %} odd {% endif %}">
+                    {% if curriculum.curriculum_type|slugify == 'U'|slugify %}
+                      <td style="display:none;">&nbsp;&nbsp;&nbsp;&nbsp;{{curr.title}}</td>
                     {% endif %}
-                  </td>
-                </tr>
-                {% endif %}
-              {% endfor %}
+                    <td style="display:none;">
+                      <input type="text" class="datepicker assigned" id="assigned_{{group.id}}_{{curr.id}}" name="assigned_{{group.id}}_{{curr.id}}" readonly="true" value="{{assignment_dates|get_item:group.id|get_item:curr.id|get_item:'assigned_date'|date:'F j, Y'}}"/>
+
+                      <input type="hidden" id="instance_{{group.id}}_{{curr.id}}" class="instance_count" value="{{instances|get_item:group.id|get_item:curr.id}}"/>
+                    </td>
+                    <td style="display:none;">
+                      <input type="text" class="datepicker due" id="due_{{group.id}}_{{curr.id}}" name="due_{{group.id}}_{{curr.id}}" readonly="true" value="{{assignment_dates|get_item:group.id|get_item:curr.id|get_item:'due_date'|date:'F j, Y'}}"/>
+                    </td>
+                    <td style="display:none;">
+                      {% if instances|get_item:group.id|get_item:curr.id == 0 %}
+                        <button type="button" class="btn btn-danger clear" id="clear_{{group.id}}_{{curr.id}}" name="clear_{{group.id}}_{{curr.id}}">Clear</button>
+                      {% endif %}
+                    </td>
+                  </tr>
+                {% endfor %}
+              {% endif %}
             {% endfor %}
           </tbody>
         </table>
@@ -93,11 +101,10 @@
 
 <script type="text/javascript">
   $(function(){
-
-    {% for assignment in assignments %}
+    /*{% for assignment in assignments %}
       $('input#assigned_{{assignment.group.id}}_{{assignment.curriculum.id}}').val('{{assignment.assigned_date|date:"F j, Y"}}');
       $('input#due_{{assignment.group.id}}_{{assignment.curriculum.id}}').val('{{assignment.due_date|date:"F j, Y"}}');
-    {% endfor %}
+    {% endfor %}*/
 
     $('.datepicker.due').datepicker({
       dateFormat: 'MM d, yy',
@@ -106,6 +113,11 @@
           var assigned = $(this).closest('tr').find('input.assigned');
           if($(assigned).val() == ""){
             $(assigned).datepicker('show');
+          }
+
+          var class_names = $(this).closest('tr').attr('class').split(' ');
+          if(class_names[0] == 'unit'){
+            $('tr.lesson.'+class_names[1]+' input.datepicker.due').val(selectedDate);
           }
         }
       }
@@ -130,6 +142,10 @@
               var due = $(this).closest('tr').find('input.due');
               if($(due).val() == ""){
                 $(due).datepicker('show');
+              }
+              var class_names = $(this).closest('tr').attr('class').split(' ');
+              if(class_names[0] == 'unit'){
+                $('tr.lesson.'+class_names[1]+' input.datepicker.assigned').val(selectedDate);
               }
             }
           }
@@ -162,7 +178,7 @@
       });
     });
 
-   $('td').on('click', 'input[type="button"].clear', function(){
+    $('td').on('click', 'button[type="button"].clear', function(){
       var clear = confirm('Are you sure you want to clear the assignment dates?');
       if(clear){
         var id = $(this).attr('id');
@@ -172,7 +188,15 @@
         $('#'+assigned_date_id).val('');
       }
     });
-
+    //expand/collapse the underlying lessons
+    $(".ec_lessons").click(function(){
+      var id = $(this).attr('id');
+      $(this).children().each(function(){
+        $(this).toggle();
+      });
+      $('tr.lesson.'+id).children('td').each(function(){
+        $(this).toggle();
+      });
+    });
   });
 </script>
-

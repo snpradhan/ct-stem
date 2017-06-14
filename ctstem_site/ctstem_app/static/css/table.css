@@ -190,3 +190,7 @@ table.mc_horiz_question_table  td:not(.mc_horiz_question) {
 table.table ul {
   padding-left: 1em;
 }
+
+table.table tr.odd {
+  background-color: #f9f9f9;
+}

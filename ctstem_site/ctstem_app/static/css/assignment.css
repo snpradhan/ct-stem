@@ -271,6 +271,10 @@ div.modal button.close {
   border: 0
 }
 
+div.modal-xlg {
+  width: 1024px;
+}
+
 .save-buttons {
   margin: 2rem 0;
   width: 100%;
@@ -659,6 +663,14 @@ img.image_option {
   height: 20%;
   width: 20%;
   vertical-align: top !important;
+}
+
+span.ec_lessons .fa-caret-square-o-down {
+  color: #3e8f3e;
+}
+
+span.ec_lessons .fa-caret-square-o-up{
+  color: #e38d13;
 }
 
 /* STYLES FOR NICE PRINTING */

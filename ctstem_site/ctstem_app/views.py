@@ -38,6 +38,7 @@ from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.http import JsonResponse
 from django.utils.crypto import get_random_string
+from django.db.models import Max, Min
 
 ####################################
 # HOME
@@ -531,14 +532,22 @@ def assignCurriculum(request, id=''):
       curriculum_list = models.Curriculum.objects.all().filter(id=curriculum.id)
 
     assignments = models.Assignment.objects.all().filter(curriculum__in=curriculum_list, group__in=groups)
+    assignment_dates = {}
     instances = {}
     for group in groups:
       instances[group.id] = {}
+      assignment_dates[group.id] = {}
+      if curriculum.curriculum_type == 'U':
+        dates = assignments.filter(group=group).aggregate(Min('assigned_date'), Max('due_date'))
+        assignment_dates[group.id][curriculum.id] = {'assigned_date': dates['assigned_date__min'], 'due_date': dates['due_date__max']}
+
       for curr in curriculum_list:
+        dates = assignments.filter(group=group, curriculum=curr).aggregate(Min('assigned_date'), Max('due_date'))
+        assignment_dates[group.id][curr.id] = {'assigned_date': dates['assigned_date__min'], 'due_date': dates['due_date__max']}
         instances[group.id][curr.id] = models.AssignmentInstance.objects.all().filter(assignment__curriculum=curr, assignment__group=group).count()
 
     if request.method == 'GET':
-      context = {'curriculum': curriculum, 'curriculum_list': curriculum_list, 'groups': groups, 'assignments': assignments, 'instances': instances}
+      context = {'curriculum': curriculum, 'curriculum_list': curriculum_list, 'groups': groups, 'assignments': assignments, 'instances': instances, 'assignment_dates': assignment_dates}
       return render(request, 'ctstem_app/CurriculumAssignment.html', context)
     elif request.method == 'POST':
       data = request.POST.copy()

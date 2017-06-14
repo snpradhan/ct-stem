@@ -917,6 +917,10 @@ div#profile .modal-content .modal-body div {
   margin-bottom: 0.5em;
 }
 
+div.modal-xlg {
+  width: 1024px;
+}
+
 ul#id_student-consent {
   list-style: none;
 }
@@ -1139,11 +1143,10 @@ a.selector-chooseall, a.selector-clearall {
   cursor: pointer;
 }
 
-span.ec .glyphicon-collapse-down {
+span.ec .glyphicon-collapse-down, span.ec_lessons .fa-caret-square-o-down {
   color: #3e8f3e;
 }
-
-span.ec .glyphicon-collapse-up{
+span.ec .glyphicon-collapse-up, span.ec_lessons .fa-caret-square-o-up{
   color: #e38d13;
 }
 

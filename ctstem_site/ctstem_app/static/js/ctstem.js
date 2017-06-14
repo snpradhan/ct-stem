@@ -188,7 +188,6 @@ $(function (){
     $(this).closest('.row').next('.row').toggle();
 
   });
-
   //add form-control class to ORDER fields
   $('input[id$=ORDER]').addClass('form-control');
 
