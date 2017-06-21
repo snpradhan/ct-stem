@@ -15,58 +15,80 @@
       {% include "ctstem_app/Tabs.html" with tab='group' group=group role='group_dashboard' %}
 
       {% if assignments %}
-      <table class="table table-striped table-bordered table-condensed dt" id="groups">
+      <table class="table table-bordered table-condensed dt" id="groups">
         <thead>
           <tr>
-            <th width="20%"> Assignment </th>
+            <th width="30%" colspan="2"> Assigned Curriculum </th>
             <th> Assigned Date </th>
             <th> Due Date </th>
             <th width="30%"> Status </th>
             <th width="10%"> Student Activity </th>
           </tr>
-          <tr id="filterrow">
-            <th> Assignment </th>
-            <th> Assigned Date </th>
-            <th> Due Date </th>
-            <th> Status </th>
-            <th> Student Activity </th>
-          </tr>
         </thead>
         <tbody>
-          {% for assignment in assignments %}
-            <tr height="20px;">
-              <td>
-                {{assignment.assignment.curriculum.title}}
-                <span>
-                  {% if assignment.assignment.curriculum.curriculum_type == 'L' %}
-                    <img src="/static/img/lesson.png" class="icon" alt="">
-                  {% else %}
-                    <img src="/static/img/assessment.png" class="icon" alt="">
-                  {% endif %}
-                </span>
-                <div class="controls">
-                  <a type="button" class="btn btn-warning" title="Preview Assignment" href="{% url 'ctstem:previewCurriculum' assignment.assignment.curriculum.id %}" target="_blank">
-                    <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
-                  </a>
-                </div>
-              </td>
-              <td> {{assignment.assignment.assigned_date|date}} </td>
-              <td> {{assignment.assignment.due_date|date}} </td>
-              <td>
-                <div id="chart_{{assignment.serial}}" class="chart" name="{{assignment.status}}"></div>
-              </td>
-              <td>
+          {% for curriculum, assignment_list in assignments.items %}
+            {% if curriculum.curriculum_type == 'U' %}
+              <tr style="background-color: {% if forloop.counter|divisibleby:2 %}  white; {% else %} #f9f9f9; {% endif %}">
+                <td rowspan="{{assignment_list|length}}">
+                  <label>Unit:</label>
+                  <div>{{curriculum.title}}</div>
+                  <div class="controls">
+                    <a type="button" class="btn btn-warning" title="Preview Assignment" href="{% url 'ctstem:previewCurriculum' curriculum.id %}" target="_blank">
+                      <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
+                    </a>
+                    {% if curriculum|has_response:request.user %}
+                      <a type="button" class="btn btn-info" href="{% url 'ctstem:export_all_response' curriculum.id %}" aria-label="Export Student Response" title="Export Student Response">
+                         <span class="glyphicon glyphicon-export" aria-hidden="true"></span>
+                      </a>
+                    {% endif %}
+                  </div>
+                </td>
+            {% endif %}
+            {% for assignment in assignment_list %}
+              {% if curriculum.curriculum_type == 'U'  %}
+                {% if forloop.counter > 1 %}
+                <tr style="background-color: {% if forloop.parentloop.counter|divisibleby:2 %}  white; {% else %} #f9f9f9; {% endif %}">
+                {% endif %}
+                <td>
+                  <label>Lesson:</label>
+                  <div>{{assignment.assignment.curriculum.title}}</div>
+                </td>
+              {% else %}
+                <tr style="background-color: {% if forloop.parentloop.counter|divisibleby:2 %}  white; {% else %} #f9f9f9; {% endif %}">
+                  <td colspan="2">
+                    {% if curriculum.curriculum_type == 'L' %}
+                      <label>Lesson:</label>
+                    {% elif curriculum.curriculum_type == 'A' %}
+                      <label>Assessment:</label>
+                    {% else %}
+                      <label>Survey</label>
+                    {% endif %}
+                    <div>{{curriculum.title}}</div>
 
-                  <a type="button" class="btn btn-warning" href="{% url 'ctstem:assignmentDashboard' assignment.assignment.id %}" aria-label="View Assignment Dashboard" title="View Assignment Dashboard">
-                    <img src="/static/img/dashboard.png" class="icon" />
-                  </a>
+                    <div class="controls">
+                      <a type="button" class="btn btn-warning" title="Preview Assignment" href="{% url 'ctstem:previewCurriculum' curriculum.id %}" target="_blank">
+                        <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
+                      </a>
+                    </div>
+                  </td>
+              {% endif %}
 
-                  <a type="button" class="btn btn-info" href="{% url 'ctstem:export_group_response' assignment.assignment.id %}" aria-label="Export Student Response" title="Export Student Response">
-                     <span class="glyphicon glyphicon-export" aria-hidden="true"></span>
-                  </a>
+                  <td> {{assignment.assignment.assigned_date|date}} </td>
+                  <td> {{assignment.assignment.due_date|date}} </td>
+                  <td>
+                    <div id="chart_{{assignment.serial}}" class="chart" name="{{assignment.status}}"></div>
+                  </td>
+                  <td>
+                    <a type="button" class="btn btn-warning" href="{% url 'ctstem:assignmentDashboard' assignment.assignment.id %}" aria-label="View Assignment Dashboard" title="View Assignment Dashboard">
+                      <img src="/static/img/dashboard.png" class="icon" />
+                    </a>
 
-              </td>
-            </tr>
+                    <a type="button" class="btn btn-info" href="{% url 'ctstem:export_group_response' assignment.assignment.id %}" aria-label="Export Student Response" title="Export Student Response">
+                       <span class="glyphicon glyphicon-export" aria-hidden="true"></span>
+                    </a>
+                  </td>
+                </tr>
+            {% endfor %}
           {% endfor %}
         </tbody>
       </table>

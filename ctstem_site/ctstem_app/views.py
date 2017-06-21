@@ -1860,13 +1860,16 @@ def groupDashboard(request, id=''):
       if privilege == 0:
         return http.HttpResponseNotFound('<h1>You do not have the privilege to view this group</h1>')
 
-      assignments = []
+      assignments = {}
       serial = 0
       status_map = {'N': 'New', 'P': 'In Progress', 'S': 'Submitted', 'F': 'Feedback Ready', 'A': 'Archived'}
       status_color = {'N': 'gray', 'P': 'blue', 'S': 'green', 'F': 'orange', 'A': 'black'}
+      assignment_queryset = models.Assignment.objects.all().filter(group=group)
+
       for assignment in models.Assignment.objects.all().filter(group=group):
         students = assignment.group.members.all()
         instances = models.AssignmentInstance.objects.all().filter(assignment=assignment)
+        curriculum = models.Curriculum.objects.get(id=assignment.curriculum.id)
         assignment_status = {}
         status = []
         for student in students:
@@ -1884,7 +1887,17 @@ def groupDashboard(request, id=''):
         for key, value in assignment_status.items():
           status.append({'name': status_map[key], 'y': value, 'color': status_color[key]})
         serial += 1
-        assignments.append({'assignment': assignment, 'status': status, 'serial': serial})
+
+        if curriculum.curriculum_type == 'L' and curriculum.unit is not None:
+          key = curriculum.unit
+        else:
+          key = curriculum
+
+        if key in assignments:
+          assignments[key].append({'assignment': assignment, 'status': status, 'serial': serial})
+        else:
+            assignments[key] = [{'assignment': assignment, 'status': status, 'serial': serial}]
+
       context = {'group': group, 'assignments': assignments}
       return render(request, 'ctstem_app/GroupDashboard.html', context)
 

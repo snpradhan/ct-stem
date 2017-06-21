@@ -32,12 +32,12 @@
           <tbody>
             {% for group in groups %}
               <tr class="unit group_{{group.id}} {% if forloop.counter|divisibleby:2 %} even {% else %} odd {% endif %}" >
-                <td rowspan="{% if curriculum_list|length > 1%} {{curriculum_list|length|add:1}} {% endif %}">{{group}}</td>
+                <td rowspan="{% if curriculum.curriculum_type|slugify == 'U'|slugify %} {{curriculum_list|length|add:1}} {% endif %}">{{group}}</td>
                 {% if user.administrator or user.researcher %}
-                  <td rowspan="{% if curriculum_list|length > 1%} {{curriculum_list|length|add:1}} {% endif %}">{{group.teacher.school}}</td>
+                  <td rowspan="{% if curriculum.curriculum_type|slugify == 'U'|slugify %} {{curriculum_list|length|add:1}} {% endif %}">{{group.teacher.school}}</td>
                 {% endif %}
                 {% if user.administrator or user.researcher or user.school_administrator %}
-                  <td rowspan="{% if curriculum_list|length > 1%} {{curriculum_list|length|add:1}} {% endif %}">{{group.teacher}}</td>
+                  <td rowspan="{% if curriculum.curriculum_type|slugify == 'U'|slugify %} {{curriculum_list|length|add:1}} {% endif %}">{{group.teacher}}</td>
                 {% endif %}
                 {% if curriculum.curriculum_type|slugify == 'U'|slugify %}
                   <td>
@@ -61,7 +61,7 @@
                   {% endif %}
                 </td>
               </tr>
-              {% if curriculum_list|length > 1 %}
+              {% if curriculum.curriculum_type|slugify == 'U'|slugify %}
                 {% for curr in curriculum_list %}
                   <tr class="lesson group_{{group.id}} {% if forloop.parentloop.counter|divisibleby:2 %} even {% else %} odd {% endif %}">
                     {% if curriculum.curriculum_type|slugify == 'U'|slugify %}
