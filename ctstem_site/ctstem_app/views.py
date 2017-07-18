@@ -2489,7 +2489,15 @@ def export_all_response(request, curriculum_id=''):
         return http.HttpResponseNotFound('<h1>You do not have the privilege to export student response for the selected curriculum</h1>')
 
       instances = models.AssignmentInstance.objects.all().filter(assignment__in=assignments)
-      ws = wb.add_sheet(curr.title)
+      sheet_title = curr.title
+      for ch in "[]:*?/\\":
+        if ch in curr.title:
+          sheet_title = sheet_title.replace(ch, "-")
+
+      #truncate sheet_title to 30 characters
+      sheet_title = (sheet_title[:30]) if len(sheet_title) > 30 else sheet_title
+
+      ws = wb.add_sheet(sheet_title)
       row_num = 0
       #write the headers
       for col_num in range(len(columns)):
