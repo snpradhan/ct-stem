@@ -140,12 +140,13 @@ header nav .page-link:active { background-color: white; }
 /* MAIN SECTION AND BASIC ELEMENTS */
 main {
   display: block;
-  max-width: 1200px;
+  /*max-width: 1200px;*/
+  width: 100%;
   min-width: 600px;
 }
 
 .page {
-  margin: 120px 5% 0 10%;
+  margin: 75px 7% 0 7%;
 }
 
 p {
@@ -173,7 +174,7 @@ h1 {
 h2 {
   font-size: 1.5rem;
   font-weight: 400;
-  margin: 0.5rem 0 0.5rem 0;
+  margin: 2rem 0 0.5rem 0;
 }
 
 h3 {
@@ -629,6 +630,8 @@ a.add_attachment {
   margin: 0;
   border: 1px solid #aaa;
   color: #444;
+  max-width: 100%;
+  width: 80em;
 }
 
 .standards hr {
@@ -673,6 +676,18 @@ span.ec_lessons .fa-caret-square-o-up{
   color: #e38d13;
 }
 
+div.print {
+  display: none !important;
+}
+
+notes, faq {
+  display: none;
+}
+
+div.teammates {
+  margin-bottom: 2em;
+}
+
 /* STYLES FOR NICE PRINTING */
 @media print {
   * { font-size: 13px; }
@@ -685,7 +700,7 @@ span.ec_lessons .fa-caret-square-o-up{
 
   main {
     margin-left: 0;
-    margin-top: 1in;
+    margin-top: 2em;
   }
 
   table.likert td, th { font-size: 11px; }
@@ -698,7 +713,7 @@ span.ec_lessons .fa-caret-square-o-up{
     padding: 0.7em 0.3em;
   }
 
-  .page  { margin: 0; }
+  .page  { margin: 0 1em; }
 
   .standards { font-size: 11px; }
 
@@ -717,4 +732,16 @@ span.ec_lessons .fa-caret-square-o-up{
   }
 
   footer a { color: black; }
+
+  div.print, notes {
+    display: block !important;
+  }
+
+  activity {
+    display: block !important;
+  }
+
+  div.comments, div.compatibility, div.next, div.share-box, div.utility {
+    display: none !important;
+  }
 }

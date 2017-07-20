@@ -241,6 +241,8 @@ def previewCurriculum(request, id='', step_order=-1):
         step = steps.get(order=int(step_order))
         context['step'] = step
 
+      context['steps'] = steps
+
       return render(request, 'ctstem_app/CurriculumPreview.html', context)
 
     return http.HttpResponseNotAllowed(['GET'])

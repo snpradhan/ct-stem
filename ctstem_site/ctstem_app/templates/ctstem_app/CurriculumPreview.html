@@ -62,7 +62,7 @@
     <!-- TOP HEADER BAR -->
     <header>
       <h1>CT-STEM</h1>
-      {{curr_unit.title|title}}
+      {{curr_unit.title|title}} - Preview
       <nav>
         <span id="activity-nav">
         {% if step_order|add:0 >= 0 %}
@@ -90,7 +90,7 @@
         <!-- SIDE MENU -->
         <nav id="side-nav">
           <ul>
-            <li><a href="#" class="lesson">
+            <li><a href="{% url 'ctstem:previewCurriculum'  curriculum.id %}" class="lesson">
               View
               {% if curr_unit.curriculum_type == 'U' %}
                 Unit
@@ -157,7 +157,7 @@
                 {% endif %}
               {% endif %}
             {% endif %}
-            <li><a href="javascript:window.print();">Print This Page <span class="fa fa-print "></span></a></li>
+            <li><a class="print" href="{% url 'ctstem:previewCurriculum' curr_unit.id %}">Print This Curriculum <span class="fa fa-print "></span></a></li>
             <li class="divider"></li>
             <li><a href="#" class="faq"">View CT FAQ</a></li>
             {% if user.is_anonymous %}
@@ -201,7 +201,7 @@
             </p>
 
             <!-- UTILITY BUTTONS -->
-            <div>
+            <div class="utility">
               {% if curriculum.status == 'A' or curriculum.status == 'P'%}
                 {% if user.teacher and curr_unit.curriculum_type == 'L' %}
                   {% if curr_unit.id|is_favorite:user.teacher.id %}
@@ -234,13 +234,15 @@
 
             <!-- TODO: Think about how to implement popup glossary -->
 
-            <h3>Overview</h3>
-            {{curr_unit.overview|safe}}
-            {{curr_unit.content|safe}}
+            <div class="overview">
+              <h2>Overview</h2>
+              {{curr_unit.overview|safe}}
+              {{curr_unit.content|safe}}
+            </div>
 
             <!-- TODO: Should this be in the database?? -->
-            <h3>Compatible With</h3>
             <div class="compatibility">
+              <h2>Compatible With</h2>
               {% for system in systems %}
                 <div class="compatible-item {% if system not in curr_unit.compatible_system.all %} incompatible {% endif %}">
                   <span class="fa fa-{{system.icon}}"></span><br>
@@ -250,22 +252,23 @@
             </div>
 
             <!-- WHAT'S NEXT - This is the same for every lesson so it doesn't need to be dynamic -->
-            <h3>What's Next?</h3>
-            <p>
-            <ul>
-              <li><a href="#" class="notes">Read the teacher notes</a></li>
-              {% if curr_unit.curriculum_type != 'U' %}
-                <li><a href="{% url 'ctstem:previewCurriculum'  curriculum.id 0 %}" class="activity">Look at the student activity</a></li>
-              {% endif %}
-              {% if curr_unit.curriculum_type == 'L' or curr_unit|get_underlying_curriculum:request.user|get_curriculum_count:'P' > 0 %}
-                <li><a href="#" class="assign" data-form="{% url 'ctstem:assignCurriculum' curr_unit.id %}">Assign this to {% if user.teacher %}my{% endif %} classes</a></li>
-              {% endif %}
-            </ul>
-            </p>
+            <div class="next">
+              <h2>What's Next?</h2>
+              <ul>
+                <li><a href="#" class="notes">Read the teacher notes</a></li>
+                {% if curr_unit.curriculum_type != 'U' %}
+                  <li><a href="{% url 'ctstem:previewCurriculum'  curriculum.id 0 %}" class="activity">Look at the student activity</a></li>
+                {% endif %}
+                {% if curr_unit.curriculum_type == 'L' or curr_unit|get_underlying_curriculum:request.user|get_curriculum_count:'P' > 0 %}
+                  <li><a href="#" class="assign" data-form="{% url 'ctstem:assignCurriculum' curr_unit.id %}">Assign this to {% if user.teacher %}my{% endif %} classes</a></li>
+                {% endif %}
+              </ul>
+            </div>
+
 
             <!-- STANDARDS BOX -->
             <!-- TODO: Figure out how to make the links work. Not sure what they should like to?? -->
-            <h3>Standards</h3>
+            <h2>Standards</h2>
             <div class="standards">
               {% for standard, categories in curr_unit.taxonomy.all|taxonomyHelper %}
                 <b>{{standard}}</b>
@@ -287,32 +290,45 @@
 
             <!-- FACEBOOK MESSAGE BOARD -->
             <div class="comments">
-              <h3>Comments, Feedback, and Quesitons</h3>
+              <h2>Comments, Feedback, and Quesitons</h2>
               <div class="fb-comments"  data-width="600" data-numposts="5"></div>
             </div>
           </div>
         </lesson-summary>
 
-        <notes style="display:none;">
+        <notes>
           <div class="page">
-            <h1>{{curr_unit.title|title}}</h1>
+          {% if user.administrator or user.researcher or user.school_administrator or user.author or user.teacher %}
             <h2>Teacher Notes</h2>
-
             {{curr_unit.teacher_notes|safe}}
+          {% endif %}
           </div>
         </notes>
 
-        <faq style="display:none;">
+        <faq>
           <div class="page">
-            <h1>CT-STEM FAQ</h1>
+            <h2>CT-STEM FAQ</h2>
           </div>
         </faq>
       {% endif %}
 
       {% if step_order >= 0 %}
         <activity>
-          {% include 'ctstem_app/CurriculumActivityPreview.html' %}
+          {% include 'ctstem_app/CurriculumActivityPreview.html' with step=step %}
         </activity>
+      {% endif %}
+
+      {% if user.administrator or user.researcher or user.school_administrator or user.author or user.teacher %}
+        {% if step_order|add:0 < 0 %}
+        <div class="page print">
+          <h2> Activities </h2>
+          {% for st in steps %}
+            <activity>
+              {% include 'ctstem_app/CurriculumActivityPreview.html' with step=st %}
+            </activity>
+          {% endfor %}
+        </div>
+        {% endif %}
       {% endif %}
 
     </main>
@@ -472,6 +488,23 @@
         {% endif %}
         return false;
       });
+
+      $("body").on("click", 'a.print', function(e){
+        e.preventDefault();
+        var url = $(this).attr('href');
+        var W = window.open(url, "Print", "height=10, width=10");
+        setTimeout(function () {
+          W.window.print();
+        }, 500);
+        W.window.onfocus = function() {
+          setTimeout(function() {
+              W.window.close();
+            }, 500);
+        }
+
+
+      });
+
     });
   </script>
 {% endwith %}
