@@ -495,11 +495,11 @@
         var W = window.open(url, "Print", "height=10, width=10");
         setTimeout(function () {
           W.window.print();
-        }, 500);
+        }, 3000);
         W.window.onfocus = function() {
           setTimeout(function() {
               W.window.close();
-            }, 500);
+            }, 3000);
         }
 
 
