@@ -2302,11 +2302,11 @@ def feedback(request, assignment_id='', instance_id=''):
         return http.HttpResponseNotFound('<h1>You do not have the privilege to provide feedback on this assignment</h1>')
 
       feedback, created = models.AssignmentFeedback.objects.get_or_create(instance=instance)
-      stepResponses = models.AssignmentStepResponse.objects.all().filter(instance=instance)
+      stepResponses = models.AssignmentStepResponse.objects.all().filter(instance=instance).order_by('step__order')
       for stepResponse in stepResponses:
         stepFeeback, created = models.StepFeedback.objects.get_or_create(assignment_feedback=feedback, step_response=stepResponse)
 
-        questionResponses = models.QuestionResponse.objects.all().filter(step_response=stepResponse)
+        questionResponses = models.QuestionResponse.objects.all().filter(step_response=stepResponse).order_by('curriculum_question__order')
         for questionResponse in questionResponses:
           questionFeedback, created = models.QuestionFeedback.objects.get_or_create(step_feedback=stepFeeback, response=questionResponse)
 
