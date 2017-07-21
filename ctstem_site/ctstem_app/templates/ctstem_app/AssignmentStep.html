@@ -190,12 +190,27 @@
                         {% elif field_type == 'DD' %}
                           <select class="form-control assignment_input" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}">
                             {% for option in questionObj.options|splitlines%}
-                              {% if option == questionForm.response.value %}
+                              {% if option|slugify == questionForm.response.value|slugify %}
                                 <option value="{{option}}" selected>{{option}}</option>
                               {% else %}
                                 <option value="{{option}}">{{option}}</option>
                               {% endif %}
                             {% endfor %}
+                            <!-- the OTHER option -->
+                            {% with options=questionObj.options|splitlines%}
+                            {% if questionForm.response.value %}
+                              {% if questionForm.response.value|is_in:options %}
+                                <option value="{{option}}" class="other">Other</option>
+                                <input type="text" placeholder="Enter your response" class="form-control assignment_input other" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="" disabled/>
+                              {% else %}
+                                <option value="{{option}}" selected class="other">Other</option>
+                                <input type="text" placeholder="Enter your response" class="form-control assignment_input other" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{questionForm.response.value}}"/>
+                              {% endif %}
+                            {% else %}
+                              <option value="{{option}}" class="other">Other</option>
+                              <input type="text" placeholder="Enter your response" class="form-control assignment_input other" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{questionForm.response.value}}" disabled/>
+                            {% endif %}
+                            {% endwith %}
                           </select>
                         {% elif field_type == 'MC' %}
                           <div class="assignment_input" tabindex="-1">
@@ -206,6 +221,21 @@
                                 <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}" />  {{option}}<br>
                               {% endif %}
                             {% endfor %}
+                            <!-- the OTHER option -->
+                            {% with options=questionObj.options|splitlines%}
+                            {% if questionForm.response.value %}
+                              {% if questionForm.response.value|is_in:options %}
+                                <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}" class="other" />  Other<br>
+                                <input type="text" placeholder="Enter your response" class="form-control assignment_input other" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="" disabled/>
+                              {% else %}
+                                <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}" checked="true" class="other"/>  Other<br>
+                                <input type="text" placeholder="Enter your response" class="form-control assignment_input other" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{questionForm.response.value}}"/>
+                              {% endif %}
+                            {% else %}
+                              <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}" class="other" />  Other<br>
+                              <input type="text" placeholder="Enter your response" class="form-control assignment_input other" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{questionForm.response.value}}" disabled/>
+                            {% endif %}
+                            {% endwith %}
                           </div>
                         {% elif field_type == 'MI' %}
                           <div class="assignment_input" tabindex="-1">
@@ -492,6 +522,30 @@
           $(this).closest('tr').hide();
           $("ul.messages li").remove();
           $("ul.messages").html('<li class="warning">Click the Save button below to Delete the uploaded files</li>');
+        }
+      });
+
+      //hide disabled Other text field
+      $('input[type="radio"]').on('change', function(){
+        if($(this).is(':checked')){
+          if($(this).hasClass('other')){
+            $(this).siblings('input[type="text"]').prop('disabled', false);
+          }
+          else{
+            $(this).siblings('input[type="text"]').prop('disabled', true);
+            $(this).siblings('input[type="text"]').val('');
+          }
+        }
+      });
+
+      $('select.assignment_input').on('change', function(){
+        var selected = $(this).find('option:selected');
+        if($(selected).hasClass('other')){
+          $(this).siblings('input[type="text"]').prop('disabled', false);
+        }
+        else{
+          $(this).siblings('input[type="text"]').prop('disabled', true);
+          $(this).siblings('input[type="text"]').val('');
         }
       });
     });

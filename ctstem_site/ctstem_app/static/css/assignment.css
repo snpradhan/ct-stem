@@ -363,6 +363,10 @@ div.data-graph {
 .canvasjs-chart-credit { display: none; }
 
 /* FORM ELEMENTS */
+select {
+  width: auto !important;
+  min-width: 20em;
+}
 textarea {
   width: 100%;
   height: 8rem !important;
@@ -376,6 +380,13 @@ input[type="text"] {
   height: 2rem;
   background-color: #fffffa;
   font-size: 0.8rem;
+}
+
+input[type="text"]:disabled {
+  display: none;
+}
+input[type="text"].other {
+  margin-top: 1em;
 }
 
 .mc-options {

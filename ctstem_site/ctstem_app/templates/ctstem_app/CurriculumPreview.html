@@ -501,8 +501,29 @@
               W.window.close();
             }, 3000);
         }
+      });
+      //hide disabled Other text field
+      $('input[type="radio"]').on('change', function(){
+        if($(this).is(':checked')){
+          if($(this).hasClass('other')){
+            $(this).siblings('input[type="text"]').prop('disabled', false);
+          }
+          else{
+            $(this).siblings('input[type="text"]').prop('disabled', true);
+            $(this).siblings('input[type="text"]').val('');
+          }
+        }
+      });
 
-
+      $('select.assignment_input').on('change', function(){
+        var selected = $(this).find('option:selected');
+        if($(selected).hasClass('other')){
+          $(this).siblings('input[type="text"]').prop('disabled', false);
+        }
+        else{
+          $(this).siblings('input[type="text"]').prop('disabled', true);
+          $(this).siblings('input[type="text"]').val('');
+        }
       });
 
     });
