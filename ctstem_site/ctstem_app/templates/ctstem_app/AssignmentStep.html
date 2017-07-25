@@ -80,9 +80,9 @@
             Please do the best that you can, and don't worry if you don't know all of the answers.
           {% elif curriculum.curriculum_type == 'L' %}
             {% if curriculum.unit %}
-              {{curriculum.unit.overview|safe}}
+              {{curriculum.unit.student_overview|safe}}
             {% else %}
-              {{curriculum.overview|safe}}
+              {{curriculum.student_overview|safe}}
             {% endif %}
           {% endif %}
           {% if attachments %}

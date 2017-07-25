@@ -12,7 +12,11 @@
         Thank you for taking this assessment!
         Please do the best that you can, and don't worry if you don't know all of the answers.
       {% elif curriculum.curriculum_type == 'L' %}
-        {{curriculum.overview|safe}}
+        {% if curriculum.unit %}
+          {{curriculum.unit.student_overview|safe}}
+        {% else %}
+          {{curriculum.student_overview|safe}}
+        {% endif %}
       {% endif %}
     {% if attachments %}
       <div>
