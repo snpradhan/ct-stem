@@ -475,6 +475,9 @@ ul.messages {
   top: 45px;
 }
 
+div.help {
+  font-size: 1em;
+}
 div.question_response_feedback {
   margin: 1em 0;
   padding: 1em 2em;
@@ -678,6 +681,10 @@ img.image_option {
   width: 20%;
   vertical-align: top !important;
 }
+img.popup_image {
+  width: 100%;
+  height: auto;
+}
 
 span.ec_lessons .fa-caret-square-o-down {
   color: #3e8f3e;
@@ -698,6 +705,7 @@ notes, faq {
 div.teammates {
   margin-bottom: 2em;
 }
+
 
 /* STYLES FOR NICE PRINTING */
 @media print {

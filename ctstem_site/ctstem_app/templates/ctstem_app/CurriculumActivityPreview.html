@@ -83,10 +83,11 @@
                       <input type="text" placeholder="Enter your response" class="form-control assignment_input" name="{{question.id}}_mc" id="{{question.id}}_mc" disabled/>
 
                     {% elif field_type == 'MI' %}
+                      <div class="help warning">You may click the images below to view a larger version</div>
                       {% for option in question.options|splitlines%}
                         <input type="radio" name="{{question.id}}_mi" id="{{question.id}}_mi" value="{{option}}"/>
                         <span>{{forloop.counter0|get_ascii_char}}.</span>
-                        <img src="{{option}}" class="image_option"/><br><br>
+                        <a data-toggle="modal" data-target="#imageModal" data-href="{{option}}" class="image_option"><img src="{{option}}" class="image_option"/></a><br><br>
                       {% endfor %}
                     {% elif field_type == 'MS' %}
                       {% for option in question.options|splitlines%}

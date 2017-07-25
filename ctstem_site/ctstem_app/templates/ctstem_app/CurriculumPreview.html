@@ -365,6 +365,17 @@
 
   <div>
     <div class="modal fade" id="assignmentModal" role="dialog"></div>
+
+    <div class="modal fade" id="imageModal" role="dialog">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+          </div>
+          <img src="" class="popup_image"/>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script type="text/javascript">
@@ -535,6 +546,13 @@
           $(this).siblings('input[type="text"]').prop('disabled', true);
           $(this).siblings('input[type="text"]').val('');
         }
+      });
+
+      $('a.image_option').click(function(){
+        var url = $(this).data("href");
+        $('#imageModal').find('img.popup_image').attr('src', url);
+        $('#imageModal').modal('show');
+        return false;
       });
 
     });

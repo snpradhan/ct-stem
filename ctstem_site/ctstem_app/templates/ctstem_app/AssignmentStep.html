@@ -246,7 +246,7 @@
                                 <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}"/>
                               {% endif %}
                               <span>{{forloop.counter0|get_ascii_char}}.</span>
-                              <img src="{{option}}" class="image_option"/><br><br>
+                               <a data-toggle="modal" data-target="#imageModal" data-href="{{option}}" class="image_option"><img src="{{option}}" class="image_option"/></a><br><br>
                             {% endfor %}
                           </div>
                         {% elif field_type == 'MS' %}
@@ -421,6 +421,17 @@
         </form>
       {% endif %}
     </div>
+    <div class="modal fade" id="imageModal" role="dialog">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+          </div>
+          <img src="" class="popup_image"/>
+        </div>
+      </div>
+    </div>
+
   </main>
   <!-- FOOTER -->
   <footer>
@@ -548,6 +559,14 @@
           $(this).siblings('input[type="text"]').val('');
         }
       });
+
+      $('a.image_option').click(function(){
+        var url = $(this).data("href");
+        $('#imageModal').find('img.popup_image').attr('src', url);
+        $('#imageModal').modal('show');
+        return false;
+      });
+
     });
 
     function waitForSave(URL){
