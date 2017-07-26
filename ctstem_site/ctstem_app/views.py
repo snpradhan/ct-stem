@@ -2402,6 +2402,8 @@ def export_response(request, assignment_id='', student_id=''):
     font_style = xlwt.XFStyle()
     date_format = xlwt.XFStyle()
     date_format.num_format_str = 'mm/dd/yyyy'
+    date_time_format = xlwt.XFStyle()
+    date_time_format.num_format_str = 'mm/dd/yyyy hh:mm AM/PM'
 
     ws.write(row_num, 0, 'Group', bold_font_style)
     ws.write(row_num, 1, assignment.group.title, font_style)
@@ -2417,7 +2419,9 @@ def export_response(request, assignment_id='', student_id=''):
     row_num += 1
     ws.write(row_num, 0, '')
 
-    columns = ['Student', 'Step Title', 'Question', 'Options', 'Response', ]
+    columns = ['Student', 'Step No.', 'Step Title', 'Question No.', 'Question', 'Options', 'Correct Answer', 'Student Response', 'Submission DateTime']
+    font_styles = [font_style, font_style, font_style, font_style, font_style, font_style, font_style, font_style, date_time_format]
+
     row_num += 1
     for col_num in range(len(columns)):
       ws.write(row_num, col_num, columns[col_num], bold_font_style)
@@ -2440,10 +2444,18 @@ def export_response(request, assignment_id='', student_id=''):
         questionResponses = models.QuestionResponse.objects.all().filter(step_response=stepResponse)
         for questionResponse in questionResponses:
           response_text = get_response_text(request, instance.id, questionResponse)
-          row = [student.user.get_full_name(), stepResponse.step.title, smart_str(questionResponse.curriculum_question.question), smart_str(questionResponse.curriculum_question.question.options), response_text]
+          row = [student.user.get_full_name(),
+                 stepResponse.step.order,
+                 stepResponse.step.title,
+                 questionResponse.curriculum_question.order,
+                 smart_str(questionResponse.curriculum_question.question),
+                 smart_str(questionResponse.curriculum_question.question.options),
+                 smart_str(questionResponse.curriculum_question.question.answer),
+                 response_text,
+                 questionResponse.modified_date.replace(tzinfo=None)]
           row_num += 1
           for col_num in range(len(row)):
-            ws.write(row_num, col_num, row[col_num], font_style)
+            ws.write(row_num, col_num, row[col_num], font_styles[col_num])
 
     wb.save(response)
     return response
@@ -2470,8 +2482,11 @@ def export_all_response(request, curriculum_id=''):
     font_style = xlwt.XFStyle()
     date_format = xlwt.XFStyle()
     date_format.num_format_str = 'mm/dd/yyyy'
-    columns = ['Group', 'Curriculum', 'Assigned Date', 'Due Date', 'Student', 'Step Title', 'Question', 'Options', 'Response']
-    font_styles = [font_style, font_style, date_format, date_format, font_style, font_style, font_style, font_style, font_style]
+    date_time_format = xlwt.XFStyle()
+    date_time_format.num_format_str = 'mm/dd/yyyy hh:mm AM/PM'
+
+    columns = ['Group', 'Curriculum', 'Assigned Date', 'Due Date', 'Student', 'Step No.', 'Step Title', 'Question No.', 'Question', 'Options', 'Correct Answer', 'Student Response', 'Submission DateTime']
+    font_styles = [font_style, font_style, date_format, date_format, font_style, font_style, font_style, font_style, font_style, font_style, font_style, font_style, date_time_format]
 
     curricula = []
 
@@ -2517,7 +2532,19 @@ def export_all_response(request, curriculum_id=''):
             questionResponses = models.QuestionResponse.objects.all().filter(step_response=stepResponse)
             for questionResponse in questionResponses:
               response_text = get_response_text(request, instance.id, questionResponse)
-              row = [instance.assignment.group.title, instance.assignment.curriculum.title, instance.assignment.assigned_date.replace(tzinfo=None), instance.assignment.due_date.replace(tzinfo=None), student, stepResponse.step.title, smart_str(questionResponse.curriculum_question.question), smart_str(questionResponse.curriculum_question.question.options), response_text]
+              row = [instance.assignment.group.title,
+                     instance.assignment.curriculum.title,
+                     instance.assignment.assigned_date.replace(tzinfo=None),
+                     instance.assignment.due_date.replace(tzinfo=None),
+                     student,
+                     stepResponse.step.order,
+                     stepResponse.step.title,
+                     questionResponse.curriculum_question.order,
+                     smart_str(questionResponse.curriculum_question.question),
+                     smart_str(questionResponse.curriculum_question.question.options),
+                     smart_str(questionResponse.curriculum_question.question.answer),
+                     response_text,
+                     questionResponse.modified_date.replace(tzinfo=None)]
               row_num += 1
               for col_num in range(len(row)):
                 ws.write(row_num, col_num, row[col_num], font_styles[col_num])
