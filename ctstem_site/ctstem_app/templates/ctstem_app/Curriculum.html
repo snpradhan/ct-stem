@@ -276,8 +276,14 @@
               <table class="table table-striped table-condensed table-bordered question inner_table">
                 <thead>
                   <tr>
-                    <th>Q#.</th>
+                    <th>Q No.</th>
                     <th style="width:70%;">Question</th>
+                    <th>
+                      Referenced By
+                      <span data-toggle="tooltip" data-placement="top" title="Provide a comma separated list of Step Numbers that will reference this question. This question will be available on those steps as readonly.">
+                        <i class="fa fa-info-circle" aria-hidden="true"></i>
+                      </span>
+                    </th>
                     <th>Delete/Edit</th>
                   </tr>
                 </thead>
@@ -297,6 +303,7 @@
                           <div></div>
                         {% endif %}
                       </td>
+                      <td>{{questionForm.referenced_by}}</td>
                       <td class="question_edit">
                         <button type="button" class="btn btn-danger delete_question" name="delete_question" aria-label="Delete Question" title="Delete Question">
                           <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>

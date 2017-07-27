@@ -156,8 +156,12 @@ function dtmAddColumnAllHeaders(selector, colHeaders, rowHeaders, editFlag) {
 /*
  * Load existing data in the data table
  */
-function loadDataTable(status){
+function loadDataTable(assignmentStatus){
   $('div.dt_input').each(function(){
+    var status = assignmentStatus;
+    if($(this).hasClass('closed')){
+      status = false;
+    }
     var divId = $(this).attr('id');
     var tableId = $(this).children('table:first').attr('id');
     //get row data

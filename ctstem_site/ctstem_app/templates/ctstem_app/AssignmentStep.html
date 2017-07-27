@@ -121,7 +121,71 @@
               <hr>
             {% endif %}
           </div>
+          <div class="referenced_question_container">
+          {% if form.instance.step|get_referenced_questions:form.instance.instance %}
+            {% with referenced_questions=form.instance.step|get_referenced_questions:form.instance.instance %}
+              <h3> Referenced Questions </h3>
+              <div class="help">These questions were answered in the previous steps.  They are provided here for your reference.</div>
+              {% for question, response in referenced_questions %}
+              {% with field_type=question.answer_field_type %}
+                <div class="referenced_question_response {% if forloop.counter|divisibleby:2 %} even {% else %} odd {% endif %}">
+                  <div class="question">
+                    <label>Question:</label>
+                    <div class="text">
+                      {{question.question_text|inline_style|safe}}
+                    </div>
+                  </div>
+                  <div class="response">
+                    <label>Response:</label>
+                    <div class="readonly text">
+                      {% if field_type == 'FI' %}
+                        <div class="file">
+                          Uploaded file(s):
+                          {% for response_file in response.response_file.all %}
+                            {% if response_file.file %}
+                              <div>
+                                <a href="{{response_file.file.url}}" target="_blank"><span class="glyphicon glyphicon-file" aria-hidden="true">{{response_file.file}}</span>
+                                </a>
+                              </div>
+                            {% endif %}
+                          {% endfor %}
+                        </div>
+                      {% elif field_type == 'MI' %}
+                        <img src="{{response.response}}" class="image_option"/><br>
+                      {% elif field_type == 'SK' %}
+                        <canvas id="{{response.id}}_sketch" width="900" height="500" class="assignment_sketch" style="{% if question.sketch_background %} background: url({{question.sketch_background.url}}) no-repeat;{% endif %}"></canvas>
+                        <input type="hidden" name="{{response.id}}_sketch_input" id="{{response.id}}_sketch_input" value='{{response.response}}'/>
+                      {% elif field_type == 'DT' %}
+                        <div class="assignment_input dt_input closed" id="dt_input_{{forloop.counter}}">
+                          <input type="hidden" name="{{response.id}}_dt_input" id="{{response.id}}_dt_input" value='{{response.response}}'/>
+                          <input type="hidden" name="column_headers" id="dt_col_headers_{{forloop.counter}}" value="{{question.options}}"/>
+                          <table class="table table-condensed table-bordered inner_table" id="dt_table_{{forloop.counter}}">
+                            <thead>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                          </table>
+                        </div>
+                      {% else %}
+                        <div>
+                          {{response.response}}
+                        </div>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+                {% if forloop.last == False %}
+                  <hr class="light">
+                {% endif %}
+              {% endwith %}
+              {% endfor %}
+            {% endwith %}
+            <hr>
+          {% endif %}
+          </div>
           <div class="question_container">
+            <h3>Step Questions</h3>
+            <div class="help">Please answer the questions below.</div>
             {{formset.management_form}}
             <div class="question_table">
               {% for questionForm in formset %}
@@ -129,7 +193,6 @@
                 {% with field_type=questionObj.answer_field_type %}
                 {% if field_type != 'MH' %}
                   <div class="question_response_feedback {% if forloop.counter|divisibleby:2 %} even {% else %} odd {% endif %}">
-
                     <div class="question">
                       <label>Question:</label>
                       <div class="text">
@@ -183,6 +246,7 @@
                         </div>
                       <!-- New and In Progress assignment -->
                       {% else %}
+                        <div class="text">
                         {% if field_type == 'TA' %}
                           <textarea placeholder="Enter your response" class="form-control assignment_textarea assignment_input" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" >{{questionForm.response.value}}</textarea>
                         {% elif field_type == 'TF' %}
@@ -322,6 +386,7 @@
                             </table>
                           </div>
                         {% endif %}
+                      </div>
                       {% endif %}
                     </div>
 

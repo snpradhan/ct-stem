@@ -50,7 +50,31 @@
           <hr>
         {% endif %}
       </div>
+      <div class="referenced_question_container">
+      {% if step|get_referenced_questions %}
+        {% with referenced_questions=step|get_referenced_questions %}
+          <h3> Referenced Questions </h3>
+          <div class="help">These questions were answered in the previous steps.  They are provided here for your reference.</div>
+          {% for question in referenced_questions %}
+            <div class="referenced_question_response {% if forloop.counter|divisibleby:2 %} even {% else %} odd {% endif %}">
+              <div class="question">
+                <label>Question:</label>
+                <div class="text">
+                  {{question.question_text|inline_style|safe}}
+                </div>
+              </div>
+            </div>
+            {% if forloop.last == False %}
+              <hr class="light">
+            {% endif %}
+          {% endfor %}
+        {% endwith %}
+        <hr>
+      {% endif %}
+      </div>
       <div class="question_container">
+        <h3>Step Questions</h3>
+        <div class="help">Please answer the questions below.</div>
         <div class="question_table">
           {% for curriculumquestion in step.curriculumquestion_set.all %}
             {% with question=curriculumquestion.question %}
@@ -63,9 +87,7 @@
                     {{question|safe}}
                   </div>
                 </div>
-
                 <div class="response">
-                  <label>Response:</label>
                   <div class="text">
                     {% if field_type == 'TA' %}
                       <textarea placeholder="Enter your response" class="form-control assignment_textarea" name="{{forloop.counter}}" id="{{forloop.counter}}" ></textarea>

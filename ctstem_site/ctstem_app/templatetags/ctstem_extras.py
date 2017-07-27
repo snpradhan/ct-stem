@@ -258,3 +258,26 @@ def get_underlying_curriculum(curriculum, user):
 @register.filter
 def get_curriculum_count(queryset, status):
   return queryset.filter(status=status).count()
+
+@register.filter
+def get_referenced_questions(step, instance=False):
+  step_order = step.order
+  curriculum = step.curriculum
+  curriculum_questions = models.CurriculumQuestion.objects.all().filter(step__in=curriculum.steps.all(), referenced_by__isnull=False, step__order__lt=step_order).order_by('step__order', 'order')
+  referenced_question = []
+  for curr_question in curriculum_questions:
+    if curr_question.referenced_by:
+      referenced_by = map(int, curr_question.referenced_by.split(','))
+      if step_order in referenced_by:
+        if instance:
+          #get the response for the question
+          response = models.QuestionResponse.objects.get(curriculum_question=curr_question, step_response__instance=instance)
+          referenced_question.append((curr_question.question, response))
+        else:
+          referenced_question.append(curr_question.question)
+
+  if referenced_question:
+    return referenced_question
+  else:
+    return False
+
