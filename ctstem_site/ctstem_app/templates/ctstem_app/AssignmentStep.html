@@ -76,15 +76,19 @@
             Thanks for taking this survey about computational thinking!
             There are no right or wrong answers to these questions, we just want to know what you think.
           {% elif curriculum.curriculum_type == 'A' %}
+            {% if curriculum.student_overview %}
+              {{curriculum.student_overview|safe}}
+            {% endif %}
             Thank you for taking this assessment!
             Please do the best that you can, and don't worry if you don't know all of the answers.
           {% elif curriculum.curriculum_type == 'L' %}
-            {% if curriculum.unit %}
-              {{curriculum.unit.student_overview|safe}}
-            {% else %}
+            {% if curriculum.student_overview %}
               {{curriculum.student_overview|safe}}
+            {% elif curriculum.unit and curriculum.unit.student_overview %}
+              {{curriculum.unit.student_overview|safe}}
             {% endif %}
           {% endif %}
+
           {% if attachments %}
             <div>You will need additional resources to complete this assignment.  Please download them from this link <a href="{% url 'ctstem:downloadAttachments' curriculum.id%}" target="_blank">Download Attachment(s) <span class="fa fa-paperclip"></span></a></div>
           {% endif %}

@@ -288,6 +288,14 @@
               {% endfor %}
             </div>
 
+            <!-- ACKNOWLEDGEMENT -->
+            {% if curr_unit.acknowledgement %}
+              <h2>Acknowledgement</h2>
+              <div class="acknowledgement">
+                {{curr_unit.acknowledgement|safe}}
+              </div>
+            {% endif %}
+
             <!-- FACEBOOK MESSAGE BOARD -->
             <div class="comments">
               <h2>Comments, Feedback, and Questions</h2>
@@ -329,6 +337,13 @@
                   {% include 'ctstem_app/CurriculumActivityPreview.html' with step=st %}
                 </activity>
               {% endfor %}
+              <!-- ACKNOWLEDGEMENT -->
+              {% if curr.acknowledgement %}
+                <h2>Acknowledgement</h2>
+                <div class="acknowledgement">
+                  {{curr.acknowledgement|safe}}
+                </div>
+              {% endif %}
             {% endfor %}
           {% else %}
             <h2> {{curr_unit.title|title}} Activities </h2>

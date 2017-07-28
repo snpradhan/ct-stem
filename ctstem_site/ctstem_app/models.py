@@ -145,6 +145,7 @@ class Curriculum (models.Model):
   icon = models.ImageField(upload_to=upload_file_to, blank=True, help_text='Upload 400x289 png image that represents this curriculum')
   shared_with = models.ManyToManyField('Teacher', null=True, blank=True, help_text='Select teachers to share this curriculum with before it is published.' )
   unit = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, related_name="underlying_curriculum", help_text="Select a unit if this lesson is part of one")
+  acknowledgement = RichTextUploadingField(null=True, blank=True)
 
   class Meta:
       ordering = ['-id']
