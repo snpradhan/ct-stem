@@ -73,8 +73,10 @@
       {% endif %}
       </div>
       <div class="question_container">
-        <h3>Step Questions</h3>
-        <div class="help">Please answer the questions below.</div>
+        {% if step.curriculumquestion_set.all|length > 0 %}
+          <h3>Step Questions</h3>
+          <div class="help">Please answer the questions below.</div>
+        {% endif %}
         <div class="question_table">
           {% for curriculumquestion in step.curriculumquestion_set.all %}
             {% with question=curriculumquestion.question %}

@@ -151,7 +151,9 @@
                           {% endfor %}
                         </div>
                       {% elif field_type == 'MI' %}
-                        <img src="{{response.response}}" class="image_option"/><br>
+                        <a data-toggle="modal" data-target="#imageModal" data-href="{{response.response}}" class="image_option">
+                          <img src="{{response.response}}" class="image_option"/>
+                        </a><br>
                       {% elif field_type == 'SK' %}
                         <canvas id="{{response.id}}_sketch" width="900" height="500" class="assignment_sketch" style="{% if question.sketch_background %} background: url({{question.sketch_background.url}}) no-repeat;{% endif %}"></canvas>
                         <input type="hidden" name="{{response.id}}_sketch_input" id="{{response.id}}_sketch_input" value='{{response.response}}'/>
@@ -184,9 +186,11 @@
           {% endif %}
           </div>
           <div class="question_container">
-            <h3>Step Questions</h3>
-            <div class="help">Please answer the questions below.</div>
             {{formset.management_form}}
+            {% if formset|length > 0 %}
+              <h3>Step Questions</h3>
+              <div class="help">Please answer the questions below.</div>
+            {% endif %}
             <div class="question_table">
               {% for questionForm in formset %}
                 {% with questionObj=questionForm.curriculum_question.value|get_curriculum_question %}
@@ -223,7 +227,9 @@
                             {% endfor %}
                             </div>
                           {% elif field_type == 'MI' %}
-                            <img src="{{questionForm.response.value}}" class="image_option"/><br>
+                            <a data-toggle="modal" data-target="#imageModal" data-href="{{questionForm.response.value}}" class="image_option">
+                              <img src="{{questionForm.response.value}}" class="image_option"/>
+                            </a><br>
                           {% elif field_type == 'SK' %}
                             <canvas id="{{questionForm.response.auto_id}}_sketch" width="900" height="500" class="assignment_sketch" style="{% if questionObj.sketch_background %} background: url({{questionObj.sketch_background.url}}) no-repeat;{% endif %}"></canvas>
                             <input type="hidden" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value='{{questionForm.response.value}}'/>
