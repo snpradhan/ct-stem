@@ -178,7 +178,14 @@
                                 {% if user.administrator or user.researcher or user.author %}
                                   <td>{{ curr.get_status_display }}</td>
                                 {% endif %}
-                                <td> {{curr.author.get_full_name}}</td>
+                                <td>
+                                {% for author in curr.authors.all %}
+                                  {{author.get_full_name}}
+                                  {% if forloop.last == False %}
+                                    ,
+                                  {% endif %}
+                                {% endfor %}
+                                </td>
                                 <td class="action">
                                   {% include "ctstem_app/CurriculaActions.html" with curriculum=curr %}
                                 </td>
