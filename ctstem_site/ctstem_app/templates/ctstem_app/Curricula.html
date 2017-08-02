@@ -136,9 +136,14 @@
                       </div>
                     {% endif %}
                     <div class="row">
-                      <div class="col-md-2 title">Author:</div>
+                      <div class="col-md-2 title">Author(s):</div>
                       <div class="col-md-10">
-                        {{curriculum.author.get_full_name}}
+                        {% for author in curriculum.authors.all %}
+                          {{author.get_full_name}}
+                          {% if forloop.last == False %}
+                            ,
+                          {% endif %}
+                        {% endfor %}
                       </div>
                     </div>
                     {% if curriculum.curriculum_type == 'U' and curriculum|get_underlying_curriculum:user %}

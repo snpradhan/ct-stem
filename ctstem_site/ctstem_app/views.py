@@ -399,7 +399,7 @@ def copyCurriculum(request, id=''):
 
           original_curriculum = models.Curriculum.objects.get(id=id)
           curriculum.title = title
-          curriculum.author = request.user
+          curriculum.authors = original_curriculum.authors.all()
           curriculum.created_date = datetime.datetime.now()
           curriculum.modified_date = datetime.datetime.now()
           curriculum.parent = original_curriculum
@@ -1096,15 +1096,17 @@ def deleteUser(request, id=''):
 # authored by this user to an admin
 ####################################
 def transferCurriculum(request, user):
-  curricula = models.Curriculum.objects.all().filter(author=user)
+  curricula = models.Curriculum.objects.all().filter(authors__in=[user])
   flag = True
   if len(curricula) > 0:
     #get an admin to transfer the curriculum ownership to
     admin = models.Administrator.objects.all().order_by('user__date_joined')[0]
     if admin:
       for curriculum in curricula:
-        curriculum.author = admin.user
-        curriculum.save()
+        # if the curriculum has only one author, set the author to an admin
+        if curriculum.authors.count() == 1:
+          curriculum.authors.add(admin.user)
+          curriculum.save()
       messages.success(request, 'Curriculum owned by %s has been trasferred to %s' % (user.username, admin.user.username))
     else:
       messages.success(request, 'No admins exists to transfer ownership of curriculum authored by %s. So the user cannot be deleted.' % user.username)

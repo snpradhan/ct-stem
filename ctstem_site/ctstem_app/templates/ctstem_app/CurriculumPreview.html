@@ -180,7 +180,13 @@
             <div class="byline">
               <!-- TODO: Need author URL field in database -->
               <!-- TODO: Byline might also say "Curriculum adapted from XYZ" -->
-              Original curriculum by <a href="#">{{curriculum.author.get_full_name}}</a>
+              Original curriculum by
+              {% for author in curriculum.authors.all %}
+                <a href="#">{{author.get_full_name}}</a>
+                {% if forloop.last == False %}
+                  ,
+                {% endif %}
+              {% endfor %}
 
               <!-- SOCIAL MEDIA SHARE BUTTONS -->
               <!-- TODO: Activate social media buttons -->
