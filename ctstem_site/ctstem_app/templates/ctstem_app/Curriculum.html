@@ -519,6 +519,12 @@
 
       $('select#id_curriculum-unit').bind('change', (function(){
         $('select#id_curriculum-curriculum_type').trigger('change');
+        if($('select#id_curriculum-unit').val() != '') {
+          $('#id_curriculum-order').closest('.form-group').show();
+        }
+        else{
+          $('#id_curriculum-order').closest('.form-group').hide();
+        }
       }));
       $('select#id_curriculum-unit').trigger('change');
 

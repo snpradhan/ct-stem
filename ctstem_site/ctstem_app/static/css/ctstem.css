@@ -1150,7 +1150,7 @@ span.ec .glyphicon-collapse-up, span.ec_lessons .fa-caret-square-o-up{
   color: #e38d13;
 }
 
-.order input[type='number'] {
+.order input[type='number'], input[type='number'].order {
   width: 5em;
 }
 /*************************************/

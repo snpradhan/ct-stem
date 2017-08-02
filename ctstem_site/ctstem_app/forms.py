@@ -324,7 +324,7 @@ class CurriculumForm(ModelForm):
 
   class Meta:
     model = models.Curriculum
-    fields = ['curriculum_type', 'unit', 'authors', 'title', 'icon', 'time', 'level', 'purpose', 'overview', 'student_overview', 'acknowledgement', 'status', 'subject', 'compatible_system', 'taxonomy', 'content', 'teacher_notes', 'shared_with']
+    fields = ['curriculum_type', 'unit', 'authors', 'order', 'title', 'icon', 'time', 'level', 'purpose', 'overview', 'student_overview', 'acknowledgement', 'status', 'subject', 'compatible_system', 'taxonomy', 'content', 'teacher_notes', 'shared_with']
 
     widgets = {
       'title': forms.TextInput(attrs={'placeholder': 'Lesson Title'}),
@@ -347,6 +347,7 @@ class CurriculumForm(ModelForm):
     super(CurriculumForm, self).__init__(*args, **kwargs)
     forms.ModelForm.__init__(self, *args, **kwargs)
     self.fields['taxonomy'].label = "Standards"
+    self.fields['order'].label = "Lesson Order"
     self.fields['authors'].choices = [(user.pk, user.get_full_name()) for user in models.User.objects.all().filter(Q(administrator__isnull=False) | Q(researcher__isnull=False) | Q(author__isnull=False)).order_by('first_name', 'last_name')]
     self.fields['unit'].queryset = models.Curriculum.objects.filter(curriculum_type='U')
 
@@ -354,7 +355,10 @@ class CurriculumForm(ModelForm):
       self.fields['curriculum_type'].widget.attrs['disabled'] = True
 
     for field_name, field in self.fields.items():
-      field.widget.attrs['class'] = 'form-control'
+      if field_name == 'order':
+        field.widget.attrs['class'] = 'form-control order'
+      else:
+        field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['placeholder'] = field.help_text
 
   def is_valid(self):
