@@ -352,7 +352,6 @@ class CurriculumForm(ModelForm):
 
     if self.instance.id:
       self.fields['curriculum_type'].widget.attrs['disabled'] = True
-      self.fields['unit'].widget.attrs['disabled'] = True
 
     for field_name, field in self.fields.items():
       field.widget.attrs['class'] = 'form-control'
