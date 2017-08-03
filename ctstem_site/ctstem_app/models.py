@@ -147,7 +147,7 @@ class Curriculum (models.Model):
   shared_with = models.ManyToManyField('Teacher', null=True, blank=True, help_text='Select teachers to share this curriculum with before it is published.' )
   unit = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, related_name="underlying_curriculum", help_text="Select a unit if this lesson is part of one")
   acknowledgement = RichTextUploadingField(null=True, blank=True)
-  order = models.IntegerField(null=True)
+  order = models.IntegerField(null=True, blank=True)
 
   class Meta:
       ordering = ['-id']
