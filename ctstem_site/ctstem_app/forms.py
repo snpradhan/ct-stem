@@ -803,6 +803,22 @@ class AssignmentInstanceForm(ModelForm):
       field.widget.attrs['class'] = 'form-control'
       if field.help_text:
         field.widget.attrs['placeholder'] = field.help_text
+
+####################################
+# AssignmentStepResponse Form
+####################################
+class AssignmentNotesForm(ModelForm):
+  class Meta:
+    model = models.AssignmentNotes
+    exclude = ('instance',)
+
+  def __init__(self, *args, **kwargs):
+    super(AssignmentNotesForm, self).__init__(*args, **kwargs)
+    for field_name, field in self.fields.items():
+      field.widget.attrs['class'] = 'form-control'
+      if field.help_text:
+        field.widget.attrs['placeholder'] = field.help_text
+
 ####################################
 # AssignmentStepResponse Form
 ####################################

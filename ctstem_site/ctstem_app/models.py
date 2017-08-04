@@ -435,6 +435,12 @@ class AssignmentInstance(models.Model):
   class Meta:
     unique_together = ('assignment', 'student')
 
+#######################################################
+# Assignment Notes Model
+#######################################################
+class AssignmentNotes(models.Model):
+  instance = models.OneToOneField(AssignmentInstance, unique=True, null=False, related_name="notes")
+  note = models.TextField(null=True, blank=True)
 
 #######################################################
 # Assignment Step Response Model

@@ -2132,6 +2132,12 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
           for curriculumQuestion in curriculumQuestions:
             initial_data.append({'curriculum_question': curriculumQuestion.id, 'response': ''})
 
+        #get notes
+        try:
+          notes = models.AssignmentNotes.objects.get(instance=instance)
+        except models.AssignmentNotes.DoesNotExist:
+          notes = models.AssignmentNotes(instance=instance)
+
         if 'GET' == request.method:
           #get the assignment step
           form = forms.AssignmentStepResponseForm(instance=assignmentStepResponse, prefix="step_response")
@@ -2147,13 +2153,15 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
           else:
             instanceform = None
 
+          notesform = forms.AssignmentNotesForm(instance=notes, prefix="notes")
+
           if len(initial_data):
             for subform, data in zip(formset.forms, initial_data):
               subform.initial = data
 
           if instance.status == 'N' or instance.status == 'P':
             instance.save()
-          context = {'curriculum': curriculum, 'instance': instance, 'instanceform': instanceform, 'form': form, 'formset': formset, 'total_steps': total_steps, 'step_order': step_order}
+          context = {'curriculum': curriculum, 'instance': instance, 'instanceform': instanceform, 'notesform': notesform, 'form': form, 'formset': formset, 'total_steps': total_steps, 'step_order': step_order}
           return render(request, 'ctstem_app/AssignmentStep.html', context)
 
         elif 'POST' == request.method:
@@ -2172,6 +2180,8 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
             instanceform = forms.AssignmentInstanceForm(data=data, assignment=assignment, instance=instance, prefix="teammates")
           else:
             instanceform = None
+
+          notesform = forms.AssignmentNotesForm(data=data, instance=notes, prefix="notes")
 
           if form.is_valid() and formset.is_valid():
             if save_only == 1 or step.order < total_steps:
@@ -2197,6 +2207,10 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
 
             if instanceform and instanceform.is_valid():
               instanceform.save()
+
+            #save notes form
+            if notesform.is_valid():
+              notesform.save()
 
             #save assignment step response
             assignmentStepResponse = form.save(commit=False)
@@ -2258,7 +2272,7 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
 
             messages.error(request, 'Please answer all the questions on this step before continuing on to the next step')
 
-          context = {'curriculum': curriculum, 'instance': instance, 'instanceform': instanceform,  'form': form, 'formset': formset, 'total_steps': total_steps, 'step_order': step_order}
+          context = {'curriculum': curriculum, 'instance': instance, 'instanceform': instanceform, 'notesform': notesform, 'form': form, 'formset': formset, 'total_steps': total_steps, 'step_order': step_order}
           return render(request, 'ctstem_app/AssignmentStep.html', context)
 
     return http.HttpResponseNotAllowed(['GET', 'POST'])

@@ -79,127 +79,133 @@
         {% if step.curriculumquestion_set.all|length > 0 %}
           <h3>Step Questions</h3>
           <div class="help">Please answer the questions below.</div>
-        {% endif %}
-        <div class="question_table">
-          {% for curriculumquestion in step.curriculumquestion_set.all %}
-            {% with question=curriculumquestion.question %}
-            {% with field_type=question.answer_field_type %}
-            {% if field_type != 'MH' %}
-              <div class="question_response_feedback {% if forloop.counter|divisibleby:2 %} even {% else %} odd {% endif %}">
-                <div class="question">
-                  <label>Question:</label>
-                  <div class="text">
-                    {{question|safe}}
+          <div class="question_table">
+            {% for curriculumquestion in step.curriculumquestion_set.all %}
+              {% with question=curriculumquestion.question %}
+              {% with field_type=question.answer_field_type %}
+              {% if field_type != 'MH' %}
+                <div class="question_response_feedback {% if forloop.counter|divisibleby:2 %} even {% else %} odd {% endif %}">
+                  <div class="question">
+                    <label>Question:</label>
+                    <div class="text">
+                      {{question|safe}}
+                    </div>
                   </div>
-                </div>
-                <div class="response">
-                  <div class="text">
-                    {% if field_type == 'TA' %}
-                      <textarea placeholder="Enter your response" class="form-control assignment_textarea" name="{{forloop.counter}}" id="{{forloop.counter}}" ></textarea>
-                    {% elif field_type == 'TF' %}
-                      <input type="text" placeholder="Enter your response" class="form-control" name="{{forloop.counter}}" id="{{forloop.counter}}"/>
-                    {% elif field_type == 'DD' %}
-                      <select class="form-control assignment_input" name="{{forloop.counter}}" id="{{forloop.counter}}">
+                  <div class="response">
+                    <div class="text">
+                      {% if field_type == 'TA' %}
+                        <textarea placeholder="Enter your response" class="form-control assignment_textarea" name="{{forloop.counter}}" id="{{forloop.counter}}" ></textarea>
+                      {% elif field_type == 'TF' %}
+                        <input type="text" placeholder="Enter your response" class="form-control" name="{{forloop.counter}}" id="{{forloop.counter}}"/>
+                      {% elif field_type == 'DD' %}
+                        <select class="form-control assignment_input" name="{{forloop.counter}}" id="{{forloop.counter}}">
+                          {% for option in question.options|splitlines%}
+                          <option value="{{option}}">{{option}}</option>
+                          {% endfor %}
+                          <option value="{{option}}" class="other">Other</option>
+                          <input type="text" placeholder="Enter your response" class="form-control assignment_input other" disabled/>
+                        </select>
+                      {% elif field_type == 'MC' %}
                         {% for option in question.options|splitlines%}
-                        <option value="{{option}}">{{option}}</option>
+                          <input type="radio" name="{{question.id}}_mc" id="{{question.id}}_mc" value="{{option}}" />  {{option}}<br>
                         {% endfor %}
-                        <option value="{{option}}" class="other">Other</option>
-                        <input type="text" placeholder="Enter your response" class="form-control assignment_input other" disabled/>
-                      </select>
-                    {% elif field_type == 'MC' %}
-                      {% for option in question.options|splitlines%}
-                        <input type="radio" name="{{question.id}}_mc" id="{{question.id}}_mc" value="{{option}}" />  {{option}}<br>
-                      {% endfor %}
-                      <input type="radio" name="{{question.id}}_mc" id="{{question.id}}_mc" value="{{option}}" class="other" />  Other<br>
-                      <input type="text" placeholder="Enter your response" class="form-control assignment_input" name="{{question.id}}_mc" id="{{question.id}}_mc" disabled/>
+                        <input type="radio" name="{{question.id}}_mc" id="{{question.id}}_mc" value="{{option}}" class="other" />  Other<br>
+                        <input type="text" placeholder="Enter your response" class="form-control assignment_input" name="{{question.id}}_mc" id="{{question.id}}_mc" disabled/>
 
-                    {% elif field_type == 'MI' %}
-                      <div class="help warning">You may click the images below to view a larger version</div>
-                      {% for option in question.options|splitlines%}
-                        <input type="radio" name="{{question.id}}_mi" id="{{question.id}}_mi" value="{{option}}"/>
-                        <span>{{forloop.counter0|get_ascii_char}}.</span>
-                        <a data-toggle="modal" data-target="#imageModal" data-href="{{option}}" class="image_option"><img src="{{option}}" class="image_option"/></a><br><br>
-                      {% endfor %}
-                    {% elif field_type == 'MS' %}
-                      {% for option in question.options|splitlines%}
-                        <input type="checkbox" name="{{question.id}}_cb" id="{{question.id}}_cb" value="{{option}}"/>  {{option}}<br>
-                      {% endfor %}
-                    {% elif field_type == 'FI' %}
-                      <div>
-                        <table class="table table-striped table-condensed table-bordered inner_table collapsible_content">
-                          <thead>
-                            <tr>
-                              <th>File</th>
-                              <th>Delete</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr>
-                              <td class="attached_file">
-                                <input type="file"/>
-                              </td>
-                              <td class="attachment_edit">
-                                <button type="button" class="delete_attachment" name="delete_attachment" aria-label="Delete Attachment" title="Delete Attachment">
-                                  <i class="fa fa-trash" aria-hidden="true"></i>
-                                </button>
-                              </td>
-                            </tr>
+                      {% elif field_type == 'MI' %}
+                        <div class="help warning">You may click the images below to view a larger version</div>
+                        {% for option in question.options|splitlines%}
+                          <input type="radio" name="{{question.id}}_mi" id="{{question.id}}_mi" value="{{option}}"/>
+                          <span>{{forloop.counter0|get_ascii_char}}.</span>
+                          <a data-toggle="modal" data-target="#imageModal" data-href="{{option}}" class="image_option"><img src="{{option}}" class="image_option"/></a><br><br>
+                        {% endfor %}
+                      {% elif field_type == 'MS' %}
+                        {% for option in question.options|splitlines%}
+                          <input type="checkbox" name="{{question.id}}_cb" id="{{question.id}}_cb" value="{{option}}"/>  {{option}}<br>
+                        {% endfor %}
+                      {% elif field_type == 'FI' %}
+                        <div>
+                          <table class="table table-striped table-condensed table-bordered inner_table collapsible_content">
+                            <thead>
+                              <tr>
+                                <th>File</th>
+                                <th>Delete</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <td class="attached_file">
+                                  <input type="file"/>
+                                </td>
+                                <td class="attachment_edit">
+                                  <button type="button" class="delete_attachment" name="delete_attachment" aria-label="Delete Attachment" title="Delete Attachment">
+                                    <i class="fa fa-trash" aria-hidden="true"></i>
+                                  </button>
+                                </td>
+                              </tr>
 
-                          </tbody>
-                        </table>
-                        <button type="button" class="add_attachment" id="form-response_file" title="Add New Attachment">
-                          Upload more
-                        </button>
-                      </div>
-                    {% elif field_type == 'SK' %}
-                      <div class="note"> Note: Draw your sketch in the sketchpad below </div>
-                      <div id="{{question.id}}_sketch_tools" class="sketch_tools"></div>
-                      <canvas id="{{question.id}}_sketch" width="900" height="500" class="assignment_sketch" style="{% if question.sketch_background %} background: url({{question.sketch_background.url}}) no-repeat;{% endif %}"></canvas>
-                    {% elif field_type == 'DT' %}
-                      <div class="assignment_input dt_input" id="dt_input_{{forloop.counter}}">
-                        <input type="hidden" name="dt_response_{{forloop.counter}}" id="dt_response_{{forloop.counter}}" value=''/>
-                        <input type="hidden" name="column_headers" id="dt_col_headers_{{forloop.counter}}" value="{{question.options}}"/>
-                        <table class="table table-condensed table-bordered inner_table" id="dt_table_{{forloop.counter}}">
-                          <thead>
-                          </thead>
-                          <tbody>
-                          </tbody>
-                        </table>
-                      </div>
-                    {% endif %}
+                            </tbody>
+                          </table>
+                          <button type="button" class="add_attachment" id="form-response_file" title="Add New Attachment">
+                            Upload more
+                          </button>
+                        </div>
+                      {% elif field_type == 'SK' %}
+                        <div class="note"> Note: Draw your sketch in the sketchpad below </div>
+                        <div id="{{question.id}}_sketch_tools" class="sketch_tools"></div>
+                        <canvas id="{{question.id}}_sketch" width="900" height="500" class="assignment_sketch" style="{% if question.sketch_background %} background: url({{question.sketch_background.url}}) no-repeat;{% endif %}"></canvas>
+                      {% elif field_type == 'DT' %}
+                        <div class="assignment_input dt_input" id="dt_input_{{forloop.counter}}">
+                          <input type="hidden" name="dt_response_{{forloop.counter}}" id="dt_response_{{forloop.counter}}" value=''/>
+                          <input type="hidden" name="column_headers" id="dt_col_headers_{{forloop.counter}}" value="{{question.options}}"/>
+                          <table class="table table-condensed table-bordered inner_table" id="dt_table_{{forloop.counter}}">
+                            <thead>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                          </table>
+                        </div>
+                      {% endif %}
+                    </div>
                   </div>
                 </div>
-              </div>
-            {% if forloop.last %}
-              <hr>
-            {% else %}
-              <hr class="light">
-            {% endif %}
-            {% else %}
-              <table class="likert">
-                <tbody>
-                  <tr class="likert-item">
-                    <td class="likert-number">
-                      {{forloop.counter}}.
-                    </td>
-                    <td class="likert-prompt">
-                      {{question.question_text|inline_style|safe}}
-                    </td>
-                    {% for option in question.options|splitlines%}
-                    <td class="likert-option">
-                      <input type="radio" name="{{question.id}}_s" id="{{question.id}}_s" value="{{option}}" />
-                    </td>
-                    {% endfor %}
-                  </tr>
-                </tbody>
-              </table>
-            {% endif %}
-            {% endwith %}
-            {% endwith %}
-          {% endfor %}
-        </div>
+                {% if forloop.last == False %}
+                  <hr class="light">
+                {% endif %}
+              {% else %}
+                <table class="likert">
+                  <tbody>
+                    <tr class="likert-item">
+                      <td class="likert-number">
+                        {{forloop.counter}}.
+                      </td>
+                      <td class="likert-prompt">
+                        {{question.question_text|inline_style|safe}}
+                      </td>
+                      {% for option in question.options|splitlines%}
+                      <td class="likert-option">
+                        <input type="radio" name="{{question.id}}_s" id="{{question.id}}_s" value="{{option}}" />
+                      </td>
+                      {% endfor %}
+                    </tr>
+                  </tbody>
+                </table>
+              {% endif %}
+              {% endwith %}
+              {% endwith %}
+            {% endfor %}
+          </div>
+          <hr>
+        {% endif %}
       </div>
-
+      {% if curriculum.curriculum_type != 'S' %}
+        <div>
+          <h3>Notes</h3>
+          <div class="help">You may enter notes below.</div>
+          <textarea class="form-control assignment_textarea" name="notes" id="id_notes" ></textarea>
+          <hr>
+        </div>
+      {% endif %}
       <div class="save-buttons">
         {% if step_order|add:0 > 0 %}
           <a href="{% url 'ctstem:previewCurriculum'  curriculum.id step_order|add:'-1' %}">
