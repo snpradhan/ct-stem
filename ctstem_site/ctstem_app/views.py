@@ -89,7 +89,7 @@ def team(request):
 ####################################
 # Curricula TABLE VIEW
 ####################################
-def curricula(request, curriculum_type='', bookmark='0'):
+def curricula(request, curriculum_type='', status='published', bookmark='0'):
   if curriculum_type == 'assessments':
     curr_type = ['A', 'S']
     curriculum_type = 'A'
@@ -103,22 +103,31 @@ def curricula(request, curriculum_type='', bookmark='0'):
     curr_type = ['S']
     curriculum_type = 'S'
 
+  if status == 'draft':
+    stat = 'D'
+  elif status == 'archived':
+    stat = 'A'
+  else:
+    stat = 'P'
+
   bookmarked = None
 
   if hasattr(request.user, 'administrator') or hasattr(request.user, 'researcher') or hasattr(request.user, 'author'):
-    curricula = models.Curriculum.objects.all().filter(curriculum_type__in = curr_type).order_by('id')
+    curricula = models.Curriculum.objects.all().filter(curriculum_type__in = curr_type, status = stat).order_by('title')
   elif hasattr(request.user, 'teacher'):
     if bookmark == '1':
-      curricula = models.Curriculum.objects.all().filter(curriculum_type__in = curr_type, status='P', bookmarked__teacher=request.user.teacher).order_by('id')
+      curricula = models.Curriculum.objects.all().filter(curriculum_type__in = curr_type, status='P', bookmarked__teacher=request.user.teacher).order_by('title')
       bookmarked = curricula
     else:
-      curricula = models.Curriculum.objects.all().filter(Q(curriculum_type__in = curr_type), Q(status='P') | Q(shared_with=request.user.teacher)).order_by('id')
+      curricula = models.Curriculum.objects.all().filter(Q(curriculum_type__in = curr_type), Q(status='P') | Q(shared_with=request.user.teacher)).order_by('title')
       bookmarked = curricula.filter(bookmarked__teacher=request.user.teacher)
+    status = 'published'
   else:
-    curricula = models.Curriculum.objects.all().filter(curriculum_type__in = curr_type, status='P').order_by('id')
+    curricula = models.Curriculum.objects.all().filter(curriculum_type__in = curr_type, status='P').order_by('title')
+    status = 'published'
 
   curricula = curricula.filter(unit__isnull=True)
-  context = {'curricula': curricula, 'curriculum_type': curriculum_type, 'bookmark': bookmark, 'bookmarked': bookmarked}
+  context = {'curricula': curricula, 'curriculum_type': curriculum_type, 'bookmark': bookmark, 'bookmarked': bookmarked, 'status': status}
   return render(request, 'ctstem_app/Curricula.html', context)
 
 
