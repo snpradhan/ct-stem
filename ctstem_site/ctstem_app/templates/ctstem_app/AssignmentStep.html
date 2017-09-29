@@ -196,13 +196,25 @@
               <div class="help">Please answer the questions below.</div>
               <div class="question_table">
                 {% for questionForm in formset %}
-                  {% with questionObj=questionForm.curriculum_question.value|get_curriculum_question %}
+                  {% with questionObj=questionForm.curriculum_question.value|get_question %}
                   {% with field_type=questionObj.answer_field_type %}
                   {% if field_type != 'MH' %}
                     <div class="question_response_feedback {% if forloop.counter|divisibleby:2 %} even {% else %} odd {% endif %}">
                       <div class="question">
-                        <label>Question:</label>
+                        <label>
+                          Question
+                          {% with curriculum_question=questionForm.curriculum_question.value|get_curriculum_question %}
+                          {% if curriculum_question.optional %}
+                            <span class="optional">(optional)</span>
+                          {% else %}
+                            <span class="mandatory">*</span>
+                          {% endif %}
+                          {% endwith %}
+                          :
+                        </label>
+
                         <div class="text">
+                          {{questionObj.optional}}
                           {{questionForm.id}}
                           {{questionObj.question_text|inline_style|safe}}
                           {{questionForm.curriculum_question.as_hidden}}

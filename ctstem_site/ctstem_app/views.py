@@ -2279,7 +2279,7 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
               print 'subform error', f.errors
               print 'subform non field error', f.non_field_errors
 
-            messages.error(request, 'Please answer all the questions on this step before continuing on to the next step')
+            messages.error(request, 'Please answer all non-optional questions on this step before continuing on to the next step')
 
           context = {'curriculum': curriculum, 'instance': instance, 'instanceform': instanceform, 'notesform': notesform, 'form': form, 'formset': formset, 'total_steps': total_steps, 'step_order': step_order}
           return render(request, 'ctstem_app/AssignmentStep.html', context)

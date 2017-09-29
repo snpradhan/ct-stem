@@ -1234,3 +1234,10 @@ span.bulk_actions select#subaction{
   display: none;
   vertical-align: middle;
 }
+
+span.optional {
+  font-style: italic;
+}
+span.mandatory {
+  color: red;
+}

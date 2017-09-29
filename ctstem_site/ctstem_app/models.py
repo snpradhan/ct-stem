@@ -186,6 +186,7 @@ class CurriculumQuestion(models.Model):
   step = models.ForeignKey(Step, null=True)
   order = models.IntegerField(null=True)
   referenced_by = models.CharField(null=True, blank=True, max_length=256)
+  optional = models.BooleanField(default=False)
 
   def __unicode__(self):
       return u'%s' % (self.question.question_text)

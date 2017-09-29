@@ -247,6 +247,13 @@ img.preview {
   margin-bottom: 2em;
 }
 
+span.optional {
+  font-style: italic;
+}
+span.mandatory {
+  color: red;
+}
+
 div.modal td, div.modal th {
   font-family: "Roboto Slab", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
   font-size: 0.8rem !important;

@@ -86,7 +86,15 @@
               {% if field_type != 'MH' %}
                 <div class="question_response_feedback {% if forloop.counter|divisibleby:2 %} even {% else %} odd {% endif %}">
                   <div class="question">
-                    <label>Question:</label>
+                    <label>
+                      Question
+                      {% if curriculumquestion.optional %}
+                        <span class="optional">(optional)</span>
+                      {% else %}
+                        <span class="mandatory">*</span>
+                      {% endif %}
+                      :
+                    </label>
                     <div class="text">
                       {{question|safe}}
                     </div>

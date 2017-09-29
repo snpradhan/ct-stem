@@ -194,3 +194,18 @@ table.table ul {
 table.table tr.odd {
   background-color: #f9f9f9;
 }
+table.table.question th.order {
+  width: 5%;
+}
+table.table.question th.question_text {
+  width: 65%;
+}
+table.table.question th.referenced_by {
+  width: 10%;
+}
+table.table.question th.optional {
+  width: 5%;
+}
+table.table.question td.optional, table.table.question td.question_edit {
+  text-align: center;
+}

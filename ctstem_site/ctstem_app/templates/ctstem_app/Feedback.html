@@ -69,7 +69,15 @@
                 {{question.id}}
                 <div class="col-md-8">
                   <div>
-                    <label>Question: </label>
+                    <label>
+                      Question:
+                      {% if question.instance.response.curriculum_question.optional %}
+                        <span class="optional">(optional)</span>
+                      {% else %}
+                        <span class="mandatory">*</span>
+                      {% endif %}
+                      :
+                    </label>
                     <div class="question"> {{question.instance.response.curriculum_question.question|safe}}</div>
                   </div>
                   <div>
