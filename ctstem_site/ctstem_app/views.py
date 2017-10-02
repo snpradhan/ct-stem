@@ -395,73 +395,21 @@ def copyCurriculum(request, id=''):
     else:
       if request.method == 'GET' or request.method == 'POST':
         if '' != id:
-          curriculum = models.Curriculum.objects.get(id=id)
-          steps = models.Step.objects.all().filter(curriculum=curriculum)
-          attachments = models.Attachment.objects.all().filter(curriculum=curriculum)
-          title = curriculum.title
-          curriculum.title = str(datetime.datetime.now())
-          curriculum.slug = slugify(curriculum.title)
-          curriculum.pk = None
-          curriculum.id = None
-          curriculum.icon = None
-          curriculum.save()
-
           original_curriculum = models.Curriculum.objects.get(id=id)
-          curriculum.title = title
-          curriculum.authors = original_curriculum.authors.all()
-          curriculum.created_date = datetime.datetime.now()
-          curriculum.modified_date = datetime.datetime.now()
-          curriculum.parent = original_curriculum
-          curriculum.status = 'D'
-          curriculum.version = int(original_curriculum.version) + 1
-          curriculum.slug = slugify(curriculum.title) + '-v%s'%curriculum.version + '-%s'%curriculum.id
-          curriculum.subject = original_curriculum.subject.all()
-          curriculum.taxonomy = original_curriculum.taxonomy.all()
-
-          if original_curriculum.icon:
-            source = original_curriculum.icon
-            filecontent = ContentFile(source.file.read())
-            filename = os.path.split(source.file.name)[-1]
-            filename_array = filename.split('.')
-            new_filename = filename_array[0] + '-' + str(curriculum.id) + '.' + filename_array[1]
-            curriculum.icon.save(new_filename, filecontent)
-            curriculum.save()
-            source.file.close()
-            original_curriculum.icon.save(filename, filecontent)
-            original_curriculum.save()
+          # non unit copy
+          if original_curriculum.curriculum_type != 'U':
+            new_curriculum = copyCurriculumMeta(request, id)
+            copyCurriculumSteps(request, original_curriculum, new_curriculum)
           else:
-            curriculum.save()
-
-          for attachment in attachments:
-            source = attachment.file_object
-            filecontent = ContentFile(source.file.read())
-            filename = os.path.split(source.file.name)[-1]
-            filename_array = filename.split('.')
-            filename = filename_array[0] + '-' + str(curriculum.id) + '.' + filename_array[1]
-            attachment.pk = None
-            attachment.id = None
-            attachment.curriculum = curriculum
-            attachment.file_object.save(filename, filecontent)
-            attachment.save()
-            source.file.close()
-
-          for step in steps:
-              step_questions = models.CurriculumQuestion.objects.all().filter(step=step)
-              step.pk = None
-              step.id = None
-              step.curriculum = curriculum
-              step.save()
-              for step_question in step_questions:
-                  question = step_question.question
-                  question.id = None
-                  question.pk = None
-                  question.save()
-
-                  step_question.id = None
-                  step_question.pk = None
-                  step_question.question = question
-                  step_question.step = step
-                  step_question.save()
+            #unit copy
+            #copy unit metadata
+            new_unit = copyCurriculumMeta(request, id)
+            #copy underlying lessons
+            for lesson in original_curriculum.underlying_curriculum.all():
+              new_lesson = copyCurriculumMeta(request, lesson.id)
+              copyCurriculumSteps(request, lesson, new_lesson)
+              new_lesson.unit = new_unit
+              new_lesson.save()
 
           messages.success(request, "A new copy of %s created.  Please archive the original curriculum" % original_curriculum.title)
           return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
@@ -469,6 +417,87 @@ def copyCurriculum(request, id=''):
 
   except models.Curriculum.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested curriculum not found</h1>')
+
+@login_required
+def copyCurriculumMeta(request, id=''):
+  if '' != id:
+    curriculum = models.Curriculum.objects.get(id=id)
+    steps = models.Step.objects.all().filter(curriculum=curriculum)
+    attachments = models.Attachment.objects.all().filter(curriculum=curriculum)
+    title = curriculum.title
+    curriculum.title = str(datetime.datetime.now())
+    curriculum.slug = slugify(curriculum.title)
+    curriculum.pk = None
+    curriculum.id = None
+    curriculum.icon = None
+    curriculum.save()
+
+    original_curriculum = models.Curriculum.objects.get(id=id)
+    curriculum.title = title
+    curriculum.authors = original_curriculum.authors.all()
+    curriculum.created_date = datetime.datetime.now()
+    curriculum.modified_date = datetime.datetime.now()
+    curriculum.parent = original_curriculum
+    curriculum.status = 'D'
+    curriculum.version = int(original_curriculum.version) + 1
+    curriculum.slug = slugify(curriculum.title) + '-v%s'%curriculum.version + '-%s'%curriculum.id
+    curriculum.subject = original_curriculum.subject.all()
+    curriculum.taxonomy = original_curriculum.taxonomy.all()
+
+    if original_curriculum.icon:
+      source = original_curriculum.icon
+      filecontent = ContentFile(source.file.read())
+      filename = os.path.split(source.file.name)[-1]
+      filename_array = filename.split('.')
+      new_filename = filename_array[0] + '-' + str(curriculum.id) + '.' + filename_array[1]
+      curriculum.icon.save(new_filename, filecontent)
+      curriculum.save()
+      source.file.close()
+      original_curriculum.icon.save(filename, filecontent)
+      original_curriculum.save()
+    else:
+      curriculum.save()
+
+    for attachment in attachments:
+      source = attachment.file_object
+      filecontent = ContentFile(source.file.read())
+      filename = os.path.split(source.file.name)[-1]
+      filename_array = filename.split('.')
+      filename = filename_array[0] + '-' + str(curriculum.id) + '.' + filename_array[1]
+      attachment.pk = None
+      attachment.id = None
+      attachment.curriculum = curriculum
+      attachment.file_object.save(filename, filecontent)
+      attachment.save()
+      source.file.close()
+
+    return curriculum
+  else:
+    return None
+
+@login_required
+def copyCurriculumSteps(request, original_curriculum, new_curriculum):
+
+  steps = models.Step.objects.all().filter(curriculum=original_curriculum)
+
+  for step in steps:
+    step_questions = models.CurriculumQuestion.objects.all().filter(step=step)
+    step.pk = None
+    step.id = None
+    step.curriculum = new_curriculum
+    step.save()
+    for step_question in step_questions:
+      question = step_question.question
+      question.id = None
+      question.pk = None
+      question.save()
+
+      step_question.id = None
+      step_question.pk = None
+      step_question.question = question
+      step_question.step = step
+      step_question.save()
+  return
 
 @login_required
 def bookmarkCurriculum(request, id=''):

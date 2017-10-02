@@ -31,10 +31,7 @@
     </a>
   {% endif %}
   <!-- Copy -->
-  {% if curriculum.curriculum_type != 'U' %}
-    <a class="util-button fa fa-files-o" aria-hidden="true" aria-label="Create New Copy" title="Create New Copy" href="{% url 'ctstem:copyCurriculum' curriculum.id %}">
-    </a>
-  {% endif %}
+  <a class="util-button fa fa-files-o" aria-hidden="true" aria-label="Create New Copy" title="Create New Copy" href="{% url 'ctstem:copyCurriculum' curriculum.id %}"></a>
 {% endif %}
 <!-- Assign -->
 {% if user.administrator or user.teacher or user.school_administrator %}
