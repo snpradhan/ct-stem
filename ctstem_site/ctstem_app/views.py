@@ -178,7 +178,7 @@ def curriculum(request, id=''):
       if form.is_valid() and formset.is_valid() and attachment_formset.is_valid():
         savedCurriculum = form.save(commit=False)
         if '' == id:
-            savedCurriculum.author = request.user
+          savedCurriculum.author = request.user
         savedCurriculum.slug = slugify(savedCurriculum.title) + '-v%s'%savedCurriculum.version
         savedCurriculum.save()
         form.save()
@@ -198,6 +198,9 @@ def curriculum(request, id=''):
         for obj in formset.deleted_objects:
           obj.delete()
 
+        #if archiving a unit, also archive the underlying lessons
+        if savedCurriculum.curriculum_type == 'U' and savedCurriculum.status == 'A':
+          archiveCurriculum(request, savedCurriculum.id)
         messages.success(request, "Curriculum Saved.")
         return shortcuts.redirect('ctstem:curriculum', id=savedCurriculum.id)
       else:
@@ -479,7 +482,6 @@ def copyCurriculumMeta(request, id=''):
 def copyCurriculumSteps(request, original_curriculum, new_curriculum):
 
   steps = models.Step.objects.all().filter(curriculum=original_curriculum)
-
   for step in steps:
     step_questions = models.CurriculumQuestion.objects.all().filter(step=step)
     step.pk = None
@@ -498,6 +500,30 @@ def copyCurriculumSteps(request, original_curriculum, new_curriculum):
       step_question.step = step
       step_question.save()
   return
+
+@login_required
+def archiveCurriculum(request, id=''):
+  try:
+    # check if the user has permission to create or modify a curriculum
+    if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'researcher') == False and hasattr(request.user, 'author') == False:
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to modify this curriculum</h1>')
+    # check if the curriculum exists
+    else:
+      if request.method == 'GET' or request.method == 'POST':
+        if '' != id:
+          curriculum = models.Curriculum.objects.get(id=id)
+          #archive unit lessons first
+          if curriculum.curriculum_type == 'U':
+            for lesson in curriculum.underlying_curriculum.all():
+              lesson.status = 'A'
+              lesson.save()
+
+          curriculum.status = 'A'
+          curriculum.save()
+        return
+      return http.HttpResponseNotAllowed(['GET', 'POST'])
+  except models.Curriculum.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested curriculum not found</h1>')
 
 @login_required
 def bookmarkCurriculum(request, id=''):
