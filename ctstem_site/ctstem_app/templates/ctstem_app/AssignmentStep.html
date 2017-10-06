@@ -506,12 +506,13 @@
               <button class="light save" id="sv" title="Save" >
                 Save
               </button>
-              <button class="bright submit" id="sc" title="Submit Assignment">
-                Submit
+              <button class="bright submit exit" id="sc" title="Save and Exit">
+                Save and Exit
               </button>
             {% endif %}
           {% endif %}
           <input type="hidden" id="save" name="save" value="0"/>
+          <input type="hidden" id="save_exit" name="save_exit" value="0"/>
         </div>
 
         </form>
@@ -604,6 +605,9 @@
       //manual submit
       $('button.submit').click(function(){
         $('input:hidden[id="save"]').val(0);
+        if($(this).hasClass('exit')) {
+          $('input:hidden[id="save_exit"]').val(1);
+        }
         $('input:hidden[id*="save"][id*="form"]').val('');
         setCanvasData();
         setDataTable();

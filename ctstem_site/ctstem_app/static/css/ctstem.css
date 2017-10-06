@@ -678,7 +678,7 @@ div.content {
 }
 
 div.content section {
-  padding: 80px 0px;
+  padding: 100px 0px;
 }
 div.content section#standard {
   padding: 40px 0px 10px 0px;
@@ -712,6 +712,9 @@ div.content section.portfolio .portfolio-item .portfolio-caption{
   padding: 10px;
 }
 
+div.content#assignments section.portfolio .portfolio-item {
+  margin-bottom: 4em;
+}
 div.content#assignments section.portfolio .portfolio-item .portfolio-caption{
   max-height: none;
 }
@@ -784,9 +787,17 @@ div.content#home section#contact .text-muted {
 div.content#assignments {
   width: 80%;
 }
-
+div.content#assignments div.inbox_filter {
+  float: right;
+  margin-right: 2em;
+}
 div.content#assignments .assignment_title {
   margin-bottom: 1em;
+  font-weight: bold;
+  font-size: 1.7em;
+  height: 2.5em;
+  overflow-x: scroll;
+  line-height: 1.3em;
 }
 
 div.content#assignments  .dates {
@@ -797,13 +808,16 @@ div.content#assignments  .dates .row {
 }
 div.content#assignments  .dates .row .title {
   font-weight: bold;
+  text-align: right;
+}
+div.content#assignments  .dates .row .value {
+  text-align: left;
 }
 div.content#assignments .chart_container {
   max-width: 200px;
   margin-left: auto;
   margin-right: auto;
 }
-
 div.btn-group {
   margin-bottom: 10px;
   width: 100%;

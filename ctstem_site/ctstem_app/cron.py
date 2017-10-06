@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from django.core.mail import send_mail, EmailMessage
 from django.conf import settings
 from django.core import management
+from django.utils import timezone
 
 def cleanup_teacher_accounts():
   #get a list of teacher account created prior to 24 hrs and still inactive
@@ -34,3 +35,8 @@ def backup_db():
   print 'start db backup', datetime.today()
   management.call_command('dbbackup')
   print 'end db backup', datetime.today()
+
+def submit_past_due_assignments():
+  instances = models.AssignmentInstance.objects.all().filter(status__in=['N', 'P'], assignment__due_date__lt=datetime.now(timezone.utc))
+  instances.update(status='S')
+  print 'submitting %d past due assignments' % instances.count(), datetime.today()

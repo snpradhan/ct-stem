@@ -2050,40 +2050,40 @@ def assignments(request, bucket=''):
       new_count = 0
       serial = 1
       percent_complete = 0
+      status_list = {'N': 1, 'P': 2, 'S': 3, 'F': 4, 'A': 5}
       for assignment in assignments:
         try:
           instance = models.AssignmentInstance.objects.get(assignment=assignment, student=student)
+          total_questions = models.CurriculumQuestion.objects.all().filter(step__curriculum=assignment.curriculum).count()
+          attempted_questions = models.QuestionResponse.objects.all().filter(step_response__instance=instance).exclude(response__exact='', responseFile__exact='').count()
+          total_steps = instance.assignment.curriculum.steps.count()
+          last_step = instance.last_step
+          if total_questions > 0:
+            percent_complete = float(attempted_questions)/float(total_questions)*100
+          else:
+            percent_complete = float(last_step)/float(total_steps)*100
 
           if instance.status in ['N', 'P', 'S', 'F']:
-            total_questions = models.CurriculumQuestion.objects.all().filter(step__curriculum=assignment.curriculum).count()
-            attempted_questions = models.QuestionResponse.objects.all().filter(step_response__instance=instance).exclude(response__exact='', responseFile__exact='').count()
-            total_steps = instance.assignment.curriculum.steps.count()
-            last_step = instance.last_step
 
-            print total_questions, attempted_questions, total_steps, last_step
-            if instance.status == 'N':
-              status = 1
-              percent_complete = 0
-            elif instance.status == 'P':
-              status = 2
-              if total_questions > 0:
-                percent_complete = float(attempted_questions)/float(total_questions)*100
-              else:
-                percent_complete = float(last_step)/float(total_steps)*100
-              print percent_complete
-            elif instance.status == 'S':
-              status = 3
-              percent_complete = 100
-            else:
-              status = 4
-              percent_complete = 100
-            active_list.append({'serial': serial, 'assignment': assignment, 'instance': instance, 'percent_complete': percent_complete, 'status': status, 'modified_date': instance.modified_date})
+            #if assignment is new or in progress and past due, submit the assignment
+            if instance.status in ['N', 'P'] and assignment.due_date < datetime.datetime.now(timezone.utc):
+              instance.status = 'S'
+              instance.save()
+            active_list.append({'serial': serial, 'assignment': assignment, 'instance': instance, 'status': status_list[instance.status], 'percent_complete': percent_complete, 'modified_date': instance.modified_date})
           else:
-            archived_list.append({'serial': serial, 'assignment': assignment, 'instance': instance, 'percent_complete': 100, 'status': 5, 'modified_date': instance.modified_date})
+            archived_list.append({'serial': serial, 'assignment': assignment, 'instance': instance, 'status': status_list[instance.status], 'percent_complete': percent_complete, 'modified_date': instance.modified_date})
         except models.AssignmentInstance.DoesNotExist:
-          instance = None
-          new_count += 1
-          active_list.append({'serial': serial, 'assignment': assignment, 'instance': instance, 'percent_complete': 0, 'status': 1, 'modified_date': timezone.now()})
+          #assignment hasn't been started but is already past due
+          if assignment.due_date < datetime.datetime.now(timezone.utc):
+            instance = models.AssignmentInstance(assignment=assignment, student=student, status='S')
+            instance.save()
+            status = 'S'
+          else:
+            instance = None
+            new_count += 1
+            status = 'N'
+          active_list.append({'serial': serial, 'assignment': assignment, 'instance': instance, 'status': status_list[status], 'percent_complete': percent_complete, 'modified_date': timezone.now()})
+
         serial += 1
 
       if bucket == 'inbox':
@@ -2154,25 +2154,26 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
       return http.HttpResponseNotFound('<h1>You do not have the privilege to do this assignments</h1>')
 
     print assignment_id, instance_id, step_order
+    assignment = models.Assignment.objects.get(id=assignment_id)
+    curriculum = assignment.curriculum
+
     #resuming/viewing assignment
     if '' != instance_id:
-      instance = models.AssignmentInstance.objects.get(assignment_id=assignment_id, id=instance_id, student=request.user.student)
+      instance = models.AssignmentInstance.objects.get(assignment__id=assignment_id, id=instance_id, student=request.user.student)
       if request.user.student != instance.student:
         return http.HttpResponseNotFound('<h1>You do not have the privilege to do this assignments</h1>')
       last_step = instance.last_step
-      #prevent users from manipulating the url in the browser
-      if int(step_order) > last_step + 1:
+      #prevent users from manipulating the url in the browser for new and in progress assignments
+      if int(step_order) > last_step + 1 and instance.status in ('N', 'P'):
         messages.error(request, 'Please use the buttons below to navigate between steps')
         return shortcuts.redirect('ctstem:resumeAssignment', assignment_id=assignment_id, instance_id=instance.id, step_order=last_step)
 
     #starting a new assignment
     else:
-      instance = models.AssignmentInstance(assignment_id=assignment_id, student=request.user.student, status='N')
+      status = 'N'
+      instance = models.AssignmentInstance(assignment__id=assignment_id, student=request.user.student, status=status)
       instance.save()
       step_order = 0
-
-    assignment = models.Assignment.objects.get(id=assignment_id)
-    curriculum = assignment.curriculum
 
     if 'GET' == request.method or 'POST' == request.method:
       steps = models.Step.objects.all().filter(curriculum=curriculum)
@@ -2233,6 +2234,7 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
           #is this a save or a submit
           #print data
           save_only = int(data['save'])
+          save_exit = int(data['save_exit'])
           form = forms.AssignmentStepResponseForm(data=data, instance=assignmentStepResponse, prefix="step_response")
           #questionResponseFormset=inlineformset_factory(models.AssignmentStepResponse, models.QuestionResponse, form=forms.QuestionResponseForm, can_delete=False, can_order=True, extra=0)
           questionResponseFormset = nestedformset_factory(models.AssignmentStepResponse, models.QuestionResponse, form=forms.QuestionResponseForm,
@@ -2248,16 +2250,17 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
           notesform = forms.AssignmentNotesForm(data=data, instance=notes, prefix="notes")
 
           if form.is_valid() and formset.is_valid():
-            if save_only == 1 or step.order < total_steps:
-              instance.status = 'P'
-              # if submit then increase the last step completed counter
-              if save_only == 0:
-                instance.last_step = step.order
-              # if save then set the last step completed to the previous step
-              else:
-                instance.last_step = step.order - 1
+            instance.status = 'P'
+            #save button clicked
+            if save_only == 1:
+              #set the last step completed to the previous step
+              instance.last_step = step.order - 1
+            #save and exit button clicked
+            elif save_exit == 1:
+              instance.last_step = step.order - 1
+            #save and continue clicked
             else:
-              instance.status = 'S'
+              #increase the last step completed counter
               instance.last_step = step.order
 
             #find the delta between the last save and current time and update the instance
@@ -2305,9 +2308,9 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
               formset.save()
 
             #update the instance
-            #submission
-            if instance.status == 'S':
-              messages.success(request, 'Your assignment has been submitted')
+            #save and exit on the last step
+            if save_exit == 1:
+              messages.success(request, 'Your responses have been saved. You may continue to update your responses until %s' % assignment.due_date.strftime('%B %d, %Y'))
               return shortcuts.redirect('ctstem:assignments', bucket='inbox')
             #Save or Save & Continue
             else:

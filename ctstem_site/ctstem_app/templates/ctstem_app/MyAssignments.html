@@ -1,5 +1,7 @@
 {% extends "ctstem_app/base.html" %}
 {% load base_extras %}
+{% load ctstem_extras %}
+
 {% block media %}
   {{ block.super }}
   {{ form.media }}
@@ -16,7 +18,7 @@
       <li class="{% navactive request 'ctstem:assignments' 'archive' %}"><a href="{% url 'ctstem:assignments' 'archive' %}">Archive ({{archived}})</a></li>
     </ul>
     {% if assignment_list %}
-    <div style="float:right;">
+    <div class="inbox_filter">
       <form method="post" class="form-horizontal">
         {% csrf_token %}
         <div class="form-group">
@@ -26,107 +28,107 @@
       </form>
     </div>
     <section class="portfolio">
-      <div class="container">
-        <div class="row">
-          {% for assignment_details in assignment_list %}
-          <div class="col-md-4 col-sm-6 portfolio-item ">
-            {% if assignment_details.instance %}
-              {% if assignment_details.instance.status == 'P' %}
-                <a href="{% url 'ctstem:resumeAssignment' assignment_details.assignment.id assignment_details.instance.id assignment_details.instance.last_step|add:'1' %}" class="portfolio-link">
+      <div class="row">
+        {% for assignment_details in assignment_list %}
+          <div class="col-lg-4 col-md-6 portfolio-item ">
+            <div class="tile">
+              {% if assignment_details.instance %}
+                {% if assignment_details.instance.status == 'P' %}
+                  <a href="{% url 'ctstem:resumeAssignment' assignment_details.assignment.id assignment_details.instance.id assignment_details.instance.last_step|add:'1' %}" class="portfolio-link">
+                {% else %}
+                  <a href="{% url 'ctstem:resumeAssignment' assignment_details.assignment.id assignment_details.instance.id 0 %}" class="portfolio-link">
+                {% endif %}
               {% else %}
-                <a href="{% url 'ctstem:resumeAssignment' assignment_details.assignment.id assignment_details.instance.id 0 %}" class="portfolio-link">
+                <a href="{% url 'ctstem:startAssignment' assignment_details.assignment.id %}" class="portfolio-link">
               {% endif %}
-            {% else %}
-              <a href="{% url 'ctstem:startAssignment' assignment_details.assignment.id %}" class="portfolio-link">
-            {% endif %}
-              <div class="portfolio-hover">
-                <div class="portfolio-hover-content">
-                  <i class="fa fa-plus fa-3x"></i>
+                <div class="portfolio-hover">
+                  <div class="portfolio-hover-content">
+                    <i class="fa fa-plus fa-3x"></i>
+                  </div>
                 </div>
-              </div>
-              {% if assignment_details.assignment.curriculum.icon %}
-                <img src="{{assignment_details.assignment.curriculum.icon.url}}" class="img-responsive" alt=""/>
-              {% else %}
-                <img src="/static/img/assessment.png" class="img-responsive" alt="">
-              {% endif %}
-            </a>
-            <div class="portfolio-caption">
-              <div class="assignment_title">
-                <h4>{{assignment_details.assignment.curriculum.title}}</h4>
-              </div>
-              <div class="row">
-                <div class="col-md-7 dates">
-                  <div class="row">
-                    <div class="col-md-4 title">Group:</div>
-                    <div class="col-md-8">{{assignment_details.assignment.group}}</div>
-                  </div>
-                  <div class="row">
-                    <div class="col-md-4 title">Assigned:</div>
-                    <div class="col-md-8">{{assignment_details.assignment.assigned_date|date}}</div>
-                  </div>
+                {% if assignment_details.assignment.curriculum.icon %}
+                  <img src="{{assignment_details.assignment.curriculum.icon.url}}" class="img-responsive" alt=""/>
+                {% else %}
+                  <img src="/static/img/assessment.png" class="img-responsive" alt="">
+                {% endif %}
+              </a>
+              <div class="portfolio-caption">
+                <div class="assignment_title">
+                  {{assignment_details.assignment.curriculum.title}}
+                </div>
+                <div class="row">
+                  <div class="col-md-7 dates">
+                    <div class="row">
+                      <div class="col-md-6 title">Group:</div>
+                      <div class="col-md-6 value">{{assignment_details.assignment.group}}</div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-6 title">Assigned:</div>
+                      <div class="col-md-6 value">{{assignment_details.assignment.assigned_date|date}}</div>
+                    </div>
 
-                  <div class="row">
-                    <div class="col-md-4 title">Due:</div>
-                    <div class="col-md-8">{{assignment_details.assignment.due_date|date}}</div>
-                  </div>
-                  <div class="row">
-                    <div class="col-md-4 title">Modified:</div>
-                    <div class="col-md-8">{% if assignment_details.instance %}
-                                {{assignment_details.instance.modified_date|date}}
-                              {% else %}
-                                -
-                              {% endif %}</div>
-                  </div>
-                  <div class="row">
-                    <div class="col-md-4 title">Status:</div>
-                    <div class="col-md-8">
-                        {% if assignment_details.instance %}
-                          {{assignment_details.instance.get_status_display}}
-                        {% else %}
-                          New
-                        {% endif %}
+                    <div class="row">
+                      <div class="col-md-6 title">Due:</div>
+                      <div class="col-md-6 value">{{assignment_details.assignment.due_date|date}}</div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-6 title">Modified:</div>
+                      <div class="col-md-6 value">{% if assignment_details.instance %}
+                                  {{assignment_details.instance.modified_date|date}}
+                                {% else %}
+                                  -
+                                {% endif %}</div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-6 title">Status:</div>
+                      <div class="col-md-6 value">
+                          {% if assignment_details.instance %}
+                            {{assignment_details.instance.get_status_display}}
+                          {% else %}
+                            New
+                          {% endif %}
+                      </div>
                     </div>
                   </div>
+                  <div class="col-md-5 chart_container">
+                    <div id="chart_{{assignment_details.serial}}" class="chart" name={{assignment_details.percent_complete}}></div>
+                  </div>
                 </div>
-                <div class="col-md-5 chart_container">
-                  <div id="chart_{{assignment_details.serial}}" class="chart" name={{assignment_details.percent_complete}}></div>
-                </div>
-              </div>
-              <div class="row">
-                {% if assignment_details.instance %}
-                  {% if assignment_details.instance.status == 'N' %}
-                    <a type="button" class="btn btn-success btn-md" aria-label="Start Assignment" title="Start Assignment" href="{% url 'ctstem:resumeAssignment' assignment_details.assignment.id assignment_details.instance.id assignment_details.instance.last_step %}">
-                      Start <span class="glyphicon glyphicon-play" aria-hidden="true"></span>
-                    </a>
-                  {% elif assignment_details.instance.status == 'P' %}
-                    <a type="button" class="btn btn-warning btn-md" aria-label="Resume Assignment" title="Resume Assignment" href="{% url 'ctstem:resumeAssignment' assignment_details.assignment.id assignment_details.instance.id assignment_details.instance.last_step|add:'1' %}">
-                      Resume <span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span>
-                    </a>
+                <div class="row">
+                  {% if assignment_details.instance %}
+                    {% if assignment_details.instance.status == 'N' %}
+                      <a type="button" class="btn btn-success btn-md" aria-label="Start Assignment" title="Start Assignment" href="{% url 'ctstem:resumeAssignment' assignment_details.assignment.id assignment_details.instance.id assignment_details.instance.last_step %}">
+                        Start <span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+                      </a>
+                    {% elif assignment_details.instance.status == 'P' %}
+                      <a type="button" class="btn btn-warning btn-md" aria-label="Resume Assignment" title="Resume Assignment" href="{% url 'ctstem:resumeAssignment' assignment_details.assignment.id assignment_details.instance.id assignment_details.instance.last_step|add:'1' %}">
+                        Resume <span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span>
+                      </a>
+                    {% else %}
+                      <a type="button" class="btn btn-info btn-md" aria-label="Resume Assignment" title="Resume Assignment" href="{% url 'ctstem:resumeAssignment' assignment_details.assignment.id assignment_details.instance.id 0 %}">
+                        {% if assignment_details.instance.status == 'F' or assignment_details.instance.status == 'A'%}
+                          Review Feedback
+                        {% else %}
+                          View
+                        {% endif %}
+                        <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
+                      </a>
+                    {% endif %}
+                    {% if assignment_details.instance.status == 'F' %}
+                      <a type="button" class="btn btn-warning btn-md" aria-label="Archive Assignment" title="Archive Assignment" href="{% url 'ctstem:archiveAssignment' assignment_details.instance.id %}">
+                        Archive <span class="glyphicon glyphicon-folder-close" aria-hidden="true"></span>
+                      </a>
+                    {% endif %}
                   {% else %}
-                    <a type="button" class="btn btn-info btn-md" aria-label="Resume Assignment" title="Resume Assignment" href="{% url 'ctstem:resumeAssignment' assignment_details.assignment.id assignment_details.instance.id 0 %}">
-                      {% if assignment_details.instance.status == 'F' or assignment_details.instance.status == 'A'%}
-                        Review Feedback
-                      {% else %}
-                        View
-                      {% endif %}
-                      <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
+                    <a type="button" class="btn btn-success btn-md" aria-label="Start Assignment" title="Start Assignment" href="{% url 'ctstem:startAssignment' assignment_details.assignment.id %}">
+                        Start <span class="glyphicon glyphicon-play" aria-hidden="true"></span>
                     </a>
                   {% endif %}
-                  {% if assignment_details.instance.status == 'F' %}
-                    <a type="button" class="btn btn-warning btn-md" aria-label="Archive Assignment" title="Archive Assignment" href="{% url 'ctstem:archiveAssignment' assignment_details.instance.id %}">
-                      Archive <span class="glyphicon glyphicon-folder-close" aria-hidden="true"></span>
-                    </a>
-                  {% endif %}
-                {% else %}
-                  <a type="button" class="btn btn-success btn-md" aria-label="Start Assignment" title="Start Assignment" href="{% url 'ctstem:startAssignment' assignment_details.assignment.id %}">
-                    Start <span class="glyphicon glyphicon-play" aria-hidden="true"></span>
-                  </a>
-                {% endif %}
+                </div>
               </div>
             </div>
           </div>
-          {% endfor %}
-        </div>
+        {% endfor %}
       </div>
     </section>
     {% else %}
@@ -139,8 +141,6 @@
   </div>
   <script type="text/javascript">
     $(function (){
-
-
 
       $("select#id_sort_by").change(function(){
         this.form.submit();

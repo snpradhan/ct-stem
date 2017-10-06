@@ -3,6 +3,7 @@ from django.utils.encoding import force_unicode
 from ctstem_app import models
 import datetime
 from django.db.models import Q
+from django.utils import timezone
 
 register = template.Library()
 
@@ -141,8 +142,11 @@ def is_favorite(curriculum_id, teacher_id):
 
 @register.filter
 def getFeedback(response_id):
-  feedback = models.QuestionFeedback.objects.all().filter(response__id=response_id)[0]
-  return feedback.feedback
+  feedback_queryset = models.QuestionFeedback.objects.all().filter(response__id=response_id)
+  if feedback_queryset:
+    return feedback_queryset[0].feedback
+  else:
+    return None
 
 @register.filter
 def get_item(dictionary, key):
