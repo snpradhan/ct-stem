@@ -2454,13 +2454,13 @@ def export_response(request, assignment_id='', student_id=''):
       if hasattr(request.user, 'researcher'):
         student = instance.student.user.id
       else:
-        student = instance.student
+        student = instance.student.user.get_full_name()
       stepResponses = models.AssignmentStepResponse.objects.all().filter(instance=instance)
       for stepResponse in stepResponses:
         questionResponses = models.QuestionResponse.objects.all().filter(step_response=stepResponse)
         for questionResponse in questionResponses:
           response_text = get_response_text(request, instance.id, questionResponse)
-          row = [student.user.get_full_name(),
+          row = [student,
                  stepResponse.step.order,
                  stepResponse.step.title,
                  questionResponse.curriculum_question.order,
