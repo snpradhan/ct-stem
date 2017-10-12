@@ -2172,7 +2172,7 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
     #starting a new assignment
     else:
       status = 'N'
-      instance = models.AssignmentInstance(assignment__id=assignment_id, student=request.user.student, status=status)
+      instance = models.AssignmentInstance(assignment=assignment, student=request.user.student, status=status)
       instance.save()
       step_order = 0
 
