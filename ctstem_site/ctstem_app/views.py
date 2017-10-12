@@ -462,17 +462,18 @@ def copyCurriculumMeta(request, id=''):
       curriculum.save()
 
     for attachment in attachments:
-      source = attachment.file_object
-      filecontent = ContentFile(source.file.read())
-      filename = os.path.split(source.file.name)[-1]
-      filename_array = filename.split('.')
-      filename = filename_array[0] + '-' + str(curriculum.id) + '.' + filename_array[1]
-      attachment.pk = None
-      attachment.id = None
-      attachment.curriculum = curriculum
-      attachment.file_object.save(filename, filecontent)
-      attachment.save()
-      source.file.close()
+      if attachment.file_object:
+        source = attachment.file_object
+        filecontent = ContentFile(source.file.read())
+        filename = os.path.split(source.file.name)[-1]
+        filename_array = filename.split('.')
+        filename = filename_array[0] + '-' + str(curriculum.id) + '.' + filename_array[1]
+        attachment.pk = None
+        attachment.id = None
+        attachment.curriculum = curriculum
+        attachment.file_object.save(filename, filecontent)
+        attachment.save()
+        source.file.close()
 
     return curriculum
   else:
