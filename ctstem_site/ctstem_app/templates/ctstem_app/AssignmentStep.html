@@ -11,6 +11,8 @@
 {% block misc %}
  <script src="http://canvasjs.com//assets/script/canvasjs.min.js"></script>
  <script src="/static/js/highlight.pack.js"></script>
+ <script type="text/javascript" src="/static/ckeditor/ckeditor-init.js"></script>
+ <script type="text/javascript" src="/static/ckeditor/ckeditor/ckeditor.js"></script>
 {% endblock %}
 {% block agency %}{% endblock %}
 {% block ctstem %}
@@ -214,11 +216,11 @@
                         </label>
 
                         <div class="text">
-                          {{questionObj.optional}}
                           {{questionForm.id}}
                           {{questionObj.question_text|inline_style|safe}}
                           {{questionForm.curriculum_question.as_hidden}}
                           {{questionForm.save.as_hidden}}
+                          {{questionForm.save_exit.as_hidden}}
                           {{questionForm.nested.management_form}}
                           {{questionForm.nested.id}}
                         </div>
@@ -259,6 +261,10 @@
                                   </tbody>
                                 </table>
                               </div>
+                            {% elif field_type == 'TA' %}
+                              <div>
+                                {{questionForm.response.value|safe}}
+                              </div>
                             {% else %}
                               <div>
                                 {{questionForm.response.value}}
@@ -269,7 +275,8 @@
                         {% else %}
                           <div class="text">
                           {% if field_type == 'TA' %}
-                            <textarea placeholder="Enter your response" class="form-control assignment_textarea assignment_input" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" >{{questionForm.response.value}}</textarea>
+                            {{questionForm.response}}
+                            <!--textarea placeholder="Enter your response" class="form-control assignment_textarea assignment_input" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" >{{questionForm.response.value}}</textarea-->
                           {% elif field_type == 'TF' %}
                             <input type="text" placeholder="Enter your response" class="form-control assignment_input" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{questionForm.response.value}}" />
                           {% elif field_type == 'DD' %}
@@ -466,17 +473,23 @@
             <hr>
           {% endif %}
         </div>
-        {% if curriculum.curriculum_type != 'S' and curriculum.curriculum_type != 'A' %}
-          <div>
-            <h3>Notes</h3>
-            <div class="help">You may enter notes below.</div>
-            {{notesform.management_form}}
-            <div class="assignment_input">
+
+        <div>
+          <h3>Notes</h3>
+          {{notesform.management_form}}
+          <div class="assignment_input">
+            {% if instance.status == 'F' or instance.status == 'S' or instance.status == 'A' %}
+              {% if notesform.note.value %}
+                {{notesform.note.value|safe}}
+              {% endif %}
+            {% else %}
+              <div class="help">You may enter notes below.</div>
               {{notesform.note}}
-            </div>
-            <hr>
+            {% endif %}
           </div>
-        {% endif %}
+          <hr>
+        </div>
+
         <div class="save-buttons">
           {% if form and form.instance.step.order > 0 %}
             <a class="back" href="javascript:waitForSave('{% url 'ctstem:resumeAssignment'  form.instance.instance.assignment.id form.instance.instance.id form.instance.step.order|add:'-1' %}')" onclick="return saveStep('{{form.instance.instance.status}}');">
@@ -597,6 +610,8 @@
       $('button.save').click(function(){
         $('input:hidden[id="save"]').val(1);
         $('input:hidden[id*="save"][id*="form"]').val('on');
+        $('input:hidden[id="save_exit"]').val(0);
+        $('input:hidden[id*="save_exit"][id*="form"]').val('off');
         setCanvasData();
         setDataTable();
         $('form#assignmentForm').submit();
@@ -605,10 +620,15 @@
       //manual submit
       $('button.submit').click(function(){
         $('input:hidden[id="save"]').val(0);
+        $('input:hidden[id*="save"][id*="form"]').val('');
         if($(this).hasClass('exit')) {
           $('input:hidden[id="save_exit"]').val(1);
+          $('input:hidden[id*="save_exit"][id*="form"]').val('on');
         }
-        $('input:hidden[id*="save"][id*="form"]').val('');
+        else {
+          $('input:hidden[id="save_exit"]').val(0);
+          $('input:hidden[id*="save_exit"][id*="form"]').val('off');
+        }
         setCanvasData();
         setDataTable();
         $('form#assignmentForm').submit();
@@ -677,6 +697,8 @@
       if(status != 'S' && status != 'F' && status != 'A'){
         $('input:hidden[id="save"]').val(1);
         $('input:hidden[id*="save"][id*="form"]').val('on');
+        $('input:hidden[id="save_exit"]').val(0);
+        $('input:hidden[id*="save_exit"][id*="form"]').val('off');
         setCanvasData();
         setDataTable();
         $('#assignmentForm').ajaxSubmit({
@@ -701,6 +723,8 @@
             //alert('focus out');
             $('input:hidden[id="save"]').val(1);
             $('input:hidden[id*="save"][id*="form"]').val('on');
+            $('input:hidden[id="save_exit"]').val(0);
+            $('input:hidden[id*="save_exit"][id*="form"]').val('off');
             setCanvasData();
             setDataTable();
             $('#assignmentForm').ajaxSubmit({

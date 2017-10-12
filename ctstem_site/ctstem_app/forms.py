@@ -833,15 +833,11 @@ class AssignmentStepResponseForm(ModelForm):
 ####################################
 class QuestionResponseForm(ModelForm):
   save = forms.BooleanField(required=False)
+  save_exit = forms.BooleanField(required=False)
 
   class Meta:
     model = models.QuestionResponse
     exclude = ('created_date', 'modified_date',)
-
-  def __init__(self, *args, **kwargs):
-    super(QuestionResponseForm, self).__init__(*args, **kwargs)
-    if self.fields['curriculum_question'].question.answer_field_type == 'TA':
-      self.fields['response'].widget = forms.Textarea(attrs={'class':'ckeditor'})
 
   def clean(self):
     cleaned_data = super(QuestionResponseForm, self).clean()

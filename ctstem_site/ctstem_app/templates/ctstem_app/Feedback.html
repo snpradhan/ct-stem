@@ -100,6 +100,8 @@
                               </tbody>
                             </table>
                           </div>
+                        {% elif question.instance.response.curriculum_question.question.answer_field_type == 'TA' %}
+                          {{question.instance.response.response|safe}}
                         {% else %}
                           {{question.instance.response.response}}
                         {% endif %}

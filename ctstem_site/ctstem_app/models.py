@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from tinymce.models import HTMLField
 from slugify import slugify
 from ckeditor_uploader.fields import RichTextUploadingField
+from ckeditor.fields import RichTextField
 from smart_selects.db_fields import ChainedForeignKey
 from PIL import Image
 import StringIO
@@ -441,7 +442,7 @@ class AssignmentInstance(models.Model):
 #######################################################
 class AssignmentNotes(models.Model):
   instance = models.OneToOneField(AssignmentInstance, unique=True, null=False, related_name="notes")
-  note = models.TextField(null=True, blank=True)
+  note = RichTextField(null=True, blank=True)
 
 #######################################################
 # Assignment Step Response Model
@@ -459,7 +460,7 @@ class AssignmentStepResponse(models.Model):
 class QuestionResponse(models.Model):
   step_response = models.ForeignKey(AssignmentStepResponse)
   curriculum_question = models.ForeignKey(CurriculumQuestion)
-  response = models.TextField(null=True, blank=True)
+  response = RichTextField(null=True, blank=True)
   responseFile = models.FileField(upload_to=upload_file_to, blank=True)
   created_date = models.DateTimeField(auto_now_add=True)
   modified_date = models.DateTimeField(auto_now=True)

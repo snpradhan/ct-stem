@@ -2083,6 +2083,7 @@ def assignments(request, bucket=''):
             instance = None
             new_count += 1
             status = 'N'
+            percent_complete = 0
           active_list.append({'serial': serial, 'assignment': assignment, 'instance': instance, 'status': status_list[status], 'percent_complete': percent_complete, 'modified_date': timezone.now()})
 
         serial += 1
