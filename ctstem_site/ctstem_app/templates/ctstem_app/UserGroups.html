@@ -24,6 +24,7 @@
             <th width="20%"> Group Name </th>
             <th width="15%"> Subject </th>
             <th width="10%"> Time </th>
+            <th> Status </th>
             {% if not user.teacher %}
               <th width="15%"> Teacher </th>
             {% endif %}
@@ -37,6 +38,7 @@
             <th> Group Name </th>
             <th> Subject </th>
             <th> Time </th>
+            <th> Status </th>
             {% if not user.teacher %}
               <th> Teacher </th>
             {% endif %}
@@ -68,6 +70,7 @@
               </td>
               <td>{{group.subject}}</td>
               <td>{{group.time}}</td>
+              <td>{{group.is_active|yesno:"Active,Inactive"}}</td>
               {% if not user.teacher %}
                 <td>{{group.teacher}}</td>
               {% endif %}

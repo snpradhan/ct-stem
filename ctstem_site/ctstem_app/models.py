@@ -396,6 +396,7 @@ class UserGroup(models.Model):
   teacher = models.ForeignKey(Teacher, related_name='groups')
   description = models.TextField(null=True)
   members = models.ManyToManyField(Student, through='Membership', blank=True, null=True, related_name='member_of')
+  is_active = models.BooleanField(null=False, blank=False, default=True)
 
   def __unicode__(self):
     return u'%s' % (self.title)

@@ -49,7 +49,11 @@
           <div class="controls">{{form.description}}</div>
           <div class="error">{{ form.description.errors }}</div>
         </div>
-
+        <div class="form-group">
+          <label for="id_{{is_active}}">{{ form.is_active.label|title }} {% if form.is_active.field.required %}(<span class="required">*</span>){% endif %} </label>
+          <div class="controls">{{form.is_active}}</div>
+          <div class="error">{{ form.is_active.errors }}</div>
+        </div>
         {% if form.instance.id %}
           <div class="form-group assignment_table">
             {{formset.management_form}}

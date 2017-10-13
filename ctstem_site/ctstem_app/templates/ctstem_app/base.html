@@ -197,7 +197,7 @@
               {% endif %}
 
               {% if user.administrator or user.researcher or user.school_administrator %}
-                <li class="dropdown {% navactive request 'ctstem:users' 'students' %} {% navactive request 'ctstem:users' 'teachers' %} {% navactive request 'ctstem:users' 'admins' %} {% navactive request 'ctstem:users' 'researchers' %} {% navactive request 'ctstem:users' 'authors' %} {% navactive request 'ctstem:groups' %}">
+                <li class="dropdown {% navactive request 'ctstem:users' 'students' %} {% navactive request 'ctstem:users' 'teachers' %} {% navactive request 'ctstem:users' 'admins' %} {% navactive request 'ctstem:users' 'researchers' %} {% navactive request 'ctstem:users' 'authors' %} {% navactive request 'ctstem:groups' 'active' %} {% navactive request 'ctstem:groups' 'inactive' %}">
                   <a href="#" class="dropdown-toggle" data-toggle="dropdown" id="users">Users  <b class="caret"></b></a>
                   <ul class="dropdown-menu">
                     {% if user.administrator %}
@@ -212,12 +212,12 @@
                       <li class="{% navactive request 'ctstem:users' 'teachers' %}"><a href="{% url 'ctstem:users' 'teachers' %}">Teachers</a></li>
                       <li class="{% navactive request 'ctstem:users' 'students' %}"><a href="{% url 'ctstem:users' 'students' %}">Students</a></li>
                       <li class="divider"></li>
-                      <li class="{% navactive request 'ctstem:groups' %}"><a href="{% url 'ctstem:groups' %}">Groups</a></li>
+                      <li class="{% navactive request 'ctstem:groups' 'active' %} {% navactive request 'ctstem:groups' 'inactive' %}"><a href="{% url 'ctstem:groups' 'active' %}">Groups</a></li>
                     {% endif %}
                   </ul>
                 </li>
               {% elif user.teacher %}
-                <li class="{% navactive request 'ctstem:groups' %}"><a href="{% url 'ctstem:groups' %}">My Groups</a></li>
+                <li class="{% navactive request 'ctstem:groups' 'active' %} {% navactive request 'ctstem:groups' 'inactive' %}"><a href="{% url 'ctstem:groups' 'active' %}">My Groups</a></li>
               {% endif %}
 
               {% if user.administrator or user.researcher %}

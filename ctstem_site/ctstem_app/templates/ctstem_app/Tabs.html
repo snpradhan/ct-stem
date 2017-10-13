@@ -13,7 +13,7 @@
       <li {% if role == 'students' %} class="active"{% endif %}><a href="{% url 'ctstem:users' 'students' %}">Students</a></li>
     {% endif %}
     {% if user.administrator or user.researcher or user.school_administrator or user.teacher %}
-      <li {% if role == 'groups' %} class="active"{% endif %}><a href="{% url 'ctstem:groups' %}">{% if user.teacher %} My {% endif %} Groups</a></li>
+      <li {% if role == 'groups' %} class="active"{% endif %}><a href="{% url 'ctstem:groups' 'active' %}">{% if user.teacher %} My {% endif %} Groups</a></li>
     {% endif %}
   {% endif %}
   {% if tab == 'group' or tab == 'assignment' %}
@@ -32,3 +32,13 @@
     {% endif %}
   {% endif %}
 </ul>
+{% if tab == 'group' %}
+  {% if user.administrator or user.researcher or user.school_administrator or user.teacher %}
+    {% if role == 'groups' %}
+      <ul class="nav nav-tabs">
+        <li {% if group_status == 'active' %} class="active"{% endif %}><a href="{% url 'ctstem:groups' 'active' %}">Active Groups</a></li>
+        <li {% if group_status == 'inactive' %} class="active"{% endif %}><a href="{% url 'ctstem:groups' 'inactive' %}">Inactive Groups</a></li>
+      </ul>
+    {% endif %}
+  {% endif %}
+{% endif %}

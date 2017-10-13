@@ -1745,17 +1745,20 @@ def deletePublication(request, slug=''):
 # GROUPS TABLE VIEW
 ####################################
 @login_required
-def groups(request):
+def groups(request, status='active'):
+  is_active = True
+  if status == 'inactive':
+    is_active = False
   if hasattr(request.user, 'administrator') or hasattr(request.user, 'researcher'):
-    groups = models.UserGroup.objects.all().order_by('id')
+    groups = models.UserGroup.objects.all().filter(is_active=is_active).order_by('id')
   elif hasattr(request.user, 'school_administrator'):
-    groups = models.UserGroup.objects.all().filter(teacher__school=request.user.school_administrator.school).order_by('id')
+    groups = models.UserGroup.objects.all().filter(is_active=is_active, teacher__school=request.user.school_administrator.school).order_by('id')
   elif hasattr(request.user, 'teacher'):
-    groups = models.UserGroup.objects.all().filter(teacher=request.user.teacher).order_by('id')
+    groups = models.UserGroup.objects.all().filter(is_active=is_active, teacher=request.user.teacher).order_by('id')
   else:
     return http.HttpResponseNotFound('<h1>You do not have the privilege to view student groups</h1>')
   uploadForm = forms.UploadFileForm(user=request.user)
-  context = {'groups': groups, 'role':'groups', 'uploadForm': uploadForm}
+  context = {'groups': groups, 'role':'groups', 'uploadForm': uploadForm, 'group_status': status}
   return render(request, 'ctstem_app/UserGroups.html', context)
 
 
