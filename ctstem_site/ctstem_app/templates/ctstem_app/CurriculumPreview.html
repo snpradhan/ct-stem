@@ -332,26 +332,11 @@
         </activity>
       {% endif %}
 
-       <div class="page print">
+      <div class="page print">
       {% if user.administrator or user.researcher or user.school_administrator or user.author or user.teacher %}
         {% if step_order|add:0 < 0 %}
-          {% if curr_unit.curriculum_type == 'U' %}
-            {% for curr in curr_unit|get_underlying_curriculum:request.user %}
-              <h2> {{curr.title|title}} Activities </h2>
-              {% for st in curr.steps.all %}
-                <activity>
-                  {% include 'ctstem_app/CurriculumActivityPreview.html' with step=st %}
-                </activity>
-              {% endfor %}
-              <!-- ACKNOWLEDGEMENT -->
-              {% if curr.acknowledgement %}
-                <h2>Acknowledgement</h2>
-                <div class="acknowledgement">
-                  {{curr.acknowledgement|safe}}
-                </div>
-              {% endif %}
-            {% endfor %}
-          {% else %}
+          {% if curr_unit.curriculum_type != 'U' %}
+
             <h2> {{curr_unit.title|title}} Activities </h2>
             {% for st in curr_unit.steps.all %}
               <activity>
