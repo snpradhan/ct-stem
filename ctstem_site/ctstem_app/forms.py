@@ -668,6 +668,11 @@ class UserGroupForm(ModelForm):
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['placeholder'] = field.help_text
 
+    #if group is inactive, disable all fields
+    if self.instance.is_active == False:
+      for field_name, field in self.fields.items():
+        field.widget.attrs['disabled'] = True
+
   def save(self, commit=True):
     instance = forms.ModelForm.save(self, False)
 
@@ -706,6 +711,7 @@ class AssignmentForm(ModelForm):
   class Meta:
     model = models.Assignment
     exclude = ('group', )
+    #fields = ['id', 'curriculum', 'group', 'assigned_date', 'due_date']
 
   def __init__(self, *args, **kwargs):
     super(AssignmentForm, self).__init__(*args, **kwargs)
@@ -713,7 +719,12 @@ class AssignmentForm(ModelForm):
 
     for field_name, field in self.fields.items():
       if field_name == 'due_date':
-        field.widget.attrs['class'] = 'form-control datepicker due'
+        if self.instance.id == None:
+          field.widget.attrs['class'] = 'form-control datepicker due'
+        elif self.instance.id and self.instance.group.is_active:
+          field.widget.attrs['class'] = 'form-control datepicker due'
+        else:
+          field.widget.attrs['class'] = 'form-control'
         field.widget.attrs['readonly'] = True
       elif field_name =='assigned_date':
         if self.instance.id and self.instance.assigned_date.date() <= date.today():

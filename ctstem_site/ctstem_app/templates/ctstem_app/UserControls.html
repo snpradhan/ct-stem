@@ -20,10 +20,14 @@
         {% teacher_actions %}
       {% elif tab == 'user' %}
         {% user_actions %}
+      {% elif tab == 'group' %}
+        {% group_actions %}
       {% endif %}
     {% else %}
       {% if tab == 'user' %}
         {% user_actions %}
+      {% elif tab == 'group' %}
+        {% group_actions %}
       {% endif %}
     {% endif %}
   {% endif %}

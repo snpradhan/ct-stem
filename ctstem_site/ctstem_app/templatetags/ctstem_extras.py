@@ -242,6 +242,15 @@ def StudentActions(context):
 def student_actions(context):
     return {'actions':StudentActions(context)}
 
+def GroupActions(context):
+    return [{'description':bulk_header,'value':''},
+        {'description':'Activate Selected Groups','value':'activate_selected'},
+        {'description':'Inactivate Selected Groups','value':'inactivate_selected'},]
+
+@register.inclusion_tag("ctstem_app/admin/actions.html", takes_context=True)
+def group_actions(context):
+    return {'actions':GroupActions(context)}
+
 @register.filter
 def get_student_groups(id):
   student = models.Student.objects.get(id=id)

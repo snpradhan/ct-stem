@@ -1637,6 +1637,17 @@ def _do_action(request, id_list, model, object_id=None):
         return True
       else:
         return False
+  elif model == 'group':
+    groups = models.UserGroup.objects.filter(id__in=id_list)
+    if u'activate_selected' == action_params.get(u'action'):
+      groups.update(is_active=True)
+      print 'activation done'
+      messages.success(request, "Selected group(s) activated.")
+      return True
+    elif u'inactivate_selected' == action_params.get(u'action'):
+      groups.update(is_active=False)
+      messages.success(request, "Selected group(s) inactivated.")
+      return True
   else:
     return False
 
@@ -1746,21 +1757,31 @@ def deletePublication(request, slug=''):
 ####################################
 @login_required
 def groups(request, status='active'):
-  is_active = True
-  if status == 'inactive':
-    is_active = False
-  if hasattr(request.user, 'administrator') or hasattr(request.user, 'researcher'):
-    groups = models.UserGroup.objects.all().filter(is_active=is_active).order_by('id')
-  elif hasattr(request.user, 'school_administrator'):
-    groups = models.UserGroup.objects.all().filter(is_active=is_active, teacher__school=request.user.school_administrator.school).order_by('id')
-  elif hasattr(request.user, 'teacher'):
-    groups = models.UserGroup.objects.all().filter(is_active=is_active, teacher=request.user.teacher).order_by('id')
-  else:
-    return http.HttpResponseNotFound('<h1>You do not have the privilege to view student groups</h1>')
-  uploadForm = forms.UploadFileForm(user=request.user)
-  context = {'groups': groups, 'role':'groups', 'uploadForm': uploadForm, 'group_status': status}
-  return render(request, 'ctstem_app/UserGroups.html', context)
+  if request.method == 'GET' or request.method == 'POST':
+    if request.method == 'POST':
+      data = request.POST.copy()
+      id_list = []
+      for key in data:
+        if 'group_' in key:
+          id_list.append(data[key])
+      _do_action(request, id_list, 'group')
 
+    is_active = True
+    if status == 'inactive':
+      is_active = False
+    if hasattr(request.user, 'administrator') or hasattr(request.user, 'researcher'):
+      groups = models.UserGroup.objects.all().filter(is_active=is_active).order_by('id')
+    elif hasattr(request.user, 'school_administrator'):
+      groups = models.UserGroup.objects.all().filter(is_active=is_active, teacher__school=request.user.school_administrator.school).order_by('id')
+    elif hasattr(request.user, 'teacher'):
+      groups = models.UserGroup.objects.all().filter(is_active=is_active, teacher=request.user.teacher).order_by('id')
+    else:
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to view student groups</h1>')
+    uploadForm = forms.UploadFileForm(user=request.user)
+    context = {'groups': groups, 'role':'groups', 'uploadForm': uploadForm, 'group_status': status}
+    return render(request, 'ctstem_app/UserGroups.html', context)
+
+  return http.HttpResponseNotAllowed(['GET', 'POST'])
 
 ####################################
 # CREATE MODIFY A USER GROUP
