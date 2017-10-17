@@ -153,7 +153,7 @@
           <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
               {% if not user.student %}
-                <li class="{% navactive request 'ctstem:curricula' 'lessons'%} "><a href="{% url 'ctstem:curricula' 'lessons' %}">Curricula</a></li>
+                <li class="{% navactive request 'ctstem:curricula' 'lessons'%} {% navactive request 'ctstem:curricula' 'units'%}"><a href="{% url 'ctstem:curricula' 'units' %}">Curricula</a></li>
                 {% if user.is_authenticated%}
                   {% if user.administrator or user.researcher or user.author %}
                     <li class="{% navactive request 'ctstem:curricula' 'assessments' %} "><a href="{% url 'ctstem:curricula' 'assessments' %}">Assessments</a></li>

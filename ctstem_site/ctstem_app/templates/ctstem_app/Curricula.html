@@ -44,9 +44,9 @@
     {% if user.teacher %}
       <ul class="nav nav-tabs">
         {% if curriculum_type == 'L' or curriculum_type == 'U' %}
+          <li {% if curriculum_type == 'U' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'units' %}">Units</a></li>
           <li {% if curriculum_type == 'L' and bookmark == '0' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'lessons' '0' %}">All Lessons</a></li>
           <li {% if curriculum_type == 'L' and bookmark == '1' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'lessons' '1' %}">Favorite Lessons</a></li>
-          <li {% if curriculum_type == 'U' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'units' %}">Units</a></li>
         {% else %}
           <li {% if bookmark == '0' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'assessments' '0' %}">All Assessments</a></li>
           <li {% if bookmark == '1' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'assessments' '1' %}">Favorite Assessments</a></li>
@@ -55,8 +55,8 @@
     {% else %}
       <ul class="nav nav-tabs">
         {% if curriculum_type == 'L' or curriculum_type == 'U' %}
-          <li {% if curriculum_type == 'L' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'lessons' %}">Lessons</a></li>
           <li {% if curriculum_type == 'U' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'units' %}">Units</a></li>
+          <li {% if curriculum_type == 'L' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'lessons' %}">Lessons</a></li>
         {% endif %}
       </ul>
     {% endif %}
@@ -167,7 +167,6 @@
                                 {% if user.administrator or user.researcher or user.author %}
                                   <th>Status</th>
                                 {% endif %}
-                                <th>Author</th>
                                 <th>Actions</th>
                               </tr>
                             </thead>
@@ -178,14 +177,6 @@
                                 {% if user.administrator or user.researcher or user.author %}
                                   <td>{{ curr.get_status_display }}</td>
                                 {% endif %}
-                                <td>
-                                {% for author in curr.authors.all %}
-                                  {{author.get_full_name}}
-                                  {% if forloop.last == False %}
-                                    ,
-                                  {% endif %}
-                                {% endfor %}
-                                </td>
                                 <td class="action">
                                   {% include "ctstem_app/CurriculaActions.html" with curriculum=curr %}
                                 </td>
