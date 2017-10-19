@@ -36,7 +36,3 @@ def backup_db():
   management.call_command('dbbackup')
   print 'end db backup', datetime.today()
 
-def submit_past_due_assignments():
-  instances = models.AssignmentInstance.objects.all().filter(status__in=['N', 'P'], assignment__due_date__lt=datetime.now(timezone.utc))
-  instances.update(status='S')
-  print 'submitting %d past due assignments' % instances.count(), datetime.today()

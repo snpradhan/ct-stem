@@ -844,7 +844,6 @@ class AssignmentStepResponseForm(ModelForm):
 ####################################
 class QuestionResponseForm(ModelForm):
   save = forms.BooleanField(required=False)
-  save_exit = forms.BooleanField(required=False)
 
   class Meta:
     model = models.QuestionResponse
@@ -860,12 +859,11 @@ class QuestionResponseForm(ModelForm):
 
     response = cleaned_data.get('response').strip()
     save = cleaned_data.get('save')
-    save_exit = cleaned_data.get('save_exit')
     curriculum_question = models.CurriculumQuestion.objects.get(id=cleaned_data.get('curriculum_question').id)
 
     # mandatory question validation when form submission is not a save and both the response field and the upload field are empty and the
     # question is not optional
-    if save == False and save_exit == False and not response and uploaded_files == 0 and not curriculum_question.optional:
+    if save == False and not response and uploaded_files == 0 and not curriculum_question.optional:
       self.add_error('response', 'Please answer this question')
       self.nested[0].add_error('file', 'Please upload at least one file')
 

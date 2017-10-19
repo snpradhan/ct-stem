@@ -305,3 +305,6 @@ def get_referenced_questions(step, instance=False):
   else:
     return False
 
+@register.filter
+def date_has_past(dt):
+  return dt < timezone.now()

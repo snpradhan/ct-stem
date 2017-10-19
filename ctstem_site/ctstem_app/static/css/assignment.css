@@ -717,6 +717,11 @@ div.teammates {
   margin-bottom: 2em;
 }
 
+div.past_due.warning {
+  margin-top: 5.5em;
+  text-align: center;
+}
+
 
 /* STYLES FOR NICE PRINTING */
 @media print {

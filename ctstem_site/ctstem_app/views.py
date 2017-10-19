@@ -2089,25 +2089,14 @@ def assignments(request, bucket=''):
             percent_complete = float(last_step)/float(total_steps)*100
 
           if instance.status in ['N', 'P', 'S', 'F']:
-
-            #if assignment is new or in progress and past due, submit the assignment
-            if instance.status in ['N', 'P'] and assignment.due_date < datetime.datetime.now(timezone.utc):
-              instance.status = 'S'
-              instance.save()
             active_list.append({'serial': serial, 'assignment': assignment, 'instance': instance, 'status': status_list[instance.status], 'percent_complete': percent_complete, 'modified_date': instance.modified_date})
           else:
             archived_list.append({'serial': serial, 'assignment': assignment, 'instance': instance, 'status': status_list[instance.status], 'percent_complete': percent_complete, 'modified_date': instance.modified_date})
         except models.AssignmentInstance.DoesNotExist:
-          #assignment hasn't been started but is already past due
-          if assignment.due_date < datetime.datetime.now(timezone.utc):
-            instance = models.AssignmentInstance(assignment=assignment, student=student, status='S')
-            instance.save()
-            status = 'S'
-          else:
-            instance = None
-            new_count += 1
-            status = 'N'
-            percent_complete = 0
+          instance = None
+          new_count += 1
+          status = 'N'
+          percent_complete = 0
           active_list.append({'serial': serial, 'assignment': assignment, 'instance': instance, 'status': status_list[status], 'percent_complete': percent_complete, 'modified_date': timezone.now()})
 
         serial += 1
@@ -2260,7 +2249,6 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
           #is this a save or a submit
           #print data
           save_only = int(data['save'])
-          save_exit = int(data['save_exit'])
           form = forms.AssignmentStepResponseForm(data=data, instance=assignmentStepResponse, prefix="step_response")
           #questionResponseFormset=inlineformset_factory(models.AssignmentStepResponse, models.QuestionResponse, form=forms.QuestionResponseForm, can_delete=False, can_order=True, extra=0)
           questionResponseFormset = nestedformset_factory(models.AssignmentStepResponse, models.QuestionResponse, form=forms.QuestionResponseForm,
@@ -2276,17 +2264,16 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
           notesform = forms.AssignmentNotesForm(data=data, instance=notes, prefix="notes")
 
           if form.is_valid() and formset.is_valid():
-            instance.status = 'P'
-            #save button clicked
-            if save_only == 1:
-              #set the last step completed to the previous step
-              instance.last_step = step.order - 1
-            #save and exit button clicked
-            elif save_exit == 1:
-              instance.last_step = step.order - 1
-            #save and continue clicked
+            if save_only == 1 or step.order < total_steps:
+              instance.status = 'P'
+              # if submit then increase the last step completed counter
+              if save_only == 0:
+                instance.last_step = step.order
+              # if save then set the last step completed to the previous step
+              else:
+                instance.last_step = step.order - 1
             else:
-              #increase the last step completed counter
+              instance.status = 'S'
               instance.last_step = step.order
 
             #find the delta between the last save and current time and update the instance
@@ -2334,11 +2321,10 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
               formset.save()
 
             #update the instance
-            #save and exit on the last step
-            if save_exit == 1:
-              messages.success(request, 'Your responses have been saved. You may continue to update your responses until %s' % assignment.due_date.strftime('%B %d, %Y'))
+            #submission
+            if instance.status == 'S':
+              messages.success(request, 'Your assignment has been submitted.  You will not be able to make further changes.')
               return shortcuts.redirect('ctstem:assignments', bucket='inbox')
-            #Save or Save & Continue
             else:
               if save_only == 1:
                 if not request.is_ajax():
@@ -2363,7 +2349,10 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
               print 'subform error', f.errors
               print 'subform non field error', f.non_field_errors
 
-            messages.error(request, 'Please answer all non-optional questions on this step before continuing on to the next step')
+            if int(step_order) == int(total_steps):
+              messages.error(request, 'Please answer all non-optional questions on this step before submitting the assignment')
+            else:
+              messages.error(request, 'Please answer all non-optional questions on this step before continuing on to the next step')
 
           context = {'curriculum': curriculum, 'instance': instance, 'instanceform': instanceform, 'notesform': notesform, 'form': form, 'formset': formset, 'total_steps': total_steps, 'step_order': step_order}
           return render(request, 'ctstem_app/AssignmentStep.html', context)
