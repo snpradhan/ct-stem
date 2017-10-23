@@ -432,11 +432,15 @@
                         {% endif %}
                       </div>
 
-                      {% if instance.status == 'F' or instance.status == 'A' %}
-                        <div class="feedback">
-                          <label>Feedback:</label>
-                          <div class="text">{{questionForm.instance.id|getFeedback}}</div>
-                        </div>
+                      {% if instance.status == 'P' or instance.status == 'S' or instance.status == 'F' or instance.status == 'A' %}
+                        {% with feedback=questionForm.instance.id|getFeedback %}
+                          {% if feedback %}
+                          <div class="feedback">
+                            <label>Feedback:</label>
+                            <div class="text">{{feedback}}</div>
+                          </div>
+                          {% endif %}
+                        {% endwith %}
                       {% endif %}
                     </div>
                     {% if forloop.last == False %}

@@ -2439,7 +2439,7 @@ def feedback(request, assignment_id='', instance_id=''):
           form.save()
           formset.save()
 
-          if data['save_and_send'] == 'true':
+          if data['save_and_close'] == 'true':
             instance.status = 'F'
             instance.save()
             messages.success(request, 'Your feedback has been saved and sent to the student')

@@ -119,19 +119,20 @@
                   </div>
                 </div>
                 <div class="col-md-4">
-                  {% if form.instance.instance.status == 'F' or form.instance.instance.status == 'S' %}
-                    <label>Feedback: </label>
-                    <div class="feedback">
-                      {% if form.instance.instance.status == 'S' %}
-                        {{question.feedback}}
-                        <a data-toggle="modal" data-target="#emojis" class="emoji-modal" href="#" data-id="{{question.feedback.auto_id}}">
-                          <i class="fa fa-smile-o" aria-hidden="true"></i>
-                        </a>
-                      {% elif form.instance.instance.status == 'F' %}
-                        {{question.feedback.value}}
-                      {% endif %}
-                    </div>
-
+                  {% if form.instance.instance.status == 'P' or form.instance.instance.status == 'S' or form.instance.instance.status == 'F' %}
+                    {% if question.instance.response.response or question.instance.response.response_file.all %}
+                      <label>Feedback: </label>
+                      <div class="feedback">
+                        {% if form.instance.instance.status == 'P' or form.instance.instance.status == 'S' %}
+                          {{question.feedback}}
+                          <a data-toggle="modal" data-target="#emojis" class="emoji-modal" href="#" data-id="{{question.feedback.auto_id}}">
+                            <i class="fa fa-smile-o" aria-hidden="true"></i>
+                          </a>
+                        {% elif form.instance.instance.status == 'F' %}
+                          {{question.feedback.value}}
+                        {% endif %}
+                      </div>
+                    {% endif %}
                   {% endif %}
                 </div>
               </div>
@@ -141,13 +142,15 @@
         {% endfor %}
       </div>
       <div>
-        <input type="hidden" name="save_and_send" id="save_and_send" value="false" />
+        <input type="hidden" name="save_and_close" id="save_and_close" value="false" />
       </div>
       <div class="form-group button-group-fixed">
-        {% if form.instance.instance.status == 'S' %}
+        {% if form.instance.instance.status == 'P' %}
+          <input type="submit" class="btn btn-info" id="save" value="Save"/>
+        {% elif form.instance.instance.status == 'S' %}
           <input type="submit" class="btn btn-info" id="save" value="Save"/>
           <br><br>
-          <input type="button" class="btn btn-success" id="send" value="Save and Send"/>
+          <input type="button" class="btn btn-success" id="close" value="Save and Close"/>
           <br><br>
         {% endif %}
         {% if prevInstance %}
@@ -164,8 +167,8 @@
   </div>
   <script type="text/javascript">
     $(function(){
-      $('#send').click(function(){
-        $("input#save_and_send").val('true');
+      $('#close').click(function(){
+        $("input#save_and_close").val('true');
         this.form.submit();
       });
       $('a.emoji-modal').click(function(){
