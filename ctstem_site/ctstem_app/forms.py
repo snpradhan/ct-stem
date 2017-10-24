@@ -454,7 +454,7 @@ class QuestionForm(ModelForm):
 
   class Meta:
     model = models.Question
-    fields = ['question_text', 'answer_field_type', 'sketch_background', 'options', 'answer']
+    fields = ['research_category', 'question_text', 'answer_field_type', 'sketch_background', 'options', 'answer']
     widgets = {
       'question_text': forms.TextInput(attrs={'placeholder': 'Enter question here'}),
       'options': forms.Textarea(attrs={'rows':5, 'cols':60, 'placeholder': 'Options for dropdown'}),
@@ -463,6 +463,26 @@ class QuestionForm(ModelForm):
 
   def __init__(self, *args, **kwargs):
     super(QuestionForm, self).__init__(*args, **kwargs)
+
+    for field_name, field in self.fields.items():
+      field.widget.attrs['class'] = 'form-control'
+      field.widget.attrs['placeholder'] = field.help_text
+
+####################################
+#  Research Category Form
+####################################
+class ResearchCategoryForm(ModelForm):
+
+  class Meta:
+    model = models.ResearchCategory
+    fields = ['category', 'description']
+    widgets = {
+      'category': forms.TextInput(attrs={'placeholder': 'Enter category here'}),
+      'description': forms.Textarea(attrs={'rows':5, 'cols':60, 'placeholder': 'Category description'}),
+    }
+
+  def __init__(self, *args, **kwargs):
+    super(ResearchCategoryForm, self).__init__(*args, **kwargs)
 
     for field_name, field in self.fields.items():
       field.widget.attrs['class'] = 'form-control'

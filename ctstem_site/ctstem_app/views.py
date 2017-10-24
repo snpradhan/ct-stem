@@ -1675,6 +1675,75 @@ def update_school(request, user, school):
     user.school = school
     user.save()
 
+####################################
+# CREATE MODIFY A RESERCH CATEGORY
+####################################
+@login_required
+def research_category(request, id=''):
+  try:
+    # check if the user has permission to create or modify a lesson
+    if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'researcher') == False:
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to modify this research category</h1>')
+
+    # check if the research category exists
+    if '' != id:
+      category = models.ResearchCategory.objects.get(id=id)
+    else:
+      category = models.ResearchCategory()
+
+    if request.method == 'GET':
+        form = forms.ResearchCategoryForm(instance=category, prefix='category')
+        context = {'form': form,}
+        return render(request, 'ctstem_app/ResearchCategory.html', context)
+
+    elif request.method == 'POST':
+      data = request.POST.copy()
+      form = forms.ResearchCategoryForm(data, instance=category, prefix="category")
+      if form.is_valid():
+        form.save()
+        messages.success(request, "Research Category Saved.")
+        return shortcuts.redirect('ctstem:categories',)
+      else:
+        print form.errors
+        messages.error(request, "The research category could not be saved because there were errors.  Please check the errors below.")
+        context = {'form': form}
+        return render(request, 'ctstem_app/ResearchCategory.html', context)
+
+  except models.ResearchCategory.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested Research Category not found</h1>')
+
+####################################
+# RESEARCH CATEGORIES TABLE VIEW
+####################################
+def research_categories(request):
+  categories = models.ResearchCategory.objects.all()
+  context = {'categories': categories}
+  return render(request, 'ctstem_app/ResearchCategories.html', context)
+
+####################################
+# DELETE RESEARCH CATEGORY
+####################################
+def deleteCategory(request, id=''):
+  try:
+    # check if the user has permission to delete a category
+    if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'researcher') == False:
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to delete this category</h1>')
+    # check if the lesson exists
+    if '' != id:
+      category = models.ResearchCategory.objects.get(id=id)
+    else:
+      raise models.ResearchCategory.DoesNotExist
+
+    if request.method == 'GET' or request.method == 'POST':
+
+      category.delete()
+      messages.success(request, '%s deleted' % category.category)
+      return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+    return http.HttpResponseNotAllowed(['GET', 'POST'])
+
+  except models.ResearchCategory.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested category not found</h1>')
 
 ####################################
 # PUBLICATIONS TABLE VIEW
@@ -2517,8 +2586,8 @@ def export_response(request, assignment_id='', student_id=''):
     row_num += 1
     ws.write(row_num, 0, '')
 
-    columns = ['Student', 'Step No.', 'Step Title', 'Question No.', 'Question', 'Options', 'Correct Answer', 'Student Response', 'Submission DateTime']
-    font_styles = [font_style, font_style, font_style, font_style, font_style, font_style, font_style, font_style, date_time_format]
+    columns = ['Student', 'Step No.', 'Step Title', 'Question No.', 'Question', 'Research Category', 'Options', 'Correct Answer', 'Student Response', 'Submission DateTime']
+    font_styles = [font_style, font_style, font_style, font_style, font_style, font_style, font_style, font_style, font_style, date_time_format]
 
     row_num += 1
     for col_num in range(len(columns)):
@@ -2547,6 +2616,7 @@ def export_response(request, assignment_id='', student_id=''):
                  stepResponse.step.title,
                  questionResponse.curriculum_question.order,
                  smart_str(questionResponse.curriculum_question.question),
+                 smart_str(questionResponse.curriculum_question.question.research_category.category) if questionResponse.curriculum_question.question.research_category else '',
                  smart_str(questionResponse.curriculum_question.question.options),
                  smart_str(questionResponse.curriculum_question.question.answer),
                  response_text,
@@ -2583,8 +2653,8 @@ def export_all_response(request, curriculum_id=''):
     date_time_format = xlwt.XFStyle()
     date_time_format.num_format_str = 'mm/dd/yyyy hh:mm AM/PM'
 
-    columns = ['Group', 'Curriculum', 'Assigned Date', 'Due Date', 'Student', 'Step No.', 'Step Title', 'Question No.', 'Question', 'Options', 'Correct Answer', 'Student Response', 'Submission DateTime']
-    font_styles = [font_style, font_style, date_format, date_format, font_style, font_style, font_style, font_style, font_style, font_style, font_style, font_style, date_time_format]
+    columns = ['Group', 'Curriculum', 'Assigned Date', 'Due Date', 'Student', 'Step No.', 'Step Title', 'Question No.', 'Question', 'Research Category', 'Options', 'Correct Answer', 'Student Response', 'Submission DateTime']
+    font_styles = [font_style, font_style, date_format, date_format, font_style, font_style, font_style, font_style, font_style, font_style, font_style, font_style, font_style, date_time_format]
 
     curricula = []
 
@@ -2639,6 +2709,7 @@ def export_all_response(request, curriculum_id=''):
                      stepResponse.step.title,
                      questionResponse.curriculum_question.order,
                      smart_str(questionResponse.curriculum_question.question),
+                     smart_str(questionResponse.curriculum_question.question.research_category.category) if questionResponse.curriculum_question.question.research_category else '',
                      smart_str(questionResponse.curriculum_question.question.options),
                      smart_str(questionResponse.curriculum_question.question.answer),
                      response_text,

@@ -214,6 +214,14 @@ class BookmarkedCurriculum(models.Model):
   teacher = models.ForeignKey('Teacher', null=False)
   created = models.DateTimeField(auto_now_add=True)
 
+# Research Category
+class ResearchCategory(models.Model):
+  category = models.CharField(null=False, blank=False, max_length=256)
+  description = models.TextField(null=True, blank=True)
+
+  def __unicode__(self):
+    return u'%s' % (self.category)
+
 # Question model
 # A bank of questions that can be resued across assessments and lessons
 class Question(models.Model):
@@ -222,6 +230,7 @@ class Question(models.Model):
   options = models.TextField(null=True, blank=True, help_text="For dropdown, multi-select and multiple choice questions provide one option per line. For multiple choice w/ images provide one image url per line. For a data table, provide one table header per line")
   answer = models.TextField(null=True, blank=True)
   sketch_background = models.ImageField(upload_to=upload_file_to, blank=True, null=True)
+  research_category = models.ForeignKey(ResearchCategory, null=True, blank=True, related_name='questions', on_delete=models.SET_NULL)
 
   def __unicode__(self):
       return u'%s' % (self.question_text)

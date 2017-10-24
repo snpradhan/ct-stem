@@ -226,6 +226,7 @@
                   <ul class="dropdown-menu">
                     <li class="{% navactive request 'ctstem:subjects' %}"><a href="{% url 'ctstem:subjects' %}">Subjects</a></li>
                     <li class="{% navactive request 'ctstem:schools' %}"><a href="{% url 'ctstem:schools' %}">Schools</a></li>
+                    <li class="{% navactive request 'ctstem:categories' %}"><a href="{% url 'ctstem:categories' %}">Research Categories</a></li>
                     {% if user.administrator %}
                       <li class="{% navactive request 'ctstem:teamMembers' %}"><a href="{% url 'ctstem:teamMembers' %}">Team</a></li>
                        <li class="{% navactive request 'ctstem:curricula' 'surveys' %} "><a href="{% url 'ctstem:curricula' 'surveys' %}">Surveys</a></li>
