@@ -1956,7 +1956,7 @@ def underlyingCurriculum(request, id=''):
 
   if 'GET' == request.method:
     curriculum = models.Curriculum.objects.get(id=id)
-    underlying_curriculum = curriculum.underlying_curriculum.all().filter(status='P')
+    underlying_curriculum = curriculum.underlying_curriculum.all().filter(status='P').order_by('order')
     curriculum_list = [{'id': curr.id, 'title': curr.title} for curr in underlying_curriculum]
     print curriculum_list
     return http.HttpResponse(json.dumps(curriculum_list), content_type="application/json")
