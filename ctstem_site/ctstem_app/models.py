@@ -138,7 +138,6 @@ class Curriculum (models.Model):
   compatible_system = models.ManyToManyField('System', null=True, blank=True, help_text="Select one or more compatible systems")
   parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL, related_name="children")
   version = models.IntegerField(default=1)
-  slug = models.SlugField(unique=True, max_length=255)
   taxonomy = models.ManyToManyField('Subcategory', null=True, blank=True)
   author = models.ForeignKey(User, null=False, related_name='curriculum_author')
   authors = models.ManyToManyField(User, null=False, related_name="curriculum_authors")

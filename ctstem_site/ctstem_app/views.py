@@ -179,7 +179,6 @@ def curriculum(request, id=''):
         savedCurriculum = form.save(commit=False)
         if '' == id:
           savedCurriculum.author = request.user
-        savedCurriculum.slug = slugify(savedCurriculum.title) + '-v%s'%savedCurriculum.version
         savedCurriculum.save()
         form.save()
         attachment_formset.save()
@@ -429,7 +428,6 @@ def copyCurriculumMeta(request, id=''):
     attachments = models.Attachment.objects.all().filter(curriculum=curriculum)
     title = curriculum.title
     curriculum.title = str(datetime.datetime.now())
-    curriculum.slug = slugify(curriculum.title)
     curriculum.pk = None
     curriculum.id = None
     curriculum.icon = None
@@ -443,7 +441,6 @@ def copyCurriculumMeta(request, id=''):
     curriculum.parent = original_curriculum
     curriculum.status = 'D'
     curriculum.version = int(original_curriculum.version) + 1
-    curriculum.slug = slugify(curriculum.title) + '-v%s'%curriculum.version + '-%s'%curriculum.id
     curriculum.subject = original_curriculum.subject.all()
     curriculum.taxonomy = original_curriculum.taxonomy.all()
 
