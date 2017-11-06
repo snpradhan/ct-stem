@@ -466,9 +466,9 @@
                           {% for option in questionObj.options|splitlines%}
                             <td class="likert-option">
                               {% if option|slugify == questionForm.response.value|slugify %}
-                                <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}"  checked="true"/>
+                                <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}"  checked="true" title="{{option}}"/>
                               {% else %}
-                                <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}" />
+                                <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}" title="{{option}}" />
                               {% endif %}
                             </td>
                           {% endfor %}
@@ -485,19 +485,21 @@
         </div>
 
         <div>
-          <h3>Notes</h3>
-          {{notesform.management_form}}
-          <div class="assignment_input">
-            {% if instance.status == 'F' or instance.status == 'S' or instance.status == 'A' %}
-              {% if notesform.note.value %}
-                {{notesform.note.value|safe}}
+          {% if curriculum.curriculum_type != 'S' and curriculum.curriculum_type != 'A' %}
+            <h3>Notes</h3>
+            {{notesform.management_form}}
+            <div class="assignment_input">
+              {% if instance.status == 'F' or instance.status == 'S' or instance.status == 'A' %}
+                {% if notesform.note.value %}
+                  {{notesform.note.value|safe}}
+                {% endif %}
+              {% else %}
+                <div class="help">You may enter notes below.</div>
+                {{notesform.note}}
               {% endif %}
-            {% else %}
-              <div class="help">You may enter notes below.</div>
-              {{notesform.note}}
-            {% endif %}
-          </div>
-          <hr>
+            </div>
+            <hr>
+          {% endif %}
         </div>
 
         <div class="save-buttons">

@@ -555,6 +555,9 @@ table.likert .likert-option {
 td.likert-option {
   font-size: 1em;
 }
+td.likert-option input[type="radio"] {
+  cursor: pointer;
+}
 
 th.likert-instructions {
   font-weight: 700;
