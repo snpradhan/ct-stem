@@ -48,6 +48,8 @@
                 </div>
                 {% if assignment_details.assignment.curriculum.icon %}
                   <img src="{{assignment_details.assignment.curriculum.icon.url}}" class="img-responsive" alt=""/>
+                {% elif assignment_details.assignment.curriculum.unit and assignment_details.assignment.curriculum.unit.icon %}
+                  <img src="{{assignment_details.assignment.curriculum.unit.icon.url}}" class="img-responsive" alt=""/>
                 {% else %}
                   <img src="/static/img/assessment.png" class="img-responsive" alt="">
                 {% endif %}

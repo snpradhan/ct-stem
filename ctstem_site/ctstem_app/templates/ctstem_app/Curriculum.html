@@ -451,12 +451,13 @@
         //reset field visibility
         reset_curriculum_metadata();
 
-        //for all curriculum types, display author, title and status
+        //for all curriculum types, display author, title, status and icon
         if($(this).val() == 'U' || $(this).val() == 'L' || $(this).val() == 'A' || $(this).val() == 'S') {
           $('#id_curriculum-author').closest('.form-group').show();
           $('#id_curriculum-authors').closest('.form-group').show();
           $('#id_curriculum-title').closest('.form-group').show();
           $('#id_curriculum-status').closest('.form-group').show();
+          $('#id_curriculum-icon').closest('.form-group').show();
         }
         //for unit, lesson and assessment, display time, teacher overview, student overview, acknowledgement and attachment table
         if($(this).val() == 'U' || $(this).val() == 'L' || $(this).val() == 'A') {
@@ -470,9 +471,8 @@
           $('#id_curriculum-acknowledgement').closest('.form-group').show();
         }
 
-        //for unit, stand alone lesson and assessment display icon, level, purpose and taxonomy
+        //for unit, stand alone lesson and assessment display level, purpose and taxonomy
         if($(this).val() == 'U' || ($(this).val() == 'L' &&  $('select#id_curriculum-unit').val() == '' )|| $(this).val() == 'A') {
-          $('#id_curriculum-icon').closest('.form-group').show();
           $('#id_curriculum-level').closest('.form-group').show();
           $('#id_curriculum-level').closest('.form-group').find('label:first').html('Level (<span class="required">*</span>)');
           $('#id_curriculum-purpose').closest('.form-group').show();
