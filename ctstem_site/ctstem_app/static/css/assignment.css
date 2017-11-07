@@ -607,7 +607,18 @@ a.add_attachment {
 .share-button:hover { background-color: #999; }
 .share-button:active { background-color: red; }
 
+.credits {
+  width: auto;
+  float: left;
+  height: 3rem;
+  width: 80%;
+  vertical-align: middle;
+  overflow-y: scroll;
+}
 
+.credits p {
+  display:  inline-block;
+}
 
 /* UTILITY BUTTONS */
 .util-button {
