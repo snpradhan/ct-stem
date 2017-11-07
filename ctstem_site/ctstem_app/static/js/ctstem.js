@@ -220,6 +220,15 @@ $(function (){
   });
   //disable a field if it is inside a div with class disabled
   $('div#userProfile div.disabled select').prop('disabled', true);
+
+  //on click of students tab load the spinner
+  $('li a.students').on('click', function() {
+    $('img#spinner').show();
+  });
+
+  $('.content').on("click", 'a.util-button.fa-files-o', function(e) {
+    $('img#spinner').show();
+  });
 });
 
 
