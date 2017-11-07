@@ -452,7 +452,7 @@ class AssignmentInstance(models.Model):
 #######################################################
 class AssignmentNotes(models.Model):
   instance = models.OneToOneField(AssignmentInstance, unique=True, null=False, related_name="notes")
-  note = RichTextField(null=True, blank=True)
+  note = RichTextField(null=True, blank=True, config_name='student_response_ckeditor')
 
 #######################################################
 # Assignment Step Response Model
@@ -470,7 +470,7 @@ class AssignmentStepResponse(models.Model):
 class QuestionResponse(models.Model):
   step_response = models.ForeignKey(AssignmentStepResponse)
   curriculum_question = models.ForeignKey(CurriculumQuestion)
-  response = RichTextField(null=True, blank=True)
+  response = RichTextField(null=True, blank=True, config_name='student_response_ckeditor')
   responseFile = models.FileField(upload_to=upload_file_to, blank=True)
   created_date = models.DateTimeField(auto_now_add=True)
   modified_date = models.DateTimeField(auto_now=True)

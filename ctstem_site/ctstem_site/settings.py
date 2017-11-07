@@ -121,6 +121,13 @@ CKEDITOR_CONFIGS = {
         'scayt_sLang': 'en_US',
         'disableNativeSpellChecker': False,
     },
+    'student_response_ckeditor': {
+        'removePlugins': 'stylesheetparser',
+        'removeButtons': 'Source,Save,NewPage,Preview,Print,Templates,Cut,Copy,Paste,PasteText,PasteFromWord,Undo,Redo,Replace,Find,SelectAll,Form,Checkbox,Radio,TextField,Textarea,Select,Button,ImageButton,HiddenField,CopyFormatting,NumberedList,BulletedList,Outdent,Indent,Blockquote,CreateDiv,JustifyLeft,BidiLtr,Link,Image,Flash,Unlink,BidiRtl,JustifyCenter,JustifyRight,JustifyBlock,Language,Anchor,Table,HorizontalRule,Smiley,SpecialChar,PageBreak,Iframe,FontSize,Font,Format,Styles,TextColor,BGColor,Maximize,ShowBlocks,About,Scayt,RemoveFormat',
+        'toolbar': None,
+        'height': 100,
+    },
+
 }
 
 MEDIA_ROOT = os.environ.get('MEDIA_ROOT',os.path.join(BASE_DIR, 'media'))
