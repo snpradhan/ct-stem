@@ -377,7 +377,7 @@ def deleteCurriculum(request, id=''):
 
     if request.method == 'GET' or request.method == 'POST':
       curriculum.delete()
-      messages.success(request, 'Curriculum %s deleted' % curriculum.title)
+      messages.success(request, "Curriculum '%s - v%s.' has been deleted" % (curriculum.title, curriculum.version))
       return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
     return http.HttpResponseNotAllowed(['GET', 'POST'])
@@ -398,22 +398,20 @@ def copyCurriculum(request, id=''):
       if request.method == 'GET' or request.method == 'POST':
         if '' != id:
           original_curriculum = models.Curriculum.objects.get(id=id)
+          new_curriculum = copyCurriculumMeta(request, id)
           # non unit copy
           if original_curriculum.curriculum_type != 'U':
-            new_curriculum = copyCurriculumMeta(request, id)
             copyCurriculumSteps(request, original_curriculum, new_curriculum)
           else:
             #unit copy
-            #copy unit metadata
-            new_unit = copyCurriculumMeta(request, id)
             #copy underlying lessons
             for lesson in original_curriculum.underlying_curriculum.all():
               new_lesson = copyCurriculumMeta(request, lesson.id)
               copyCurriculumSteps(request, lesson, new_lesson)
-              new_lesson.unit = new_unit
+              new_lesson.unit = new_curriculum
               new_lesson.save()
 
-          messages.success(request, "A new copy of %s created.  Please archive the original curriculum" % original_curriculum.title)
+          messages.success(request, "A new curriculum '%s - v%s.' has been created and added to the Draft folder.  Please archive the original curriculum" % (new_curriculum.title, new_curriculum.version))
           return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
       return http.HttpResponseNotAllowed(['GET', 'POST'])
 
