@@ -132,7 +132,9 @@
         });
       </script>
       {% endblock %}
-      {% block custom_media %}{% endblock %}
+      {% block custom_media %}
+        <script type="text/javascript" src="/static/js/jquery.form.min.js"></script>
+      {% endblock %}
     {% endblock %}
   </head>
 
@@ -297,7 +299,9 @@
       </ul>
     {% endblock %}
     {% block spinner %}
-      <img src="/static/img/spinner.gif"/ id="spinner" style="display:none;">
+      <div id="spinner" style="display:none;">
+        <img src="/static/img/page-loader.gif" id="loading">
+      </div>
     {% endblock %}
     {% block modals %}
       {% block login %}

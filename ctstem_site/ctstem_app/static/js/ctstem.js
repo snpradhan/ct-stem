@@ -223,11 +223,19 @@ $(function (){
 
   //on click of students tab load the spinner
   $('li a.students').on('click', function() {
-    $('img#spinner').show();
+    $('div#spinner').show();
   });
 
   $('.content').on("click", 'a.util-button.fa-files-o', function(e) {
-    $('img#spinner').show();
+    $('div#spinner').show();
+  });
+
+  $('form#curriculumForm input#submit').on('click', function() {
+    $('div#spinner').show();
+  });
+
+  $('form#curriculumForm input#preview').on('click', function() {
+    $('div#spinner').show();
   });
 });
 

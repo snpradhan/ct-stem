@@ -200,15 +200,23 @@ def curriculum(request, id=''):
         #if archiving a unit, also archive the underlying lessons
         if savedCurriculum.curriculum_type == 'U' and savedCurriculum.status == 'A':
           archiveCurriculum(request, savedCurriculum.id)
-        messages.success(request, "Curriculum Saved.")
-        return shortcuts.redirect('ctstem:curriculum', id=savedCurriculum.id)
+        if request.is_ajax():
+          response_data = {'status': 1, 'message': 'Curriculum Saved.'}
+          return http.HttpResponse(json.dumps(response_data), content_type = 'application/json')
+        else:
+          messages.success(request, "Curriculum Saved.")
+          return shortcuts.redirect('ctstem:curriculum', id=savedCurriculum.id)
       else:
         print form.errors
         print formset.errors
         print attachment_formset.errors
-        messages.error(request, "The curriculum could not be saved because there were errors.  Please check the errors below.")
-        context = {'form': form, 'attachment_formset': attachment_formset, 'formset':formset, 'newQuestionForm': newQuestionForm}
-        return render(request, 'ctstem_app/Curriculum.html', context)
+        if request.is_ajax():
+          response_data = {'status': 0, 'message': 'The preview could not be generated because some mandatory fields are missing.  Please manually save the curriculum to see specific errors.'}
+          return http.HttpResponse(json.dumps(response_data), content_type = 'application/json')
+        else:
+          messages.error(request, "The curriculum could not be saved because there were errors.  Please check the errors below.")
+          context = {'form': form, 'attachment_formset': attachment_formset, 'formset':formset, 'newQuestionForm': newQuestionForm}
+          return render(request, 'ctstem_app/Curriculum.html', context)
 
     return http.HttpResponseNotAllowed(['GET', 'POST'])
 

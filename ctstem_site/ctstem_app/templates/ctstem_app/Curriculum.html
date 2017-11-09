@@ -7,7 +7,7 @@
   {{block.super}}
   <div class="content">
     <h2> Curriculum </h2>
-    <form method="post" enctype="multipart/form-data">
+    <form method="post" enctype="multipart/form-data" id='curriculumForm'>
       {% csrf_token %}
       {{form.media}}
       <div class="table" id="curriculum">
@@ -323,6 +323,12 @@
       {% endfor %}
 
       <div class="form-group button-group-fixed">
+        {% if form.instance.id %}
+          <input type="button" class="btn btn-warning" id="preview" value="Preview"/>
+        {% else %}
+          <input type="button" class="btn btn-warning" id="preview" value="Preview" title="Save this curriculum for the Preview button to be enabled" disabled/>
+        {% endif %}
+        <br><br>
         <input type="submit" class="btn btn-success" id="submit" value="Save"/>
         <br><br>
         <input type="button" class="btn btn-info" id="addStep" value="Add Step" style="display:none;"/>
@@ -382,7 +388,9 @@
         cloneMore('div.table:last', 'form');
         var new_step_div = $('div.table:last').prev();
         $(new_step_div).toggle();
-
+        //set the step order
+        var step_order = $('div.table.step:visible').length;
+        $(new_step_div).find('div.order input[id$="ORDER"]').val(step_order);
         $(new_step_div).find('textarea').each(function(){
           if($(this).attr('name') !== undefined && $(this).attr('data-config') !== undefined){
             var config = {
@@ -404,10 +412,6 @@
             CKEDITOR.replace($(this).attr('name'), config);
           }
         });
-
-        /*var step_order_div = $('div.table:last span.step_order');
-        var step_order = parseInt($(step_order_div).html()) + 1;
-        $(step_order_div).html(step_order);*/
       });
 
       $('input#id_curriculum-title').on('input', function(){
@@ -537,6 +541,35 @@
         //only show the curriculum type field
         $('#id_curriculum-curriculum_type').closest('.form-group').show();
       }
+
+      //on click of preview, first save the curriculum and then generate the preview
+      $('input#preview').on('click', function(){
+
+        for ( instance in CKEDITOR.instances )
+          CKEDITOR.instances[instance].updateElement();
+
+        $('#curriculumForm').ajaxSubmit({
+           dataType : 'json',
+           success: function(data){
+            if(data["status"]){
+              setTimeout(function(){
+                window.location.href = '/curriculum/{{form.instance.id}}';
+                window.open('/curriculum/preview/{{form.instance.id}}', '_blank');
+              }, 1000);
+            }
+            else{
+              $('div#spinner').hide();
+              $('ul.messages').html("<li class='error'>"+data['message']+"</li>");
+            }
+            return false;
+           },
+           error: function(){
+            $('div#spinner').hide();
+            $('ul.messages').html("<li class='error'>The curriculum could not be saved because there were errors.  Please manually save the curriculum to see specific errors.</li>");
+           },
+        });
+      })
+
     });
   </script>
 
