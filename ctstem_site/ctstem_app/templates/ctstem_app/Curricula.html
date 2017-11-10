@@ -107,7 +107,14 @@
                     {% endif %}
                   </td>
                   <td class="information">
-                    <div class="title">{{curriculum.title}} - v{{curriculum.version}}. </div>
+                    <div class="title">
+                      {{curriculum.title}} - v{{curriculum.version}}.
+                      {% if curriculum.locked_by %}
+                        {% if user.administrator or user.researcher or user.author %}
+                          <i class="fa fa-lock" aria-hidden="true" title="Locked by {{curriculum.locked_by}}"></i>
+                        {% endif %}
+                      {% endif %}
+                    </div>
                     {% if user.administrator or user.researcher or user.author %}
                       <div class="row">
                         <div class="col-md-2 title">Status:</div>
@@ -194,7 +201,14 @@
                             <tbody>
                             {% for curr in underlying_curriculum %}
                               <tr>
-                                <td class="title">{{curr.title}} - v{{curr.version}}. </td>
+                                <td class="title">
+                                  {{curr.title}} - v{{curr.version}}.
+                                  {% if curr.locked_by %}
+                                    {% if user.administrator or user.researcher or user.author %}
+                                      <i class="fa fa-lock" aria-hidden="true" title="Locked by {{curr.locked_by}}"></i>
+                                    {% endif %}
+                                  {% endif %}
+                                </td>
                                 {% if user.administrator or user.researcher or user.author %}
                                   <td>{{ curr.get_status_display }}</td>
                                 {% endif %}

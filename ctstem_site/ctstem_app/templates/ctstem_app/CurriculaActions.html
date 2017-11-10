@@ -32,6 +32,18 @@
   {% endif %}
   <!-- Copy -->
   <a class="util-button fa fa-files-o" aria-hidden="true" aria-label="Create New Copy" title="Create New Copy" href="{% url 'ctstem:copyCurriculum' curriculum.id %}"></a>
+
+  <!-- Lock/Unlock -->
+  {% if curriculum.locked_by %}
+    <!-- Unlock -->
+    {% if user.administrator or curriculum.locked_by == user %}
+      <a class="util-button fa fa-unlock" aria-hidden="true" aria-label="Unlock Curriculum" title="Unlock Curriculum" href="{% url 'ctstem:unlockCurriculum' curriculum.id %}"></a>
+    {% endif %}
+  {% else %}
+    <!-- Lock -->
+    <a class="util-button fa fa-lock" aria-hidden="true" aria-label="Lock Curriculum" title="Lock Curriculum" href="{% url 'ctstem:lockCurriculum' curriculum.id %}"></a>
+  {% endif %}
+
 {% endif %}
 <!-- Assign -->
 {% if user.administrator or user.teacher or user.school_administrator %}

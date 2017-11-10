@@ -149,6 +149,7 @@ class Curriculum (models.Model):
   acknowledgement = RichTextUploadingField(null=True, blank=True)
   order = models.IntegerField(null=True, blank=True)
   credits = RichTextUploadingField(null=True, blank=True)
+  locked_by = models.ForeignKey(User, null=True)
 
   class Meta:
       ordering = ['-id']

@@ -142,6 +142,11 @@ def curriculum(request, id=''):
     # check if the lesson exists
     if '' != id:
       curriculum = models.Curriculum.objects.get(id=id)
+      #check if the curriculum is locked
+      if curriculum.locked_by:
+        if hasattr(request.user, 'administrator') == False and curriculum.locked_by != request.user:
+          messages.error(request, 'You do not have the privilege to modify this curriculum because it is locked by %s' % curriculum.locked_by)
+          return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
     else:
       curriculum = models.Curriculum()
       curriculum.author = request.user
@@ -270,6 +275,62 @@ def previewCurriculum(request, id='', step_order=-1):
     return http.HttpResponseNotFound('<h1>Requested curriculum not found</h1>')
 
 ####################################
+# Lock a curriculum
+####################################
+def lockCurriculum(request, id=''):
+  try:
+    # check if user has privilege to lock curriculum
+    if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'researcher') == False and hasattr(request.user, 'author') == False:
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to lock this curriculum</h1>')
+
+    if '' != id:
+      curriculum = models.Curriculum.objects.get(id=id)
+    else:
+      curriculum = models.Curriculum()
+
+    #check if curriculum already has a lock
+    if curriculum.locked_by:
+      messages.error(request, "The curriculum %s is already locked by someone else" % curriculum.title)
+    else:
+      curriculum.locked_by = request.user
+      curriculum.save()
+      messages.success(request, "The curriculum %s has been locked.  Only you or a site admin can modify and/or unlock this curriculum " % curriculum.title)
+    return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+  except models.Curriculum.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested curriculum not found</h1>')
+
+####################################
+# Unlock a curriculum
+####################################
+def unlockCurriculum(request, id=''):
+  try:
+    # check if user has privilege to lock curriculum
+    if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'researcher') == False and hasattr(request.user, 'author') == False:
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to unlock this curriculum</h1>')
+
+    if '' != id:
+      curriculum = models.Curriculum.objects.get(id=id)
+    else:
+      curriculum = models.Curriculum()
+
+    #check if curriculum already has a lock
+    if curriculum.locked_by:
+      if hasattr(request.user, 'administrator') or curriculum.locked_by == request.user:
+        curriculum.locked_by = None
+        curriculum.save()
+        messages.success(request, "The curriculum %s has been unlocked" % curriculum.title)
+      else:
+        messages.error(request, "You do not have the privilege to unlock this curriculum")
+    else:
+      messages.error(request, "The curriculum is not yet locked")
+
+    return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+  except models.Curriculum.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested curriculum not found</h1>')
+
+####################################
 # Lesson PDF
 ####################################
 def pdfCurriculum(request, id='', pdf='0'):
@@ -380,6 +441,11 @@ def deleteCurriculum(request, id=''):
     # check if the lesson exists
     if '' != id:
       curriculum = models.Curriculum.objects.get(id=id)
+      #check if the curriculum is locked
+      if curriculum.locked_by:
+        if hasattr(request.user, 'administrator') == False and curriculum.locked_by != request.user:
+          messages.error(request, 'You do not have the privilege to delete this curriculum because it is locked by %s' % curriculum.locked_by)
+          return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
     else:
       raise models.Curriculum.DoesNotExist
 
