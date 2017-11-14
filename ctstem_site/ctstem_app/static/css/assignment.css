@@ -608,16 +608,15 @@ a.add_attachment {
 .share-button:active { background-color: red; }
 
 .credits {
-  width: auto;
   float: left;
   height: 3rem;
-  width: 80%;
-  vertical-align: middle;
-  overflow-y: scroll;
+  max-width: 80%;
+  overflow-y: auto;
 }
 
 .credits p {
-  display:  inline-block;
+  margin-top: 0.5em;
+  margin-bottom: 0.1em;
 }
 
 /* UTILITY BUTTONS */
