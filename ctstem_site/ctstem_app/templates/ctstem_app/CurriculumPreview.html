@@ -190,7 +190,11 @@
                 {% endif %}
               {% endfor %}
               -->
-              <div class="credits">{{curr_unit.credits|safe}}</div>
+              <div class="credits">
+                {% if curr_unit.credits %}
+                  {{curr_unit.credits|safe}}
+                {% endif %}
+              </div>
               <!-- SOCIAL MEDIA SHARE BUTTONS -->
               <!-- TODO: Activate social media buttons -->
               <div class="share-box">
