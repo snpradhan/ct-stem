@@ -248,9 +248,31 @@
             <!-- TODO: Think about how to implement popup glossary -->
 
             <div class="overview">
-              <h2>Overview</h2>
+              {% if curr_unit.curriculum_type == 'U' %}
+                <h2>Unit Overview</h2>
+              {% else %}
+                <h2>Lesson Overview</h2>
+              {% endif %}
               {{curr_unit.overview|safe}}
               {{curr_unit.content|safe}}
+
+              {% if curr_unit.curriculum_type == 'U' %}
+                <div class="underlying_lessons_overview">
+                  {% with underlying_lessons=curr_unit|get_underlying_curriculum:request.user %}
+                  {% if underlying_lessons %}
+                    <h2>Lessons Overview</h2>
+                    {% for lesson in underlying_lessons%}
+                      <div class="lesson_overview">
+                        {% if lesson.overview %}
+                          <a class="lesson_overview_link">{{lesson.order}}. {{lesson.title}} Overview</a>
+                          <div class="lesson_overview_content">{{lesson.overview|safe}}</div>
+                        {% endif %}
+                      </div>
+                    {% endfor %}
+                  {% endif %}
+                  {% endwith %}
+                </div>
+              {% endif %}
             </div>
 
             <!-- TODO: Should this be in the database?? -->
@@ -575,6 +597,11 @@
 
         });
       });
+
+      $('body').on("click", "a.lesson_overview_link", function(e) {
+        $(this).next().toggle();
+      });
+
     });
   </script>
 {% endwith %}

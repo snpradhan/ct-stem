@@ -655,6 +655,15 @@ a.add_attachment {
   color: #ccc;
 }
 
+/* OVERVIEW */
+.overview .lesson_overview_content {
+  display: none;
+  margin-left: 1em;
+}
+
+.overview a.lesson_overview_link {
+  cursor: pointer;
+}
 
 /* STANDARDS BOX */
 .standards {
