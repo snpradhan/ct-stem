@@ -223,6 +223,9 @@ class ResearchCategory(models.Model):
   def __unicode__(self):
     return u'%s' % (self.category)
 
+  class Meta:
+    ordering = ['category']
+
 # Question model
 # A bank of questions that can be resued across assessments and lessons
 class Question(models.Model):
@@ -231,7 +234,7 @@ class Question(models.Model):
   options = models.TextField(null=True, blank=True, help_text="For dropdown, multi-select and multiple choice questions provide one option per line. For multiple choice w/ images provide one image url per line. For a data table, provide one table header per line")
   answer = models.TextField(null=True, blank=True)
   sketch_background = models.ImageField(upload_to=upload_file_to, blank=True, null=True)
-  research_category = models.ForeignKey(ResearchCategory, null=True, blank=True, related_name='questions', on_delete=models.SET_NULL)
+  research_category = models.ManyToManyField(ResearchCategory, null=True, blank=True, related_name='questions')
 
   def __unicode__(self):
       return u'%s' % (self.question_text)
