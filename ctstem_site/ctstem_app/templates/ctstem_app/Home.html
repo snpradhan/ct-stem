@@ -108,10 +108,14 @@
           Modern scientists, engineers, and mathematicians use an array of computational tools and practices in their everyday work. It is increasingly important for high school students not just to know how to use computers but to be computationally <i>literate</i>. To help guide the creation of CT activities, lessons, and assessments, we have developed a taxonomy of relevant computational practices organized into four strands.
         </p>
 
+        <div id="video">
+          <script src="https://fast.wistia.com/embed/medias/mciwh2a07z.jsonp" async></script><script src="https://fast.wistia.com/assets/external/E-v1.js" async></script><div class="wistia_responsive_padding" style="padding:56.25% 0 0 0;position:relative;"><div class="wistia_responsive_wrapper" style="height:100%;left:0;position:absolute;top:0;width:100%;"><div class="wistia_embed wistia_async_mciwh2a07z videoFoam=true" style="height:100%;width:100%">&nbsp;</div></div></div>
+        </div>
+
         {% for practice in practices %}
         <div class="practice">
           {% if practice.icon %}
-          <img src="{{practice.icon.url}}" style="width: 130px; height: 130px; float: right; margin: 2rem 0 1rem 1rem;">
+          <img src="{{practice.icon.url}}" style="width: 130px; height: 130px; float: right;">
           {% endif %}
           <h3>{{practice.name}}</h3>
           <p>{{practice.description}}</p>
