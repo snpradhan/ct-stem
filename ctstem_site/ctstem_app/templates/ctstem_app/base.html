@@ -156,12 +156,11 @@
             <ul class="nav navbar-nav">
               {% if not user.student %}
                 <li class="{% navactive request 'ctstem:curricula' 'lessons'%} {% navactive request 'ctstem:curricula' 'units'%}"><a href="{% url 'ctstem:curricula' 'units' %}">Curricula</a></li>
+                <li class="{% navactive request 'ctstem:curricula' 'assessments' %} "><a href="{% url 'ctstem:curricula' 'assessments' %}">Assessments</a></li>
                 {% if user.is_authenticated%}
                   {% if user.administrator or user.researcher or user.author %}
-                    <li class="{% navactive request 'ctstem:curricula' 'assessments' %} "><a href="{% url 'ctstem:curricula' 'assessments' %}">Assessments</a></li>
                     <li class="{% navactive request 'ctstem:standards' %} "><a href="{% url 'ctstem:standards' %}">Standards</a></li>
                   {% else %}
-                    <li class="{% navactive request 'ctstem:curricula' 'assessments' %} "><a href="{% url 'ctstem:curricula' 'assessments' %}">Assessments</a></li>
                     <!--li><a href="http://ct-stem-assess.herokuapp.com/" target="_blank">Assessments</a></li-->
                     <li><a class="page-scroll" href="{% url 'ctstem:home' %}#practices">Standards</a></li>
                   {% endif %}
@@ -181,13 +180,11 @@
                   <li class="{% navactive request 'ctstem:team' %}"><a href="{% url 'ctstem:team' %}">Team</a></li>
 
                 {% elif request.path == '/' %}
-                  <li><a class="page-scroll" href="#assessments">Assessments</a></li>
                   <li><a class="page-scroll" href="#practices">Standards</a></li>
                   <li class="{% navactive request 'ctstem:publications' %}"><a href="{% url 'ctstem:publications' %}">Research</a></li>
                   <li class="{% navactive request 'ctstem:training' %}"><a href="{% url 'ctstem:training' %}">Training</a></li>
                   <li class="{% navactive request 'ctstem:team' %}"><a href="{% url 'ctstem:team' %}">Team</a></li>
                 {% else %}
-                  <li><a class="page-scroll" href="{% url 'ctstem:home' %}#assessments">Assessments</a></li>
                   <li><a class="page-scroll" href="{% url 'ctstem:home' %}#practices">Standards</a></li>
                   <li class="{% navactive request 'ctstem:publications' %}"><a href="{% url 'ctstem:publications' %}">Research</a></li>
                   <li class="{% navactive request 'ctstem:training' %}"><a href="{% url 'ctstem:training' %}">Training</a></li>
