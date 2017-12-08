@@ -118,10 +118,21 @@
 }
 
 #home #practices #video {
+  position: relative;
+  padding-bottom: 36.95%;
+  padding-top: 35px;
+  height: 0;
+  overflow: hidden;
   width: 70%;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: 2em;
+  margin: 0 auto;
+}
+
+#home #practices #video iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
 }
 
 #home .practice {
