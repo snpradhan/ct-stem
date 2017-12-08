@@ -620,6 +620,13 @@
             allowPrompt = true;
           }
         };
+
+        //auto saving on ckeditor focusout
+        for ( instance in CKEDITOR.instances ) {
+          CKEDITOR.instances[instance].on('blur', function(e){
+            autoSave();
+          });
+        }
       }
 
       loadCanvasData();
@@ -639,21 +646,23 @@
         allowPrompt = false;
       });
 
-      //manual save
+      //Save button click
       $('button.save').click(function(){
         submit_assignment(1);
       });
 
-      //manual submit
+      //Save and Continue button click
       $('button.submit').click(function(){
         submit_assignment(0);
       });
 
+      //Save and Submit button click
       $('button.confirm_submit').click(function(){
         $('#confirmModal').modal('show');
         return false;
       });
 
+      //Submit button click on confirmation modal
       $('button#modal_submit').click(function(){
         submit_assignment(0);
       });
@@ -716,6 +725,7 @@
 
     });
 
+    //manual save on clicking Save or Save and Continue
     function submit_assignment(save){
       if(save == 1) {
         $('input:hidden[id="save"]').val(1);
@@ -738,6 +748,9 @@
       if(status != 'S' && status != 'F' && status != 'A'){
         $('input:hidden[id="save"]').val(1);
         $('input:hidden[id*="save"][id*="form"]').val('on');
+        for ( instance in CKEDITOR.instances ) {
+          CKEDITOR.instances[instance].updateElement();
+        }
         setCanvasData();
         setDataTable();
         $('#assignmentForm').ajaxSubmit({
@@ -750,7 +763,7 @@
       return true;
     }
 
-    //auto submit on focusout
+    //auto saving on focusout of form elements other than ckeditor
     function bindFocusOutSave(status) {
       if (status) {
         $('.assignment_input').focusout(function(e){
@@ -759,40 +772,7 @@
             return false;
           }
           else{
-            //alert('focus out');
-            $('input:hidden[id="save"]').val(1);
-            $('input:hidden[id*="save"][id*="form"]').val('on');
-            setCanvasData();
-            setDataTable();
-            $('#assignmentForm').ajaxSubmit({
-              dataType : 'json',
-              success: function(data){
-                //message at the top of the page stating responses auto saved
-                $("ul.messages li").remove();
-                $("ul.messages").html('<li class="success">'+data.message+'</li>');
-                //change the url in the browser if new assignment
-                if (history.pushState) {
-                  var newurl = document.location.protocol +'//'+ document.location.host + data.url;
-                  history.replaceState({},'',newurl);
-                }
-                //update question response ids for new assignment
-                $('input:hidden[id^="id_form-"][id$="-id"]').each(function(){
-                  var id = $(this).attr('id');
-                  if(!($(this).val())){
-                    $(this).val(data.questionResponses[id]);
-                  }
-                });
-                $('input:hidden[id="id_form-INITIAL_FORMS"]').val(data.questionCount);
-
-              },
-              error: function(data) {
-                $("ul.messages li").remove();
-                $("ul.messages").html('<li class="error">The responses could not auto saved. Please click the Save or Save and Continue button at the bottom of the page.</li>');
-              }
-            });
-            $('ul.messages').show();
-            $('ul.messages').delay(30000).fadeOut('slow');
-            return false;
+            autoSave();
           }
         });
       }
@@ -801,6 +781,46 @@
           $(this)[0].removeEventListener('click');
         });
       }
+    }
+
+    // ajax submit assignment step form
+    function autoSave(){
+      $('input:hidden[id="save"]').val(1);
+      $('input:hidden[id*="save"][id*="form"]').val('on');
+      for ( instance in CKEDITOR.instances ) {
+        CKEDITOR.instances[instance].updateElement();
+      }
+      setCanvasData();
+      setDataTable();
+      $('#assignmentForm').ajaxSubmit({
+        dataType : 'json',
+        success: function(data){
+          //message at the top of the page stating responses auto saved
+          $("ul.messages li").remove();
+          $("ul.messages").html('<li class="success">'+data.message+'</li>');
+          //change the url in the browser if new assignment
+          if (history.pushState) {
+            var newurl = document.location.protocol +'//'+ document.location.host + data.url;
+            history.replaceState({},'',newurl);
+          }
+          //update question response ids for new assignment
+          $('input:hidden[id^="id_form-"][id$="-id"]').each(function(){
+            var id = $(this).attr('id');
+            if(!($(this).val())){
+              $(this).val(data.questionResponses[id]);
+            }
+          });
+          $('input:hidden[id="id_form-INITIAL_FORMS"]').val(data.questionCount);
+
+        },
+        error: function(data) {
+          $("ul.messages li").remove();
+          $("ul.messages").html('<li class="error">The responses could not auto saved. Please click the Save or Save and Continue button at the bottom of the page.</li>');
+        }
+      });
+      $('ul.messages').show();
+      $('ul.messages').delay(30000).fadeOut('slow');
+      return false;
     }
 
   </script>
