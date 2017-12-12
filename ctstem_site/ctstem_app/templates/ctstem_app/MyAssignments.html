@@ -33,10 +33,16 @@
           <div class="col-lg-4 col-md-6 portfolio-item ">
             <div class="tile">
               {% if assignment_details.instance %}
-                {% if assignment_details.instance.status == 'P' %}
+                {% if assignment_details.instance.status == 'N' %}
+                  <a href="{% url 'ctstem:resumeAssignment' assignment_details.assignment.id assignment_details.instance.id assignment_details.instance.last_step %}" class="portfolio-link">
+                {% elif assignment_details.instance.status == 'P' %}
                   <a href="{% url 'ctstem:resumeAssignment' assignment_details.assignment.id assignment_details.instance.id assignment_details.instance.last_step|add:'1' %}" class="portfolio-link">
                 {% else %}
-                  <a href="{% url 'ctstem:resumeAssignment' assignment_details.assignment.id assignment_details.instance.id 0 %}" class="portfolio-link">
+                  {% if not assignment_details.assignment.lock_on_completion %}
+                    <a href="{% url 'ctstem:resumeAssignment' assignment_details.assignment.id assignment_details.instance.id 0 %}" class="portfolio-link">
+                  {% else %}
+                    <a class="portfolio-link lock_on_completion">
+                  {% endif %}
                 {% endif %}
               {% else %}
                 <a href="{% url 'ctstem:startAssignment' assignment_details.assignment.id %}" class="portfolio-link">
@@ -107,14 +113,16 @@
                         Resume <span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span>
                       </a>
                     {% else %}
-                      <a type="button" class="btn btn-info btn-md" aria-label="Resume Assignment" title="Resume Assignment" href="{% url 'ctstem:resumeAssignment' assignment_details.assignment.id assignment_details.instance.id 0 %}">
-                        {% if assignment_details.instance.status == 'F' or assignment_details.instance.status == 'A'%}
-                          Review Feedback
-                        {% else %}
-                          View
-                        {% endif %}
-                        <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
-                      </a>
+                      {% if not assignment_details.assignment.lock_on_completion %}
+                        <a type="button" class="btn btn-info btn-md" aria-label="Resume Assignment" title="Resume Assignment" href="{% url 'ctstem:resumeAssignment' assignment_details.assignment.id assignment_details.instance.id 0 %}">
+                          {% if assignment_details.instance.status == 'F' or assignment_details.instance.status == 'A'%}
+                            Review Feedback
+                          {% else %}
+                            View
+                          {% endif %}
+                          <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
+                        </a>
+                      {% endif %}
                     {% endif %}
                     {% if assignment_details.instance.status == 'F' %}
                       <a type="button" class="btn btn-warning btn-md" aria-label="Archive Assignment" title="Archive Assignment" href="{% url 'ctstem:archiveAssignment' assignment_details.instance.id %}">
@@ -155,6 +163,10 @@
           $(this).modal('show');
         });
         return false;
+      });
+
+      $('a.lock_on_completion').on('click', function(){
+        alert("You cannot view this assignment after submission");
       });
 
       $(".chart").each(function(){

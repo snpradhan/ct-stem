@@ -422,6 +422,7 @@ class Assignment(models.Model):
   group = models.ForeignKey(UserGroup, related_name="assignments")
   assigned_date = models.DateTimeField(default=datetime.datetime.now, blank=False)
   due_date = models.DateTimeField(null=False, blank=False)
+  lock_on_completion = models.BooleanField(default=False)
 
   def __unicode__(self):
     return u'%s' % (self.curriculum.title)

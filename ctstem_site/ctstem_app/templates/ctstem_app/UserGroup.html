@@ -76,6 +76,7 @@
                     <th style="width:60%;">Lesson Plan/Assessment</th>
                     <th>Scheduled Start Date <i class="fa fa-info-circle" aria-hidden="true" title="The date when the assignment is first available to students"></i></th>
                     <th>Due Date</th>
+                    <th>Lock on Completion <i class="fa fa-info-circle" aria-hidden="true" title="When locked, students will be unable to open and view the assignment once they submit"></i></th>
                     <th>Delete</th>
                   </tr>
                 </thead>
@@ -94,7 +95,6 @@
                         </div>
                       </td>
                       <td style="vertical-align:middle;">
-
                           {{assignmentForm.assigned_date }}
                           <div class="error">
                             {{assignmentForm.assigned_date.errors }}
@@ -107,6 +107,12 @@
                         </div>
                         <div class="error">
                           {{assignmentForm.due_date.errors }}
+                        </div>
+                      </td>
+                      <td class="lock_on_completion">
+                        {{assignmentForm.lock_on_completion }}
+                        <div class="error">
+                          {{assignmentForm.lock_on_completion.errors }}
                         </div>
                       </td>
                       <td>
