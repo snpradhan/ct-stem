@@ -2641,6 +2641,16 @@ def export_response(request, assignment_id='', student_id=''):
     date_time_format = xlwt.XFStyle()
     date_time_format.num_format_str = 'mm/dd/yyyy hh:mm AM/PM'
 
+    if hasattr(request.user, 'administrator') == True or hasattr(request.user, 'researcher') == True:
+      ws.write(row_num, 0, 'School', bold_font_style)
+      ws.write(row_num, 1, assignment.group.teacher.school.name, font_style)
+      row_num += 1
+
+    if hasattr(request.user, 'administrator') == True or hasattr(request.user, 'researcher') == True or hasattr(request.user, 'school_administrator') == True:
+      ws.write(row_num, 0, 'Teacher', bold_font_style)
+      ws.write(row_num, 1, assignment.group.teacher.user.get_full_name(), font_style)
+      row_num += 1
+
     ws.write(row_num, 0, 'Group', bold_font_style)
     ws.write(row_num, 1, assignment.group.title, font_style)
     row_num += 1
@@ -2722,8 +2732,19 @@ def export_all_response(request, curriculum_id=''):
     date_time_format = xlwt.XFStyle()
     date_time_format.num_format_str = 'mm/dd/yyyy hh:mm AM/PM'
 
+
     columns = ['Group', 'Curriculum', 'Assigned Date', 'Due Date', 'Student', 'Step No.', 'Step Title', 'Question No.', 'Question', 'Research Category', 'Options', 'Correct Answer', 'Student Response', 'Submission DateTime']
     font_styles = [font_style, font_style, date_format, date_format, font_style, font_style, font_style, font_style, font_style, font_style, font_style, font_style, font_style, date_time_format]
+
+    if hasattr(request.user, 'administrator') == True or hasattr(request.user, 'researcher') == True or hasattr(request.user, 'school_administrator') == True:
+      columns.insert(0, 'Teacher')
+      font_styles.insert(0, font_style)
+
+      if hasattr(request.user, 'administrator') == True or hasattr(request.user, 'researcher') == True:
+        columns.insert(0, 'School')
+        font_styles.insert(0, font_style)
+
+
 
     curricula = []
 
@@ -2783,6 +2804,12 @@ def export_all_response(request, curriculum_id=''):
                      smart_str(questionResponse.curriculum_question.question.answer),
                      response_text,
                      questionResponse.modified_date.replace(tzinfo=None)]
+              if hasattr(request.user, 'administrator') == True or hasattr(request.user, 'researcher') == True or hasattr(request.user, 'school_administrator') == True:
+                row.insert(0, instance.assignment.group.teacher.user.get_full_name())
+
+                if hasattr(request.user, 'administrator') == True or hasattr(request.user, 'researcher') == True:
+                  row.insert(0, instance.assignment.group.teacher.school.name)
+
               row_num += 1
               for col_num in range(len(row)):
                 ws.write(row_num, col_num, row[col_num], font_styles[col_num])
