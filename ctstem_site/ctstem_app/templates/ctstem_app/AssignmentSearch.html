@@ -124,6 +124,10 @@ $(function (){
                 $(new_assignment_row).toggle();
                 $(new_assignment_row).find('.datepicker').removeClass('hasDatepicker');
                 $(new_assignment_row).find('.datepicker').datepicker({dateFormat: 'M d, yy'});
+                if($("#id_curriculum_type").val() == 'A') {
+                  $(new_assignment_row).find('.lock_on_completion input').prop('checked', true);
+                }
+
               }
             });
           }

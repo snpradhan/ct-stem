@@ -723,7 +723,12 @@ def assignCurriculum(request, id=''):
               else:
                 assigned_date_object = datetime.datetime.now()
               due_date_object = datetime.datetime.strptime(due_date, '%B %d, %Y')
-              new_assignment = models.Assignment(curriculum=curr, group=group, due_date=due_date_object, assigned_date=assigned_date_object)
+              #check if the new assignment is an assessment
+              lock_on_completion = False
+              if curr.curriculum_type == 'A':
+                #lock on completion by default
+                lock_on_completion = True
+              new_assignment = models.Assignment(curriculum=curr, group=group, due_date=due_date_object, assigned_date=assigned_date_object, lock_on_completion=lock_on_completion)
               new_assignment.save()
 
       response_data = {'message': 'The curriculum "%s" has been assigned' % curriculum.title}

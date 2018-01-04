@@ -830,7 +830,7 @@ div.content#assignments .chart_container {
   margin-right: auto;
 }
 
-div.assignment_table td.lock_on_completion input{
+td.lock_on_completion input{
   width: auto;
   height: auto;
   margin-left: auto;
