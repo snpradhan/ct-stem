@@ -552,7 +552,7 @@ def active(sender, instance, **kwargs):
     domain = current_site.domain
 
     send_mail('CT-STEM Account Activated',
-              'Your account has been activated on Computational Thinking in STEM website http://%s.\r\n\r\n\
+              'Your account has been activated on Computational Thinking in STEM website https://%s.\r\n\r\n\
                You can login using the credentials created during registration.\r\n\r\n\
               -- CT-STEM Admin' % domain,
               settings.DEFAULT_FROM_EMAIL,
