@@ -30,7 +30,6 @@ class RegistrationForm (forms.Form):
   email = forms.EmailField(required=True, max_length=75, label=u'Email')
   account_type = forms.ChoiceField(required=True, choices = models.USER_ROLE_CHOICES)
   school = forms.ModelChoiceField(required=False, queryset=models.School.objects.all().filter(is_active=True).order_by('name'))
-  captcha = CaptchaField(help_text=u'Solve the equation to the right')
 
   def __init__(self, *args, **kwargs):
     user = kwargs.pop('user')
@@ -47,8 +46,6 @@ class RegistrationForm (forms.Form):
         self.fields['school'].queryset = models.School.objects.filter(id=user.teacher.school.id)
       elif hasattr(user, 'administrator'):
         self.fields['school'].queryset = models.School.objects.filter(~Q(school_code='OTHER'), is_active=True)
-
-      self.fields.pop('captcha')
 
     elif group_id:
       self.fields['account_type'].choices = models.USER_ROLE_CHOICES[3:]

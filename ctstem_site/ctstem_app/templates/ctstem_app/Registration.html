@@ -37,13 +37,7 @@
                 <label for="id_{{field.name}}">{{ field.label|title }}
                   {% if field.field.required %}(<span class="required">*</span>) {% endif %}
                 </label>
-                {% if field.name == 'captcha' %}
-                  <div>
-                    {{field}}
-                    <button class='js-captcha-refresh btn btn-default'><i class="fa fa-refresh" aria-hidden="true"></i></button>
-                  </div>
-                  <div class="help warning">{{field.help_text}}</div>
-                {% elif field.name == 'school' and school_form %}
+                {% if field.name == 'school' and school_form %}
                   {{field}}
                   <div id="school_form" style="display:none;">
                     {% for field in school_form %}
@@ -154,20 +148,6 @@
         });
         /**************************/
 
-        $('.js-captcha-refresh').click(function(){
-          $form = $(this).parents('form');
-
-          var url = location.protocol + "//" + window.location.hostname + ":"
-                    + location.port + "/captcha/refresh/";
-
-          // Make the AJAX-call
-          $.getJSON(url, {}, function(json) {
-              $form.find('input[name="captcha_0"]').val(json.key);
-              $form.find('img.captcha').attr('src', json.image_url);
-          });
-
-          return false;
-        });
         $('select#id_school').on('change', function(){
           if($(this).val() == "{{other_school.id}}"){
             $("div#school_form").show();
