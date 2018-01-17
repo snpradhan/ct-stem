@@ -158,6 +158,11 @@
           }
         });
         $('select#id_school').trigger('change');
+
+        {% if user.is_anonymous and group_id and school_id %}
+          //this is student registration, hide the menu items
+          $('ul.nav.navbar-nav').hide();
+        {% endif %}
       });
     </script>
   </div>
