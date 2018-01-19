@@ -242,6 +242,24 @@ def StudentActions(context):
 def student_actions(context):
     return {'actions':StudentActions(context)}
 
+def StudentInGroupAdminActions(context):
+  actions = StudentActions(context)
+  actions.append({'description':'Remove Selected Students From Group','value':'remove_selected'})
+  return actions
+
+@register.inclusion_tag("ctstem_app/admin/actions.html", takes_context=True)
+def student_in_group_admin_actions(context):
+    return {'actions':StudentInGroupAdminActions(context)}
+
+def StudentInGroupTeacherActions(context):
+  actions = UserActions(context)
+  actions.append({'description':'Remove Selected Students From Group','value':'remove_selected'})
+  return actions
+
+@register.inclusion_tag("ctstem_app/admin/actions.html", takes_context=True)
+def student_in_group_teacher_actions(context):
+    return {'actions':StudentInGroupTeacherActions(context)}
+
 def GroupActions(context):
     return [{'description':bulk_header,'value':''},
         {'description':'Activate Selected Groups','value':'activate_selected'},

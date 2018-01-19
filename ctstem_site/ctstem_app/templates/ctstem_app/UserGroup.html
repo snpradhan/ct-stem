@@ -147,9 +147,9 @@
                 </a>
 
                 {% if user.administrator %}
-                  {% student_actions %}
+                  {% student_in_group_admin_actions %}
                 {% else %}
-                  {% user_actions %}
+                  {% student_in_group_teacher_actions %}
                 {% endif %}
               {% endif %}
             </div>

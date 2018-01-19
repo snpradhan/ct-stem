@@ -795,7 +795,8 @@ class CurriculumAssignmentForm(ModelForm):
 ####################################
 class UploadFileForm(forms.Form):
   group = forms.ModelChoiceField(required=True, queryset=models.UserGroup.objects.all())
-  emails = forms.CharField(required=True, widget=forms.Textarea, help_text="Enter comma separated list of student emails")
+  emails = forms.CharField(required=False, widget=forms.Textarea, help_text="Enter a list of student emails, one per line")
+  uploadFile = forms.FileField (required=False, help_text="Upload a csv file containing a list of student emails in the first column")
 
   def __init__(self, *args, **kwargs):
     user = kwargs.pop('user')

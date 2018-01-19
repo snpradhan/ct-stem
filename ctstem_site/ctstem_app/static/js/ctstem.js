@@ -113,10 +113,7 @@ $(function (){
       },
       success: function(data){
         if(data['result'] == 'Success'){
-          if(window.location.href.indexOf('/groups/') != -1){
-            window.location.reload();
-          }
-          else if(window.location.href.indexOf('/group/') != -1){
+          if(window.location.href.indexOf('/group/') != -1){
 
             for(var student in  data['new_students']){
               if($('tr#'+student).length == 0){
@@ -125,6 +122,7 @@ $(function (){
                 var membership_id = data['new_students'][student]['membership_id']
                 //add student detail to the table
                 $('table.table#members tbody').append('<tr id='+student+'>\
+                  <td><input id="student_'+student+'" type="checkbox" class="action-select" value="'+student+'" name="student_'+student+'">\
                   <td>'+data['new_students'][student]['username']+'\
                     <div class="controls">\
                       <a type="button" class="btn btn-success edit" aria-label="Edit User" title="Edit User" href="/user/'+user_id+'">\
@@ -138,6 +136,9 @@ $(function (){
                   <td>'+data['new_students'][student]['full_name']+'</td>\
                   <td>'+data['new_students'][student]['email']+'</td>\
                   <td>'+data['new_students'][student]['status']+'</td>\
+                  <td>'+data['new_students'][student]['student_consent']+'</td>\
+                  <td>'+data['new_students'][student]['parental_consent']+'</td>\
+                  <td>'+data['new_students'][student]['member_since']+'</td>\
                   <td>'+data['new_students'][student]['last_login']+'</td></tr>');
 
                 //add student membership hidden input
@@ -148,6 +149,10 @@ $(function (){
             $("#upload").modal('toggle');
             bind_user_removal();
             display_messages(data['messages'])
+          }
+          else {
+            //location is users or groups page
+            window.location.reload();
           }
         }
         else{

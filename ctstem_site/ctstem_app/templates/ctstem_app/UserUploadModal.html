@@ -15,8 +15,12 @@
             {{uploadForm.group}}
           </div>
           <div class="form-group">
-            <label for="id_emails">Student Emails (<span class="required">*</span>)</label>
+            <label for="id_emails">Student Emails</label>
             {{uploadForm.emails}}
+          </div>
+          <div class="form-group">
+            <label for="id_uploadFile">Upload a CSV</label>
+            {{uploadForm.uploadFile}}
           </div>
           <div id="spinner">
             <img src="/static/img/page-loader.gif" class="icon"/>

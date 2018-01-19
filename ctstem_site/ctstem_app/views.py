@@ -2974,11 +2974,24 @@ def user_upload(request):
   msg = {'error': [], 'success': []}
 
   if request.method == 'POST':
-    form = forms.UploadFileForm(request.POST, user=request.user)
+    form = forms.UploadFileForm(request.POST, request.FILES, user=request.user)
     data = request.POST.copy()
+
     if form.is_valid():
       group = models.UserGroup.objects.get(id=data['group'])
-      emails = data['emails'].split(",")
+      #read the emails in the text field
+      emails = []
+      if data['emails']:
+        emails = [e.strip() for e in data['emails'].splitlines()]
+      #read the emails in the csv and append to the previous list
+      if request.FILES:
+        f = request.FILES['uploadFile']
+        reader = csv.reader(f.read().splitlines(), delimiter=',')
+        for row in reader:
+          csv_email = str(row[0])
+          if csv_email is not None and csv_email != '':
+            emails.append(csv_email)
+
       for email in emails:
         count += 1
         #check email format
@@ -2989,8 +3002,8 @@ def user_upload(request):
           valid_email = False
 
         if not valid_email:
-          msg['error'].append('Email %d is invalid' % count)
-          messages.error(request, 'Email %d is invalid' % count)
+          msg['error'].append('%s is an invalid email' % email)
+          messages.error(request, '%s is an invalid email' % email)
           invalid +=1
         else:
           #check if email exists
@@ -3001,7 +3014,17 @@ def user_upload(request):
               #TODO
               student = models.Student.objects.get(user__email=email)
               membership, created = models.Membership.objects.get_or_create(student=student, group=group)
-              added_students[student.id] = {'user_id': student.user.id, 'username': student.user.username, 'full_name': student.user.get_full_name(), 'email': student.user.email, 'status': 'Active' if student.user.is_active else 'Inactive', 'last_login': student.user.last_login.strftime('%B %d, %Y') if student.user.last_login else '', 'group': group.id}
+              student_consent = 'Unknown'
+              if student.consent == 'A':
+                student_consent = 'Agree'
+              elif student.consent == 'D':
+                student_consent = 'Disagree'
+              added_students[student.id] = {'user_id': student.user.id, 'username': student.user.username,
+                                            'full_name': student.user.get_full_name(), 'email': student.user.email,
+                                            'status': 'Active' if student.user.is_active else 'Inactive',
+                                            'student_consent':  student_consent, 'parental_consent': student.get_parental_consent_display(),
+                                            'member_since': student.user.date_joined.strftime('%b %d, %Y'),
+                                            'last_login': student.user.last_login.strftime('%b %d, %Y') if student.user.last_login else '', 'group': group.id}
               added += 1
             else:
               #error out email in use and does not belong to a student account
@@ -3026,7 +3049,7 @@ def user_upload(request):
       response_data = {'result': 'Success', 'new_students': added_students, 'messages': msg}
     else:
       print form.errors
-      response_data = {'result': 'Failure', 'message': 'Please select a group and a comma separated list of student emails to upload.'}
+      response_data = {'result': 'Failure', 'message': 'Please select a group and either a list of student emails or a student email csv to upload.'}
     return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 
   return http.HttpResponseNotAllowed(['POST'])
