@@ -728,6 +728,7 @@ div.content#assignments section.portfolio .portfolio-item {
 }
 div.content#assignments section.portfolio .portfolio-item .portfolio-caption{
   max-height: none;
+  min-height: 25em;
 }
 div.content section.portfolio.bg-light-gray .portfolio-item .portfolio-caption {
   background-color: #fff;
@@ -804,9 +805,10 @@ div.content#assignments div.inbox_filter {
 }
 div.content#assignments .assignment_title {
   margin-bottom: 1em;
+  margin-top: 0.5em;
   font-weight: bold;
-  font-size: 1.7em;
-  height: 2.5em;
+  font-size: 1.5em;
+  height: 3.6em;
   overflow-x: scroll;
   line-height: 1.3em;
 }
