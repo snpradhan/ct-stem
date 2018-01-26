@@ -13,7 +13,13 @@
         <div class="modal-body">
           {% for field in studentAddForm %}
             <div class="form-group">
-              <label for="id_{{field.name}}">{{ field.label|title }} (<span class="required">*</span>)</label>
+              <label for="id_{{field.name}}">{{ field.label|title }} (<span class="required">*</span>)
+              {% if field.name == 'username' %}
+                <span data-toggle="tooltip" data-placement="top" title="Please enter the username in lowercase.">
+                  <i class="fa fa-info-circle" aria-hidden="true"></i>
+                </span>
+              {% endif %}
+              </label>
               {{field}}
               <div class="error">{{ field.errors }}</div>
             </div>

@@ -5,7 +5,7 @@
 
 {% block content %}
   <div class="content">
-  	<form method="post" action="{{ url }}">
+  	<form method="post" action="{{ url }}" id="password_reset">
   		{% csrf_token %}
       <div class="table" id="password">
     		{% for field in form %}
@@ -24,6 +24,17 @@
   <script type="text/javascript">
     $(document).ready(function(){
       $('input[type="text"]').addClass('form-control');
+
+      $('input[type="submit"]').on("click", function(e){
+        e.preventDefault();
+        var username_email = $('input#id_username_or_email').val();
+        //check if username was entered
+        if(username_email.indexOf('@') == -1){
+          //convert only usernames to lowercase
+          $('input#id_username_or_email').val(username_email.toLowerCase())
+        }
+        $('form#password_reset').submit();
+      });
     });
   </script>
 {% endblock %}

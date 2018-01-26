@@ -19,7 +19,14 @@
             {{field.as_hidden}}
           {% else %}
             <div class="form-group">
-              <label for="id_{{field.name}}">{{ field.label|title }} (<span class="required">*</span>)</label>
+              <label for="id_{{field.name}}">{{ field.label|title }} (<span class="required">*</span>)
+              {% if field.name == 'username' %}
+                <span data-toggle="tooltip" data-placement="top" title="Please enter your username in lowercase.">
+                  <i class="fa fa-info-circle" aria-hidden="true"></i>
+                </span>
+              {% endif %}
+              </label>
+
               {{field}}
               <div class="error">{{ field.errors }}</div>
             </div>

@@ -778,7 +778,9 @@ def register(request, group_id=''):
 
       if form.is_valid():
         print form.cleaned_data
-        user = User.objects.create_user(form.cleaned_data['username'],
+        #convert username to lowercase
+        username = form.cleaned_data['username'].lower()
+        user = User.objects.create_user(username,
                                         form.cleaned_data['email'],
                                         form.cleaned_data['password1'])
         user.first_name = form.cleaned_data['first_name']
@@ -877,7 +879,7 @@ def register(request, group_id=''):
 
           #student account
           elif form.cleaned_data['account_type'] == 'S':
-            new_user = authenticate(username=form.cleaned_data['username'],
+            new_user = authenticate(username=form.cleaned_data['username'].lower(),
                                     password=form.cleaned_data['password1'], )
             login(request, new_user)
             messages.info(request, 'Your have successfully registered.')
@@ -960,7 +962,7 @@ def register(request, group_id=''):
 def user_login(request):
   username = password = ''
   if 'POST' == request.method:
-    username = request.POST.get('username')
+    username = request.POST.get('username').lower()
     password = request.POST.get('password')
     user = authenticate(username=username, password=password)
     response_data = {}
@@ -1086,6 +1088,8 @@ def userProfile(request, id=''):
           data.__setitem__('author-user', author.user.id)
       elif role == 'school_administrator':
           data.__setitem__('school_administrator-user', school_administrator.user.id)
+      #convert username to lowercase before save
+      data.__setitem__('user-username', data.__getitem__('user-username').lower())
       data.__setitem__('user-password', user.password)
       data.__setitem__('user-last_login', user.last_login)
       data.__setitem__('user-date_joined', user.date_joined)
@@ -1318,7 +1322,7 @@ def createStudent(request, group_id=''):
     if request.method == 'POST':
       data=request.POST
       response_data = {}
-      username = data['username']
+      username = data['username'].lower()
       email = data['email']
       first_name = data['first_name']
       last_name = data['last_name']
@@ -3546,7 +3550,7 @@ def validate(request):
     data = request.POST.copy()
     form = forms.ValidationForm(data)
     if form.is_valid():
-      username = form.cleaned_data['username']
+      username = form.cleaned_data['username'].lower()
       password = form.cleaned_data['password']
       user = authenticate(username=username, password=password)
       user.is_active = True

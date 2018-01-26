@@ -19,6 +19,11 @@
               {% if field.field.required %}
                 (<span class="required">*</span>)
               {% endif %}
+              {% if field.name == 'username' %}
+                <span data-toggle="tooltip" data-placement="top" title="Please enter your username in lowercase.">
+                  <i class="fa fa-info-circle" aria-hidden="true"></i>
+                </span>
+              {% endif %}
             </label>
             {{field}}
             <div class="error">{{ field.errors }}</div>

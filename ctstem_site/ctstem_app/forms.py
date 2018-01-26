@@ -60,7 +60,7 @@ class RegistrationForm (forms.Form):
 
 
   def clean_username(self):
-    if User.objects.filter(username=self.cleaned_data['username']).count() > 0:
+    if User.objects.filter(username=self.cleaned_data['username'].lower()).count() > 0:
       raise forms.ValidationError(u'This username is already taken. Please choose another.')
     return self.cleaned_data['username']
 
@@ -117,7 +117,7 @@ class ValidationForm (forms.Form):
     if not valid:
       return valid
 
-    username = self.cleaned_data['username']
+    username = self.cleaned_data['username'].lower()
     password = self.cleaned_data['password']
     validation_code = self.cleaned_data['validation_code']
     try:
