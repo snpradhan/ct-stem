@@ -44,6 +44,7 @@ urlpatterns = [
     url(r'^logout/$', views.user_logout, name='logout'),
     url(r'^user/(?P<id>[\d]+)/$', views.userProfile, name='userProfile'),
     url(r'^user/delete/(?P<id>[\d]+)/$', views.deleteUser, name='deleteUser'),
+    url(r'^user/reset_password/(?P<id>[\d]+)/$', views.resetPassword, name='resetPassword'),
     url(r'^student/remove/(?P<group_id>[\d]+)/(?P<student_id>[\d]+)$', views.removeStudent, name='removeStudent'),
     url(r'^student/add/(?P<group_id>[\d]+)/(?P<student_id>[\d]+)$', views.addStudent, name='addStudent'),
     url(r'^student/create/(?P<group_id>[\d]+)/$', views.createStudent, name='createStudent'),

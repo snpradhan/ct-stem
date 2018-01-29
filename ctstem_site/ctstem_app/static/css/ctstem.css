@@ -866,10 +866,16 @@ hr.light {
 /***********   FORM GROUP END   ************/
 
 /******** Button ***********/
-.btn-primary, .btn-default, .btn-success, .btn-danger, .btn-warning, .btn-info {
+.btn-primary, .btn-default, .btn-success, .btn-danger, .btn-warning, .btn-info, .btn-gray {
   font-family: Montserrat, "Helvetica Neue", Helvetica, Arial, sans-serif;
   text-transform: uppercase;
   font-weight: 700
+}
+
+.btn-gray {
+  color: #fff;
+  background-color: #b7b7b7;
+  border-color: #b7b7b7;
 }
 
 div.content #pagination {
@@ -897,6 +903,9 @@ div.modal-content div.msg {
   text-align: center;
   color: red;
   font-size: 1.4em;
+}
+div.modal-content div.msg.success {
+  color: green;
 }
 div.modal-content div.results{
   padding: 0 2em 1em 2em;
@@ -939,6 +948,10 @@ div.modal-content div#studentResults {
   height: auto;
   max-height: 50em;
   overflow-y: auto;
+}
+
+div#reset_password .modal-content .modal-body .form-group div {
+  font-size: 1.5em;
 }
 
 div#profile .modal-content .modal-body {

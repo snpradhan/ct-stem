@@ -191,9 +191,14 @@
                           <a type="button" class="btn btn-warning removeUser" aria-label="Remove Student from this group" title="Remove Student from this group" href="{% url 'ctstem:removeStudent' form.instance.id student.id  %}" data-id="{{forloop.counter0}}">
                             <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
                           </a>
-                          <button type="button" class="btn btn-info reset" aria-label="Reset User Password" title="Reset User Password" onclick="return reset_password('{{student.user.username}}','{{csrf_token}}')">
-                            <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+                          <button type="button" class="btn btn-info reset_email" aria-label="Send password reset email" title="Send password reset email" onclick="return send_password_reset_email('{{student.user.username}}','{{csrf_token}}')">
+                            <span class="glyphicon glyphicon-send" aria-hidden="true"></span>
                           </button>
+                          {% if user.administrator or user.teacher %}
+                            <button type="button" class="btn btn-gray reset" aria-label="Reset Student Password" title="Reset Student Password" onclick="return reset_password('{{student.user.get_full_name}}','{{student.user.id}}','{{csrf_token}}')">
+                              <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+                            </button>
+                          {% endif %}
                         </div>
                       {% endif %}
                       </td>
@@ -252,6 +257,10 @@
     {% block create_and_add_student %}
       {% include "ctstem_app/CreateAndAddStudent.html" %}
     {% endblock %}
+
+    {% block password_reset %}
+      {% include "ctstem_app/UserPassword.html" %}
+    {% endblock %}
   {% endif %}
 
   <script type="text/javascript">
@@ -282,6 +291,7 @@
         $("div.modal#upload select#id_group option[value='"+$(this).data('id')+"']").prop('selected', true);
         $("div.modal#upload select#id_group").closest('.form-group').hide();
       });
+
     });
   </script>
 {% endblock %}

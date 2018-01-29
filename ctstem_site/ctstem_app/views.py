@@ -3584,3 +3584,22 @@ def subaction(request, action=1):
     return http.HttpResponse(json.dumps(data, ensure_ascii=False), content_type='application/javascript')
   else:
     return http.HttpResponse(status=400)
+
+@login_required
+def resetPassword(request, id=''):
+  if request.method in ['GET', 'POST']:
+    try:
+      if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'teacher') == False:
+        response_data = {'result': 'Failure', 'message': 'You do not have the privilege to reset user password'}
+      else:
+        user = User.objects.get(id=id)
+        password = User.objects.make_random_password()
+        user.set_password(password)
+        user.save()
+        print 'password reset'
+        response_data = {'result': 'Success', 'full_name': user.get_full_name(), 'username': user.username, 'password': password}
+      return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+    except models.User.DoesNotExist:
+      return http.HttpResponseNotFound('<h1>Requested User not found</h1>')
+  return http.HttpResponseNotAllowed(['GET', 'POST'])
+

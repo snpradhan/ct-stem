@@ -1,4 +1,4 @@
-function reset_password(username, csrf_token){
+function send_password_reset_email(username, csrf_token){
   data = {}
   data['csrfmiddlewaretoken'] = csrf_token;
   data['username_or_email'] = username;
@@ -20,6 +20,43 @@ function reset_password(username, csrf_token){
       $('ul.messages').delay(30000).fadeOut('slow');
     },
   });
+  return false;
+}
+
+function reset_password(user_full_name, user_id, csrf_token){
+  var r = confirm("Are you sure you want to reset "+user_full_name+"'s password?");
+  if (r == true) {
+    data = {}
+    data['csrfmiddlewaretoken'] = csrf_token;
+    var data = $.param(data);
+    $.ajax({
+      type: "POST",
+      url: '/user/reset_password/'+user_id+'/',
+      data: data,
+      success: function(data){
+        console.log(data);
+        if(data['result'] == 'Success'){
+          $('div.modal#reset_password #id_name').html(data['full_name']);
+          $('div.modal#reset_password #id_username').html(data['username']);
+          $('div.modal#reset_password #id_password').html(data['password']);
+          $('div.modal#reset_password').modal('show');
+        }
+        else{
+          $("ul.messages li").remove();
+          $("ul.messages").html('<li class="error">'+data['message']+'</li>');
+          $('ul.messages').show();
+          $('ul.messages').delay(30000).fadeOut('slow');
+        }
+
+      },
+      error: function(xhr, ajaxOptions, thrownError){
+        $("ul.messages li").remove();
+        $("ul.messages").html('<li class="error">User password could not be reset</li>');
+        $('ul.messages').show();
+        $('ul.messages').delay(30000).fadeOut('slow');
+      },
+    });
+  }
   return false;
 }
 
