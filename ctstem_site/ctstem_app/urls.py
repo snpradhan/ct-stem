@@ -68,6 +68,7 @@ urlpatterns = [
     url(r'^assignments/(?P<bucket>[\w-]+)/$', views.assignments, name='assignments'),
     url(r'^assignment/(?P<assignment_id>[\d]+)/new/$', views.assignment, name='startAssignment'),
     url(r'^assignment/(?P<assignment_id>[\d]+)/(?P<instance_id>[\d]+)/(?P<step_order>[\d]+)/$', views.assignment, name='resumeAssignment'),
+    url(r'^assignment/(?P<assignment_id>[\d]+)/(?P<instance_id>[\d]+)/unlock/$', views.unlockAssignment, name='unlockAssignment'),
     url(r'^assignment/archive/(?P<instance_id>[\d]+)/$', views.archiveAssignment, name='archiveAssignment'),
     url(r'^assignment/search/$', views.searchAssignment, name='searchAssignment'),
     url(r'^export_response/(?P<assignment_id>[\d]+)/$', views.export_response, name='export_group_response'),

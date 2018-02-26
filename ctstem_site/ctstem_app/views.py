@@ -2610,6 +2610,39 @@ def feedback(request, assignment_id='', instance_id=''):
   except models.Step.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Curriculum Step not found </h1>')
 
+####################################
+# Unlock submitted assignment
+####################################
+@login_required
+def unlockAssignment(request, assignment_id='', instance_id=''):
+  try:
+    if '' != instance_id:
+      instance = models.AssignmentInstance.objects.get(assignment__id=assignment_id, id=instance_id)
+      school = instance.student.school
+      group = instance.assignment.group
+      privilege = 0
+      if hasattr(request.user, 'researcher') or hasattr(request.user, 'administrator'):
+        privilege = 1
+      elif hasattr(request.user, 'teacher') and request.user.teacher == group.teacher:
+          privilege = 1
+      elif hasattr(request.user, 'school_administrator') and request.user.school_administrator.school == school:
+        privilege = 1
+
+      if privilege == 0:
+        return http.HttpResponseNotFound('<h1>You do not have the privilege to unlock this assignment</h1>')
+
+      if instance.status == 'S':
+        instance.status = 'P'
+        instance.last_step = instance.last_step - 1
+        instance.save()
+        messages.success(request, 'The assignment %s for %s has been unlocked' % (instance.assignment.curriculum, instance.student))
+      else:
+        messages.error(request, 'The assignment status is %s and cannot be unlocked' % (instance.status))
+      return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+    else:
+      raise models.AssignmentInstance.DoesNotExist
+  except models.AssignmentInstance.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested assignment not found</h1>')
 
 ####################################
 # Export Student Responses
