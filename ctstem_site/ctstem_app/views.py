@@ -39,6 +39,9 @@ from django.core.exceptions import ValidationError
 from django.http import JsonResponse
 from django.utils.crypto import get_random_string
 from django.db.models import Max, Min
+import logging
+
+logger = logging.getLogger('django')
 
 ####################################
 # HOME
@@ -2489,12 +2492,13 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
                 return shortcuts.redirect('ctstem:resumeAssignment', assignment_id=assignment_id, instance_id=instance.id, step_order=next_step)
 
           else:
-            print form.errors
-            print formset.errors
-            print 'total errors', formset.total_error_count
-            for f in formset.forms:
-              print 'subform error', f.errors
-              print 'subform non field error', f.non_field_errors
+            logger.error({'action': 'save assignment', 'user': str(request.user.username),
+                          'curriculum': str(curriculum.title), 'step': str(step.title), 'step_order': int(step_order),
+                          'assignment_id': int(assignment_id), 'instance_id': int(instance_id),
+                          'form errors': str(form.errors),
+                          'form non field errors': str(form.non_field_errors),
+                          'formset errors': str(formset.errors),
+                          'formset non form errors': str(formset.non_form_errors)})
 
             if int(step_order) == int(total_steps):
               messages.error(request, 'Please answer all non-optional questions on this step before submitting the assignment')
