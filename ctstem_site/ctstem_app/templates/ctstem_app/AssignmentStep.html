@@ -589,6 +589,87 @@
       e = e || window.event;
       evt = e;
     }
+    /*
+     * iframe save/restore functions
+     * iframes that implement save/restore state must have a unique id across the page and also have class receiver
+     */
+    window.onload = function() {
+      var myStorage = window.localStorage;
+      // Get the window displayed in the iframe.
+
+      //iterate for each iframe
+      $('iframe.receiver').each(function(){
+        var iframe = $(this);
+        var id = $(this).attr('id');
+        var url = get_url($(iframe).attr('src'));
+        console.log('iframe '+id);
+        var receiver = document.getElementById(id).contentWindow;
+        //make an ajax call to get iframe state
+        $.ajax({
+          url: "/iframe_state/{{instance.id}}/"+id+"/",
+          method: "GET",
+          dataType: "json",
+          success: function(data){
+            if(data["result"] == "Success") {
+              var state = data['state'];
+              var payload = JSON.stringify({'id': id, 'data': state});
+              console.log(payload);
+              receiver.postMessage(payload, url);
+            }
+            console.log(data['message']);
+          },
+          error: function (request, status, error) {
+            console.log(request.responseText);
+          },
+        });
+        //if there is saved form data, send it to the child iframe
+
+      });
+
+      // A function to process messages received by the window.
+      function receiveMessage(e) {
+        // Check to make sure that this message came from the correct domain.
+
+        if(e.data){
+          var origin = e.origin;
+          console.log(e.data);
+          var payload = JSON.parse(e.data);
+          var id = payload.id;
+          var url = get_url($('iframe#'+id).attr('src'));
+          if(origin == url){
+            //save the iframe state data
+            //make an ajax call to get iframe state
+            var data = {}
+            data['csrfmiddlewaretoken'] = $("input[name='csrfmiddlewaretoken']").val();
+            data['state'] = JSON.stringify(payload.data)
+            data = $.param(data);
+            $.ajax({
+              url: "/iframe_state/{{instance.id}}/"+id+"/",
+              method: "POST",
+              dataType: "json",
+              data: data,
+              success: function(data){
+                console.log(data['message']);
+              },
+              error: function (request, status, error) {
+                console.log(request.responseText);
+              },
+            });
+            //.setItem(id, JSON.stringify(payload.data));
+          }
+        }
+      }
+
+      function get_url(src) {
+        var url_arr = src.split('/');
+        var url = url_arr[0] + '//' + url_arr[2];
+        return url;
+      }
+
+      // Setup an event listener that calls receiveMessage() when the window
+      // receives a new MessageEvent.
+      window.addEventListener('message', receiveMessage);
+    };
 
     $(function(){
 

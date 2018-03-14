@@ -470,6 +470,19 @@ class AssignmentStepResponse(models.Model):
     unique_together = ('instance', 'step')
 
 #######################################################
+# Assignment Step Iframe State Model
+# This model holds the state of each iframe embedded
+# in a curriculum
+#######################################################
+class IframeState(models.Model):
+  instance = models.ForeignKey(AssignmentInstance)
+  iframe_id = models.CharField(null=False, max_length=255)
+  state = models.TextField(null=True, blank=True)
+
+  class Meta:
+    unique_together = ('instance', 'iframe_id')
+
+#######################################################
 # Question Response Model
 #######################################################
 class QuestionResponse(models.Model):

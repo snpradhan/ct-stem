@@ -86,6 +86,7 @@ urlpatterns = [
     url(r'^school/delete/(?P<id>[\d]+)/$', views.deleteSchool, name='deleteSchool'),
     url(r'^check_session/$', views.check_session, name='check_session'),
     url(r'^feedback/(?P<assignment_id>[\d]+)/(?P<instance_id>[\d]+)/$', views.feedback, name='feedback'),
+    url(r'^iframe_state/(?P<instance_id>[\d]+)/(?P<iframe_id>[a-zA-Z0-9_]+)/$', views.iframe_state, name='iframe_state'),
     url(r'^consent/$', views.consent, name='consent'),
     url(r'^load_consent/$', views.load_consent, name='load_consent'),
     url(r'^validate/$', views.validate, name='validate'),

@@ -3642,3 +3642,30 @@ def resetPassword(request, id=''):
       return http.HttpResponseNotFound('<h1>Requested User not found</h1>')
   return http.HttpResponseNotAllowed(['GET', 'POST'])
 
+
+# Get and Set iframe state for the
+# given instance, and iframe id
+@login_required
+def iframe_state(request, instance_id, iframe_id):
+  if request.is_ajax():
+    try:
+      if hasattr(request.user, 'student'):
+        student = request.user.student
+        instance = models.AssignmentInstance.objects.get(id=instance_id, student=student)
+        if request.method == 'GET':
+          iframeState = models.IframeState.objects.get(instance=instance, iframe_id=iframe_id)
+          response_data = {'result': 'Success', 'message': 'State retrieved', 'state': iframeState.state}
+        else:
+          state = request.POST['state']
+          obj, created = models.IframeState.objects.update_or_create(instance=instance, iframe_id=iframe_id, defaults={'state': state})
+          response_data = {'result': 'Success', 'message': 'State saved'}
+
+    except models.AssignmentInstance.DoesNotExist:
+      response_data = {'result': 'Failure', 'message': 'Assignment does not exist'}
+    except models.IframeState.DoesNotExist:
+      response_data = {'result': 'Failure', 'message': 'Iframe state does not exist'}
+
+    return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+
+  return http.HttpResponse(status=400)
+
