@@ -3663,7 +3663,7 @@ def iframe_state(request, instance_id, iframe_id):
     except models.AssignmentInstance.DoesNotExist:
       response_data = {'result': 'Failure', 'message': 'Assignment does not exist'}
     except models.IframeState.DoesNotExist:
-      response_data = {'result': 'Failure', 'message': 'Iframe state does not exist'}
+      response_data = {'result': 'Success', 'message': 'Iframe state does not exist', 'state': None}
 
     return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 
