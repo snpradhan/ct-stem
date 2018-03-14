@@ -2625,12 +2625,14 @@ def unlockAssignment(request, assignment_id='', instance_id=''):
       school = instance.student.school
       group = instance.assignment.group
       privilege = 0
-      if hasattr(request.user, 'researcher') or hasattr(request.user, 'administrator'):
-        privilege = 1
-      elif hasattr(request.user, 'teacher') and request.user.teacher == group.teacher:
+      #only allow Lessons to be unlocked
+      if instance.assignment.curriculum.curriculum_type == 'L':
+        if hasattr(request.user, 'researcher') or hasattr(request.user, 'administrator'):
           privilege = 1
-      elif hasattr(request.user, 'school_administrator') and request.user.school_administrator.school == school:
-        privilege = 1
+        elif hasattr(request.user, 'teacher') and request.user.teacher == group.teacher:
+            privilege = 1
+        elif hasattr(request.user, 'school_administrator') and request.user.school_administrator.school == school:
+          privilege = 1
 
       if privilege == 0:
         return http.HttpResponseNotFound('<h1>You do not have the privilege to unlock this assignment</h1>')

@@ -82,7 +82,9 @@
                   <div>
                     <a type="button" class="btn btn-success" href="{% url 'ctstem:feedback' assignment.id  assignment_details.instance.id %}" title="Give Feedback"> <img src="/static/img/feedback.png" class="icon" /> </a>
                     <a type="button" class="btn btn-info" href="{% url 'ctstem:export_student_response' assignment.id  student.id %}" title="Export Student Response"> <span class="glyphicon glyphicon-export" aria-hidden="true"></span> </a>
-                    <a type="button" class="btn btn-warning" href="{% url 'ctstem:unlockAssignment' assignment.id  assignment_details.instance.id %}" title="Unlock Assignment" onclick="return confirm('Are you sure you want to unlock this assignment? Unlocking the assignment will allow the student to edit his/her responses and resubmit.');"> <span class="fa fa-unlock" aria-hidden="true"></span> </a>
+                    {% if assignment_details.instance.assignment.curriculum.curriculum_type == 'L' %}
+                      <a type="button" class="btn btn-warning" href="{% url 'ctstem:unlockAssignment' assignment.id  assignment_details.instance.id %}" title="Unlock Assignment" onclick="return confirm('Are you sure you want to unlock this assignment? Unlocking the assignment will allow the student to edit his/her responses and resubmit.');"> <span class="fa fa-unlock" aria-hidden="true"></span> </a>
+                    {% endif %}
                   </div>
                 {% elif assignment_details.instance.status == 'F' %}
                   <div> Feedback Provided </div>
