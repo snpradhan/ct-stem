@@ -477,10 +477,11 @@ class AssignmentStepResponse(models.Model):
 class IframeState(models.Model):
   instance = models.ForeignKey(AssignmentInstance)
   iframe_id = models.CharField(null=False, max_length=255)
+  iframe_url = models.URLField(null=False, max_length=1600)
   state = models.TextField(null=True, blank=True)
 
   class Meta:
-    unique_together = ('instance', 'iframe_id')
+    unique_together = ('instance', 'iframe_id', 'iframe_url')
 
 #######################################################
 # Question Response Model

@@ -594,27 +594,31 @@
      * iframes that implement save/restore state must have a unique id across the page and also have class receiver
      */
     window.onload = function() {
-      var myStorage = window.localStorage;
+      //var myStorage = window.localStorage;
       // Get the window displayed in the iframe.
 
       //iterate for each iframe
       $('iframe.receiver').each(function(){
         var iframe = $(this);
         var id = $(this).attr('id');
-        var url = get_url($(iframe).attr('src'));
+        var iframe_url = $(iframe).attr('src');
+        var iframe_domain = get_url(iframe_url);
         console.log('iframe '+id);
         var receiver = document.getElementById(id).contentWindow;
         //make an ajax call to get iframe state
+        var data = {}
+        data['iframe_url'] = iframe_url;
         $.ajax({
           url: "/iframe_state/{{instance.id}}/"+id+"/",
           method: "GET",
           dataType: "json",
+          data: $.param(data),
           success: function(data){
             if(data["result"] == "Success") {
               var state = data['state'];
               var payload = JSON.stringify({'id': id, 'data': state});
-              console.log(payload);
-              receiver.postMessage(payload, url);
+              receiver.postMessage(payload, iframe_domain);
+              console.log('iframe state sent to url => '+payload);
             }
             console.log(data['message']);
           },
@@ -635,13 +639,15 @@
           console.log(e.data);
           var payload = JSON.parse(e.data);
           var id = payload.id;
-          var url = get_url($('iframe#'+id).attr('src'));
-          if(origin == url){
+          var iframe_url = $('iframe#'+id).attr('src');
+          var iframe_domain = get_url(iframe_url);
+          if(origin == iframe_domain){
             //save the iframe state data
             //make an ajax call to get iframe state
             var data = {}
             data['csrfmiddlewaretoken'] = $("input[name='csrfmiddlewaretoken']").val();
-            data['state'] = JSON.stringify(payload.data)
+            data['state'] = JSON.stringify(payload.data);
+            data['iframe_url'] = iframe_url;
             data = $.param(data);
             $.ajax({
               url: "/iframe_state/{{instance.id}}/"+id+"/",

@@ -3653,11 +3653,13 @@ def iframe_state(request, instance_id, iframe_id):
         student = request.user.student
         instance = models.AssignmentInstance.objects.get(id=instance_id, student=student)
         if request.method == 'GET':
-          iframeState = models.IframeState.objects.get(instance=instance, iframe_id=iframe_id)
+          iframe_url = request.GET['iframe_url']
+          iframeState = models.IframeState.objects.get(instance=instance, iframe_id=iframe_id, iframe_url=iframe_url)
           response_data = {'result': 'Success', 'message': 'State retrieved', 'state': iframeState.state}
         else:
           state = request.POST['state']
-          obj, created = models.IframeState.objects.update_or_create(instance=instance, iframe_id=iframe_id, defaults={'state': state})
+          iframe_url = request.POST['iframe_url']
+          obj, created = models.IframeState.objects.update_or_create(instance=instance, iframe_id=iframe_id, iframe_url=iframe_url, defaults={'state': state})
           response_data = {'result': 'Success', 'message': 'State saved'}
 
     except models.AssignmentInstance.DoesNotExist:
