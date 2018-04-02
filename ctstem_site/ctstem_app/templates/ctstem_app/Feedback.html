@@ -44,7 +44,11 @@
             {% endif %}</td>
             <td>
               {% for teammate in form.instance.instance.teammates.all %}
-                {{teammate}} <br>
+                {% if user.researcher %}
+                  {{teammate.user.id}} <br>
+                {% else %}
+                  {{teammate}} <br>
+                {% endif %}
               {% endfor %}
             </td>
             <td><a href="{% url 'ctstem:groupDashboard' form.instance.instance.assignment.group.id %}">{{form.instance.instance.assignment.group}}</a></td>

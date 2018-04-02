@@ -65,7 +65,11 @@
               </td>
               <td>
                 {% for teammate in assignment_details.instance.teammates.all %}
-                  {{teammate}} <br>
+                  {% if user.researcher %}
+                    {{teammate.user.id}} <br>
+                  {% else %}
+                    {{teammate}} <br>
+                  {% endif %}
                 {% endfor %}
               </td>
               <td> {{assignment_details.instance.created_date|date}} </td>
