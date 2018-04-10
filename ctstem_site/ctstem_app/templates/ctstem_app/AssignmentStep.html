@@ -610,13 +610,14 @@
             allowPrompt = true;
           }
         };
-
+        /* Disable Auto Save
         //auto saving on ckeditor focusout
         for ( instance in CKEDITOR.instances ) {
           CKEDITOR.instances[instance].on('blur', function(e){
             autoSave();
           });
         }
+        */
       }
 
       /*
@@ -711,7 +712,8 @@
 
       loadCanvasData();
       loadDataTable(!closed);
-      bindFocusOutSave(!closed);
+      //Disable Auto Save
+      //bindFocusOutSave(!closed);
 
       $("#assignmentForm input:checkbox").change(function(){
         var selectedValues = $("input[id="+$(this).attr('id')+"]:checked").map(function() {return this.value;}).get().join(',')
@@ -842,7 +844,7 @@
       }
       return true;
     }
-
+    /* Disable Auto Save
     //auto saving on focusout of form elements other than ckeditor
     function bindFocusOutSave(status) {
       if (status) {
@@ -862,7 +864,8 @@
         });
       }
     }
-
+    */
+    /* Disable Auto Save
     // ajax submit assignment step form
     function autoSave(){
       $('input:hidden[id="save"]').val(1);
@@ -902,7 +905,7 @@
       $('ul.messages').delay(30000).fadeOut('slow');
       return false;
     }
-
+    */
   </script>
 
 {% endblock %}

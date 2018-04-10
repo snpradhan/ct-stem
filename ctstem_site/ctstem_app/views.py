@@ -2493,7 +2493,7 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
 
           else:
             logger.error({'action': 'save assignment', 'user': str(request.user.username),
-                          'curriculum': str(curriculum.title), 'step': str(step.title), 'step_order': int(step_order),
+                          'curriculum': str(curriculum.title.encode('utf-8')), 'step': str(step.title.encode('utf-8')), 'step_order': int(step_order),
                           'assignment_id': int(assignment_id), 'instance_id': int(instance_id),
                           'form errors': str(form.errors),
                           'form non field errors': str(form.non_field_errors),
