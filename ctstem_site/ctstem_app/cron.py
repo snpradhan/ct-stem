@@ -12,14 +12,14 @@ def cleanup_teacher_accounts():
   teachers = models.Teacher.objects.all().filter(user__is_active = False, user__date_joined__lt=regEnd)
   count = len(teachers)
   for teacher in teachers:
-    print 'deleting', teacher
+    #print 'deleting', teacher
     #check if this teacher created a new school, if so delete the school as well
     school = models.School.objects.get(id=teacher.school.id)
     if not school.is_active:
       school.delete()
-    send_deletion_email(teacher.user)
+    #send_deletion_email(teacher.user)
     teacher.user.delete()
-  print 'done cleaning up %d teacher accounts' % count
+  print '%d teacher accounts purged' % count
 
 def send_deletion_email(user):
   send_mail('CT-STEM Account Deletion',
