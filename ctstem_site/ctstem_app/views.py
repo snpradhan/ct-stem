@@ -502,14 +502,14 @@ def copyCurriculumMeta(request, id=''):
     steps = models.Step.objects.all().filter(curriculum=curriculum)
     attachments = models.Attachment.objects.all().filter(curriculum=curriculum)
     title = curriculum.title
-    curriculum.title = str(datetime.datetime.now())
+    #curriculum.title = str(datetime.datetime.now())
     curriculum.pk = None
     curriculum.id = None
     curriculum.icon = None
     curriculum.save()
 
     original_curriculum = models.Curriculum.objects.get(id=id)
-    curriculum.title = title
+    # curriculum.title = title
     curriculum.authors = original_curriculum.authors.all()
     curriculum.created_date = datetime.datetime.now()
     curriculum.modified_date = datetime.datetime.now()
@@ -520,32 +520,38 @@ def copyCurriculumMeta(request, id=''):
     curriculum.taxonomy = original_curriculum.taxonomy.all()
 
     if original_curriculum.icon:
-      source = original_curriculum.icon
-      filecontent = ContentFile(source.file.read())
-      filename = os.path.split(source.file.name)[-1]
-      filename_array = filename.split('.')
-      new_filename = filename_array[0] + '-' + str(curriculum.id) + '.' + filename_array[1]
-      curriculum.icon.save(new_filename, filecontent)
-      curriculum.save()
-      source.file.close()
-      original_curriculum.icon.save(filename, filecontent)
-      original_curriculum.save()
+      try:
+        source = original_curriculum.icon
+        filecontent = ContentFile(source.file.read())
+        filename = os.path.split(source.file.name)[-1]
+        filename_array = filename.split('.')
+        new_filename = filename_array[0] + '-' + str(curriculum.id) + '.' + filename_array[1]
+        curriculum.icon.save(new_filename, filecontent)
+        curriculum.save()
+        source.file.close()
+        original_curriculum.icon.save(filename, filecontent)
+        original_curriculum.save()
+      except IOError, e:
+        curriculum.save()
     else:
       curriculum.save()
 
     for attachment in attachments:
       if attachment.file_object:
-        source = attachment.file_object
-        filecontent = ContentFile(source.file.read())
-        filename = os.path.split(source.file.name)[-1]
-        filename_array = filename.split('.')
-        filename = filename_array[0] + '-' + str(curriculum.id) + '.' + filename_array[1]
-        attachment.pk = None
-        attachment.id = None
-        attachment.curriculum = curriculum
-        attachment.file_object.save(filename, filecontent)
-        attachment.save()
-        source.file.close()
+        try:
+          source = attachment.file_object
+          filecontent = ContentFile(source.file.read())
+          filename = os.path.split(source.file.name)[-1]
+          filename_array = filename.split('.')
+          filename = filename_array[0] + '-' + str(curriculum.id) + '.' + filename_array[1]
+          attachment.pk = None
+          attachment.id = None
+          attachment.curriculum = curriculum
+          attachment.file_object.save(filename, filecontent)
+          attachment.save()
+          source.file.close()
+        except IOError, e:
+          continue
 
     return curriculum
   else:

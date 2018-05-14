@@ -16,6 +16,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from tinymce.widgets import TinyMCE
 from django.db.models import Q
 from captcha.fields import CaptchaField
+import os
 
 ####################################
 # Registration Form
@@ -364,33 +365,41 @@ class CurriculumForm(ModelForm):
     if not valid:
       return valid
 
-    if self.cleaned_data['curriculum_type'] == 'U'  or self.cleaned_data['curriculum_type'] == 'L' or self.cleaned_data['curriculum_type'] == 'A':
-      if self.cleaned_data['title'] == '':
+    cleaned_data = super(CurriculumForm, self).clean()
+
+    if cleaned_data.get('curriculum_type') == 'U'  or cleaned_data.get('curriculum_type') == 'L' or cleaned_data.get('curriculum_type') == 'A':
+      if cleaned_data.get('icon'):
+        try:
+          cleaned_data.get('icon').read()
+        except IOError, e:
+          self._errors['icon'] = u'Icon file is invalid. Please upload a new icon.'
+          valid = False
+      if cleaned_data.get('title') == '':
         self._errors['title'] = u'Title is required'
         valid = False
-      if self.cleaned_data['time'] == '':
+      if cleaned_data.get('time') == '':
         self._errors['time'] = u'Time is required'
         valid = False
-      if self.cleaned_data['curriculum_type'] != 'L' or not self.cleaned_data['unit']:
-        if self.cleaned_data['level'] == '':
+      if cleaned_data.get('curriculum_type') != 'L' or not cleaned_data.get('unit'):
+        if cleaned_data.get('level') == '':
           self._errors['level'] = u'Level is required'
           valid = False
-        if self.cleaned_data['purpose'] == '':
+        if cleaned_data.get('purpose') == '':
           self._errors['purpose'] = u'Purpose is required'
           valid = False
-        if self.cleaned_data['overview'] == '':
+        if cleaned_data.get('overview') == '':
           self._errors['overview'] = u'Overview is required'
           valid = False
-      if not self.cleaned_data['taxonomy'] and not self.cleaned_data['unit']:
+      if not cleaned_data.get('taxonomy') and not cleaned_data.get('unit'):
           self._errors['taxonomy'] = u'Standards is required'
           valid = False
 
-      if self.cleaned_data['curriculum_type'] == 'U'  or self.cleaned_data['curriculum_type'] == 'L':
-        if self.cleaned_data['curriculum_type'] != 'L' or not self.cleaned_data['unit']:
-          if not self.cleaned_data['subject']:
+      if cleaned_data.get('curriculum_type') == 'U'  or cleaned_data.get('curriculum_type') == 'L':
+        if cleaned_data.get('curriculum_type') != 'L' or not cleaned_data.get('unit'):
+          if not cleaned_data.get('subject'):
             self._errors['subject'] = u'Subject is required'
             valid = False
-          if self.cleaned_data['content'] == '':
+          if cleaned_data.get('content') == '':
             self._errors['content'] = u'Content is required'
             valid = False
     return valid
@@ -435,6 +444,22 @@ class AttachmentForm(ModelForm):
     for field_name, field in self.fields.items():
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['placeholder'] = field.help_text
+
+  def is_valid(self):
+    valid = super(AttachmentForm, self).is_valid()
+    if not valid:
+      return valid
+
+    cleaned_data = super(AttachmentForm, self).clean()
+
+    if cleaned_data.get('file_object') and not cleaned_data.get('DELETE'):
+      try:
+        cleaned_data.get('file_object').read()
+      except IOError, e:
+        self._errors['file_object'] = u'Attached file is invalid. Please upload a new attachment.'
+        valid = False
+
+    return valid
 
 ####################################
 # Curriculum Question Form

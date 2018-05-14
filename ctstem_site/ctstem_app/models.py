@@ -159,6 +159,7 @@ class Curriculum (models.Model):
 
   def save(self, *args, **kwargs):
     if self.icon:
+      self.icon.seek(0)
       image = Image.open(StringIO.StringIO(self.icon.read()))
       image = image.resize((400,289), Image.ANTIALIAS)
       output = StringIO.StringIO()
