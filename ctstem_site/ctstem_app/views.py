@@ -1733,6 +1733,8 @@ def _do_action(request, id_list, model, object_id=None):
       return True
     elif u'inactivate_selected' == action_params.get(u'action'):
       groups.update(is_active=False)
+      #archive assignments
+      archiveAssignments(request, id_list)
       messages.success(request, "Selected group(s) inactivated.")
       return True
   else:
@@ -1980,6 +1982,10 @@ def group(request, id=''):
       if form.is_valid() and formset.is_valid():
         savedGroup = form.save()
         formset.save()
+        #if group is being inactivated, archive the associated assignments
+        if 'group-is_active' not in data:
+          archiveAssignments(request, [id])
+
         id_list = []
         for key in data:
           if 'student_' in key:
@@ -2249,11 +2255,13 @@ def assignments(request, bucket=''):
           else:
             archived_list.append({'serial': serial, 'assignment': assignment, 'instance': instance, 'status': status_list[instance.status], 'percent_complete': percent_complete, 'modified_date': instance.modified_date})
         except models.AssignmentInstance.DoesNotExist:
-          instance = None
-          new_count += 1
-          status = 'N'
-          percent_complete = 0
-          active_list.append({'serial': serial, 'assignment': assignment, 'instance': instance, 'status': status_list[status], 'percent_complete': percent_complete, 'modified_date': timezone.now()})
+          if assignment.group.is_active:
+            #only display new assignments for active groups
+            instance = None
+            new_count += 1
+            status = 'N'
+            percent_complete = 0
+            active_list.append({'serial': serial, 'assignment': assignment, 'instance': instance, 'status': status_list[status], 'percent_complete': percent_complete, 'modified_date': timezone.now()})
 
         serial += 1
 
@@ -2314,6 +2322,19 @@ def archiveAssignment(request, instance_id=''):
 
   except models.AssignmentInstance.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested assignment not found</h1>')
+
+
+####################################
+# When group is inactivated by an Admin or a Teacher,
+# archive the associated assignments
+####################################
+def archiveAssignments(request, group_ids):
+  groups = models.UserGroup.objects.filter(id__in=group_ids)
+  #get all assignments for the groups
+  instances = models.AssignmentInstance.objects.all().filter(assignment__group__in=groups)
+  instances.update(status= 'A')
+  messages.success(request, 'All associated assignments have been archived')
+
 
 ####################################
 # STUDENT ATTEMPTING ASSIGNMENTS
