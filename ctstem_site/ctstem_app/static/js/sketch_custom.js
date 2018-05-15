@@ -7,7 +7,7 @@ $(function(){
     $.each([3, 5, 10, 15], function() {
       $('#'+id+'_tools').append("<a href='#"+id+"' class='size button-size' data-size='" + this + "' data-tool='marker' style='background: #ccc'>" + this + "</a> ");
     });
-    $('#'+id+'_tools').append("<a href='#"+id+"' class='eraser button-tool' data-tool='eraser'>Eraser</a> ");
+    $('#'+id+'_tools').append("<a href='#"+id+"' class='eraser button-tool' data-tool='eraser'>Clear</a> ");
     $('#'+id+'_tools').append("<a href='#"+id+"' class='line button-tool' data-tool='line'>Line</a> ");
     $('#'+id+'_tools').append("<a href='#"+id+"' class='rect button-tool' data-tool='rect'>Rectangle</a> ");
     $('#'+id+'_tools').append("<a href='#"+id+"' class='text button-tool' data-tool='text'>Text</a> ");
