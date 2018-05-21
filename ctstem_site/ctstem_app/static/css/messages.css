@@ -30,3 +30,9 @@ ul.messages li {
   font-size: 1.2em;
   font-style: italic;
 }
+
+#signup_note {
+  text-align: center;
+  padding: 0.25em 0 0.75em 0;
+  font-size: 1.5em;
+}

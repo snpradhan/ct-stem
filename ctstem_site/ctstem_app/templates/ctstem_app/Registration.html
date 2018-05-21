@@ -13,9 +13,15 @@
   {{block.super}}
   <div class="content">
     {% if user.is_authenticated %}
-      <h2>Create User</h2>
+      <h2 id="page_title">Create User</h2>
     {% else %}
-      <h2>Sign Up</h2>
+      {% if group_id and school_id %}
+        <h2 id="page_title">Student Sign Up</h2>
+        <div id="signup_note" class="warning">(Note: You are signing up as a student.  Enter the info below to sign on to your teacher's classroom)</div>
+      {% else %}
+        <h2 id="page_title">Teacher Sign Up</h2>
+        <div id="signup_note" class="warning">(Note: You are signing up as a teacher.  If you are a student please use the link found in your student email. Sometimes it is in your spam folder.)</div>
+      {% endif %}
     {% endif %}
 
     <form method="post">
@@ -24,8 +30,10 @@
         <fieldset>
           {{form.management_form}}
           {% for field in form %}
-            {% if group_id and field.name == 'account_type' %}
+            {% if user.is_anonymous and group_id and field.name == 'account_type' %}
               <input id="id_account_type" name="account_type" type="hidden" value="S">
+            {% elif user.is_anonymous and field.name == 'account_type' %}
+              <input id="id_account_type" name="account_type" type="hidden" value="T">
             {% elif group_id and field.name == 'school' %}
               <input id="id_school" name="school" type="hidden" value="{{school_id}}">
             {% elif user.school_administrator and field.name == 'school' %}

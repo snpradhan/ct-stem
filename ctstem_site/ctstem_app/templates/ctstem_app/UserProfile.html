@@ -8,7 +8,11 @@
 {% block content %}
   {{block.super}}
   <div class="content">
-    <h2>{{role|title}} Profile</h2>
+    {% if user.id = userform.instance.id %}
+      <h2>My Profile</h2>
+    {% else %}
+      <h2>{{role|title}} Profile</h2>
+    {% endif %}
     <form method="post">
       {% csrf_token %}
       <div class="table" id="userProfile">
