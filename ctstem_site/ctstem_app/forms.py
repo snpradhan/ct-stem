@@ -819,7 +819,7 @@ class CurriculumAssignmentForm(ModelForm):
 # CSV Upload Form
 ####################################
 class UploadFileForm(forms.Form):
-  group = forms.ModelChoiceField(required=True, queryset=models.UserGroup.objects.all())
+  group = forms.ModelChoiceField(required=True, queryset=models.UserGroup.objects.all().filter(is_active=True))
   emails = forms.CharField(required=False, widget=forms.Textarea, help_text="Enter a list of student emails, one per line")
   uploadFile = forms.FileField (required=False, help_text="Upload a csv file containing a list of student emails in the first column")
 
@@ -829,9 +829,9 @@ class UploadFileForm(forms.Form):
     print 'user', user
     if user.is_authenticated():
       if hasattr(user, 'school_administrator'):
-        self.fields['group'].queryset = models.UserGroup.objects.all().filter(teacher__school=user.school_administrator.school)
+        self.fields['group'].queryset = models.UserGroup.objects.all().filter(teacher__school=user.school_administrator.school, is_active=True)
       elif hasattr(user, 'teacher'):
-        self.fields['group'].queryset = models.UserGroup.objects.all().filter(teacher=user.teacher)
+        self.fields['group'].queryset = models.UserGroup.objects.all().filter(teacher=user.teacher, is_active=True)
     else:
       self.fields['group'].queryset = models.UserGroup.objects.none()
 
