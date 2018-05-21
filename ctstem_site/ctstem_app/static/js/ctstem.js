@@ -127,84 +127,97 @@ $(function (){
     });
   });
 
-  //csv upload
+  //user upload modal submit
   $("#formUpload").submit(function(e) {
     e.preventDefault();
     //var data = $(this).serialize();
-    var data = new FormData($('form#formUpload').get(0));
-    var url = "/upload/users";
-    $.ajax({
-      type: "POST",
-      url: url,
-      data: data,
-      dataType: 'json',
-      enctype: 'multipart/form-data',
-      cache: false,
-      processData: false,
-      contentType: false,
-      beforeSend: function(){
-        $('#formUpload #spinner').show();
-      },
-      complete: function(){
-        $('#formUpload #spinner').hide();
-      },
-      success: function(data){
-        if(data['result'] == 'Success'){
-          if(window.location.href.indexOf('/group/') != -1){
+    //var data = new FormData($('form#formUpload').get(0));
+    var emails = $('#formUpload textarea#id_emails').val();
+    var file = $('#formUpload input#id_uploadFile').val();
+    if(emails == '' && file == ''){
+      $('#uploadMsg').html("Please type in the emails or upload a CSV");
+    }
+    else {
 
-            for(var student in  data['new_students']){
-              if($('tr#'+student).length == 0){
-                var group = data['new_students'][student]['group'];
-                var user_id = data['new_students'][student]['user_id'];
-                var membership_id = data['new_students'][student]['membership_id']
-                //add student detail to the table
-                $('table.table#members tbody').append('<tr id='+student+'>\
-                  <td><input id="student_'+student+'" type="checkbox" class="action-select" value="'+student+'" name="student_'+student+'">\
-                  <td>'+data['new_students'][student]['username']+'\
-                    <div class="controls">\
-                      <a type="button" class="btn btn-success edit" aria-label="Edit User" title="Edit User" href="/user/'+user_id+'">\
-                        <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>\
-                      </a>\
-                      <a type="button" class="btn btn-warning removeUser" aria-label="Remove Student" title="Remove Student" href="/student/remove/'+group+'/'+student+'" data-id="'+student+'">\
-                        <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>\
-                      </a>\
-                    </div>\
-                  </td>\
-                  <td>'+data['new_students'][student]['full_name']+'</td>\
-                  <td>'+data['new_students'][student]['email']+'</td>\
-                  <td>'+data['new_students'][student]['status']+'</td>\
-                  <td>'+data['new_students'][student]['student_consent']+'</td>\
-                  <td>'+data['new_students'][student]['parental_consent']+'</td>\
-                  <td>'+data['new_students'][student]['member_since']+'</td>\
-                  <td>'+data['new_students'][student]['last_login']+'</td></tr>');
+      //create options for ajax call
+      var options = {
+        type: "POST",
+        url: "/upload/users/",
+        beforeSend: function(){
+          $('#formUpload #spinner').show();
+        },
+        complete: function(){
+          $('#formUpload #spinner').hide();
+        },
+        success: function(data){
+          if(data['result'] == 'Success'){
+            if(window.location.href.indexOf('/group/') != -1){
 
-                //add student membership hidden input
-                $('table.table#members').before('<input id="id_group-members_'+student+'" name="group-members" type="hidden" value="'+student+'">');
+              for(var student in  data['new_students']){
+                if($('tr#'+student).length == 0){
+                  var group = data['new_students'][student]['group'];
+                  var user_id = data['new_students'][student]['user_id'];
+                  var membership_id = data['new_students'][student]['membership_id']
+                  //add student detail to the table
+                  $('table.table#members tbody').append('<tr id='+student+'>\
+                    <td><input id="student_'+student+'" type="checkbox" class="action-select" value="'+student+'" name="student_'+student+'">\
+                    <td>'+data['new_students'][student]['username']+'\
+                      <div class="controls">\
+                        <a type="button" class="btn btn-success edit" aria-label="Edit User" title="Edit User" href="/user/'+user_id+'">\
+                          <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>\
+                        </a>\
+                        <a type="button" class="btn btn-warning removeUser" aria-label="Remove Student" title="Remove Student" href="/student/remove/'+group+'/'+student+'" data-id="'+student+'">\
+                          <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>\
+                        </a>\
+                      </div>\
+                    </td>\
+                    <td>'+data['new_students'][student]['full_name']+'</td>\
+                    <td>'+data['new_students'][student]['email']+'</td>\
+                    <td>'+data['new_students'][student]['status']+'</td>\
+                    <td>'+data['new_students'][student]['student_consent']+'</td>\
+                    <td>'+data['new_students'][student]['parental_consent']+'</td>\
+                    <td>'+data['new_students'][student]['member_since']+'</td>\
+                    <td>'+data['new_students'][student]['last_login']+'</td></tr>');
 
+                  //add student membership hidden input
+                  $('table.table#members').before('<input id="id_group-members_'+student+'" name="group-members" type="hidden" value="'+student+'">');
+
+                }
               }
+              $("#upload").modal('toggle');
+              bind_user_removal();
+              display_messages(data['messages'])
             }
-            $("#upload").modal('toggle');
-            bind_user_removal();
-            display_messages(data['messages'])
+            else {
+              //location is users or groups page
+              window.location.reload();
+            }
           }
-          else {
-            //location is users or groups page
-            window.location.reload();
+          else{
+            $('#uploadMsg').html(data['message']);
           }
-        }
-        else{
-          $('#uploadMsg').html(data['message']);
-        }
-      },
-      error: function(xhr, ajaxOptions, thrownError){
-        $('#uploadMsg').html("Something went wrong.  Try again later!");
-      },
-    });
+        },
+        error: function(xhr, ajaxOptions, thrownError){
+          $('#uploadMsg').html("Something went wrong.  Try again later!");
+        },
+      };
+
+      if(file == '') {
+        options['data'] = $(this).serialize();
+      }
+      else{
+        options['data'] = new FormData($('form#formUpload').get(0));
+        options['enctype'] = 'multipart/form-data';
+        options['cache'] = false;
+        options['processData'] = false;
+        options['contentType'] = false;
+      }
+
+      $.ajax(options);
+    }
   });
 
-
   bind_user_removal();
-
 
   $(".expand_collapse").click(function(){
     $(this).closest('.table').children('.collapsible_content').toggle();
@@ -280,8 +293,6 @@ $(function (){
     $('div#spinner').show();
   });
 });
-
-
 
 function bind_user_removal(){
   $('a.removeUser').unbind('click');

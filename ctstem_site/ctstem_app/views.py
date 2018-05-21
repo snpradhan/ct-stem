@@ -801,10 +801,16 @@ def register(request, group_id=''):
             user.is_active = True
         user.save()
 
-        if form.cleaned_data['account_type'] == 'T':
-          newUser = models.Teacher()
-          #generate validation code
-          newUser.validation_code = get_random_string(length=5)
+        role = ''
+        if form.cleaned_data['account_type'] == 'T' or form.cleaned_data['account_type'] == 'P':
+          if form.cleaned_data['account_type'] == 'T':
+            newUser = models.Teacher()
+            #generate validation code
+            newUser.validation_code = get_random_string(length=5)
+            role = 'teacher'
+          else:
+            newUser = models.SchoolAdministrator()
+            role = 'school administrator'
 
           #get the school id
           selected_school = form.cleaned_data['school']
@@ -836,81 +842,59 @@ def register(request, group_id=''):
           if group_id:
             membership, created = models.Membership.objects.get_or_create(student=newUser, group=group)
 
-        elif form.cleaned_data['account_type'] == 'P':
-            newUser = models.SchoolAdministrator()
-            newUser.user = user
-            newUser.save()
+          role = 'student'
 
         elif form.cleaned_data['account_type'] == 'A':
-            newUser = models.Administrator()
-            newUser.user = user
-            newUser.save()
+          newUser = models.Administrator()
+          newUser.user = user
+          newUser.save()
+          role = 'site admin'
 
         elif form.cleaned_data['account_type'] == 'R':
           newUser = models.Researcher()
           newUser.user = user
           newUser.save()
+          role = 'researcher'
         elif form.cleaned_data['account_type'] == 'C':
           newUser = models.Author()
           newUser.user = user
           newUser.save()
+          role = 'content author'
 
 
         current_site = Site.objects.get_current()
         domain = current_site.domain
 
+        #anonymous user creates an account
         if request.user.is_anonymous():
+          #account type created is Admin, Researcher, Content Author, School Principal
           if form.cleaned_data['account_type'] in ['A', 'R', 'C', 'P']:
             #send an email to the registering user
             messages.info(request, 'Your account is pending admin approval.  You will be notified once your account is approved.')
             #send email confirmation
-            send_mail('CT-STEM Account Pending',
-            'Welcome to Computational Thinking in STEM website http://%s.  \r\n\r\n \
-            Your account is pending approval, and you will be notified once approved.\r\n\r\n  \
-            -- CT-STEM Admin' % domain,
-                      settings.DEFAULT_FROM_EMAIL,
-                      [newUser.user.email])
-
-            #send an email to the site admin
-            send_mail('CT-STEM Account Approval Request',
-            'Please approve the user account for %s on http://%s.  \r\n\r\n \
-            -- CT-STEM Admin' % (user.username, domain),
-                      settings.DEFAULT_FROM_EMAIL,
-                      [settings.DEFAULT_FROM_EMAIL])
+            send_account_pending_email(role, newUser.user)
             return shortcuts.redirect('ctstem:home')
-          #teacher account
+
+          #account type created is Teacher
           elif form.cleaned_data['account_type'] == 'T':
             #send an email with the username and validation code to validate the account
             messages.info(request, 'An email has been sent to %s to validate your account.  Please validate your account with in 24 hours.' % newUser.user.email)
-            send_account_validation_email(newUser)
-
+            send_teacher_account_validation_email(newUser)
             return shortcuts.redirect('ctstem:home')
 
-          #student account
+          #account type created is Student
           elif form.cleaned_data['account_type'] == 'S':
             new_user = authenticate(username=form.cleaned_data['username'].lower(),
-                                    password=form.cleaned_data['password1'], )
+                                    password=form.cleaned_data['password1'],)
             login(request, new_user)
             messages.info(request, 'Your have successfully registered.')
-            send_mail('CT-STEM Account Created',
-            'Welcome to Computational Thinking in STEM website http://%s.  \r\n\r\n \
-            You can login using the credentials created during registration. \r\n\r\n \
-            -- CT-STEM Admin' % domain,
-                      settings.DEFAULT_FROM_EMAIL,
-                      [newUser.user.email])
+
+            send_student_account_by_self_confirmation_email(newUser.user, group)
             return shortcuts.redirect('ctstem:home')
 
         else:
-          messages.info(request, 'User account has been created.')
-
-          send_mail('CT-STEM Account Created',
-          'Your user account has been created on Computational Thinking in STEM website http://%s.  \r\n\r\n \
-           Please login to the site using the following credentials and change your password.\r\n\r\n  \
-           Username: %s \r\n \
-           Temporary Password: %s \r\n\r\n \
-           -- CT-STEM Admin'%(domain, newUser.user.username, form.cleaned_data['password1']),
-                      settings.DEFAULT_FROM_EMAIL,
-                      [newUser.user.email])
+          messages.info(request, '%s account has been created.' % role.title())
+          send_account_by_admin_confirmation_email(role, newUser.user, form.cleaned_data['password1'])
 
           if form.cleaned_data['account_type'] == 'A':
             return shortcuts.redirect('ctstem:users', role='admins')
@@ -1080,7 +1064,7 @@ def userProfile(request, id=''):
       else:
         return http.HttpResponseNotFound('<h1>Requested user does not have a role</h1>')
 
-      context = {'profileform': profileform, 'userform': userform, 'role': role}
+      context = {'profileform': profileform, 'userform': userform, 'role': role.replace('_', ' ')}
       return render(request, 'ctstem_app/UserProfile.html', context)
 
     elif request.method == 'POST':
@@ -1120,7 +1104,7 @@ def userProfile(request, id=''):
         if profileform is None:
           userform.save()
           messages.success(request, "User profile saved successfully")
-          context = {'userform': userform, 'role': role}
+          context = {'userform': userform, 'role': role.replace('_', ' ')}
         elif profileform.is_valid():
           userform.save()
           profile = profileform.save()
@@ -1131,17 +1115,17 @@ def userProfile(request, id=''):
             if new_school != school:
               update_school(request, profile, new_school)
           messages.success(request, "User profile saved successfully")
-          context = {'profileform': profileform, 'userform': userform, 'role': role}
+          context = {'profileform': profileform, 'userform': userform, 'role': role.replace('_', ' ')}
         else:
           print profileform.errors
           messages.error(request, "User profile could not be saved. Please check the errors below.")
-          context = {'profileform': profileform, 'userform': userform, 'role': role}
+          context = {'profileform': profileform, 'userform': userform, 'role': role.replace('_', ' ')}
       else:
         print userform.errors
         if profileform:
           print profileform.errors
         messages.error(request, "User profile could not be saved. Please check the errors below.")
-        context = {'profileform': profileform, 'userform': userform, 'role': role}
+        context = {'profileform': profileform, 'userform': userform, 'role': role.replace('_', ' ')}
 
       return render(request, 'ctstem_app/UserProfile.html', context)
 
@@ -1265,6 +1249,10 @@ def transferCurriculum(request, user):
       flag = False
   return flag
 
+####################################
+# Remove student from the group
+# but do not delete the student account from the system
+####################################
 def removeStudent(request, group_id='', student_id=''):
   try:
     # check if the user has permission to create or modify a group
@@ -1294,6 +1282,10 @@ def removeStudent(request, group_id='', student_id=''):
   except models.Student.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested student not found</h1>')
 
+####################################
+# Add an existing student to the group
+# and send an email notification to the student
+####################################
 def addStudent(request, group_id='', student_id=''):
   try:
     # check if the user has permission to create or modify a group
@@ -1312,6 +1304,7 @@ def addStudent(request, group_id='', student_id=''):
 
     if request.method == 'POST':
       membership = models.Membership.objects.get_or_create(group=group, student=student)
+      send_added_to_group_confirmation_email(student.user.email, group)
       response_data = {'result': 'Success'}
       return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 
@@ -1322,6 +1315,10 @@ def addStudent(request, group_id='', student_id=''):
   except models.Student.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested student not found</h1>')
 
+####################################
+# Create a new student account and add them to the group
+# Then send an email notification to the student
+####################################
 def createStudent(request, group_id=''):
   try:
     # check if the user has permission to create a student
@@ -1361,7 +1358,7 @@ def createStudent(request, group_id=''):
                           'student_consent': student.get_consent(), 'parental_consent': student.get_parental_consent(), 'member_since': user.date_joined.strftime('%B %d, %Y')}
                         }
 
-        send_account_confirmation_email(user, password)
+        send_account_by_admin_confirmation_email('student', user, password)
 
       return http.HttpResponse(json.dumps(response_data), content_type="application/json")
     return http.HttpResponseNotAllowed(['POST'])
@@ -3056,9 +3053,9 @@ def user_upload(request):
       #read the emails in the csv and append to the previous list
       if request.FILES:
         f = request.FILES['uploadFile']
-        reader = csv.reader(f.read().splitlines(), delimiter=',')
+        reader = csv.reader(f.read().decode("utf-8-sig").encode("utf-8").splitlines(), delimiter=',')
         for row in reader:
-          csv_email = str(row[0])
+          csv_email = str(row[0]).strip()
           if csv_email is not None and csv_email != '':
             emails.append(csv_email)
 
@@ -3095,6 +3092,7 @@ def user_upload(request):
                                             'student_consent':  student_consent, 'parental_consent': student.get_parental_consent_display(),
                                             'member_since': student.user.date_joined.strftime('%b %d, %Y'),
                                             'last_login': student.user.last_login.strftime('%b %d, %Y') if student.user.last_login else '', 'group': group.id}
+              send_added_to_group_confirmation_email(email, group)
               added += 1
             else:
               #error out email in use and does not belong to a student account
@@ -3103,7 +3101,7 @@ def user_upload(request):
               invalid += 1
           else:
             #email does not exist.  Send and email with registration link
-            send_account_creation_email(email, group)
+            send_student_account_request_email(email, group)
             new += 1
 
       if added:
@@ -3124,140 +3122,143 @@ def user_upload(request):
 
   return http.HttpResponseNotAllowed(['POST'])
 
-####################################
-# UPLOAD USERS
-####################################
+################################################
+# Send account pending email to anonymous user after
+# registering admin, researcher, author, school administrator account
+################################################
+def send_account_pending_email(role, user):
+  current_site = Site.objects.get_current()
+  domain = current_site.domain
+  #send an email to registering user about pending account
+  body = '<div> Welcome to Computational Thinking in STEM website http://%s.  <div> \
+          <div> Your <b>%s</b> account is pending admin approval, and you will be notified once approved. </div>  <br>\
+          <div><b>CT-STEM Admin</b></div>' % (domain, role.title())
+  send_mail('CT-STEM - %s Account Pending' % role.title(), body, settings.DEFAULT_FROM_EMAIL, [user.email], html_message=body)
 
-# @login_required
-# def user_upload_csv(request):
-#   if hasattr(request.user, 'administrator'):
-#     role = 'admin'
-#   elif hasattr(request.user, 'school_administrator'):
-#     role = 'school_administrator'
-#   elif hasattr(request.user, 'teacher'):
-#     role = 'teacher'
-#   else:
-#     return http.HttpResponseNotFound('<h1>You do not have the privilege to upload users</h1>')
+  #send an email to the site admin
+  body = '<div>%s has requested <b>%s</b> account on http://%s.  You may approve the user account here http://%s/user/%d/.  </div>  <br>\
+          <div><b>CT-STEM Admin</b></div>' % (user.get_full_name(), role.title(), user.username, domain, domain, user.id)
+  send_mail('CT-STEM - %s Account Approval Request' % role.title(), body, settings.DEFAULT_FROM_EMAIL, [settings.DEFAULT_FROM_EMAIL], html_message=body)
 
-#   count = 0
-#   added = 0
-#   new = 0
-#   added_students = {}
-#   msg = {'error': [], 'success': []}
-
-#   if request.method == 'POST':
-#     form = forms.UploadFileForm(request.POST, request.FILES, user=request.user)
-#     data = request.POST.copy()
-#     print data
-#     if form.is_valid():
-#       f = request.FILES['uploadFile']
-#       group = models.UserGroup.objects.get(id=data['group'])
-#       reader = csv.reader(f.read().splitlines(), delimiter=',')
-#       for row in reader:
-#         count += 1
-#         if row[0] != 'Email*':
-#           email = str(row[0])
-#           print email
-
-#           #check if the student with the email already exists
-#           #email is mandatory
-#           if email is None or email == '':
-#             msg['error'].append('Email is missing on row %d' % count)
-#             messages.error(request, 'Email is missing on row %d' % count)
-#           else:
-#             #check if email exists
-#             if User.objects.filter(email=email).exists():
-#               #check if email belongs to a student
-#               if models.Student.objects.filter(user__email=email).exists():
-#                 #add student to group
-#                 #TODO
-#                 student = models.Student.objects.get(user__email=email)
-#                 membership, created = models.Membership.objects.get_or_create(student=student, group=group)
-#                 added_students[student.id] = {'user_id': student.user.id, 'username': student.user.username, 'full_name': student.user.get_full_name(), 'email': student.user.email, 'status': 'Active' if student.user.is_active else 'Inactive', 'last_login': student.user.last_login.strftime('%B %d, %Y') if student.user.last_login else '', 'group': group.id}
-#                 added += 1
-#               else:
-#                 #error out email in use and does not belong to a student account
-#                 msg['error'].append('Email on row %d does not belong to a student account' % count)
-#                 messages.error(request, 'Email on row %d does not belong to a student account' % count)
-#             else:
-#               #email does not exist.  Send and email with registration link
-#               send_account_creation_email(email, group)
-#               new += 1
-
-
-#       msg['success'].append('%d existing students were found and added to the group, %d new students were requested to create an account.' % (added, new))
-#       messages.success(request, '%d existing students were found and added to the group, %d new students were requested to create an account.' % (added, new))
-#       response_data = {'result': 'Success', 'new_students': added_students, 'messages': msg}
-#     else:
-#       print form.errors
-#       response_data = {'result': 'Failure', 'message': 'Please select a group and provide a valid student template to upload.'}
-#     return http.HttpResponse(json.dumps(response_data), content_type="application/json")
-
-#   return http.HttpResponseNotAllowed(['POST'])
-
-
-def send_account_confirmation_email(user, password):
+################################################
+# Send account request email after
+# teacher adds a new email to group
+################################################
+def send_student_account_request_email(email, group):
   #email user the  user name and password
   current_site = Site.objects.get_current()
   domain = current_site.domain
+  body = '<div>Your teacher has requested you to create an account on Computational Thinking in STEM website </div><br> \
+          <div>Click the link below and follow the instructions on the webpage to create a student account. </div><br> \
+          <div>http://%s/register/group/%d?email=%s  </div><br> \
+          <div>If clicking the link does not seem to work, you can copy and paste the link into your browser&#39;s address window, </div> \
+          <div>or retype it there. Once you have returned to CT-STEM, we will give instructions for creating an account. </div><br> \
+          <div><b>CT-STEM Admin</b></div>'%(domain, group.id, email)
 
-  send_mail('CT-STEM Account Created',
-  'Your student account has been created on Computational Thinking in STEM website http://%s.  \r\n\r\n \
-   Please login to the site using the credentials below and change your password.\r\n  \
-   Username: %s \r\n \
-   Temporary Password: %s \r\n\r\n \
-   -- CT-STEM Admin'%(domain, user.username, password),
-        settings.DEFAULT_FROM_EMAIL,
-        [user.email])
+  send_mail('CT-STEM - Student Account Signup Request', body, settings.DEFAULT_FROM_EMAIL, [email], html_message=body)
 
-def send_account_creation_email(email, group):
+################################################
+# Send account confirmation email after
+# an admin creates an account for a subordinate
+################################################
+def send_account_by_admin_confirmation_email(role, user, password):
   #email user the  user name and password
   current_site = Site.objects.get_current()
   domain = current_site.domain
+  body = '<div>Your <b>%s</b> account has been created on Computational Thinking in STEM website http://%s.  </div> \
+          <div>Please login to the site using the credentials below and change your password immediately.  </div><br> \
+          <div><b>Username:</b> %s </div> \
+          <div><b>Temporary Password:</b> %s </div><br>\
+          <div><b>CT-STEM Admin</b></div>'%(role.title(), domain, user.username, password)
 
-  send_mail('CT-STEM Account Signup',
-  'Your teacher has requested you to create an account on Computational Thinking in STEM website \r\n\r\n \
-  Please click the link below to create an account.\r\n  \
-  http://%s/register/group/%d?email=%s  \r\n\r\n \
-  -- CT-STEM Admin'%(domain, group.id, email),
-        settings.DEFAULT_FROM_EMAIL,
-        [email])
+  send_mail('CT-STEM - %s Account Created'%role.title(), body, settings.DEFAULT_FROM_EMAIL, [user.email], html_message=body)
 
+def send_student_account_by_self_confirmation_email(user, group):
+  current_site = Site.objects.get_current()
+  domain = current_site.domain
+  body = '<div>Welcome to Computational Thinking in STEM website http://%s.  <div> \
+          <div>You have successfully created a student account on our site.  You have also been added to the group <b>%s</b>. </div> \
+          <div>Now you can login to complete your assignments. <div> <br>\
+          <div>If you have forgotten your password since you last logged in, you can reset your password here http://%s/password_reset/recover/  </div><br> \
+          <div><b>CT-STEM Admin</b></div>' % (domain, group.title.title(), domain)
+
+  send_mail('CT-STEM - Student Account Created', body, settings.DEFAULT_FROM_EMAIL, [user.email], html_message=body)
+
+################################################
+# Send an email to an existing student after
+# teacher adds the student to a group
+################################################
+def send_added_to_group_confirmation_email(email, group):
+  #email user the  user name and password
+  current_site = Site.objects.get_current()
+  domain = current_site.domain
+  body = '<div>Your teacher has added you to the group <b>%s</b> on Computational Thinking in STEM website. </div><br> \
+          <div>You may login with your credentials here http://%s </div><br> \
+          <div>If you have forgotten your password since you last logged in, you can reset your password here http://%s/password_reset/recover/  </div><br> \
+          <div>If clicking the link does not seem to work, you can copy and paste the link into your browser&#39;s address window, </div> \
+          <div>or retype it there. Once you have returned to CT-STEM, we will give instructions to proceed. </div><br> \
+          <div><b>CT-STEM Admin</b></div>'%(group.title.title(), domain, domain)
+  subject = 'CT-STEM - Student Account added to %s' % group.title.title()
+
+  send_mail(subject, body, settings.DEFAULT_FROM_EMAIL, [email], html_message=body)
+
+################################################
+# Send email to student when feedback is ready
+# on their assignment
+################################################
 def send_feedback_ready_email(email, curriculum):
   current_site = Site.objects.get_current()
   domain = current_site.domain
+  body = '<div>Your teacher has provided feedback on the assignment %s. </div><br> \
+          <div>Please login to our website http://%s to review the feedback. </div><br> \
+          <div><b>CT-STEM Admin</b></div>'%(curriculum.title, domain)
 
-  send_mail('CT-STEM Assignment Feedback Ready',
-  'Your teacher has provided feedback on the assignment %s. \r\n\r\n \
-  Please login to our website http://%s to review the feedback. \r\n\r\n  \
-  -- CT-STEM Admin'%(curriculum.title, domain),
-        settings.DEFAULT_FROM_EMAIL,
-        [email])
+  send_mail('CT-STEM - Assignment Feedback Ready', body, settings.DEFAULT_FROM_EMAIL, [email], html_message=body)
 
-def send_account_validation_email(teacher):
+################################################
+# Send account validation email after a user
+# creates a teacher account
+################################################
+def send_teacher_account_validation_email(teacher):
   current_site = Site.objects.get_current()
   domain = current_site.domain
+  body =  '<div>Welcome to Computational Thinking in STEM. </div><br> \
+           <div>Your e-mail address was used to create a teacher account on our website. If you made this request, please follow the instructions below.<div><br> \
+           <div>Please click this link http://%s/validate  and use the credentials below to validate your account. </div><br> \
+           <div><b>Username:</b> %s </div> \
+           <div><b>Validation code:</b> %s </div><br> \
+           <div>If you did not request this account you can safely ignore this email. Rest assured your e-mail address and the associated account will be deleted from our system in 24 hours.</div><br> \
+           <div><b>CT-STEM Admin</b></div>' % (domain, teacher.user.username, teacher.validation_code)
 
-  send_mail('CT-STEM Account Validation',
-    ' \r\n \
-    Welcome to Computational Thinking in STEM \r\n\r\n \
-    Please validate your account here http://%s/validate  and use the credentials below.\r\n\r\n \
-    Username: %s \r\n\r\n \
-    Validation code: %s \r\n\r\n \
-    -- CT-STEM Admin' % (domain, teacher.user.username, teacher.validation_code),
-              settings.DEFAULT_FROM_EMAIL,
-              [teacher.user.email])
+  send_mail('CT-STEM - Teacher Account Validation', body, settings.DEFAULT_FROM_EMAIL, [teacher.user.email], html_message=body)
 
+################################################
+# Send account approval email after
+# admin approves the user account
+################################################
 def send_account_approval_email(user):
   current_site = Site.objects.get_current()
   domain = current_site.domain
+  body = '<div>Your account has been approved on Computational Thinking in STEM website http://%s.  </div> \
+          <div>Please login to the site using the the credentials created during registration. </div><br> \
+          <div><b>CT-STEM Admin</b></div>'%(domain)
 
-  send_mail('CT-STEM Account Approval',
-  'Your account has been approved on Computational Thinking in STEM website http://%s.  \r\n\r\n \
-   Please login to the site using the the credentials created during registration.\r\n\r\n  \
-   -- CT-STEM Admin'%(domain) ,
-              settings.DEFAULT_FROM_EMAIL,
-              [user.email])
+  send_mail('CT-STEM - Account Approved', body, settings.DEFAULT_FROM_EMAIL,[user.email], html_message=body)
+
+
+################################################
+# Send training request email to admin and the sender
+################################################
+def send_training_request_email(training):
+  #send email to sender and admin
+  body =  '<div>Thank you for your interest in attending our training session.  We received the following information from you.</div> <br>\
+           <div><b>Name </b>: %s </div> \
+           <div><b>Email </b>: %s </div> \
+           <div><b>School </b>: %s </div> \
+           <div><b>Subject </b>: %s </div> <br>\
+           <div>We will communicate the date, place and other details about the event shortly. </div><br> \
+           <div><b>CT-STEM Admin </b></div>' % (training.name, training.email, training.school, training.subject)
+  send_mail('CT-STEM - Training Request', body, settings.DEFAULT_FROM_EMAIL, [training.email, settings.DEFAULT_FROM_EMAIL], html_message=body)
 
 ####################################
 # Schools
@@ -3582,18 +3583,9 @@ def request_training(request):
         training = form.save()
         messages.success(request, "Your request has been sent to the site admin")
         response_data['result'] = 'Success'
-        #send email to the admin
-        send_email('CT-STEM Training Request',
-                    '<b>Name </b>: %s <br> \
-                    <b>Email </b>: %s <br> \
-                    <b>School </b>: %s <br> \
-                    <b>Subject </b>: %s <br><br> \
-                    Thank you for your interest in attending our training session.  We will communicate \
-                    the date, place and other details about the event shortly. <br> \
-                    <br> \
-                    -CT-STEM Admin' % (training.name, training.email, training.school, training.subject),
-                    settings.DEFAULT_FROM_EMAIL,
-                    [training.email])
+        #send email to the sender and admin
+        send_training_request_email(training)
+
         return http.HttpResponse(json.dumps(response_data), content_type="application/json")
       else:
         print form.errors

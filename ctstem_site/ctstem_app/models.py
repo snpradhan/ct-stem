@@ -565,10 +565,9 @@ def active(sender, instance, **kwargs):
   if instance.is_active and User.objects.filter(pk=instance.pk, is_active=False).exists():
     current_site = Site.objects.get_current()
     domain = current_site.domain
+    body = '<div>Your account has been activated on Computational Thinking in STEM website http://%s.<div> \
+            <div>You can login using the credentials created during registration.</div><br> \
+            <div>If you have forgotten your password, you can reset them here http://%s/password_reset/recover/  </div><br> \
+            <div><b>CT-STEM Admin</b></div>' % (domain, domain)
 
-    send_mail('CT-STEM Account Activated',
-              'Your account has been activated on Computational Thinking in STEM website https://%s.\r\n\r\n\
-               You can login using the credentials created during registration.\r\n\r\n\
-              -- CT-STEM Admin' % domain,
-              settings.DEFAULT_FROM_EMAIL,
-              [instance.email])
+    send_mail('CT-STEM - Account Activated', body, settings.DEFAULT_FROM_EMAIL, [instance.email], html_message=body)
