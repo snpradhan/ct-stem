@@ -1057,7 +1057,6 @@ class TeamMemberForm(ModelForm):
 # Training Request Form
 ####################################
 class TrainingRequestForm(ModelForm):
-  captcha = CaptchaField(help_text=u'Solve the equation to the right')
 
   class Meta:
     model = models.TrainingRequest

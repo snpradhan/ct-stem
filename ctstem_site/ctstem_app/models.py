@@ -552,10 +552,10 @@ class Team(models.Model):
       ordering = ['order']
 
 class TrainingRequest(models.Model):
-  name = models.CharField(max_length=255, blank=False, help_text="Name")
-  email = models.EmailField(max_length=255, blank=False, help_text="Email")
-  school = models.CharField(max_length=255, blank=False, help_text="School Name")
-  subject = models.CharField(max_length=255, blank=False, help_text="Subject")
+  name = models.CharField(max_length=255, blank=False, null=False, help_text="Name")
+  email = models.EmailField(max_length=255, blank=False, null=False, help_text="Email")
+  school = models.CharField(max_length=255, blank=False, null=False, help_text="School Name")
+  subject = models.CharField(max_length=255, blank=False, null=False, help_text="Subject")
   created_date = models.DateTimeField(auto_now_add=True)
 
 

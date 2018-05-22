@@ -14,25 +14,17 @@
           {% for field in form %}
             <div class="form-group">
               <label for="id_{{field.name}}">{{ field.label|title }} {% if field.field.required %}(<span class="required">*</span>){% endif %} </label>
-              {% if field.name == 'captcha' %}
-                <div>
-                  {{field}}
-                  <a type="button" class='js-captcha-refresh btn btn-default'><i class="fa fa-refresh" aria-hidden="true"></i></a>
-                </div>
-                <div class="help warning">{{field.help_text}}</div>
-              {% else %}
-                <div>
-                  {{field}}
-                </div>
-              {% endif %}
+              <div>{{field}}</div>
               <div class="error" id="{{field.name}}_error">{{ field.errors }}</div>
             </div>
           {% endfor %}
-          <div class="form-group" id="div_conditions">
-              <label>
-                <input type="checkbox" id="conditions" name="condition"/> I agree to the <a data-toggle="modal" data-target="#terms" class="terms" href="#">Conditions</a>
-              </label>
-            </div>
+          {% if user.is_anonymous %}
+          <div class="form-group">
+            <script src='https://www.google.com/recaptcha/api.js'></script>
+            <div class="g-recaptcha" data-sitekey="6Lfiv1oUAAAAAO4uGoHA7t8Psp8mATiML0bKg9oc"></div>
+            <div class="error" id="recaptcha_error"></div>
+          </div>
+          {% endif %}
           <div id="spinner">
             <img src="/static/img/page-loader.gif" class="icon"/>
           </div>
@@ -87,20 +79,6 @@
       });
     });
 
-    $('.js-captcha-refresh').click(function(){
-      $form = $(this).parents('form');
-
-      var url = location.protocol + "//" + window.location.hostname + ":"
-                + location.port + "/captcha/refresh/";
-
-      // Make the AJAX-call
-      $.getJSON(url, {}, function(json) {
-          $form.find('input[name="captcha_0"]').val(json.key);
-          $form.find('img.captcha').attr('src', json.image_url);
-      });
-
-      return false;
-    });
   });
   </script>
 

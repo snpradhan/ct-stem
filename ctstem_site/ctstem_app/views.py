@@ -30,7 +30,7 @@ from django.contrib.sites.models import Site
 from django.core import serializers
 import zipfile
 from django.core.files import File
-import urllib2
+import urllib, urllib2
 from urllib import urlretrieve
 import base64
 from django.utils.encoding import smart_str, smart_unicode
@@ -765,159 +765,157 @@ def register(request, group_id=''):
     other_school = models.School.objects.get(school_code='OTHER')
 
   if request.method == 'POST':
-    # checking for bot signup
-    #Agree checkbox is visible to the user while condition checkbox is hidden.
-    #The user needs to check the Agree checkbox to enable the Register button
-    #Ensure the agree checkbox is checked and the condition checkbox is unchecked to verify the request is sent by a real person
-    if 'condition' in request.POST:
-      #this is a bot
-      #do not sign them up but show a deceiving message that they are signed up and redirect them to the homepage
-      messages.info(request, 'Thank you for registering')
-      return shortcuts.redirect('ctstem:home')
+    #print request.POST.copy()
+    school_form = None
+    new_school = None
+    if group_id:
+      form = forms.RegistrationForm(user=request.user, data=request.POST, group_id=group_id)
     else:
-      #print request.POST.copy()
-      school_form = None
-      new_school = None
-      if group_id:
-        form = forms.RegistrationForm(user=request.user, data=request.POST, group_id=group_id)
+      form = forms.RegistrationForm(user=request.user, data=request.POST)
+      if request.user.is_anonymous():
+        school_form = forms.SchoolForm(data=request.POST, instance=school, prefix="school")
+
+    if form.is_valid():
+      # checking for bot signup
+      # anonymous users signing up as teachers need to go through recaptcha validation
+      if request.user.is_anonymous() and group_id == '':
+        recaptcha_response = request.POST.get('g-recaptcha-response')
+        is_human = validate_recaptcha(request, recaptcha_response)
+        if not is_human:
+          context = {'form': form, 'school_form': school_form, 'other_school': other_school, 'recaptcha_error':  'Invalid reCAPTCHA'}
+          return render(request, 'ctstem_app/Registration.html', context)
+
+      #convert username to lowercase
+      username = form.cleaned_data['username'].lower()
+      user = User.objects.create_user(username,
+                                      form.cleaned_data['email'],
+                                      form.cleaned_data['password1'])
+      user.first_name = form.cleaned_data['first_name']
+      user.last_name = form.cleaned_data['last_name']
+      #Admin, Researcher, Author, School Admin or Teacher account created by anonymous user is set as inactive
+      if form.cleaned_data['account_type'] in  ['A', 'R', 'C', 'P', 'T'] and request.user.is_anonymous():
+          user.is_active = False
       else:
-        form = forms.RegistrationForm(user=request.user, data=request.POST)
-        if request.user.is_anonymous():
-          school_form = forms.SchoolForm(data=request.POST, instance=school, prefix="school")
+          user.is_active = True
+      user.save()
 
-      if form.is_valid():
-        print form.cleaned_data
-        #convert username to lowercase
-        username = form.cleaned_data['username'].lower()
-        user = User.objects.create_user(username,
-                                        form.cleaned_data['email'],
-                                        form.cleaned_data['password1'])
-        user.first_name = form.cleaned_data['first_name']
-        user.last_name = form.cleaned_data['last_name']
-        #Admin, Researcher, Author, School Admin or Teacher account created by anonymous user is set as inactive
-        if form.cleaned_data['account_type'] in  ['A', 'R', 'C', 'P', 'T'] and request.user.is_anonymous():
-            user.is_active = False
+      role = ''
+      if form.cleaned_data['account_type'] == 'T' or form.cleaned_data['account_type'] == 'P':
+        if form.cleaned_data['account_type'] == 'T':
+          newUser = models.Teacher()
+          #generate validation code
+          newUser.validation_code = get_random_string(length=5)
+          role = 'teacher'
         else:
-            user.is_active = True
-        user.save()
+          newUser = models.SchoolAdministrator()
+          role = 'school administrator'
 
-        role = ''
-        if form.cleaned_data['account_type'] == 'T' or form.cleaned_data['account_type'] == 'P':
-          if form.cleaned_data['account_type'] == 'T':
-            newUser = models.Teacher()
-            #generate validation code
-            newUser.validation_code = get_random_string(length=5)
-            role = 'teacher'
+        #get the school id
+        selected_school = form.cleaned_data['school']
+        if selected_school.school_code == 'OTHER':
+          if school_form.is_valid():
+            #create a new school entry
+            new_school = school_form.save(commit=False)
+            new_school.save()
+            newUser.school = new_school
           else:
-            newUser = models.SchoolAdministrator()
-            role = 'school administrator'
-
-          #get the school id
-          selected_school = form.cleaned_data['school']
-          if selected_school.school_code == 'OTHER':
-            if school_form.is_valid():
-              #create a new school entry
-              new_school = school_form.save(commit=False)
-              new_school.save()
-              newUser.school = new_school
-            else:
-              print school_form.errors
-              user.delete()
-              context = {'form': form, 'school_form': school_form, 'other_school': other_school }
-              return render(request, 'ctstem_app/Registration.html', context)
-
-          else:
-            newUser.school = form.cleaned_data['school']
-          newUser.user = user
-          newUser.save()
-
-        elif form.cleaned_data['account_type'] == 'S':
-          newUser = models.Student()
-          if group_id:
-            newUser.school = school
-          else:
-            newUser.school = form.cleaned_data['school']
-          newUser.user = user
-          newUser.save()
-          if group_id:
-            membership, created = models.Membership.objects.get_or_create(student=newUser, group=group)
-
-          role = 'student'
-
-        elif form.cleaned_data['account_type'] == 'A':
-          newUser = models.Administrator()
-          newUser.user = user
-          newUser.save()
-          role = 'site admin'
-
-        elif form.cleaned_data['account_type'] == 'R':
-          newUser = models.Researcher()
-          newUser.user = user
-          newUser.save()
-          role = 'researcher'
-        elif form.cleaned_data['account_type'] == 'C':
-          newUser = models.Author()
-          newUser.user = user
-          newUser.save()
-          role = 'content author'
-
-
-        current_site = Site.objects.get_current()
-        domain = current_site.domain
-
-        #anonymous user creates an account
-        if request.user.is_anonymous():
-          #account type created is Admin, Researcher, Content Author, School Principal
-          if form.cleaned_data['account_type'] in ['A', 'R', 'C', 'P']:
-            #send an email to the registering user
-            messages.info(request, 'Your account is pending admin approval.  You will be notified once your account is approved.')
-            #send email confirmation
-            send_account_pending_email(role, newUser.user)
-            return shortcuts.redirect('ctstem:home')
-
-          #account type created is Teacher
-          elif form.cleaned_data['account_type'] == 'T':
-            #send an email with the username and validation code to validate the account
-            messages.info(request, 'An email has been sent to %s to validate your account.  Please validate your account with in 24 hours.' % newUser.user.email)
-            send_teacher_account_validation_email(newUser)
-            return shortcuts.redirect('ctstem:home')
-
-          #account type created is Student
-          elif form.cleaned_data['account_type'] == 'S':
-            new_user = authenticate(username=form.cleaned_data['username'].lower(),
-                                    password=form.cleaned_data['password1'],)
-            login(request, new_user)
-            messages.info(request, 'Your have successfully registered.')
-
-            send_student_account_by_self_confirmation_email(newUser.user, group)
-            return shortcuts.redirect('ctstem:home')
+            print school_form.errors
+            user.delete()
+            context = {'form': form, 'school_form': school_form, 'other_school': other_school }
+            return render(request, 'ctstem_app/Registration.html', context)
 
         else:
-          messages.info(request, '%s account has been created.' % role.title())
-          send_account_by_admin_confirmation_email(role, newUser.user, form.cleaned_data['password1'])
+          newUser.school = form.cleaned_data['school']
+        newUser.user = user
+        newUser.save()
 
-          if form.cleaned_data['account_type'] == 'A':
-            return shortcuts.redirect('ctstem:users', role='admins')
-          elif form.cleaned_data['account_type'] == 'R':
-            return shortcuts.redirect('ctstem:users', role='researchers')
-          elif form.cleaned_data['account_type'] == 'P':
-            return shortcuts.redirect('ctstem:users', role='school_administrators')
-          elif form.cleaned_data['account_type'] == 'C':
-            return shortcuts.redirect('ctstem:users', role='authors')
-          elif form.cleaned_data['account_type'] == 'T':
-            return shortcuts.redirect('ctstem:users', role='teachers')
-          elif form.cleaned_data['account_type'] == 'S':
-            return shortcuts.redirect('ctstem:users', role='students')
-          return render(request, 'ctstem_app/About_us.html')
-
-      else:
-        print form.errors
+      elif form.cleaned_data['account_type'] == 'S':
+        newUser = models.Student()
         if group_id:
-          context = {'form': form, 'group_id': group_id, 'school_id': school.id}
+          newUser.school = school
         else:
-          context = {'form': form, 'school_form': school_form, 'other_school': other_school }
+          newUser.school = form.cleaned_data['school']
+        newUser.user = user
+        newUser.save()
+        if group_id:
+          membership, created = models.Membership.objects.get_or_create(student=newUser, group=group)
 
-        return render(request, 'ctstem_app/Registration.html', context)
+        role = 'student'
+
+      elif form.cleaned_data['account_type'] == 'A':
+        newUser = models.Administrator()
+        newUser.user = user
+        newUser.save()
+        role = 'site admin'
+
+      elif form.cleaned_data['account_type'] == 'R':
+        newUser = models.Researcher()
+        newUser.user = user
+        newUser.save()
+        role = 'researcher'
+      elif form.cleaned_data['account_type'] == 'C':
+        newUser = models.Author()
+        newUser.user = user
+        newUser.save()
+        role = 'content author'
+
+
+      current_site = Site.objects.get_current()
+      domain = current_site.domain
+
+      #anonymous user creates an account
+      if request.user.is_anonymous():
+        #account type created is Admin, Researcher, Content Author, School Principal
+        if form.cleaned_data['account_type'] in ['A', 'R', 'C', 'P']:
+          #send an email to the registering user
+          messages.info(request, 'Your account is pending admin approval.  You will be notified once your account is approved.')
+          #send email confirmation
+          send_account_pending_email(role, newUser.user)
+          return shortcuts.redirect('ctstem:home')
+
+        #account type created is Teacher
+        elif form.cleaned_data['account_type'] == 'T':
+          #send an email with the username and validation code to validate the account
+          messages.info(request, 'An email has been sent to %s to validate your account.  Please validate your account with in 24 hours.' % newUser.user.email)
+          send_teacher_account_validation_email(newUser)
+          return shortcuts.redirect('ctstem:home')
+
+        #account type created is Student
+        elif form.cleaned_data['account_type'] == 'S':
+          new_user = authenticate(username=form.cleaned_data['username'].lower(),
+                                  password=form.cleaned_data['password1'],)
+          login(request, new_user)
+          messages.info(request, 'Your have successfully registered.')
+
+          send_student_account_by_self_confirmation_email(newUser.user, group)
+          return shortcuts.redirect('ctstem:home')
+
+      else:
+        messages.info(request, '%s account has been created.' % role.title())
+        send_account_by_admin_confirmation_email(role, newUser.user, form.cleaned_data['password1'])
+
+        if form.cleaned_data['account_type'] == 'A':
+          return shortcuts.redirect('ctstem:users', role='admins')
+        elif form.cleaned_data['account_type'] == 'R':
+          return shortcuts.redirect('ctstem:users', role='researchers')
+        elif form.cleaned_data['account_type'] == 'P':
+          return shortcuts.redirect('ctstem:users', role='school_administrators')
+        elif form.cleaned_data['account_type'] == 'C':
+          return shortcuts.redirect('ctstem:users', role='authors')
+        elif form.cleaned_data['account_type'] == 'T':
+          return shortcuts.redirect('ctstem:users', role='teachers')
+        elif form.cleaned_data['account_type'] == 'S':
+          return shortcuts.redirect('ctstem:users', role='students')
+        return render(request, 'ctstem_app/About_us.html')
+
+    else:
+      print form.errors
+      if group_id:
+        context = {'form': form, 'group_id': group_id, 'school_id': school.id}
+      else:
+        context = {'form': form, 'school_form': school_form, 'other_school': other_school }
+
+      return render(request, 'ctstem_app/Registration.html', context)
 
   else:
     print request.user
@@ -948,6 +946,26 @@ def register(request, group_id=''):
       context = {'form': form}
 
     return render(request, 'ctstem_app/Registration.html', context)
+
+####################################
+# Validate reCAPTCHA response during
+# registration
+####################################
+def validate_recaptcha(request, recaptcha_response):
+  url = 'https://www.google.com/recaptcha/api/siteverify'
+  values = {
+    'secret': settings.GOOGLE_RECAPTCHA_SECRET_KEY,
+    'response': recaptcha_response
+  }
+  data = urllib.urlencode(values)
+  req = urllib2.Request(url, data)
+  response = urllib2.urlopen(req)
+  result = json.load(response)
+
+  if result['success']:
+    return True
+  else:
+    return False
 
 ####################################
 # USER LOGIN
@@ -3547,7 +3565,6 @@ def training_requests(request):
 
   if request.method == "GET" or request.method == "POST":
     trainingRequests = models.TrainingRequest.objects.all()
-    print trainingRequests
     context = {'trainingRequests': trainingRequests}
     return render(request, 'ctstem_app/TrainingRequests.html', context)
   return http.HttpResponseNotAllowed(['GET', 'POST'])
@@ -3572,27 +3589,31 @@ def request_training(request):
   elif request.method == 'POST':
     response_data = {}
     data = request.POST.copy()
-    #checking for bots
-    if 'condition' in data:
+
+    form = forms.TrainingRequestForm(data, instance=training)
+    if form.is_valid():
+      #checking for bots
+      if request.user.is_anonymous():
+        recaptcha_response = request.POST.get('g-recaptcha-response')
+        is_human = validate_recaptcha(request, recaptcha_response)
+        if not is_human:
+          response_data['result'] = 'Failed'
+          response_data['errors'] = {'recaptcha': 'Invalid reCAPTCHA'}
+          return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+
+      training = form.save()
       messages.success(request, "Your request has been sent to the site admin")
       response_data['result'] = 'Success'
+      #send email to the sender and admin
+      send_training_request_email(training)
+
       return http.HttpResponse(json.dumps(response_data), content_type="application/json")
     else:
-      form = forms.TrainingRequestForm(data, instance=training)
-      if form.is_valid():
-        training = form.save()
-        messages.success(request, "Your request has been sent to the site admin")
-        response_data['result'] = 'Success'
-        #send email to the sender and admin
-        send_training_request_email(training)
-
-        return http.HttpResponse(json.dumps(response_data), content_type="application/json")
-      else:
-        print form.errors
-        return JsonResponse({
-            'result': 'Failed',
-            'errors': dict(form.errors.items()),
-        })
+      print form.errors
+      return JsonResponse({
+          'result': 'Failed',
+          'errors': dict(form.errors.items()),
+      })
 
   return http.HttpResponseNotAllowed(['GET', 'POST'])
 
