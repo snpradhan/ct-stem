@@ -639,9 +639,6 @@ select {
   width: auto !important;
 }
 
-input.form-control.captcha {
-  width: auto;
-}
 /***************** end input *******************/
 
 

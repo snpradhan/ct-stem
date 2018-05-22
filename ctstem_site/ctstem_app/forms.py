@@ -15,7 +15,6 @@ from django.utils.safestring import mark_safe
 from django.core.exceptions import ObjectDoesNotExist
 from tinymce.widgets import TinyMCE
 from django.db.models import Q
-from captcha.fields import CaptchaField
 import os
 
 ####################################

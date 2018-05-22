@@ -56,7 +56,6 @@ INSTALLED_APPS = (
     'smart_selects',
     'django_cleanup',
     'endless_pagination',
-    'captcha',
     'django_crontab',
     'dbbackup', #django-dbbackup
 )
@@ -183,10 +182,6 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 # Auto logout delay in minutes
 AUTO_LOGOUT_DELAY = 30
-
-CAPTCHA_IMAGE_SIZE = (150,40)
-CAPTCHA_FONT_SIZE = 36
-CAPTCHA_CHALLENGE_FUNCT = 'captcha.helpers.math_challenge'
 
 #Cron jobs
 CRONJOBS = [
