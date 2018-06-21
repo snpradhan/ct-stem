@@ -2542,10 +2542,16 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
                           'formset errors': str(formset.errors),
                           'formset non form errors': str(formset.non_form_errors)})
 
-            if int(step_order) == int(total_steps):
-              messages.error(request, 'Please answer all non-optional questions on this step before submitting the assignment')
+            message = 'Your responses could not be saved. Please correct the errors below and click '
+            if save_only == 1:
+              message = message + 'Save again.'
             else:
-              messages.error(request, 'Please answer all non-optional questions on this step before continuing on to the next step')
+              if int(step_order) == int(total_steps):
+                message = message + 'Submit again.'
+              else:
+                message = message + 'Save & Continue again.'
+
+            messages.error(request, message)
 
           context = {'curriculum': curriculum, 'instance': instance, 'instanceform': instanceform, 'notesform': notesform, 'form': form, 'formset': formset, 'total_steps': total_steps, 'step_order': step_order}
           return render(request, 'ctstem_app/AssignmentStep.html', context)

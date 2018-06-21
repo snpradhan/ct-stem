@@ -910,6 +910,10 @@ class QuestionResponseForm(ModelForm):
       self.add_error('response', 'Please answer this question')
       self.nested[0].add_error('file', 'Please upload at least one file')
 
+    if curriculum_question.question.answer_field_type in ('TA', 'TF') and len(response) > 30000:
+      self.add_error('response', 'Your response cannot be longer than 30,000 characters')
+
+
 ####################################
 # QuestionResponseFile Form
 ####################################
