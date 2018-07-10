@@ -945,6 +945,10 @@ div.modal-content div#studentResults {
   overflow-y: auto;
 }
 
+div.modal-content div.modal-footer div.extra {
+  font-size: 1.3em;
+  margin-bottom: 0.5em;
+}
 div#reset_password .modal-content .modal-body .form-group div {
   font-size: 1.5em;
 }

@@ -335,11 +335,11 @@
                       <span class="glyphicon glyphicon-log-in" aria-hidden="true"></span>
                       Login
                     </button>
-                    <a type="button" href="{% url 'ctstem:register' %}" class="btn btn-info">Register</a>
                   </div>
-                  <div class="form-group button-row">
-                    <a href="{% url 'password_reset_recover' %}">Forgot Password</a><br>
-                    <a href="{% url 'ctstem:validate' %}">Validate Account</a>
+                  <div>
+                    <div class="extra"><a href="{% url 'ctstem:register' %}">Teacher Registration</a></div>
+                    <div class="extra"><a href="{% url 'password_reset_recover' %}">Forgot Password</a></div>
+                    <div class="extra"><a href="{% url 'ctstem:validate' %}">Validate Account</a></div>
                   </div>
                 </div>
               </form>
