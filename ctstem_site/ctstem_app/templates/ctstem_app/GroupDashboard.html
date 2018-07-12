@@ -6,12 +6,12 @@
   {{ form.media }}
   <script src="https://code.highcharts.com/highcharts.js"></script>
 {% endblock %}
-{% block title %}Group Dashboard |{% endblock %}
+{% block title %}Class Dashboard |{% endblock %}
 
 {% block content %}
   {{block.super}}
   <div class="content" id="dashboard">
-    <h2> {{group}} Dashboard </h2>
+    <h2> {{group}} - Dashboard </h2>
       {% include "ctstem_app/Tabs.html" with tab='group' group=group role='group_dashboard' %}
 
       {% if assignments %}

@@ -213,12 +213,12 @@
                       <li class="{% navactive request 'ctstem:users' 'teachers' %}"><a href="{% url 'ctstem:users' 'teachers' %}">Teachers</a></li>
                       <li class="{% navactive request 'ctstem:users' 'students' %}"><a href="{% url 'ctstem:users' 'students' %}" class="students">Students</a></li>
                       <li class="divider"></li>
-                      <li class="{% navactive request 'ctstem:groups' 'active' %} {% navactive request 'ctstem:groups' 'inactive' %}"><a href="{% url 'ctstem:groups' 'active' %}">Groups</a></li>
+                      <li class="{% navactive request 'ctstem:groups' 'active' %} {% navactive request 'ctstem:groups' 'inactive' %}"><a href="{% url 'ctstem:groups' 'active' %}">Classes</a></li>
                     {% endif %}
                   </ul>
                 </li>
               {% elif user.teacher %}
-                <li class="{% navactive request 'ctstem:groups' 'active' %} {% navactive request 'ctstem:groups' 'inactive' %}"><a href="{% url 'ctstem:groups' 'active' %}">My Groups</a></li>
+                <li class="{% navactive request 'ctstem:groups' 'active' %} {% navactive request 'ctstem:groups' 'inactive' %}"><a href="{% url 'ctstem:groups' 'active' %}">My Classes</a></li>
               {% endif %}
 
               {% if user.administrator or user.researcher %}

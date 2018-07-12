@@ -47,7 +47,9 @@ class RegistrationForm (forms.Form):
 
     elif group_id:
       self.fields['account_type'].choices = models.USER_ROLE_CHOICES[3:]
-      self.fields['email'].widget.attrs['readonly'] = True
+      if kwargs.get('initial', None) and kwargs['initial']['email']:
+        print kwargs['initial']['email']
+        self.fields['email'].widget.attrs['readonly'] = True
     else:
       self.fields['account_type'].choices = models.USER_ROLE_CHOICES[4:5]
 
@@ -696,8 +698,9 @@ class UserGroupForm(ModelForm):
   def __init__(self, *args, **kwargs):
     user = kwargs.pop('user')
     super(UserGroupForm, self).__init__(*args, **kwargs)
-
+    self.fields['title'].label = 'Class Name/Title'
     self.fields['time'].label = 'Time/Period'
+    self.fields['group_code'].label = 'Class Code'
     if hasattr(user, 'teacher'):
       self.fields['members'].queryset = self.fields['members'].queryset.filter(school=user.teacher.school)
     elif hasattr(user, 'school_administrator'):

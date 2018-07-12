@@ -10,9 +10,9 @@
       <span class="glyphicon glyphicon-download" aria-hidden="true"></span> Download Student Template
     </a-->
     <a type="button" class="btn btn-success upload-modal" href="#" data-toggle="modal" data-target="#upload" title="Upload Students">
-      <span class="glyphicon glyphicon-upload" aria-hidden="true"></span> Upload Students
+      <i class="fa fa-user-plus"></i> Add Students
     </a>
-    <a type="button" class="btn btn-info" href="{% url 'ctstem:newGroup' %}" title="Create new group">Create Group</a>
+    <a type="button" class="btn btn-info" href="{% url 'ctstem:newGroup' %}" title="Create new group">Add Class</a>
     {% if user.administrator %}
       {% if role == 'students' %}
         {% student_actions %}

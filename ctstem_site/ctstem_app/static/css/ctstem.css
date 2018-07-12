@@ -718,12 +718,22 @@ div.content section.portfolio .portfolio-item .portfolio-caption{
   padding: 10px;
 }
 
-div.content#assignments section.portfolio .portfolio-item {
+div.content#assignments section.portfolio .portfolio-item, div.content#classes section.portfolio .portfolio-item {
   margin-bottom: 4em;
 }
 div.content#assignments section.portfolio .portfolio-item .portfolio-caption{
   max-height: none;
   min-height: 25em;
+}
+
+div.content#classes section.portfolio .portfolio-item .portfolio-caption{
+  max-height: none;
+  min-height: 15em;
+}
+
+div.content#classes section.portfolio .portfolio-item .portfolio-caption input[type=checkbox] {
+  float: right;
+  zoom: 1.1;
 }
 div.content section.portfolio.bg-light-gray .portfolio-item .portfolio-caption {
   background-color: #fff;
@@ -791,14 +801,14 @@ div.content#home section#contact {
 div.content#home section#contact .text-muted {
   color: #ddd;
 }
-div.content#assignments {
+div.content#assignments, div.content#classes {
   width: 80%;
 }
 div.content#assignments div.inbox_filter {
   float: right;
   margin-right: 2em;
 }
-div.content#assignments .assignment_title {
+div.content#assignments .assignment_title, div.content#classes .class_title {
   margin-bottom: 1em;
   margin-top: 0.5em;
   font-weight: bold;
@@ -808,17 +818,22 @@ div.content#assignments .assignment_title {
   line-height: 1.3em;
 }
 
-div.content#assignments  .dates {
+div.content#classes .class_title {
+  height: 1.5em;
+}
+
+div.content#assignments  .dates, div.content#classes .details {
+  margin-bottom: 1em;
   font-size: 1.3em;
 }
-div.content#assignments  .dates .row {
+div.content#assignments  .dates .row, div.content#classes .details .row {
   margin-bottom: 0.5em;
 }
-div.content#assignments  .dates .row .title {
+div.content#assignments  .dates .row .title, div.content#classes .details .row .title {
   font-weight: bold;
   text-align: right;
 }
-div.content#assignments  .dates .row .value {
+div.content#assignments  .dates .row .value, div.content#classes .details .row .value {
   text-align: left;
 }
 div.content#assignments .chart_container {

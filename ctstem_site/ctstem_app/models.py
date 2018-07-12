@@ -8,6 +8,8 @@ from smart_selects.db_fields import ChainedForeignKey
 from PIL import Image
 import StringIO
 import datetime
+import string
+from django.utils.crypto import get_random_string
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db.models import signals
 from django.dispatch import receiver
@@ -120,6 +122,22 @@ def upload_file_to(instance, filename):
     return 'questionResponse/%s/%s_%s%s' % (instance.question_response.step_response.instance.student.user, slugify(filename_base.lower()[:10]), dt, filename_ext.lower(),)
 
   return 'misc/%s_%s%s' % (filename_base.lower(), dt, filename_ext.lower(),)
+
+####################################
+# GENERATE UNIQUE USER CODE HELPER
+####################################
+def generate_code_helper():
+  allowed_chars = ''.join((string.uppercase, string.digits))
+  code = get_random_string(length=5, allowed_chars=allowed_chars)
+  schools = School.objects.all().filter(school_code=code)
+  groups = UserGroup.objects.all().filter(group_code=code)
+  # ensure the user code is unique across teachers and researchers
+  while schools.count() > 0 or groups.count() > 0:
+    code = get_random_string(length=5, allowed_chars=allowed_chars)
+    schools = School.objects.all().filter(school_code=code)
+    groups = UserGroup.objects.all().filter(group_code=code)
+
+  return code
 
 # Create your models here.
 
@@ -404,16 +422,24 @@ class Publication(models.Model):
 # Group model
 #######################################################
 class UserGroup(models.Model):
-  title = models.CharField(max_length=255, help_text='Group Title. Eg. Physics Section A')
-  subject = models.ForeignKey(Subject)
+  title = models.CharField(max_length=255, help_text='Class Title. Eg. Physics Section A')
+  subject = models.ForeignKey(Subject, null=True, blank=True)
   time = models.CharField(null=False, max_length=256)
   teacher = models.ForeignKey(Teacher, related_name='groups')
   description = models.TextField(null=True)
   members = models.ManyToManyField(Student, through='Membership', blank=True, null=True, related_name='member_of')
+  group_code = models.CharField(null=False, blank=False, max_length=10, unique=True, default=generate_code_helper)
   is_active = models.BooleanField(null=False, blank=False, default=True)
 
   def __unicode__(self):
     return u'%s' % (self.title)
+
+class GroupInvitee(models.Model):
+  group = models.ForeignKey(UserGroup, related_name='groups')
+  email = models.EmailField(max_length=255, blank=False, null=False, help_text="Email")
+
+  class Meta:
+    unique_together = ('group', 'email')
 
 #######################################################
 # Assignment model

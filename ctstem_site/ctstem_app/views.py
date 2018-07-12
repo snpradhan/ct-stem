@@ -50,6 +50,8 @@ def home(request):
   #get published lessons
   if hasattr(request.user, 'student') == True:
     return shortcuts.redirect('ctstem:assignments', bucket='inbox')
+  elif hasattr(request.user, 'teacher') == True:
+    return shortcuts.redirect('ctstem:groups', status="active")
   else:
     lessons = models.Curriculum.objects.all().filter(curriculum_type = 'L', status='P')[:6]
     assessments = models.Curriculum.objects.all().filter(curriculum_type = 'A', status='P')[:6]
@@ -750,9 +752,11 @@ def assignCurriculum(request, id=''):
 ####################################
 # REGISTER
 ####################################
-def register(request, group_id=''):
-  if group_id:
-    group = models.UserGroup.objects.get(id=group_id)
+def register(request, group_code=''):
+  group_id = None
+  if group_code:
+    group = models.UserGroup.objects.get(group_code=group_code)
+    group_id = group.id
     school = group.teacher.school
   else:
     if hasattr(request.user, 'school_administrator'):
@@ -840,6 +844,10 @@ def register(request, group_id=''):
         newUser.save()
         if group_id:
           membership, created = models.Membership.objects.get_or_create(student=newUser, group=group)
+          #check if the student was a group invitee and remove the student invitation
+          invitation = models.GroupInvitee.objects.filter(email=user.email, group=group)
+          if invitation:
+            invitation.delete()
 
         role = 'student'
 
@@ -925,9 +933,18 @@ def register(request, group_id=''):
       messages.error(request, 'You do not have the privilege to register any other user')
       return shortcuts.redirect('ctstem:home')
 
-    if group_id and 'email' in request.GET:
-      email = request.GET['email']
-      form = forms.RegistrationForm(initial={'email': email}, user=request.user, group_id=group_id)
+    if group_id:
+      if 'email' in request.GET:
+        email = request.GET['email']
+        #validate the email is a valid group invitee
+        try:
+          invitee = models.GroupInvitee.objects.get(email=email, group__id=group_id)
+        except models.GroupInvitee.DoesNotExist:
+          return http.HttpResponseNotFound('<h1>Invalid invitation link.  Please use the link found to your email.</h1>')
+
+        form = forms.RegistrationForm(initial={'email': email}, user=request.user, group_id=group_id)
+      else:
+        form = forms.RegistrationForm(user=request.user, group_id=group_id)
       context = {'form': form, 'group_id': group_id, 'school_id': school.id}
     elif request.user.is_anonymous():
       form = forms.RegistrationForm(user=request.user)
@@ -1949,7 +1966,18 @@ def groups(request, status='active'):
     elif hasattr(request.user, 'school_administrator'):
       groups = models.UserGroup.objects.all().filter(is_active=is_active, teacher__school=request.user.school_administrator.school).order_by('id')
     elif hasattr(request.user, 'teacher'):
+      if is_active == True:
+        group_count = models.UserGroup.objects.all().filter(is_active=is_active, teacher=request.user.teacher).count()
+        print group_count, 'group count'
+        print group_count == 0
+        if group_count == 0:
+          group_list = []
+          for i in range(1, 7):
+            group_list.append(models.UserGroup(title='Class %s'%(i), teacher=request.user.teacher, is_active=True))
+
+          models.UserGroup.objects.bulk_create(group_list)
       groups = models.UserGroup.objects.all().filter(is_active=is_active, teacher=request.user.teacher).order_by('id')
+
     else:
       return http.HttpResponseNotFound('<h1>You do not have the privilege to view student groups</h1>')
     uploadForm = forms.UploadFileForm(user=request.user)
@@ -1966,16 +1994,16 @@ def group(request, id=''):
   try:
     # check if the user has permission to create or modify a group
     if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'school_administrator') == False and hasattr(request.user, 'teacher') == False :
-      return http.HttpResponseNotFound('<h1>You do not have the privilege to create/modify a group</h1>')
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to create/modify a class</h1>')
     # check if the lesson exists
     if '' != id:
       group = models.UserGroup.objects.get(id=id)
       if hasattr(request.user, 'teacher'):
         if request.user.teacher != group.teacher:
-          return http.HttpResponseNotFound('<h1>You do not have the privilege to view/modify this group</h1>')
+          return http.HttpResponseNotFound('<h1>You do not have the privilege to view/modify this class</h1>')
       elif hasattr(request.user, 'school_administrator'):
         if request.user.school_administrator.school != group.teacher.school:
-          return http.HttpResponseNotFound('<h1>You do not have the privilege to view/modify this group</h1>')
+          return http.HttpResponseNotFound('<h1>You do not have the privilege to view/modify this class</h1>')
     else:
       group = models.UserGroup()
 
@@ -2008,12 +2036,12 @@ def group(request, id=''):
           if 'student_' in key:
             id_list.append(data[key])
         _do_action(request, id_list, 'student', id)
-        messages.success(request, "Group Saved.")
+        messages.success(request, "Class Saved.")
         return shortcuts.redirect('ctstem:group', id=savedGroup.id)
       else:
         print form.errors
         print formset.errors
-        messages.error(request, "The group could not be saved because there were errors.  Please check the errors below.")
+        messages.error(request, "The class could not be saved because there were errors.  Please check the errors below.")
         uploadForm = forms.UploadFileForm(user=request.user)
         assignmentForm = forms.AssignmentSearchForm()
         studentSearchForm = forms.StudentSearchForm()
@@ -2024,7 +2052,7 @@ def group(request, id=''):
     return http.HttpResponseNotAllowed(['GET', 'POST'])
 
   except models.UserGroup.DoesNotExist:
-    return http.HttpResponseNotFound('<h1>Requested group not found</h1>')
+    return http.HttpResponseNotFound('<h1>Requested class not found</h1>')
 
 ####################################
 # Search Assignment
@@ -3027,23 +3055,9 @@ def questionResponse(request, instance_id='', response_id=''):
 # GENERATE UNIQUE USER CODE
 ####################################
 def generate_code(request):
-  code = generate_code_helper(request)
+  code = models.generate_code_helper()
   response_data = {'code': code}
   return http.HttpResponse(json.dumps(response_data), content_type="application/json")
-
-####################################
-# GENERATE UNIQUE USER CODE HELPER
-####################################
-def generate_code_helper(request):
-  allowed_chars = ''.join((string.uppercase, string.digits))
-  code = get_random_string(length=5, allowed_chars=allowed_chars)
-  schools = models.School.objects.all().filter(school_code=code)
-  # ensure the user code is unique across teachers and researchers
-  while schools.count() > 0:
-    code = get_random_string(length=5, allowed_chars=allowed_chars)
-    schools = models.School.objects.all().filter(school_code=code)
-
-  return code
 
 ####################################
 # UPLOAD USERS
@@ -3128,6 +3142,10 @@ def user_upload(request):
           else:
             #email does not exist.  Send and email with registration link
             send_student_account_request_email(email, group)
+            #add email to group invitee list
+            group_invitee = models.GroupInvitee(group=group, email=email)
+            group_invitee.save()
+
             new += 1
 
       if added:
@@ -3176,10 +3194,10 @@ def send_student_account_request_email(email, group):
   domain = current_site.domain
   body = '<div>Your teacher has requested you to create an account on Computational Thinking in STEM website </div><br> \
           <div>Click the link below and follow the instructions on the webpage to create a student account. </div><br> \
-          <div>http://%s/register/group/%d?email=%s  </div><br> \
+          <div>http://%s/register/group/%s?email=%s  </div><br> \
           <div>If clicking the link does not seem to work, you can copy and paste the link into your browser&#39;s address window, </div> \
           <div>or retype it there. Once you have returned to CT-STEM, we will give instructions for creating an account. </div><br> \
-          <div><b>CT-STEM Admin</b></div>'%(domain, group.id, email)
+          <div><b>CT-STEM Admin</b></div>'%(domain, group.group_code, email)
 
   send_mail('CT-STEM - Student Account Signup Request', body, settings.DEFAULT_FROM_EMAIL, [email], html_message=body)
 

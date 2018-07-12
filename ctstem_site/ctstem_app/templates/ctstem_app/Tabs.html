@@ -13,16 +13,16 @@
       <li {% if role == 'students' %} class="active"{% endif %}><a href="{% url 'ctstem:users' 'students' %}" class="students">Students</a></li>
     {% endif %}
     {% if user.administrator or user.researcher or user.school_administrator or user.teacher %}
-      <li {% if role == 'groups' %} class="active"{% endif %}><a href="{% url 'ctstem:groups' 'active' %}">{% if user.teacher %} My {% endif %} Groups</a></li>
+      <li {% if role == 'groups' %} class="active"{% endif %}><a href="{% url 'ctstem:groups' 'active' %}">{% if user.teacher %} My {% endif %} Classes</a></li>
     {% endif %}
   {% endif %}
   {% if tab == 'group' or tab == 'assignment' %}
     {% if user.administrator or user.researcher or user.school_administrator or user.teacher %}
       {% if group.id %}
         {% if not user.researcher %}
-          <li {% if role == 'group' %} class="active"{% endif %}><a href="{% url 'ctstem:group' group.id %}">Group Details</a></li>
+          <li {% if role == 'group' %} class="active"{% endif %}><a href="{% url 'ctstem:group' group.id %}">Class Details</a></li>
         {% endif %}
-        <li {% if role == 'group_dashboard' %} class="active"{% endif %}><a href="{% url 'ctstem:groupDashboard' group.id %}">Group Dashboard</a></li>
+        <li {% if role == 'group_dashboard' %} class="active"{% endif %}><a href="{% url 'ctstem:groupDashboard' group.id %}">Class Dashboard</a></li>
       {% endif %}
     {% endif %}
   {% endif %}
@@ -36,8 +36,8 @@
   {% if user.administrator or user.researcher or user.school_administrator or user.teacher %}
     {% if role == 'groups' %}
       <ul class="nav nav-tabs">
-        <li {% if group_status == 'active' %} class="active"{% endif %}><a href="{% url 'ctstem:groups' 'active' %}">Active Groups</a></li>
-        <li {% if group_status == 'inactive' %} class="active"{% endif %}><a href="{% url 'ctstem:groups' 'inactive' %}">Inactive Groups</a></li>
+        <li {% if group_status == 'active' %} class="active"{% endif %}><a href="{% url 'ctstem:groups' 'active' %}">Active Classes</a></li>
+        <li {% if group_status == 'inactive' %} class="active"{% endif %}><a href="{% url 'ctstem:groups' 'inactive' %}">Inactive Classes</a></li>
       </ul>
     {% endif %}
   {% endif %}

@@ -5,15 +5,15 @@
   {{ form.media }}
 {% endblock %}
 
-{% block title %}User Group |{% endblock %}
+{% block title %}Class |{% endblock %}
 
 {% block content %}
   {{block.super}}
   <div class="content">
-    {% if form.instance %}
-      <h2>{{form.instance.title|title}}</h2>
+    {% if form.instance.id %}
+      <h2>Edit Class</h2>
     {% else %}
-      <h2>Student Group</h2>
+      <h2>Add New Class</h2>
     {% endif %}
     {% include "ctstem_app/Tabs.html" with tab='group' group=form.instance role='group'%}
     <form method="post" id="userGroupForm">
@@ -26,12 +26,12 @@
           <div class="error">{{ form.title.errors }}</div>
         </div>
         <div class="form-group">
-          <label for="id_{{title}}">{{ form.subject.label }} {% if form.subject.field.required %}(<span class="required">*</span>){% endif %} </label>
+          <label for="id_{{subject}}">{{ form.subject.label }} {% if form.subject.field.required %}(<span class="required">*</span>){% endif %} </label>
           <div class="controls">{{form.subject}}</div>
           <div class="error">{{ form.subject.errors }}</div>
         </div>
         <div class="form-group">
-          <label for="id_{{title}}">{{ form.time.label }} {% if form.time.field.required %}(<span class="required">*</span>){% endif %} </label>
+          <label for="id_{{time}}">{{ form.time.label }} {% if form.time.field.required %}(<span class="required">*</span>){% endif %} </label>
           <div class="controls">{{form.time}}</div>
           <div class="error">{{ form.time.errors }}</div>
         </div>
@@ -39,16 +39,29 @@
           <input type="hidden" id="id_group-teacher" name="group-teacher" value="{{user.teacher.id}}"/>
         {% else %}
           <div class="form-group">
-            <label for="id_{{title}}">{{ form.teacher.label }} {% if form.teacher.field.required %}(<span class="required">*</span>){% endif %} </label>
+            <label for="id_{{teacher}}">{{ form.teacher.label }} {% if form.teacher.field.required %}(<span class="required">*</span>){% endif %} </label>
             <div class="controls">{{form.teacher}}</div>
             <div class="error">{{ form.teacher.errors }}</div>
           </div>
         {% endif %}
         <div class="form-group">
-          <label for="id_{{title}}">{{ form.description.label }} {% if form.description.field.required %}(<span class="required">*</span>){% endif %} </label>
+          <label for="id_{{description}}">{{ form.description.label }} {% if form.description.field.required %}(<span class="required">*</span>){% endif %} </label>
           <div class="controls">{{form.description}}</div>
           <div class="error">{{ form.description.errors }}</div>
         </div>
+        <div class="form-group">
+          <label for="id_{{group_code}}">{{ form.group_code.label }} {% if form.group_code.field.required %}(<span class="required">*</span>){% endif %} </label>
+          <div class="input-group">
+            {{form.group_code}}
+            <span class="input-group-btn">
+              <input type="button" class="btn btn-info" id="generate_code" value="Generate"/>
+            </span>
+          </div>
+          <div class="error">{{ form.group_code.errors }}</div>
+        </div>
+
+
+
         <div class="form-group">
           <label for="id_{{is_active}}">{{ form.is_active.label|title }} {% if form.is_active.field.required %}(<span class="required">*</span>){% endif %} </label>
           <div class="controls">{{form.is_active}}</div>
@@ -139,8 +152,8 @@
                 <a type="button" class="btn btn-info upload-modal" href="#" data-toggle="modal" data-target="#studentSearch" data-id="{{form.instance.id}}" title="Search and Add existing Students to this group">
                   <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
                 </a>
-                <a type="button" class="btn btn-success upload-modal" href="#" data-toggle="modal" data-target="#upload" data-id="{{form.instance.id}}" title="Upload new and existing Students to this group">
-                  <span class="glyphicon glyphicon-upload" aria-hidden="true"></span>
+                <a type="button" class="btn btn-success upload-modal" href="#" data-toggle="modal" data-target="#upload" data-id="{{form.instance.id}}" data-title="{{form.instance.title}}" title="Upload new and existing Students to this group">
+                  <i class="fa fa-user-plus"></i>
                 </a>
                 <a type="button" class="btn btn-info upload-modal" href="#" data-toggle="modal" data-target="#addStudent" data-id="{{form.instance.id}}" title="Create and Add new Student to this group">
                   <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
@@ -226,7 +239,7 @@
             <div class="error">{{ form.members.errors }}</div>
           </div>
         {% else %}
-          <h4> Save the Group to add Assignments and Students </h4>
+          <h4 class="warning"> Save the Class and then add Assignments and Students </h4>
           {{formset.management_form}}
           {{formset.id}}
           {{formset.as_hidden}}
@@ -234,7 +247,7 @@
 
         {% if form.instance.is_active %}
           <div class="form-group button-group-fixed">
-            <input type="submit" class="btn btn-success" id="submit" value="Save Group"/>
+            <input type="submit" class="btn btn-success" id="submit" value="Save Class"/>
           </div>
         {% endif %}
       </div>
@@ -290,6 +303,8 @@
         $("div.modal#upload select#id_group option:selected").prop('selected', false);
         $("div.modal#upload select#id_group option[value='"+$(this).data('id')+"']").prop('selected', true);
         $("div.modal#upload select#id_group").closest('.form-group').hide();
+        $("div.modal#upload .modal-title span").html('<div>'+$(this).data('title')+'</div>');
+
       });
 
     });

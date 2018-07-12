@@ -3,7 +3,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h3 class="modal-title">Upload Students</h3>
+        <h3 class="modal-title">Add Students to <span>Class</span></h3>
       </div>
       <div id="uploadMsg" class="msg">
       </div>
@@ -11,7 +11,7 @@
         {% csrf_token %}
         <div class="modal-body">
           <div class="form-group">
-            <label for="id_group">Group (<span class="required">*</span>)</label>
+            <label for="id_group">Class (<span class="required">*</span>)</label>
             {{uploadForm.group}}
           </div>
           <div class="form-group">
@@ -21,6 +21,9 @@
           <div class="form-group">
             <label for="id_uploadFile">Upload a CSV</label>
             {{uploadForm.uploadFile}}
+          </div>
+           <div class="form-group">
+            <h5 class=""></h5>
           </div>
           <div id="spinner">
             <img src="/static/img/page-loader.gif" class="icon"/>
