@@ -21,10 +21,12 @@
           <tr>
             <th> Subject </th>
             <th> Abbrevation </th>
+            <th> Icon </th>
           </tr>
           <tr id="filterrow">
             <th> Subject </th>
             <th> Abbrevation </th>
+            <th> Icon </th>
           </tr>
         </thead>
         <tbody>
@@ -42,6 +44,11 @@
               </td>
               <td>
                 {{ subject.abbrevation}}
+              </td>
+              <td>
+                {% if subject.icon %}
+                  <a target="_blanl" href="{{subject.icon.url}}"><img class="icon" src="{{subject.icon.url}}"/></a>
+                {% endif %}
               </td>
             </tr>
           {% endfor %}

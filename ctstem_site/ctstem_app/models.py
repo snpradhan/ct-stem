@@ -108,6 +108,8 @@ def upload_file_to(instance, filename):
     return 'curriculum/%s_%s%s' % (slugify(instance.title[:40]), dt, filename_ext.lower(),)
   elif isinstance(instance, Publication):
       return 'publications/%s_%s%s' % (slugify(instance.title[:40]), dt, filename_ext.lower(),)
+  elif isinstance(instance, Subject):
+      return 'subjects/%s_%s%s' % (slugify(instance.name[:40]), dt, filename_ext.lower(),)
   elif isinstance(instance, Team):
     return 'team/%s_%s%s' % (slugify(instance.name[:40]), dt, filename_ext.lower(),)
   elif isinstance(instance, Attachment):
@@ -262,6 +264,8 @@ class Question(models.Model):
 class Subject(models.Model):
   name = models.CharField(null=False, max_length=256)
   abbrevation = models.CharField(null=True, blank=True, max_length=10)
+  icon = models.ImageField(upload_to=upload_file_to, blank=True, help_text='Upload 400x289 png image that represents this subject')
+
 
   def __unicode__(self):
       return u'%s' % (self.name)

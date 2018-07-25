@@ -186,6 +186,12 @@ img.big_icon {
   width: 200px;
   height: auto;
 }
+img.group_icon {
+  height: 289px;
+  width: auto;
+  margin: 1em auto 0 auto;
+}
+
 img.profile {
   width: 150px;
   height: 200px;
@@ -729,6 +735,38 @@ div.content#assignments section.portfolio .portfolio-item .portfolio-caption{
 div.content#classes section.portfolio .portfolio-item .portfolio-caption{
   max-height: none;
   min-height: 15em;
+
+}
+div.content#assignments section.portfolio .portfolio-item .portfolio-caption,
+div.content#classes section.portfolio .portfolio-item .portfolio-caption{
+  border-bottom: 2px solid;
+  border-left: 2px solid;
+  border-right: 2px solid;
+  border-bottom-left-radius: 2em;
+  border-bottom-right-radius: 2em;
+  border-color: #f7f7f7;
+}
+
+div.content#classes section.portfolio .portfolio-item .portfolio-link,
+div.content#assignments section.portfolio .portfolio-item .portfolio-link {
+  border-top: 2px solid;
+  border-left: 2px solid;
+  border-right: 2px solid;
+  border-top-left-radius: 2em;
+  border-top-right-radius: 2em;
+  border-color: #f7f7f7;
+}
+
+section.portfolio .portfolio-item .portfolio-link img,
+section.portfolio .portfolio-item .portfolio-link .portfolio-hover {
+  border-top-left-radius: 2em;
+  border-top-right-radius: 2em;
+}
+
+div.content#classes section.portfolio .portfolio-item .portfolio-caption .button_row {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 5em;
 }
 
 div.content#classes section.portfolio .portfolio-item .portfolio-caption input[type=checkbox] {
@@ -801,7 +839,7 @@ div.content#home section#contact {
 div.content#home section#contact .text-muted {
   color: #ddd;
 }
-div.content#assignments, div.content#classes {
+div.content#assignments, div.content.teacher#classes {
   width: 80%;
 }
 div.content#assignments div.inbox_filter {
@@ -876,7 +914,7 @@ hr.light {
 /***********   FORM GROUP END   ************/
 
 /******** Button ***********/
-.btn-primary, .btn-default, .btn-success, .btn-danger, .btn-warning, .btn-info, .btn-gray {
+.btn-primary, .btn-default, .btn-success, .btn-danger, .btn-warning, .btn-info, .btn-gray, .btn-yellow, .btn-purple {
   font-family: Montserrat, "Helvetica Neue", Helvetica, Arial, sans-serif;
   text-transform: uppercase;
   font-weight: 700
@@ -888,6 +926,16 @@ hr.light {
   border-color: #b7b7b7;
 }
 
+.btn-yellow {
+  color: #fff;
+  background-color: #fed136;
+  border-color: #fed136;
+}
+.btn-purple {
+  color: #fff;
+  background-color: #8B008B;
+  border-color: #8B008B;
+}
 div.content #pagination {
   text-align: center;
   font-size: 2em;
@@ -922,6 +970,12 @@ div.modal-content div.results{
 }
 div.modal-content span.time {
   color: red;
+}
+
+div.modal-content div.link {
+  font-size: 1.8em;
+  font-weight: bold;
+  text-align: center;
 }
 
 div.modal-content form#consentForm div.modal-body{
@@ -1203,6 +1257,19 @@ a.selector-chooseall, a.selector-clearall {
 /******* glyphicon colors and behavior ********/
 .glyphicon {
   cursor: pointer;
+}
+
+.gi-2x{
+  font-size: 2em;
+}
+.gi-3x{
+  font-size: 3em;
+}
+.gi-4x{
+  font-size: 4em;
+}
+.gi-5x{
+  font-size: 5em;
 }
 
 span.ec .glyphicon-collapse-down, span.ec_lessons .fa-caret-square-o-down {

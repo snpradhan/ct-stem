@@ -50,8 +50,6 @@ def home(request):
   #get published lessons
   if hasattr(request.user, 'student') == True:
     return shortcuts.redirect('ctstem:assignments', bucket='inbox')
-  elif hasattr(request.user, 'teacher') == True:
-    return shortcuts.redirect('ctstem:groups', status="active")
   else:
     lessons = models.Curriculum.objects.all().filter(curriculum_type = 'L', status='P')[:6]
     assessments = models.Curriculum.objects.all().filter(curriculum_type = 'A', status='P')[:6]
@@ -1000,8 +998,10 @@ def user_login(request):
       login(request, user)
       response_data['result'] = 'Success'
       if hasattr(user, 'teacher'):
+        response_data['role'] = 'teacher'
         messages.success(request, "Welcome to the CT-STEM website.  If you need help with using the site, you can checkout the help videos on the Training page <a href='/training#help_videos'>here</a>", extra_tags='safe');
       else:
+        response_data['role'] = 'non-teacher'
         messages.success(request, "You have logged in")
     else:
       response_data['result'] = 'Failed'
@@ -1967,21 +1967,19 @@ def groups(request, status='active'):
       groups = models.UserGroup.objects.all().filter(is_active=is_active, teacher__school=request.user.school_administrator.school).order_by('id')
     elif hasattr(request.user, 'teacher'):
       if is_active == True:
-        group_count = models.UserGroup.objects.all().filter(is_active=is_active, teacher=request.user.teacher).count()
-        print group_count, 'group count'
-        print group_count == 0
+        group_count = models.UserGroup.objects.all().filter(teacher=request.user.teacher).count()
         if group_count == 0:
-          group_list = []
-          for i in range(1, 7):
-            group_list.append(models.UserGroup(title='Class %s'%(i), teacher=request.user.teacher, is_active=True))
+          new_group = models.UserGroup(title='My Class 1', teacher=request.user.teacher, is_active=True)
+          new_group.save()
 
-          models.UserGroup.objects.bulk_create(group_list)
       groups = models.UserGroup.objects.all().filter(is_active=is_active, teacher=request.user.teacher).order_by('id')
 
     else:
       return http.HttpResponseNotFound('<h1>You do not have the privilege to view student groups</h1>')
+    current_site = Site.objects.get_current()
+    domain = current_site.domain
     uploadForm = forms.UploadFileForm(user=request.user)
-    context = {'groups': groups, 'role':'groups', 'uploadForm': uploadForm, 'group_status': status}
+    context = {'groups': groups, 'role':'groups', 'uploadForm': uploadForm, 'group_status': status, 'domain': domain}
     return render(request, 'ctstem_app/UserGroups.html', context)
 
   return http.HttpResponseNotAllowed(['GET', 'POST'])
@@ -2117,17 +2115,13 @@ def deleteGroup(request, id=''):
       privilege = 0
       if hasattr(request.user, 'administrator'):
         privilege = 1
-      elif hasattr(request.user, 'school_administrator') and request.user.school_administrator.school == group.teacher.school:
-        privilege = 1
-      elif hasattr(request.user, 'teacher') and group.teacher == request.user.teacher:
-        privilege = 1
 
       if privilege == 0:
-        return http.HttpResponseNotFound('<h1>You do not have the privilege to delete this group</h1>')
+        return http.HttpResponseNotFound('<h1>You do not have the privilege to delete this class</h1>')
 
       if request.method == 'GET' or request.method == 'POST':
         group.delete()
-        messages.success(request, 'Student Group "%s" deleted' % group.title)
+        messages.success(request, '"%s" and all related assignments deleted' % group.title)
         return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
     else:
@@ -2368,6 +2362,37 @@ def archiveAssignment(request, instance_id=''):
   except models.AssignmentInstance.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested assignment not found</h1>')
 
+
+####################################
+# Inactivate a group and
+# archive the associated assignments
+####################################
+def inactivateGroup(request, id=''):
+  try:
+    privilege = 0
+    if '' != id:
+      group = models.UserGroup.objects.get(id=id)
+      if hasattr(request.user, 'administrator') or hasattr(request.user, 'researcher'):
+        privilege = 1
+      elif hasattr(request.user, 'school_administrator'):
+        if group.is_active and group.teacher.school == request.user.school_administrator.school:
+          privilege = 1
+      elif hasattr(request.user, 'teacher'):
+        if group.is_active and group.teacher == request.user.teacher:
+          privilege = 1
+
+      if privilege > 0:
+        group.is_active = False
+        group.save()
+        messages.success(request, '"%s" inactivated' % group.title)
+        archiveAssignments(request, [id])
+        return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+      else:
+        http.HttpResponseNotFound('<h1>You do not have the privilege to inactivate this class</h1>')
+    else:
+      raise models.UserGroup.DoesNotExist
+  except models.UserGroup.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested class not found</h1>')
 
 ####################################
 # When group is inactivated by an Admin or a Teacher,
@@ -3412,7 +3437,7 @@ def subject(request, id=''):
     elif request.method == 'POST':
       data = request.POST.copy()
 
-      form = forms.SubjectForm(data, instance=subject, prefix="subject")
+      form = forms.SubjectForm(data, request.FILES, instance=subject, prefix="subject")
       if form.is_valid():
         form.save()
         messages.success(request, "Subject Saved.")

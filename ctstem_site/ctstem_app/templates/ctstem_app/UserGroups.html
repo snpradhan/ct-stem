@@ -8,7 +8,7 @@
 
 {% block content %}
   {{block.super}}
-  <div class="content" id="classes">
+  <div class="content {% if user.teacher %} teacher {% endif %}" id="classes">
     {% if user.teacher %}
       <h2> My Classes </h2>
     {% else %}
@@ -20,66 +20,96 @@
       {% include "ctstem_app/Tabs.html" with tab='group'%}
 
       {% if user.teacher %}
-        {% if groups %}
-          <section class="portfolio">
-            <div class="row">
-              {% for group in groups %}
-                <div class="col-lg-4 col-md-6 portfolio-item ">
-                  <div class="tile">
-                    <div class="portfolio-caption">
-                        <input id="group_{{group.id}}" type="checkbox" class="action-select" value="{{group.id}}" name="group_{{group.id}}"/>
-                        <div class="class_title">{{group.title}}</div>
+        <section class="portfolio">
+          <div class="row">
+            {% for group in groups %}
+              <div class="col-lg-4 col-md-6 portfolio-item ">
+                <div class="tile">
 
-                        <div class="row details">
-                            <div class="row">
-                              <div class="col-md-6 title">Subject:</div>
-                              <div class="col-md-6 value">{{group.subject|default_if_none:""}}</div>
-                            </div>
-                            <div class="row">
-                              <div class="col-md-6 title">Time:</div>
-                              <div class="col-md-6 value">{{group.time|default_if_none:""}}</div>
-                            </div>
-                            <div class="row">
-                              <div class="col-md-6 title">No. of Students:</div>
-                              <div class="col-md-6 value">{{group.members.count}}</div>
-                            </div>
-                            <div class="row">
-                              <div class="col-md-6 title">No. of Assignments:</div>
-                              <div class="col-md-6 value">{{group.assignments.count}}</div>
-                            </div>
+                  <a href="{% url 'ctstem:group' group.id %}" class="portfolio-link">
+                     <div class="portfolio-hover">
+                      <div class="portfolio-hover-content">
+                        <span class="glyphicon glyphicon-pencil gi-3x" aria-hidden="true"></span>
+                        <!--i class="fa fa-edit fa-3x"></i-->
+                      </div>
+                    </div>
+                    {% if group.subject and group.subject.icon %}
+                      <img src="{{group.subject.icon.url}}" class="img-responsive group_icon" alt="">
+                    {% else %}
+                      <img src="/static/img/class.png" class="img-responsive group_icon" alt="">
+                    {% endif %}
+                  </a>
+
+                  <div class="portfolio-caption">
+                    <input id="group_{{group.id}}" type="checkbox" class="action-select" value="{{group.id}}" name="group_{{group.id}}"/>
+                    <div class="class_title">{{group.title}}</div>
+
+                    <div class="button_row">
+                      {% if group.is_active %}
+                        <div>
+                          <a type="button" class="btn btn-info" aria-label="Edit Class" title="Edit Class" href="{% url 'ctstem:group' group.id %}">
+                            <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+                          </a>
                         </div>
 
-                      <div class="row">
-                        {% if group.is_active %}
-                          <div class="col-md-3">
-                            <a type="button" class="btn btn-info" aria-label="Edit Group" title="Edit Class" href="{% url 'ctstem:group' group.id %}">
-                              <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
-                            </a>
-                          </div>
-                          <div class="col-md-3">
-                            <a type="button" class="btn btn-danger" aria-label="Delete Group" title="Delete Class" href="{% url 'ctstem:deleteGroup' group.id %}" onclick="return confirm('Are you sure you want to delete {{group.title}}?')">
-                                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-                            </a>
-                          </div>
-                          <div class="col-md-3">
-                            <a type="button" class="btn btn-success upload-modal" href="#" data-toggle="modal" data-target="#upload" data-id="{{group.id}}" data-title="{{group.title}}" title="Add Students">
-                              <i class="fa fa-user-plus"></i>
-                            </a>
-                          </div>
-                          <div class="col-md-3">
-                            <a type="button" class="btn btn-warning" aria-label="Edit Group" title="Class Dashboard" href="{% url 'ctstem:groupDashboard' group.id %}">
-                              <img src="/static/img/dashboard.png" class="icon" />
-                            </a>
-                          </div>
-                        {% endif %}
-                      </div>
+                         <div>
+                          <a type="button" class="btn btn-yellow invite-modal" href="#" data-toggle="modal" data-target="#invite" data-invite-link="https://{{domain}}/register/group/{{group.group_code}}" data-title="{{group.title}}" title="Student Invitation Link">
+                            <i class="fa fa-link"></i>
+                          </a>
+                        </div>
+
+                        <div>
+                          <a type="button" class="btn btn-success upload-modal" href="#" data-toggle="modal" data-target="#upload" data-id="{{group.id}}" data-title="{{group.title}}" title="Add Students">
+                            <i class="fa fa-user-plus"></i>
+                          </a>
+                        </div>
+                        <div>
+                          <a type="button" class="btn btn-warning" aria-label="Class Dashboard" title="Class Dashboard" href="{% url 'ctstem:groupDashboard' group.id %}">
+                            <img src="/static/img/dashboard.png" class="icon" />
+                          </a>
+                        </div>
+
+                        <div>
+                          <a type="button" class="btn btn-purple" aria-label="Inactivate Class" title="Inactivate Class" href="{% url 'ctstem:inactivateGroup' group.id %}" onclick="return confirm('Are you sure you want to inactivate {{group.title}}?')">
+                              <i class="fa fa-archive"></i>
+                          </a>
+                        </div>
+                      {% else %}
+                        <div>
+                          <a type="button" class="btn btn-info" aria-label="Edit Class" title="Edit Class" href="{% url 'ctstem:group' group.id %}">
+                            <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
+                          </a>
+                        </div>
+                        <div>
+                          <a type="button" class="btn btn-warning" aria-label="Class Dashboard" title="Class Dashboard" href="{% url 'ctstem:groupDashboard' group.id %}">
+                            <img src="/static/img/dashboard.png" class="icon" />
+                          </a>
+                        </div>
+                      {% endif %}
                     </div>
                   </div>
                 </div>
-              {% endfor %}
+              </div>
+            {% endfor %}
+            {% if group_status == 'active' %}
+            <div class="col-lg-4 col-md-6 portfolio-item ">
+              <div class="tile">
+                <a href="{% url 'ctstem:newGroup' %}" class="portfolio-link">
+                   <div class="portfolio-hover">
+                    <div class="portfolio-hover-content">
+                      <span class="glyphicon glyphicon-plus gi-3x" aria-hidden="true"></span>
+                    </div>
+                  </div>
+                  <img src="/static/img/new_class.png" class="img-responsive group_icon" alt="">
+                </a>
+                <div class="portfolio-caption">
+                  <h3>ADD NEW CLASS</h3>
+                </div>
+              </div>
             </div>
-          </section>
-        {% endif %}
+            {% endif %}
+          </div>
+        </section>
 
       {% else %}
         {% if groups %}
@@ -87,7 +117,7 @@
             <thead>
               <tr>
                 <th width="1%" class="no-sort"><input id="select-all" type="checkbox" value="0" name="select-all"/></th>
-                <th width="20%"> Group Name </th>
+                <th width="20%"> Class Name </th>
                 <th width="15%"> Subject </th>
                 <th width="10%"> Time </th>
                 <th> Status </th>
@@ -102,7 +132,7 @@
               </tr>
               <tr id="filterrow">
                 <th class="no-sort"></th>
-                <th> Group Name </th>
+                <th> Class Name </th>
                 <th> Subject </th>
                 <th> Time </th>
                 <th> Status </th>
@@ -126,7 +156,7 @@
                     {{group.title}}
                     {% if not user.researcher %}
                       <div class="controls">
-                        <a type="button" class="btn btn-info" aria-label="Edit Group" title="Edit Group" href="{% url 'ctstem:group' group.id %}">
+                        <a type="button" class="btn btn-info" aria-label="Edit Class" title="Edit Class" href="{% url 'ctstem:group' group.id %}">
                             {% if group.is_active %}
                               <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
                             {% else %}
@@ -134,11 +164,17 @@
                             {% endif %}
                         </a>
                         {% if group.is_active %}
-                          <a type="button" class="btn btn-danger" aria-label="Delete Group" title="Delete Group" href="{% url 'ctstem:deleteGroup' group.id %}" onclick="return confirm('Are you sure you want to delete {{group.title}}?')">
-                              <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                          <a type="button" class="btn btn-yellow invite-modal" href="#" data-toggle="modal" data-target="#invite" data-invite-link="https://{{domain}}/register/group/{{group.group_code}}" data-title="{{group.title}}" title="Student Invitation Link">
+                            <i class="fa fa-link"></i>
                           </a>
                           <a type="button" class="btn btn-success upload-modal" href="#" data-toggle="modal" data-target="#upload" data-id="{{group.id}}" data-title="{{group.title}}" title="Upload Students">
                             <i class="fa fa-user-plus"></i>
+                          </a>
+                          <a type="button" class="btn btn-purple" aria-label="Inactivate Class" title="Inactivate Class" href="{% url 'ctstem:inactivateGroup' group.id %}" onclick="return confirm('Are you sure you want to inactivate {{group.title}}?')">
+                              <i class="fa fa-archive"></i>
+                          </a>
+                          <a type="button" class="btn btn-danger" aria-label="Delete Class" title="Delete Class" href="{% url 'ctstem:deleteGroup' group.id %}" onclick="return confirm('Are you sure you want to delete {{group.title}}?')">
+                              <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
                           </a>
                         {% endif %}
                       </div>
@@ -167,7 +203,7 @@
                       {% if group.assignments.count > 0 %}
                         {{group.assignments.count}} Assignments
                         <div>
-                          <a type="button" class="btn btn-warning" href="{% url 'ctstem:groupDashboard' group.id %}" aria-label="View Group Dashboard" title="View Group Dashboard">
+                          <a type="button" class="btn btn-warning" href="{% url 'ctstem:groupDashboard' group.id %}" aria-label="View Class Dashboard" title="View Class Dashboard">
                             <img src="/static/img/dashboard.png" class="icon" />
                           </a>
                         </div>
@@ -189,6 +225,9 @@
   </div>
   {% block upload %}
     {% include "ctstem_app/UserUploadModal.html" %}
+  {% endblock %}
+  {% block invite %}
+    {% include "ctstem_app/InviteModal.html" %}
   {% endblock %}
 
   <script type="text/javascript">
@@ -216,6 +255,11 @@
         else{
           $("div.modal#upload select#id_group").closest('.form-group').show();
         }
+      });
+
+      $('a.invite-modal').click(function(){
+        $("div.modal#invite .modal-title span").html($(this).data('title'));
+        $("div.modal#invite .modal-body .link").html($(this).data('invite-link'));
       });
 
       $('div.portfolio-select').on('click', function(){

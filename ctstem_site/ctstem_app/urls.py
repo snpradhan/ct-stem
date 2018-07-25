@@ -63,6 +63,7 @@ urlpatterns = [
     url(r'^response/(?P<instance_id>[\d]+)/(?P<response_id>[\d]+)/$', views.questionResponse, name='questionResponse'),
     url(r'^group/(?P<id>[\d]+)/$', views.group, name='group'),
     url(r'^group/delete/(?P<id>[\d]+)/$', views.deleteGroup, name='deleteGroup'),
+    url(r'^group/inactivate/(?P<id>[\d]+)/$', views.inactivateGroup, name='inactivateGroup'),
     url(r'^groups/(?P<status>[a-zA-Z0-9_]+)/$', views.groups, name='groups'),
     url(r'^group/new/$', views.group, name='newGroup'),
     url(r'^assignments/(?P<bucket>[\w-]+)/$', views.assignments, name='assignments'),

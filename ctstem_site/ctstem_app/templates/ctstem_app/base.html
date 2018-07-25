@@ -94,8 +94,12 @@
               dataType: 'json',
               success: function(data){
                 if(data['result'] == 'Success'){
-                  //window.location = "{% url 'ctstem:home' %}";
-                  window.location.reload();
+                  if(data['role'] == 'teacher'){
+                    window.location = "{% url 'ctstem:groups' 'active' %}";
+                  }
+                  else{
+                    window.location.reload();
+                  }
                 }
                 else{
                   $('#loginMsg').html(data['message']);

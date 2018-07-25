@@ -262,8 +262,8 @@ def student_in_group_teacher_actions(context):
 
 def GroupActions(context):
     return [{'description':bulk_header,'value':''},
-        {'description':'Activate Selected Groups','value':'activate_selected'},
-        {'description':'Inactivate Selected Groups','value':'inactivate_selected'},]
+        {'description':'Activate Selected Classes','value':'activate_selected'},
+        {'description':'Inactivate Selected Classes','value':'inactivate_selected'},]
 
 @register.inclusion_tag("ctstem_app/admin/actions.html", takes_context=True)
 def group_actions(context):
