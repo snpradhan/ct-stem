@@ -187,7 +187,7 @@ img.big_icon {
   height: auto;
 }
 img.group_icon {
-  height: 289px;
+  height: 150px;
   width: auto;
   margin: 1em auto 0 auto;
 }
@@ -734,8 +734,6 @@ div.content#assignments section.portfolio .portfolio-item .portfolio-caption{
 
 div.content#classes section.portfolio .portfolio-item .portfolio-caption{
   max-height: none;
-  min-height: 15em;
-
 }
 div.content#assignments section.portfolio .portfolio-item .portfolio-caption,
 div.content#classes section.portfolio .portfolio-item .portfolio-caption{
@@ -766,7 +764,6 @@ section.portfolio .portfolio-item .portfolio-link .portfolio-hover {
 div.content#classes section.portfolio .portfolio-item .portfolio-caption .button_row {
   display: flex;
   justify-content: space-around;
-  margin-top: 5em;
 }
 
 div.content#classes section.portfolio .portfolio-item .portfolio-caption input[type=checkbox] {
