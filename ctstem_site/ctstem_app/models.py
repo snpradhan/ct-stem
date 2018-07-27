@@ -426,7 +426,7 @@ class Publication(models.Model):
 # Group model
 #######################################################
 class UserGroup(models.Model):
-  title = models.CharField(max_length=255, help_text='Class Title. Eg. Physics Section A')
+  title = models.CharField(max_length=50, help_text='Class Title. Eg. Physics Section A')
   subject = models.ForeignKey(Subject, null=True, blank=True)
   time = models.CharField(null=False, max_length=256)
   teacher = models.ForeignKey(Teacher, related_name='groups')

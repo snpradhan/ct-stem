@@ -854,7 +854,8 @@ div.content#assignments .assignment_title, div.content#classes .class_title {
 }
 
 div.content#classes .class_title {
-  height: 1.5em;
+  height: 2em;
+  overflow-x: unset;
 }
 
 div.content#assignments  .dates, div.content#classes .details {
