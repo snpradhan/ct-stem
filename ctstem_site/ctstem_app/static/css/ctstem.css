@@ -854,7 +854,7 @@ div.content#assignments .assignment_title, div.content#classes .class_title {
 }
 
 div.content#classes .class_title {
-  height: 2em;
+  height: 1.5em;
   overflow-x: unset;
 }
 
