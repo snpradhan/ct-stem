@@ -79,7 +79,7 @@ $(function (){
 
   //user code generation
   $("#generate_code").click(function(){
-    var url = "/generate_code";
+    var url = "/generate_code/";
     var obj = $(this);
     $.ajax({
       type: 'GET',
