@@ -158,6 +158,11 @@
             }
         });
         /**************************/
+        $('select#id_school option[value="{{other_school.id}}"]').remove();
+        $('select#id_school').prepend($('<option>', {
+            value: '{{other_school.id}}',
+            text: '{{other_school.name}}'
+        }));
 
         $('select#id_school').on('change', function(){
           if($(this).val() == "{{other_school.id}}"){

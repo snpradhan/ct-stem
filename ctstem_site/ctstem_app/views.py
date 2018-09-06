@@ -772,8 +772,7 @@ def register(request, group_id=''):
       form = forms.RegistrationForm(user=request.user, data=request.POST, group_id=group_id)
     else:
       form = forms.RegistrationForm(user=request.user, data=request.POST)
-      if request.user.is_anonymous():
-        school_form = forms.SchoolForm(data=request.POST, instance=school, prefix="school")
+      school_form = forms.SchoolForm(data=request.POST, instance=school, prefix="school")
 
     if form.is_valid():
       # checking for bot signup
@@ -816,6 +815,8 @@ def register(request, group_id=''):
           if school_form.is_valid():
             #create a new school entry
             new_school = school_form.save(commit=False)
+            if user.is_active:
+              new_school.is_active = True
             new_school.save()
             newUser.school = new_school
           else:
@@ -943,7 +944,8 @@ def register(request, group_id=''):
       context = {'form': form, 'school_id': school.id}
     else:
       form = forms.RegistrationForm(user=request.user)
-      context = {'form': form}
+      school_form = forms.SchoolForm(instance=school, prefix='school')
+      context = {'form': form, 'school_form': school_form, 'other_school': other_school}
 
     return render(request, 'ctstem_app/Registration.html', context)
 

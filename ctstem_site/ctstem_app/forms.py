@@ -44,8 +44,6 @@ class RegistrationForm (forms.Form):
       elif hasattr(user, 'teacher'):
         self.fields['account_type'].choices = models.USER_ROLE_CHOICES[5:]
         self.fields['school'].queryset = models.School.objects.filter(id=user.teacher.school.id)
-      elif hasattr(user, 'administrator'):
-        self.fields['school'].queryset = models.School.objects.filter(~Q(school_code='OTHER'), is_active=True)
 
     elif group_id:
       self.fields['account_type'].choices = models.USER_ROLE_CHOICES[3:]
@@ -204,7 +202,7 @@ class StudentForm (ModelForm):
       if school is not None:
         self.fields['school'].queryset = models.School.objects.filter(id=school.id)
       else:
-        self.fields['school'].queryset = models.School.objects.filter(~Q(school_code='OTHER'), is_active=True)
+        self.fields['school'].queryset = models.School.objects.filter(~Q(school_code='OTHER'), is_active=True).order_by('name')
 
       if hasattr(user, 'student') == False:
         del self.fields['consent']
@@ -256,7 +254,7 @@ class TeacherForm (ModelForm):
       if school is not None:
         self.fields['school'].queryset = models.School.objects.filter(id=school.id)
       else:
-        self.fields['school'].queryset = models.School.objects.filter(~Q(school_code='OTHER'), is_active=True)
+        self.fields['school'].queryset = models.School.objects.filter(~Q(school_code='OTHER'), is_active=True).order_by('name')
 
     else:
       self.fields['school'].queryset = models.School.objects.all().filter(is_active=True)
@@ -294,7 +292,7 @@ class SchoolAdministratorForm (ModelForm):
       school = user.school_administrator.school
       self.fields['school'].queryset = models.School.objects.filter(id=school.id)
     else:
-      self.fields['school'].queryset = models.School.objects.filter(~Q(school_code='OTHER'), is_active=True)
+      self.fields['school'].queryset = models.School.objects.filter(~Q(school_code='OTHER'), is_active=True).order_by('name')
 
     for field_name, field in self.fields.items():
       field.widget.attrs['class'] = 'form-control'
