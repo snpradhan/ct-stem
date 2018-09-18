@@ -99,7 +99,7 @@ $(function (){
               if($(this).hasClass('unit')){
                 $.ajax({
                   type: 'GET',
-                  url: '/curriculum/underlying/'+$(this).attr('id'),
+                  url: '/curriculum/underlying/'+$(this).attr('id')+'/',
                   success: function(data){
                     $.each(data, function(key, value){
                       cloneMore('div.assignment_table table.table tr:last', 'form');
