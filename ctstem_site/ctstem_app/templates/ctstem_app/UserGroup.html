@@ -21,17 +21,17 @@
       <div class="table" id="group">
         {{form.management_form}}
         <div class="form-group">
-          <label for="id_{{title}}">{{ form.title.label }} {% if form.title.field.required %}(<span class="required">*</span>){% endif %} </label>
+          <label for="id_group-title">{{ form.title.label }} {% if form.title.field.required %}(<span class="required">*</span>){% endif %} </label>
           <div class="controls">{{form.title}}</div>
           <div class="error">{{ form.title.errors }}</div>
         </div>
         <div class="form-group">
-          <label for="id_{{subject}}">{{ form.subject.label }} {% if form.subject.field.required %}(<span class="required">*</span>){% endif %} </label>
+          <label for="id_group-subject">{{ form.subject.label }} {% if form.subject.field.required %}(<span class="required">*</span>){% endif %} </label>
           <div class="controls">{{form.subject}}</div>
           <div class="error">{{ form.subject.errors }}</div>
         </div>
         <div class="form-group">
-          <label for="id_{{time}}">{{ form.time.label }} {% if form.time.field.required %}(<span class="required">*</span>){% endif %} </label>
+          <label for="id_group-time">{{ form.time.label }} {% if form.time.field.required %}(<span class="required">*</span>){% endif %} </label>
           <div class="controls">{{form.time}}</div>
           <div class="error">{{ form.time.errors }}</div>
         </div>
@@ -39,18 +39,18 @@
           <input type="hidden" id="id_group-teacher" name="group-teacher" value="{{user.teacher.id}}"/>
         {% else %}
           <div class="form-group">
-            <label for="id_{{teacher}}">{{ form.teacher.label }} {% if form.teacher.field.required %}(<span class="required">*</span>){% endif %} </label>
+            <label for="id_group-teacher">{{ form.teacher.label }} {% if form.teacher.field.required %}(<span class="required">*</span>){% endif %} </label>
             <div class="controls">{{form.teacher}}</div>
             <div class="error">{{ form.teacher.errors }}</div>
           </div>
         {% endif %}
         <div class="form-group">
-          <label for="id_{{description}}">{{ form.description.label }} {% if form.description.field.required %}(<span class="required">*</span>){% endif %} </label>
+          <label for="id_group-description">{{ form.description.label }} {% if form.description.field.required %}(<span class="required">*</span>){% endif %} </label>
           <div class="controls">{{form.description}}</div>
           <div class="error">{{ form.description.errors }}</div>
         </div>
         <div class="form-group">
-          <label for="id_{{group_code}}">{{ form.group_code.label }} {% if form.group_code.field.required %}(<span class="required">*</span>){% endif %} </label>
+          <label for="id_group-group_code">{{ form.group_code.label }} {% if form.group_code.field.required %}(<span class="required">*</span>){% endif %} </label>
           <div class="input-group">
             {{form.group_code}}
             <span class="input-group-btn">
@@ -59,11 +59,8 @@
           </div>
           <div class="error">{{ form.group_code.errors }}</div>
         </div>
-
-
-
         <div class="form-group">
-          <label for="id_{{is_active}}">{{ form.is_active.label|title }} {% if form.is_active.field.required %}(<span class="required">*</span>){% endif %} </label>
+          <label for="id_group-is_active">{{ form.is_active.label|title }} {% if form.is_active.field.required %}(<span class="required">*</span>){% endif %} </label>
           <div class="controls">{{form.is_active}}</div>
           <div class="error">{{ form.is_active.errors }}</div>
         </div>
@@ -72,68 +69,53 @@
             {{formset.management_form}}
             {{formset.id}}
             <div>
-              <label for="id_assignment_table">Assignments</label>
-              <!--a type="button" class="btn btn-info add_assignment" name="add_assignment" title="Add Assignment" id="addAssignment">
-                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-              </a-->
-              {% if form.instance.is_active %}
-                <a type="button" class="btn btn-success assignment-modal" href="#" data-toggle="modal" data-target="#assignment" data-id="{{form.instance.id}}" title="Search and Add Assignments">
-                  <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
-                </a>
-              {% endif %}
+              <label for="id_assignment_table">Assignments (<span id="assignment_count">{{assignments|length}}</span>)</label>
             </div>
+            {% if form.instance.is_active %}
+            <div>
+              <a type="button" class="btn btn-success assignment-modal" href="#" data-toggle="modal" data-target="#assignment" data-id="{{form.instance.id}}" data-title="{{form.instance.title}}" title="Search and Add Assignments">
+                  <i class="fa fa-tasks"></i>
+              </a>
+            </div>
+            {% endif %}
+
             <div class="table_container">
               <table class="table table-striped table-condensed table-bordered inner_table">
                 <thead>
                   <tr>
-                    <th style="width:60%;">Lesson Plan/Assessment</th>
-                    <th>Scheduled Start Date <i class="fa fa-info-circle" aria-hidden="true" title="The date when the assignment is first available to students"></i></th>
-                    <th>Due Date</th>
+                    <th style="width:75%;">Curriculum</th>
+                    <th>Assigned On</th>
                     <th>Lock on Completion <i class="fa fa-info-circle" aria-hidden="true" title="When locked, students will be unable to open and view the assignment once they submit"></i></th>
                     <th>Delete</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {% for assignmentForm in formset %}
-                    <tr style="{% if forloop.last %} display:none; {% endif %}">
+                  {% for assignment in assignments %}
+                    <tr id="{{assignment.id}}">
                       <td>
-                        {{assignmentForm.id}}
-                        {{assignmentForm.curriculum.as_hidden}}
                         <div class="assignment_title">
-                          {% if assignmentForm.curriculum.value %}
-                            {{assignmentForm.curriculum.value|get_curriculum_title}}
-                          {% endif %}</div>
-                        <div class="error">
-                          {{assignmentForm.curriculum.errors}}
+                          {% with curriculum=assignment.curriculum %}
+                            {% if curriculum.unit %}
+                              <b>Unit:</b> {{curriculum.unit.title}} --
+                            {% endif %}
+                            <b>{{curriculum.get_curriculum_type_display}}:</b> {{curriculum.title}}
+                          {% endwith %}
                         </div>
                       </td>
                       <td style="vertical-align:middle;">
-                          {{assignmentForm.assigned_date }}
-                          <div class="error">
-                            {{assignmentForm.assigned_date.errors }}
-                          </div>
-
-                        </td>
-                      <td>
-                        <div>
-                          {{assignmentForm.due_date }}
-                        </div>
-                        <div class="error">
-                          {{assignmentForm.due_date.errors }}
-                        </div>
+                        {{assignment.assigned_date|date }}
                       </td>
-                      <td class="lock_on_completion">
-                        {{assignmentForm.lock_on_completion }}
-                        <div class="error">
-                          {{assignmentForm.lock_on_completion.errors }}
-                        </div>
+                      <td class="lock_on_completion" style="text-align:center;">
+                        <input type="checkbox" class="lock_assignment" {% if assignment.lock_on_completion %} checked {% endif %} data-id="{{assignment.id}}" data-title="{{assignment.curriculum.title}}" {% if not form.instance.is_active %} disabled {% endif %}/>
                       </td>
                       <td>
+                        <!-- only allow assignments to be deleted if the class is active and the assignment in question is still New -->
                         {% if form.instance.is_active %}
-                          <button type="button" class="btn btn-danger delete_assignment" name="delete_assignment" aria-label="Delete Assignment" title="Delete this Assignment">
-                            <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-                          </button>
-                          {{assignmentForm.DELETE.as_hidden}}
+                          {% if assignment.id|get_class_assignment_status == 'N' %}
+                            <button type="button" class="btn btn-danger delete_assignment" name="delete_assignment" aria-label="Delete Assignment" title="Delete this Assignment" data-id="{{assignment.id}}" data-title="{{assignment.curriculum.title}}">
+                              <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                            </button>
+                          {% endif %}
                         {% endif %}
                       </td>
                     </tr>
@@ -145,17 +127,17 @@
 
           <div class="form-group">
             <div>
-              <label for="id_{{title}}"> Students {% if form.members.field.required %}(<span class="required">*</span>){% endif %} </label>
+              <label for="id_{{title}}"> Students (<span id="student_count">{{form.members.value|length}}</span>) </label>
             </div>
             <div>
               {% if form.instance.is_active %}
-                <a type="button" class="btn btn-info upload-modal" href="#" data-toggle="modal" data-target="#studentSearch" data-id="{{form.instance.id}}" title="Search and Add existing Students to this group">
+                <a type="button" class="btn btn-info upload-modal" href="#" data-toggle="modal" data-target="#studentSearch" data-id="{{form.instance.id}}" title="Search and Add existing Students to this class">
                   <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
                 </a>
-                <a type="button" class="btn btn-success upload-modal" href="#" data-toggle="modal" data-target="#upload" data-id="{{form.instance.id}}" data-title="{{form.instance.title}}" title="Upload new and existing Students to this group">
+                <a type="button" class="btn btn-success upload-modal" href="#" data-toggle="modal" data-target="#upload" data-id="{{form.instance.id}}" data-title="{{form.instance.title}}" title="Upload new and existing Students to this class">
                   <i class="fa fa-user-plus"></i>
                 </a>
-                <a type="button" class="btn btn-info upload-modal" href="#" data-toggle="modal" data-target="#addStudent" data-id="{{form.instance.id}}" title="Create and Add new Student to this group">
+                <a type="button" class="btn btn-info upload-modal" href="#" data-toggle="modal" data-target="#addStudent" data-id="{{form.instance.id}}" title="Create and Add new Student to this class">
                   <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
                 </a>
 
@@ -278,33 +260,55 @@
 
   <script type="text/javascript">
     $(function (){
-      function add_assignment(){
-        cloneMore('div.assignment_table table.table tr:last', 'form');
-        var new_assignment_row = $('div.assignment_table table.table tr:nth-last-child(2)');
-        $(new_assignment_row).toggle();
-        $(new_assignment_row).find('.datepicker').each(function(){
-          $(this).removeClass('hasDatepicker');
-          $(this).datepicker({dateFormat: 'M d, yy'});
-        });
-      }
 
       $('button.delete_assignment').click(function(){
+        var btn = $(this);
         var r = confirm("Are you sure you want to delete this assignment?");
         if (r == true) {
-          $(this).next('input').val('on');
-          $(this).closest('tr').hide();
+          var assignment_id = $(this).data('id');
+          var url = '/assignment/delete/'+assignment_id+'/';
+          $.ajax({
+            type: 'GET',
+            url: url,
+            success: function(data){
+              if(data['success'] == true){
+                $(btn).closest('tr').hide();
+              }
+              else {
+                alert("This assignment cannot be deleted.")
+              }
+            },
+            error: function(){
+              alert('error');
+            }
+          });
+
         }
       });
 
-      $('.datepicker').each(function(){
-        $(this).datepicker({dateFormat: 'M d, yy'});
-      });
       $('a.upload-modal').click(function(){
         $("div.modal#upload select#id_group option:selected").prop('selected', false);
         $("div.modal#upload select#id_group option[value='"+$(this).data('id')+"']").prop('selected', true);
         $("div.modal#upload select#id_group").closest('.form-group').hide();
         $("div.modal#upload .modal-title span").html('<div>'+$(this).data('title')+'</div>');
+      });
 
+      $('.lock_assignment').on('click', function(){
+        var flag = 0;
+        var assignment_id = $(this).data('id');
+        if($(this).is(':checked')){
+          flag = 1;
+        }
+        var url = '/assignment/lock_on_completion/'+assignment_id+'/'+flag+'/';
+        $.ajax({
+          type: 'GET',
+          url: url,
+          success: function(data){
+          },
+          error: function(){
+            alert('error');
+          }
+        });
       });
 
     });

@@ -292,6 +292,43 @@ $(function (){
   $('form#curriculumForm input#preview').on('click', function() {
     $('div#spinner').show();
   });
+
+  /* handler for search and assign curriculum modal trigger */
+  $('a.assignment-modal').click(function(){
+    $("div.modal#assignment select#id_group_class option:selected").prop('selected', false);
+    $("div.modal#assignment select#id_group_class option[value='"+$(this).data('id')+"']").prop('selected', true);
+    var title = 'to Class';
+    if($(this).data('title') !== undefined){
+      title = 'to <div>'+$(this).data('title')+'</div>';
+    }
+    $("div.modal#assignment .modal-title span").html(title);
+
+    if($(this).data('id') != null){
+      $("div.modal#assignment select#id_group_class").closest('.form-group').hide();
+    }
+    else{
+      $("div.modal#assignment select#id_group_class").closest('.form-group').show();
+    }
+  });
+
+  /* handler for user upload modal trigger */
+  $('a.upload-modal').click(function(){
+    $("div.modal#upload select#id_group option:selected").prop('selected', false);
+    $("div.modal#upload select#id_group option[value='"+$(this).data('id')+"']").prop('selected', true);
+
+    var title = 'Class';
+    if($(this).data('title') !== undefined){
+      title = '<div>'+$(this).data('title')+'</div>';
+    }
+    $("div.modal#upload .modal-title span").html(title);
+
+    if($(this).data('id') != null){
+      $("div.modal#upload select#id_group").closest('.form-group').hide();
+    }
+    else{
+      $("div.modal#upload select#id_group").closest('.form-group').show();
+    }
+  });
 });
 
 function bind_user_removal(){

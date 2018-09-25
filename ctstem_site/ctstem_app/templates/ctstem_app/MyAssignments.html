@@ -67,7 +67,7 @@
                 <div class="row">
                   <div class="col-md-7 dates">
                     <div class="row">
-                      <div class="col-md-6 title">Group:</div>
+                      <div class="col-md-6 title">Class:</div>
                       <div class="col-md-6 value">{{assignment_details.assignment.group}}</div>
                     </div>
                     <div class="row">
@@ -75,10 +75,6 @@
                       <div class="col-md-6 value">{{assignment_details.assignment.assigned_date|date}}</div>
                     </div>
 
-                    <div class="row">
-                      <div class="col-md-6 title">Due:</div>
-                      <div class="col-md-6 value">{{assignment_details.assignment.due_date|date}}</div>
-                    </div>
                     <div class="row">
                       <div class="col-md-6 title">Modified:</div>
                       <div class="col-md-6 value">{% if assignment_details.instance %}

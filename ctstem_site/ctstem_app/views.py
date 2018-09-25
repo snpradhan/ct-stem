@@ -659,11 +659,11 @@ def assignCurriculum(request, id=''):
   try:
     # check if the user has permission to bookmark a curriculum
     if hasattr(request.user, 'administrator') or hasattr(request.user, 'researcher'):
-      groups = models.UserGroup.objects.all()
+      groups = models.UserGroup.objects.all().filter(is_active=True)
     elif hasattr(request.user, 'school_administrator'):
-      groups = models.UserGroup.objects.all().filter(teacher__school = request.user.school_administrator.school)
+      groups = models.UserGroup.objects.all().filter(teacher__school = request.user.school_administrator.school, is_active=True)
     elif hasattr(request.user, 'teacher'):
-      groups = models.UserGroup.objects.all().filter(teacher = request.user.teacher)
+      groups = models.UserGroup.objects.all().filter(teacher = request.user.teacher, is_active=True)
     else:
       return http.HttpResponseNotFound('<h1>You do not have the privilege to assign this curriculum</h1>')
 
@@ -672,27 +672,26 @@ def assignCurriculum(request, id=''):
       return http.HttpResponseNotFound("<h1>This curriculum hasn't been published and cannot be assigned</h1>")
     #check if curriculum is stand alone or a unit
     if curriculum.curriculum_type == 'U':
-      curriculum_list = models.Curriculum.objects.all().filter(unit=curriculum, status='P')
+      curriculum_list = models.Curriculum.objects.all().filter(unit=curriculum, status='P').order_by('order')
     else:
       curriculum_list = models.Curriculum.objects.all().filter(id=curriculum.id)
 
     assignments = models.Assignment.objects.all().filter(curriculum__in=curriculum_list, group__in=groups)
-    assignment_dates = {}
+    assignment_count = {}
     instances = {}
     for group in groups:
       instances[group.id] = {}
-      assignment_dates[group.id] = {}
+      assignment_count[group.id] = {}
       if curriculum.curriculum_type == 'U':
-        dates = assignments.filter(group=group).aggregate(Min('assigned_date'), Max('due_date'))
-        assignment_dates[group.id][curriculum.id] = {'assigned_date': dates['assigned_date__min'], 'due_date': dates['due_date__max']}
+        assignment_count[group.id][curriculum.id] = assignments.filter(group=group).count()
+        instances[group.id][curriculum.id] = models.AssignmentInstance.objects.all().filter(assignment__curriculum__unit=curriculum, assignment__group=group).count()
 
       for curr in curriculum_list:
-        dates = assignments.filter(group=group, curriculum=curr).aggregate(Min('assigned_date'), Max('due_date'))
-        assignment_dates[group.id][curr.id] = {'assigned_date': dates['assigned_date__min'], 'due_date': dates['due_date__max']}
+        assignment_count[group.id][curr.id] = assignments.filter(group=group, curriculum=curr).count()
         instances[group.id][curr.id] = models.AssignmentInstance.objects.all().filter(assignment__curriculum=curr, assignment__group=group).count()
 
     if request.method == 'GET':
-      context = {'curriculum': curriculum, 'curriculum_list': curriculum_list, 'groups': groups, 'assignments': assignments, 'instances': instances, 'assignment_dates': assignment_dates}
+      context = {'curriculum': curriculum, 'curriculum_list': curriculum_list, 'groups': groups, 'assignments': assignments, 'instances': instances, 'assignment_count': assignment_count}
       return render(request, 'ctstem_app/CurriculumAssignment.html', context)
     elif request.method == 'POST':
       data = request.POST.copy()
@@ -701,43 +700,21 @@ def assignCurriculum(request, id=''):
         for curr in curriculum_list:
           #check if an assignment already exists
           assignment = assignments.filter(group=group, curriculum=curr).first()
-          assigned_date_key = 'assigned_%s_%s'%(str(group.id), str(curr.id))
-          due_date_key = 'due_%s_%s'%(str(group.id), str(curr.id))
-          #if assignment already exists, check if the dates have changed
+          assigned_key = 'assigned_%s_%s'%(str(group.id), str(curr.id))
+          #if assignment already exists, but is unchecked
           if assignment:
-            if due_date_key in data and data[due_date_key]:
-              due_date = data[due_date_key]
-              if assigned_date_key in data and data[assigned_date_key]:
-                assigned_date = data[assigned_date_key]
-                assigned_date_object = datetime.datetime.strptime(assigned_date, '%B %d, %Y')
-              else:
-                assigned_date_object = datetime.datetime.now()
-              due_date_object = datetime.datetime.strptime(due_date, '%B %d, %Y')
-
-              # check if due date has changed and update
-              if assignment.due_date.date() != due_date_object.date() or assignment.assigned_date.date() != assigned_date_object.date():
-                assignment.due_date = due_date_object
-                assignment.assigned_date = assigned_date_object
-                assignment.save()
-            else:
+            if assigned_key not in data:
               #assignment has been unmarked for deletion
               assignment.delete()
           else:
             #check if new assignment has been made
-            if due_date_key in data and data[due_date_key]:
-              due_date = data[due_date_key]
-              if assigned_date_key in data and data[assigned_date_key]:
-                assigned_date = data[assigned_date_key]
-                assigned_date_object = datetime.datetime.strptime(assigned_date, '%B %d, %Y')
-              else:
-                assigned_date_object = datetime.datetime.now()
-              due_date_object = datetime.datetime.strptime(due_date, '%B %d, %Y')
+            if assigned_key in data and data[assigned_key]:
               #check if the new assignment is an assessment
               lock_on_completion = False
               if curr.curriculum_type == 'A':
                 #lock on completion by default
                 lock_on_completion = True
-              new_assignment = models.Assignment(curriculum=curr, group=group, due_date=due_date_object, assigned_date=assigned_date_object, lock_on_completion=lock_on_completion)
+              new_assignment = models.Assignment(curriculum=curr, group=group, lock_on_completion=lock_on_completion)
               new_assignment.save()
 
       response_data = {'message': 'The curriculum "%s" has been assigned' % curriculum.title}
@@ -1686,7 +1663,8 @@ def users(request, role):
       return http.HttpResponseNotFound('<h1>You do not have the privilege view %s</h1>'% role)
 
     uploadForm = forms.UploadFileForm(user=request.user)
-    context = {'users': users, 'role': role, 'uploadForm': uploadForm}
+    assignmentForm = forms.AssignmentSearchForm(user=request.user)
+    context = {'users': users, 'role': role, 'uploadForm': uploadForm, 'assignmentForm': assignmentForm}
 
     return render(request, 'ctstem_app/Users.html', context)
 
@@ -1962,9 +1940,9 @@ def groups(request, status='active'):
     if status == 'inactive':
       is_active = False
     if hasattr(request.user, 'administrator') or hasattr(request.user, 'researcher'):
-      groups = models.UserGroup.objects.all().filter(is_active=is_active).order_by('id')
+      groups = models.UserGroup.objects.all().filter(is_active=is_active).order_by('title')
     elif hasattr(request.user, 'school_administrator'):
-      groups = models.UserGroup.objects.all().filter(is_active=is_active, teacher__school=request.user.school_administrator.school).order_by('id')
+      groups = models.UserGroup.objects.all().filter(is_active=is_active, teacher__school=request.user.school_administrator.school).order_by('title')
     elif hasattr(request.user, 'teacher'):
       if is_active == True:
         group_count = models.UserGroup.objects.all().filter(teacher=request.user.teacher).count()
@@ -1972,14 +1950,15 @@ def groups(request, status='active'):
           new_group = models.UserGroup(title='My Class 1', teacher=request.user.teacher, is_active=True)
           new_group.save()
 
-      groups = models.UserGroup.objects.all().filter(is_active=is_active, teacher=request.user.teacher).order_by('id')
+      groups = models.UserGroup.objects.all().filter(is_active=is_active, teacher=request.user.teacher).order_by('title')
 
     else:
       return http.HttpResponseNotFound('<h1>You do not have the privilege to view student groups</h1>')
     current_site = Site.objects.get_current()
     domain = current_site.domain
     uploadForm = forms.UploadFileForm(user=request.user)
-    context = {'groups': groups, 'role':'groups', 'uploadForm': uploadForm, 'group_status': status, 'domain': domain}
+    assignmentForm = forms.AssignmentSearchForm(user=request.user)
+    context = {'groups': groups, 'role':'groups', 'uploadForm': uploadForm, 'group_status': status, 'domain': domain, 'assignmentForm': assignmentForm}
     return render(request, 'ctstem_app/UserGroups.html', context)
 
   return http.HttpResponseNotAllowed(['GET', 'POST'])
@@ -2007,24 +1986,20 @@ def group(request, id=''):
 
     if request.method == 'GET':
         form = forms.UserGroupForm(user=request.user, instance=group, prefix='group')
-        assignmentFormset=inlineformset_factory(models.UserGroup, models.Assignment, form=forms.AssignmentForm, can_delete=True, extra=1)
-        formset = assignmentFormset(instance=group, prefix='form')
+        assignments = models.Assignment.objects.all().filter(group=group).order_by('curriculum__unit__title', 'curriculum__curriculum_type', 'curriculum__order', 'curriculum__title')
         uploadForm = forms.UploadFileForm(user=request.user)
-        assignmentForm = forms.AssignmentSearchForm()
+        assignmentForm = forms.AssignmentSearchForm(user=request.user)
         studentSearchForm = forms.StudentSearchForm()
         studentAddForm = forms.StudentAddForm()
-        context = {'form': form, 'formset': formset, 'role': 'group', 'uploadForm': uploadForm, 'assignmentForm': assignmentForm, 'studentSearchForm': studentSearchForm, 'studentAddForm': studentAddForm}
+        context = {'form': form, 'role': 'group', 'uploadForm': uploadForm, 'assignmentForm': assignmentForm, 'studentSearchForm': studentSearchForm, 'studentAddForm': studentAddForm, 'assignments': assignments}
         return render(request, 'ctstem_app/UserGroup.html', context)
 
     elif request.method == 'POST':
       data = request.POST.copy()
       #print data
       form = forms.UserGroupForm(user=request.user, data=data, instance=group, prefix="group")
-      assignmentFormset=inlineformset_factory(models.UserGroup, models.Assignment, form=forms.AssignmentForm, can_delete=True, extra=1)
-      formset = assignmentFormset(data, instance=group, prefix='form')
-      if form.is_valid() and formset.is_valid():
+      if form.is_valid():
         savedGroup = form.save()
-        formset.save()
         #if group is being inactivated, archive the associated assignments
         if 'group-is_active' not in data:
           archiveAssignments(request, [id])
@@ -2038,13 +2013,12 @@ def group(request, id=''):
         return shortcuts.redirect('ctstem:group', id=savedGroup.id)
       else:
         print form.errors
-        print formset.errors
         messages.error(request, "The class could not be saved because there were errors.  Please check the errors below.")
         uploadForm = forms.UploadFileForm(user=request.user)
-        assignmentForm = forms.AssignmentSearchForm()
+        assignmentForm = forms.AssignmentSearchForm(user=request.user)
         studentSearchForm = forms.StudentSearchForm()
         studentAddForm = forms.StudentAddForm()
-        context = {'form': form, 'formset':formset, 'role': 'group', 'uploadForm': uploadForm, 'assignmentForm': assignmentForm, 'studentSearchForm': studentSearchForm, 'studentAddForm': studentAddForm}
+        context = {'form': form, 'role': 'group', 'uploadForm': uploadForm, 'assignmentForm': assignmentForm, 'studentSearchForm': studentSearchForm, 'studentAddForm': studentAddForm}
         return render(request, 'ctstem_app/UserGroup.html', context)
 
     return http.HttpResponseNotAllowed(['GET', 'POST'])
@@ -2057,7 +2031,7 @@ def group(request, id=''):
 ####################################
 @login_required
 def searchAssignment(request):
-  # check if the user has permission to add a question
+  # check if the user has permission to search and assign curriculum
   if hasattr(request.user, 'school_administrator') == False and hasattr(request.user, 'teacher') == False and  hasattr(request.user, 'administrator') == False:
     return http.HttpResponseNotFound('<h1>You do not have the privilege search assignments</h1>')
 
@@ -2160,7 +2134,7 @@ def groupDashboard(request, id=''):
       status_color = {'N': 'gray', 'P': 'blue', 'S': 'green', 'F': 'orange', 'A': 'black'}
       assignment_queryset = models.Assignment.objects.all().filter(group=group)
 
-      for assignment in models.Assignment.objects.all().filter(group=group):
+      for assignment in models.Assignment.objects.all().filter(group=group).order_by('assigned_date'):
         students = assignment.group.members.all()
         instances = models.AssignmentInstance.objects.all().filter(assignment=assignment)
         curriculum = models.Curriculum.objects.get(id=assignment.curriculum.id)
@@ -2322,8 +2296,6 @@ def assignments(request, bucket=''):
         assignment_list.sort(key=lambda item:item['assignment'].assigned_date)
       elif sort_by == 'group':
         assignment_list.sort(key=lambda item:item['assignment'].group)
-      elif sort_by == 'due':
-        assignment_list.sort(key=lambda item:item['assignment'].due_date)
       elif sort_by == 'status':
         assignment_list.sort(key=lambda item:item['status'])
       elif sort_by == 'percent':
@@ -2727,17 +2699,12 @@ def unlockAssignment(request, assignment_id='', instance_id=''):
       instance = models.AssignmentInstance.objects.get(assignment__id=assignment_id, id=instance_id)
       school = instance.student.school
       group = instance.assignment.group
-      privilege = 0
+      has_permission = False
       #only allow Lessons to be unlocked
       if instance.assignment.curriculum.curriculum_type == 'L':
-        if hasattr(request.user, 'researcher') or hasattr(request.user, 'administrator'):
-          privilege = 1
-        elif hasattr(request.user, 'teacher') and request.user.teacher == group.teacher:
-            privilege = 1
-        elif hasattr(request.user, 'school_administrator') and request.user.school_administrator.school == school:
-          privilege = 1
+        has_permission = check_assignment_permission(request, assignment_id)
 
-      if privilege == 0:
+      if has_permission == False:
         return http.HttpResponseNotFound('<h1>You do not have the privilege to unlock this assignment</h1>')
 
       if instance.status == 'S':
@@ -2752,6 +2719,114 @@ def unlockAssignment(request, assignment_id='', instance_id=''):
       raise models.AssignmentInstance.DoesNotExist
   except models.AssignmentInstance.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested assignment not found</h1>')
+
+####################################
+# Set lock_on_completion flag for the assignment
+####################################
+@login_required
+def lock_on_completion(request, assignment_id='', flag='0'):
+  # check if the user has permission to do this operation
+  has_permission = check_assignment_permission(request, assignment_id)
+  response_data = {'success': False }
+  if has_permission:
+    assignment = models.Assignment.objects.get(id=assignment_id)
+    if flag == '0':
+      assignment.lock_on_completion = False
+    else:
+      assignment.lock_on_completion = True
+    assignment.save()
+    response_data['success'] = True
+  return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+
+####################################
+# Delete Assignment
+####################################
+@login_required
+def deleteAssignment(request, assignment_id=''):
+  # check if the user has permission to do this operation
+  has_permission = check_assignment_permission(request, assignment_id)
+  response_data = {'success': False }
+  if has_permission:
+    assignment = models.Assignment.objects.get(id=assignment_id)
+    assignment_instances = models.AssignmentInstance.objects.all().filter(assignment__id=assignment_id)
+    status = 'N'
+    for instance in assignment_instances:
+      if instance.status != 'N':
+        status = instance.status
+        break
+    if status == 'N':
+      assignment.delete()
+      response_data['success'] = True
+  return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+
+####################################
+# Add Assignment to Group
+####################################
+@login_required
+def addAssignment(request, curriculum_id='', group_id=''):
+  # check if the user has permission to do this operation
+  has_permission = check_group_permission(request, group_id)
+  response_data = {'success': False }
+  if has_permission:
+    curriculum = models.Curriculum.objects.get(id=curriculum_id)
+    group = models.UserGroup.objects.get(id=group_id)
+    lock_on_completion = False
+    if curriculum.curriculum_type == 'U':
+      curricula = curriculum.underlying_curriculum.all().filter(status='P')
+    else:
+      if curriculum.curriculum_type == 'A':
+        lock_on_completion = True
+      curricula = models.Curriculum.objects.all().filter(id=curriculum_id)
+
+    for curr in curricula:
+      assignment, created = models.Assignment.objects.get_or_create(group=group, curriculum=curr, lock_on_completion=lock_on_completion)
+    response_data['success'] = True
+  return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+
+
+####################################
+# check if the user has permission to do this operation on a group
+####################################
+@login_required
+def check_group_permission(request, group_id=''):
+  has_permission = False
+  try:
+    group = models.UserGroup.objects.get(id=group_id)
+    if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'researcher') == False and hasattr(request.user, 'teacher') == False and hasattr(request.user, 'school_administrator') == False:
+      has_permission = False
+    elif hasattr(request.user, 'school_administrator') and group.teacher.school !=  request.user.school_administrator.school:
+      has_permission = False
+    elif hasattr(request.user, 'teacher') and group.teacher != request.user.teacher:
+      has_permission = False
+    else:
+      has_permission = True
+  except models.UserGroup.DoesNotExist:
+    has_permission = False
+
+  return has_permission
+
+####################################
+# check if the user has permission to do this operation on assignment
+####################################
+@login_required
+def check_assignment_permission(request, assignment_id=''):
+  has_permission = False
+  try:
+    assignment = models.Assignment.objects.get(id=assignment_id)
+    print assignment
+    if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'researcher') == False and hasattr(request.user, 'teacher') == False and hasattr(request.user, 'school_administrator') == False:
+      has_permission = False
+    elif hasattr(request.user, 'school_administrator') and assignment.group.teacher.school !=  request.user.school_administrator.school:
+      has_permission = False
+    elif hasattr(request.user, 'teacher') and assignment.group.teacher != request.user.teacher:
+      has_permission = False
+    else:
+      has_permission = True
+  except models.Assignment.DoesNotExist:
+    has_permission = False
+
+  return has_permission
+
 
 ####################################
 # Export Student Responses
@@ -2811,9 +2886,6 @@ def export_response(request, assignment_id='', student_id=''):
     ws.write(row_num, 0, 'Assigned Date', bold_font_style)
     ws.write(row_num, 1, assignment.assigned_date.replace(tzinfo=None), date_format)
     row_num += 1
-    ws.write(row_num, 0, 'Due Date', bold_font_style)
-    ws.write(row_num, 1, assignment.due_date.replace(tzinfo=None), date_format)
-    row_num += 1
     ws.write(row_num, 0, '')
 
     columns = ['Student', 'Step No.', 'Step Title', 'Question No.', 'Question', 'Research Category', 'Options', 'Correct Answer', 'Student Response', 'Submission DateTime']
@@ -2822,14 +2894,6 @@ def export_response(request, assignment_id='', student_id=''):
     row_num += 1
     for col_num in range(len(columns)):
       ws.write(row_num, col_num, columns[col_num], bold_font_style)
-
-    '''writer = csv.writer(response)
-    writer.writerow(['Group', assignment.group])
-    writer.writerow(['Assignment', assignment])
-    writer.writerow(['Assigned Date', assignment.assigned_date])
-    writer.writerow(['Due Date', assignment.due_date])
-    writer.writerow([])
-    writer.writerow(['Student', 'Step Title', 'Question', 'Options', 'Response'])'''
 
     for instance in instances:
       if hasattr(request.user, 'researcher'):
@@ -2884,8 +2948,8 @@ def export_all_response(request, curriculum_id=''):
     date_time_format.num_format_str = 'mm/dd/yyyy hh:mm AM/PM'
 
 
-    columns = ['Group', 'Curriculum', 'Assigned Date', 'Due Date', 'Student', 'Step No.', 'Step Title', 'Question No.', 'Question', 'Research Category', 'Options', 'Correct Answer', 'Student Response', 'Submission DateTime']
-    font_styles = [font_style, font_style, date_format, date_format, font_style, font_style, font_style, font_style, font_style, font_style, font_style, font_style, font_style, date_time_format]
+    columns = ['Group', 'Curriculum', 'Assigned Date', 'Student', 'Step No.', 'Step Title', 'Question No.', 'Question', 'Research Category', 'Options', 'Correct Answer', 'Student Response', 'Submission DateTime']
+    font_styles = [font_style, font_style, date_format, font_style, font_style, font_style, font_style, font_style, font_style, font_style, font_style, font_style, date_time_format]
 
     if hasattr(request.user, 'administrator') == True or hasattr(request.user, 'researcher') == True or hasattr(request.user, 'school_administrator') == True:
       columns.insert(0, 'Teacher')
@@ -2902,7 +2966,7 @@ def export_all_response(request, curriculum_id=''):
     if curriculum.curriculum_type != 'U':
       curricula.append(curriculum)
     else:
-      curricula = curriculum.underlying_curriculum.all().filter(Q(status='P')|Q(status='A'))
+      curricula = curriculum.underlying_curriculum.all().filter(Q(status='P')|Q(status='A')).order_by('order')
 
     for curr in curricula:
       if hasattr(request.user, 'administrator') == True or hasattr(request.user, 'researcher') == True:
@@ -2920,8 +2984,9 @@ def export_all_response(request, curriculum_id=''):
         if ch in curr.title:
           sheet_title = sheet_title.replace(ch, "-")
 
-      #truncate sheet_title to 30 characters
-      sheet_title = (sheet_title[:30]) if len(sheet_title) > 30 else sheet_title
+      #truncate sheet_title to 25 characters
+      index = curr.order
+      sheet_title = (sheet_title[:25]+' ('+str(index)+')') if len(sheet_title) > 25 else sheet_title+' ('+str(index)+')'
 
       ws = wb.add_sheet(sheet_title)
       row_num = 0
@@ -2944,7 +3009,6 @@ def export_all_response(request, curriculum_id=''):
               row = [instance.assignment.group.title,
                      instance.assignment.curriculum.title,
                      instance.assignment.assigned_date.replace(tzinfo=None),
-                     instance.assignment.due_date.replace(tzinfo=None),
                      student,
                      stepResponse.step.order,
                      stepResponse.step.title,
@@ -3261,7 +3325,7 @@ def send_added_to_group_confirmation_email(email, group):
   #email user the  user name and password
   current_site = Site.objects.get_current()
   domain = current_site.domain
-  body = '<div>Your teacher has added you to the group <b>%s</b> on Computational Thinking in STEM website. </div><br> \
+  body = '<div>Your teacher has added you to the class <b>%s</b> on Computational Thinking in STEM website. </div><br> \
           <div>You may login with your credentials here http://%s </div><br> \
           <div>If you have forgotten your password since you last logged in, you can reset your password here http://%s/password_reset/recover/  </div><br> \
           <div>If clicking the link does not seem to work, you can copy and paste the link into your browser&#39;s address window, </div> \

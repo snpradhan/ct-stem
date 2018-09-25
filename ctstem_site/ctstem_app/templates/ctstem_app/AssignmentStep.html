@@ -108,12 +108,7 @@
           </a>
         </div>
       {% else %}
-        <!-- warning for past due assignment -->
-        {% if instance.assignment.due_date|date_has_past %}
-          {% if instance.status == 'N' or instance.status == 'P' %}
-            <div class="past_due warning">This assignment was due on {{instance.assignment.due_date|date}}.  Any changes you make here will be considered late. </div>
-          {% endif %}
-        {% endif %}
+
         <h2>{{form.instance.step.title}}</h2>
         <hr>
         <form method="post" enctype="multipart/form-data" id="assignmentForm">

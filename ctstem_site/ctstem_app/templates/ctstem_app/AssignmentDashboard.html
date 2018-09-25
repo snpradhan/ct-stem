@@ -18,8 +18,7 @@
         <tr>
           <th>Group</th>
           <th>Assignment</th>
-          <th>Assigned Date</th>
-          <th>Due Date </th>
+          <th>Assigned On</th>
         </tr>
       </thead>
       <tbody>
@@ -27,7 +26,6 @@
           <td><a href="{% url 'ctstem:groupDashboard' assignment.group.id %}">{{assignment.group}}</a></td>
           <td>{{assignment.curriculum.title}}</td>
           <td>{{assignment.assigned_date|date}}</td>
-          <td>{{assignment.due_date|date}}</td>
         </tr>
       </tbody>
     </table>

@@ -35,6 +35,7 @@
             <button type="submit" id="search" class="btn btn-success">
               Search
             </button>
+            <a type="button" class="btn btn-danger" data-dismiss="modal">Close</a>
           </div>
         </div>
       </form>
@@ -60,13 +61,13 @@
 
 <script type="text/javascript">
 $(function (){
+  $('#studentSearch').on('hidden.bs.modal', function () {
+   location.reload();
+  })
 
   $("#studentForm").submit(function(e) {
-
     e.preventDefault();
     $("#studentResults table tbody").empty();
-
-
     /*var url = "{% url 'ctstem:newQuestion' %}";*/
     $.ajax({
       type: $(this).attr('method'),
@@ -83,14 +84,14 @@ $(function (){
             //if the student isn't already added
 
             if($('tr#'+value['student_id']).length == 0){
-              student_row = "<tr><td>"+value['username']+"</td><td>"+value['name']+"</td><<td>"+value['email']+"</td><td>"+value['status']+"</td><td>"+value['last_login']+"</td><td><button type='button' class='btn btn-info select_student' id='"+value['student_id']+"''>Add</a></td></tr>";
+              student_row = "<tr><td>"+value['username']+"</td><td>"+value['name']+"</td><<td>"+value['email']+"</td><td>"+value['status']+"</td><td>"+value['last_login']+"</td><td><button type='button' class='btn btn-info select_student' id='"+value['student_id']+"''>Add to Class</a></td></tr>";
 
               $("#studentResults table tbody").append(student_row);
               $("#studentResults button.select_student#"+value["student_id"]).click(function(){
                 // ajax add student to group
                 var data = {};
                 data['csrfmiddlewaretoken'] = $('#studentForm').find('input:hidden').eq(0).val();
-                add_student_to_data_table(value, data['csrfmiddlewaretoken']);
+                //add_student_to_data_table(value, data['csrfmiddlewaretoken']);
                 $.ajax({
                   type: 'POST',
                   url: '/student/add/'+value['group']+'/'+value['student_id'],
@@ -98,10 +99,11 @@ $(function (){
                   context: this,
                   success: function(data){
                     if('error' in data){
-                      $('#studentMsg').html(data['error']);
+                      $('#studentMsg').removeClass('success').html(data['error']);
                     }
                     else {
                       bind_user_removal();
+                      $('#studentMsg').addClass('success').html(value['username']+" added to class");
                     }
                     return false;
                   },

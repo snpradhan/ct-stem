@@ -1,4 +1,4 @@
-<ul class="nav nav-tabs">
+<ul class="nav nav-tabs top">
   {% if tab == 'user' or tab == 'group' or tab == 'assignment' %}
     {% if user.administrator %}
       <li {% if role == 'admins' %} class="active"{% endif %}><a href="{% url 'ctstem:users' 'admins' %}">Admins</a></li>
@@ -13,7 +13,10 @@
       <li {% if role == 'students' %} class="active"{% endif %}><a href="{% url 'ctstem:users' 'students' %}" class="students">Students</a></li>
     {% endif %}
     {% if user.administrator or user.researcher or user.school_administrator or user.teacher %}
-      <li {% if role == 'groups' %} class="active"{% endif %}><a href="{% url 'ctstem:groups' 'active' %}">{% if user.teacher %} My {% endif %} Classes</a></li>
+      {% if role != 'groups' %}
+        <li><a href="{% url 'ctstem:groups' 'active' %}">{% if user.teacher %} My {% endif %} Classes</a>
+        </li>
+      {% endif %}
     {% endif %}
   {% endif %}
   {% if tab == 'group' or tab == 'assignment' %}
@@ -35,7 +38,7 @@
 {% if tab == 'group' %}
   {% if user.administrator or user.researcher or user.school_administrator or user.teacher %}
     {% if role == 'groups' %}
-      <ul class="nav nav-tabs">
+      <ul class="nav nav-tabs bottom">
         <li {% if group_status == 'active' %} class="active"{% endif %}><a href="{% url 'ctstem:groups' 'active' %}">Active Classes</a></li>
         <li {% if group_status == 'inactive' %} class="active"{% endif %}><a href="{% url 'ctstem:groups' 'inactive' %}">Inactive Classes</a></li>
       </ul>

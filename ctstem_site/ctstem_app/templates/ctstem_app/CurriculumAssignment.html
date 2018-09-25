@@ -14,7 +14,7 @@
         <table class="table table-condensed table-bordered inner_table">
          <thead>
             <tr>
-              <th width="20%">Group</th>
+              <th width="20%">Class</th>
               {% if user.administrator or user.researcher %}
                 <th width="15%">School</th>
               {% endif %}
@@ -22,11 +22,10 @@
                 <th width="10%">Teacher</th>
               {% endif %}
               {% if curriculum.curriculum_type|slugify == 'U'|slugify %}
-                <th width="20%">Curriculum</th>
+                <th width="30%">Curriculum</th>
               {% endif %}
-              <th width="15%" class="date">Scheduled Start Date <i class="fa fa-info-circle" aria-hidden="true" title="The date when the assignment is first available to students"></i></th>
-              <th width="15%" class="date">Due Date</th>
-              <th width="5%">Clear</th>
+              <th width="5%" class="date">Select to Assign</th>
+
             </tr>
           </thead>
           <tbody>
@@ -48,18 +47,20 @@
                     </span>
                   </td>
                 {% endif %}
-                <td>
-                  <input type="text" class="datepicker assigned" id="assigned_{{group.id}}_{{curriculum.id}}" name="assigned_{{group.id}}_{{curriculum.id}}" readonly="true" value="{{assignment_dates|get_item:group.id|get_item:curriculum.id|get_item:'assigned_date'|date:'F j, Y'}}"/>
-
-                  <input type="hidden" id="instance_{{group.id}}_{{curriculum.id}}" class="instance_count" value="{{instances|get_item:group.id|get_item:curriculum.id}}"/>
-                </td>
-                <td>
-                  <input type="text" class="datepicker due" id="due_{{group.id}}_{{curriculum.id}}" name="due_{{group.id}}_{{curriculum.id}}" readonly="true" value="{{assignment_dates|get_item:group.id|get_item:curriculum.id|get_item:'due_date'|date:'F j, Y'}}"/></td>
-                <td>
-                  {% if instances|get_item:group.id|get_item:curriculum.id == 0 %}
-                    <button type="button" class="btn btn-danger clear" id="clear_{{group.id}}_{{curriculum.id}}" name="clear_{{group.id}}_{{curriculum.id}}">Clear</button>
+                <td style="text-align:center;">
+                  <!--In work assignment, cannot be unassigned  -->
+                  {% if instances|get_item:group.id|get_item:curriculum.id > 0 %}
+                    <input type="checkbox" id="display_assigned_{{group.id}}_{{curriculum.id}}" name="display_assigned_{{group.id}}_{{curriculum.id}}" disabled
+                    checked/>
+                    <input type="hidden" id="assigned_{{group.id}}_{{curriculum.id}}" name="assigned_{{group.id}}_{{curriculum.id}}" value="1" />
+                  {% else %}
+                    <input type="checkbox" class="assigned" id="assigned_{{group.id}}_{{curriculum.id}}" name="assigned_{{group.id}}_{{curriculum.id}}"
+                   {% if assignment_count|get_item:group.id|get_item:curriculum.id > 0 %} checked="checked" {% endif %} />
                   {% endif %}
+                  <input type="hidden" id="instance_{{group.id}}_{{curriculum.id}}" class="instance_count" value="{{instances|get_item:group.id|get_item:curriculum.id}}"/>
+
                 </td>
+
               </tr>
               {% if curriculum.curriculum_type|slugify == 'U'|slugify %}
                 {% for curr in curriculum_list %}
@@ -67,19 +68,20 @@
                     {% if curriculum.curriculum_type|slugify == 'U'|slugify %}
                       <td style="display:none;">&nbsp;&nbsp;&nbsp;&nbsp;{{curr.title}}</td>
                     {% endif %}
-                    <td style="display:none;">
-                      <input type="text" class="datepicker assigned" id="assigned_{{group.id}}_{{curr.id}}" name="assigned_{{group.id}}_{{curr.id}}" readonly="true" value="{{assignment_dates|get_item:group.id|get_item:curr.id|get_item:'assigned_date'|date:'F j, Y'}}"/>
-
-                      <input type="hidden" id="instance_{{group.id}}_{{curr.id}}" class="instance_count" value="{{instances|get_item:group.id|get_item:curr.id}}"/>
-                    </td>
-                    <td style="display:none;">
-                      <input type="text" class="datepicker due" id="due_{{group.id}}_{{curr.id}}" name="due_{{group.id}}_{{curr.id}}" readonly="true" value="{{assignment_dates|get_item:group.id|get_item:curr.id|get_item:'due_date'|date:'F j, Y'}}"/>
-                    </td>
-                    <td style="display:none;">
-                      {% if instances|get_item:group.id|get_item:curr.id == 0 %}
-                        <button type="button" class="btn btn-danger clear" id="clear_{{group.id}}_{{curr.id}}" name="clear_{{group.id}}_{{curr.id}}">Clear</button>
+                    <td style="display:none; text-align:center;">
+                      <!--In work assignment, cannot be unassigned  -->
+                      {% if instances|get_item:group.id|get_item:curr.id > 0 %}
+                        <input type="checkbox" id="display_assigned_{{group.id}}_{{curr.id}}" name="display_assigned_{{group.id}}_{{curr.id}}" disabled
+                        checked/>
+                        <input type="hidden" id="assigned_{{group.id}}_{{curr.id}}" name="assigned_{{group.id}}_{{curr.id}}" value="1" />
+                      {% else %}
+                        <input type="checkbox" class="assigned" id="assigned_{{group.id}}_{{curr.id}}" name="assigned_{{group.id}}_{{curr.id}}"
+                        {% if assignment_count|get_item:group.id|get_item:curr.id > 0 %} checked="checked" {% endif %} />
                       {% endif %}
+                      <input type="hidden" id="instance_{{group.id}}_{{curr.id}}" class="instance_count" value="{{instances|get_item:group.id|get_item:curr.id}}"/>
+
                     </td>
+
                   </tr>
                 {% endfor %}
               {% endif %}
@@ -90,7 +92,7 @@
       <div class="modal-footer">
         <div class="form-group button-row">
           <button type="submit" id="saveAssignment" class="btn btn-success">
-            Assign
+            Save
           </button>
           <a type="button" class="btn btn-danger" data-dismiss="modal">Cancel</a>
         </div>
@@ -101,10 +103,6 @@
 
 <script type="text/javascript">
   $(function(){
-    /*{% for assignment in assignments %}
-      $('input#assigned_{{assignment.group.id}}_{{assignment.curriculum.id}}').val('{{assignment.assigned_date|date:"F j, Y"}}');
-      $('input#due_{{assignment.group.id}}_{{assignment.curriculum.id}}').val('{{assignment.due_date|date:"F j, Y"}}');
-    {% endfor %}*/
 
     $('.datepicker.due').datepicker({
       dateFormat: 'MM d, yy',
@@ -123,34 +121,19 @@
       }
     });
 
-    $('.datepicker.assigned').each(function(){
-      var editable = true;
-      //check if assignment has started
-      //if assignment has started make the assigned date field uneditable
-      var instance_count = $(this).closest('td').find('input.instance_count').val();
-      if(parseInt(instance_count) > 0){
-        editable = false;
-        $(this).removeClass('hasDatepicker');
-        $(this).removeClass('datepicker');
-      }
-
-      if(editable){
-        $(this).datepicker({
-          dateFormat: 'MM d, yy',
-          onClose: function(selectedDate){
-            if(selectedDate != ""){
-              var due = $(this).closest('tr').find('input.due');
-              if($(due).val() == ""){
-                $(due).datepicker('show');
-              }
-              var class_names = $(this).closest('tr').attr('class').split(' ');
-              if(class_names[0] == 'unit'){
-                $('tr.lesson.'+class_names[1]+' input.datepicker.assigned').val(selectedDate);
-              }
-            }
-          }
+    $('.assigned').each(function(){
+      var class_names = $(this).closest('tr').attr('class').split(' ');
+      if(class_names[0] == 'unit'){
+        $(this).change(function(){
+          $('tr.lesson.'+class_names[1]+' input.assigned').prop("checked", $(this).is(':checked'));
         });
       }
+      $(this).on('click', function(){
+        if(!($(this).is(':checked'))) {
+          return confirm('Are you sure you want to remove this assignment?')
+        }
+        return true;
+      });
     });
 
     $('#curriculumAssignmentForm').submit(function(e){

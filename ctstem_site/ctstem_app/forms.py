@@ -616,12 +616,19 @@ class StudentAddForm(forms.Form):
 # Assignment Search Form
 ####################################
 class AssignmentSearchForm(forms.Form):
+
+  group_class = forms.ModelChoiceField(queryset=models.UserGroup.objects.all().filter(is_active=True).order_by('title'))
   curriculum_type = forms.ChoiceField(choices=models.CURRICULUM_TYPE_CHOICES)
   title = forms.CharField(max_length=256)
   subject = forms.ModelChoiceField(queryset=models.Subject.objects.all())
 
   def __init__(self, *args, **kwargs):
+    user = kwargs.pop('user')
     super(AssignmentSearchForm, self).__init__(*args, **kwargs)
+    if hasattr(user, 'teacher'):
+      self.fields['group_class'].queryset = self.fields['group_class'].queryset.filter(teacher=user.teacher)
+    elif hasattr(user, 'school_administrator'):
+      self.fields['group_class'].queryset = self.fields['group_class'].queryset.filter(teacher__school=user.school_administrator.school)
 
     for field_name, field in self.fields.items():
       field.widget.attrs['class'] = 'form-control'
@@ -701,6 +708,7 @@ class UserGroupForm(ModelForm):
     self.fields['title'].label = 'Class Name/Title'
     self.fields['time'].label = 'Time/Period'
     self.fields['group_code'].label = 'Class Code'
+    self.fields['group_code'].widget.attrs['readonly'] = True
     if hasattr(user, 'teacher'):
       self.fields['members'].queryset = self.fields['members'].queryset.filter(school=user.teacher.school)
     elif hasattr(user, 'school_administrator'):
@@ -748,12 +756,10 @@ class UserGroupForm(ModelForm):
 # Assignment Form
 ####################################
 class AssignmentForm(ModelForm):
-  due_date = forms.DateField(widget=forms.DateInput(format='%b %d, %Y'), input_formats=['%b %d, %Y'])
-  assigned_date = forms.DateField(widget=forms.DateInput(format='%b %d, %Y'), input_formats=['%b %d, %Y'])
 
   class Meta:
     model = models.Assignment
-    exclude = ('group', )
+    exclude = ('group', 'assigned_date')
     #fields = ['id', 'curriculum', 'group', 'assigned_date', 'due_date']
 
   def __init__(self, *args, **kwargs):
@@ -761,23 +767,8 @@ class AssignmentForm(ModelForm):
     self.fields["curriculum"].queryset = models.Curriculum.objects.filter(status='P')
 
     for field_name, field in self.fields.items():
-      if field_name == 'due_date':
-        if self.instance.id == None:
-          field.widget.attrs['class'] = 'form-control datepicker due'
-        elif self.instance.id and self.instance.group.is_active:
-          field.widget.attrs['class'] = 'form-control datepicker due'
-        else:
-          field.widget.attrs['class'] = 'form-control'
-        field.widget.attrs['readonly'] = True
-      elif field_name =='assigned_date':
-        if self.instance.id and self.instance.assigned_date.date() <= date.today():
-          field.widget.attrs['class'] = 'form-control'
-        else:
-          field.widget.attrs['class'] = 'form-control datepicker assigned'
-        field.widget.attrs['readonly'] = True
-      else:
-        field.widget.attrs['class'] = 'form-control'
-        field.widget.attrs['placeholder'] = field.help_text
+      field.widget.attrs['class'] = 'form-control'
+      field.widget.attrs['placeholder'] = field.help_text
 
   def get_assigned_date(self):
     if self.instance.id:

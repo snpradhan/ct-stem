@@ -28,8 +28,7 @@
             <th>Teammates</th>
             <th>Group</th>
             <th>Assignment</th>
-            <th>Assigned Date</th>
-            <th>Due Date </th>
+            <th>Assigned On</th>
             <th>Status</th>
             <th>Time Spent(hh:mm:ss)</th>
             <th>Last Modified</th>
@@ -55,7 +54,6 @@
             <td><a href="{% url 'ctstem:groupDashboard' form.instance.instance.assignment.group.id %}">{{form.instance.instance.assignment.group}}</a></td>
             <td><a href="{% url 'ctstem:assignmentDashboard' form.instance.instance.assignment.id %}">{{form.instance.instance.assignment.curriculum.title}}</a></td>
             <td>{{form.instance.instance.assignment.assigned_date|date}}</td>
-            <td>{{form.instance.instance.assignment.due_date|date}}</td>
             <td>{{form.instance.instance.get_status_display}}</td>
             <td>{{form.instance.instance.time_spent|format_time}}</td>
             <td>{{form.instance.instance.modified_date|date}}</td>

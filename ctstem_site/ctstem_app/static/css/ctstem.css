@@ -641,7 +641,7 @@ input[type="tel"], input[type="color"], .uneditable-input {
     height: auto;
     max-width: 100%;
 }
-select {
+select, input[type="checkbox"] {
   width: auto !important;
 }
 
@@ -717,6 +717,9 @@ div.content#home section h3.section-subheading.text-muted {
   padding: 0 20px !important;
   font-style: normal;
 }
+div.content section.portfolio {
+  padding: 3em 1em;
+}
 div.content section.portfolio .portfolio-item .portfolio-caption{
   background-color: #f7f7f7;
   min-height: 100px;
@@ -727,9 +730,10 @@ div.content section.portfolio .portfolio-item .portfolio-caption{
 div.content#assignments section.portfolio .portfolio-item, div.content#classes section.portfolio .portfolio-item {
   margin-bottom: 4em;
 }
+
 div.content#assignments section.portfolio .portfolio-item .portfolio-caption{
   max-height: none;
-  min-height: 25em;
+  min-height: 30em;
 }
 
 div.content#classes section.portfolio .portfolio-item .portfolio-caption{
@@ -839,6 +843,11 @@ div.content#home section#contact .text-muted {
 div.content#assignments, div.content.teacher#classes {
   width: 80%;
 }
+
+div.content.teacher#classes ul.nav.top {
+  display: none;
+}
+
 div.content#assignments div.inbox_filter {
   float: right;
   margin-right: 2em;
@@ -965,13 +974,16 @@ div.modal-content div.msg.success {
 }
 div.modal-content div.results{
   padding: 0 2em 1em 2em;
+  height: auto;
+  max-height: 50em;
+  overflow-y: auto;
 }
 div.modal-content span.time {
   color: red;
 }
 
 div.modal-content div.link {
-  font-size: 1.8em;
+  font-size: 2.5em;
   font-weight: bold;
   text-align: center;
 }
@@ -1004,12 +1016,6 @@ div.modal-content form#consentForm div.modal-body div.form-group{
 div.modal#studentSearch {
   height: auto;
   max-height: 88em;
-}
-
-div.modal-content div#studentResults {
-  height: auto;
-  max-height: 50em;
-  overflow-y: auto;
 }
 
 div.modal-content div.modal-footer div.extra {

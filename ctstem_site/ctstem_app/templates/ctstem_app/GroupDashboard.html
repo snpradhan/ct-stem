@@ -18,9 +18,8 @@
       <table class="table table-bordered table-condensed dt" id="groups">
         <thead>
           <tr>
-            <th width="30%" colspan="2"> Assigned Curriculum </th>
-            <th> Assigned Date </th>
-            <th> Due Date </th>
+            <th width="50%" colspan="2"> Assigned Curriculum </th>
+            <th> Assigned On </th>
             <th width="30%"> Status </th>
             <th width="10%"> Student Activity </th>
           </tr>
@@ -74,7 +73,6 @@
               {% endif %}
 
                   <td> {{assignment.assignment.assigned_date|date}} </td>
-                  <td> {{assignment.assignment.due_date|date}} </td>
                   <td>
                     <div id="chart_{{assignment.serial}}" class="chart" name="{{assignment.status}}"></div>
                   </td>

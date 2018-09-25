@@ -129,7 +129,7 @@ def upload_file_to(instance, filename):
 # GENERATE UNIQUE USER CODE HELPER
 ####################################
 def generate_code_helper():
-  allowed_chars = ''.join((string.uppercase, string.digits))
+  allowed_chars = ''.join(('ABCDEFGHJKMNPQRSTUVWXYZ', '23456789'))
   code = get_random_string(length=5, allowed_chars=allowed_chars)
   schools = School.objects.all().filter(school_code=code)
   groups = UserGroup.objects.all().filter(group_code=code)
@@ -451,8 +451,7 @@ class GroupInvitee(models.Model):
 class Assignment(models.Model):
   curriculum = models.ForeignKey(Curriculum, related_name="assignments")
   group = models.ForeignKey(UserGroup, related_name="assignments")
-  assigned_date = models.DateTimeField(default=datetime.datetime.now, blank=False)
-  due_date = models.DateTimeField(null=False, blank=False)
+  assigned_date = models.DateTimeField(auto_now_add=True)
   lock_on_completion = models.BooleanField(default=False)
 
   def __unicode__(self):

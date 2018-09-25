@@ -56,6 +56,16 @@ def get_curriculum_title(curriculum_id):
     return None
 
 @register.filter
+def get_curriculum_object(curriculum_id):
+  try:
+    if curriculum_id != 'None':
+      return models.Curriculum.objects.get(id=curriculum_id)
+    else:
+      return None
+  except models.Curriculum.DoesNotExist:
+    return None
+
+@register.filter
 def is_in(var, obj):
     return var in obj
 
@@ -244,7 +254,7 @@ def student_actions(context):
 
 def StudentInGroupAdminActions(context):
   actions = StudentActions(context)
-  actions.append({'description':'Remove Selected Students From Group','value':'remove_selected'})
+  actions.append({'description':'Remove Selected Students From Class','value':'remove_selected'})
   return actions
 
 @register.inclusion_tag("ctstem_app/admin/actions.html", takes_context=True)
@@ -253,7 +263,7 @@ def student_in_group_admin_actions(context):
 
 def StudentInGroupTeacherActions(context):
   actions = UserActions(context)
-  actions.append({'description':'Remove Selected Students From Group','value':'remove_selected'})
+  actions.append({'description':'Remove Selected Students From Class','value':'remove_selected'})
   return actions
 
 @register.inclusion_tag("ctstem_app/admin/actions.html", takes_context=True)
@@ -272,13 +282,13 @@ def group_actions(context):
 @register.filter
 def get_student_groups(id):
   student = models.Student.objects.get(id=id)
-  memberships = student.student_membership.all()
+  memberships = student.student_membership.all().filter(group__is_active=True)
   return memberships
 
 @register.filter
 def get_teacher_groups(id):
   teacher = models.Teacher.objects.get(id=id)
-  groups = teacher.groups.all()
+  groups = teacher.groups.all().filter(is_active=True)
   return groups
 
 @register.filter
@@ -326,3 +336,15 @@ def get_referenced_questions(step, instance=False):
 @register.filter
 def date_has_past(dt):
   return dt < timezone.now()
+
+@register.filter
+def get_class_assignment_status(assignment_id):
+  assignment = models.Assignment.objects.get(id=assignment_id)
+  assignment_instances = models.AssignmentInstance.objects.all().filter(assignment__id=assignment_id)
+  status = 'N'
+  for instance in assignment_instances:
+    if instance.status != 'N':
+      status = instance.status
+      break
+
+  return status

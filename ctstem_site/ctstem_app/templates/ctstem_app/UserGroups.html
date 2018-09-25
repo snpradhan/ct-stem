@@ -30,7 +30,6 @@
                      <div class="portfolio-hover">
                       <div class="portfolio-hover-content">
                         <span class="glyphicon glyphicon-pencil gi-3x" aria-hidden="true"></span>
-                        <!--i class="fa fa-edit fa-3x"></i-->
                       </div>
                     </div>
                     {% if group.subject and group.subject.icon %}
@@ -46,13 +45,7 @@
 
                     <div class="button_row">
                       {% if group.is_active %}
-                        <!--div>
-                          <a type="button" class="btn btn-info" aria-label="Edit Class" title="Edit Class" href="{% url 'ctstem:group' group.id %}">
-                            <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
-                          </a>
-                        </div-->
-
-                         <div>
+                        <div>
                           <a type="button" class="btn btn-yellow invite-modal" href="#" data-toggle="modal" data-target="#invite" data-invite-link="https://{{domain}}/register/group/{{group.group_code}}" data-title="{{group.title}}" title="Student Invitation Link">
                             <i class="fa fa-link"></i>
                           </a>
@@ -66,6 +59,11 @@
                         <div>
                           <a type="button" class="btn btn-warning" aria-label="Class Dashboard" title="Class Dashboard" href="{% url 'ctstem:groupDashboard' group.id %}">
                             <img src="/static/img/dashboard.png" class="icon" />
+                          </a>
+                        </div>
+                         <div>
+                          <a type="button" class="btn btn-info assignment-modal" href="#" data-toggle="modal" data-target="#assignment" data-id="{{group.id}}" title="Search and Add Assignments">
+                            <i class="fa fa-tasks"></i>
                           </a>
                         </div>
 
@@ -206,6 +204,11 @@
                           <a type="button" class="btn btn-warning" href="{% url 'ctstem:groupDashboard' group.id %}" aria-label="View Class Dashboard" title="View Class Dashboard">
                             <img src="/static/img/dashboard.png" class="icon" />
                           </a>
+
+                          <a type="button" class="btn btn-info assignment-modal" href="#" data-toggle="modal" data-target="#assignment" data-id="{{group.id}}" data-title="{{group.title}}" title="Search and Add Assignments">
+                            <i class="fa fa-tasks"></i>
+                          </a>
+
                         </div>
                       {% else %}
                         No Assignment
@@ -229,6 +232,9 @@
   {% block invite %}
     {% include "ctstem_app/InviteModal.html" %}
   {% endblock %}
+  {% block assignment %}
+    {% include "ctstem_app/AssignmentSearch.html" %}
+  {% endblock %}
 
   <script type="text/javascript">
     $(function(){
@@ -237,24 +243,6 @@
         $(this).children().each(function(){
           $(this).toggle();
         })
-      });
-
-      $('a.upload-modal').click(function(){
-        $("div.modal#upload select#id_group option:selected").prop('selected', false);
-        $("div.modal#upload select#id_group option[value='"+$(this).data('id')+"']").prop('selected', true);
-
-        var title = 'Class';
-        if($(this).data('title') !== undefined){
-          title = '<div>'+$(this).data('title')+'</div>';
-        }
-        $("div.modal#upload .modal-title span").html(title);
-
-        if($(this).data('id') != null){
-          $("div.modal#upload select#id_group").closest('.form-group').hide();
-        }
-        else{
-          $("div.modal#upload select#id_group").closest('.form-group').show();
-        }
       });
 
       $('a.invite-modal').click(function(){
