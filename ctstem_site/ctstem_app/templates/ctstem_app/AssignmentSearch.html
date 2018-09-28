@@ -46,18 +46,6 @@
         </div>
       </form>
       <div id="assignmentResults" style="display:none;" class="results">
-        <table class="table table-bordered table-striped table-condensed inner_table">
-          <thead>
-            <tr>
-              <th>Type</th>
-              <th>Title</th>
-              <th>Subject</th>
-              <th>Assign</th>
-            </tr>
-          </thead>
-          <tbody>
-          </tbody>
-        </table>
       </div>
     </div>
   </div>
@@ -68,78 +56,43 @@ $(function (){
    location.reload();
   })
 
+  $("#id_group_class").on('change', function(){
+    $("#assignmentResults").empty();
+    $("#assignmentResults").hide();
+  });
+
   $("#assignmentForm").submit(function(e) {
     e.preventDefault();
-
-    $("#assignmentResults table tbody").empty();
-    var csrf_token = $('#assignmentForm').find('input:hidden').eq(0).val();
-    data = {}
-    data['curriculum_type'] = $("#id_curriculum_type").val();
-    data['subject'] = $("#id_subject").val();
-    data['title'] = $("#id_title").val();
-    data['csrfmiddlewaretoken'] = csrf_token;
-    var data = $.param(data);
-    $.ajax({
-      type: $(this).attr('method'),
-      url: this.action,
-      data: data,
-      context: this,
-      success: function(data){
-        if('error' in data){
-          $('#assignmentMsg').html(data['error']);
-        }
-        else {
-          var assignment = "";
-          var curriculum_type = '';
-          $.each(data, function(key, value){
-            curriculum_type = '';
-            curriculum_type = value['curriculum_type'].toLowerCase();
-            assignment += "<tr><td>"+value['curriculum_type']+"</td><td>"+value['title']+"</td><td>"+value['subject']+"</td><td><button type='button' class='btn btn-info select_assignment "+curriculum_type+"' id='"+value['id']+"' name='"+value['title']+"'>Assign</a></td></tr>";
-          });
-          if(assignment.length == 0){
-            $('#assignmentMsg').html('No matching assignments found');
-            $("#assignmentResults").hide();
-          }
-          else {
-            $('#assignmentMsg').html('');
-            $("#assignmentResults table tbody").html(assignment);
-            $("#assignmentResults").show();
-            $("#assignmentResults button.select_assignment").click(function(){
-              //if assigning a Unit get and assign all the underlying published lessons
-              var curriculum_name = $(this).attr('name');
-              var group_class_id = $('select#id_group_class').val();
-              data = {}
-              data['csrfmiddlewaretoken'] = csrf_token;
-              var data = $.param(data);
-              if(group_class_id){
-                $.ajax({
-                  type: 'POST',
-                  url: '/assignment/add/'+$(this).attr('id')+'/'+group_class_id+'/',
-                  data: data,
-                  success: function(data){
-                    $('#assignmentMsg').addClass('success').html("Curriculum "+curriculum_name+" has been assigned");
-                  },
-                  error: function(xhr, ajaxOptions, thrownError){
-                    $('#assignmentMsg').removeClass('success').html("Something went wrong...");
-                  },
-                });
-                $(this).attr('disabled', 'disabled');
-              }
-              else{
-                alert('Select a class to assign this curriculum to');
-              }
-            });
-          }
-          //$("#taxonomyForm")[0].reset();
-          //$("#taxonomyModal").modal('toggle');
-        }
-        return false;
-      },
-      error: function(xhr, ajaxOptions, thrownError){
-        alert(thrownError);
-      },
-    });
+    if($("#id_group_class").val()){
+      $("#assignmentResults table tbody").empty();
+      var csrf_token = $('#assignmentForm').find('input:hidden').eq(0).val();
+      data = {}
+      data['group'] = $("#id_group_class").val();
+      data['curriculum_type'] = $("#id_curriculum_type").val();
+      data['subject'] = $("#id_subject").val();
+      data['title'] = $("#id_title").val();
+      data['csrfmiddlewaretoken'] = csrf_token;
+      var data = $.param(data);
+      $.ajax({
+        type: $(this).attr('method'),
+        url: this.action,
+        data: data,
+        context: this,
+        success: function(data){
+          $("#assignmentResults").html(data);
+          $("#assignmentResults").show();
+          return false;
+        },
+        error: function(xhr, ajaxOptions, thrownError){
+          alert(thrownError);
+        },
+      });
+    }
+    else{
+      $('#assignmentMsg').removeClass('success').html("Select a Class to search assignments");
+    }
   });
+
 
 });
 

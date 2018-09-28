@@ -71,54 +71,79 @@
             <div>
               <label for="id_assignment_table">Assignments (<span id="assignment_count">{{assignments|length}}</span>)</label>
             </div>
+             <div>
             {% if form.instance.is_active %}
-            <div>
-              <a type="button" class="btn btn-success assignment-modal" href="#" data-toggle="modal" data-target="#assignment" data-id="{{form.instance.id}}" data-title="{{form.instance.title}}" title="Search and Add Assignments">
+              <a type="button" class="btn btn-info assignment-modal" href="#" data-toggle="modal" data-target="#assignment" data-id="{{form.instance.id}}" data-title="{{form.instance.title}}" title="Search and Add Assignments">
                   <i class="fa fa-tasks"></i>
               </a>
-            </div>
             {% endif %}
-
+            <a type="button" class="btn btn-warning" href="{% url 'ctstem:groupDashboard' form.instance.id %}" aria-label="View Class Dashboard" title="View Class Dashboard">
+              <img src="/static/img/dashboard.png" class="icon" />
+            </a>
+            </div>
             <div class="table_container">
               <table class="table table-striped table-condensed table-bordered inner_table">
                 <thead>
                   <tr>
-                    <th style="width:75%;">Curriculum</th>
+                    <th style="width:75%;" colspan="2">Assigned Curriculum</th>
                     <th>Assigned On</th>
                     <th>Lock on Completion <i class="fa fa-info-circle" aria-hidden="true" title="When locked, students will be unable to open and view the assignment once they submit"></i></th>
                     <th>Delete</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {% for assignment in assignments %}
-                    <tr id="{{assignment.id}}">
-                      <td>
-                        <div class="assignment_title">
-                          {% with curriculum=assignment.curriculum %}
-                            {% if curriculum.unit %}
-                              <b>Unit:</b> {{curriculum.unit.title}} --
-                            {% endif %}
-                            <b>{{curriculum.get_curriculum_type_display}}:</b> {{curriculum.title}}
-                          {% endwith %}
-                        </div>
-                      </td>
-                      <td style="vertical-align:middle;">
-                        {{assignment.assigned_date|date }}
-                      </td>
-                      <td class="lock_on_completion" style="text-align:center;">
-                        <input type="checkbox" class="lock_assignment" {% if assignment.lock_on_completion %} checked {% endif %} data-id="{{assignment.id}}" data-title="{{assignment.curriculum.title}}" {% if not form.instance.is_active %} disabled {% endif %}/>
-                      </td>
-                      <td>
-                        <!-- only allow assignments to be deleted if the class is active and the assignment in question is still New -->
-                        {% if form.instance.is_active %}
-                          {% if assignment.id|get_class_assignment_status == 'N' %}
-                            <button type="button" class="btn btn-danger delete_assignment" name="delete_assignment" aria-label="Delete Assignment" title="Delete this Assignment" data-id="{{assignment.id}}" data-title="{{assignment.curriculum.title}}">
-                              <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-                            </button>
-                          {% endif %}
+                  {% for curriculum, assignment_list in assignments.items %}
+                    {% if curriculum.curriculum_type == 'U' %}
+                      <tr class="{% if forloop.counter|divisibleby:2 %}  even {% else %} odd {% endif %}">
+                        <td rowspan="{{assignment_list|length}}">
+                          <div>Unit: {{curriculum.title}}</div>
+                        </td>
+                    {% endif %}
+                    {% for assignment in assignment_list %}
+                      {% if curriculum.curriculum_type == 'U'  %}
+                        {% if forloop.counter > 1 %}
+                        <tr class="{% if forloop.parentloop.counter|divisibleby:2 %}  even {% else %} odd {% endif %}">
                         {% endif %}
-                      </td>
-                    </tr>
+                        <td>
+                          <div>Lesson: {{assignment.curriculum.title}}</div>
+                        </td>
+                      {% else %}
+                        <tr class="{% if forloop.parentloop.counter|divisibleby:2 %}  even {% else %} odd {% endif %}">
+                          <td colspan="2">
+                            <div>
+                              {% if curriculum.curriculum_type == 'L' %}
+                                Lesson:
+                              {% elif curriculum.curriculum_type == 'A' %}
+                                Assessment:
+                              {% else %}
+                                Survey:
+                              {% endif %}
+                            &nbsp;{{curriculum.title}}
+                            </div>
+                          </td>
+                      {% endif %}
+
+                          <td style="vertical-align:middle;">
+                            {{assignment.assigned_date|date }}
+                          </td>
+                          <td class="lock_on_completion" style="text-align:center;">
+                            <input type="checkbox" class="lock_assignment" {% if assignment.lock_on_completion %} checked {% endif %} data-id="{{assignment.id}}" data-title="{{assignment.curriculum.title}}" {% if not form.instance.is_active %} disabled {% endif %}/>
+                          </td>
+                          <td style="text-align:center;">
+                            <!-- only allow assignments to be deleted if the class is active and the assignment in question is still New -->
+                            {% if form.instance.is_active %}
+                              {% if assignment.id|get_class_assignment_status == 'N' %}
+                                <a type="button" class="btn btn-danger delete_assignment" name="delete_assignment" aria-label="Delete Assignment" title="Delete this Assignment" href="{% url 'ctstem:deleteAssignment' assignment.id %}" onclick="return confirm('Are you sure you want to delete this assignment?')">
+                                  <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                                </a>
+                              {% else %}
+                                <div class="assignment_status">Assignment In Progress</div>
+                              {% endif %}
+                            {% endif %}
+
+                          </td>
+                        </tr>
+                    {% endfor %}
                   {% endfor %}
                 </tbody>
               </table>
@@ -260,31 +285,6 @@
 
   <script type="text/javascript">
     $(function (){
-
-      $('button.delete_assignment').click(function(){
-        var btn = $(this);
-        var r = confirm("Are you sure you want to delete this assignment?");
-        if (r == true) {
-          var assignment_id = $(this).data('id');
-          var url = '/assignment/delete/'+assignment_id+'/';
-          $.ajax({
-            type: 'GET',
-            url: url,
-            success: function(data){
-              if(data['success'] == true){
-                $(btn).closest('tr').hide();
-              }
-              else {
-                alert("This assignment cannot be deleted.")
-              }
-            },
-            error: function(){
-              alert('error');
-            }
-          });
-
-        }
-      });
 
       $('a.upload-modal').click(function(){
         $("div.modal#upload select#id_group option:selected").prop('selected', false);

@@ -194,6 +194,9 @@ table.table ul {
 table.table tr.odd {
   background-color: #f9f9f9;
 }
+table.table tr.even {
+  background-color: white;
+}
 table.table.question th.order {
   width: 5%;
 }

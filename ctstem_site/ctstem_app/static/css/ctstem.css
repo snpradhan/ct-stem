@@ -978,6 +978,9 @@ div.modal-content div.results{
   max-height: 50em;
   overflow-y: auto;
 }
+div.modal-content div.results div.assignment_status, div.assignment_table div.assignment_status{
+  font-weight: bold;
+}
 div.modal-content span.time {
   color: red;
 }

@@ -1984,42 +1984,55 @@ def group(request, id=''):
     else:
       group = models.UserGroup()
 
-    if request.method == 'GET':
-        form = forms.UserGroupForm(user=request.user, instance=group, prefix='group')
-        assignments = models.Assignment.objects.all().filter(group=group).order_by('curriculum__unit__title', 'curriculum__curriculum_type', 'curriculum__order', 'curriculum__title')
-        uploadForm = forms.UploadFileForm(user=request.user)
-        assignmentForm = forms.AssignmentSearchForm(user=request.user)
-        studentSearchForm = forms.StudentSearchForm()
-        studentAddForm = forms.StudentAddForm()
-        context = {'form': form, 'role': 'group', 'uploadForm': uploadForm, 'assignmentForm': assignmentForm, 'studentSearchForm': studentSearchForm, 'studentAddForm': studentAddForm, 'assignments': assignments}
-        return render(request, 'ctstem_app/UserGroup.html', context)
+    if request.method in ['GET', 'POST']:
+      assignments = {}
 
-    elif request.method == 'POST':
-      data = request.POST.copy()
-      #print data
-      form = forms.UserGroupForm(user=request.user, data=data, instance=group, prefix="group")
-      if form.is_valid():
-        savedGroup = form.save()
-        #if group is being inactivated, archive the associated assignments
-        if 'group-is_active' not in data:
-          archiveAssignments(request, [id])
+      for assignment in models.Assignment.objects.all().filter(group=group).order_by('curriculum__unit__title', 'curriculum__order'):
+        instances = models.AssignmentInstance.objects.all().filter(assignment=assignment)
+        curriculum = assignment.curriculum
 
-        id_list = []
-        for key in data:
-          if 'student_' in key:
-            id_list.append(data[key])
-        _do_action(request, id_list, 'student', id)
-        messages.success(request, "Class Saved.")
-        return shortcuts.redirect('ctstem:group', id=savedGroup.id)
-      else:
-        print form.errors
-        messages.error(request, "The class could not be saved because there were errors.  Please check the errors below.")
-        uploadForm = forms.UploadFileForm(user=request.user)
-        assignmentForm = forms.AssignmentSearchForm(user=request.user)
-        studentSearchForm = forms.StudentSearchForm()
-        studentAddForm = forms.StudentAddForm()
-        context = {'form': form, 'role': 'group', 'uploadForm': uploadForm, 'assignmentForm': assignmentForm, 'studentSearchForm': studentSearchForm, 'studentAddForm': studentAddForm}
-        return render(request, 'ctstem_app/UserGroup.html', context)
+        if curriculum.curriculum_type == 'L' and curriculum.unit is not None:
+          key = curriculum.unit
+        else:
+          key = curriculum
+
+        if key in assignments:
+          assignments[key].append(assignment)
+        else:
+            assignments[key] = [assignment]
+
+      uploadForm = forms.UploadFileForm(user=request.user)
+      assignmentForm = forms.AssignmentSearchForm(user=request.user)
+      studentSearchForm = forms.StudentSearchForm()
+      studentAddForm = forms.StudentAddForm()
+
+      if request.method == 'GET':
+          form = forms.UserGroupForm(user=request.user, instance=group, prefix='group')
+          context = {'form': form, 'role': 'group', 'uploadForm': uploadForm, 'assignmentForm': assignmentForm, 'studentSearchForm': studentSearchForm, 'studentAddForm': studentAddForm, 'assignments': assignments}
+          return render(request, 'ctstem_app/UserGroup.html', context)
+
+      elif request.method == 'POST':
+        data = request.POST.copy()
+        #print data
+        form = forms.UserGroupForm(user=request.user, data=data, instance=group, prefix="group")
+        if form.is_valid():
+          savedGroup = form.save()
+          #if group is being inactivated, archive the associated assignments
+          if 'group-is_active' not in data:
+            archiveAssignments(request, [id])
+
+          id_list = []
+          for key in data:
+            if 'student_' in key:
+              id_list.append(data[key])
+          _do_action(request, id_list, 'student', id)
+          messages.success(request, "Class Saved.")
+          return shortcuts.redirect('ctstem:group', id=savedGroup.id)
+        else:
+          print form.errors
+          messages.error(request, "The class could not be saved because there were errors.  Please check the errors below.")
+          context = {'form': form, 'role': 'group', 'uploadForm': uploadForm, 'assignmentForm': assignmentForm, 'studentSearchForm': studentSearchForm, 'studentAddForm': studentAddForm, 'assignments': assignments}
+          return render(request, 'ctstem_app/UserGroup.html', context)
 
     return http.HttpResponseNotAllowed(['GET', 'POST'])
 
@@ -2037,25 +2050,60 @@ def searchAssignment(request):
 
   if 'POST' == request.method:
     data = request.POST.copy()
-    query_filter = {}
-    if data['curriculum_type']:
-      query_filter['curriculum_type'] = str(data['curriculum_type'])
-    if data['title']:
-      query_filter['title__icontains'] = str(data['title'])
-    if data['subject']:
-      query_filter['subject__id'] = data['subject']
+    curricula = []
+    if data['group']:
+      query_filter = {}
+      if data['curriculum_type']:
+        query_filter['curriculum_type'] = str(data['curriculum_type'])
+      if data['title']:
+        query_filter['title__icontains'] = str(data['title'])
+      if data['subject']:
+        query_filter['subject__id'] = data['subject']
 
-    query_filter['status'] = 'P'
-    curriculumQueryset = models.Curriculum.objects.filter(**query_filter)
-    curriculumList = []
-    if data['curriculum_type'] == 'U':
-      for curriculum in curriculumQueryset:
-        if curriculum.underlying_curriculum.all().filter(status='P').count() > 0:
-          curriculumList.append(curriculum)
-    else:
-      curriculumList = curriculumQueryset
-    curriculum_list = [{'curriculum_type': curriculum.get_curriculum_type_display(), 'title': curriculum.title, 'subject': [subject.name for subject in curriculum.subject.all()], 'id': curriculum.id} for curriculum in curriculumList]
-    return http.HttpResponse(json.dumps(curriculum_list), content_type="application/json")
+      query_filter['status'] = 'P'
+      curriculumQueryset = models.Curriculum.objects.filter(**query_filter)
+      curriculumList = []
+      if data['curriculum_type'] == 'U':
+        for curriculum in curriculumQueryset:
+          if curriculum.underlying_curriculum.all().filter(status='P').count() > 0:
+            curriculumList.append(curriculum)
+      else:
+        curriculumList = curriculumQueryset
+
+      for curriculum in curriculumList:
+        curr = {'id': curriculum.id, 'curriculum_type': curriculum.get_curriculum_type_display(), 'title': curriculum.title, 'subject': [subject.name for subject in curriculum.subject.all()]}
+
+        if curriculum.curriculum_type == 'U':
+          underlying_curriculum_queryset = curriculum.underlying_curriculum.all().filter(status='P')
+          underlying_curriculum = []
+          unit_assigned = False
+          lesson_assigned_count = 0
+          for lesson in underlying_curriculum_queryset.order_by('order'):
+            lesson_assigned = False
+            assignments = models.Assignment.objects.all().filter(curriculum=lesson, group__id=int(data['group']))
+            if assignments.count() > 0:
+              lesson_assigned = True
+              lesson_assigned_count = lesson_assigned_count + 1
+            underlying_curriculum.append({'id': lesson.id, 'title': lesson.title, 'assigned': lesson_assigned})
+
+          curr['assigned'] = underlying_curriculum_queryset.count() == lesson_assigned_count
+          curr['underlying_curriculum'] = underlying_curriculum
+          curr['underlying_curriculum_count'] = underlying_curriculum_queryset.count()
+          curr['underlying_curriculum_assigned'] = lesson_assigned_count
+        else:
+          assigned = False
+          assignments = models.Assignment.objects.all().filter(curriculum=curriculum, group__id=int(data['group']))
+          if assignments.count() > 0:
+            assigned = True
+
+          curr['assigned'] = assigned
+          curr['underlying_curriculum'] = None
+
+        curricula.append(curr)
+
+    context = {'curricula': curricula, 'group_id': data['group'] }
+    html = render_to_string('ctstem_app/AssignmentSearchResult.html', context, context_instance=RequestContext(request))
+    return http.HttpResponse(html)
 
   return http.HttpResponseNotAllowed(['POST'])
 
@@ -2132,7 +2180,6 @@ def groupDashboard(request, id=''):
       serial = 0
       status_map = {'N': 'New', 'P': 'In Progress', 'S': 'Submitted', 'F': 'Feedback Ready', 'A': 'Archived'}
       status_color = {'N': 'gray', 'P': 'blue', 'S': 'green', 'F': 'orange', 'A': 'black'}
-      assignment_queryset = models.Assignment.objects.all().filter(group=group)
 
       for assignment in models.Assignment.objects.all().filter(group=group).order_by('assigned_date'):
         students = assignment.group.members.all()
@@ -2757,7 +2804,16 @@ def deleteAssignment(request, assignment_id=''):
     if status == 'N':
       assignment.delete()
       response_data['success'] = True
-  return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+  if request.is_ajax():
+    return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+  else:
+    if status == 'N':
+      messages.success(request, 'The assignment %s has been deleted' % (assignment.curriculum))
+    else:
+      messages.error(request, 'The assignment %s is in progress and cannot be deleted' % (assignment.curriculum))
+
+    return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
 
 ####################################
 # Add Assignment to Group

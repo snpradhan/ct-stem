@@ -348,3 +348,7 @@ def get_class_assignment_status(assignment_id):
       break
 
   return status
+
+@register.filter
+def subtract(value, arg):
+  return value - arg
