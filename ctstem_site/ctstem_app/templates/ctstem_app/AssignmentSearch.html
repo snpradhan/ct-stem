@@ -47,6 +47,7 @@
       </form>
       <div id="assignmentResults" style="display:none;" class="results">
       </div>
+      <input type="hidden" id="assign_id" name="assign_id"/>
     </div>
   </div>
 </div>
@@ -64,7 +65,6 @@ $(function (){
   $("#assignmentForm").submit(function(e) {
     e.preventDefault();
     if($("#id_group_class").val()){
-      $("#assignmentResults table tbody").empty();
       var csrf_token = $('#assignmentForm').find('input:hidden').eq(0).val();
       data = {}
       data['group'] = $("#id_group_class").val();
@@ -81,6 +81,9 @@ $(function (){
         success: function(data){
           $("#assignmentResults").html(data);
           $("#assignmentResults").show();
+          if($('input#assign_id').val()){
+            $('tr.unit#'+$('input#assign_id').val()).find('.ec_lessons').click();
+          }
           return false;
         },
         error: function(xhr, ajaxOptions, thrownError){

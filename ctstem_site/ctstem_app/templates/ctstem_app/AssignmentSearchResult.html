@@ -13,7 +13,7 @@
     {% for curriculum in curricula %}
 
       {% if curriculum.curriculum_type|slugify == 'Unit'|slugify %}
-        <tr class="{% if forloop.counter|divisibleby:2 %} even {% else %} odd {% endif %}">
+        <tr class="unit unit_{{curriculum.id}} {% if forloop.counter|divisibleby:2 %} even {% else %} odd {% endif %}" id="curr_{{curriculum.id}}">
           <td>
             {{curriculum.curriculum_type}}: {{curriculum.title}}
             <span class="ec_lessons" id="unit_{{curriculum.id}}">
@@ -34,11 +34,11 @@
           </td>
         </tr>
         {% for curr in curriculum.underlying_curriculum %}
-          <tr class="lesson unit_{{curriculum.id}} {% if forloop.parentloop.counter|divisibleby:2 %} even {% else %} odd {% endif %}">
+          <tr class="lesson unit_{{curriculum.id}} {% if forloop.parentloop.counter|divisibleby:2 %} even {% else %} odd {% endif %}" id="curr_{{curr.id}}" >
             <td style="display:none;">&emsp;&emsp;&emsp;&emsp;Lesson: {{curr.title}}</td>
             <td style="display:none; text-align:center;">
               {% if curr.assigned|slugify == 'False'|slugify %}
-                <button class="btn btn-info select_assignment lesson_{{curriculum.id}}" id="{{curr.id}}" name="{{curr.title}}">Assign Lesson</button>
+                <button class="btn btn-info select_assignment lesson" id="{{curr.id}}" name="{{curr.title}}">Assign Lesson</button>
               {% else %}
                 <div class="assignment_status">Lesson Assigned</div>
               {% endif %}
@@ -46,11 +46,11 @@
         </tr>
         {% endfor %}
       {% else %}
-        <tr class="{% if forloop.counter|divisibleby:2 %} even {% else %} odd {% endif %}">
+        <tr class="{% if forloop.counter|divisibleby:2 %} even {% else %} odd {% endif %}" id="curr_{{curriculum.id}}">
           <td>{{curriculum.curriculum_type}}: {{curriculum.title}}</td>
           <td style="text-align:center;">
             {% if curriculum.assigned|slugify == 'False'|slugify %}
-              <button class="btn btn-info select_assignment" id="{{curriculum.id}}" name="{{curriculum.title}}">Assign</button>
+              <button class="btn btn-info select_assignment" id="{{curriculum.id}}" name="{{curriculum.title}}">Assign {{curriculum.curriculum_type|title}}</button>
             {% else %}
               <div class="assignment_status">{{curriculum.curriculum_type|title}} Assigned</div>
             {% endif %}
@@ -78,22 +78,36 @@ $(function (){
     //if assigning a Unit get and assign all the underlying published lessons
     var curriculum_name = $(this).attr('name');
     var group_class_id = "{{group_id}}";
+    var curr_id = $(this).attr('id');
+    $('input#assign_id').val();
+    var keep_open_id = null;
+    if($(this).hasClass('lesson')){
+      var lesson_tr = $(this).closest('tr.lesson');
+      keep_open_id = $(lesson_tr).prevAll('tr.unit:first').attr('id');
+    }
+    else if($(this).hasClass('unit')){
+      keep_open_id = $(this).closest('tr.unit').attr('id');
+    }
     data = {}
     data['csrfmiddlewaretoken'] = $('#assignmentForm').find('input:hidden').eq(0).val();;
     var data = $.param(data);
     if(group_class_id){
       $.ajax({
         type: 'POST',
-        url: '/assignment/add/'+$(this).attr('id')+'/'+group_class_id+'/',
+        url: '/assignment/add/'+curr_id+'/'+group_class_id+'/',
         data: data,
         success: function(data){
           $('#assignmentMsg').addClass('success').html("Curriculum "+curriculum_name+" has been assigned");
+          //save the id of the clicked button row in a hidden input so the row can be expanded on reload
+          if(keep_open_id){
+            $('input#assign_id').val(keep_open_id);
+          }
+          $("#assignmentForm").submit();
         },
         error: function(xhr, ajaxOptions, thrownError){
           $('#assignmentMsg').removeClass('success').html("Something went wrong...");
         },
       });
-      $(this).attr('disabled', 'disabled');
     }
     else{
       alert('Select a class to assign this curriculum to');
