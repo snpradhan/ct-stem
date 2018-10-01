@@ -324,9 +324,9 @@ def get_referenced_questions(step, instance=False):
         if instance:
           #get the response for the question
           response = models.QuestionResponse.objects.get(curriculum_question=curr_question, step_response__instance=instance)
-          referenced_question.append((curr_question.question, response))
+          referenced_question.append((curr_question, response))
         else:
-          referenced_question.append(curr_question.question)
+          referenced_question.append(curr_question)
 
   if referenced_question:
     return referenced_question

@@ -58,12 +58,12 @@
         {% with referenced_questions=step|get_referenced_questions %}
           <h3> Referenced Questions </h3>
           <div class="help">These questions were answered in the previous steps.  They are provided here for your reference.</div>
-          {% for question in referenced_questions %}
+          {% for curr_question in referenced_questions %}
             <div class="referenced_question_response {% if forloop.counter|divisibleby:2 %} even {% else %} odd {% endif %}">
               <div class="question">
-                <label>Question:</label>
+                <label>Question {{curr_question.step.order}}.{{curr_question.order}}</label>
                 <div class="text">
-                  {{question.question_text|inline_style|safe}}
+                  {{curr_question.question.question_text|inline_style|safe}}
                 </div>
               </div>
             </div>
@@ -86,7 +86,7 @@
               {% if field_type != 'MH' %}
                 <div class="question_response_feedback {% if forloop.counter|divisibleby:2 %} even {% else %} odd {% endif %}">
                   <div class="question">
-                    <label>Question:</label>
+                    <label>Question {{step.order}}.{{forloop.counter}}</label>
                     <div class="text">
                       {{question|safe}}
                     </div>
