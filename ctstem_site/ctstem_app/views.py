@@ -52,6 +52,7 @@ def home(request):
   if hasattr(request.user, 'student') == True:
     return shortcuts.redirect('ctstem:assignments', bucket='inbox')
   else:
+    curricula = models.Curriculum.objects.all().filter(status='P', unit__isnull=True)[:3]
     lessons = models.Curriculum.objects.all().filter(curriculum_type = 'L', status='P')[:6]
     assessments = models.Curriculum.objects.all().filter(curriculum_type = 'A', status='P')[:6]
     practices = models.Category.objects.all().filter(standard__primary=True).select_related()
@@ -72,7 +73,7 @@ def home(request):
         requester_role = ''
 
     if request.method == 'GET':
-      context = {'lessons': lessons, 'assessments' : assessments, 'practices': practices, 'team': team, 'publications': publications}
+      context = {'curricula': curricula, 'lessons': lessons, 'assessments' : assessments, 'practices': practices, 'team': team, 'publications': publications}
       return render(request, 'ctstem_app/Home.html', context)
 
     return http.HttpResponseNotAllowed(['GET'])

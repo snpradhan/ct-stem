@@ -79,7 +79,7 @@ footer {
 footer div.footer_content {
   margin-bottom: 2em;
   color: white;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "proxima-nova", sans-serif;
 }
 /***********   FOOTER END   ************/
 
@@ -138,7 +138,7 @@ footer div.footer_content {
   vertical-align: top;
 }
 .navbar-default a.navbar-brand {
-  font-family: sans-serif;
+  font-family: "proxima-nova", sans-serif;
   font-size: 2.5em;
 }
 .navbar-default .navbar-nav > li.active > a, .navbar-default .navbar-nav > li.active > a:hover{
@@ -164,7 +164,7 @@ footer div.footer_content {
   color: white;
 }
 .navbar-login p {
-  font-family: 'Montserrat, sans-serif';
+  font-family: "proxima-nova", sans-serif;
   font-weight: 400;
   letter-spacing: 1px;
 }
@@ -710,11 +710,7 @@ div.content section.practice {
     padding-top: 20px;
   }
 }
-div.content#home section h3.section-subheading.text-muted {
-  line-height: 150%;
-  padding: 0 20px !important;
-  font-style: normal;
-}
+
 div.content section.portfolio {
   padding: 3em 1em;
 }
@@ -776,68 +772,6 @@ div.content section.portfolio.bg-light-gray .portfolio-item .portfolio-caption {
   background-color: #fff;
 }
 
-div.content#home section#about-us i.lessons {
-  color: #FED136;
-}
-div.content#home section#about-us i.standards {
-  color: #E7513A;
-}
-div.content#home section#about-us i.assessments {
-  color: #8C36FE;
-}
-div.content#home section#about-us i.training {
-  color: #26D4E7;
-}
-div.content#home section#about-us i.research {
-  color: #7BFF29;
-}
-div.content#home section#about-us i.tools {
-  color: #444;
-}
-div.content#home section#about-us p.text-muted {
-  text-align: left !important;
-}
-
-div.content#home section#research .portfolio-item .portfolio-caption{
-  text-align: left !important;
-  max-width: 100%;
-}
-div.content#home section#research .portfolio-item .portfolio-caption div {
-  margin-bottom: 0.5em;
-}
-div.content#home section#research .portfolio-item .portfolio-caption .title {
-  font-weight: bold;
-  font-size: 1.2em;
-}
-div.content#home section#research .portfolio-item .portfolio-caption .authors {
-  font-style: italic;
-}
-div.content#home section#research .portfolio-item .portfolio-caption .authors .journal {
-  font-style: normal;
-}
-div.content#home {
-  width: 100%;
-  font-size: 1.5em;
-  /*background-color: rgba(204,204,204, 1);
-  border-radius: 2em;*/
-  margin: 0 0 0 0;
-}
-
-div.content#home section#practices img.img-circle {
-  height: 100%;
-  width: 100%;
-}
-
-div.content#home section .explore_more {
-  text-align: center;
-}
-
-div.content#home section#contact {
-  background-color: #666;
-}
-div.content#home section#contact .text-muted {
-  color: #ddd;
-}
 div.content#assignments, div.content.teacher#classes {
   width: 80%;
 }
@@ -920,7 +854,7 @@ hr.light {
 
 /******** Button ***********/
 .btn-primary, .btn-default, .btn-success, .btn-danger, .btn-warning, .btn-info, .btn-gray, .btn-yellow, .btn-purple {
-  font-family: Montserrat, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "proxima-nova", sans-serif;
   text-transform: uppercase;
   font-weight: 700
 }
@@ -1029,7 +963,7 @@ div#reset_password .modal-content .modal-body .form-group div {
 
 div#profile .modal-content .modal-body {
   font-size: 1.3em;
-  font-family: Montserrat, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "proxima-nova", sans-serif;
 }
 div#profile .modal-content .modal-body h4{
   text-align: left !important;

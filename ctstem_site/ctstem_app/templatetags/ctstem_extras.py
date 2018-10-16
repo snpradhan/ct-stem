@@ -129,6 +129,14 @@ def getTaxonomy(value):
   return taxonomy
 
 @register.filter
+def getStandards(taxonomies):
+  standards = []
+  for taxonomy in taxonomies:
+    if taxonomy.category.standard not in standards:
+      standards.append(taxonomy.category.standard)
+  return standards
+
+@register.filter
 def getStudentInfo(value):
   student = models.Student.objects.get(id=value)
   return student
