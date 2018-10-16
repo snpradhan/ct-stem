@@ -3041,7 +3041,9 @@ def export_all_response(request, curriculum_id=''):
           sheet_title = sheet_title.replace(ch, "-")
 
       #truncate sheet_title to 25 characters
-      index = curr.order
+      index = 1
+      if curr.order:
+        index = curr.order
       sheet_title = (sheet_title[:25]+' ('+str(index)+')') if len(sheet_title) > 25 else sheet_title+' ('+str(index)+')'
 
       ws = wb.add_sheet(sheet_title)
