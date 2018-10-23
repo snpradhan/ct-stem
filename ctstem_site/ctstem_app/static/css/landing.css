@@ -12,20 +12,22 @@
   --landing-color-dark-blue: #343D51;
   --landing-color-gray: #A4A7BF;
   --landing-color-light-gray: #C1C4D9;
+  font-size: 10px;
 }
 #home {
   width: 100%;
   font-family: var(--landing-font-family) !important;
-  font-size: 10px;
   margin-top: 0;
+  letter-spacing: 0.05em;
 
 }
 #home h1, #home h2, #home h3, #home h4, #home h5, #home h6 {
   font-family: var(--landing-font-family) !important;
-  font-weight: 500; /* semi bold */
+  font-weight: 600; /* semi bold */
   color: #4e4e4e;
   text-transform: none;
   text-align: left;
+
 }
 #home h1.center, #home h2.center, #home h3.center, #home h4.center, #home h5.center, #home h6.center {
   text-align: center;
@@ -36,7 +38,11 @@
   color: #4e4e4e;
   text-transform: none;
   text-align: left;
+  font-size: 1.8em;
+  line-height: 1.3em;
+  margin-bottom: 1.5em;
 }
+
 #home h1 {
   font-size: 4em;
 }
@@ -48,10 +54,6 @@
 }
 #home h4 {
   font-size: 2em;
-}
-
-#home .block p {
- font-size: 1.3em;
 }
 
 #home .block .col-container {
@@ -66,11 +68,12 @@
 #home .btn {
   font-family: var(--landing-font-family) !important;
   text-transform: uppercase;
+  font-weight: 600;
 
 }
 
 #home .btn.big {
-  font-size: 1.2em;
+  font-size: 1.6em;
   color: white;
   background-color: var(--landing-color-blue);
   padding: 1em 1.6em;
@@ -81,7 +84,7 @@
   color: var(--landing-color-blue);;
 }
 #home .btn.normal {
-  font-size: 1em;
+  font-size: 1.4em;
   color: black;
   padding: 0.8em 1.6em;
   margin-right: 2em;
@@ -127,16 +130,20 @@
 
 #home .block .col-container .col li {
   list-style: none;
-  font-size: 1.2em;
+  font-size: 1.6em;
   color: black;
-  margin-bottom: 1.7em;
+  margin-bottom: 2em;
   display: block;
+  line-height: 1.2em;
 }
 #home .block .col-container .col li span {
   display: inline-block;
-  width: 90%;
+  width: 80%;
 }
-#home .block .col-container .col li .light {
+#home .block .col-container .col li span.dark {
+  margin-bottom: 0.5em;
+}
+#home .block .col-container .col li span.light {
   color: #ccc;
 }
 
@@ -158,7 +165,7 @@
   margin-right: auto;
 }
 
-#home .block#one h3{
+#home .block#one h2{
   margin-bottom: 1.6em;
 }
 #home .block#one p{
@@ -197,7 +204,7 @@
   width: auto;
   margin-right: 2.4em;
   float: right;
-  margin-top: 7em;
+  margin-top: 5.5vw;
 }
 
 #home .block#one .col.right #video iframe {
@@ -270,9 +277,9 @@
 }
 
 #home .block#two p.shaded {
-  font-size: 1em;
-  color: gray;
+  color: var(--landing-color-gray);
   text-align: center;
+  font-size: 1.6em;
 }
 
 /**************************/
@@ -286,7 +293,7 @@
   text-align: center;
 
 }
-#home .block#three h3 {
+#home .block#three h2 {
   color: white;
   margin-bottom: 1.25em;
 }
@@ -303,14 +310,14 @@
   border: 1px solid #ccc;
   margin: 1em;
   border-radius: 3px;
-  width: 27em;
-  height: 35em;
+  width: 38em;
+  height: 48em;
   box-shadow: -0.8em 0.8em var(--landing-color-medium-blue);
 }
 
 #home .block#three .tile .icon {
   background-color: #ccc;
-  height: 19em;
+  height: 25em;
   border-top-right-radius: 3px;
   border-top-left-radius: 3px;
 }
@@ -321,28 +328,36 @@
 }
 #home .block#three .tile .detail {
   background-color: white;
-  height: 16em;
+  height: 23em;
   border-bottom-right-radius: 3px;
   border-bottom-left-radius: 3px;
   text-align: left;
-  padding: 0.8em;
+  padding: 1.6em;
   position: relative;
 }
 #home .block#three .tile .detail .type {
   text-transform: uppercase;
   margin-bottom: 0.6em;
+  font-size: 1.4em;
+  font-weight: 600;
 }
 #home .block#three .tile .detail .period {
   color: #7d7d7d;
   margin-bottom: 1.6em;
+  font-size: 1.4em;
+  font-weight: 400;
 }
 #home .block#three .tile .detail .title {
-  font-size: 1.3em;
+  font-size: 2em;
+  font-weight: 600;
+  line-height: 1em;
 }
 #home .block#three .tile .detail .others {
   color: #ccc;
   position: absolute;
   bottom: 0.8em;
+  font-size: 1.4em;
+  font-weight: 400;
 }
 #home .block#three .tile .detail .others .author {
   margin-bottom: 0.6em;
@@ -390,23 +405,27 @@
 
 }
 
-#home .block#five h3, #home .block#five h4,
-#home .block#six h3, #home .block#six h4 {
+#home .block#five h2, #home .block#five h3,
+#home .block#six h2, #home .block#six h3 {
   margin-top: 0;
 }
-#home .block#four h3, #home .block#four h4,
-#home .block#seven h3, #home .block#seven h4 {
+#home .block#four h2, #home .block#seven h2 {
   margin-top: 2em;
 }
-#home .block#four h3, #home .block#four h4,
-#home .block#five h3, #home .block#five h4,
-#home .block#six h3, #home .block#six h4,
-#home .block#seven h3, #home .block#seven h4 {
+#home .block#four h3, #home .block#seven h3 {
+   margin-top: 2.5em;
+   margin-bottom: 1.4em;
+}
+
+#home .block#four h2,
+#home .block#five h2, #home .block#five h3,
+#home .block#six h2, #home .block#six h3,
+#home .block#seven h2 {
   margin-bottom: 1em;
 
 }
 
-#home .block#four h4 {
+#home .block#four h3 {
   color: var(--landing-color-yellow);
 }
 #home .block#four .col-container,
@@ -472,98 +491,6 @@
 /**************************/
 /* END */
 /**************************/
-#home a:hover {
-  text-decoration: none;
-}
-
-
-#home .tagline {
-  font-family: Montserrat, "Helvetica Neue", Helvetica, Arial, sans-serif;
-  padding: 2rem;
-  font-size: 1.7rem;
-  line-height: 160%;
-  text-transform: none;
-  color: black;
-}
-
-
-#home img.institution {
-  height: 65px;
-  margin: 20px 40px 40px 40px;
-}
-
-#home .ctstem-content {
-  height: auto;
-  margin: 0 auto;
-  min-width: 650px;
-  width: 75%;
-  color: black;
-}
-
-
-#home .ctstem-content p {
-  font-size: 1.8rem;
-  font-weight: 300;
-  line-height: 150%;
-  text-align: justify;
-  margin: 1rem;
-}
-
-
-#home img.section-splash {
-  margin: 0 0 7rem 0;
-  width: 100%;
-}
-
-
-#home #offerings {
-  padding: 5rem 0 10rem 0;
-  background-color: white;
-}
-
-
-#home .offering {
-  display: inline-block;
-  vertical-align: top;
-  width: 49%;
-  padding: 20px;
-  margin: 0;
-  text-align: left;
-}
-
-
-#home .offering p {
-  font-size: 1.5rem;
-  text-align: left;
-  margin: 0;
-}
-
-
-#home #practices {
-  margin: 10rem 0 0 0;
-  padding: 5rem 0 10rem 0;
-  background-color: #eee;
-}
-
-
-
-#home .practice {
-  margin: 4rem 0 0 1rem;
-  display: block;
-}
-
-
-#home .practice p {
-  font-size: 1.5rem;
-  margin: 0;
-  width: 75%;
-}
-
-#home #assessments {
-  margin: 0 0 5rem 0;
-}
-
-
 
 @media screen and (min-width: 1201px) {
   #home {
@@ -572,13 +499,13 @@
 }
 @media screen and (max-width: 1200px) {
   #home {
-    font-size: 0.9em;
+    font-size: 0.7em;
   }
   #home .block#one .col-container  .col .dialog {
     margin-top: 3em;
   }
   #home .block#two .col-container  .col {
-    width: 20em;
+    width: 25em;
   }
   #home .block#four .col-container,
   #home .block#five .col-container,
@@ -589,7 +516,7 @@
   }
 }
 
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 800px) {
   #home {
     font-size: 0.8em;
   }
