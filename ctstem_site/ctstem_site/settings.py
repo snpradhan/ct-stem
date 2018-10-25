@@ -98,7 +98,7 @@ CKEDITOR_CONFIGS = {
         'height': 100,
         'width': '115%',
         'allowedContent': True,
-        'mathJaxLib': '//cdn.mathjax.org/mathjax/2.2-latest/MathJax.js?config=TeX-AMS_HTML',
+        'mathJaxLib': '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_HTMLorMML',
         'codeSnippet_theme': 'monokai_sublime',
         'extraPlugins': ','.join(
             ['mathjax', 'codesnippet', 'scayt']
@@ -112,7 +112,7 @@ CKEDITOR_CONFIGS = {
         'toolbar': None,  # put selected toolbar config here
         'height': 100,
         'width': '98%',
-        'mathJaxLib': '//cdn.mathjax.org/mathjax/2.2-latest/MathJax.js?config=TeX-AMS_HTML',
+        'mathJaxLib': '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_HTMLorMML',
         'extraPlugins': ','.join(
             ['mathjax', 'scayt']
         ),
