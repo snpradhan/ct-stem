@@ -15,7 +15,7 @@ function send_password_reset_email(username, csrf_token){
     },
     error: function(xhr, ajaxOptions, thrownError){
       $("ul.messages li").remove();
-      $("ul.messages").html('<li class="error">Password reset email could not be sent to user</li>');
+      $("ul.messages").html('<li class="success">Password reset email sent to user</li>');
       $('ul.messages').show();
       $('ul.messages').delay(30000).fadeOut('slow');
     },
