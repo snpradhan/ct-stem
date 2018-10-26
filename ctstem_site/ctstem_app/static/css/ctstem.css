@@ -1,4 +1,15 @@
 /* Page Element Styles */
+:root {
+  --ctstem-font-family: "proxima-nova", sans-serif;
+  --ctstem-color-yellow: #FFD028;
+  --ctstem-color-blue: #00ADFF;
+  --ctstem-color-medium-blue: #3A74E8;
+  --ctstem-color-dark-blue: #343D51;
+  --ctstem-color-gray: #A4A7BF;
+  --ctstem-color-light-gray: #C1C4D9;
+  --ctstem-color-red: #F24878;
+  font-size: 10px;
+}
 html {
   height: 100%;
 }
@@ -11,6 +22,7 @@ body {
   font-weight:normal;
   line-height:1.5em;
   height: 100%;
+  font-family: "proxima-nova", sans-serif !important;
 }
 
 /* basic layout Styles */
@@ -70,17 +82,74 @@ a {
             *   FOOTER   *
  ***************************************/
 footer {
-  font-size: 1.3em;
   text-align: left;
-  background-color: #333;
+  background-color: var(--ctstem-color-dark-blue);
   padding-top: 4rem;
 }
 
-footer div.footer_content {
-  margin-bottom: 2em;
-  color: white;
+footer .col-container {
+  margin-left: auto;
+  margin-right: auto;
   font-family: "proxima-nova", sans-serif;
 }
+footer > .col-container {
+  width: 80%;
+  justify-content: space-around;
+  margin-bottom: 5em;
+}
+footer .col-container h4 {
+  color: var(--ctstem-color-blue);
+}
+footer .col-container p {
+  color: var(--ctstem-color-light-gray) !important;
+  font-size: 1.4em;
+}
+footer > .col-container .col.left {
+  width: 30%;
+}
+footer > .col-container .col.right {
+  width: 50%;
+}
+
+footer > .col-container .col.left .col {
+  width: 40%;
+}
+footer > .col-container .col.left .col ul{
+  list-style: none;
+  padding-left: 0;
+  font-size: 1.4em;
+}
+footer > .col-container .col.left .col ul li{
+  margin-bottom: 0.75em;
+}
+
+footer > .col-container .col.right .col-container {
+  justify-content: space-around;
+  align-items: center;
+}
+footer > .col-container .col.right .col {
+  text-align: center;
+}
+footer > .col-container .col.right .col img {
+  height: 7em;
+  width: auto;
+  margin-bottom: 2em;
+}
+footer a:not(.btn) {
+  color: white;
+  text-decoration: underline;
+}
+footer > .col-container .col.end {
+  width: 90%;
+}
+footer hr {
+  border-top: 1px solid var(--ctstem-color-light-gray);
+  margin-bottom: 3em;
+}
+footer h4 {
+  text-align: left;
+}
+
 /***********   FOOTER END   ************/
 
 
@@ -126,13 +195,17 @@ footer div.footer_content {
  .navbar-default {
   background-image: none !important;
   border: none;
-  background-color: #222;
+  background-color: #fff;
   padding: 10px 0;
   margin-bottom: 10px;
+  box-shadow: none;
+  color: black;
 }
-
+.navbar-default .container {
+  width: 90% !important;
+}
 .navbar-default .navbar-nav {
-  font-size: 1.2em;
+  font-size: 1.6em;
   display: inline-block;
   float: none;
   vertical-align: top;
@@ -140,39 +213,94 @@ footer div.footer_content {
 .navbar-default a.navbar-brand {
   font-family: "proxima-nova", sans-serif;
   font-size: 2.5em;
+  color: black !important;
 }
-.navbar-default .navbar-nav > li.active > a, .navbar-default .navbar-nav > li.active > a:hover{
+
+.dropdown-menu {
+  font-size: inherit;
+}
+.navbar-default .navbar-nav > li > a,
+.dropdown-menu > li > a {
+  color: black !important;
+  border: 0 !important;
   background-image: none !important;
+  background-color: white !important;
+  text-transform: none !important;
+  font-family: var(--ctstem-font-family) !important;
+  margin-left: 2em;
+}
+
+.navbar-default .navbar-nav > li.active > a,
+.navbar-default .navbar-nav > li.active > a:hover
+.navbar-default .navbar-nav > li > a:hover,
+.navbar-default .navbar-nav > .open > a,
+.dropdown-menu > li.active > a,
+.dropdown-menu > li.active > a:hover
+.dropdown-menu > li > a:hover {
+  background-image: none !important;
+  background-color: white !important;
+  color: black !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  text-transform: none !important;
+}
+
+.navbar-default .navbar-nav > li a.btn.normal {
+  font-family: var(--ctstem-font-family) !important;
+  font-weight: 600 !important;
+  padding: 0.8em 1.6em !important;
+  font-size: 1em !important;
+  margin-bottom: 0 !important;
+  margin-right: 0 !important;
+
+}
+.navbar-default .navbar-nav > li a.btn.blue {
+  background-color: var(--ctstem-color-blue) !important;
+  color: white !important;
+}
+.navbar-default .navbar-nav > li a.btn.blue:hover {
+  border: 1px solid var(--ctstem-color-blue) !important;
+  background-color: #ffffff !important;
+  color: var(--ctstem-color-blue) !important;
+}
+
+.navbar-default .navbar-nav > li > a:hover,
+.dropdown-menu > li > a:hover,
+.navbar-default .navbar-nav > .open > a {
+  border-bottom: 4px solid #A4A7BF !important;
+}
+.navbar-default .navbar-nav > li.active > a,
+.dropdown-menu > li.active > a {
+  font-weight: 600;
+  border-bottom: 4px solid #FFD028 !important;
 }
 .navbar-default .dropdown-menu{
   background-image: none !important;
-  border: none;
-  background-color: #222;
-  padding: 0;
-  font-size: 1em;
+  background-color: #fff;
+  padding: 1em;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  box-shadow: -10px 10px #ccc;
+  margin-top: 0.5em !important;
 }
 .dropdown-menu > li > a {
-  padding: 10px 20px;
+  padding: 1em 0;
+  margin: 0 1em;
 }
-.navbar-default .navbar-right li a.login {
-  color: #fed136;
+.navbar-default .dropdown-menu > li  a.btn.normal {
+  font-size: 0.85em !important;
 }
-.navbar-login {
-  width: 305px;
-  padding: 10px;
-  padding-bottom: 0px;
-  color: white;
+.dropdown-menu .col-container {
+  margin: 0.75em 0;
 }
-.navbar-login p {
-  font-family: "proxima-nova", sans-serif;
-  font-weight: 400;
-  letter-spacing: 1px;
+.dropdown-menu .col-container .col {
+  margin: 0 0.5em;
 }
-
-.navbar-login-session {
-  padding: 10px;
-  padding-bottom: 0px;
-  padding-top: 0px;
+.dropdown-menu .col-container .col .icon {
+  font-size: 2.5em;
+}
+.dropdown-menu .col-container .col .profile {
+  margin-bottom: 0.75em;
 }
 
 .icon-size{
@@ -887,6 +1015,62 @@ div.content #curricula_tile  .row.button a {
   margin-right: 1em;
 }
 
+.btn {
+  font-family: var(--ctstem-font-family) !important;
+  text-transform: uppercase !important;
+  font-weight: 600 !important;
+
+}
+
+.btn.big {
+  font-size: 1.6em !important;
+  padding: 1em 1.6em !important;
+}
+
+.btn.normal {
+  font-size: 1.4em !important;
+  padding: 0.8em 1.6em !important;
+  margin-right: 2em !important;
+  margin-bottom: 2em !important;
+}
+
+.btn.blue {
+  background-color: var(--ctstem-color-blue) !important;
+  color: white !important;
+}
+.btn.blue:hover {
+  border: 1px solid var(--ctstem-color-blue) !important;
+  background-color: #ffffff !important;
+  color: var(--ctstem-color-blue) !important;
+}
+.btn.yellow {
+  background-color: var(--ctstem-color-yellow) !important;
+  color: black !important;
+}
+.btn.yellow:hover {
+  border: 1px solid var(--ctstem-color-yellow) !important;
+  background-color: #ffffff !important;
+  color: var(--ctstem-color-yellow) !important;
+}
+.btn.white {
+  border: 1px solid var(--ctstem-color-light-gray) !important;
+  background-color: #ffffff !important;
+  color: black !important;
+}
+.btn.white:hover {
+  background-color: var(--ctstem-color-light-gray) !important;
+  color: #ffffff !important;
+}
+.btn.red {
+  background-color: var(--ctstem-color-red) !important;
+  color: white !important;
+}
+.btn.red:hover {
+  border: 1px solid var(--ctstem-color-red) !important;
+  background-color: #ffffff !important;
+  color: var(--ctstem-color-red) !important;
+}
+
 /********************/
 
 /***************************************
@@ -1018,8 +1202,48 @@ ul#id_student-consent li {
   text-align: center;
 }
 
+
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--ctstem-font-family) !important;
+  font-weight: 600; /* semi bold */
+  color: #4e4e4e;
+  text-transform: none;
+}
+
 h2.left, h3.left, h4.left {
   text-align: left;
+}
+p {
+  font-family: var(--ctstem-font-family) !important;
+  font-weight: 400; /* normal */
+  color: #4e4e4e;
+  text-transform: none;
+  font-size: 1.8em;
+  line-height: 1.3em;
+  margin-bottom: 1.5em;
+}
+
+h1 {
+  font-size: 4em;
+}
+h2 {
+  font-size: 3.6em;
+}
+h3 {
+  font-size: 2.4em;
+}
+h4 {
+  font-size: 2em;
+}
+
+.col-container {
+  display: flex;
+  width: 100%;
+}
+
+.col-container  .col {
+  position: relative;
 }
 
 /*.h1, h1 {
