@@ -52,7 +52,7 @@ def home(request):
   if hasattr(request.user, 'student') == True:
     return shortcuts.redirect('ctstem:assignments', bucket='inbox')
   else:
-    curricula = models.Curriculum.objects.all().filter(status='P', unit__isnull=True)[:3]
+    curricula = models.Curriculum.objects.all().filter(status='P', unit__isnull=True)[:4]
     lessons = models.Curriculum.objects.all().filter(curriculum_type = 'L', status='P')[:6]
     assessments = models.Curriculum.objects.all().filter(curriculum_type = 'A', status='P')[:6]
     practices = models.Category.objects.all().filter(standard__primary=True).select_related()

@@ -490,42 +490,40 @@
 
 
       <div class="col-container">
-        <div class="col left">
-          <div class="col-container">
-            <div class="col left">
-              <h4>For you</h4>
-              <ul>
-                <li><a href="{% url 'ctstem:curricula' 'units' %}">Teaching Resources</a></li>
-                <li><a class="page-scroll" href="{% url 'ctstem:home' %}#five">Intro to CT</a></li>
-                <li><a href="{% url 'ctstem:training' %}">Training</a></li>
-                {% if user.is_anonymous %}
-                  <li><a href="{% url 'ctstem:login' %}">Login</a></li>
-                {% endif %}
-              </ul>
+        <div class="col left resources">
+          <div class="resource">
+            <h4>For you</h4>
+            <ul>
+              <li><a href="{% url 'ctstem:curricula' 'units' %}">Teaching Resources</a></li>
+              <li><a class="page-scroll" href="{% url 'ctstem:home' %}#five">Intro to CT</a></li>
+              <li><a href="{% url 'ctstem:training' %}">Training</a></li>
+              {% if user.is_anonymous %}
+                <li><a href="{% url 'ctstem:login' %}">Login</a></li>
+              {% endif %}
+            </ul>
 
-            </div>
-            <div class="col right">
-               <h4>About us</h4>
-               <ul>
-                <li><a href="{% url 'ctstem:standards' %}">Standards</a></li>
-                <li><a class="page-scroll" href="{% url 'ctstem:publications' %}#five">Research</a></li>
-                <li><a href="{% url 'ctstem:team' %}">Team</a></li>
-              </ul>
-            </div>
+          </div>
+          <div class="resource">
+             <h4>About us</h4>
+             <ul>
+              <li><a href="{% url 'ctstem:standards' %}">Standards</a></li>
+              <li><a class="page-scroll" href="{% url 'ctstem:publications' %}#five">Research</a></li>
+              <li><a href="{% url 'ctstem:team' %}">Team</a></li>
+            </ul>
           </div>
         </div>
 
         <div class="col right">
           <h4>Sponsors</h4>
           <p>This project was made possible through generous support from both the National Science Foundation and the Spencer Foundation.</p>
-          <div class="col-container">
-            <div class="col">
+          <div class="logos">
+            <div class="logo">
               <img src="/static/img/nsf_logo_white.png" class="logo" alt="">
             </div>
-            <div class="col">
+            <div class="logo">
               <img src="/static/img/spencer_logo.png" class="logo">
             </div>
-            <div class="col">
+            <div class="logo">
               <img src="/static/img/nu-logo.png" class="logo" alt="">
             </div>
           </div>
