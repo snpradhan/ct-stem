@@ -1,7 +1,7 @@
 {% load ctstem_extras %}
 <div class="form-group">
   {% if user.administrator or user.school_administrator%}
-    <a type="button" class="btn btn-info" href="{% url 'ctstem:register' %}" title="Add a new user">
+    <a type="button" class="btn btn-info modal-open" data-toggle="modal" data-href="{% url 'ctstem:register' %}" data-target="#register" href="#" title="Add a new user">
       <span class="glyphicon glyphicon-user" aria-hidden="true"></span> Create User
     </a>
   {% endif %}

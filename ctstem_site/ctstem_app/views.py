@@ -73,7 +73,16 @@ def home(request):
         requester_role = ''
 
     if request.method == 'GET':
-      context = {'curricula': curricula, 'lessons': lessons, 'assessments' : assessments, 'practices': practices, 'team': team, 'publications': publications}
+      redirect_url = request.GET.get('next', '')
+      target = None
+      print 'redirect_url', redirect_url
+      if 'register' in redirect_url:
+        target = '#register'
+      elif 'validate' in redirect_url:
+        target = '#validate'
+      elif 'password_reset' in redirect_url:
+        target = '#password'
+      context = {'curricula': curricula, 'lessons': lessons, 'assessments' : assessments, 'practices': practices, 'team': team, 'publications': publications, 'redirect_url': redirect_url, 'target': target}
       return render(request, 'ctstem_app/Home.html', context)
 
     return http.HttpResponseNotAllowed(['GET'])
@@ -726,6 +735,8 @@ def assignCurriculum(request, id=''):
   except models.Curriculum.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested curriculum not found</h1>')
 
+
+
 ####################################
 # PRE-REGISTER
 # if student email exists, add them to the class
@@ -766,7 +777,7 @@ def preregister(request, group_code=''):
 ####################################
 # REGISTER
 ####################################
-def register(request, group_code=''):
+def register(request, group_code='', email=''):
   group_id = None
   if group_code:
     group = models.UserGroup.objects.get(group_code=group_code)
@@ -786,6 +797,7 @@ def register(request, group_code=''):
     #print request.POST.copy()
     school_form = None
     new_school = None
+    response_data = {}
     if group_id:
       form = forms.RegistrationForm(user=request.user, data=request.POST, group_id=group_id)
     else:
@@ -795,12 +807,14 @@ def register(request, group_code=''):
     if form.is_valid():
       # checking for bot signup
       # anonymous users signing up as teachers need to go through recaptcha validation
-      if request.user.is_anonymous() and group_id == '':
+      if request.user.is_anonymous() and group_id is None:
         recaptcha_response = request.POST.get('g-recaptcha-response')
         is_human = validate_recaptcha(request, recaptcha_response)
         if not is_human:
           context = {'form': form, 'school_form': school_form, 'other_school': other_school, 'recaptcha_error':  'Invalid reCAPTCHA'}
-          return render(request, 'ctstem_app/Registration.html', context)
+          response_data['success'] = False
+          response_data['html'] = render_to_string('ctstem_app/RegistrationModal.html', context, context_instance=RequestContext(request))
+          return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 
       #convert username to lowercase
       username = form.cleaned_data['username'].lower()
@@ -841,8 +855,9 @@ def register(request, group_code=''):
             print school_form.errors
             user.delete()
             context = {'form': form, 'school_form': school_form, 'other_school': other_school }
-            return render(request, 'ctstem_app/Registration.html', context)
-
+            response_data['success'] = False
+            response_data['html'] = render_to_string('ctstem_app/RegistrationModal.html', context, context_instance=RequestContext(request))
+            return http.HttpResponse(json.dumps(response_data), content_type="application/json")
         else:
           newUser.school = form.cleaned_data['school']
         newUser.user = user
@@ -878,7 +893,6 @@ def register(request, group_code=''):
         newUser.save()
         role = 'content author'
 
-
       current_site = Site.objects.get_current()
       domain = current_site.domain
 
@@ -887,17 +901,18 @@ def register(request, group_code=''):
         #account type created is Admin, Researcher, Content Author, School Principal
         if form.cleaned_data['account_type'] in ['A', 'R', 'C', 'P']:
           #send an email to the registering user
-          messages.info(request, 'Your account is pending admin approval.  You will be notified once your account is approved.')
-          #send email confirmation
           send_account_pending_email(role, newUser.user)
-          return shortcuts.redirect('ctstem:home')
+          response_data['success'] = True
+          response_data['message'] = 'Your account is pending admin approval.  You will be notified once your account is approved.'
+
 
         #account type created is Teacher
         elif form.cleaned_data['account_type'] == 'T':
           #send an email with the username and validation code to validate the account
-          messages.info(request, 'An email has been sent to %s to validate your account.  Please validate your account with in 24 hours.' % newUser.user.email)
           send_teacher_account_validation_email(newUser)
-          return shortcuts.redirect('ctstem:home')
+          response_data['success'] = True
+          response_data['message'] = 'An email has been sent to %s to validate your account.  Please validate your account with in 24 hours.' % newUser.user.email
+
 
         #account type created is Student
         elif form.cleaned_data['account_type'] == 'S':
@@ -907,35 +922,47 @@ def register(request, group_code=''):
           messages.info(request, 'Your have successfully registered.')
 
           send_student_account_by_self_confirmation_email(newUser.user, group)
-          return shortcuts.redirect('ctstem:home')
+          response_data['success'] = True
+
+        else:
+          response_data['success'] = False
+          messages.error(request, 'Sorry you cannot create this user account')
+
+        response_data['redirect_url'] = '/'
 
       else:
-        messages.info(request, '%s account has been created.' % role.title())
+        response_data['message'] = '%s account has been created.' % role.title()
         send_account_by_admin_confirmation_email(role, newUser.user, form.cleaned_data['password1'])
-
+        url = '/'
         if form.cleaned_data['account_type'] == 'A':
-          return shortcuts.redirect('ctstem:users', role='admins')
+          url = '/users/admins'
         elif form.cleaned_data['account_type'] == 'R':
-          return shortcuts.redirect('ctstem:users', role='researchers')
+          url = '/users/researchers'
         elif form.cleaned_data['account_type'] == 'P':
-          return shortcuts.redirect('ctstem:users', role='school_administrators')
+          url = '/users/school_administrators'
         elif form.cleaned_data['account_type'] == 'C':
-          return shortcuts.redirect('ctstem:users', role='authors')
+          url = '/users/authors'
         elif form.cleaned_data['account_type'] == 'T':
-          return shortcuts.redirect('ctstem:users', role='teachers')
+          url = '/users/teachers'
         elif form.cleaned_data['account_type'] == 'S':
-          return shortcuts.redirect('ctstem:users', role='students')
-        return render(request, 'ctstem_app/About_us.html')
+          url = '/users/students'
+
+        response_data['success'] = True
+        response_data['redirect_url'] = url
 
     else:
       print form.errors
       if group_id:
-        context = {'form': form, 'group_id': group_id, 'school_id': school.id}
+        context = {'form': form, 'group_id': group_id, 'school_id': school.id, 'group_code': group_code, 'email': email}
       else:
+        school_form.is_valid()
         context = {'form': form, 'school_form': school_form, 'other_school': other_school }
+      response_data['success'] = False
+      response_data['html'] = render_to_string('ctstem_app/RegistrationModal.html', context, context_instance=RequestContext(request))
 
-      return render(request, 'ctstem_app/Registration.html', context)
+    return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 
+  ########### GET ###################
   else:
     print request.user
 
@@ -947,9 +974,10 @@ def register(request, group_code=''):
       if 'email' in request.GET:
         email = request.GET['email']
         form = forms.RegistrationForm(initial={'email': email}, user=request.user, group_id=group_id)
+        context = {'form': form, 'group_id': group_id, 'school_id': school.id, 'group_code': group_code, 'email': email}
       else:
         form = forms.RegistrationForm(user=request.user, group_id=group_id)
-      context = {'form': form, 'group_id': group_id, 'school_id': school.id}
+        context = {'form': form, 'group_id': group_id, 'school_id': school.id, 'group_code': group_code}
     elif request.user.is_anonymous():
       form = forms.RegistrationForm(user=request.user)
       school_form = forms.SchoolForm(instance=school, prefix='school')
@@ -968,7 +996,7 @@ def register(request, group_code=''):
       school_form = forms.SchoolForm(instance=school, prefix='school')
       context = {'form': form, 'school_form': school_form, 'other_school': other_school}
 
-    return render(request, 'ctstem_app/Registration.html', context)
+    return render(request, 'ctstem_app/RegistrationModal.html', context)
 
 ####################################
 # Validate reCAPTCHA response during
@@ -995,30 +1023,45 @@ def validate_recaptcha(request, recaptcha_response):
 ####################################
 def user_login(request):
   username = password = ''
-  if 'POST' == request.method:
-    username = request.POST.get('username').lower()
-    password = request.POST.get('password')
-    user = authenticate(username=username, password=password)
+  print request.method
+  if request.method == 'POST':
+    data = request.POST.copy()
+    form = forms.LoginForm(data)
     response_data = {}
-    if user is not None and user.is_active:
-      login(request, user)
-      response_data['result'] = 'Success'
-      if hasattr(user, 'teacher'):
-        response_data['role'] = 'teacher'
-        messages.success(request, "Welcome to the CT-STEM website.  If you need help with using the site, you can checkout the help videos on the Training page <a href='/training#help_videos'>here</a>", extra_tags='safe');
-      else:
-        response_data['role'] = 'non-teacher'
-        messages.success(request, "You have logged in")
-    else:
-      response_data['result'] = 'Failed'
-      if user and user.is_active == False:
-        response_data['message'] = 'Your account has not been activated'
-      else:
-        response_data['message'] = 'Your username and/or password is invalid'
-    return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+    if form.is_valid():
+      username = form.cleaned_data['username'].lower()
+      password = form.cleaned_data['password']
+      user = authenticate(username=username, password=password)
 
-  elif 'GET' == request.method:
-    return shortcuts.redirect('ctstem:home')
+      if user.is_active:
+        login(request, user)
+        if hasattr(user, 'teacher'):
+          messages.success(request, "Welcome to the CT-STEM website.  If you need help with using the site, you can checkout the help videos on the Training page <a href='/training#help_videos'>here</a>", extra_tags='safe');
+          response_data['success'] = True
+          response_data['redirect_url'] = '/groups/active/'
+
+        else:
+          messages.success(request, "You have logged in")
+          response_data['success'] = True
+          response_data['redirect_url'] = '/'
+
+      else:
+        messages.error(request, 'Your account has not been activated')
+        context = {'form': form}
+        response_data['success'] = False
+        response_data['html'] = render_to_string('ctstem_app/LoginModal.html', context, context_instance=RequestContext(request))
+    else:
+      context = {'form': form}
+      response_data['success'] = False
+      response_data['html'] = render_to_string('ctstem_app/LoginModal.html', context, context_instance=RequestContext(request))
+
+    return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+  elif request.method == 'GET':
+    form = forms.LoginForm()
+    context = {'form': form}
+    return render(request, 'ctstem_app/LoginModal.html', context)
+
+  return http.HttpResponseNotAllowed(['GET', 'POST'])
 
 ####################################
 # USER LOGOUT
@@ -1218,10 +1261,10 @@ def consent(request):
     response_data = {}
     if form.is_valid():
       form.save()
-      response_data['result'] = 'Success'
+      response_data['success'] = True
       messages.success(request, "Thank you for submitting the opt-in form")
     else:
-      response_data['result'] = 'Failed'
+      response_data['success'] = False
       response_data['message'] = 'Please select "I Agree" or "I Disagree" and submit this form to proceed'
     return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 
@@ -3124,7 +3167,7 @@ def get_response_text(request, instance_id, questionResponse):
   if answer_field_type == 'SK' or answer_field_type == 'DT':
     current_site = Site.objects.get_current()
     domain = current_site.domain
-    response_text = 'http://%s/response/%d/%d'%(domain, instance_id, questionResponse.id)
+    response_text = 'https://%s/response/%d/%d'%(domain, instance_id, questionResponse.id)
   elif answer_field_type == 'FI':
     uploaded_files = questionResponse.response_file.all()
     response_text = ''
@@ -3328,10 +3371,11 @@ def user_upload(request):
         msg['error'].append('Invalid emails found: %d' % (invalid))
         messages.error(request, 'Invalid emails found: %d' % (invalid))
 
-      response_data = {'result': 'Success', 'new_students': added_students, 'messages': msg}
+      response_data = {'success': True, 'new_students': added_students, 'messages': msg}
     else:
       print form.errors
-      response_data = {'result': 'Failure', 'message': 'Please select a group and either a list of student emails or a student email csv to upload.'}
+      response_data = {'success': False, 'message': 'Please select a group and either a list of student emails or a student email csv to upload.'}
+
     return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 
   return http.HttpResponseNotAllowed(['POST'])
@@ -3344,13 +3388,13 @@ def send_account_pending_email(role, user):
   current_site = Site.objects.get_current()
   domain = current_site.domain
   #send an email to registering user about pending account
-  body = '<div> Welcome to Computational Thinking in STEM website http://%s.  <div> \
+  body = '<div> Welcome to Computational Thinking in STEM website https://%s.  <div> \
           <div> Your <b>%s</b> account is pending admin approval, and you will be notified once approved. </div>  <br>\
           <div><b>CT-STEM Admin</b></div>' % (domain, role.title())
   send_mail('CT-STEM - %s Account Pending' % role.title(), body, settings.DEFAULT_FROM_EMAIL, [user.email], html_message=body)
 
   #send an email to the site admin
-  body = '<div>%s has requested <b>%s</b> account on http://%s.  You may approve the user account here http://%s/user/%d/.  </div>  <br>\
+  body = '<div>%s has requested <b>%s</b> account on https://%s.  You may approve the user account here https://%s/user/%d/.  </div>  <br>\
           <div><b>CT-STEM Admin</b></div>' % (user.get_full_name(), role.title(), user.username, domain, domain, user.id)
   send_mail('CT-STEM - %s Account Approval Request' % role.title(), body, settings.DEFAULT_FROM_EMAIL, [settings.DEFAULT_FROM_EMAIL], html_message=body)
 
@@ -3364,7 +3408,7 @@ def send_student_account_request_email(email, group):
   domain = current_site.domain
   body = '<div>Your teacher has requested you to create an account on Computational Thinking in STEM website </div><br> \
           <div>Click the link below and follow the instructions on the webpage to create a student account. </div><br> \
-          <div>http://%s/register/group/%s?email=%s  </div><br> \
+          <div>https://%s?next=/register/group/%s/%s/  </div><br> \
           <div>If clicking the link does not seem to work, you can copy and paste the link into your browser&#39;s address window, </div> \
           <div>or retype it there. Once you have returned to CT-STEM, we will give instructions for creating an account. </div><br> \
           <div><b>CT-STEM Admin</b></div>'%(domain, group.group_code, email)
@@ -3379,7 +3423,7 @@ def send_account_by_admin_confirmation_email(role, user, password):
   #email user the  user name and password
   current_site = Site.objects.get_current()
   domain = current_site.domain
-  body = '<div>Your <b>%s</b> account has been created on Computational Thinking in STEM website http://%s.  </div> \
+  body = '<div>Your <b>%s</b> account has been created on Computational Thinking in STEM website https://%s.  </div> \
           <div>Please login to the site using the credentials below and change your password immediately.  </div><br> \
           <div><b>Username:</b> %s </div> \
           <div><b>Temporary Password:</b> %s </div><br>\
@@ -3390,10 +3434,10 @@ def send_account_by_admin_confirmation_email(role, user, password):
 def send_student_account_by_self_confirmation_email(user, group):
   current_site = Site.objects.get_current()
   domain = current_site.domain
-  body = '<div>Welcome to Computational Thinking in STEM website http://%s.  <div> \
+  body = '<div>Welcome to Computational Thinking in STEM website https://%s.  <div> \
           <div>You have successfully created a student account on our site.  You have also been added to the group <b>%s</b>. </div> \
           <div>Now you can login to complete your assignments. <div> <br>\
-          <div>If you have forgotten your password since you last logged in, you can reset your password here http://%s/password_reset/recover/  </div><br> \
+          <div>If you have forgotten your password since you last logged in, you can reset your password here https://%s/password_reset/recover/  </div><br> \
           <div><b>CT-STEM Admin</b></div>' % (domain, group.title.title(), domain)
 
   send_mail('CT-STEM - Student Account Created', body, settings.DEFAULT_FROM_EMAIL, [user.email], html_message=body)
@@ -3407,8 +3451,8 @@ def send_added_to_group_confirmation_email(email, group):
   current_site = Site.objects.get_current()
   domain = current_site.domain
   body = '<div>Your teacher has added you to the class <b>%s</b> on Computational Thinking in STEM website. </div><br> \
-          <div>You may login with your credentials here http://%s </div><br> \
-          <div>If you have forgotten your password since you last logged in, you can reset your password here http://%s/password_reset/recover/  </div><br> \
+          <div>You may login with your credentials here https://%s </div><br> \
+          <div>If you have forgotten your password since you last logged in, you can reset your password here https://%s/password_reset/recover/  </div><br> \
           <div>If clicking the link does not seem to work, you can copy and paste the link into your browser&#39;s address window, </div> \
           <div>or retype it there. Once you have returned to CT-STEM, we will give instructions to proceed. </div><br> \
           <div><b>CT-STEM Admin</b></div>'%(group.title.title(), domain, domain)
@@ -3424,7 +3468,7 @@ def send_feedback_ready_email(email, curriculum):
   current_site = Site.objects.get_current()
   domain = current_site.domain
   body = '<div>Your teacher has provided feedback on the assignment %s. </div><br> \
-          <div>Please login to our website http://%s to review the feedback. </div><br> \
+          <div>Please login to our website https://%s to review the feedback. </div><br> \
           <div><b>CT-STEM Admin</b></div>'%(curriculum.title, domain)
 
   send_mail('CT-STEM - Assignment Feedback Ready', body, settings.DEFAULT_FROM_EMAIL, [email], html_message=body)
@@ -3438,7 +3482,7 @@ def send_teacher_account_validation_email(teacher):
   domain = current_site.domain
   body =  '<div>Welcome to Computational Thinking in STEM. </div><br> \
            <div>Your e-mail address was used to create a teacher account on our website. If you made this request, please follow the instructions below.<div><br> \
-           <div>Please click this link http://%s/validate  and use the credentials below to validate your account. </div><br> \
+           <div>Please click this link https://%s?next=/validate/  and use the credentials below to validate your account. </div><br> \
            <div><b>Username:</b> %s </div> \
            <div><b>Validation code:</b> %s </div><br> \
            <div>If you did not request this account you can safely ignore this email. Rest assured your e-mail address and the associated account will be deleted from our system in 24 hours.</div><br> \
@@ -3453,7 +3497,7 @@ def send_teacher_account_validation_email(teacher):
 def send_account_approval_email(user):
   current_site = Site.objects.get_current()
   domain = current_site.domain
-  body = '<div>Your account has been approved on Computational Thinking in STEM website http://%s.  </div> \
+  body = '<div>Your account has been approved on Computational Thinking in STEM website https://%s.  </div> \
           <div>Please login to the site using the the credentials created during registration. </div><br> \
           <div><b>CT-STEM Admin</b></div>'%(domain)
 
@@ -3793,23 +3837,26 @@ def request_training(request):
         recaptcha_response = request.POST.get('g-recaptcha-response')
         is_human = validate_recaptcha(request, recaptcha_response)
         if not is_human:
-          response_data['result'] = 'Failed'
-          response_data['errors'] = {'recaptcha': 'Invalid reCAPTCHA'}
+          response_data['success'] = False
+          context = {'form': form, 'recaptcha_error':  'Invalid reCAPTCHA'}
+          response_data['html'] = render_to_string('ctstem_app/TrainingRequestModal.html', context, context_instance=RequestContext(request))
+
           return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 
       training = form.save()
       messages.success(request, "Your request has been sent to the site admin")
-      response_data['result'] = 'Success'
+      response_data['success'] = True
       #send email to the sender and admin
       send_training_request_email(training)
 
       return http.HttpResponse(json.dumps(response_data), content_type="application/json")
     else:
       print form.errors
-      return JsonResponse({
-          'result': 'Failed',
-          'errors': dict(form.errors.items()),
-      })
+      response_data['success'] = False
+      context = {'form': form}
+      response_data['html'] = render_to_string('ctstem_app/TrainingRequestModal.html', context, context_instance=RequestContext(request))
+
+      return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 
   return http.HttpResponseNotAllowed(['GET', 'POST'])
 
@@ -3820,8 +3867,9 @@ def validate(request):
   if request.method == 'GET':
     form = forms.ValidationForm()
     context = {'form': form}
-    return render(request, 'ctstem_app/Validation.html', context)
+    return render(request, 'ctstem_app/ValidationModal.html', context)
   elif request.method == 'POST':
+    response_data = {}
     data = request.POST.copy()
     form = forms.ValidationForm(data)
     if form.is_valid():
@@ -3830,8 +3878,11 @@ def validate(request):
       user = authenticate(username=username, password=password)
       user.is_active = True
       user.save()
+
+      response_data['redirect_url'] = '/'
       #check if this user added a new school
       if hasattr(user, 'teacher'):
+        response_data['redirect_url'] = '/groups/active/'
         school = models.School.objects.get(id=user.teacher.school.id)
         if not school.is_active:
           school.is_active = True
@@ -3839,10 +3890,16 @@ def validate(request):
 
       login(request, user)
       messages.success(request, "Your account has been validated")
-      return shortcuts.redirect('ctstem:home')
+      response_data['success'] = True
+
     else:
+      print form.errors
       context = {'form': form}
-      return render(request, 'ctstem_app/Validation.html', context)
+      response_data['success'] = False
+      response_data['html'] = render_to_string('ctstem_app/ValidationModal.html', context, context_instance=RequestContext(request))
+
+    return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+
 
 
   return http.HttpResponseNotAllowed(['GET', 'POST'])

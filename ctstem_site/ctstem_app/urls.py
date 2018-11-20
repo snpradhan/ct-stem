@@ -37,6 +37,7 @@ urlpatterns = [
     url(r'^teamProfile/(?P<id>[\d]+)/$', views.teamProfile, name='teamProfile'),
     url(r'^teamRoles/$', views.teamRoles, name='teamRoles'),
     url(r'^register/$', views.register, name='register'),
+    url(r'^register/group/(?P<group_code>[a-zA-Z0-9_]+)/(?P<email>[A-Za-z0-9.-_]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4})/$', views.register, name='register'),
     url(r'^register/group/(?P<group_code>[a-zA-Z0-9_]+)/$', views.register, name='register'),
     url(r'^preregister/group/(?P<group_code>[a-zA-Z0-9_]+)/$', views.preregister, name='preregister'),
     url(r'^generate_code/$', views.generate_code, name='generate_code'),

@@ -12,7 +12,7 @@
     {% block media %}
       {% block bootstrap_css %}
         <!-- Bootstrap CSS -->
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">      <!-- Optional theme -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css">
       {% endblock %}
 
@@ -87,35 +87,6 @@
       {% block inlinejs %}
       <script type="text/javascript">
         $(function (){
-          $("#formLogin").submit(function(e) {
-            e.preventDefault();
-            var data = $(this).serialize();
-            var url = "{% url 'ctstem:login' %}";
-            $.ajax({
-              type: "POST",
-              url: url,
-              data: data,
-              dataType: 'json',
-              success: function(data){
-                if(data['result'] == 'Success'){
-                  if(data['role'] == 'teacher'){
-                    window.location = "{% url 'ctstem:groups' 'active' %}";
-                  }
-                  else{
-                    window.location.reload();
-                  }
-                }
-                else{
-                  $('#loginMsg').html(data['message']);
-                  $('#password').val('');
-                }
-              },
-              error: function(xhr, ajaxOptions, thrownError){
-                $('#loginMsg').html("Something went wrong.  Try again later!");
-                $('#password').val('');
-              },
-            });
-          });
           //check student session every 60 seconds
           {% if user.student %}
             setInterval(check_session, 60000);
@@ -137,6 +108,12 @@
                   });
                 }
               },
+            });
+          {% endif %}
+
+          {% if redirect_url and target %}
+            $("{{target}}").load("{{redirect_url}}", function() {
+              $(this).modal('show');
             });
           {% endif %}
         });
@@ -304,10 +281,10 @@
                   </li>
                 {% else %}
                   <li>
-                   <a type="button" class="btn normal blue" href="{% url 'ctstem:register' %}">Register</a>
+                    <a type="button" class="btn normal blue modal-open" data-toggle="modal" data-target="#register" data-href="{% url 'ctstem:register' %}" href="#">Register</a>
                   </li>
                   <li>
-                    <a data-toggle="modal" data-target="#login" class="login" href="#">Login</a>
+                    <a data-toggle="modal" data-target="#login" class="login modal-open" data-href="{% url 'ctstem:login' %}" href="#">Login</a>
                   </li>
                 {% endif %}
               {% endblock %}
@@ -330,50 +307,7 @@
       </div>
     {% endblock %}
     {% block modals %}
-      {% block login %}
-        <div class="modal fade" id="login" role="dialog">
-          <div class="modal-dialog modal-sm">
-            <div class="modal-content">
-              <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h3 class="modal-title">Login</h3>
-              </div>
-              <div id="loginMsg" class="msg">
-              </div>
-              <form class="form" id="formLogin" method="post">
-                {% csrf_token %}
-                <div class="modal-body">
-                  <div class="form-group">
-                    <label for="id_username">Username (<span class="required">*</span>)
-                      <span data-toggle="tooltip" data-placement="top" title="Please enter your username in lowercase.">
-                        <i class="fa fa-info-circle" aria-hidden="true"></i>
-                      </span>
-                    </label>
-                    <input name="username" id="username" type="text" class="form-control">
-                  </div>
-                  <div class="form-group">
-                    <label for="id_password">Password (<span class="required">*</span>)</label>
-                    <input name="password" id="password" type="password" class="form-control">
-                  </div>
-                </div>
-                <div class="modal-footer">
-                  <div class="form-group button-row">
-                    <button type="submit" id="btnLogin" class="btn btn-success">
-                      <span class="glyphicon glyphicon-log-in" aria-hidden="true"></span>
-                      Login
-                    </button>
-                  </div>
-                  <div>
-                    <div class="extra"><a href="{% url 'ctstem:register' %}">Teacher Registration</a></div>
-                    <div class="extra"><a href="{% url 'password_reset_recover' %}">Forgot Password</a></div>
-                    <div class="extra"><a href="{% url 'ctstem:validate' %}">Validate Account</a></div>
-                  </div>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      {% endblock %}
+
       {% block session_expiry %}
         <div class="modal fade" id="session_expiry" role="dialog">
           <div class="modal-dialog modal-sm">
@@ -458,11 +392,30 @@
           </div>
         </div>
       </div>
+      <div class="modal fade" id="notification" role="dialog">
+        <div class="modal-dialog modal-md">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <h3 class="left">Notification</h3>
+            </div>
+            <div class="modal-body">
+              <p></p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal fade" id="login" role="dialog">
+      </div>
+      <div class="modal fade" id="password" role="dialog">
+      </div>
       <div class="modal fade" id="curriculum" role="dialog">
       </div>
       <div class="modal fade" id="profile" role="dialog">
       </div>
-       <div class="modal fade" id="register" role="dialog">
+      <div class="modal fade" id="register" role="dialog">
+      </div>
+      <div class="modal fade" id="validate" role="dialog">
       </div>
       <div class="modal fade" id="consent" role="dialog" data-keyboard="false" data-backdrop="static"></div>
 

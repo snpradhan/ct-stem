@@ -5,9 +5,12 @@
   --ctstem-color-blue: #00ADFF;
   --ctstem-color-medium-blue: #3A74E8;
   --ctstem-color-dark-blue: #343D51;
+  --ctstem-color-dark-gray: #999EA8;
   --ctstem-color-gray: #A4A7BF;
   --ctstem-color-light-gray: #C1C4D9;
   --ctstem-color-red: #F24878;
+  --ctstem-color-green: #0AD35E;
+  --ctstem-color-ornage: #FA7921;
 }
 html {
   height: 100%;
@@ -215,7 +218,7 @@ footer h4 {
 /***************************************
             *   NAVBAR   *
  ***************************************/
- @media (max-width: 992px) {
+ @media (max-width: 1075px) {
     .navbar-header {
         float: none;
     }
@@ -855,15 +858,20 @@ select, input[type="checkbox"] {
  ***************************************/
 div.form-group {
   overflow: auto;
-  margin-bottom: 2.5em;
-  margin-top: 1.5em;
 }
 div.form-group label{
-  font-size: 1.6em;
+  font-size: 1.5em;
+  margin-bottom: 0.5em;
 }
-
+div.form-group label a {
+  color: var(--ctstem-color-gray);
+}
+div.form-group .msg{
+  text-align: left;
+  padding-top: 0.5em;
+}
 div.form-group label .required{
-  color: red;
+  color: var(--ctstem-color-red);
 }
 
 div.content {
@@ -1091,10 +1099,12 @@ div.content #curricula_tile  .row.button a {
 .btn.normal {
   font-size: 1.4em !important;
   padding: 0.8em 1.6em !important;
-  margin-right: 2em !important;
-  margin-bottom: 2em !important;
 }
 
+.btn.small {
+  font-size: 1em !important;
+  padding: 0.6em 1em !important;
+}
 .btn.blue {
   background-color: var(--ctstem-color-blue) !important;
   color: white !important;
@@ -1122,6 +1132,15 @@ div.content #curricula_tile  .row.button a {
   background-color: var(--ctstem-color-light-gray) !important;
   color: #ffffff !important;
 }
+
+.btn.gray {
+  border: 1px solid var(--ctstem-color-light-gray) !important;
+  background-color: var(--ctstem-color-light-gray) !important;
+  color: black !important;
+}
+.btn.gray:hover {
+  background-color: #ffffff !important;
+}
 .btn.red {
   background-color: var(--ctstem-color-red) !important;
   color: white !important;
@@ -1137,17 +1156,58 @@ div.content #curricula_tile  .row.button a {
 /***************************************
             *   MODAL FORM   *
  ***************************************/
+ div.modal div.modal-dialog {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 90%;
+}
+div.modal div.modal-dialog hr{
+  border-top: 2px solid var(--ctstem-color-light-gray);
+}
+div.modal .modal-sm {
+  width: 37em;
+}
+div.modal .modal-md {
+  width: 70em;
+}
+
+div.modal .btn {
+  margin-bottom: 0.5em !important;
+}
+
+div.modal#terms {
+  z-index: 2000;
+}
+div.modal#register input[type="checkbox"] {
+  zoom: 2;
+}
+div.modal#register #agree_terms {
+  display: table !important;
+}
+div.modal#register #agree_terms #agree, div.modal#register #agree_terms #terms {
+  display: table-cell !important;
+  vertical-align: middle !important;
+  margin: 0 1em 0 0 !important;
+}
+div.modal #recaptcha {
+  width: auto !important;
+  max-width: none !important;
+}
 div.modal-content {
   max-height: 90%;
   overflow-y: scroll;
+  padding: 0 1em;
+  border-radius: 3px;
+  box-shadow: -0.8em 0.8em var(--ctstem-color-dark-gray);
 }
-div.modal-content div.msg {
-  text-align: center;
-  color: red;
-  font-size: 1.4em;
+div.modal-content div.modal-header {
+  border-bottom: 0;
 }
-div.modal-content div.msg.success {
-  color: green;
+div.modal-content div.modal-header .close{
+  font-size: 6em;
+}
+div.modal-content div.modal-footer {
+  border-top: 0;
 }
 div.modal-content div.results{
   padding: 0 2em 1em 2em;
@@ -1159,7 +1219,7 @@ div.modal-content div.results div.assignment_status, div.assignment_table div.as
   font-weight: bold;
 }
 div.modal-content span.time {
-  color: red;
+  color: var(--ctstem-color-red);;
 }
 
 div.modal-content div.link {
@@ -1168,31 +1228,80 @@ div.modal-content div.link {
   text-align: center;
 }
 
-div.modal-content form#consentForm div.modal-body{
+/***** Consent Form Modal *****/
+div.modal#consent div.modal-content form#consentForm div.modal-body{
   padding: 2.5em 2.5em 1em 2.5em;
 }
 
-div.modal-content form#consentForm div.modal-body  div.body{
+div.modal#consent div.modal-content form#consentForm div.modal-body  div.body{
   font-size: 1.5em;
 }
-div.modal-content form#consentForm div.modal-body div.consent {
-  max-height: 25em;
+div.modal#consent div.modal-content form#consentForm div.modal-body div.consent {
+  max-height: 30em;
   overflow-y: auto;
   border: 2px solid #ccc;
   margin: 2em 1em;
   padding: 1em;
 }
-div.modal-content form#consentForm div.modal-body div.consent div.header {
+div.modal#consent div.modal-content form#consentForm div.modal-body div.consent div.header {
   font-size: 1.1em;
   font-weight: bold;
   margin-top: 1em;
   margin-bottom: 0.5em;
 }
 
-div.modal-content form#consentForm div.modal-body div.form-group{
+div.modal#consent div.modal-content form#consentForm div.modal-body div.form-group{
   margin-bottom: 0em !important;
 }
+div.modal#consent div.modal-content form#consentForm div.modal-footer div.form-group button{
+  margin-bottom: 0em !important;
+}
+/***** ********* *****/
 
+div.modal .form-group {
+  margin-bottom: 1.5em;
+}
+div.modal .form-group.buttons {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+div.modal .form-group.button {
+  padding: 0.5em 0;
+}
+div.modal .form-group.button a{
+  width: 100%;
+}
+/***** ********* *****/
+
+div.modal .form-group.button.right {
+  text-align: right;
+}
+@media only screen and (min-width: 768px) {
+  div.modal .col-container {
+    display: flex !important;
+    justify-content: space-between;
+  }
+  div.modal .col-container.center {
+    align-items: center;
+  }
+  div.modal .col-container .col {
+    width: 30em !important;
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
+@media only screen and (max-width: 767px) {
+  div.modal .col-container {
+    display: block !important;
+  }
+  div.modal .col {
+    display:inline-block !important;
+    width: 100% !important;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
 div.modal#studentSearch {
   height: auto;
   max-height: 88em;
@@ -1592,7 +1701,28 @@ span.optional {
   font-style: italic;
 }
 span.mandatory {
-  color: red;
+  color: var(--ctstem-color-red);
+}
+
+div.modal .form-control {
+  font-size: 1.6em;
+}
+div.modal select.form-control {
+  width: 100% !important;
+  height: auto;
+}
+
+.form-control {
+  border: 2px solid var(--ctstem-color-gray);
+  color: var(--ctstem-color-gray);
+}
+.form-control.error {
+  border: 2px solid var(--ctstem-color-red);
+}
+.form-control:focus {
+  border-color: var(--ctstem-color-yellow);
+  box-shadow: unset;
+  color: black;
 }
 
 /************************* CKEDITOR ***********************/

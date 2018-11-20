@@ -10,21 +10,39 @@ ul.messages {
   z-index: 99;
 }
 
+ul.errorlist {
+  list-style-type: none;
+  padding-left: 0;
+  padding-top: 0.5em;
+  font-size: 1.4em;
+}
+
+div.modal .msg {
+  padding: 0 15px;
+  text-align: center;
+}
 ul.messages li {
   text-align: center;
   padding: 0.5em 0;
 }
+
+ul.errorlist li, ul.messages li {
+  line-height: 1em;
+}
 .error {
-  color: red;
+  color: var(--ctstem-color-red);
 }
 .success {
-  color: green;
+  color: var(--ctstem-color-green);
 }
 .warning {
-  color: orange;
+  color: var(--ctstem-color-ornage);
 }
 .info {
-  color: blue;
+  color: var(--ctstem-color-blue);;
+}
+.default {
+  color: black;
 }
 .help {
   font-size: 1.2em;
@@ -33,6 +51,6 @@ ul.messages li {
 
 #signup_note {
   text-align: center;
-  padding: 0.25em 0 0.75em 0;
+  padding: 0.25em 0;
   font-size: 1.5em;
 }

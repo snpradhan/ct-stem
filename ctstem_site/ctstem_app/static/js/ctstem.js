@@ -61,18 +61,10 @@ function reset_password(user_full_name, user_id, csrf_token){
 }
 
 $(function (){
-  //login modal
-  $('#navLogin').click(function(){
-    $('div#login').show();
-  });
-
-  $('#closeLogin').click(function(){
-    $('div#login').hide();
-  });
 
   $('.modal').on('hidden.bs.modal', function(){
     $(this).find('form')[0].reset();
-    $(this).find('.msg').html('');
+    $(this).find('.msg .errorlist .error').html('');
     $(this).find('.results').hide();
     $(this).find('.results tbody').html('');
   });
@@ -92,6 +84,15 @@ $(function (){
         alert("Please try generating the user code again.")
       }
 
+    });
+  });
+
+  $("a.modal-open").click(function(e){
+    e.preventDefault();
+    var url = $(this).data('href');
+    var target = $(this).data('target');
+    $(target).load(url, function() {
+      $(this).modal('show');
     });
   });
 
@@ -135,7 +136,7 @@ $(function (){
     var emails = $('#formUpload textarea#id_emails').val();
     var file = $('#formUpload input#id_uploadFile').val();
     if(emails == '' && file == ''){
-      $('#uploadMsg').html("Please type in the emails or upload a CSV");
+      $('#uploadMsg .errorlist .error').html("Please select a class and either a list of student emails or a student email csv to upload.")
     }
     else {
 
@@ -150,7 +151,7 @@ $(function (){
           $('#formUpload #spinner').hide();
         },
         success: function(data){
-          if(data['result'] == 'Success'){
+          if(data['success'] == true){
             if(window.location.href.indexOf('/group/') != -1){
 
               for(var student in  data['new_students']){
@@ -190,15 +191,16 @@ $(function (){
             }
             else {
               //location is users or groups page
+              $("#upload").modal('toggle');
               window.location.reload();
             }
           }
           else{
-            $('#uploadMsg').html(data['message']);
+            $('#uploadMsg .errorlist .error').html(data['message']);
           }
         },
         error: function(xhr, ajaxOptions, thrownError){
-          $('#uploadMsg').html("Something went wrong.  Try again later!");
+          $('#uploadMsg .errorlist .error').html("Something went wrong.  Try again later!");
         },
       };
 

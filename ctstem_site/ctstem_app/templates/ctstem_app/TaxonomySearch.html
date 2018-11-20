@@ -5,7 +5,7 @@
   <div class="modal-content">
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal">&times;</button>
-      <h3 class="modal-title">{{title}}</h3>
+      <h3 class="left">{{title}}</h3>
     </div>
     <div id="taxonomyMsg" class="msg">
     </div>
@@ -35,8 +35,8 @@
         </div>
       </div>
       <div class="modal-footer">
-        <div class="form-group button-row">
-          <button type="submit" id="search" class="btn btn-success">
+        <div class="form-group">
+          <button type="submit" id="search" class="btn normal yellow">
             Search
           </button>
         </div>
@@ -111,7 +111,7 @@ $(function (){
         else {
           var taxonomy = "";
           $.each(data, function(key, value){
-            taxonomy += "<tr><td>"+value['standard']+"</td><<td>"+value['category']+"</td><<td>"+value['title']+"</td><td>"+value['code']+"</td><td><button type='button' class='btn btn-info select_taxonomy' id='"+value['id']+"''>Select</a></td></tr>";
+            taxonomy += "<tr><td>"+value['standard']+"</td><<td>"+value['category']+"</td><<td>"+value['title']+"</td><td>"+value['code']+"</td><td><button type='button' class='btn small blue select_taxonomy' id='"+value['id']+"''>Select</a></td></tr>";
           });
           if(taxonomy.length == 0){
             $('#taxonomyMsg').html('No matching standards found');

@@ -2,6 +2,7 @@ from django import forms
 from django.forms import ModelForm
 from django.forms.formsets import BaseFormSet
 from ctstem_app import models, widgets
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
 from django.forms.models import inlineformset_factory
@@ -18,6 +19,43 @@ from django.db.models import Q
 from django.db.models.functions import Lower
 import os
 
+
+####################################
+# Login Form
+####################################
+class LoginForm (forms.Form):
+  username = forms.RegexField(required=True, regex=r'^\w+$', max_length=30, label=u'Username',
+                              error_messages={'invalid': 'Usernames may only contain letters, numbers, and underscores (_)',
+                                               'required': 'Username is required'})
+  password = forms.CharField(required=True, widget=forms.PasswordInput(render_value=False), label=u'Password',
+                              error_messages={'required': 'Password is required'})
+
+  def __init__(self, *args, **kwargs):
+    super(LoginForm, self).__init__(*args, **kwargs)
+
+    for field_name, field in self.fields.items():
+      field.widget.attrs['class'] = 'form-control'
+      field.widget.attrs['aria-describedby'] = field.label
+      field.widget.attrs['placeholder'] = field.help_text
+
+  def clean(self):
+    cleaned_data = super(LoginForm, self).clean()
+    username = cleaned_data.get('username')
+    password = cleaned_data.get('password')
+
+    if username is None:
+      self.fields['username'].widget.attrs['class'] += ' error'
+    elif User.objects.filter(username=username.lower()).count() == 0:
+      self.add_error('username', u'Username is incorrect.')
+      self.fields['username'].widget.attrs['class'] += ' error'
+
+    if password is None:
+      self.fields['password'].widget.attrs['class'] += ' error'
+    else:
+      user = authenticate(username=username, password=password)
+      if user is None:
+        self.add_error('password', u'Password is incorrect.')
+        self.fields['password'].widget.attrs['class'] += ' error'
 
 ####################################
 # Registration Form
@@ -50,7 +88,6 @@ class RegistrationForm (forms.Form):
     elif group_id:
       self.fields['account_type'].choices = models.USER_ROLE_CHOICES[3:]
       if kwargs.get('initial', None) and kwargs['initial']['email']:
-        print kwargs['initial']['email']
         self.fields['email'].widget.attrs['readonly'] = True
     else:
       self.fields['account_type'].choices = models.USER_ROLE_CHOICES[4:5]
@@ -59,44 +96,50 @@ class RegistrationForm (forms.Form):
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['aria-describedby'] = field.label
       field.widget.attrs['placeholder'] = field.help_text
+      if field_name != 'school':
+        field.error_messages['required'] = '{fieldname} is required'.format(fieldname=field.label)
 
 
-  def clean_username(self):
-    if User.objects.filter(username=self.cleaned_data['username'].lower()).count() > 0:
-      raise forms.ValidationError(u'This username is already taken. Please choose another.')
-    return self.cleaned_data['username']
+  def clean(self):
+    cleaned_data = super(RegistrationForm, self).clean()
+    username = cleaned_data.get('username')
+    first_name = cleaned_data.get('first_name')
+    last_name = cleaned_data.get('last_name')
+    password1 = cleaned_data.get('password1')
+    password2 = cleaned_data.get('password2')
+    email = cleaned_data.get('email')
+    account_type = cleaned_data.get('account_type')
+    school = cleaned_data.get('school')
 
-  def clean_email(self):
-    if User.objects.filter(email=self.cleaned_data['email']).count() > 0:
-      raise forms.ValidationError(u'This email address is already in use. Please supply a different email address.')
-    return self.cleaned_data['email']
+    if username is None:
+      self.fields['username'].widget.attrs['class'] += ' error'
+    elif User.objects.filter(username=username.lower()).count() > 0:
+      self.add_error('username', u'This username is already taken. Please choose another.')
+      self.fields['username'].widget.attrs['class'] += ' error'
 
-  def is_valid(self):
-    valid = super(RegistrationForm, self).is_valid()
-    if not valid:
-      return valid
+    if password1 is None:
+      self.fields['password1'].widget.attrs['class'] += ' error'
+    if password2 is None:
+      self.fields['password2'].widget.attrs['class'] += ' error'
+    if password1 != password2:
+      self.add_error('password1', u'Passwords do not match.')
+      self.fields['password1'].widget.attrs['class'] += ' error'
 
-    clean = True
-    error_list = []
-    #check password
-    if self.cleaned_data['password1'] != self.cleaned_data['password2']:
-      error_list.append('P')
-      self._errors['password1'] = u'Passwords are not identical'
-      clean = False
+    if first_name is None:
+      self.fields['first_name'].widget.attrs['class'] += ' error'
+    if last_name is None:
+      self.fields['last_name'].widget.attrs['class'] += ' error'
+    if email is None:
+      self.fields['email'].widget.attrs['class'] += ' error'
+    elif User.objects.filter(email=email).count() > 0:
+      self.add_error('email', u'This email is already taken. Please choose another.')
+      self.fields['email'].widget.attrs['class'] += ' error'
     #check fields for Teacher, Student and School Administrator
-    if self.cleaned_data['account_type'] in ['T', 'S', 'P']:
-      if self.cleaned_data['school'] is None or self.cleaned_data['school'] == '':
-        error_list.append('SR');
-
-    if len(error_list) > 0:
-      clean = False
-
-    for error in error_list:
-      if error == 'SR':
-        self._errors['school'] = u'School is required'
+    if account_type in ['T', 'S', 'P'] and school is None:
+      self.fields['school'].widget.attrs['class'] += ' error'
+      self.add_error('school', u'School is required.')
 
 
-    return clean
 
 class PreRegistrationForm(forms.Form):
   email = forms.EmailField(required=True, max_length=75, label=u'Email')
@@ -149,31 +192,38 @@ class ValidationForm (forms.Form):
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['aria-describedby'] = field.label
       field.widget.attrs['placeholder'] = field.help_text
+      field.error_messages['required'] = '{fieldname} is required'.format(fieldname=field.label)
 
-  def is_valid(self):
-    valid = super(ValidationForm, self).is_valid()
-    if not valid:
-      return valid
 
-    username = self.cleaned_data['username'].lower()
-    password = self.cleaned_data['password']
-    validation_code = self.cleaned_data['validation_code']
-    try:
-      user = User.objects.get(username=username)
-      teacher = models.Teacher.objects.get(user=user)
-    except (User.DoesNotExist, models.Teacher.DoesNotExist):
-      self.errors['username'] = u'Username is invalid'
-      return False
+  def clean(self):
+    cleaned_data = super(ValidationForm, self).clean()
+    username = cleaned_data.get('username')
+    password = cleaned_data.get('password')
+    validation_code = cleaned_data.get('validation_code')
 
-    if not user.check_password(password):
-      self.errors['password'] = u'Password is invalid'
-      return False
+    user = teacher = None
+    if username is None:
+      self.fields['username'].widget.attrs['class'] += ' error'
+    else:
+      try:
+        user = User.objects.get(username=username)
+        teacher = models.Teacher.objects.get(user=user)
+      except (User.DoesNotExist, models.Teacher.DoesNotExist):
+        self.add_error('username', u'Username is incorrect.')
+        self.fields['username'].widget.attrs['class'] += ' error'
 
-    if teacher.validation_code != validation_code:
-      self.errors['validation_code'] = u'Validation Code is invalid'
-      return False
+    if password is None:
+      self.fields['password'].widget.attrs['class'] += ' error'
+    elif teacher and not user.check_password(password):
+      self.add_error('password', u'Password is incorrect.')
+      self.fields['password'].widget.attrs['class'] += ' error'
 
-    return True
+    if validation_code is None:
+      self.fields['validation_code'].widget.attrs['class'] += ' error'
+    elif teacher and teacher.validation_code != validation_code:
+      self.add_error('validation_code', u'Validation Code is incorrect.')
+      self.fields['validation_code'].widget.attrs['class'] += ' error'
+
 
 ####################################
 # UserProfile Form
@@ -1046,6 +1096,24 @@ class SchoolForm(ModelForm):
 
       if field_name == 'name':
         field.label = 'School Name'
+        field.error_messages = {'required':'School name is required'.format(
+                fieldname=field.label)}
+      elif field_name == 'city':
+        field.error_messages = {'required':'School location is required'.format(
+                fieldname=field.label)}
+
+  def clean(self):
+    cleaned_data = super(SchoolForm, self).clean()
+    name = cleaned_data.get('name')
+    city = cleaned_data.get('city')
+
+
+    if name is None:
+      self.fields['name'].widget.attrs['class'] += ' error'
+    if city is None:
+      self.fields['city'].widget.attrs['class'] += ' error'
+
+
 
 ####################################
 # Subject Form
@@ -1110,6 +1178,26 @@ class TrainingRequestForm(ModelForm):
     for field_name, field in self.fields.items():
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['placeholder'] = field.help_text
+      field.error_messages['required'] = '{fieldname} is required'.format(fieldname=field.label)
+
+
+  def clean(self):
+    cleaned_data = super(TrainingRequestForm, self).clean()
+    name = cleaned_data.get('name')
+    email = cleaned_data.get('email')
+    school = cleaned_data.get('school')
+    subject = cleaned_data.get('subject')
+
+    if name is None:
+      self.fields['name'].widget.attrs['class'] += ' error'
+    if email is None:
+      self.fields['email'].widget.attrs['class'] += ' error'
+    if school is None:
+      self.fields['school'].widget.attrs['class'] += ' error'
+
+    if subject is None:
+      self.fields['subject'].widget.attrs['class'] += ' error'
+
 
   def is_valid(self):
     valid = super(TrainingRequestForm, self).is_valid()

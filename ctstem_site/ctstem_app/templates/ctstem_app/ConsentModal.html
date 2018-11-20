@@ -6,9 +6,11 @@
         <button type="button" class="close" data-dismiss="modal">&times;</button>
       {% endif %}
       <h3 class="modal-title">Welcome to CT-STEM!</h3>
-
     </div>
     <div id="consentMsg" class="msg">
+      <ul class="errorlist">
+        <li></li>
+      </ul>
     </div>
     <form class="form" id="consentForm" method="post" action="{% url 'ctstem:consent' %}">
       {% csrf_token %}
@@ -19,9 +21,12 @@
           </div>
           {% include 'ctstem_app/ConsentLanguage.html' %}
           <div class="body">
-            <p>If you wish to participate, please click the <b>“I Agree”</b> button and you will be taken to the survey.</p>
-            <p>If you do not wish to participate in this study, please select <b>“I Disagree”</b>.</p>
-            <p>You may change your answer by clicking on the Edit Profile link.</p>
+            <div>If you wish to participate, please click the <b>“I Agree”</b> button and you will be taken to the survey.</div>
+            <div>&nbsp;</div>
+            <div>If you do not wish to participate in this study, please select <b>“I Disagree”</b>.</div>
+            <div>&nbsp;</div>
+            <div>You may change your answer by clicking on the Edit Profile link.</div>
+            <div>&nbsp;</div>
           </div>
           {% if parent != 'profile' %}
             <div class="form-group">
@@ -34,22 +39,22 @@
       </div>
 
       <div class="modal-footer">
-        <div class="form-group button-row">
+        <div class="form-group">
           {% if user.student %}
-            <button type="button" class="btn btn-default" id="print">Print</button>
+            <button type="button" class="btn normal gray" id="print">Print</button>
             {% if parent != 'profile' %}
-              <button type="submit" id="saveConsent" class="btn btn-success">
+              <button type="submit" id="saveConsent" class="btn normal yellow">
                 Submit
               </button>
             {% else %}
-              <button type="button" class="btn btn-danger" data-dismiss="modal">
+              <button type="button" class="btn normal red" data-dismiss="modal">
                 Close
               </button>
             {% endif %}
           {% elif user.teacher %}
-            <button type="button" class="btn btn-danger" data-dismiss="modal">
-                Close
-              </button>
+            <button type="button" class="btn normal red" data-dismiss="modal">
+              Close
+            </button>
           {% endif %}
         </div>
       </div>
@@ -68,11 +73,11 @@
         data: $(this).serialize(),
         context: this,
         success: function(data){
-          if(data['result'] == 'Success'){
+          if(data['success'] == true){
             window.location.reload();
           }
           else{
-            $('#consentMsg').html(data['message']);
+            $('#consentMsg .errorlist').addClass('error').html(data['message']);
           }
           return false;
         },

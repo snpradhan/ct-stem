@@ -65,6 +65,14 @@
 #home .block img {
   max-width: 100%;
 }
+
+#home .btn {
+  margin-bottom: 1em;
+}
+
+#home .graphic img {
+  border: 5px solid red;
+}
 /**************************/
 /* BLOCK ONE */
 /**************************/
@@ -361,7 +369,7 @@
 #home .block#five .col-container .col.graphic,
 #home .block#six .col-container .col.graphic,
 #home .block#seven .col-container .col.graphic {
-  width: 40%;
+  width: 45%;
 }
 #home .block#four .col-container .col.text,
 #home .block#five .col-container .col.text,
@@ -553,7 +561,7 @@
   #home .block#two .col.two .graphic {
     order: 2;
   }
-   #home .block#three .col-container .col {
+  #home .block#three .col-container .col {
     width: 38em !important;
 
   }
@@ -565,6 +573,10 @@
 @media only screen and (max-width: 767px) {
   #home .block#three .col-container .col.col-4 {
     display: none !important;
+  }
+
+  #home .block .col-container {
+    width: 90% !important;
   }
 }
 

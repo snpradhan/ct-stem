@@ -6,6 +6,9 @@
       <h3 class="modal-title">{{title}}</h3>
     </div>
     <div id="questionMsg" class="msg">
+      <ul class="errorlist">
+        <li></li>
+      </ul>
     </div>
     <form class="form" id="questionForm" method="post" enctype="multipart/form-data" action="{% if questionForm.instance.id %} {% url 'ctstem:question' questionForm.instance.id %} {% else %} {% url 'ctstem:newQuestion' %} {% endif %}">
       {% csrf_token %}
@@ -35,8 +38,8 @@
         {% endfor %}
       </div>
       <div class="modal-footer">
-        <div class="form-group button-row">
-          <button type="submit" id="saveQuestion" class="btn btn-success">
+        <div class="form-group">
+          <button type="submit" id="saveQuestion" class="btn normal yellow">
             Save
           </button>
         </div>
@@ -149,7 +152,7 @@ $(function (){
       processData: false,
       success: function(data){
         if('error' in data){
-          $('#questionMsg').html(data['error']);
+          $('#questionMsg .errorlist li').addClass('error').html(data['error']);
         }
         else {
           var formset_div = $("input[id="+id_step+"]").parent();

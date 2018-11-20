@@ -1,40 +1,81 @@
-{% extends "ctstem_app/base.html" %}
 {% load i18n %}
-
-{% block title %}{% trans "Password recovery" %}{% endblock %}
-
-{% block content %}
-  <div class="content">
-  	<form method="post" action="{{ url }}" id="password_reset">
-  		{% csrf_token %}
-      <div class="table" id="password">
-    		{% for field in form %}
-          <div class="form-group">
-            <label for="id_{{field.name}}">{{ field.label|title }} {% if field.field.required %}(<span class="required">*</span>){% endif %} </label>
-            <div>
-              {{field}}
-            </div>
-            <div class="error">{{ field.errors }}</div>
-          </div>
+<div class="modal-dialog modal-sm">
+  <div class="modal-content">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal">&times;</button>
+      <h3 class="left">Password Recovery</h3>
+    </div>
+    <div id="passwordMsg" class="msg">
+      <ul class="errorlist">
+        {% for message in messages %}
+          <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message|safe }}</li>
         {% endfor %}
-  		  <input type="submit" value="{% trans "Recover my password" %}" class="btn btn-info">
-      </div>
-  	</form>
+      </ul>
+    </div>
+    <div class="modal-body">
+      <form method="post" id="password_reset" action="{{ url }}">
+        {% csrf_token %}
+        <div class="form-group">
+          <label for="id_{{form.username_or_email.name}}">{{ form.username_or_email.label }}</label>
+          {{form.username_or_email}}
+          <div class="error">{{ form.username_or_email.errors }}</div>
+        </div>
+        <div id="spinner">
+          <img src="/static/img/page-loader.gif" class="icon"/>
+        </div>
+        <div class="form-group button right">
+         <input type="submit" value="{% trans "Recover my password" %}" class="btn normal yellow">
+        </div>
+      </form>
+    </div>
   </div>
-  <script type="text/javascript">
-    $(document).ready(function(){
-      $('input[type="text"]').addClass('form-control');
+</div>
 
-      $('input[type="submit"]').on("click", function(e){
-        e.preventDefault();
-        var username_email = $('input#id_username_or_email').val();
-        //check if username was entered
-        if(username_email.indexOf('@') == -1){
-          //convert only usernames to lowercase
-          $('input#id_username_or_email').val(username_email.toLowerCase())
+<script type="text/javascript">
+  $(function (){
+    $('input[type="text"]').addClass('form-control');
+    $('div.error').each(function(){
+      if($(this).html().length > 0){
+        $(this).prev().addClass('error');
+      }
+    });
+
+    $('form#password_reset').submit(function(e){
+      e.preventDefault();
+      var username_email = $('input#id_username_or_email').val();
+      //check if username was entered
+      if(username_email.indexOf('@') == -1){
+        //convert only usernames to lowercase
+        $('input#id_username_or_email').val(username_email.toLowerCase())
+      }
+      $.ajax({
+        type: $(this).attr('method'),
+        url: this.action,
+        data: $(this).serialize(),
+        context: this,
+        beforeSend: function(){
+          $('#password_reset #spinner').show();
+        },
+        complete: function(){
+          $('#password_reset #spinner').hide();
+        },
+        success: function(data, status) {
+          if(data.trim().endsWith('password.')) {
+            var html = $.parseHTML(data.trim());
+            $('#password').modal('toggle');
+            $('#notification .modal-body p').html(html[0]['data']);
+            $('#notification').modal('toggle');
+          }
+          else{
+            $('#password').html(data);
+          }
+        },
+        error: function(){
+          $('#password').modal('toggle');
+          $('#notification .modal-body p').html("An email was sent to your email address. Use the link in the email to reset your password.");
+          $('#notification').modal('toggle');
         }
-        $('form#password_reset').submit();
       });
     });
+  });
   </script>
-{% endblock %}

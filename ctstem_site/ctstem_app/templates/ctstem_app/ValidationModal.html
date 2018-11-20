@@ -1,0 +1,80 @@
+
+<div class="modal-dialog modal-sm">
+  <div class="modal-content">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal">&times;</button>
+      <h3 class="left">Account Validation</h3>
+    </div>
+    <div id="validationMsg" class="msg">
+      <ul class="errorlist">
+        {% for message in messages %}
+          <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message|safe }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="modal-body">
+      <form method="post" id="formValidate" action="{% url 'ctstem:validate' %}">
+        {% csrf_token %}
+        <div class="form-group">
+          <label for="id_{{form.username.name}}">{{ form.username.label }}</label>
+          {{form.username}}
+          <div class="error">{{ form.username.errors }}</div>
+        </div>
+        <div class="form-group">
+          <label for="id_{{form.password.name}}">{{ form.password.label }}</label>
+          {{form.password}}
+          <div class="error">{{ form.password.errors }}</div>
+        </div>
+        <div class="form-group">
+          <label for="id_{{form.validation_code.name}}">{{ form.validation_code.label }}</label>
+          {{form.validation_code}}
+          <div class="error">{{ form.validation_code.errors }}</div>
+        </div>
+        <div class="form-group buttons">
+          <label><a class="modal-open" data-toggle="modal"  data-target="#password" data-dismiss="modal" data-href="{% url 'password_reset_recover' %}" href="#">Forgot Password?</a></label>
+          <button type="submit" id="btnValidate" class="btn normal yellow">
+            Validate
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+  $(function (){
+    $("#formValidate").submit(function(e){
+      e.preventDefault();
+
+      $.ajax({
+        type: $(this).attr('method'),
+        url: this.action,
+        data: $(this).serialize(),
+        context: this,
+        success: function(data, status) {
+          if(data['success'] == true){
+            $('#validate').modal('toggle');
+            window.parent.location.href = data['redirect_url'];
+          }
+          else{
+            console.log(data['html']);
+            $('#validate').html(data['html']);
+          }
+        },
+        error: function(){
+          alert("Something went wrong.");
+        }
+      });
+    });
+
+    $("a.modal-open").click(function(e){
+      e.preventDefault();
+      var url = $(this).data('href');
+      var target = $(this).data('target');
+      $(target).load(url, function() {
+        $(this).modal('show');
+      });
+    });
+  });
+</script>
+

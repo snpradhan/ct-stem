@@ -22,7 +22,9 @@
             <h2>Expert tools for high school science learning</h2>
             <p>Use authentic computational practices to fuel discovery in science and math with free CT lesson plans and resources.</p>
             <div class="buttons">
-              <a class="btn big blue" href="/register">REGISTER AS A TEACHER</a>
+              {% if user.is_anonymous %}
+                <a type="button" class="btn big blue modal-open" data-toggle="modal" data-target="#register" data-href="{% url 'ctstem:register' %}" href="#" >REGISTER AS A TEACHER</a>
+              {% endif %}
             </div>
           </div>
           <div class="dialog">
@@ -156,6 +158,7 @@
           </div>
           <div class="buttons">
             <a class="btn normal yellow" href="{% url 'ctstem:training' %}">CT-STEM Workshops</a>
+            &nbsp;&nbsp;
             <a class="btn normal white" href="{% url 'ctstem:training' %}">Video Resources</a>
           </div>
         </div>
@@ -219,6 +222,7 @@
           </div>
           <div class="buttons">
             <a class="btn normal yellow" href="{% url 'ctstem:curricula' 'units' %}">More about CT</a>
+            &nbsp;&nbsp;
             <a class="btn normal white" href="{% url 'ctstem:publications' %}">Our Research</a>
           </div>
         </div>
@@ -249,12 +253,14 @@
           <div>
             <h2>Getting started</h2>
             <p>Whether you're in search of professional training, or a way to easily manage and review your CT assignments, our platform is designed to help</p>
-            <p>
-              Click below to create your free account.
-            </p>
           </div>
           <div class="buttons">
-            <a class="btn big blue" href="{% url 'ctstem:register' %}">Create my Teacher Account</a>
+            {% if user.is_anonymous %}
+              <p>
+                Click below to create your free account.
+              </p>
+              <a type="button" class="btn big blue modal-open" data-toggle="modal" data-target="#register" data-href="{% url 'ctstem:register' %}" href="#" >Create my Teacher Account</a>
+            {% endif %}
           </div>
         </div>
         <div class="col graphic">
