@@ -3290,8 +3290,7 @@ def user_upload(request):
             #email does not exist.  Send and email with registration link
             send_student_account_request_email(email, group)
             #add email to group invitee list
-            group_invitee = models.GroupInvitee(group=group, email=email)
-            group_invitee.save()
+            group_invitee, created = models.GroupInvitee.objects.get_or_create(group=group, email=email)
 
             new += 1
 
