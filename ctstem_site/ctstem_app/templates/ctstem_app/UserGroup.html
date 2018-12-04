@@ -211,7 +211,7 @@
                           <a type="button" class="btn btn-warning removeUser" aria-label="Remove Student from this group" title="Remove Student from this group" href="{% url 'ctstem:removeStudent' form.instance.id student.id  %}" data-id="{{forloop.counter0}}">
                             <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
                           </a>
-                          <button type="button" class="btn btn-info reset_email" aria-label="Send password reset email" title="Send password reset email" onclick="return send_password_reset_email('{{student.user.username}}','{{csrf_token}}')">
+                          <button type="button" class="btn btn-info reset_email" aria-label="Send password reset email" title="Send password reset email" onclick="this.disabled=true; return send_password_reset_email('{{student.user.username}}','{{csrf_token}}')">
                             <span class="glyphicon glyphicon-send" aria-hidden="true"></span>
                           </button>
                           {% if user.administrator or user.teacher %}
