@@ -11,6 +11,7 @@ $(function(){
     $('#'+id+'_tools').append("<a href='#"+id+"' class='line button-tool' data-tool='line'>Line</a> ");
     $('#'+id+'_tools').append("<a href='#"+id+"' class='rect button-tool' data-tool='rect'>Rectangle</a> ");
     $('#'+id+'_tools').append("<a href='#"+id+"' class='text button-tool' data-tool='text'>Text</a> ");
+    $('#'+id+'_tools').append("<a href='#"+id+"' class='undo'>Undo</a> ");
     $('#'+id+'').sketch();
   });
 
@@ -33,6 +34,14 @@ $(function(){
     $('a.button-tool').removeClass('activeTool');
     $(this).addClass('popout').addClass('activecolor');
   });
+
+  $('a.undo').click(function(e){
+    var canvasId = $(this).attr('href');
+    $(canvasId).sketch().undo();
+    $(canvasId).sketch().redraw();
+  });
+
+
 });
 
 /*

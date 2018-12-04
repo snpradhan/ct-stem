@@ -163,7 +163,12 @@ var __slice = Array.prototype.slice;
       });
     };
 
+    Sketch.prototype.undo = function() {
+      this.actions.pop();
+    };
+
     return Sketch;
+
   })();
 
   $.sketch = {
