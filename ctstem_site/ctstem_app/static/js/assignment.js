@@ -185,8 +185,11 @@ function loadDataTable(assignmentStatus){
         }
       }
       else if (header.length == 1){
-        if(header[0] != ""){
+        if(header[0] != "&nbsp;"){
           colHeaders.push(header[0]);
+        }
+        else{
+          colHeaders.push("");
         }
       }
     }
