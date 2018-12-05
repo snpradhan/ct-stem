@@ -71,6 +71,7 @@ function loadCanvasData(){
       var actions_json = JSON.parse(actions);
       $.each(actions_json, function (i, val) {
         $(id).sketch().actions.push(val);
+        $(id).sketch().history.push(val);
         $(id).sketch().redraw();
       });
     }
