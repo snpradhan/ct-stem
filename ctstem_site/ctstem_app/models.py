@@ -252,9 +252,9 @@ class ResearchCategory(models.Model):
 class Question(models.Model):
   question_text = RichTextUploadingField(null=False, blank=False, config_name='question_ckeditor')
   answer_field_type = models.CharField(null=False, max_length=2, choices=FIELD_TYPE_CHOICES, default='TF')
-  options = models.TextField(null=True, blank=True, help_text="For dropdown, multi-select and multiple choice questions provide one option per line. For multiple choice w/ images provide one image url per line. For a data table, provide one table header per line")
+  options = models.TextField(null=True, blank=True, help_text="Click on the &#9432; icon to see the Options Guide")
   answer = models.TextField(null=True, blank=True)
-  sketch_background = models.ImageField(upload_to=upload_file_to, blank=True, null=True)
+  sketch_background = models.ImageField(upload_to=upload_file_to, blank=True, null=True, help_text='Upload 900x500 png background image for the sketch pad')
   research_category = models.ManyToManyField(ResearchCategory, null=True, blank=True, related_name='questions')
 
   def __unicode__(self):

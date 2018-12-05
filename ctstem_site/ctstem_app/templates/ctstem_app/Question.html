@@ -28,6 +28,7 @@
               {% if field.name == 'question_text' %}
                 <input type="hidden" id="question_html" name="question_html" />
               {% endif %}
+              <div class="help warning">{{field.help_text|safe}}</div>
             </div>
             <div class="error">{{ field.errors }}</div>
           </div>

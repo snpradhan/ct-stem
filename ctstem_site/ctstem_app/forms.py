@@ -482,7 +482,7 @@ class QuestionForm(ModelForm):
     fields = ['research_category', 'question_text', 'answer_field_type', 'sketch_background', 'options', 'answer']
     widgets = {
       'question_text': forms.TextInput(attrs={'placeholder': 'Enter question here'}),
-      'options': forms.Textarea(attrs={'rows':5, 'cols':60, 'placeholder': 'Options for dropdown'}),
+      'options': forms.Textarea(attrs={'rows':5, 'cols':60}),
       'answer': forms.Textarea(attrs={'rows':5, 'cols':60, 'placeholder': 'Answer if applicable'}),
     }
 
@@ -491,7 +491,6 @@ class QuestionForm(ModelForm):
 
     for field_name, field in self.fields.items():
       field.widget.attrs['class'] = 'form-control'
-      field.widget.attrs['placeholder'] = field.help_text
 
 ####################################
 #  Research Category Form
