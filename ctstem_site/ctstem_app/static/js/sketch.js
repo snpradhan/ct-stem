@@ -52,8 +52,9 @@ var __slice = Array.prototype.slice;
       this.tool = this.options.defaultTool;
 
 
-      this.actions = [];      // history of drawing commands
+      this.actions = [];
       this.action = [];
+      this.history = [];  // history of drawing commands
 
       // all mouse events got to onEvent
       this.canvas.bind('click mousedown mouseup mousemove mouseleave mouseout touchstart touchmove touchend touchcancel', this.onEvent);
@@ -111,6 +112,7 @@ var __slice = Array.prototype.slice;
     Sketch.prototype.stopPainting = function() {
       if (this.action) {
         this.actions.push(this.action);
+        this.history.push(this.action);
       }
       this.painting = false;
       this.action = null;
@@ -150,21 +152,31 @@ var __slice = Array.prototype.slice;
     };
 
     Sketch.prototype.addText = function(color, fontsize, textX, textY, textValue) {
-      this.actions.push(
-      {
+
+      var text_data = {
         tool: "text",
         textX: textX,
         textY: textY,
-    color: color,
+        color: color,
         font: fontsize + "px sans-serif",
-
         textValue: textValue,
         alignment: "left"
-      });
+      }
+
+      this.actions.push(text_data);
+      this.history.push(text_data);
     };
 
     Sketch.prototype.undo = function() {
       this.actions.pop();
+    };
+
+    Sketch.prototype.redo = function() {
+      var current_index = this.actions.length;
+      var history_index = this.history.length;
+      if(history_index > current_index) {
+        this.actions.push(this.history[current_index]);
+      }
     };
 
     Sketch.prototype.clear = function() {

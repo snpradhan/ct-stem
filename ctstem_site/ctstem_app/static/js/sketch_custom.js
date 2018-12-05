@@ -12,6 +12,7 @@ $(function(){
     $('#'+id+'_tools').append("<a href='#"+id+"' class='rect button-tool' data-tool='rect'>Rectangle</a> ");
     $('#'+id+'_tools').append("<a href='#"+id+"' class='text button-tool' data-tool='text'>Text</a> ");
     $('#'+id+'_tools').append("<a href='#"+id+"' class='undo'>Undo</a> ");
+    $('#'+id+'_tools').append("<a href='#"+id+"' class='redo'>Redo</a> ");
     $('#'+id+'').sketch();
   });
 
@@ -41,6 +42,12 @@ $(function(){
     $(canvasId).sketch().redraw();
   });
 
+  $('a.redo').click(function(e){
+    var canvasId = $(this).attr('href');
+    $(canvasId).sketch().redo();
+    $(canvasId).sketch().redraw();
+  });
+
 
   $('a.clear').click(function(e){
     var r = confirm("Are you sure you want to clear the sketch board?");
@@ -50,8 +57,6 @@ $(function(){
       $(canvasId).sketch().redraw();
     }
   });
-
-
 
 });
 
