@@ -167,6 +167,10 @@ var __slice = Array.prototype.slice;
       this.actions.pop();
     };
 
+    Sketch.prototype.clear = function() {
+      this.actions = [];
+    };
+
     return Sketch;
 
   })();
