@@ -2296,7 +2296,6 @@ def assignments(request, bucket=''):
       archived_list = []
       new_count = 0
       serial = 1
-      percent_complete = 0
       status_list = {'N': 1, 'P': 2, 'S': 3, 'F': 4, 'A': 5}
       for assignment in assignments:
         try:
@@ -2305,9 +2304,10 @@ def assignments(request, bucket=''):
           attempted_questions = models.QuestionResponse.objects.all().filter(step_response__instance=instance).exclude(response__exact='', responseFile__exact='').count()
           total_steps = instance.assignment.curriculum.steps.count()
           last_step = instance.last_step
+          percent_complete = 0
           if total_questions > 0:
             percent_complete = float(attempted_questions)/float(total_questions)*100
-          else:
+          elif total_steps > 0:
             percent_complete = float(last_step)/float(total_steps)*100
 
           if instance.status in ['N', 'P', 'S', 'F']:
