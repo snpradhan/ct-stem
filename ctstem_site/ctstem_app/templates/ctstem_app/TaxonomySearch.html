@@ -134,12 +134,14 @@ $(function (){
                 });
                 taxonomy += "<td> <button type='button' class='btn btn-danger remove_taxonomy' title='Remove Taxonomy'><span class='glyphicon glyphicon-trash' aria-hidden='true'></span></button></td>";
                 $('div.curriculum_content div#taxonomy_div table#taxonomy tbody').append(taxonomy);
+                rowAddorRemove($('table#taxonomy'));
 
                 //bind remove function
                 $("button.remove_taxonomy").click(function(e){
                   var taxonomy_id = $(this).closest('tr').attr('id');
                   $('select[id^="id"][id$="taxonomy"] option[value="'+taxonomy_id+'"]').prop('selected', false);
                   $('div.curriculum_content div#taxonomy_div table#taxonomy tbody tr#'+taxonomy_id).remove();
+                  rowAddorRemove($('table#taxonomy'));
                 });
               }
             });

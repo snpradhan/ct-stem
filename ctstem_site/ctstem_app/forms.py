@@ -657,7 +657,7 @@ class AssignmentSearchForm(forms.Form):
     user = kwargs.pop('user')
     super(AssignmentSearchForm, self).__init__(*args, **kwargs)
     if hasattr(user, 'teacher'):
-      self.fields['group_class'].queryset = self.fields['group_class'].queryset.filter(teacher=user.teacher)
+      self.fields['group_class'].queryset = self.fields['group_class'].queryset.filter(Q(teacher=user.teacher) | Q(shared_with=user.teacher))
     elif hasattr(user, 'school_administrator'):
       self.fields['group_class'].queryset = self.fields['group_class'].queryset.filter(teacher__school=user.school_administrator.school)
 
@@ -736,15 +736,16 @@ class UserGroupForm(ModelForm):
   def __init__(self, *args, **kwargs):
     user = kwargs.pop('user')
     super(UserGroupForm, self).__init__(*args, **kwargs)
+
     self.fields['title'].label = 'Class Name/Title'
     self.fields['time'].label = 'Time/Period'
     self.fields['group_code'].label = 'Class Code'
     self.fields['group_code'].widget.attrs['readonly'] = True
     if hasattr(user, 'teacher'):
-      self.fields['members'].queryset = self.fields['members'].queryset.filter(school=user.teacher.school)
+      self.fields['members'].queryset = self.fields['members'].queryset.filter(school=user.teacher.school).order_by('user__first_name', 'user__last_name')
     elif hasattr(user, 'school_administrator'):
-      self.fields['teacher'].queryset = self.fields['teacher'].queryset.filter(school=user.school_administrator.school)
-      self.fields['members'].queryset = self.fields['members'].queryset.filter(school=user.school_administrator.school)
+      self.fields['teacher'].queryset = self.fields['teacher'].queryset.filter(school=user.school_administrator.school).order_by('user__first_name', 'user__last_name')
+      self.fields['members'].queryset = self.fields['members'].queryset.filter(school=user.school_administrator.school).order_by('user__first_name', 'user__last_name')
 
     for field_name, field in self.fields.items():
       field.widget.attrs['class'] = 'form-control'
@@ -775,6 +776,14 @@ class UserGroupForm(ModelForm):
         except models.Membership.DoesNotExist:
             membership = models.Membership(group=instance, student=member)
             membership.save()
+
+      for teacher in self.cleaned_data['shared_with']:
+        if teacher not in instance.shared_with.all():
+          instance.shared_with.add(teacher)
+
+      for teacher in instance.shared_with.all():
+        if teacher not in self.cleaned_data['shared_with']:
+          instance.shared_with.remove(teacher)
 
     self.save_m2m = save_m2m
     if commit:
@@ -853,7 +862,7 @@ class UploadFileForm(forms.Form):
       if hasattr(user, 'school_administrator'):
         self.fields['group'].queryset = models.UserGroup.objects.all().filter(teacher__school=user.school_administrator.school, is_active=True)
       elif hasattr(user, 'teacher'):
-        self.fields['group'].queryset = models.UserGroup.objects.all().filter(teacher=user.teacher, is_active=True)
+        self.fields['group'].queryset = models.UserGroup.objects.all().filter(Q(is_active=True), Q(teacher=user.teacher)| Q(shared_with=user.teacher))
     else:
       self.fields['group'].queryset = models.UserGroup.objects.none()
 

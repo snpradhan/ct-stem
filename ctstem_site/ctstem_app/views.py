@@ -3,6 +3,7 @@ from django.contrib.auth.models import User, Group
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
+from django.db.models.functions import Lower
 from django import http, shortcuts, template
 from django.shortcuts import render
 from django.contrib import auth, messages
@@ -663,7 +664,7 @@ def assignCurriculum(request, id=''):
     elif hasattr(request.user, 'school_administrator'):
       groups = models.UserGroup.objects.all().filter(teacher__school = request.user.school_administrator.school, is_active=True)
     elif hasattr(request.user, 'teacher'):
-      groups = models.UserGroup.objects.all().filter(teacher = request.user.teacher, is_active=True)
+      groups = models.UserGroup.objects.all().filter(Q(teacher=request.user.teacher) | Q(shared_with=request.user.teacher), Q(is_active=True)).distinct()
     else:
       return http.HttpResponseNotFound('<h1>You do not have the privilege to assign this curriculum</h1>')
 
@@ -1297,18 +1298,12 @@ def transferCurriculum(request, user):
 def removeStudent(request, group_id='', student_id=''):
   try:
     # check if the user has permission to create or modify a group
-    if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'school_administrator') == False and hasattr(request.user, 'teacher') == False :
+    has_permission = check_group_permission(request, group_id)
+    if not has_permission:
       return http.HttpResponseNotFound('<h1>You do not have the privilege to remove users from this group</h1>')
-    # check if the lesson exists
 
     group = models.UserGroup.objects.get(id=group_id)
     student = models.Student.objects.get(id=student_id)
-    if hasattr(request.user, 'teacher'):
-      if request.user.teacher != group.teacher:
-        return http.HttpResponseNotFound('<h1>You do not have the privilege to remove users from this group</h1>')
-    elif hasattr(request.user, 'school_administrator'):
-      if request.user.school_administrator.school != group.teacher.school:
-        return http.HttpResponseNotFound('<h1>You do not have the privilege to remove users from this group</h1>')
 
     if request.method == 'GET' or request.method == 'POST':
       membership = models.Membership.objects.get(group=group, student=student)
@@ -1330,18 +1325,12 @@ def removeStudent(request, group_id='', student_id=''):
 def addStudent(request, group_id='', student_id=''):
   try:
     # check if the user has permission to create or modify a group
-    if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'school_administrator') == False and hasattr(request.user, 'teacher') == False :
-      return http.HttpResponseNotFound('<h1>You do not have the privilege to add users from this group</h1>')
-    # check if the lesson exists
+    has_permission = check_group_permission(request, group_id)
+    if not has_permission:
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to remove users from this group</h1>')
 
     group = models.UserGroup.objects.get(id=group_id)
     student = models.Student.objects.get(id=student_id)
-    if hasattr(request.user, 'teacher'):
-      if request.user.teacher != group.teacher:
-        return http.HttpResponseNotFound('<h1>You do not have the privilege to remove users from this group</h1>')
-    elif hasattr(request.user, 'school_administrator'):
-      if request.user.school_administrator.school != group.teacher.school:
-        return http.HttpResponseNotFound('<h1>You do not have the privilege to remove users from this group</h1>')
 
     if request.method == 'POST':
       membership = models.Membership.objects.get_or_create(group=group, student=student)
@@ -1364,8 +1353,11 @@ def createStudent(request, group_id=''):
   try:
     # check if the user has permission to create a student
     import re
-    if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'school_administrator') == False and hasattr(request.user, 'teacher') == False :
-      return http.HttpResponseNotFound('<h1>You do not have the privilege to create a student</h1>')
+    # check if the user has permission to create or modify a group
+    has_permission = check_group_permission(request, group_id)
+    if not has_permission:
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to remove users from this group</h1>')
+
     if request.method == 'POST':
       data=request.POST
       response_data = {}
@@ -1608,7 +1600,7 @@ def searchStudents(request):
 @login_required
 def searchTeachers(request):
   # check if the user has permission to add a question
-  if hasattr(request.user, 'author') == False and hasattr(request.user, 'researcher') == False and  hasattr(request.user, 'administrator') == False:
+  if request.user.is_anonymous() or hasattr(request.user, 'student'):
     return http.HttpResponseNotFound('<h1>You do not have the privilege search teachers</h1>')
 
   if 'GET' == request.method:
@@ -1628,6 +1620,11 @@ def searchTeachers(request):
       query_filter['user__last_name__icontains'] = str(data['last_name'])
     if data['email']:
       query_filter['user__email__icontains'] = str(data['email'])
+
+    if hasattr(request.user, 'teacher'):
+      query_filter['school'] = request.user.teacher.school
+    elif hasattr(request.user, 'school_administrator'):
+      query_filter['school'] = request.user.school_administrator.school
 
     print query_filter
     teacherList = models.Teacher.objects.filter(**query_filter)
@@ -1923,6 +1920,7 @@ def publication(request, slug=''):
   except models.Publication.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested publication not found</h1>')
 
+
 ####################################
 # DELETE PUBLICATION
 ####################################
@@ -1967,9 +1965,9 @@ def groups(request, status='active'):
     if status == 'inactive':
       is_active = False
     if hasattr(request.user, 'administrator') or hasattr(request.user, 'researcher'):
-      groups = models.UserGroup.objects.all().filter(is_active=is_active).order_by('title')
+      groups = models.UserGroup.objects.all().filter(is_active=is_active)
     elif hasattr(request.user, 'school_administrator'):
-      groups = models.UserGroup.objects.all().filter(is_active=is_active, teacher__school=request.user.school_administrator.school).order_by('title')
+      groups = models.UserGroup.objects.all().filter(is_active=is_active, teacher__school=request.user.school_administrator.school)
     elif hasattr(request.user, 'teacher'):
       if is_active == True:
         group_count = models.UserGroup.objects.all().filter(teacher=request.user.teacher).count()
@@ -1977,7 +1975,8 @@ def groups(request, status='active'):
           new_group = models.UserGroup(title='My Class 1', teacher=request.user.teacher, is_active=True)
           new_group.save()
 
-      groups = models.UserGroup.objects.all().filter(is_active=is_active, teacher=request.user.teacher).order_by('title')
+      groups = models.UserGroup.objects.all().filter(Q(is_active=is_active), Q(teacher=request.user.teacher) | Q(shared_with=request.user.teacher)).distinct()
+      print groups
 
     else:
       return http.HttpResponseNotFound('<h1>You do not have the privilege to view student groups</h1>')
@@ -1997,19 +1996,18 @@ def groups(request, status='active'):
 def group(request, id=''):
   try:
     # check if the user has permission to create or modify a group
-    if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'school_administrator') == False and hasattr(request.user, 'teacher') == False :
-      return http.HttpResponseNotFound('<h1>You do not have the privilege to create/modify a class</h1>')
-    # check if the lesson exists
+    group = None
     if '' != id:
-      group = models.UserGroup.objects.get(id=id)
-      if hasattr(request.user, 'teacher'):
-        if request.user.teacher != group.teacher:
-          return http.HttpResponseNotFound('<h1>You do not have the privilege to view/modify this class</h1>')
-      elif hasattr(request.user, 'school_administrator'):
-        if request.user.school_administrator.school != group.teacher.school:
-          return http.HttpResponseNotFound('<h1>You do not have the privilege to view/modify this class</h1>')
+      has_permission = check_group_permission(request, id)
+      if has_permission:
+        group = models.UserGroup.objects.get(id=id)
+      else:
+        return http.HttpResponseNotFound('<h1>You do not have the privilege to view/modify this class</h1>')
     else:
-      group = models.UserGroup()
+      if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'school_administrator') == False and hasattr(request.user, 'teacher') == False:
+        return http.HttpResponseNotFound('<h1>You do not have the privilege to create/modify a class</h1>')
+      else:
+        group = models.UserGroup()
 
     if request.method in ['GET', 'POST']:
       assignments = {}
@@ -2187,20 +2185,12 @@ def groupDashboard(request, id=''):
   try:
     if request.method == 'GET':
       group = models.UserGroup.objects.get(id=id)
-
-      privilege = 1
-      if hasattr(request.user, 'administrator') or hasattr(request.user, 'researcher'):
-        privilege = 1
-      elif hasattr(request.user, 'school_administrator'):
-        if group.teacher.school != request.user.school_administrator.school:
-          privilege = 0
-      elif hasattr(request.user, 'teacher'):
-        if group.teacher != request.user.teacher:
-          privilege = 0
+      if hasattr(request.user, 'researcher'):
+        has_permission = True
       else:
-        privilege = 0
+        has_permission = check_group_permission(request, id)
 
-      if privilege == 0:
+      if not has_permission:
         return http.HttpResponseNotFound('<h1>You do not have the privilege to view this group</h1>')
 
       assignments = {}
@@ -2256,20 +2246,14 @@ def assignmentDashboard(request, id=''):
   try:
     if request.method == 'GET':
       assignment = models.Assignment.objects.get(id=id)
+      group = assignment.group
 
-      privilege = 1
-      if hasattr(request.user, 'administrator') or hasattr(request.user, 'researcher'):
-        privilege = 1
-      elif hasattr(request.user, 'school_administrator'):
-        if assignment.group.teacher.school !=  request.user.school_administrator.school:
-          privilege = 0
-      elif hasattr(request.user, 'teacher'):
-        if assignment.group.teacher != request.user.teacher:
-          privilege = 0
+      if hasattr(request.user, 'researcher'):
+        has_permission = True
       else:
-        privilege = 0
+        has_permission = check_group_permission(request, group.id)
 
-      if privilege == 0:
+      if not has_permission:
         return http.HttpResponseNotFound('<h1>You do not have the privilege to view this grassignmentoup</h1>')
 
       students = assignment.group.members.all()
@@ -2688,15 +2672,13 @@ def feedback(request, assignment_id='', instance_id=''):
 
       school = instance.student.school
       group = instance.assignment.group
-      privilege = 0
-      if hasattr(request.user, 'researcher') or hasattr(request.user, 'administrator'):
-        privilege = 1
-      elif hasattr(request.user, 'teacher') and request.user.teacher == group.teacher:
-          privilege = 1
-      elif hasattr(request.user, 'school_administrator') and request.user.school_administrator.school == school:
-        privilege = 1
 
-      if privilege == 0:
+      if hasattr(request.user, 'researcher'):
+        has_permission = True
+      else:
+        has_permission = check_group_permission(request, group.id)
+
+      if not has_permission:
         return http.HttpResponseNotFound('<h1>You do not have the privilege to provide feedback on this assignment</h1>')
 
       feedback, created = models.AssignmentFeedback.objects.get_or_create(instance=instance)
@@ -2723,7 +2705,7 @@ def feedback(request, assignment_id='', instance_id=''):
         return render(request, 'ctstem_app/Feedback.html', context)
       elif 'POST' == request.method:
         data = request.POST.copy()
-        print data
+
         form = forms.FeedbackForm(data, instance=feedback, prefix='feedback')
         #AssessmentStepFormSet = inlineformset_factory(models.Assessment, models.AssessmentStep, form=forms.AssessmentStepForm,can_delete=True, can_order=True, extra=1)
 
@@ -2733,8 +2715,6 @@ def feedback(request, assignment_id='', instance_id=''):
 
 
         formset = StepFeedbackFormSet(data, instance=feedback, prefix='form')
-        print form.is_valid()
-        print formset.is_valid()
         if form.is_valid() and formset.is_valid():
           form.save()
           formset.save()
@@ -2820,6 +2800,7 @@ def deleteAssignment(request, assignment_id=''):
   # check if the user has permission to do this operation
   has_permission = check_assignment_permission(request, assignment_id)
   response_data = {'success': False }
+
   if has_permission:
     assignment = models.Assignment.objects.get(id=assignment_id)
     assignment_instances = models.AssignmentInstance.objects.all().filter(assignment__id=assignment_id)
@@ -2831,13 +2812,17 @@ def deleteAssignment(request, assignment_id=''):
     if status == 'N':
       assignment.delete()
       response_data['success'] = True
+
   if request.is_ajax():
     return http.HttpResponse(json.dumps(response_data), content_type="application/json")
   else:
-    if status == 'N':
-      messages.success(request, 'The assignment %s has been deleted' % (assignment.curriculum))
+    if has_permission:
+      if status == 'N':
+        messages.success(request, 'The assignment %s has been deleted' % (assignment.curriculum))
+      else:
+        messages.error(request, 'The assignment %s is in progress and cannot be deleted' % (assignment.curriculum))
     else:
-      messages.error(request, 'The assignment %s is in progress and cannot be deleted' % (assignment.curriculum))
+      messages.error(request, 'You do not have the permission to delete this assignment')
 
     return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
@@ -2872,41 +2857,37 @@ def addAssignment(request, curriculum_id='', group_id=''):
 ####################################
 @login_required
 def check_group_permission(request, group_id=''):
-  has_permission = False
+  has_permission = True
   try:
     group = models.UserGroup.objects.get(id=group_id)
-    if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'researcher') == False and hasattr(request.user, 'teacher') == False and hasattr(request.user, 'school_administrator') == False:
+    if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'teacher') == False and hasattr(request.user, 'school_administrator') == False:
       has_permission = False
-    elif hasattr(request.user, 'school_administrator') and group.teacher.school !=  request.user.school_administrator.school:
+    elif hasattr(request.user, 'school_administrator') and group.teacher.school != request.user.school_administrator.school:
       has_permission = False
-    elif hasattr(request.user, 'teacher') and group.teacher != request.user.teacher:
+    elif hasattr(request.user, 'teacher') and group.teacher != request.user.teacher and request.user.teacher not in group.shared_with.all():
       has_permission = False
-    else:
-      has_permission = True
+
   except models.UserGroup.DoesNotExist:
     has_permission = False
 
   return has_permission
+
 
 ####################################
 # check if the user has permission to do this operation on assignment
 ####################################
 @login_required
 def check_assignment_permission(request, assignment_id=''):
-  has_permission = False
+  has_permission = True
   try:
     assignment = models.Assignment.objects.get(id=assignment_id)
-    print assignment
-    if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'researcher') == False and hasattr(request.user, 'teacher') == False and hasattr(request.user, 'school_administrator') == False:
-      has_permission = False
-    elif hasattr(request.user, 'school_administrator') and assignment.group.teacher.school !=  request.user.school_administrator.school:
-      has_permission = False
-    elif hasattr(request.user, 'teacher') and assignment.group.teacher != request.user.teacher:
-      has_permission = False
-    else:
-      has_permission = True
+    group = assignment.group
+    has_permission = check_group_permission(request, group.id)
+
   except models.Assignment.DoesNotExist:
     has_permission = False
+  except models.UserGroup.DoesNotExist:
+     has_permission = False
 
   return has_permission
 
@@ -2916,17 +2897,16 @@ def check_assignment_permission(request, assignment_id=''):
 ####################################
 @login_required
 def export_response(request, assignment_id='', student_id=''):
-  # check if the user has permission to add a question
-  if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'researcher') == False and hasattr(request.user, 'teacher') == False and hasattr(request.user, 'school_administrator') == False:
-    return http.HttpResponseNotFound('<h1>You do not have the privilege to export student response</h1>')
   try:
     assignment = models.Assignment.objects.get(id=assignment_id)
-    if hasattr(request.user, 'school_administrator'):
-      if assignment.group.teacher.school !=  request.user.school_administrator.school:
-        return http.HttpResponseNotFound('<h1>You do not have the privilege to export student responses for this assignment</h1>')
-    elif hasattr(request.user, 'teacher'):
-      if assignment.group.teacher != request.user.teacher:
-        return http.HttpResponseNotFound('<h1>You do not have the privilege to export student responses for this assignment</h1>')
+    group = assignment.group
+    if hasattr(request.user, 'researcher'):
+      has_permission = True
+    else:
+      has_permission = check_group_permission(request, group.id)
+
+    if not has_permission:
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to export student response for this assignment</h1>')
 
     response = http.HttpResponse(content_type='application/ms-excel')
     if '' != student_id:
@@ -3061,7 +3041,7 @@ def export_all_response(request, curriculum_id=''):
       elif hasattr(request.user, 'school_administrator') == True:
         assignments = models.Assignment.objects.all().filter(curriculum__id = curr.id, group__teacher__school = request.user.school_administrator.school)
       elif hasattr(request.user, 'teacher') == True:
-        assignments = models.Assignment.objects.all().filter(curriculum__id = curr.id, group__teacher = request.user.teacher)
+        assignments = models.Assignment.objects.all().filter(Q(curriculum__id = curr.id), Q(group__teacher = request.user.teacher) | Q(group__shared_with = request.user.teacher))
       else:
         return http.HttpResponseNotFound('<h1>You do not have the privilege to export student response for the selected curriculum</h1>')
 

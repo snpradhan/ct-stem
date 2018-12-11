@@ -93,22 +93,25 @@ $(function (){
               if($('select[id^="id"][id$="shared_with"] option[value="'+$(this).attr('id')+'"]').prop('selected') == false){
                //select the teacher id in the hidden select field
                 $('select[id^="id"][id$="shared_with"] option[value="'+$(this).attr('id')+'"]').prop('selected', true);
+                console.log($('select[id^="id"][id$="shared_with"] option[value="'+$(this).attr('id')+'"]').prop('selected'));
                 //add the selected teacher to the shared with table
                 teacher_row = $(this).closest('tr');
                 teacher = "<tr id='"+$(this).attr('id')+"'>";
                 $(teacher_row).find('td:not(:last)').each(function(){
                   teacher += "<td>"+$(this).html()+"</td>";
                 });
-                teacher += "<td> <button type='button' class='btn btn-warning unshare' aria-label='Unshare curriculum with this teacher' title='Unshare curriculum with this teacher'> \
+                teacher += "<td> <button type='button' class='btn btn-warning unshare' aria-label='Unshare resource with this teacher' title='Unshare resource with this teacher'> \
                             <span class='glyphicon glyphicon-trash' aria-hidden='true'></span>\
                           </button></td>";
-                $('div.curriculum_content table#teachers tbody').append(teacher);
+                $('table#teachers tbody').append(teacher);
+                rowAddorRemove($('table#teachers'));
 
                 //bind remove function
                 $("button.unshare").click(function(e){
                   var teacher_id = $(this).closest('tr').attr('id');
                   $('select[id^="id"][id$="shared_with"] option[value="'+teacher_id+'"]').prop('selected', false);
-                  $('div.curriculum_content table#teachers tbody tr#'+teacher_id).remove();
+                  $('table#teachers tbody tr#'+teacher_id).remove();
+                  rowAddorRemove($('table#teachers'));
                 });
               }
 

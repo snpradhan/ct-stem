@@ -330,7 +330,40 @@ $(function (){
     }
   });
 
+  $("button.search_teachers").click(function(e){
+    e.preventDefault();
+    var url = $(this).data("form");
+    $("#teacherModal").load(url, function() {
+      $(this).modal('show');
+    });
+    return false;
+  });
+
+  //bind remove function
+  $("button.unshare").click(function(e){
+    var teacher_id = $(this).closest('tr').attr('id');
+    $('select[id^="id"][id$="shared_with"] option[value="'+teacher_id+'"]').prop('selected', false);
+    $('table#teachers tbody tr#'+teacher_id).remove();
+    rowAddorRemove($('table#teachers'));
+  });
+
+  //hide table header if no rows
+  $('table.inner_table').each(function(){
+    if(!$(this).parent().hasClass('results')) {
+      rowAddorRemove($(this));
+    }
+  });
+
 });
+
+function rowAddorRemove(tbl){
+  if($(tbl).find('tbody > tr:visible').length == 0){
+    $(tbl).find('thead').css('display', 'none');
+  }
+  else{
+    $(tbl).find('thead').css('display', 'table-header-group');
+  }
+}
 
 function bind_user_removal(){
   $('a.removeUser').unbind('click');
@@ -338,6 +371,7 @@ function bind_user_removal(){
     e.preventDefault();
     var remove = confirm('Are you sure you want to remove the student from the group?');
     var tr = $(this).closest('tr');
+    var table = $(this).closest('table');
     var hd_input = $('input:hidden#id_group-members_'+$(this).data('id'));
     if(remove){
       var url = $(this).attr('href');
@@ -352,6 +386,7 @@ function bind_user_removal(){
         success: function(data){
           if(data['result'] == 'Success'){
             $(tr).remove();
+            rowAddorRemove(table);
             $(hd_input).remove();
           }
           else{
@@ -412,8 +447,11 @@ function add_student_to_data_table(value, csrf){
     <td>'+value['member_since']+'</td>\
     <td>'+value['last_login']+'</td></tr>');
 
+  rowAddorRemove($('table.table#members'));
+
   //add student membership hidden input
   $('table.table#members').before('<input id="id_group-members_'+value['student_id']+'" name="group-members" type="hidden" value="'+value['student_id']+'">');
+
 }
 
 function update_subaction( action, csrftoken ) {

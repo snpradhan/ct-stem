@@ -14,6 +14,7 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db.models import signals
 from django.dispatch import receiver
 from django.db.models.signals import pre_save, post_save
+from django.db.models.functions import Upper
 from django.conf import settings
 from django.core.mail import send_mail
 from django.contrib.sites.models import Site
@@ -385,6 +386,9 @@ class Teacher(models.Model):
   consent = models.CharField(null=False, max_length=1, default='U', choices=CONSENT_CHOICES)
   validation_code = models.CharField(null=False, max_length=5)
 
+  class Meta:
+      ordering = ['user__first_name', 'user__last_name']
+
   def __unicode__(self):
       return u'%s' % (self.user.get_full_name())
 
@@ -446,6 +450,7 @@ class UserGroup(models.Model):
   teacher = models.ForeignKey(Teacher, related_name='groups')
   description = models.TextField(null=True)
   members = models.ManyToManyField(Student, through='Membership', blank=True, null=True, related_name='member_of')
+  shared_with = models.ManyToManyField(Teacher, null=True, blank=True, help_text='Select teachers to share this class with.' )
   group_code = models.CharField(null=False, blank=False, max_length=10, unique=True, default=generate_code_helper)
   is_active = models.BooleanField(null=False, blank=False, default=True)
   created_date = models.DateTimeField(auto_now_add=True)
@@ -491,7 +496,8 @@ class Membership(models.Model):
   group = models.ForeignKey(UserGroup, related_name="group_members")
   joined_on = models.DateTimeField(auto_now_add=True)
 
-
+  class Meta:
+    ordering = ('student__user__first_name', 'student__user__last_name')
 #######################################################
 # Assignment Instance Model
 #######################################################

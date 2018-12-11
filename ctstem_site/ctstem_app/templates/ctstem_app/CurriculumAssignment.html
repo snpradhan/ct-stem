@@ -31,7 +31,13 @@
           <tbody>
             {% for group in groups %}
               <tr class="unit group_{{group.id}} {% if forloop.counter|divisibleby:2 %} even {% else %} odd {% endif %}" >
-                <td rowspan="{% if curriculum.curriculum_type|slugify == 'U'|slugify %} {{curriculum_list|length|add:1}} {% endif %}">{{group}}</td>
+                <td rowspan="{% if curriculum.curriculum_type|slugify == 'U'|slugify %} {{curriculum_list|length|add:1}} {% endif %}">
+                  {{group}}
+                  {% if user.teacher and user.teacher in group.shared_with.all %}
+                    <i class="fa fa-share-alt" title="Shared by {{group.teacher}}"></i>
+                  {% endif %}
+
+                </td>
                 {% if user.administrator or user.researcher %}
                   <td rowspan="{% if curriculum.curriculum_type|slugify == 'U'|slugify %} {{curriculum_list|length|add:1}} {% endif %}">{{group.teacher.school}}</td>
                 {% endif %}

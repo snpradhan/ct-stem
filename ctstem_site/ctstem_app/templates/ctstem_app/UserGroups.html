@@ -45,7 +45,12 @@
 
                   <div class="portfolio-caption">
                     <input id="group_{{group.id}}" type="checkbox" class="action-select" value="{{group.id}}" name="group_{{group.id}}"/>
-                    <div class="class_title">{{group.title}}</div>
+                    <div class="class_title">
+                      {{group.title}}
+                      {% if user.teacher in group.shared_with.all %}
+                        <i class="fa fa-share-alt" title="Shared by {{group.teacher}}"></i>
+                      {% endif %}
+                    </div>
 
                     <div class="button_row">
                       {% if group.is_active %}
@@ -122,12 +127,13 @@
               <tr>
                 <th width="1%" class="no-sort"><input id="select-all" type="checkbox" value="0" name="select-all"/></th>
                 <th width="20%"> Class Name </th>
-                <th width="15%"> Subject </th>
+                <th width="10%"> Subject </th>
                 <th width="10%"> Time </th>
                 <th> Status </th>
                 {% if not user.teacher %}
                   <th width="15%"> Teacher </th>
                 {% endif %}
+                <th width="15%">Co-teachers</th>
                 {% if not user.teacher and not user.school_administrator %}
                   <th width="15%"> School </th>
                 {% endif %}
@@ -144,6 +150,7 @@
                 {% if not user.teacher %}
                   <th> Teacher </th>
                 {% endif %}
+                <th>Co-teachers</th>
                 {% if not user.teacher and not user.school_administrator %}
                   <th width="15%"> School </th>
                 {% endif %}
@@ -192,6 +199,11 @@
                   {% if not user.teacher %}
                     <td>{{group.teacher}}</td>
                   {% endif %}
+                  <td>
+                    {% for coteacher in group.shared_with.all %}
+                      <div>{{coteacher}}</div>
+                    {% endfor %}
+                  </td>
                   {% if not user.teacher and not user.school_administrator %}
                     <td> {{group.teacher.school}} </td>
                   {% endif %}

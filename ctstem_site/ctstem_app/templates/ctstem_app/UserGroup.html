@@ -11,7 +11,12 @@
   {{block.super}}
   <div class="content">
     {% if form.instance.id %}
-      <h2>Edit Class</h2>
+      <h2>
+        Edit Class
+        {% if user.teacher and user.teacher in form.instance.shared_with.all %}
+          <i class="fa fa-share-alt" title="Shared by {{form.instance.teacher}}"></i>
+        {% endif %}
+      </h2>
     {% else %}
       <h2>Add New Class</h2>
     {% endif %}
@@ -25,11 +30,13 @@
           <div class="controls">{{form.title}}</div>
           <div class="error">{{ form.title.errors }}</div>
         </div>
+
         <div class="form-group">
           <label for="id_group-subject">{{ form.subject.label }} {% if form.subject.field.required %}(<span class="required">*</span>){% endif %} </label>
           <div class="controls">{{form.subject}}</div>
           <div class="error">{{ form.subject.errors }}</div>
         </div>
+
         <div class="form-group">
           <label for="id_group-icon">{{ form.icon.label }} {% if form.icon.field.required %}(<span class="required">*</span>){% endif %} </label>
           <div class="controls">{{form.icon}}</div>
@@ -41,8 +48,19 @@
           <div class="controls">{{form.time}}</div>
           <div class="error">{{ form.time.errors }}</div>
         </div>
+
         {% if user.teacher %}
-          <input type="hidden" id="id_group-teacher" name="group-teacher" value="{{user.teacher.id}}"/>
+          {% if form.teacher.value %}
+            <input type="hidden" id="id_group-teacher" name="group-teacher" value="{{form.teacher.value}}"/>
+          {% else %}
+            <input type="hidden" id="id_group-teacher" name="group-teacher" value="{{user.teacher.id}}"/>
+          {% endif %}
+          {% if form.instance.id and user.teacher.id != form.teacher.value %}
+            <div class="form-group">
+              <label for="id_group-teacher">Teacher</label>
+              <div class="controls"><input type="text" class="form-control" name="teacher" value="{{form.instance.teacher.user.get_full_name}}" disabled style="width: auto;"></input></div>
+            </div>
+          {% endif %}
         {% else %}
           <div class="form-group">
             <label for="id_group-teacher">{{ form.teacher.label }} {% if form.teacher.field.required %}(<span class="required">*</span>){% endif %} </label>
@@ -50,11 +68,22 @@
             <div class="error">{{ form.teacher.errors }}</div>
           </div>
         {% endif %}
+
+        {% if user.teacher and user.teacher.id in form.shared_with.value %}
+          {{form.shared_with.as_hidden}}
+        {% else %}
+          <div class="form-group">
+            <label for="id_group-coteachers">{{ form.shared_with.label }} {% if form.shared_with.field.required %}(<span class="required">*</span>){% endif %} </label>
+            {% include "ctstem_app/SharedTeachers.html" with resource='group' field=form.shared_with %}
+            <div class="help warning">{{form.shared_with.help_text|safe}}</div>
+          </div>
+        {% endif %}
         <div class="form-group">
           <label for="id_group-description">{{ form.description.label }} {% if form.description.field.required %}(<span class="required">*</span>){% endif %} </label>
           <div class="controls">{{form.description}}</div>
           <div class="error">{{ form.description.errors }}</div>
         </div>
+
         <div class="form-group">
           <label for="id_group-group_code">{{ form.group_code.label }} {% if form.group_code.field.required %}(<span class="required">*</span>){% endif %} </label>
           <div class="input-group">
@@ -65,11 +94,13 @@
           </div>
           <div class="error">{{ form.group_code.errors }}</div>
         </div>
+
         <div class="form-group">
           <label for="id_group-is_active">{{ form.is_active.label|title }} {% if form.is_active.field.required %}(<span class="required">*</span>){% endif %} </label>
           <div class="controls">{{form.is_active}}</div>
           <div class="error">{{ form.is_active.errors }}</div>
         </div>
+
         {% if form.instance.id %}
         <div class="form-group">
           <label for="id_group-dates">Dates </label>
@@ -337,7 +368,6 @@
           }
         });
       });
-
     });
   </script>
 {% endblock %}
