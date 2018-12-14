@@ -13,6 +13,7 @@ ul.messages {
 ul.messages li {
   text-align: center;
   padding: 0.5em 0;
+  background-color: #f7f7f7
 }
 .error {
   color: red;
@@ -35,4 +36,9 @@ ul.messages li {
   text-align: center;
   padding: 0.25em 0 0.75em 0;
   font-size: 1.5em;
+}
+
+.posted {
+  animation: fadeout 2s;
+  animation-delay: 5s;
 }
