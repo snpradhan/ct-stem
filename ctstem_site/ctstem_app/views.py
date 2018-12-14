@@ -2944,8 +2944,8 @@ def export_response(request, assignment_id='', student_id=''):
     row_num += 1
     ws.write(row_num, 0, '')
 
-    columns = ['Student', 'Step No.', 'Step Title', 'Question No.', 'Question', 'Research Category', 'Options', 'Correct Answer', 'Student Response', 'Submission DateTime']
-    font_styles = [font_style, font_style, font_style, font_style, font_style, font_style, font_style, font_style, font_style, date_time_format]
+    columns = ['Student', 'Student ID', 'Step No.', 'Step Title', 'Question No.', 'Question', 'Research Category', 'Options', 'Correct Answer', 'Student Response', 'Submission DateTime']
+    font_styles = [font_style, font_style, font_style, font_style, font_style, font_style, font_style, font_style, font_style, font_style, date_time_format]
 
     row_num += 1
     for col_num in range(len(columns)):
@@ -2956,12 +2956,16 @@ def export_response(request, assignment_id='', student_id=''):
         student = instance.student.user.id
       else:
         student = instance.student.user.get_full_name()
+
+      studentID = instance.student.user.id
+
       stepResponses = models.AssignmentStepResponse.objects.all().filter(instance=instance)
       for stepResponse in stepResponses:
         questionResponses = models.QuestionResponse.objects.all().filter(step_response=stepResponse)
         for questionResponse in questionResponses:
           response_text = get_response_text(request, instance.id, questionResponse)
           row = [student,
+                 studentID,
                  stepResponse.step.order,
                  stepResponse.step.title,
                  questionResponse.curriculum_question.order,
@@ -3004,8 +3008,8 @@ def export_all_response(request, curriculum_id=''):
     date_time_format.num_format_str = 'mm/dd/yyyy hh:mm AM/PM'
 
 
-    columns = ['Group', 'Curriculum', 'Assigned Date', 'Student', 'Step No.', 'Step Title', 'Question No.', 'Question', 'Research Category', 'Options', 'Correct Answer', 'Student Response', 'Submission DateTime']
-    font_styles = [font_style, font_style, date_format, font_style, font_style, font_style, font_style, font_style, font_style, font_style, font_style, font_style, date_time_format]
+    columns = ['Group', 'Curriculum', 'Assigned Date', 'Student', 'Student ID', 'Step No.', 'Step Title', 'Question No.', 'Question', 'Research Category', 'Options', 'Correct Answer', 'Student Response', 'Submission DateTime']
+    font_styles = [font_style, font_style, date_format, font_style, font_style, font_style, font_style, font_style, font_style, font_style, font_style, font_style, font_style, date_time_format]
 
     if hasattr(request.user, 'administrator') == True or hasattr(request.user, 'researcher') == True or hasattr(request.user, 'school_administrator') == True:
       columns.insert(0, 'Teacher')
@@ -3058,6 +3062,8 @@ def export_all_response(request, curriculum_id=''):
             student = instance.student.user.id
           else:
             student = instance.student.user.get_full_name()
+
+          studentID = instance.student.user.id
           stepResponses = models.AssignmentStepResponse.objects.all().filter(instance=instance)
           print stepResponses
           for stepResponse in stepResponses:
@@ -3068,6 +3074,7 @@ def export_all_response(request, curriculum_id=''):
                      instance.assignment.curriculum.title,
                      instance.assignment.assigned_date.replace(tzinfo=None),
                      student,
+                     studentID,
                      stepResponse.step.order,
                      stepResponse.step.title,
                      questionResponse.curriculum_question.order,
@@ -3882,4 +3889,3 @@ def iframe_state(request, instance_id, iframe_id):
     return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 
   return http.HttpResponse(status=400)
-
