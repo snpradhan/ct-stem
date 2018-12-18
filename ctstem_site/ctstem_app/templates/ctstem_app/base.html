@@ -141,35 +141,21 @@
           <!-- Collect the nav links, forms, and other content for toggling -->
           <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
+
               {% if user.student %}
                 <!-- Student role -->
                 <li class="{% navactive request 'ctstem:assignments' 'inbox' %}"><a href="{% url 'ctstem:assignments' 'inbox' %}">My Assignments</a></li>
-              {% else %}
+              {% endif %}
 
-                <!-- Teaching Resource Menu -->
-                <li class="{% navactive request 'ctstem:curricula' 'lessons'%}
-                           {% navactive request 'ctstem:curricula' 'lessons' 'published' '0' %}
-                           {% navactive request 'ctstem:curricula' 'lessons' 'published' '1' %}
-                           {% navactive request 'ctstem:curricula' 'lessons' 'draft' '0' %}
-                           {% navactive request 'ctstem:curricula' 'lessons' 'archived' '0' %}
-                           {% navactive request 'ctstem:curricula' 'units'%}
-                           {% navactive request 'ctstem:curricula' 'units' 'published' '0' %}
-                           {% navactive request 'ctstem:curricula' 'units' 'published' '1' %}
-                           {% navactive request 'ctstem:curricula' 'units' 'draft' '0' %}
-                           {% navactive request 'ctstem:curricula' 'units' 'archived' '0' %}
-                           {% navactive request 'ctstem:curricula' 'assessments' %}
-                           {% navactive request 'ctstem:curricula' 'assessments' 'published' '0' %}
-                           {% navactive request 'ctstem:curricula' 'assessments' 'published' '1' %}
-                           {% navactive request 'ctstem:curricula' 'assessments' 'draft' '0' %}
-                           {% navactive request 'ctstem:curricula' 'assessments' 'archived' '0' %}">
-                  {% if user.is_authenticated %}
-                    <a href="{% url 'ctstem:curricula' 'units' %}">Teaching Resources</a>
-                  {% elif request.path == '/' %}
-                    <a class="page-scroll" href="#three">Teaching Resources</a>
-                  {% else %}
-                    <a class="page-scroll" href="{% url 'ctstem:home' %}#three">Teaching Resources</a>
-                  {% endif %}
-                </li>
+              {% if not user.student %}
+                <!-- Teaching Resources Menu -->
+                <li class="{% navactive request 'ctstem:curricula' 'lesson' %}
+                           {% navactive request 'ctstem:curricula' 'unit' %}
+                           {% navactive request 'ctstem:curricula' 'assessment' %}
+                           {% navactive request 'ctstem:curricula' 'teacher_authored' %}
+                           {% navactive request 'ctstem:curricula' 'my' %}
+                           {% navactive request 'ctstem:curricula' 'shared' %}
+                           {% navactive request 'ctstem:curricula' 'favorite' %}"><a href="{% url 'ctstem:curricula' 'unit' %}">Teaching Resources</a></li>
                 <!-- Intro to CT Menu -->
                 <li><a class="page-scroll" href="{% url 'ctstem:home' %}#five">Intro to CT</a></li>
 
@@ -319,33 +305,31 @@
     {% endblock %}
     {% block modals %}
 
-      {% block session_expiry %}
-        <div class="modal fade" id="session_expiry" role="dialog">
-          <div class="modal-dialog modal-sm">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h3 class="modal-title">Session Expiring</h3>
-              </div>
-              <div id="sessionMsg" class="msg">
-              </div>
-              <form class="form" id="formSession" method="post" action="{% url 'ctstem:check_session' %}">
-                {% csrf_token %}
-                <div class="modal-body">
-                  <h5>Your session is expiring in <span class="time"></span> second(s)</h5>
-                </div>
-                <div class="modal-footer">
-                  <div class="form-group button-row">
-                    <button type="submit" id="btnSession" class="btn btn-success">
-                      Keep Session
-                    </button>
-                    <a type="button" href="{% url 'ctstem:logout' %}" class="btn btn-warning">Logout</a>
-                  </div>
-                </div>
-              </form>
+      <div class="modal fade" id="session_expiry" role="dialog">
+        <div class="modal-dialog modal-sm">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h3 class="modal-title">Session Expiring</h3>
             </div>
+            <div id="sessionMsg" class="msg">
+            </div>
+            <form class="form" id="formSession" method="post" action="{% url 'ctstem:check_session' %}">
+              {% csrf_token %}
+              <div class="modal-body">
+                <h5>Your session is expiring in <span class="time"></span> second(s)</h5>
+              </div>
+              <div class="modal-footer">
+                <div class="form-group button-row">
+                  <button type="submit" id="btnSession" class="btn btn-success">
+                    Keep Session
+                  </button>
+                  <a type="button" href="{% url 'ctstem:logout' %}" class="btn btn-warning">Logout</a>
+                </div>
+              </div>
+            </form>
           </div>
         </div>
-      {% endblock %}
+      </div>
 
       <div class="modal fade" id="privacy" role="dialog">
         <div class="modal-dialog modal-lg">
@@ -420,8 +404,7 @@
       </div>
       <div class="modal fade" id="password" role="dialog">
       </div>
-      <div class="modal fade" id="curriculum" role="dialog">
-      </div>
+      <div class="modal fade" id="curriculum" role="dialog"></div>
       <div class="modal fade" id="profile" role="dialog">
       </div>
       <div class="modal fade" id="register" role="dialog">
@@ -429,9 +412,10 @@
       <div class="modal fade" id="validate" role="dialog">
       </div>
       <div class="modal fade" id="consent" role="dialog" data-keyboard="false" data-backdrop="static"></div>
+      <div class="modal fade" id="userSearch" role="dialog"></div>
 
-      <div class="modal fade" id="teacherModal" role="dialog"></div>
     {% endblock %}
+
   </body>
 
   {% block footer %}

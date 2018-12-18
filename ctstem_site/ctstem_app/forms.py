@@ -481,13 +481,18 @@ class CurriculumForm(ModelForm):
     }
 
   def __init__(self, *args, **kwargs):
+    usr = kwargs.pop('user')
     super(CurriculumForm, self).__init__(*args, **kwargs)
     forms.ModelForm.__init__(self, *args, **kwargs)
     self.fields['taxonomy'].label = "Standards"
     self.fields['order'].label = "Curriculum Order"
-    self.fields['authors'].choices = [(user.pk, user.get_full_name()) for user in models.User.objects.all().filter(Q(administrator__isnull=False) | Q(researcher__isnull=False) | Q(author__isnull=False)).order_by('first_name', 'last_name')]
+    self.fields['authors'].choices = [(user.pk, user.get_full_name()) for user in models.User.objects.all().filter(Q(administrator__isnull=False) | Q(researcher__isnull=False) | Q(author__isnull=False) |  Q(teacher__isnull=False)).order_by(Lower('first_name'), Lower('last_name'))]
     self.fields['unit'].queryset = models.Curriculum.objects.filter(curriculum_type='U').order_by(Lower('title'), 'version')
     self.fields['unit'].label_from_instance = lambda obj: "%s - v%d." % (obj.title, obj.version)
+    if hasattr(usr, 'teacher'):
+      self.fields['unit'].widget.attrs['disabled'] = True
+      self.fields.pop('status')
+
 
     if self.instance.id:
       self.fields['curriculum_type'].widget.attrs['disabled'] = True
@@ -717,38 +722,23 @@ class TaxonomySearchForm(ModelForm):
         field.queryset = models.Category.objects.none()
 
 ####################################
-# Student Search Form
+# User Search Form
 ####################################
-class StudentSearchForm(forms.Form):
+class UserSearchForm(forms.Form):
   username = forms.CharField(required=False, max_length=30, label=u'Username')
   first_name = forms.CharField(required=False, max_length=30, label=u'First name')
   last_name = forms.CharField(required=False, max_length=30, label=u'Last name')
   email = forms.EmailField(required=False, max_length=75, label=u'Email')
 
   def __init__(self, *args, **kwargs):
-    super(StudentSearchForm, self).__init__(*args, **kwargs)
+    super(UserSearchForm, self).__init__(*args, **kwargs)
 
     for field_name, field in self.fields.items():
       field.widget.attrs['class'] = 'form-control'
       if field.help_text:
         field.widget.attrs['placeholder'] = field.help_text
 
-####################################
-# Teacher Search Form
-####################################
-class TeacherSearchForm(forms.Form):
-  username = forms.CharField(required=False, max_length=30, label=u'Username')
-  first_name = forms.CharField(required=False, max_length=30, label=u'First name')
-  last_name = forms.CharField(required=False, max_length=30, label=u'Last name')
-  email = forms.EmailField(required=False, max_length=75, label=u'Email')
 
-  def __init__(self, *args, **kwargs):
-    super(TeacherSearchForm, self).__init__(*args, **kwargs)
-
-    for field_name, field in self.fields.items():
-      field.widget.attrs['class'] = 'form-control'
-      if field.help_text:
-        field.widget.attrs['placeholder'] = field.help_text
 ####################################
 # Create and Add Student Form
 ####################################

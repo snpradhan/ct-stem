@@ -1,70 +1,65 @@
-<div class="modal fade" id="studentSearch" role="dialog">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h3 class="left">Search Students</h3>
-      </div>
-      <div id="studentMsg" class="msg">
-        <ul class="errorlist">
-          <li></li>
-        </ul>
-      </div>
-      <form class="form" id="studentForm" method="post" action="{% url 'ctstem:searchStudents' %}">
-        {% csrf_token %}
-        <input type="hidden" name="group_id" value="{{form.instance.id}}"/>
-        <div class="modal-body">
-          <div class="form-inline">
-            <div class="form-group">
-              <label for="id_username">Username</label>
-              <div>{{studentSearchForm.username}}</div>
-            </div>
-            <div class="form-group">
-              <label for="id_first_name">First Name</label>
-              <div>{{studentSearchForm.first_name}}</div>
-            </div>
-            <div class="form-group">
-              <label for="id_last_name">Last Name</label>
-              <div>{{studentSearchForm.last_name}}</div>
-            </div>
-            <div class="form-group">
-              <label for="id_email">Email</label>
-              <div>{{studentSearchForm.email}}</div>
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer">
+<div class="modal-dialog modal-lg">
+  <div class="modal-content">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal">&times;</button>
+      <h3 class="modal-title">Search Students</h3>
+    </div>
+    <div id="studentMsg" class="msg">
+    </div>
+    <form class="form" id="studentForm" method="post" action="{% url 'ctstem:searchStudents' %}">
+      {% csrf_token %}
+      <input type="hidden" name="group_id" value="{{form.instance.id}}"/>
+      <div class="modal-body">
+        <div class="form-inline">
           <div class="form-group">
-            <a type="button" class="btn normal red" data-dismiss="modal">Close</a>
-            <button type="submit" id="search" class="btn normal yellow">
-              Search
-            </button>
+            <label for="id_username">Username</label>
+            <div>{{studentSearchForm.username}}</div>
+          </div>
+          <div class="form-group">
+            <label for="id_first_name">First Name</label>
+            <div>{{studentSearchForm.first_name}}</div>
+          </div>
+          <div class="form-group">
+            <label for="id_last_name">Last Name</label>
+            <div>{{studentSearchForm.last_name}}</div>
+          </div>
+          <div class="form-group">
+            <label for="id_email">Email</label>
+            <div>{{studentSearchForm.email}}</div>
           </div>
         </div>
-      </form>
-      <div id="studentResults" style="display:none;" class="results">
-        <table class="table table-bordered table-striped table-condensed inner_table">
-          <thead>
-            <tr>
-              <th>Username</th>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Status</th>
-              <th>Last Login </th>
-              <th>Select?</th>
-            </tr>
-          </thead>
-          <tbody>
-          </tbody>
-        </table>
       </div>
+      <div class="modal-footer">
+        <div class="form-group button-row">
+          <button type="submit" id="search" class="btn btn-success">
+            Search
+          </button>
+          <a type="button" class="btn btn-danger" data-dismiss="modal">Close</a>
+        </div>
+      </div>
+    </form>
+    <div id="studentResults" style="display:none;" class="results">
+      <table class="table table-bordered table-striped table-condensed inner_table">
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Status</th>
+            <th>Last Login </th>
+            <th>Select?</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
     </div>
   </div>
 </div>
 
 <script type="text/javascript">
 $(function (){
-  $('#studentSearch').on('hidden.bs.modal', function () {
+  $('#userSearch').on('hidden.bs.modal', function () {
    location.reload();
   })
 

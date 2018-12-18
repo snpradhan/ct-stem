@@ -99,45 +99,54 @@ def team(request):
 ####################################
 # Curricula TABLE VIEW
 ####################################
-def curricula(request, curriculum_type='', status='published', bookmark='0'):
-  if curriculum_type == 'assessments':
-    curr_type = ['A', 'S']
-    curriculum_type = 'A'
-  elif curriculum_type == 'lessons':
-    curr_type = ['L']
-    curriculum_type = 'L'
-  elif curriculum_type == 'units':
-    curr_type = ['U']
-    curriculum_type = 'U'
-  else:
-    curr_type = ['S']
-    curriculum_type = 'S'
+def curricula(request, bucket='unit', status='public'):
 
-  if status == 'draft':
-    stat = 'D'
-  elif status == 'archived':
-    stat = 'A'
-  else:
-    stat = 'P'
+  curriculum_type = []
+  if bucket == 'unit':
+    curriculum_type = ['U']
+  elif bucket == 'lesson':
+    curriculum_type = ['L']
+  elif bucket == 'assessment':
+    curriculum_type = ['A', 'S']
+  elif bucket in ['teacher_authored', 'my', 'favorite', 'shared']:
+    curriculum_type = ['U', 'L', 'A', 'S']
 
-  bookmarked = None
-
-  if hasattr(request.user, 'administrator') or hasattr(request.user, 'researcher') or hasattr(request.user, 'author'):
-    curricula = models.Curriculum.objects.all().filter(curriculum_type__in = curr_type, status = stat).order_by(Lower('title'))
-  elif hasattr(request.user, 'teacher'):
-    if bookmark == '1':
-      curricula = models.Curriculum.objects.all().filter(curriculum_type__in = curr_type, status='P', bookmarked__teacher=request.user.teacher).order_by(Lower('title'))
-      bookmarked = curricula
+  stat = []
+  curricula = None
+  if bucket in ['unit', 'lesson', 'assessment']:
+    if hasattr(request.user, 'administrator') or hasattr(request.user, 'researcher') or hasattr(request.user, 'author'):
+      if status == 'archived':
+        stat = ['A']
+      elif status == 'private':
+        stat = ['D']
+      else:
+        stat = ['P']
     else:
-      curricula = models.Curriculum.objects.all().filter(Q(curriculum_type__in = curr_type), Q(status='P') | Q(shared_with=request.user.teacher)).order_by(Lower('title'))
-      bookmarked = curricula.filter(bookmarked__teacher=request.user.teacher)
-    status = 'published'
-  else:
-    curricula = models.Curriculum.objects.all().filter(curriculum_type__in = curr_type, status='P').order_by(Lower('title'))
-    status = 'published'
+      stat = ['P']
+    curricula = models.Curriculum.objects.all().filter(unit__isnull=True, curriculum_type__in = curriculum_type, status__in = stat).order_by('title')
 
-  curricula = curricula.filter(unit__isnull=True)
-  context = {'curricula': curricula, 'curriculum_type': curriculum_type, 'bookmark': bookmark, 'bookmarked': bookmarked, 'status': status}
+  elif bucket == 'teacher_authored':
+    if hasattr(request.user, 'administrator') or hasattr(request.user, 'researcher') or hasattr(request.user, 'author'):
+      stat = ['D', 'P', 'A']
+      curricula = models.Curriculum.objects.all().filter(unit__isnull=True, curriculum_type__in = curriculum_type, status__in = stat, authors__teacher__isnull=False).distinct().order_by(Lower('title'))
+
+  elif bucket == 'my' and hasattr(request.user, 'teacher'):
+    stat = ['D', 'P', 'A']
+    curricula = models.Curriculum.objects.all().filter(unit__isnull=True, curriculum_type__in = curriculum_type, status__in = stat, authors=request.user).order_by(Lower('title'))
+
+  elif bucket == 'favorite' and hasattr(request.user, 'teacher'):
+    stat = ['P']
+    curricula = models.Curriculum.objects.all().filter(Q(unit__isnull=True), Q(curriculum_type__in=curriculum_type), Q(bookmarked__teacher=request.user.teacher), Q(status__in=stat) | Q(shared_with=request.user.teacher)).distinct().order_by(Lower('title'))
+
+  elif bucket == 'shared' and hasattr(request.user, 'teacher'):
+    stat = ['D', 'P']
+    curricula = models.Curriculum.objects.all().filter(unit__isnull=True, curriculum_type__in = curriculum_type, status__in = stat, shared_with=request.user.teacher).order_by(Lower('title'))
+
+  else:
+    messages.error(request, "There are no curricula for the requested category.")
+
+  context = {'curricula': curricula, 'bucket': bucket, 'status': status}
+
   return render(request, 'ctstem_app/Curricula.html', context)
 
 
@@ -146,19 +155,21 @@ def curricula(request, curriculum_type='', status='published', bookmark='0'):
 ####################################
 def curriculum(request, id=''):
   try:
-    # check if the user has permission to create or modify a lesson
-    if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'researcher') == False and hasattr(request.user, 'author') == False:
-      return http.HttpResponseNotFound('<h1>You do not have the privilege to create/modify this curriculum</h1>')
-    # check if the lesson exists
+    # curriculum exists
     if '' != id:
-      curriculum = models.Curriculum.objects.get(id=id)
-      #check if the curriculum is locked
-      if curriculum.locked_by:
-        if hasattr(request.user, 'administrator') == False and curriculum.locked_by != request.user:
-          messages.error(request, 'You do not have the privilege to modify this curriculum because it is locked by %s' % curriculum.locked_by)
-          return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+      has_permission = check_curriculum_permission(request, id, 'modify')
+      if has_permission:
+        curriculum = models.Curriculum.objects.get(id=id)
+      else:
+         return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+    #curriculum does not exist
     else:
-      curriculum = models.Curriculum()
+      has_permission = check_curriculum_permission(request, id, 'create')
+      if has_permission:
+        curriculum = models.Curriculum()
+        curriculum.author = request.user
+      else:
+         return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
     newQuestionForm = forms.QuestionForm()
 
@@ -166,7 +177,7 @@ def curriculum(request, id=''):
       initial = {}
       if '' == id:
         initial['authors'] = [request.user.id]
-      form = forms.CurriculumForm(instance=curriculum, prefix='curriculum', initial=initial)
+      form = forms.CurriculumForm(user=request.user, instance=curriculum, prefix='curriculum', initial=initial)
       #AssessmentStepFormSet = inlineformset_factory(models.Assessment, models.AssessmentStep, form=forms.AssessmentStepForm,can_delete=True, can_order=True, extra=1)
 
       StepFormSet = nestedformset_factory(models.Curriculum, models.Step, form=forms.StepForm,
@@ -181,7 +192,7 @@ def curriculum(request, id=''):
 
     elif request.method == 'POST':
       data = request.POST.copy()
-      form = forms.CurriculumForm(data, request.FILES, instance=curriculum, prefix="curriculum")
+      form = forms.CurriculumForm(user=request.user, data=data, files=request.FILES, instance=curriculum, prefix="curriculum")
       #AssessmentStepFormSet = inlineformset_factory(models.Assessment, models.AssessmentStep, form=forms.AssessmentStepForm,
                                                     #can_delete=True, can_order=True, extra=0)
       StepFormSet = nestedformset_factory(models.Curriculum, models.Step, form=forms.StepForm,
@@ -241,21 +252,12 @@ def curriculum(request, id=''):
 ####################################
 def previewCurriculum(request, id='', step_order=-1):
   try:
-    # check if the lesson exists
-    if hasattr(request.user, 'student'):
-      return http.HttpResponseNotFound('<h1>You do not have the privilege to preview this curriculum</h1>')
-
-    if '' != id:
+    # check curriculum permission
+    has_permission = check_curriculum_permission(request, id, 'preview')
+    if has_permission:
       curriculum = models.Curriculum.objects.get(id=id)
     else:
-      curriculum = models.Curriculum()
-
-    #teachers are only allowed to preview published or shared curriculum
-    if curriculum.status == 'D':
-      if hasattr(request.user, 'teacher') and curriculum.shared_with.all().filter(id=request.user.teacher.id).exists() == False:
-        return http.HttpResponseNotFound('<h1>You do not have the privilege to preview this curriculum</h1>')
-      elif hasattr(request.user, 'school_administrator'):
-        return http.HttpResponseNotFound('<h1>You do not have the privilege to preview this curriculum</h1>')
+      return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
     if request.method == 'GET':
       steps = models.Step.objects.all().filter(curriculum=curriculum)
@@ -288,21 +290,14 @@ def previewCurriculum(request, id='', step_order=-1):
 def lockCurriculum(request, id=''):
   try:
     # check if user has privilege to lock curriculum
-    if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'researcher') == False and hasattr(request.user, 'author') == False:
-      return http.HttpResponseNotFound('<h1>You do not have the privilege to lock this curriculum</h1>')
+    has_permission = check_curriculum_permission(request, id, 'lock')
 
-    if '' != id:
+    if has_permission:
       curriculum = models.Curriculum.objects.get(id=id)
-    else:
-      curriculum = models.Curriculum()
-
-    #check if curriculum already has a lock
-    if curriculum.locked_by:
-      messages.error(request, "The curriculum %s is already locked by someone else" % curriculum.title)
-    else:
       curriculum.locked_by = request.user
       curriculum.save()
       messages.success(request, "The curriculum %s has been locked.  Only you or a site admin can modify and/or unlock this curriculum " % curriculum.title)
+
     return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
   except models.Curriculum.DoesNotExist:
@@ -313,25 +308,14 @@ def lockCurriculum(request, id=''):
 ####################################
 def unlockCurriculum(request, id=''):
   try:
-    # check if user has privilege to lock curriculum
-    if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'researcher') == False and hasattr(request.user, 'author') == False:
-      return http.HttpResponseNotFound('<h1>You do not have the privilege to unlock this curriculum</h1>')
+    # check if user has privilege to unlock curriculum
+    has_permission = check_curriculum_permission(request, id, 'unlock')
 
-    if '' != id:
+    if has_permission:
       curriculum = models.Curriculum.objects.get(id=id)
-    else:
-      curriculum = models.Curriculum()
-
-    #check if curriculum already has a lock
-    if curriculum.locked_by:
-      if hasattr(request.user, 'administrator') or curriculum.locked_by == request.user:
-        curriculum.locked_by = None
-        curriculum.save()
-        messages.success(request, "The curriculum %s has been unlocked" % curriculum.title)
-      else:
-        messages.error(request, "You do not have the privilege to unlock this curriculum")
-    else:
-      messages.error(request, "The curriculum is not yet locked")
+      curriculum.locked_by = None
+      curriculum.save()
+      messages.success(request, "The curriculum %s has been unlocked" % curriculum.title)
 
     return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
@@ -438,26 +422,23 @@ def downloadAttachments(request, id=''):
 
   except models.Curriculum.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested Curriculum not found</h1>')
+
+
+
+
 ####################################
 # DELETE a curriculum
 ####################################
 def deleteCurriculum(request, id=''):
   try:
-    # check if the user has permission to delete a lesson
-    if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'researcher') == False and hasattr(request.user, 'author') == False:
-      return http.HttpResponseNotFound('<h1>You do not have the privilege to delete this curriculum</h1>')
-    # check if the lesson exists
-    if '' != id:
-      curriculum = models.Curriculum.objects.get(id=id)
-      #check if the curriculum is locked
-      if curriculum.locked_by:
-        if hasattr(request.user, 'administrator') == False and curriculum.locked_by != request.user:
-          messages.error(request, 'You do not have the privilege to delete this curriculum because it is locked by %s' % curriculum.locked_by)
-          return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-    else:
-      raise models.Curriculum.DoesNotExist
+    # check if the user has permission to delete a curriculum
+    has_permission = check_curriculum_permission(request, id, 'delete')
+
+    if not has_permission:
+      return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
     if request.method == 'GET' or request.method == 'POST':
+      curriculum = models.Curriculum.objects.get(id=id)
       curriculum.delete()
       messages.success(request, "Curriculum '%s - v%s.' has been deleted" % (curriculum.title, curriculum.version))
       return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
@@ -472,30 +453,40 @@ def deleteCurriculum(request, id=''):
 ####################################
 def copyCurriculum(request, id=''):
   try:
-    # check if the user has permission to create or modify a curriculum
-    if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'researcher') == False and hasattr(request.user, 'author') == False:
-      return http.HttpResponseNotFound('<h1>You do not have the privilege to modify this curriculum</h1>')
-    # check if the curriculum exists
-    else:
-      if request.method == 'GET' or request.method == 'POST':
-        if '' != id:
-          original_curriculum = models.Curriculum.objects.get(id=id)
-          new_curriculum = copyCurriculumMeta(request, id)
-          # non unit copy
-          if original_curriculum.curriculum_type != 'U':
-            copyCurriculumSteps(request, original_curriculum, new_curriculum)
-          else:
-            #unit copy
-            #copy underlying lessons
-            for lesson in original_curriculum.underlying_curriculum.all():
-              new_lesson = copyCurriculumMeta(request, lesson.id)
-              copyCurriculumSteps(request, lesson, new_lesson)
-              new_lesson.unit = new_curriculum
-              new_lesson.save()
 
-          messages.success(request, "A new curriculum '%s - v%s.' has been created and added to the Draft folder.  Please archive the original curriculum" % (new_curriculum.title, new_curriculum.version))
-          return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-      return http.HttpResponseNotAllowed(['GET', 'POST'])
+    # check if the user has permission to copy a curriculum
+    has_permission = check_curriculum_permission(request, id, 'copy')
+
+    if not has_permission:
+      return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+    if request.method == 'GET' or request.method == 'POST':
+      original_curriculum = models.Curriculum.objects.get(id=id)
+      new_curriculum = copyCurriculumMeta(request, id)
+      # non unit copy
+      if original_curriculum.curriculum_type != 'U':
+        copyCurriculumSteps(request, original_curriculum, new_curriculum)
+      else:
+        #unit copy
+        #copy underlying lessons
+        if hasattr(request.user, 'teacher'):
+          underlying_curriculum =  original_curriculum.underlying_curriculum.all().filter(Q(status='P') | Q(authors=request.user) | Q(shared_with=request.user.teacher))
+        else:
+          underlying_curriculum = original_curriculum.underlying_curriculum.all()
+
+        for lesson in underlying_curriculum:
+          new_lesson = copyCurriculumMeta(request, lesson.id)
+          copyCurriculumSteps(request, lesson, new_lesson)
+          new_lesson.unit = new_curriculum
+          new_lesson.save()
+
+      if hasattr(request.user, 'teacher'):
+        messages.success(request, "A new curriculum '%s - v%s.' has been created and added to your My Curricula folder." % (new_curriculum.title, new_curriculum.version))
+      else:
+        messages.success(request, "A new curriculum '%s - v%s.' has been created and added to the Private folder.  Please archive the original curriculum" % (new_curriculum.title, new_curriculum.version))
+
+      return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+    return http.HttpResponseNotAllowed(['GET', 'POST'])
 
   except models.Curriculum.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested curriculum not found</h1>')
@@ -516,6 +507,8 @@ def copyCurriculumMeta(request, id=''):
     original_curriculum = models.Curriculum.objects.get(id=id)
     # curriculum.title = title
     curriculum.authors = original_curriculum.authors.all()
+    if request.user not in curriculum.authors.all():
+      curriculum.authors.add(request.user)
     curriculum.created_date = datetime.datetime.now()
     curriculum.modified_date = datetime.datetime.now()
     curriculum.parent = original_curriculum
@@ -523,6 +516,7 @@ def copyCurriculumMeta(request, id=''):
     curriculum.version = int(original_curriculum.version) + 1
     curriculum.subject = original_curriculum.subject.all()
     curriculum.taxonomy = original_curriculum.taxonomy.all()
+    curriculum.locked_by = None
 
     if original_curriculum.icon:
       try:
@@ -672,26 +666,25 @@ def removeBookmark(request, id=''):
 
 
 ####################################
-# Assign curriculum
+# Assign curriculum to classes
 ####################################
 def assignCurriculum(request, id=''):
   try:
-    # check if the user has permission to bookmark a curriculum
+    has_permission = check_curriculum_permission(request, id, 'assign')
+    if not has_permission:
+      return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+    # check if the user has permission to assign a curriculum
     if hasattr(request.user, 'administrator') or hasattr(request.user, 'researcher'):
       groups = models.UserGroup.objects.all().filter(is_active=True)
     elif hasattr(request.user, 'school_administrator'):
       groups = models.UserGroup.objects.all().filter(teacher__school = request.user.school_administrator.school, is_active=True)
     elif hasattr(request.user, 'teacher'):
       groups = models.UserGroup.objects.all().filter(Q(teacher=request.user.teacher) | Q(shared_with=request.user.teacher), Q(is_active=True)).distinct()
-    else:
-      return http.HttpResponseNotFound('<h1>You do not have the privilege to assign this curriculum</h1>')
 
     curriculum = models.Curriculum.objects.get(id=id)
-    if curriculum.status == 'D':
-      return http.HttpResponseNotFound("<h1>This curriculum hasn't been published and cannot be assigned</h1>")
     #check if curriculum is stand alone or a unit
     if curriculum.curriculum_type == 'U':
-      curriculum_list = models.Curriculum.objects.all().filter(unit=curriculum, status='P').order_by('order')
+      curriculum_list = models.Curriculum.objects.all().filter(unit=curriculum).order_by('order')
     else:
       curriculum_list = models.Curriculum.objects.all().filter(id=curriculum.id)
 
@@ -1594,7 +1587,7 @@ def deleteStandard(request, id=''):
 @login_required
 def searchTaxonomy(request):
   # check if the user has permission to add a question
-  if hasattr(request.user, 'author') == False and hasattr(request.user, 'researcher') == False and  hasattr(request.user, 'administrator') == False:
+  if hasattr(request.user, 'teacher') == False and hasattr(request.user, 'author') == False and hasattr(request.user, 'researcher') == False and  hasattr(request.user, 'administrator') == False:
     return http.HttpResponseNotFound('<h1>You do not have the privilege search taxonomy</h1>')
 
   subcategory = models.Subcategory()
@@ -1631,7 +1624,12 @@ def searchStudents(request):
   if hasattr(request.user, 'teacher') == False and hasattr(request.user, 'school_administrator') == False and  hasattr(request.user, 'administrator') == False:
     return http.HttpResponseNotFound('<h1>You do not have the privilege search students</h1>')
 
-  if 'POST' == request.method:
+  if 'GET' == request.method:
+    studentSearchForm = forms.UserSearchForm()
+    context = {'studentSearchForm': studentSearchForm}
+    return render(request, 'ctstem_app/StudentSearch.html', context)
+
+  elif 'POST' == request.method:
     data = request.POST.copy()
     print data
     query_filter = {}
@@ -1648,7 +1646,6 @@ def searchStudents(request):
     school = group.teacher.school
     query_filter['school__id'] = school.id
 
-    print query_filter
     studentList = models.Student.objects.filter(**query_filter)
     student_list = [{'user_id': student.user.id, 'student_id': student.id, 'username': student.user.username, 'name': student.user.get_full_name(),
                      'email': student.user.email, 'status': 'Active' if student.user.is_active else 'Inactive',
@@ -1658,7 +1655,7 @@ def searchStudents(request):
                 for student in studentList]
     return http.HttpResponse(json.dumps(student_list), content_type="application/json")
 
-  return http.HttpResponseNotAllowed(['POST'])
+  return http.HttpResponseNotAllowed(['GET', 'POST'])
 
 ####################################
 # Search Teachers
@@ -1670,7 +1667,7 @@ def searchTeachers(request):
     return http.HttpResponseNotFound('<h1>You do not have the privilege search teachers</h1>')
 
   if 'GET' == request.method:
-    teacherSearchForm = forms.TeacherSearchForm()
+    teacherSearchForm = forms.UserSearchForm()
     context = {'teacherSearchForm': teacherSearchForm}
     return render(request, 'ctstem_app/TeacherSearch.html', context)
 
@@ -1701,6 +1698,51 @@ def searchTeachers(request):
     return http.HttpResponse(json.dumps(teacher_list), content_type="application/json")
 
   return http.HttpResponseNotAllowed(['GET', 'POST'])
+
+####################################
+# Search Curriculum Authors
+####################################
+@login_required
+def searchAuthors(request):
+  # check if the user has permission search Authors
+  if hasattr(request.user, 'teacher') == False and hasattr(request.user, 'school_administrator') == False and hasattr(request.user, 'author') == False and hasattr(request.user, 'administrator') == False:
+    return http.HttpResponseNotFound('<h1>You do not have the privilege search authors</h1>')
+
+  if 'GET' == request.method:
+    authorSearchForm = forms.UserSearchForm()
+    context = {'authorSearchForm': authorSearchForm}
+    return render(request, 'ctstem_app/CurriculumAuthorSearch.html', context)
+
+  elif 'POST' == request.method:
+    data = request.POST.copy()
+    print data
+    query_filter = {}
+    if data['username']:
+      query_filter['username__icontains'] = str(data['username'])
+    if data['first_name']:
+      query_filter['first_name__icontains'] = str(data['first_name'])
+    if data['last_name']:
+      query_filter['last_name__icontains'] = str(data['last_name'])
+    if data['email']:
+      query_filter['email__icontains'] = str(data['email'])
+
+    if hasattr(request.user, 'teacher'):
+      school = request.user.teacher.school
+      authorList = User.objects.filter(teacher__school=school).exclude(id=request.user.id)
+    elif hasattr(request.user, 'school_administrator'):
+      school = request.user.school_administrator.school
+      authorList = User.objects.filter(teacher__school=school)
+    else:
+      authorList = User.objects.filter(Q(administrator__isnull=False) | Q(researcher__isnull=False) | Q(author__isnull=False) |  Q(teacher__isnull=False))
+
+    authorList = authorList.filter(**query_filter).order_by('first_name', 'last_name')
+    author_list = [{'user_id': user.id, 'username': user.username, 'name': user.get_full_name(),
+                     'email': user.email}
+                for user in authorList]
+    return http.HttpResponse(json.dumps(author_list), content_type="application/json")
+
+  return http.HttpResponseNotAllowed(['GET', 'POST'])
+
 ####################################
 # USER LIST
 ####################################
@@ -2098,13 +2140,13 @@ def group(request, id=''):
       keys.sort(key=lambda x:x.title)
       uploadForm = forms.UploadFileForm(user=request.user)
       assignmentForm = forms.AssignmentSearchForm(user=request.user)
-      studentSearchForm = forms.StudentSearchForm()
       studentAddForm = forms.StudentAddForm()
 
       if request.method == 'GET':
-          form = forms.UserGroupForm(user=request.user, instance=group, prefix='group')
-          context = {'form': form, 'role': 'group', 'uploadForm': uploadForm, 'assignmentForm': assignmentForm, 'studentSearchForm': studentSearchForm, 'studentAddForm': studentAddForm, 'assignments': assignments, 'keys': keys}
-          return render(request, 'ctstem_app/UserGroup.html', context)
+        form = forms.UserGroupForm(user=request.user, instance=group, prefix='group')
+        context = {'form': form, 'role': 'group', 'uploadForm': uploadForm, 'assignmentForm': assignmentForm, 'studentAddForm': studentAddForm, 'assignments': assignments, 'keys': keys}
+
+        return render(request, 'ctstem_app/UserGroup.html', context)
 
       elif request.method == 'POST':
         data = request.POST.copy()
@@ -2126,8 +2168,9 @@ def group(request, id=''):
         else:
           print form.errors
           messages.error(request, "The class could not be saved because there were errors.  Please check the errors below.")
-          context = {'form': form, 'role': 'group', 'uploadForm': uploadForm, 'assignmentForm': assignmentForm, 'studentSearchForm': studentSearchForm, 'studentAddForm': studentAddForm, 'assignments': assignments, 'keys': keys}
-          return render(request, 'ctstem_app/UserGroup.html', context)
+          context = {'form': form, 'role': 'group', 'uploadForm': uploadForm, 'assignmentForm': assignmentForm, 'studentAddForm': studentAddForm, 'assignments': assignments, 'keys': keys}
+
+        return render(request, 'ctstem_app/UserGroup.html', context)
 
     return http.HttpResponseNotAllowed(['GET', 'POST'])
 
@@ -3049,21 +3092,205 @@ def addAssignment(request, curriculum_id='', group_id=''):
     response_data['success'] = True
   return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 
+####################################
+# Check if the user has the permission
+# to perform the specified action on the
+# curriculum
+####################################
+def check_curriculum_permission(request, curriculum_id, action):
+  try:
+    has_permission = False
+    is_admin = is_researcher = is_author = is_school_admin = is_teacher = False
+
+    if hasattr(request.user, 'administrator'):
+      is_admin = True
+    elif hasattr(request.user, 'researcher'):
+      is_researcher = True
+    elif hasattr(request.user, 'author'):
+      is_author = True
+    elif hasattr(request.user, 'school_administrator'):
+      is_school_admin = True
+    elif hasattr(request.user, 'teacher'):
+      is_teacher = True
+
+    ############ CREATE ############
+    if action == 'create':
+      # only admin, researcher and author can create a new curriculum
+      if is_admin or is_researcher or is_author:
+        has_permission = True
+      else:
+        has_permission = False
+        messages.error(request, 'You do not have the privilege to create a new curriculum')
+    else:
+      curriculum = models.Curriculum.objects.get(id=curriculum_id)
+      ############ COPY ############
+      if action == 'copy':
+        # admin, researcher and author can copy any curriculum
+        if is_admin or is_researcher or is_author:
+          has_permission = True
+        # teacher can only copy units, stand alone lessons, assessments and surveys that are public or something that they own
+        elif is_teacher:
+          if request.user in curriculum.authors.all():
+            has_permission = True
+          elif curriculum.status == 'P' and curriculum.unit is None:
+            has_permission = True
+          else:
+            has_permission = False
+            messages.error(request, 'You do not have the privilege to copy this curriculum')
+
+      ############ EDIT/DELETE ############
+      elif action == 'modify' or action == 'delete':
+        #check if the curriculum is archived
+        if curriculum.status == 'A':
+          if is_admin:
+            has_permission = True
+          else:
+            has_permission = False
+            messages.error(request, 'You do not have the privilege to %s this curriculum because it is archived' % (action))
+
+        #check if the curriculum is locked
+        elif curriculum.locked_by:
+          # only and admin or the user holding the lock can edit/delete
+          if is_admin or curriculum.locked_by == request.user:
+            has_permission = True
+          else:
+            has_permission = False
+            messages.error(request, 'You do not have the privilege to %s this curriculum because it is locked by %s' % (action, curriculum.locked_by))
+        else:
+          # admin, researcher and author can edit any unlocked curriculum
+          if is_admin or is_researcher or is_author:
+            has_permission = True
+          # teacher can only edit their own curriculum that is unlocked
+          elif is_teacher:
+            if request.user in curriculum.authors.all():
+              has_permission = True
+            else:
+              has_permission = False
+              messages.error(request, 'You do not have the privilege to %s this curriculum'% (action))
+
+        # has permission so far
+        if has_permission:
+          #check if the curriculum is assigned
+          is_assigned = is_curriculum_assigned(request, curriculum_id)
+          if is_assigned:
+            if action == 'modify':
+              #admins can edit curriculum that are assigned
+              if is_admin:
+                has_permission = True
+                messages.warning(request, 'This curriculum has already been assigned, please be careful with the modification')
+              else:
+                has_permission = False
+                messages.error(request, 'You do not have the privilege to modify this curriculum because it is already assigned')
+
+            elif action == 'delete':
+              has_permission = False
+              messages.error(request, 'You do not have the privilege to delete this curriculum because it is already assigned')
+
+
+      ############ LOCK ############
+      elif action == 'lock':
+        if curriculum.locked_by:
+          has_permission = False
+          if curriculum.locked_by == request.user:
+            messages.warning(request, "You have already locked this curriculum")
+          else:
+            messages.error(request, "The curriculum has already been locked by %s" % curriculum.locked_by)
+        elif is_admin or is_researcher or is_author:
+          has_permission = True
+        elif is_teacher and request.user in curriculum.authors.all():
+          has_permission = True
+        else:
+          has_permission = False
+          messages.error(request, 'You do not have the privilege to lock this curriculum')
+
+      ############ UNLOCK ############
+      elif action == 'unlock':
+        if curriculum.locked_by:
+          if is_admin or request.user in curriculum.authors.all():
+            has_permission = True
+          else:
+            has_permission = False
+            messages.error(request, 'You do not have the privilege to unlock this curriculum')
+        else:
+          has_permission = False
+          messages.error(request, "The curriculum is not yet locked")
+
+      ############ PREVIEW ############
+      elif action == 'preview':
+        # admin, researcher and author can preview any curriculum
+        if is_admin or is_researcher or is_author:
+          has_permission = True
+        elif is_school_admin and curriculum.status == 'P':
+          has_permission = True
+        # teacher can only preview curriculum that are public, shared with them or that they own
+        elif is_teacher:
+          if curriculum.status == 'P':
+            has_permission = True
+          elif request.user in curriculum.authors.all():
+            has_permission = True
+          elif request.user.teacher in curriculum.shared_with.all():
+            has_permission = True
+
+        if not has_permission:
+          messages.error(request, 'You do not have the privilege to preview this curriculum')
+
+      ############ ASSIGN ############
+      elif action == 'assign':
+        # admin, school_admin and teacher can assign public curriculum
+        if curriculum.status == 'P':
+          if is_admin or is_school_admin or is_teacher:
+            has_permission = True
+        #only teachers can assign private curriculum that they own and that is locked
+        elif curriculum.status == 'D':
+          if is_teacher and curriculum.locked_by and request.user in curriculum.authors.all():
+            has_permission = True
+
+        if not has_permission:
+          messages.error(request, 'You do not have the privilege to assign this curriculum')
+
+      ############ ASSIGN ############
+      elif action == 'export_response':
+        # admin, school_admin and teacher can export student data of public curriculum
+        if curriculum.status == 'P' or curriculum.status == 'A':
+          if is_admin or is_researcher or is_school_admin or is_teacher:
+            has_permission = True
+        #only teachers can export student data of private curriculum that they own
+        elif curriculum.status == 'D':
+          if is_teacher and request.user in curriculum.authors.all():
+            has_permission = True
+
+        if not has_permission:
+          messages.error(request, 'You do not have the privilege to export student data of this curriculum')
+
+      ############ FAVORITE ############
+      elif action == 'favorite':
+        # a teacher who is not the author can mark a curriculum as favorite
+        if is_teacher and request.user not in curriculum.authors.all() and curriculum.unit is None:
+          has_permission = True
+
+        if not has_permission:
+          messages.error(request, 'You do not have the privilege to mark this curriculum as favorite')
+
+    return has_permission
+
+  except models.Curriculum.DoesNotExist:
+    return False
 
 ####################################
 # check if the user has permission to do this operation on a group
 ####################################
 @login_required
 def check_group_permission(request, group_id=''):
-  has_permission = True
+  has_permission = False
   try:
     group = models.UserGroup.objects.get(id=group_id)
-    if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'teacher') == False and hasattr(request.user, 'school_administrator') == False:
-      has_permission = False
-    elif hasattr(request.user, 'school_administrator') and group.teacher.school != request.user.school_administrator.school:
-      has_permission = False
-    elif hasattr(request.user, 'teacher') and group.teacher != request.user.teacher and request.user.teacher not in group.shared_with.all():
-      has_permission = False
+    if hasattr(request.user, 'administrator') == True:
+      has_permission = True
+    elif hasattr(request.user, 'school_administrator') and group.teacher.school == request.user.school_administrator.school:
+      has_permission = True
+    elif hasattr(request.user, 'teacher'):
+      if group.teacher == request.user.teacher or request.user.teacher in group.shared_with.all():
+        has_permission = True
 
   except models.UserGroup.DoesNotExist:
     has_permission = False
@@ -3076,7 +3303,7 @@ def check_group_permission(request, group_id=''):
 ####################################
 @login_required
 def check_assignment_permission(request, assignment_id=''):
-  has_permission = True
+  has_permission = False
   try:
     assignment = models.Assignment.objects.get(id=assignment_id)
     group = assignment.group
@@ -3084,8 +3311,6 @@ def check_assignment_permission(request, assignment_id=''):
 
   except models.Assignment.DoesNotExist:
     has_permission = False
-  except models.UserGroup.DoesNotExist:
-     has_permission = False
 
   return has_permission
 
@@ -3348,7 +3573,7 @@ def get_response_text(request, instance_id, questionResponse):
 @login_required
 def question(request, id=''):
   # check if the user has permission to add a question
-  if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'researcher') == False and hasattr(request.user, 'author') == False:
+  if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'researcher') == False and hasattr(request.user, 'author') == False and hasattr(request.user, 'teacher') == False:
     return http.HttpResponseNotFound('<h1>You do not have the privilege to add a question</h1>')
   if '' == id:
     question = models.Question()
@@ -4128,3 +4353,13 @@ def iframe_state(request, instance_id, iframe_id):
     return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 
   return http.HttpResponse(status=400)
+
+@login_required
+def is_curriculum_assigned(request, curriculum_id):
+  curriculum = models.Curriculum.objects.get(id=curriculum_id)
+  is_assigned = False
+  if curriculum.curriculum_type != 'U':
+    assignment_count = models.Assignment.objects.all().filter(curriculum=curriculum).count()
+    if assignment_count > 0:
+      is_assigned = True
+  return is_assigned

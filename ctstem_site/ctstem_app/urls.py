@@ -4,8 +4,8 @@ from . import views
 
 urlpatterns = [
     url(r'^$', views.home, name='home'),
-    url(r'^curricula/(?P<curriculum_type>[\w-]+)/$', views.curricula, name='curricula'),
-    url(r'^curricula/(?P<curriculum_type>[\w-]+)/(?P<status>[\w-]+)/(?P<bookmark>[\w-]+)/$', views.curricula, name='curricula'),
+    url(r'^curricula/(?P<bucket>[\w-]+)/$', views.curricula, name='curricula'),
+    url(r'^curricula/(?P<bucket>[\w-]+)/(?P<status>[\w-]+)/$', views.curricula, name='curricula'),
     url(r'^curriculum/new/$', views.curriculum, name='newCurriculum'),
     url(r'^curriculum/(?P<id>[\d]+)/$', views.curriculum, name='curriculum'),
     url(r'^curriculum/bookmark/(?P<id>[\d]+)/$', views.bookmarkCurriculum, name='bookmarkCurriculum'),
@@ -60,6 +60,7 @@ urlpatterns = [
     url(r'^users/(?P<role>[a-zA-Z0-9_]+)/$', views.users, name='users'),
     url(r'^students/search/$', views.searchStudents, name='searchStudents'),
     url(r'^teachers/search/$', views.searchTeachers, name='searchTeachers'),
+    url(r'^authors/search/$', views.searchAuthors, name='searchAuthors'),
     url(r'^question/new/$', views.question, name='newQuestion'),
     url(r'^question/(?P<id>[\d]+)/$', views.question, name='question'),
     url(r'^response/(?P<instance_id>[\d]+)/(?P<response_id>[\d]+)/$', views.questionResponse, name='questionResponse'),

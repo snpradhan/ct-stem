@@ -523,7 +523,6 @@ div.table#curriculum span.controls, div.table.activity span.controls, div.table#
   float: right;
 }
 div.curriculum_content div#taxonomy_div {
-  max-height: 40%;
   overflow-y: auto;
 }
 div.curriculum_content div#taxonomy_div
@@ -898,6 +897,7 @@ div.content {
   margin-bottom: 40px;
   margin-top: 120px;
   min-height: 90%;
+  overflow-y: auto;
 }
 
 div.content section {

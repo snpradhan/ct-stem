@@ -1,5 +1,5 @@
 {% load ctstem_extras %}
-<button class="btn btn-info search_teachers" name="search_teachers" data-form="{% url 'ctstem:searchTeachers' %}">
+<button class="btn btn-info search_users" data-target="#userSearch" data-form="{% url 'ctstem:searchTeachers' %}">
   <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
 </button>
 <div class="controls table_container">
@@ -23,7 +23,7 @@
           <td>{{teacher.user.get_full_name}}</td>
           <td>{{teacher.user.email}}</td>
           <td>
-            <button type="button" class="btn btn-warning unshare" aria-label="Unshare resource with this teacher" title="Unshare resource with this teacher" href="#">
+            <button type="button" class="btn btn-warning remove" aria-label="Unshare resource with this teacher" title="Unshare resource with this teacher" href="#">
               <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
             </button>
           </td>

@@ -96,7 +96,6 @@ $(function (){
               if($('select[id^="id"][id$="shared_with"] option[value="'+$(this).attr('id')+'"]').prop('selected') == false){
                //select the teacher id in the hidden select field
                 $('select[id^="id"][id$="shared_with"] option[value="'+$(this).attr('id')+'"]').prop('selected', true);
-                console.log($('select[id^="id"][id$="shared_with"] option[value="'+$(this).attr('id')+'"]').prop('selected'));
                 //add the selected teacher to the shared with table
                 teacher_row = $(this).closest('tr');
                 teacher = "<tr id='"+$(this).attr('id')+"'>";

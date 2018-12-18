@@ -20,8 +20,8 @@ from django.contrib.sites.models import Site
 
 
 CURRICULUM_STATUS_CHOICES = (
-    (u'D', u'Draft'),
-    (u'P', u'Published'),
+    (u'D', u'Private'),
+    (u'P', u'Public'),
     (u'A', u'Archived'),
 )
 
@@ -161,7 +161,7 @@ class Curriculum (models.Model):
   parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL, related_name="children")
   version = models.IntegerField(default=1)
   taxonomy = models.ManyToManyField('Subcategory', null=True, blank=True)
-  authors = models.ManyToManyField(User, null=False, related_name="curriculum_authors")
+  authors = models.ManyToManyField(User, null=False, related_name="curriculum_authors", help_text='Select authors for this curriculum.')
   created_date = models.DateTimeField(auto_now_add=True)
   modified_date = models.DateTimeField(auto_now=True)
   icon = models.ImageField(upload_to=upload_file_to, blank=True, help_text='Upload an image at least 400x289 in resolution that represents this curriculum')

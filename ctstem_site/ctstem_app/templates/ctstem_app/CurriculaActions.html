@@ -1,71 +1,69 @@
 {% load ctstem_extras %}
 <!-- Preview -->
-{% if curriculum.curriculum_type == 'U'%}
-  <a class="util-button fa fa-eye" aria-hidden="true" title="Preview Curriculum" href="{% url 'ctstem:previewCurriculum' curriculum.id %}" target="_blank">
-  </a>
-  <a class="util-button fa fa-print" aria-hidden="true" title="Print" href="{% url 'ctstem:previewCurriculum' curriculum.id %}"></a>
-{% elif curriculum.curriculum_type == 'L' %}
+{% check_curriculum_permission curriculum.id 'preview' as has_preview_permission %}
+{% if has_preview_permission == True %}
   {% if curriculum.unit|slugify == 'None'|slugify %}
     <a class="util-button fa fa-eye" aria-hidden="true" title="Preview Curriculum" href="{% url 'ctstem:previewCurriculum' curriculum.id %}" target="_blank">
-    </a>
     <a class="util-button fa fa-print" aria-hidden="true" title="Print" href="{% url 'ctstem:previewCurriculum' curriculum.id %}"></a>
   {% else %}
     <a class="util-button fa fa-eye" aria-hidden="true" title="Preview Curriculum" href="{% url 'ctstem:previewCurriculum' curriculum.id 0 %}" target="_blank">
     </a>
   {% endif %}
-{% else %}
-  {% if user.administrator or user.researcher or user.author or user.school_administrator or user.teacher %}
-    <a class="util-button fa fa-eye" aria-hidden="true" title="Preview Curriculum" href="{% url 'ctstem:previewCurriculum' curriculum.id %}" target="_blank">
-  </a>
-  {% endif %}
 {% endif %}
-{% if user.administrator or user.researcher or user.author %}
-  <!-- Edit and Delete -->
-  {% if curriculum.status == 'D' or curriculum.status == 'P'%}
-    <a class="util-button fa fa-pencil" aria-hidden="true" aria-label="Edit Curriculum" title="Edit Curriculum" href="{% url 'ctstem:curriculum' curriculum.id %}"></a>
-    <a class="util-button fa fa-trash" aria-hidden="true" aria-label="Delete Curriculum" title="Delete Curriculum" href="{% url 'ctstem:deleteCurriculum' curriculum.id %}" onclick="return confirm('Are you sure you want to delete {{curriculum.title}}?')">
-    </a>
-  {% elif curriculum.status == 'A' and  user.administrator %}
+
+<!-- Assign -->
+{% check_curriculum_permission curriculum.id 'modify' as has_modify_permission %}
+{% if has_modify_permission == True %}
+  {% if curriculum.status == 'A' %}
     <a class="util-button fa fa-pencil" aria-hidden="true" aria-label="Edit Curriculum" title="Edit Curriculum" href="{% url 'ctstem:curriculum' curriculum.id %}"
     onclick="return confirm('This curriculum has been archived.  Are you sure you want to edit this curriculum?');">
     </a>
-  {% endif %}
-  <!-- Copy -->
-  <a class="util-button fa fa-files-o" aria-hidden="true" aria-label="Create New Copy" title="Create New Copy" href="{% url 'ctstem:copyCurriculum' curriculum.id %}"></a>
-
-  <!-- Lock/Unlock -->
-  {% if curriculum.locked_by %}
-    <!-- Unlock -->
-    {% if user.administrator or curriculum.locked_by == user %}
-      <a class="util-button fa fa-unlock" aria-hidden="true" aria-label="Unlock Curriculum" title="Unlock Curriculum" href="{% url 'ctstem:unlockCurriculum' curriculum.id %}"></a>
-    {% endif %}
   {% else %}
-    <!-- Lock -->
-    <a class="util-button fa fa-lock" aria-hidden="true" aria-label="Lock Curriculum" title="Lock Curriculum" href="{% url 'ctstem:lockCurriculum' curriculum.id %}"></a>
+    <a class="util-button fa fa-pencil" aria-hidden="true" aria-label="Edit Curriculum" title="Edit Curriculum" href="{% url 'ctstem:curriculum' curriculum.id %}"></a>
   {% endif %}
+{% endif %}
+<!-- Delete -->
+{% check_curriculum_permission curriculum.id 'delete' as has_delete_permission %}
+{% if has_delete_permission == True %}
+  <a class="util-button fa fa-trash" aria-hidden="true" aria-label="Delete Curriculum" title="Delete Curriculum" href="{% url 'ctstem:deleteCurriculum' curriculum.id %}" onclick="return confirm('Are you sure you want to delete {{curriculum.title}}?')">
+    </a>
+{% endif %}
+<!-- Copy -->
+{% check_curriculum_permission curriculum.id 'copy' as has_copy_permission %}
+{% if has_copy_permission == True %}
+  <a class="util-button fa fa-files-o" aria-hidden="true" aria-label="Create New Copy" title="Create New Copy" href="{% url 'ctstem:copyCurriculum' curriculum.id %}"></a>
+{% endif %}
 
+<!-- Lock -->
+{% check_curriculum_permission curriculum.id 'lock' as has_lock_permission %}
+{% if has_lock_permission == True %}
+  <a class="util-button fa fa-lock" aria-hidden="true" aria-label="Lock Curriculum" title="Lock Curriculum" href="{% url 'ctstem:lockCurriculum' curriculum.id %}"></a>
 {% endif %}
+<!-- Lock -->
+{% check_curriculum_permission curriculum.id 'unlock' as has_unlock_permission %}
+{% if has_unlock_permission == True %}
+  <a class="util-button fa fa-unlock" aria-hidden="true" aria-label="Unlock Curriculum" title="Unlock Curriculum" href="{% url 'ctstem:unlockCurriculum' curriculum.id %}"></a>
+{% endif %}
+
 <!-- Assign -->
-{% if user.administrator or user.teacher or user.school_administrator %}
-  {% if curriculum.status == 'A' or curriculum.status == 'P'%}
-    {% if curriculum.curriculum_type != 'U' or curriculum|get_underlying_curriculum:request.user|get_curriculum_count:'P' > 0 %}
-      <a class="assign util-button fa fa-calendar-check-o" aria-hidden="true" data-form="{% url 'ctstem:assignCurriculum' curriculum.id%}" aria-label="Assign Curriculum" title="Assign Curriculum">
-    {% endif %}
-  </a>
-  {% endif %}
+{% check_curriculum_permission curriculum.id 'assign' as has_assign_permission %}
+{% if has_assign_permission == True %}
+  <a class="assign util-button fa fa-calendar-check-o" aria-hidden="true" data-form="{% url 'ctstem:assignCurriculum' curriculum.id%}" aria-label="Assign Curriculum" title="Assign Curriculum"></a>
 {% endif %}
-{% if curriculum.curriculum_type != 'U' and curriculum.unit|slugify == 'None'|slugify%}
-  {% if user.teacher %}
-    <a class="bookmark util-button fa fa-star" href="{% url 'ctstem:removeBookmark' curriculum.id %}" style="{% if curriculum|is_bookmarked:bookmarked %} display: inline-block; {% else %} display: none; {% endif %}" title="Remove from Favorites"></a>
-    <a class="bookmark util-button fa fa-star-o" href="{% url 'ctstem:bookmarkCurriculum' curriculum.id %}" style="{% if curriculum|is_bookmarked:bookmarked %} display: none; {% else %} display: inline-block; {% endif %}" title="Add to Favorites"></a>
-  {% endif %}
+
+<!-- Favorite -->
+{% check_curriculum_permission curriculum.id 'favorite' as has_favorite_permission %}
+{% if has_favorite_permission == True %}
+  <a class="bookmark util-button fa fa-star" href="{% url 'ctstem:removeBookmark' curriculum.id %}" style="{% if curriculum|is_bookmarked:user.teacher %} display: inline-block; {% else %} display: none; {% endif %}" title="Remove from Favorites"></a>
+  <a class="bookmark util-button fa fa-star-o" href="{% url 'ctstem:bookmarkCurriculum' curriculum.id %}" style="{% if curriculum|is_bookmarked:user.teacher %} display: none; {% else %} display: inline-block; {% endif %}" title="Add to Favorites"></a>
 {% endif %}
-{% if user.administrator or user.researcher or user.teacher or user.school_administrator %}
-  {% if curriculum.status == 'A' or curriculum.status == 'P'%}
-    {% if curriculum|has_response:request.user %}
-      <a class="util-button fa fa-external-link" aria-hidden="true" aria-label="Export Student Response" title="Export Student Response" href="{% url 'ctstem:export_all_response' curriculum.id %}">
-      </a>
-    {% endif %}
+
+<!-- Export Student Data -->
+{% check_curriculum_permission curriculum.id 'export_response' as has_export_permission %}
+{% if has_export_permission == True %}
+  {% if curriculum|has_response:request.user %}
+    <a class="util-button fa fa-external-link" aria-hidden="true" aria-label="Export Student Response" title="Export Student Response" href="{% url 'ctstem:export_all_response' curriculum.id %}">
+    </a>
   {% endif %}
 {% endif %}
 

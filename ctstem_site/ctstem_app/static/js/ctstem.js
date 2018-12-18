@@ -337,21 +337,27 @@ $(function (){
     }
   });
 
-  $("button.search_teachers").click(function(e){
+  $("button.search_users").click(function(e){
     e.preventDefault();
     var url = $(this).data("form");
-    $("#teacherModal").load(url, function() {
+    var modal = $(this).data("target");
+    var group_id = $(this).data("id");
+    $(modal).load(url, function() {
+      $(this).find('input[name="group_id"]').val(group_id);
       $(this).modal('show');
     });
     return false;
   });
 
   //bind remove function
-  $("button.unshare").click(function(e){
-    var teacher_id = $(this).closest('tr').attr('id');
-    $('select[id^="id"][id$="shared_with"] option[value="'+teacher_id+'"]').prop('selected', false);
-    $('table#teachers tbody tr#'+teacher_id).remove();
-    rowAddorRemove($('table#teachers'));
+  $("button.remove").click(function(e){
+    var id = $(this).closest('tr').attr('id');
+    var form_group = $(this).closest('.form-group');
+    $(form_group).find('select[id^="id"] option[value="'+id+'"]').prop('selected', false);
+    //$('select[id^="id"][id$="shared_with"] option[value="'+id+'"]').prop('selected', false);
+    var table = $(form_group).find('table.inner_table');
+    $(table).find('tbody tr#'+id).remove();
+    rowAddorRemove($(table));
   });
 
   //hide table header if no rows

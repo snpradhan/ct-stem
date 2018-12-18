@@ -13,7 +13,7 @@
     {% if form.instance.id %}
       <h2>
         Edit Class
-        {% if user.teacher and user.teacher in form.instance.shared_with.all %}
+        {% if user.teacher and user.teacher.id != form.teacher.value and user.teacher in form.instance.shared_with.all %}
           <i class="fa fa-share-alt" title="Shared by {{form.instance.teacher}}"></i>
         {% endif %}
       </h2>
@@ -51,7 +51,6 @@
               <div class="controls">{{form.time}}</div>
               <div class="error">{{ form.time.errors }}</div>
             </div>
-
             {% if user.teacher %}
               {% if form.teacher.value %}
                 <input type="hidden" id="id_group-teacher" name="group-teacher" value="{{form.teacher.value}}"/>
@@ -66,13 +65,12 @@
               {% endif %}
             {% else %}
               <div class="form-group">
-                <label for="id_group-teacher">{{ form.teacher.label }} {% if form.teacher.field.required %}(<span class="required">*</span>){% endif %} </label>
+                <label for="id_group-coteachers">{{ form.teacher.label }} {% if form.teacher.field.required %}(<span class="required">*</span>){% endif %} </label>
                 <div class="controls">{{form.teacher}}</div>
                 <div class="error">{{ form.teacher.errors }}</div>
               </div>
             {% endif %}
-
-            {% if user.teacher and user.teacher.id in form.shared_with.value %}
+            {% if user.teacher and user.teacher.id != form.teacher.value and user.teacher.id in form.shared_with.value %}
               {{form.shared_with.as_hidden}}
             {% else %}
               <div class="form-group">
@@ -230,9 +228,9 @@
                 </div>
                 <div>
                   {% if form.instance.is_active %}
-                    <a type="button" class="btn btn-info upload-modal" href="#" data-toggle="modal" data-target="#studentSearch" data-id="{{form.instance.id}}" title="Search and Add existing Students to this class">
+                    <button class="btn btn-info search_users" data-target="#userSearch" data-id="{{form.instance.id}}" data-form="{% url 'ctstem:searchStudents' %}" title="Search and Add existing Students to this class">
                       <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
-                    </a>
+                    </button>
                     <a type="button" class="btn btn-success upload-modal" href="#" data-toggle="modal" data-target="#upload" data-id="{{form.instance.id}}" data-title="{{form.instance.title}}" title="Upload new and existing Students to this class">
                       <i class="fa fa-user-plus"></i>
                     </a>
@@ -343,10 +341,6 @@
 
     {% block assignment %}
       {% include "ctstem_app/AssignmentSearch.html" %}
-    {% endblock %}
-
-    {% block search_and_add_students %}
-      {% include "ctstem_app/StudentSearch.html" %}
     {% endblock %}
 
     {% block create_and_add_student %}

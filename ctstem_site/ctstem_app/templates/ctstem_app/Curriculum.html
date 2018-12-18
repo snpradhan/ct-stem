@@ -93,6 +93,8 @@
                       <div class="error">{{ field.errors }}</div>
                     {% elif field.name == 'shared_with' %}
                       {% include "ctstem_app/SharedTeachers.html" with resource='curriculum'%}
+                    {% elif field.name == 'authors' %}
+                      {% include "ctstem_app/CurriculumAuthors.html"%}
                     {% else %}
                       <div>
                         {{field}}
@@ -101,7 +103,7 @@
                         {% endif %}
                       </div>
                     {% endif %}
-                    {% if field.name == 'icon' or field.name == 'subject' or field.name == 'compatible_system' or field.name == 'unit' or field.name == 'shared_with' or field.name == 'order' %}
+                    {% if field.name == 'icon' or field.name == 'subject' or field.name == 'compatible_system' or field.name == 'unit' or field.name == 'shared_with' or field.name == 'order' or field.name == 'authors' %}
                     <div class="help warning">{{field.help_text|safe}}</div>
                   {% endif %}
                   <div class="error">{{ field.errors }}</div>

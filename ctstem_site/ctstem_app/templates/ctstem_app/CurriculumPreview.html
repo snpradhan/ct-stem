@@ -73,13 +73,13 @@
           {% if step_order|add:0  == 0 %}
             <a class="page-link selected" href="#">{{0}}</a>
           {% else %}
-            <a class="page-link" href="{% url 'ctstem:previewCurriculum'  curriculum.id 0 %}">{{0}}</a>
+            <a class="page-link" href="{% url 'ctstem:previewCurriculum' curriculum.id 0 %}">{{0}}</a>
           {% endif %}
           {% for i in total_steps|iterate %}
             {% if i|add:0 == step_order|add:0 %}
-              <a class="page-link selected" href="{% url 'ctstem:previewCurriculum'  curriculum.id i %}">{{i}}</a>
+              <a class="page-link selected" href="{% url 'ctstem:previewCurriculum' curriculum.id i %}">{{i}}</a>
             {% else %}
-              <a class="page-link" href="{% url 'ctstem:previewCurriculum'  curriculum.id i %}">{{i}}</a>
+              <a class="page-link" href="{% url 'ctstem:previewCurriculum' curriculum.id i %}">{{i}}</a>
             {% endif %}
           {% endfor %}
         {% endif %}
@@ -143,23 +143,25 @@
               <li><a href="{% url 'ctstem:downloadAttachments' curr_unit.id%}">Download Attachment(s) <span class="fa fa-paperclip"></span></a></li>
             {% endif %}
             <li class="divider"></li>
-            {% if curr_unit.status == 'A' or curr_unit.status == 'P'%}
-              {% if curr_unit.curriculum_type == 'L' or curr_unit|get_underlying_curriculum:request.user|get_curriculum_count:'P' > 0 %}
-                {% if user.administrator or user.school_administrator %}
+            {% check_curriculum_permission curr_unit.id 'assign' as has_assign_permission %}
+            {% if has_assign_permission == True %}
+              {% if user.administrator or user.school_administrator %}
                   <li><a class="assign" href="#" data-form="{% url 'ctstem:assignCurriculum' curr_unit.id%}">Assign to Classes</a></li>
-                {% elif user.teacher %}
+              {% elif user.teacher %}
                   <li><a class="assign" href="#" data-form="{% url 'ctstem:assignCurriculum' curr_unit.id%}">Assign to My Classes</a></li>
-                {% endif %}
-              {% endif %}
-
-              {% if user.teacher and curr_unit.curriculum_type == 'L' %}
-                {% if curr_unit.id|is_favorite:user.teacher.id %}
-                  <li><a id="favorites-link" class="favorites">Remove from Favorites</a></li>
-                {% else %}
-                  <li><a id="favorites-link" class="favorites">Add to Favorites</a></li>
-                {% endif %}
               {% endif %}
             {% endif %}
+
+            {% check_curriculum_permission curr_unit.id 'favorite' as has_favorite_permission %}
+            {% if has_favorite_permission == True %}
+              {% if curr_unit|is_bookmarked:user.teacher %}
+                <li><a id="favorites-link" class="favorites">Remove from Favorites</a></li>
+              {% else %}
+                <li><a id="favorites-link" class="favorites">Add to Favorites</a></li>
+              {% endif %}
+            {% endif %}
+
+
             <li><a class="print" href="{% url 'ctstem:previewCurriculum' curr_unit.id %}">Print This Curriculum <span class="fa fa-print "></span></a></li>
             <li class="divider"></li>
             <li><a href="#" class="faq"">View CT FAQ</a></li>
@@ -216,23 +218,23 @@
 
             <!-- UTILITY BUTTONS -->
             <div class="utility">
-              {% if curriculum.status == 'A' or curriculum.status == 'P'%}
-                {% if user.teacher and curr_unit.curriculum_type == 'L' %}
-                  {% if curr_unit.id|is_favorite:user.teacher.id %}
-                    <a class="util-button fa fa-star favorites" id="favorites-icon" title="Remove from Favorites"></a>
-                  {% else %}
-                    <a class="util-button fa fa-star-o favorites" id="favorites-icon" title="Add to My Favorites"></a>
-                  {% endif %}
+              {% check_curriculum_permission curr_unit.id 'favorite' as has_favorite_permission %}
+              {% if has_favorite_permission == True %}
+                {% if curr_unit|is_bookmarked:user.teacher %}
+                  <a class="util-button fa fa-star favorites" id="favorites-icon" title="Remove from Favorites"></a>
+                {% else %}
+                  <a class="util-button fa fa-star-o favorites" id="favorites-icon" title="Add to My Favorites"></a>
                 {% endif %}
               {% endif %}
+
               <a class="util-button fa fa-print" href="javascript:window.print();" title="Print"></a>
-              {% if curr_unit.status == 'A' or curr_unit.status == 'P'%}
-                {% if curr_unit.curriculum_type == 'L' or curr_unit|get_underlying_curriculum:request.user|get_curriculum_count:'P' > 0 %}
-                  {% if user.administrator or user.school_administrator %}
-                    <a class="assign util-button fa fa-calendar-check-o" aria-hidden="true" data-form="{% url 'ctstem:assignCurriculum' curr_unit.id%}" aria-label="Assign to Classes" title="Assign to Classes"></a>
-                  {% elif user.teacher %}
-                    <a class="assign util-button fa fa-calendar-check-o" aria-hidden="true" data-form="{% url 'ctstem:assignCurriculum' curr_unit.id%}" aria-label="Assign to Classes" title="Assign to My Classes"></a>
-                  {% endif %}
+
+              {% check_curriculum_permission curr_unit.id 'assign' as has_assign_permission %}
+              {% if has_assign_permission == True %}
+                {% if user.administrator or user.school_administrator %}
+                  <a class="assign util-button fa fa-calendar-check-o" aria-hidden="true" data-form="{% url 'ctstem:assignCurriculum' curr_unit.id%}" aria-label="Assign to Classes" title="Assign to Classes"></a>
+                {% elif user.teacher %}
+                  <a class="assign util-button fa fa-calendar-check-o" aria-hidden="true" data-form="{% url 'ctstem:assignCurriculum' curr_unit.id%}" aria-label="Assign to Classes" title="Assign to My Classes"></a>
                 {% endif %}
               {% endif %}
             </div>
@@ -294,7 +296,9 @@
                 {% if curr_unit.curriculum_type != 'U' %}
                   <li><a href="{% url 'ctstem:previewCurriculum'  curriculum.id 0 %}" class="activity">Look at the student activity</a></li>
                 {% endif %}
-                {% if curr_unit.curriculum_type == 'L' or curr_unit|get_underlying_curriculum:request.user|get_curriculum_count:'P' > 0 %}
+
+                {% check_curriculum_permission curr_unit.id 'assign' as has_assign_permission %}
+                {% if has_assign_permission == True %}
                   <li><a href="#" class="assign" data-form="{% url 'ctstem:assignCurriculum' curr_unit.id %}">Assign this to {% if user.teacher %}my{% endif %} classes</a></li>
                 {% endif %}
               </ul>
@@ -528,9 +532,11 @@
       $('body').on("click", "a.assign", function(e){
         e.preventDefault();
         {% if user.is_anonymous or user.author  or user.researcher %}
-          alert('Please login as a teacher to assign this lesson');
-        {% elif curr_unit.status == 'D' %}
-          alert("This lesson hasn't been published and cannot be assigned");
+          alert('Please login as a teacher to assign this curriculum');
+        {% elif user.administrator and curr_unit.status == 'D'  %}
+          alert("Please make this curriculum public to assign");
+        {% elif user.teacher and user in curr_unit.authors.all and curr_unit.status == 'D' and not curr_unit.locked_by  %}
+          alert("Please lock this curriculum to assign");
         {% else %}
           var url = $(this).data('form');
           $("#assignmentModal").load(url, function() {

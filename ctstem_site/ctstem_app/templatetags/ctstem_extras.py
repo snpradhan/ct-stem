@@ -1,6 +1,7 @@
 from django import template
 from django.utils.encoding import force_unicode
-from ctstem_app import models
+from ctstem_app import models, views
+from django.contrib import messages
 import datetime
 from django.db.models import Q
 from django.utils import timezone
@@ -148,12 +149,20 @@ def getTeacherInfo(value):
   return teacher
 
 @register.filter
+def getUserInfo(value):
+  user = models.User.objects.get(id=value)
+  return user
+
+@register.filter
 def iterate(value):
   return range(1, value+1)
 
 @register.filter
-def is_bookmarked(obj, qset):
-  return obj in qset
+def is_bookmarked(curriculum, teacher):
+  bookmark = models.BookmarkedCurriculum.objects.all().filter(curriculum=curriculum, teacher=teacher).count()
+  if bookmark:
+    return True
+  return False
 
 @register.filter
 def is_favorite(curriculum_id, teacher_id):
@@ -192,14 +201,14 @@ def has_response(curriculum, user):
   if curriculum.curriculum_type != 'U':
     curricula = models.Curriculum.objects.all().filter(id=curriculum.id)
   else:
-    curricula = curriculum.underlying_curriculum.all().filter(Q(status='P') | Q(status='A'))
+    curricula = curriculum.underlying_curriculum.all()
 
   if hasattr(user, 'administrator') == True or hasattr(user, 'researcher') == True:
     assignments = models.Assignment.objects.all().filter(curriculum__in=curricula)
   elif hasattr(user, 'school_administrator') == True:
-    assignments = models.Assignment.objects.all().filter(curriculum__in=curricula, group__teacher__school = user.school_administrator.school)
+    assignments = models.Assignment.objects.all().filter(curriculum__in=curricula, group__teacher__school=user.school_administrator.school)
   elif hasattr(user, 'teacher') == True:
-    assignments = models.Assignment.objects.all().filter(curriculum__in=curricula, group__teacher = user.teacher)
+    assignments = models.Assignment.objects.all().filter(Q(curriculum__in=curricula), Q(group__teacher=user.teacher) | Q(group__shared_with=user.teacher))
   else:
     return False
 
@@ -312,7 +321,7 @@ def get_underlying_curriculum(curriculum, user):
   if hasattr(user, 'administrator') == True or hasattr(user, 'researcher') == True or hasattr(user, 'author') == True:
     return unit.underlying_curriculum.all().order_by('order').distinct()
   elif hasattr(user, 'teacher') == True:
-    return unit.underlying_curriculum.all().filter(Q(status='P') | Q(shared_with=user.teacher)).order_by('order').distinct()
+    return unit.underlying_curriculum.all().filter(Q(status='P') | Q(shared_with=user.teacher) | Q(authors=user)).order_by('order').distinct()
   else:
     return unit.underlying_curriculum.all().filter(status='P').order_by('order').distinct()
 
@@ -383,3 +392,11 @@ def is_teacher_authored(curriculum):
       return True
 
   return False
+
+@register.assignment_tag(takes_context=True)
+def check_curriculum_permission(context, curriculum_id, action):
+  request = context.get('request')
+  has_permission = views.check_curriculum_permission(request, curriculum_id, action)
+
+  list(messages.get_messages(request))
+  return has_permission

@@ -8,77 +8,78 @@
 
 {% block content %}
   {{block.super}}
-<div class="content">
-  <div class="col-lg-12">
-    {% if curriculum_type == 'L' or curriculum_type == 'U' %}
-      {% if curriculum_type == 'L' %}
-        <h2> Lessons </h2>
-      {% else %}
-        <h2> Units </h2>
-      {% endif %}
-      <p class="page-blurb">
-      Our computational thinking lesson plans are designed to embed authentic CT practices into high school science and mathematics classrooms while enriching disciplinary content learning.
-      </p>
-    {% elif  curriculum_type == 'A' %}
-      <h2> Assessments </h2>
-    {% elif  curriculum_type == 'S' %}
-      <h2> Surveys </h2>
-    {% endif %}
-
-    <div class="btn-group">
-      {% if user.administrator or user.researcher or user.author %}
-        <a type="button" class="btn btn-success" href="{% url 'ctstem:newCurriculum' %}" title="Create new curriculum">Create Curriculum</a>
-      {% endif %}
-
-      {% comment %}
-      {% if user.administrator or user.researcher or user.author or user.teacher or user.school_administrator %}
-        <label class="switch">
-          <input class="switch-input" type="checkbox" />
-          <span class="switch-label" data-on="Table" data-off="Tile"></span>
-          <span class="switch-handle"></span>
-        </label>
-      {% endif %}
-      {% endcomment %}
-    </div>
-
-    {% if user.teacher %}
-      <ul class="nav nav-tabs">
-        <li {% if curriculum_type == 'U' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'units' 'published' '0' %}">Units</a></li>
-        <li {% if curriculum_type == 'L' and bookmark == '0' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'lessons' 'published' '0' %}">All Lessons</a></li>
-        <li {% if curriculum_type == 'L' and bookmark == '1' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'lessons' 'published' '1' %}">Favorite Lessons</a></li>
-        <li {% if curriculum_type == 'A' and bookmark == '0' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'assessments' 'published' '0' %}">All Assessments</a></li>
-        <li {% if curriculum_type == 'A' and bookmark == '1' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'assessments' 'published' '1' %}">Favorite Assessments</a></li>
-      </ul>
-    {% else %}
-      <ul class="nav nav-tabs">
-        <li {% if curriculum_type == 'U' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'units' 'published' '0' %}">Units</a></li>
-        <li {% if curriculum_type == 'L' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'lessons' 'published' '0' %}">Lessons</a></li>
-        <li {% if curriculum_type == 'A' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'assessments' 'published' '0' %}">Assessments</a></li>
-      </ul>
-      {% if user.administrator or user.researcher or user.author %}
-        {% if curriculum_type == 'L' %}
-          <ul class="nav nav-tabs">
-            <li {% if status == 'draft' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'lessons' 'draft' '0' %}">Draft</a></li>
-            <li {% if status == 'published' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'lessons' 'published' '0' %}">Published</a></li>
-            <li {% if status == 'archived' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'lessons' 'archived' '0' %}">Archived</a></li>
-          </ul>
-        {% elif curriculum_type == 'U' %}
-           <ul class="nav nav-tabs">
-            <li {% if status == 'draft' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'units' 'draft' '0' %}">Draft</a></li>
-            <li {% if status == 'published' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'units' 'published' '0' %}">Published</a></li>
-            <li {% if status == 'archived' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'units' 'archived' '0' %}">Archived</a></li>
-          </ul>
+  <div class="content">
+    <div class="col-lg-12">
+      {% if bucket == 'lesson' or bucket == 'unit' %}
+        {% if bucket == 'lesson' %}
+          <h2> Lessons </h2>
         {% else %}
-          <ul class="nav nav-tabs">
-            <li {% if status == 'draft' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'assessments' 'draft' '0' %}">Draft</a></li>
-            <li {% if status == 'published' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'assessments' 'published' '0' %}">Published</a></li>
-            <li {% if status == 'archived' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'assessments' 'archived' '0' %}">Archived</a></li>
-          </ul>
+          <h2> Units </h2>
+        {% endif %}
+        <p class="page-blurb">
+        Our computational thinking lesson plans are designed to embed authentic CT practices into high school science and mathematics classrooms while enriching disciplinary content learning.
+        </p>
+      {% elif bucket == 'assessment' %}
+        <h2> Assessments </h2>
+      {% elif bucket == 'survey' %}
+        <h2> Surveys </h2>
+      {% elif bucket == 'teacher_authored' %}
+        <h2> Teacher Authored Curricula </h2>
+      {% elif bucket == 'my' %}
+        <h2> My Curricula </h2>
+      {% elif bucket == 'shared' %}
+        <h2> Shared Curricula </h2>
+      {% elif bucket == 'favorite' %}
+        <h2> Favorite Curricula </h2>
+      {% endif %}
+
+      <div class="btn-group">
+        {% if user.administrator or user.researcher or user.author %}
+          <a type="button" class="btn btn-success" href="{% url 'ctstem:newCurriculum' %}" title="Create new curriculum">Create Curriculum</a>
+        {% endif %}
+      </div>
+
+      {% if user.teacher %}
+        <ul class="nav nav-tabs">
+            <li {% if bucket == 'unit' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'unit' 'public' %}">Units</a></li>
+            <li {% if bucket == 'lesson' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'lesson' 'public' %}">Lessons</a></li>
+            <li {% if bucket == 'assessment' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'assessment' 'public' %}">Assessment</a></li>
+            <li {% if bucket == 'my' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'my' %}">My Curricula</a></li>
+            <li {% if bucket == 'shared'%} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'shared' %}">Shared Curricula</a></li>
+            <li {% if bucket == 'favorite' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'favorite' %}">Favorite Curricula</a></li>
+        </ul>
+      {% else %}
+        <ul class="nav nav-tabs">
+          <li {% if bucket == 'unit' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'unit' 'public' %}">Units</a></li>
+          <li {% if bucket == 'lesson' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'lesson' 'public' %}">Lessons</a></li>
+          <li {% if bucket == 'assessment' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'assessment' 'public' %}">Assessment</a></li>
+          {% if user.administrator or user.researcher or user.author %}
+            <li {% if bucket == 'teacher_authored' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'teacher_authored' %}">Teacher Authored Curricula</a></li>
+          {% endif %}
+        </ul>
+        {% if user.administrator or user.researcher or user.author %}
+          {% if bucket == 'unit' %}
+             <ul class="nav nav-tabs">
+              <li {% if status == 'private' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'unit' 'private'%}">Private</a></li>
+              <li {% if status == 'public' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'unit' 'public' %}">Public</a></li>
+              <li {% if status == 'archived' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'unit' 'archived' %}">Archived</a></li>
+            </ul>
+          {% elif bucket == 'lesson' %}
+            <ul class="nav nav-tabs">
+              <li {% if status == 'private' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'lesson' 'private' %}">Private</a></li>
+              <li {% if status == 'public' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'lesson' 'public' %}">Public</a></li>
+              <li {% if status == 'archived' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'lesson' 'archived' %}">Archived</a></li>
+            </ul>
+          {% elif bucket == 'assessment' %}
+            <ul class="nav nav-tabs">
+              <li {% if status == 'private' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'assessment' 'private' %}">Private</a></li>
+              <li {% if status == 'public' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'assessment' 'public' %}">Public</a></li>
+              <li {% if status == 'archived' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'assessment' 'archived' %}">Archived</a></li>
+            </ul>
+          {% endif %}
         {% endif %}
       {% endif %}
-    {% endif %}
-    {% if curricula %}
-
+      {% if curricula %}
         <div id="curricula_table">
           <table class="table table-striped dt" id="curricula">
             <thead>
@@ -108,15 +109,26 @@
                       {% if curriculum.locked_by %}
                         {% if user.administrator or user.researcher or user.author %}
                           <i class="fa fa-lock" aria-hidden="true" title="Locked by {{curriculum.locked_by}}"></i>
+                        {% elif user.teacher %}
+                          {% if user in curriculum.authors.all or user in curriculum.shared_with.all %}
+                            <i class="fa fa-lock" aria-hidden="true" title="Locked by {{curriculum.locked_by}}"></i>
+                          {% endif %}
                         {% endif %}
                       {% endif %}
                     </div>
-                    {% if user.administrator or user.researcher or user.author %}
+                    {% if user.administrator or user.researcher or user.author or user.teacher %}
+                      {% if bucket == 'teacher_authored' or bucket == 'my' or bucket == 'shared' or bucket == 'favorite' %}
+                        <div class="row">
+                          <div class="col-md-2 title">Curriculum Type:</div>
+                          <div class="col-md-10">{{ curriculum.get_curriculum_type_display }}</div>
+                        </div>
+                      {% endif %}
                       <div class="row">
                         <div class="col-md-2 title">Status:</div>
                         <div class="col-md-10">{{ curriculum.get_status_display }}</div>
                       </div>
                     {% endif %}
+
                     {% if curriculum.curriculum_type|is_in:"['U', L', 'A']" %}
                       <div class="row">
                         <div class="col-md-2 title">Subject(s):</div>
@@ -227,22 +239,28 @@
             </tbody>
           </table>
         </div>
-      </div>
-    {% else %}
-      <p>No {{status}} curriculum available.</p>
-    {% endif %}
+      {% else %}
+        <p>No curricula exists for the selected category.</p>
+      {% endif %}
+    </div>
   </div>
-
   <div class="modal fade" id="assignmentModal" role="dialog"></div>
-</div>
+
   <script type="text/javascript">
     $(function(){
 
       $('.content').on("click", 'a.fa-print', function(e){
         e.preventDefault();
         var url = $(this).attr('href');
-        var W = window.open(url);
-        W.window.print();
+        var W = window.open(url, "Print", "height=50, width=50");
+        setTimeout(function () {
+          W.window.print();
+        }, 3000);
+        W.window.onfocus = function() {
+          setTimeout(function() {
+              W.window.close();
+            }, 3000);
+        }
       });
       $('.portfolio-item').each(function(){
         var id = $(this).attr('id');
@@ -261,7 +279,7 @@
           type: "GET",
           url: url,
           success: function(data){
-            {% if bookmark == '1' %}
+            {% if bucket == 'favorite' %}
               $(tr).hide();
             {% else %}
               $(tr).find('a.bookmark').each(function(){

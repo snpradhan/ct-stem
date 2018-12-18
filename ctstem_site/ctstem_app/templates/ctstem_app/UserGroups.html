@@ -47,7 +47,7 @@
                     <input id="group_{{group.id}}" type="checkbox" class="action-select" value="{{group.id}}" name="group_{{group.id}}"/>
                     <div class="class_title">
                       {{group.title}}
-                      {% if user.teacher in group.shared_with.all %}
+                      {% if user.teacher != group.teacher and user.teacher in group.shared_with.all %}
                         <i class="fa fa-share-alt" title="Shared by {{group.teacher}}"></i>
                       {% endif %}
                     </div>
