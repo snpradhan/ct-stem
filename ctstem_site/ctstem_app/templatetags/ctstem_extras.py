@@ -352,3 +352,16 @@ def get_class_assignment_status(assignment_id):
 @register.filter
 def subtract(value, arg):
   return value - arg
+
+@register.filter
+def class_last_login(group):
+  memberships = models.Membership.objects.all().filter(group=group)
+  last_login = None
+  for membership in memberships:
+    login = membership.student.user.last_login
+    if last_login is None and login is not None:
+      last_login = login
+    elif last_login is not None and login is not None and login > last_login:
+      last_login = login
+
+  return last_login

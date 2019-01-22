@@ -434,6 +434,8 @@ class UserGroup(models.Model):
   members = models.ManyToManyField(Student, through='Membership', blank=True, null=True, related_name='member_of')
   group_code = models.CharField(null=False, blank=False, max_length=10, unique=True, default=generate_code_helper)
   is_active = models.BooleanField(null=False, blank=False, default=True)
+  created_date = models.DateTimeField(auto_now_add=True)
+  modified_date = models.DateTimeField(auto_now=True)
 
   def __unicode__(self):
     return u'%s' % (self.title)

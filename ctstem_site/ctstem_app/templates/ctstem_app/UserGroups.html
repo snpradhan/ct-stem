@@ -1,5 +1,5 @@
 {% extends "ctstem_app/base.html" %}
-
+{% load ctstem_extras %}
 {% block media %}
   {{ block.super }}
   {{ form.media }}
@@ -127,6 +127,7 @@
                 {% endif %}
                 <th> Students </th>
                 <th> Assignments </th>
+                <th width="10%"> Created <br> Modified <br> Last Login</th>
               </tr>
               <tr id="filterrow">
                 <th class="no-sort"></th>
@@ -142,6 +143,7 @@
                 {% endif %}
                 <th> Students </th>
                 <th> Assignments </th>
+                <th> Created <br> Modified <br> Last Login</th>
               </tr>
             </thead>
             <tbody>
@@ -214,6 +216,11 @@
                         No Assignment
                       {% endif %}
                     </div>
+                  </td>
+                  <td>
+                    <div>Cr: {{group.created_date|date}}</div>
+                    <div>Mo: {{group.modified_date|date}}</div>
+                    <div>LL: {{group|class_last_login|date}}</div>
                   </td>
                 </tr>
               {% endfor %}

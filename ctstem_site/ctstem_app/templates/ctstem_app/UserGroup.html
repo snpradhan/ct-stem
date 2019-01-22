@@ -65,6 +65,27 @@
           <div class="error">{{ form.is_active.errors }}</div>
         </div>
         {% if form.instance.id %}
+        <div class="form-group">
+          <label for="id_group-dates">Dates </label>
+          <div class="controls table_container">
+            <table class="table table-striped table-bordered table-condensed inner_table" id="members">
+              <thead>
+                <tr>
+                  <th> Class Created Date </th>
+                  <th> Class Last Modified </th>
+                  <th> Last Student Login </th>
+                </tr>
+              </thead>
+              <tbody>
+                <td>{{form.instance.created_date|date}}</td>
+                <td>{{form.instance.modified_date|date}}</td>
+                <td>{{form.instance|class_last_login|date}}</td>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        {% endif %}
+        {% if form.instance.id %}
           <div class="form-group assignment_table">
             {{formset.management_form}}
             {{formset.id}}
