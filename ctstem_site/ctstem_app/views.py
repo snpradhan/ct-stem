@@ -2013,8 +2013,8 @@ def group(request, id=''):
 
       elif request.method == 'POST':
         data = request.POST.copy()
-        #print data
-        form = forms.UserGroupForm(user=request.user, data=data, instance=group, prefix="group")
+        form = forms.UserGroupForm(user=request.user, data=data, files=request.FILES, instance=group, prefix="group")
+
         if form.is_valid():
           savedGroup = form.save()
           #if group is being inactivated, archive the associated assignments

@@ -27,16 +27,20 @@
                 <div class="tile">
 
                   <a href="{% url 'ctstem:group' group.id %}" class="portfolio-link">
-                     <div class="portfolio-hover">
+                    <div class="portfolio-hover">
                       <div class="portfolio-hover-content">
                         <span class="glyphicon glyphicon-pencil gi-3x" aria-hidden="true"></span>
                       </div>
                     </div>
-                    {% if group.subject and group.subject.icon %}
-                      <img src="{{group.subject.icon.url}}" class="img-responsive group_icon" alt="">
+                    <div class="portfolio-icon">
+                    {% if group.icon %}
+                      <img src="{{group.icon.url}}" class="img-responsive" alt="">
+                    {% elif group.subject and group.subject.icon %}
+                      <img src="{{group.subject.icon.url}}" class="img-responsive" alt="">
                     {% else %}
-                      <img src="/static/img/class.png" class="img-responsive group_icon" alt="">
+                      <img src="/static/img/class.png" class="img-responsive group_icon_stock" alt="">
                     {% endif %}
+                    </div>
                   </a>
 
                   <div class="portfolio-caption">
@@ -98,7 +102,9 @@
                       <span class="glyphicon glyphicon-plus gi-3x" aria-hidden="true"></span>
                     </div>
                   </div>
-                  <img src="/static/img/new_class.png" class="img-responsive group_icon" alt="">
+                  <div class="portfolio-icon">
+                    <img src="/static/img/new_class.png" class="img-responsive group_icon_stock" alt="">
+                  </div>
                 </a>
                 <div class="portfolio-caption">
                    <div class="class_title"><h3>ADD NEW CLASS</h3></div>

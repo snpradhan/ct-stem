@@ -120,6 +120,8 @@ def upload_file_to(instance, filename):
     return 'questionResponse/%s/%s_%s%s' % (instance.step_response.instance.student.user, slugify(filename_base.lower()[:10]), dt, filename_ext.lower(),)
   elif isinstance(instance, Question):
     return 'question/%s_%s%s' % (slugify(filename_base.lower()[:40]), dt, filename_ext.lower(),)
+  elif isinstance(instance, UserGroup):
+    return 'group/%s_%s%s' % (slugify(filename_base.lower()[:40]), dt, filename_ext.lower(),)
   elif isinstance(instance, QuestionResponseFile):
     return 'questionResponse/%s/%s_%s%s' % (instance.question_response.step_response.instance.student.user, slugify(filename_base.lower()[:10]), dt, filename_ext.lower(),)
 
@@ -269,6 +271,18 @@ class Subject(models.Model):
 
   def __unicode__(self):
       return u'%s' % (self.name)
+
+  def save(self, *args, **kwargs):
+    if self.icon:
+      self.icon.seek(0)
+      image = Image.open(StringIO.StringIO(self.icon.read()))
+      image = image.resize((400,289), Image.ANTIALIAS)
+      output = StringIO.StringIO()
+      image.save(output, format='png', quality=75)
+      output.seek(0)
+      self.icon = InMemoryUploadedFile(output,'ImageField', "%s.png" %self.icon.name, 'image/png', output.len, None)
+
+    super(Subject, self).save(*args, **kwargs)
 
 # Compatible devices and OS
 class System(models.Model):
@@ -436,9 +450,25 @@ class UserGroup(models.Model):
   is_active = models.BooleanField(null=False, blank=False, default=True)
   created_date = models.DateTimeField(auto_now_add=True)
   modified_date = models.DateTimeField(auto_now=True)
+  icon = models.ImageField(upload_to=upload_file_to, blank=True, help_text='Upload 400x289 png image that represents this class')
 
   def __unicode__(self):
     return u'%s' % (self.title)
+
+  class Meta:
+    ordering = ['title']
+
+  def save(self, *args, **kwargs):
+    if self.icon:
+      self.icon.seek(0)
+      image = Image.open(StringIO.StringIO(self.icon.read()))
+      image = image.resize((400,289), Image.ANTIALIAS)
+      output = StringIO.StringIO()
+      image.save(output, format='png', quality=75)
+      output.seek(0)
+      self.icon = InMemoryUploadedFile(output,'ImageField', "%s.png" %self.icon.name, 'image/png', output.len, None)
+
+    super(UserGroup, self).save(*args, **kwargs)
 
 class GroupInvitee(models.Model):
   group = models.ForeignKey(UserGroup, related_name='groups')

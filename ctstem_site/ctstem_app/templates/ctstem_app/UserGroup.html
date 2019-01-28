@@ -16,7 +16,7 @@
       <h2>Add New Class</h2>
     {% endif %}
     {% include "ctstem_app/Tabs.html" with tab='group' group=form.instance role='group'%}
-    <form method="post" id="userGroupForm">
+    <form method="post" id="userGroupForm" enctype="multipart/form-data">
       {% csrf_token %}
       <div class="table" id="group">
         {{form.management_form}}
@@ -30,6 +30,12 @@
           <div class="controls">{{form.subject}}</div>
           <div class="error">{{ form.subject.errors }}</div>
         </div>
+        <div class="form-group">
+          <label for="id_group-icon">{{ form.icon.label }} {% if form.icon.field.required %}(<span class="required">*</span>){% endif %} </label>
+          <div class="controls">{{form.icon}}</div>
+          <div class="error">{{ form.icon.errors }}</div>
+        </div>
+
         <div class="form-group">
           <label for="id_group-time">{{ form.time.label }} {% if form.time.field.required %}(<span class="required">*</span>){% endif %} </label>
           <div class="controls">{{form.time}}</div>

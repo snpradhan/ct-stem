@@ -186,10 +186,8 @@ img.big_icon {
   width: 200px;
   height: auto;
 }
-img.group_icon {
-  height: 150px;
-  width: auto;
-  margin: 1em auto 0 auto;
+img.group_icon_stock {
+  transform: scale(0.5, 0.7);
 }
 
 img.profile {
