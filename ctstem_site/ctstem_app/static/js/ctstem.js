@@ -329,6 +329,7 @@ $(function (){
       $("div.modal#upload select#id_group").closest('.form-group').show();
     }
   });
+
 });
 
 function bind_user_removal(){

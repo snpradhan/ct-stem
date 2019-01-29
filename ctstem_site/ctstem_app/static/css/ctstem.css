@@ -1375,3 +1375,16 @@ span.optional {
 span.mandatory {
   color: red;
 }
+
+/************************* CKEDITOR ***********************/
+div.django-ckeditor-widget {
+  min-width: 85%;
+}
+span.cke_top.blur, span.cke_bottom.blur {
+  display: none !important;
+}
+
+span.cke_top.focus, span.cke_bottom.focus {
+  display: block !important;
+}
+
