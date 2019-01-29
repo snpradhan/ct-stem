@@ -1,0 +1,52 @@
+{% extends "ctstem_app/base.html" %}
+
+{% block title %}Registration |{% endblock %}
+
+
+{% block styles %}
+  #sidebar {
+    display: none;
+  }
+{% endblock %}
+
+{% block content %}
+  {{block.super}}
+  <div class="content">
+   <h2 id="page_title">Student Sign Up</h2>
+   <div id="signup_note" class="warning">(Note: You are signing up as a student.  Enter the info below to sign on to your teacher's classroom)</div>
+
+
+    <form method="post">
+      {% csrf_token %}
+      <div class="table" id="register">
+        <fieldset>
+          {{form.management_form}}
+          <div class="form-group" id="div_{{form.email.name}}">
+            <label for="id_{{form.email.name}}">{{ form.email.label|title }}
+              {% if form.email.field.required %}(<span class="required">*</span>) {% endif %}
+            </label>
+            <div>
+              {{form.email}}
+            </div>
+            <div class="error">{{ form.email.errors }}</div>
+          </div>
+          <div class="form-group button-group">
+            <input type="submit" class="btn btn-success" id="submit" value="Validate Email"/>
+          </div>
+
+        </fieldset>
+      </div>
+    </form>
+
+    <script type="text/javascript">
+      $(function(){
+        {% if user.is_anonymous %}
+          {% if group_id and school_id %}
+            //this is student registration, hide the menu items
+            $('ul.nav.navbar-nav').hide();
+          {% endif %}
+        {% endif %}
+      });
+    </script>
+  </div>
+{% endblock %}

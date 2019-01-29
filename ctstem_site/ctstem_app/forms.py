@@ -23,13 +23,13 @@ import os
 # Registration Form
 ####################################
 class RegistrationForm (forms.Form):
+  email = forms.EmailField(required=True, max_length=75, label=u'Email')
   username = forms.RegexField(required=True, regex=r'^\w+$', max_length=30, label=u'Username',
                               error_messages={'invalid': 'Usernames may only contain letters, numbers, and underscores (_)'})
   first_name = forms.CharField(required=True, max_length=30, label=u'First name')
   last_name = forms.CharField(required=True, max_length=30, label=u'Last name')
   password1 = forms.CharField(required=True, widget=forms.PasswordInput(render_value=False), label=u'Password')
   password2 = forms.CharField(required=True, widget=forms.PasswordInput(render_value=False), label=u'Confirm Password')
-  email = forms.EmailField(required=True, max_length=75, label=u'Email')
   account_type = forms.ChoiceField(required=True, choices = models.USER_ROLE_CHOICES)
   school = forms.ModelChoiceField(required=False, queryset=models.School.objects.all().filter(is_active=True).order_by('name'))
 
@@ -97,6 +97,35 @@ class RegistrationForm (forms.Form):
 
 
     return clean
+
+class PreRegistrationForm(forms.Form):
+  email = forms.EmailField(required=True, max_length=75, label=u'Email')
+
+  def __init__(self, *args, **kwargs):
+    super(PreRegistrationForm, self).__init__(*args, **kwargs)
+
+    for field_name, field in self.fields.items():
+      field.widget.attrs['class'] = 'form-control'
+      field.widget.attrs['aria-describedby'] = field.label
+      field.widget.attrs['placeholder'] = field.help_text
+
+  def is_valid(self):
+    valid = super(PreRegistrationForm, self).is_valid()
+    if not valid:
+      return valid
+
+    email = self.cleaned_data['email']
+
+    try:
+      user = User.objects.get(email=email)
+      student = models.Student.objects.get(user=user)
+    except User.DoesNotExist:
+      return True
+    except models.Student.DoesNotExist:
+      self.errors['email'] = u'Email exists in the system but is not associated with a student account'
+      return False
+
+    return True
 
 ####################################
 # Validation Form

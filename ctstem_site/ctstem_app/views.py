@@ -725,6 +725,43 @@ def assignCurriculum(request, id=''):
     return http.HttpResponseNotFound('<h1>Requested curriculum not found</h1>')
 
 ####################################
+# PRE-REGISTER
+# if student email exists, add them to the class
+# else redirect to the full registration page with prepopulated email
+####################################
+def preregister(request, group_code=''):
+  if group_code:
+    group = models.UserGroup.objects.get(group_code=group_code)
+    group_id = group.id
+    school = group.teacher.school
+
+    if request.method == 'GET':
+      form = forms.PreRegistrationForm()
+      context = {'form': form, 'group_id': group_id, 'school_id': school.id}
+      return render(request, 'ctstem_app/PreRegistration.html', context)
+    elif request.method == 'POST':
+      form = forms.PreRegistrationForm(data=request.POST)
+      if form.is_valid():
+        email = form.cleaned_data['email']
+        try:
+          #if student exists, add them to the class and send a notification
+          student = models.Student.objects.get(user__email=email)
+          membership, created = models.Membership.objects.get_or_create(student=student, group=group)
+          send_added_to_group_confirmation_email(email, group)
+          messages.info(request, 'You have been added to the class %s.  You may now login to do your assignments. An email has been sent with instructions on resetting your password.' % group.title)
+          return shortcuts.redirect('ctstem:home')
+
+        except models.Student.DoesNotExist:
+          # if student does not exist, redirect to a full registration form
+          return shortcuts.redirect('/register/group/%s?email=%s' %(group_code, email))
+      else:
+        context = {'form': form, 'group_id': group_id, 'school_id': school.id}
+        return render(request, 'ctstem_app/PreRegistration.html', context)
+    return http.HttpResponseNotAllowed(['GET', 'POST'])
+  else:
+    return http.HttpResponseNotFound('<h1>Invalid URL</h1>')
+
+####################################
 # REGISTER
 ####################################
 def register(request, group_code=''):
@@ -819,10 +856,6 @@ def register(request, group_code=''):
         newUser.save()
         if group_id:
           membership, created = models.Membership.objects.get_or_create(student=newUser, group=group)
-          #check if the student was a group invitee and remove the student invitation
-          invitation = models.GroupInvitee.objects.filter(email=user.email, group=group)
-          if invitation:
-            invitation.delete()
 
         role = 'student'
 
@@ -911,12 +944,6 @@ def register(request, group_code=''):
     if group_id:
       if 'email' in request.GET:
         email = request.GET['email']
-        #validate the email is a valid group invitee
-        try:
-          invitee = models.GroupInvitee.objects.get(email=email, group__id=group_id)
-        except models.GroupInvitee.DoesNotExist:
-          return http.HttpResponseNotFound('<h1>Invalid invitation link.  Please use the link found to your email.</h1>')
-
         form = forms.RegistrationForm(initial={'email': email}, user=request.user, group_id=group_id)
       else:
         form = forms.RegistrationForm(user=request.user, group_id=group_id)
@@ -3296,8 +3323,6 @@ def user_upload(request):
           else:
             #email does not exist.  Send and email with registration link
             send_student_account_request_email(email, group)
-            #add email to group invitee list
-            group_invitee, created = models.GroupInvitee.objects.get_or_create(group=group, email=email)
 
             new += 1
 

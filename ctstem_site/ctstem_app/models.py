@@ -470,12 +470,6 @@ class UserGroup(models.Model):
 
     super(UserGroup, self).save(*args, **kwargs)
 
-class GroupInvitee(models.Model):
-  group = models.ForeignKey(UserGroup, related_name='groups')
-  email = models.EmailField(max_length=255, blank=False, null=False, help_text="Email")
-
-  class Meta:
-    unique_together = ('group', 'email')
 
 #######################################################
 # Assignment model
