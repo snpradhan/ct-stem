@@ -2264,7 +2264,7 @@ def assignmentDashboard(request, id=''):
         try:
           instance = instances.get(student=student)
           total_questions = models.CurriculumQuestion.objects.all().filter(step__curriculum=assignment.curriculum).count()
-          attempted_questions = models.QuestionResponse.objects.all().filter(step_response__instance=instance).exclude(response__exact='', responseFile__exact='').count()
+          attempted_questions = models.QuestionResponse.objects.all().filter(step_response__instance=instance).exclude(response__exact='', response_file__isnull=True).count()
           total_steps = instance.assignment.curriculum.steps.count()
           last_step = instance.last_step
           if total_questions > 0:
@@ -2312,7 +2312,7 @@ def assignments(request, bucket=''):
         try:
           instance = models.AssignmentInstance.objects.get(assignment=assignment, student=student)
           total_questions = models.CurriculumQuestion.objects.all().filter(step__curriculum=assignment.curriculum).count()
-          attempted_questions = models.QuestionResponse.objects.all().filter(step_response__instance=instance).exclude(response__exact='', responseFile__exact='').count()
+          attempted_questions = models.QuestionResponse.objects.all().filter(step_response__instance=instance).exclude(response__exact='', response_file__isnull=True).count()
           total_steps = instance.assignment.curriculum.steps.count()
           last_step = instance.last_step
           percent_complete = 0
