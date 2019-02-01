@@ -742,7 +742,7 @@ def preregister(request, group_code=''):
       return render(request, 'ctstem_app/PreRegistration.html', context)
     elif request.method == 'POST':
       form = forms.PreRegistrationForm(data=request.POST)
-      if form.is_valid():
+      if form.is_valid(group_id):
         email = form.cleaned_data['email']
         try:
           #if student exists, add them to the class and send a notification
@@ -3275,31 +3275,42 @@ def user_upload(request):
           invalid +=1
         else:
           #check if email exists
-          if User.objects.filter(email=email).exists():
+          user_count = User.objects.filter(email=email).count()
+          if user_count == 1:
             #check if email belongs to a student
             if models.Student.objects.filter(user__email=email).exists():
-              #add student to group
-              #TODO
               student = models.Student.objects.get(user__email=email)
-              membership, created = models.Membership.objects.get_or_create(student=student, group=group)
-              student_consent = 'Unknown'
-              if student.consent == 'A':
-                student_consent = 'Agree'
-              elif student.consent == 'D':
-                student_consent = 'Disagree'
-              added_students[student.id] = {'user_id': student.user.id, 'username': student.user.username,
-                                            'full_name': student.user.get_full_name(), 'email': student.user.email,
-                                            'status': 'Active' if student.user.is_active else 'Inactive',
-                                            'student_consent':  student_consent, 'parental_consent': student.get_parental_consent_display(),
-                                            'member_since': student.user.date_joined.strftime('%b %d, %Y'),
-                                            'last_login': student.user.last_login.strftime('%b %d, %Y') if student.user.last_login else '', 'group': group.id}
-              send_added_to_group_confirmation_email(email, group)
-              added += 1
+              #if student belongs to the same school as the teacher
+              if group.teacher.school == student.school:
+                membership, created = models.Membership.objects.get_or_create(student=student, group=group)
+                student_consent = 'Unknown'
+                if student.consent == 'A':
+                  student_consent = 'Agree'
+                elif student.consent == 'D':
+                  student_consent = 'Disagree'
+                added_students[student.id] = {'user_id': student.user.id, 'username': student.user.username,
+                                              'full_name': student.user.get_full_name(), 'email': student.user.email,
+                                              'status': 'Active' if student.user.is_active else 'Inactive',
+                                              'student_consent':  student_consent, 'parental_consent': student.get_parental_consent_display(),
+                                              'member_since': student.user.date_joined.strftime('%b %d, %Y'),
+                                              'last_login': student.user.last_login.strftime('%b %d, %Y') if student.user.last_login else '', 'group': group.id}
+                send_added_to_group_confirmation_email(email, group)
+                added += 1
+              else:
+                #error out email does not belong to the same school
+                msg['error'].append('Email %d belongs to a student in a different school' % count)
+                messages.error(request, 'Email %d belongs to a student in a different school' % count)
+                invalid += 1
             else:
-              #error out email in use and does not belong to a student account
+              #error out email in use does not belong to a student account
               msg['error'].append('Email %d does not belong to a student account' % count)
               messages.error(request, 'Email %d does not belong to a student account' % count)
               invalid += 1
+          elif user_count > 1:
+            #error out email because there is more than one account with that email
+            msg['error'].append('Email %d used in more than one user account' % count)
+            messages.error(request, 'Email %d used in more than one user account' % count)
+            invalid += 1
           else:
             #email does not exist.  Send and email with registration link
             send_student_account_request_email(email, group)

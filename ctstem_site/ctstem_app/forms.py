@@ -109,7 +109,7 @@ class PreRegistrationForm(forms.Form):
       field.widget.attrs['aria-describedby'] = field.label
       field.widget.attrs['placeholder'] = field.help_text
 
-  def is_valid(self):
+  def is_valid(self, group_id):
     valid = super(PreRegistrationForm, self).is_valid()
     if not valid:
       return valid
@@ -117,8 +117,15 @@ class PreRegistrationForm(forms.Form):
     email = self.cleaned_data['email']
 
     try:
+      group = models.UserGroup.objects.get(id=group_id)
       user = User.objects.get(email=email)
       student = models.Student.objects.get(user=user)
+      if group.teacher.school != student.school:
+        self.errors['email'] = u'Your student account belongs to a different school and you cannot join this class.'
+        return False
+    except User.MultipleObjectsReturned:
+      self.errors['email'] = u'More than one account exists for this email. Contact your system admin.'
+      return False
     except User.DoesNotExist:
       return True
     except models.Student.DoesNotExist:
