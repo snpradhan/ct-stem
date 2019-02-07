@@ -75,13 +75,13 @@ def home(request):
     if request.method == 'GET':
       redirect_url = request.GET.get('next', '')
       target = None
-      print 'redirect_url', redirect_url
       if 'register' in redirect_url:
         target = '#register'
       elif 'validate' in redirect_url:
         target = '#validate'
       elif 'password_reset' in redirect_url:
         target = '#password'
+
       context = {'curricula': curricula, 'lessons': lessons, 'assessments' : assessments, 'practices': practices, 'team': team, 'publications': publications, 'redirect_url': redirect_url, 'target': target}
       return render(request, 'ctstem_app/Home.html', context)
 
@@ -750,9 +750,11 @@ def preregister(request, group_code=''):
 
     if request.method == 'GET':
       form = forms.PreRegistrationForm()
-      context = {'form': form, 'group_id': group_id, 'school_id': school.id}
+      context = {'form': form, 'group_code': group_code}
       return render(request, 'ctstem_app/PreRegistration.html', context)
+
     elif request.method == 'POST':
+      response_data = {}
       form = forms.PreRegistrationForm(data=request.POST)
       if form.is_valid(group_id):
         email = form.cleaned_data['email']
@@ -761,15 +763,22 @@ def preregister(request, group_code=''):
           student = models.Student.objects.get(user__email=email)
           membership, created = models.Membership.objects.get_or_create(student=student, group=group)
           send_added_to_group_confirmation_email(email, group)
-          messages.info(request, 'You have been added to the class %s.  You may now login to do your assignments. An email has been sent with instructions on resetting your password.' % group.title)
-          return shortcuts.redirect('ctstem:home')
+          response_data['success'] = True
+          response_data['message'] ='You have been added to the class %s.  You may now login to do your assignments. An email has been sent with instructions on resetting your password.' % group.title
+          response_data['redirect_url'] = '/'
 
         except models.Student.DoesNotExist:
           # if student does not exist, redirect to a full registration form
-          return shortcuts.redirect('/register/group/%s?email=%s' %(group_code, email))
+          response_data['success'] = True
+          response_data['redirect_url'] = "/?next=/register/group/%s/%s" %(group_code, email)
+
       else:
-        context = {'form': form, 'group_id': group_id, 'school_id': school.id}
-        return render(request, 'ctstem_app/PreRegistration.html', context)
+        context = {'form': form, 'group_code': group_code}
+        response_data['success'] = False
+        response_data['html'] = render_to_string('ctstem_app/PreRegistration.html', context, context_instance=RequestContext(request))
+
+      return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+
     return http.HttpResponseNotAllowed(['GET', 'POST'])
   else:
     return http.HttpResponseNotFound('<h1>Invalid URL</h1>')
@@ -971,8 +980,7 @@ def register(request, group_code='', email=''):
       return shortcuts.redirect('ctstem:home')
 
     if group_id:
-      if 'email' in request.GET:
-        email = request.GET['email']
+      if email:
         form = forms.RegistrationForm(initial={'email': email}, user=request.user, group_id=group_id)
         context = {'form': form, 'group_id': group_id, 'school_id': school.id, 'group_code': group_code, 'email': email}
       else:
@@ -1344,7 +1352,7 @@ def removeStudent(request, group_id='', student_id=''):
     # check if the user has permission to create or modify a group
     has_permission = check_group_permission(request, group_id)
     if not has_permission:
-      return http.HttpResponseNotFound('<h1>You do not have the privilege to remove users from this group</h1>')
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to remove users from this class</h1>')
 
     group = models.UserGroup.objects.get(id=group_id)
     student = models.Student.objects.get(id=student_id)
@@ -1358,7 +1366,7 @@ def removeStudent(request, group_id='', student_id=''):
     return http.HttpResponseNotAllowed(['GET', 'POST'])
 
   except models.UserGroup.DoesNotExist:
-    return http.HttpResponseNotFound('<h1>Requested group not found</h1>')
+    return http.HttpResponseNotFound('<h1>Requested class not found</h1>')
   except models.Student.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested student not found</h1>')
 
@@ -1371,7 +1379,7 @@ def addStudent(request, group_id='', student_id=''):
     # check if the user has permission to create or modify a group
     has_permission = check_group_permission(request, group_id)
     if not has_permission:
-      return http.HttpResponseNotFound('<h1>You do not have the privilege to remove users from this group</h1>')
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to add students to this class</h1>')
 
     group = models.UserGroup.objects.get(id=group_id)
     student = models.Student.objects.get(id=student_id)
@@ -1385,7 +1393,7 @@ def addStudent(request, group_id='', student_id=''):
     return http.HttpResponseNotAllowed(['POST'])
 
   except models.UserGroup.DoesNotExist:
-    return http.HttpResponseNotFound('<h1>Requested group not found</h1>')
+    return http.HttpResponseNotFound('<h1>Requested class not found</h1>')
   except models.Student.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested student not found</h1>')
 
@@ -1400,7 +1408,7 @@ def createStudent(request, group_id=''):
     # check if the user has permission to create or modify a group
     has_permission = check_group_permission(request, group_id)
     if not has_permission:
-      return http.HttpResponseNotFound('<h1>You do not have the privilege to remove users from this group</h1>')
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to add students from this class</h1>')
 
     if request.method == 'POST':
       data=request.POST
@@ -1441,7 +1449,7 @@ def createStudent(request, group_id=''):
     return http.HttpResponseNotAllowed(['POST'])
 
   except models.UserGroup.DoesNotExist:
-    return http.HttpResponseNotFound('<h1>Requested group not found</h1>')
+    return http.HttpResponseNotFound('<h1>Requested class not found</h1>')
   except models.Student.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested student not found</h1>')
 
@@ -1761,7 +1769,7 @@ def _do_action(request, id_list, model, object_id=None):
     if u'remove_selected' == action_params.get(u'action'):
       for user in users:
         removeStudent(request, object_id, user.student.id)
-      messages.success(request, "Selected student(s) removed from group.")
+      messages.success(request, "Selected student(s) removed from class.")
       return True
     elif u'activate_selected' == action_params.get(u'action'):
       for user in users:
@@ -1809,13 +1817,13 @@ def _do_action(request, id_list, model, object_id=None):
     if u'activate_selected' == action_params.get(u'action'):
       groups.update(is_active=True)
       print 'activation done'
-      messages.success(request, "Selected group(s) activated.")
+      messages.success(request, "Selected class(es) activated.")
       return True
     elif u'inactivate_selected' == action_params.get(u'action'):
       groups.update(is_active=False)
       #archive assignments
       archiveAssignments(request, id_list)
-      messages.success(request, "Selected group(s) inactivated.")
+      messages.success(request, "Selected class(es) inactivated.")
       return True
   else:
     return False
@@ -2023,7 +2031,7 @@ def groups(request, status='active'):
       print groups
 
     else:
-      return http.HttpResponseNotFound('<h1>You do not have the privilege to view student groups</h1>')
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to view classes</h1>')
     current_site = Site.objects.get_current()
     domain = current_site.domain
     uploadForm = forms.UploadFileForm(user=request.user)
@@ -2219,7 +2227,7 @@ def deleteGroup(request, id=''):
       raise models.UserGroup.DoesNotExist
 
   except models.UserGroup.DoesNotExist:
-    return http.HttpResponseNotFound('<h1>Requested group not found</h1>')
+    return http.HttpResponseNotFound('<h1>Requested class not found</h1>')
 
 ####################################
 # Group Dashboard
@@ -2235,7 +2243,7 @@ def groupDashboard(request, id=''):
         has_permission = check_group_permission(request, id)
 
       if not has_permission:
-        return http.HttpResponseNotFound('<h1>You do not have the privilege to view this group</h1>')
+        return http.HttpResponseNotFound('<h1>You do not have the privilege to view this class</h1>')
 
       assignments = {}
       serial = 0
@@ -2280,7 +2288,7 @@ def groupDashboard(request, id=''):
     return http.HttpResponseNotAllowed(['GET'])
 
   except models.UserGroup.DoesNotExist:
-    return http.HttpResponseNotFound('<h1>Requested group not found</h1>')
+    return http.HttpResponseNotFound('<h1>Requested class not found</h1>')
 
 ####################################
 # Assignment Dashboard
@@ -2298,7 +2306,7 @@ def assignmentDashboard(request, id=''):
         has_permission = check_group_permission(request, group.id)
 
       if not has_permission:
-        return http.HttpResponseNotFound('<h1>You do not have the privilege to view this grassignmentoup</h1>')
+        return http.HttpResponseNotFound('<h1>You do not have the privilege to view this assignment</h1>')
 
       students = assignment.group.members.all()
       instances = models.AssignmentInstance.objects.all().filter(assignment=assignment)
@@ -3362,8 +3370,8 @@ def user_upload(request):
             new += 1
 
       if added:
-        msg['success'].append('Existing students added to the group: %d' % (added))
-        messages.success(request, 'Existing students added to the group: %d' % (added))
+        msg['success'].append('Existing students added to the class: %d' % (added))
+        messages.success(request, 'Existing students added to the class: %d' % (added))
       if new:
         msg['success'].append('Email sent to new students to create an account: %d' % (new))
         messages.success(request, 'Email sent to new students to create an account: %d' % (new))
@@ -3374,7 +3382,7 @@ def user_upload(request):
       response_data = {'success': True, 'new_students': added_students, 'messages': msg}
     else:
       print form.errors
-      response_data = {'success': False, 'message': 'Please select a group and either a list of student emails or a student email csv to upload.'}
+      response_data = {'success': False, 'message': 'Please select a class and either a list of student emails or a student email csv to upload.'}
 
     return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 
@@ -3435,9 +3443,9 @@ def send_student_account_by_self_confirmation_email(user, group):
   current_site = Site.objects.get_current()
   domain = current_site.domain
   body = '<div>Welcome to Computational Thinking in STEM website https://%s.  <div> \
-          <div>You have successfully created a student account on our site.  You have also been added to the group <b>%s</b>. </div> \
+          <div>You have successfully created a student account on our site.  You have also been added to the class <b>%s</b>. </div> \
           <div>Now you can login to complete your assignments. <div> <br>\
-          <div>If you have forgotten your password since you last logged in, you can reset your password here https://%s/password_reset/recover/  </div><br> \
+          <div>If you have forgotten your password since you last logged in, you can reset your password here https://%s/?next=/password_reset/recover/  </div><br> \
           <div><b>CT-STEM Admin</b></div>' % (domain, group.title.title(), domain)
 
   send_mail('CT-STEM - Student Account Created', body, settings.DEFAULT_FROM_EMAIL, [user.email], html_message=body)
@@ -3452,7 +3460,7 @@ def send_added_to_group_confirmation_email(email, group):
   domain = current_site.domain
   body = '<div>Your teacher has added you to the class <b>%s</b> on Computational Thinking in STEM website. </div><br> \
           <div>You may login with your credentials here https://%s </div><br> \
-          <div>If you have forgotten your password since you last logged in, you can reset your password here https://%s/password_reset/recover/  </div><br> \
+          <div>If you have forgotten your password since you last logged in, you can reset your password here https://%s/?next=/password_reset/recover/  </div><br> \
           <div>If clicking the link does not seem to work, you can copy and paste the link into your browser&#39;s address window, </div> \
           <div>or retype it there. Once you have returned to CT-STEM, we will give instructions to proceed. </div><br> \
           <div><b>CT-STEM Admin</b></div>'%(group.title.title(), domain, domain)

@@ -1,52 +1,70 @@
-{% extends "ctstem_app/base.html" %}
 
-{% block title %}Registration |{% endblock %}
+<div class="modal-dialog modal-sm">
+  <div class="modal-content">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal">&times;</button>
 
+      <h3 class="left">Create Student Account</h3>
+      <div id="signup_note" class="warning">(Note: You are signing up as a student.  Enter the info below to sign on to your teacher's classroom)</div>
 
-{% block styles %}
-  #sidebar {
-    display: none;
-  }
-{% endblock %}
+      <div id="registerMsg" class="msg">
+        <ul class="errorlist">
+          {% for message in messages %}
+          <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message|safe }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
 
-{% block content %}
-  {{block.super}}
-  <div class="content">
-   <h2 id="page_title">Student Sign Up</h2>
-   <div id="signup_note" class="warning">(Note: You are signing up as a student.  Enter the info below to sign on to your teacher's classroom)</div>
+    <form class="form" id="formRegister" method="post" action="{% url 'ctstem:preregister' group_code %}">
+      <div class="modal-body">
+        {% csrf_token %}
+        {{form.management_form}}
 
+        <div class="form-group">
+          <label for="id_{{form.email.name}}">{{ form.email.label }} {% if form.email.field.required %}(<span class="required">*</span>){% endif %}</label>
+          {{form.email}}
+          <div class="error">{{ form.email.errors }}</div>
+        </div>
+      </div>
 
-    <form method="post">
-      {% csrf_token %}
-      <div class="table" id="register">
-        <fieldset>
-          {{form.management_form}}
-          <div class="form-group" id="div_{{form.email.name}}">
-            <label for="id_{{form.email.name}}">{{ form.email.label|title }}
-              {% if form.email.field.required %}(<span class="required">*</span>) {% endif %}
-            </label>
-            <div>
-              {{form.email}}
-            </div>
-            <div class="error">{{ form.email.errors }}</div>
-          </div>
-          <div class="form-group button-group">
-            <input type="submit" class="btn btn-success" id="submit" value="Validate Email"/>
-          </div>
-
-        </fieldset>
+       <div class="modal-footer">
+        <div class="form-group">
+          <input type="submit" class="btn normal yellow" id="submit" value="Validate Email"/>
+        </div>
       </div>
     </form>
-
-    <script type="text/javascript">
-      $(function(){
-        {% if user.is_anonymous %}
-          {% if group_id and school_id %}
-            //this is student registration, hide the menu items
-            $('ul.nav.navbar-nav').hide();
-          {% endif %}
-        {% endif %}
-      });
-    </script>
   </div>
-{% endblock %}
+</div>
+
+<script type="text/javascript">
+  $(function (){
+    $("#formRegister").submit(function(e){
+      e.preventDefault();
+      $.ajax({
+        type: $(this).attr('method'),
+        url: this.action,
+        data: $(this).serialize(),
+        context: this,
+        success: function(data, status) {
+          if(data['success'] == true){
+            $('#register').modal('toggle');
+            if(data['message']){
+              $('#notification .modal-body p').html(data['message']);
+              $('#notification').modal('toggle');
+            }
+            else {
+              window.parent.location.href = data['redirect_url'];
+            }
+          }
+          else{
+            $('#register').html(data['html']);
+          }
+        },
+        error: function(){
+          alert("Something went wrong.");
+        }
+      });
+    });
+  });
+</script>
