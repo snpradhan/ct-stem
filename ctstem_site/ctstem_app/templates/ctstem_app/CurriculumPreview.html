@@ -64,8 +64,8 @@
     {% endif %}
     <!-- TOP HEADER BAR -->
     <header>
-      <h1><a class="navbar-brand" href="{% url 'ctstem:home' %}"><i class="fa fa-home" aria-hidden="true"></i>  CT-STEM</a></h1>
-      {{curr_unit.title|title}} - Preview
+      <a class="navbar-brand" href="{% url 'ctstem:home' %}"><img src="/static/img/logo/svg/light/wide.svg"></a>
+      <span>{{curr_unit.title|title}} - Preview </span>
       <nav>
         <span id="activity-nav">
         {% if step_order|add:0 >= 0 %}

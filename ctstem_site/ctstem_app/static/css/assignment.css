@@ -38,6 +38,10 @@ header nav {
   right: 30px;
 }
 
+header span {
+  font-family: 'Roboto Condensed', sans-serif;
+}
+
 header nav.activated {
   background-color: rgb(70, 160, 215);
 }
@@ -133,8 +137,9 @@ header nav .page-link {
 header nav .page-link.selected { background-color: white; color: rgb(70, 160, 215); }
 header nav .page-link:hover { background-color: rgba(255, 255, 255, 0.8); color: rgb(70, 160, 215); }
 header nav .page-link:active { background-color: white; }
-header h1 a.navbar-brand {
-  color: inherit;
+header a.navbar-brand img{
+  width: 150px;
+  margin-right: 50px;
 }
 
 

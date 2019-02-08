@@ -19,8 +19,8 @@
       <div class="col-container">
         <div class="col text">
           <div class="heading">
-            <h2>Expert tools for high school science learning</h2>
-            <p>Use authentic computational practices to fuel discovery in science and math with free CT lesson plans and resources.</p>
+            <h2>Computational tools for high school STEM</h2>
+            <p>Empower next-gen thinkers, enrich existing curricula and fuel discovery with free computational thinking lesson plans and professional training.</p>
             <div class="buttons">
               {% if user.is_anonymous %}
                 <a type="button" class="btn big blue modal-open" data-toggle="modal" data-target="#register" data-href="{% url 'ctstem:register' %}" href="#" >REGISTER AS A TEACHER</a>
@@ -44,7 +44,7 @@
       <div class="col-container">
         <div class="col one">
           <div class="graphic">
-            <img src="https://ct-stem.s3.amazonaws.com/curriculum/electrons-to-electricity-how-does-a-ci_2018-09-14-21-24-24-711539.png">
+            <img src="/static/img/blue_illustration.svg">
           </div>
           <div class="text">
             <h3 class="center">One thing is certain</h3>
@@ -53,7 +53,7 @@
         </div>
         <div class="col two">
           <div class="graphic">
-            <img src="https://ct-stem.s3.amazonaws.com/curriculum/electrons-to-electricity-how-does-a-ci_2018-09-14-21-24-24-711539.png">
+            <img src="/static/img/yellow_illustration.svg">
           </div>
           <div class="text">
             <h3 class="center">It's time for change</h3>
@@ -62,11 +62,11 @@
         </div>
         <div class="col three">
           <div class="graphic">
-            <img src="https://ct-stem.s3.amazonaws.com/curriculum/electrons-to-electricity-how-does-a-ci_2018-09-14-21-24-24-711539.png">
+            <img src="/static/img/red_illustration.svg">
           </div>
           <div class="text">
-            <h3 class="center">You can benefit</h3>
-            <p class="shaded">Our free, NGSS-aligned resources are helping teachers of all computing abilities to confidently integrate computational thinking into high school science and math.</p>
+            <h3 class="center">Feel enpowered</h3>
+            <p class="shaded">Our free, CT resources and workshops are helping teachers of all abilities to confidently integrate computational thinking into existing high school curricula.</p>
           </div>
         </div>
       </div>
@@ -136,7 +136,7 @@
         </div>
         {% endfor %}
       </div>
-      <a class="btn normal yellow" href="{% url 'ctstem:curricula' 'units' %}">Browse All</a>
+      <a class="btn normal darkblue" href="{% url 'ctstem:curricula' 'units' %}">Browse All</a>
     </div>
 
     <div class="block" id="four">
@@ -206,7 +206,7 @@
     <div class="block" id="five">
       <div class="col-container">
         <div class="col graphic">
-          <img src="https://ct-stem.s3.amazonaws.com/curriculum/electrons-to-electricity-how-does-a-ci_2018-09-14-21-24-24-711539.png">
+          <img src="/static/img/laptop_illustration.svg">
         </div>
         <div class="col text">
           <div>
@@ -232,7 +232,7 @@
     <div class="block" id="six">
       <div class="col-container">
         <div class="col graphic">
-          <img src="https://ct-stem.s3.amazonaws.com/curriculum/electrons-to-electricity-how-does-a-ci_2018-09-14-21-24-24-711539.png">
+          <img src="/static/img/tablet_illustration.svg">
         </div>
         <div class="col text">
           <div>
@@ -251,7 +251,7 @@
       <div class="col-container">
         <div class="col text">
           <div>
-            <h2>Getting started</h2>
+            <h2>Get started</h2>
             <p>Whether you're in search of professional training, or a way to easily manage and review your CT assignments, our platform is designed to help</p>
           </div>
           <div class="buttons">

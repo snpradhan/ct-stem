@@ -40,8 +40,8 @@
 
 {% block content %}
   <header>
-    <h1><a class="navbar-brand" href="{% url 'ctstem:home' %}"><i class="fa fa-home" aria-hidden="true"></i>  CT-STEM</a></h1>
-    {{curriculum.title|title}}
+    <a class="navbar-brand" href="{% url 'ctstem:home' %}"><img src="/static/img/logo/svg/light/wide.svg"></a>
+    <span>{{curriculum.title|title}}</span>
     <nav>
       Page &nbsp;
       {% if step_order|add:0  == 0 %}
