@@ -20,7 +20,7 @@
         <div class="col text">
           <div class="heading">
             <h2>Computational tools for high school STEM</h2>
-            <p>Empower next-gen thinkers, enrich existing curricula and fuel discovery with free computational thinking lesson plans and professional training.</p>
+            <p>Empower learning and enrich your curriculum with free computational thinking lesson plans and professional training.</p>
             <div class="buttons">
               {% if user.is_anonymous %}
                 <a type="button" class="btn big blue modal-open" data-toggle="modal" data-target="#register" data-href="{% url 'ctstem:register' %}" href="#" >REGISTER AS A TEACHER</a>
@@ -48,7 +48,7 @@
           </div>
           <div class="text">
             <h3 class="center">One thing is certain</h3>
-            <p class="shaded">Computational thinking (CT) is a problem solving mindset essential to any STEM career, and a crucial science and engineering practice within the NGSS.</p>
+            <p class="shaded">Computational thinking is a crucial science and engineering practice within the Next Generation Science Standards.</p>
           </div>
         </div>
         <div class="col two">
@@ -66,14 +66,14 @@
           </div>
           <div class="text">
             <h3 class="center">Feel enpowered</h3>
-            <p class="shaded">Our free, CT resources and workshops are helping teachers of all abilities to confidently integrate computational thinking into existing high school curricula.</p>
+            <p class="shaded">Our free classroom resources help teachers confidently integrate computational thinking into their classrooms.</p>
           </div>
         </div>
       </div>
     </div>
 
     <div class="block" id="three">
-      <h2 class="center">Browser-friently CT lesson plans for your classroom</h2>
+      <h2 class="center">Browser-friendly CT lesson plans for your classroom</h2>
       <div class="col-container">
         {% for curriculum in curricula %}
         <div class="col col-{{forloop.counter}}">
