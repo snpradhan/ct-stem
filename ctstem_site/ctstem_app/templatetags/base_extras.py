@@ -15,9 +15,9 @@ from django.contrib.staticfiles import finders
 register = template.Library()
 
 @register.simple_tag
-def navactive(request, urls, args=None):
+def navactive(request, urls, *args):
   if args:
-    if request.path in ( reverse(url, args=(args,)) for url in urls.split() ):
+   if request.path in ( reverse(url, args=args) for url in urls.split() ):
       return "active"
   else:
     if request.path in ( reverse(url) for url in urls.split() ):
