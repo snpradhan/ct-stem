@@ -65,7 +65,7 @@
             <img src="/static/img/red_illustration.svg">
           </div>
           <div class="text">
-            <h3 class="center">Feel enpowered</h3>
+            <h3 class="center">Feel empowered</h3>
             <p class="shaded">Our free classroom resources help teachers confidently integrate computational thinking into their classrooms.</p>
           </div>
         </div>
@@ -144,22 +144,24 @@
         <div class="col text">
           <div>
             <h2>Teach with confidence</h2>
-            <p>Don't sweat the small stuff, our tried and tested lesson plan are NGSS-aligned, browser-friendly and free.
+            <p>Our tried and tested lesson plan are NGSS-aligned, browser-friendly and free.
             </p>
             <p>
-              Designed to integrate with conventional curricula, CT-STEM lesson plans can be implemented on their own, or used to supplement lessons that you already feel comfortable teaching. Either way, your students will explore authentic computational practices that enrich convententional content learning and nurture computational literacy.
+              Designed to integrate with conventional curricula, CT-STEM lesson plans can be implemented on their own, or used to supplement lessons that you already feel comfortable teaching. Either way, your students will explore authentic computational practices that enrich convententional subject matter learning and nurture computational literacy.
             </p>
             <p>
-              All CT-STEM content is backed by years of professional research and a specialist team of educators at Northwestern University.
+              Our content is co-designed with teachers, classroom tested, and backed by years of research at Northwestern University.
             </p>
+             <!--
             <p>
-              Our workshops, coaching and video resources can help you to formulate CT lesson plans that are right for your classroom.
+            Our workshops, coaching and video resources can help you to formulate CT lesson plans that are right for your classroom.
             </p>
+             -->
           </div>
           <div class="buttons">
             <a class="btn normal yellow" href="{% url 'ctstem:training' %}">CT-STEM Workshops</a>
             &nbsp;&nbsp;
-            <a class="btn normal white" href="{% url 'ctstem:training' %}">Video Resources</a>
+            <!--<a class="btn normal white" href="{% url 'ctstem:training' %}">Video Resources</a>-->
           </div>
         </div>
         <div class="col graphic">
@@ -169,7 +171,7 @@
                 <li>
                   <span>
                     <span class="dark">Enrich conventional content</span><br>
-                    <span class="light">no need to change what you're teaching</span>
+                    <span class="light">no need to change what content you're teaching</span>
                   </span>
                 </li>
                 <li>
@@ -181,7 +183,7 @@
                 <li>
                   <span>
                     <span class="dark">Meet modern education standards</span><br>
-                    <span class="light">guarantee your alignment with NGSS</span>
+                    <span class="light">guarantee your alignment with the NGSS</span>
                   </span>
                 </li>
                 <li>
@@ -193,7 +195,7 @@
                 <li>
                   <span>
                     <span class="dark">Spend your time where it matters most</span><br>
-                    <span class="light">our browser-friently lessons are ready to go</span>
+                    <span class="light">our browser-friendly lessons are ready to go</span>
                   </span>
                 </li>
             </ul>
@@ -217,11 +219,11 @@
               People are ingenious, but computers are lightning fast at processing information and following instructions. CT is about learning useful ways to compound our ingenuity with this raw, computational power.
             </p>
             <p>
-              Because computation is changing the way we think and learn about the world, understanding and leveraging its utility has never been a more important skill for students to develop.
+              Because computation is changing the way we think and learn about the world, understanding and leveraging its abilities has never been a more important skill for students to develop.
             </p>
           </div>
           <div class="buttons">
-            <a class="btn normal yellow" href="{% url 'ctstem:curricula' 'units' %}">More about CT</a>
+            <a class="btn normal yellow" href="{% url 'ctstem:curricula' 'units' %}">See CT Curricula</a>
             &nbsp;&nbsp;
             <a class="btn normal white" href="{% url 'ctstem:publications' %}">Our Research</a>
           </div>
@@ -237,11 +239,9 @@
         <div class="col text">
           <div>
             <h2>Where does CT fit in?</h2>
+            <p>By equipping students with modern tools and challenging them to actively contsruct their understanding, you can boost content engagement while nurturing vital computational skills for the future.</p>
             <p>Letting students explore and experiment before teaching them content can help to foster a genuine atmosphere of discovery in the classroom.</p>
-            <p>
-              This is important because it provides the ideal context within which students can utilize authentic computational practices to explore new ideas and develop methods of inquiry.</p>
-            <p>
-              By equipping students with these modern tools and challenging them to form their understanding, you can boost content engagement while nurturing vital computational skills for the future.</p>
+            <p>This is important because it provides the ideal context within which students can utilize authentic computational practices: exploring new ideas and developing their own methods of inquiry.</p>
           </div>
         </div>
       </div>
@@ -252,7 +252,7 @@
         <div class="col text">
           <div>
             <h2>Get started</h2>
-            <p>Whether you're in search of professional training, or a way to easily manage and review your CT assignments, our platform is designed to help</p>
+            <p>Our site provides access to research-backed CT curricula along with a set of tools to easily manage, review and provide feedback to students on CT assignments.</p>
           </div>
           <div class="buttons">
             {% if user.is_anonymous %}
@@ -282,14 +282,16 @@
               <li>
                 <span>
                   <span class="dark">Track student progress and provide feedback</span><br>
-                  <span class="light">export spreadsheet-friendly student responses</span>
+                  <span class="light">view and export student responses</span>
                 </span>
               </li>
               <li>
+                 <!--
                 <span>
                   <span class="dark">Receive professional training</span><br>
                   <span class="light">via live workshops, discipline specific coaching and video resources</span>
                 </span>
+                -->
               </li>
             </ul>
           </div>
