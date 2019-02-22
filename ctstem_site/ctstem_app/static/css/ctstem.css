@@ -1718,7 +1718,7 @@ div.modal select.form-control {
 
 .form-control {
   border: 2px solid var(--ctstem-color-gray);
-  color: var(--ctstem-color-gray);
+  color: black;
 }
 .form-control.error {
   border: 2px solid var(--ctstem-color-red);
@@ -1740,4 +1740,3 @@ span.cke_top.blur, span.cke_bottom.blur {
 span.cke_top.focus, span.cke_bottom.focus {
   display: block !important;
 }
-
