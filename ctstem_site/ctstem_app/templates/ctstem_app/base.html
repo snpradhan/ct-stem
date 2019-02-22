@@ -462,7 +462,7 @@
               <li><a class="page-scroll" href="{% url 'ctstem:home' %}#five">Intro to CT</a></li>
               <li><a href="{% url 'ctstem:training' %}">Training</a></li>
               {% if user.is_anonymous %}
-                <li><a href="{% url 'ctstem:login' %}">Login</a></li>
+                <li><a data-toggle="modal" data-target="#login" class="login modal-open" data-href="{% url 'ctstem:login' %}" href="#">Login</a></li>
               {% endif %}
             </ul>
 
