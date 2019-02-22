@@ -1237,6 +1237,7 @@ div.modal-content div.link {
   font-size: 2.5em;
   font-weight: bold;
   text-align: center;
+  line-height: 1.25em;
 }
 
 /***** Consent Form Modal *****/
