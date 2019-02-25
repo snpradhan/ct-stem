@@ -332,11 +332,7 @@
               </div>
             {% endif %}
 
-            <!-- FACEBOOK MESSAGE BOARD -->
-            <div class="comments">
-              <h2>Comments, Feedback, and Questions</h2>
-              <div class="fb-comments"  data-width="600" data-numposts="5"></div>
-            </div>
+
           </div>
         </lesson-summary>
 
@@ -417,8 +413,6 @@
   <script type="text/javascript">
     $(function(){
       loadDataTable(true);
-
-      $('.fb-comments').data('href', window.location.href);
 
       $('body').on('click', 'button.fa-facebook', function(){
         window.open('https://www.facebook.com/sharer/sharer.php?u='+window.location.href+'&title={{curr_unit.title}}', 'Facebook', 'width=640,height=300');
