@@ -288,7 +288,6 @@ footer h4 {
 .navbar-default .navbar-nav > li > a,
 .dropdown-menu > li > a {
   color: black !important;
-  border: 0 !important;
   background-image: none !important;
   background-color: white !important;
   text-transform: none !important;
