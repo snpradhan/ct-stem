@@ -52,7 +52,7 @@ class LoginForm (forms.Form):
     if password is None:
       self.fields['password'].widget.attrs['class'] += ' error'
     else:
-      user = authenticate(username=username, password=password)
+      user = authenticate(username=username.lower(), password=password)
       if user is None:
         self.add_error('password', u'Password is incorrect.')
         self.fields['password'].widget.attrs['class'] += ' error'
