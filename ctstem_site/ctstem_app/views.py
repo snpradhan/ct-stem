@@ -2063,7 +2063,7 @@ def group(request, id=''):
 
     if request.method in ['GET', 'POST']:
       assignments = {}
-
+      keys = []
       for assignment in models.Assignment.objects.all().filter(group=group).order_by('curriculum__unit__title', 'curriculum__order'):
         instances = models.AssignmentInstance.objects.all().filter(assignment=assignment)
         curriculum = assignment.curriculum
@@ -2073,11 +2073,15 @@ def group(request, id=''):
         else:
           key = curriculum
 
-        if key in assignments:
-          assignments[key].append(assignment)
-        else:
-            assignments[key] = [assignment]
+        if key not in keys:
+          keys.append(key)
 
+        if key in assignments:
+          assignments[key][curriculum.order] = assignment
+        else:
+          assignments[key] = {curriculum.order: assignment}
+
+      keys.sort(key=lambda x:x.title)
       uploadForm = forms.UploadFileForm(user=request.user)
       assignmentForm = forms.AssignmentSearchForm(user=request.user)
       studentSearchForm = forms.StudentSearchForm()
@@ -2085,7 +2089,7 @@ def group(request, id=''):
 
       if request.method == 'GET':
           form = forms.UserGroupForm(user=request.user, instance=group, prefix='group')
-          context = {'form': form, 'role': 'group', 'uploadForm': uploadForm, 'assignmentForm': assignmentForm, 'studentSearchForm': studentSearchForm, 'studentAddForm': studentAddForm, 'assignments': assignments}
+          context = {'form': form, 'role': 'group', 'uploadForm': uploadForm, 'assignmentForm': assignmentForm, 'studentSearchForm': studentSearchForm, 'studentAddForm': studentAddForm, 'assignments': assignments, 'keys': keys}
           return render(request, 'ctstem_app/UserGroup.html', context)
 
       elif request.method == 'POST':
@@ -2108,7 +2112,7 @@ def group(request, id=''):
         else:
           print form.errors
           messages.error(request, "The class could not be saved because there were errors.  Please check the errors below.")
-          context = {'form': form, 'role': 'group', 'uploadForm': uploadForm, 'assignmentForm': assignmentForm, 'studentSearchForm': studentSearchForm, 'studentAddForm': studentAddForm, 'assignments': assignments}
+          context = {'form': form, 'role': 'group', 'uploadForm': uploadForm, 'assignmentForm': assignmentForm, 'studentSearchForm': studentSearchForm, 'studentAddForm': studentAddForm, 'assignments': assignments, 'keys': key}
           return render(request, 'ctstem_app/UserGroup.html', context)
 
     return http.HttpResponseNotAllowed(['GET', 'POST'])
@@ -2249,9 +2253,10 @@ def groupDashboard(request, id=''):
       serial = 0
       status_map = {'N': 'New', 'P': 'In Progress', 'S': 'Submitted', 'F': 'Feedback Ready', 'A': 'Archived'}
       status_color = {'N': 'gray', 'P': 'blue', 'S': 'green', 'F': 'orange', 'A': 'black'}
+      students = group.members.all()
+      keys = []
 
-      for assignment in models.Assignment.objects.all().filter(group=group).order_by('assigned_date'):
-        students = assignment.group.members.all()
+      for assignment in models.Assignment.objects.all().filter(group=group).order_by('curriculum__unit__title', 'curriculum__order'):
         instances = models.AssignmentInstance.objects.all().filter(assignment=assignment)
         curriculum = models.Curriculum.objects.get(id=assignment.curriculum.id)
         assignment_status = {}
@@ -2277,12 +2282,16 @@ def groupDashboard(request, id=''):
         else:
           key = curriculum
 
-        if key in assignments:
-          assignments[key].append({'assignment': assignment, 'status': status, 'serial': serial})
-        else:
-            assignments[key] = [{'assignment': assignment, 'status': status, 'serial': serial}]
+        if key not in keys:
+          keys.append(key)
 
-      context = {'group': group, 'assignments': assignments}
+        if key in assignments:
+          assignments[key][curriculum.order] = {'assignment': assignment, 'status': status, 'serial': serial}
+        else:
+          assignments[key] = {curriculum.order : {'assignment': assignment, 'status': status, 'serial': serial}}
+
+      keys.sort(key=lambda x:x.title)
+      context = {'group': group, 'assignments': assignments, 'keys': keys}
       return render(request, 'ctstem_app/GroupDashboard.html', context)
 
     return http.HttpResponseNotAllowed(['GET'])
@@ -2353,7 +2362,7 @@ def assignments(request, bucket=''):
       groups = models.Membership.objects.all().filter(student=student).values_list('group', flat=True)
       #for each group
       tomorrow = datetime.date.today() + datetime.timedelta(days=1)
-      assignments = models.Assignment.objects.all().filter(group__in=groups, assigned_date__lt=tomorrow)
+      assignments = models.Assignment.objects.all().filter(group__in=groups, assigned_date__lt=tomorrow).order_by('curriculum__unit__title', 'curriculum__order')
       assignment_list = []
       active_list = []
       archived_list = []
@@ -2361,6 +2370,7 @@ def assignments(request, bucket=''):
       serial = 1
       status_list = {'N': 1, 'P': 2, 'S': 3, 'F': 4, 'A': 5}
       for assignment in assignments:
+        title = assignment.curriculum.unit.title if assignment.curriculum.unit is not None else assignment.curriculum.title
         try:
           instance = models.AssignmentInstance.objects.get(assignment=assignment, student=student)
           total_questions = models.CurriculumQuestion.objects.all().filter(step__curriculum=assignment.curriculum).count()
@@ -2374,9 +2384,9 @@ def assignments(request, bucket=''):
             percent_complete = float(last_step)/float(total_steps)*100
 
           if instance.status in ['N', 'P', 'S', 'F']:
-            active_list.append({'serial': serial, 'assignment': assignment, 'instance': instance, 'status': status_list[instance.status], 'percent_complete': percent_complete, 'modified_date': instance.modified_date})
+            active_list.append({'serial': serial, 'title': title, 'assignment': assignment, 'instance': instance, 'status': status_list[instance.status], 'percent_complete': percent_complete, 'modified_date': instance.modified_date})
           else:
-            archived_list.append({'serial': serial, 'assignment': assignment, 'instance': instance, 'status': status_list[instance.status], 'percent_complete': percent_complete, 'modified_date': instance.modified_date})
+            archived_list.append({'serial': serial, 'title': title, 'assignment': assignment, 'instance': instance, 'status': status_list[instance.status], 'percent_complete': percent_complete, 'modified_date': instance.modified_date})
         except models.AssignmentInstance.DoesNotExist:
           if assignment.group.is_active:
             #only display new assignments for active groups
@@ -2384,7 +2394,7 @@ def assignments(request, bucket=''):
             new_count += 1
             status = 'N'
             percent_complete = 0
-            active_list.append({'serial': serial, 'assignment': assignment, 'instance': instance, 'status': status_list[status], 'percent_complete': percent_complete, 'modified_date': timezone.now()})
+            active_list.append({'serial': serial, 'title': title, 'assignment': assignment, 'instance': instance, 'status': status_list[status], 'percent_complete': percent_complete, 'modified_date': timezone.now()})
 
         serial += 1
 
@@ -2401,17 +2411,18 @@ def assignments(request, bucket=''):
         sort_by = data['sort_by']
         sort_form = forms.InboxSortForm(data)
 
-      print sort_by
-      if sort_by == 'assigned':
-        assignment_list.sort(key=lambda item:item['assignment'].assigned_date)
-      elif sort_by == 'group':
-        assignment_list.sort(key=lambda item:item['assignment'].group)
-      elif sort_by == 'status':
-        assignment_list.sort(key=lambda item:item['status'])
-      elif sort_by == 'percent':
-        assignment_list.sort(key=lambda item:item['percent_complete'])
-      elif sort_by == 'modified':
-        assignment_list.sort(key=lambda item:item['modified_date'])
+      # print sort_by
+      # if sort_by == 'assigned':
+      #   assignment_list.sort(key=lambda item:item['assignment'].assigned_date)
+      # elif sort_by == 'group':
+      #   assignment_list.sort(key=lambda item:item['assignment'].group)
+      # elif sort_by == 'status':
+      #   assignment_list.sort(key=lambda item:item['status'])
+      # elif sort_by == 'percent':
+      #   assignment_list.sort(key=lambda item:item['percent_complete'])
+      # elif sort_by == 'modified':
+      #   assignment_list.sort(key=lambda item:item['modified_date'])
+      assignment_list.sort(key=lambda item:item['title'])
 
       context = {'assignment_list': assignment_list, 'new': new_count, 'inbox': len(active_list), 'archived': len(archived_list), 'sort_form': sort_form, 'consent': student.consent}
       return render(request, 'ctstem_app/MyAssignments.html', context)

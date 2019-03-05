@@ -143,21 +143,22 @@
               <table class="table table-striped table-condensed table-bordered inner_table">
                 <thead>
                   <tr>
-                    <th style="width:75%;" colspan="2">Assigned Curriculum</th>
-                    <th>Assigned On</th>
-                    <th>Lock on Completion <i class="fa fa-info-circle" aria-hidden="true" title="When locked, students will be unable to open and view the assignment once they submit"></i></th>
-                    <th>Delete</th>
+                    <th style="width:70%;" colspan="2">Assigned Curriculum</th>
+                    <th style="width:10%;">Assigned On</th>
+                    <th style="width:10%;">Lock on Completion <i class="fa fa-info-circle" aria-hidden="true" title="When locked, students will be unable to open and view the assignment once they submit"></i></th>
+                    <th style="width:10%;">Delete</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {% for curriculum, assignment_list in assignments.items %}
+                  {% for curriculum in keys %}
+                  {% with assignment_list=assignments|get_item:curriculum %}
                     {% if curriculum.curriculum_type == 'U' %}
                       <tr class="{% if forloop.counter|divisibleby:2 %}  even {% else %} odd {% endif %}">
                         <td rowspan="{{assignment_list|length}}">
                           <div>Unit: {{curriculum.title}}</div>
                         </td>
                     {% endif %}
-                    {% for assignment in assignment_list %}
+                    {% for order, assignment in assignment_list.items|sort %}
                       {% if curriculum.curriculum_type == 'U'  %}
                         {% if forloop.counter > 1 %}
                         <tr class="{% if forloop.parentloop.counter|divisibleby:2 %}  even {% else %} odd {% endif %}">
@@ -202,6 +203,7 @@
                           </td>
                         </tr>
                     {% endfor %}
+                  {% endwith %}
                   {% endfor %}
                 </tbody>
               </table>
