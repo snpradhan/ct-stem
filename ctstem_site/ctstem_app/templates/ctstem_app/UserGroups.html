@@ -55,7 +55,7 @@
                     <div class="button_row">
                       {% if group.is_active %}
                         <div>
-                          <a type="button" class="btn btn-yellow invite-modal" href="#" data-toggle="modal" data-target="#invite" data-invite-link="https://{{domain}}/?next=/preregister/group/{{group.group_code}}" data-title="{{group.title}}" title="Student Invitation Link">
+                          <a type="button" class="btn btn-yellow invite-modal" href="#" data-toggle="modal" data-target="#invite" data-invite-link="https://{{domain}}/?next=/preregister/group/{{group.group_code}}/" data-title="{{group.title}}" title="Student Invitation Link">
                             <i class="fa fa-link"></i>
                           </a>
                         </div>
@@ -177,7 +177,7 @@
                             {% endif %}
                         </a>
                         {% if group.is_active %}
-                          <a type="button" class="btn btn-yellow invite-modal" href="#" data-toggle="modal" data-target="#invite" data-invite-link="https://{{domain}}/?next=/preregister/group/{{group.group_code}}" data-title="{{group.title}}" title="Student Invitation Link">
+                          <a type="button" class="btn btn-yellow invite-modal" href="#" data-toggle="modal" data-target="#invite" data-invite-link="https://{{domain}}/?next=/preregister/group/{{group.group_code}}/" data-title="{{group.title}}" title="Student Invitation Link">
                             <i class="fa fa-link"></i>
                           </a>
                           <a type="button" class="btn btn-success upload-modal" href="#" data-toggle="modal" data-target="#upload" data-id="{{group.id}}" data-title="{{group.title}}" title="Upload Students">
