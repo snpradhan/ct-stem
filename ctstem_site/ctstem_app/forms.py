@@ -24,9 +24,8 @@ import os
 # Login Form
 ####################################
 class LoginForm (forms.Form):
-  username = forms.RegexField(required=True, regex=r'^\w+$', max_length=30, label=u'Username',
-                              error_messages={'invalid': 'Usernames may only contain letters, numbers, and underscores (_)',
-                                               'required': 'Username is required'})
+  username_email = forms.CharField(required=True, max_length=75, label=u'Username or Email',
+                              error_messages={'required': 'Username or email is required'})
   password = forms.CharField(required=True, widget=forms.PasswordInput(render_value=False), label=u'Password',
                               error_messages={'required': 'Password is required'})
 
@@ -40,19 +39,25 @@ class LoginForm (forms.Form):
 
   def clean(self):
     cleaned_data = super(LoginForm, self).clean()
-    username = cleaned_data.get('username')
+    username_email = cleaned_data.get('username_email').lower()
     password = cleaned_data.get('password')
 
-    if username is None:
-      self.fields['username'].widget.attrs['class'] += ' error'
-    elif User.objects.filter(username=username.lower()).count() == 0:
-      self.add_error('username', u'Username is incorrect.')
-      self.fields['username'].widget.attrs['class'] += ' error'
+    if username_email is None:
+      self.fields['username_email'].widget.attrs['class'] += ' error'
+    elif User.objects.filter(username=username_email).count() == 0 and User.objects.filter(email=username_email).count() == 0:
+      self.add_error('username_email', u'Username or email is incorrect.')
+      self.fields['username_email'].widget.attrs['class'] += ' error'
 
     if password is None:
       self.fields['password'].widget.attrs['class'] += ' error'
     else:
-      user = authenticate(username=username.lower(), password=password)
+      username = None
+      if User.objects.filter(username=username_email).count() == 1:
+        username = username_email
+      elif User.objects.filter(email=username_email).count() == 1:
+        username = User.objects.get(email=username_email).username.lower()
+
+      user = authenticate(username=username, password=password)
       if user is None:
         self.add_error('password', u'Password is incorrect.')
         self.fields['password'].widget.attrs['class'] += ' error'
@@ -254,16 +259,19 @@ class UserProfileForm(ModelForm):
       user.save()
       return user
 
-  def is_valid(self):
+  def is_valid(self, user_id):
     valid = super(UserProfileForm, self).is_valid()
     if not valid:
       return valid
 
     if self.cleaned_data['password1'] != self.cleaned_data['password2']:
       self._errors['password1'] = u'Passwords are not identical'
-      return False
+      valid = False
+    elif User.objects.filter(email=self.cleaned_data['email']).exclude(id=user_id).count() > 0:
+      self._errors['email'] = u'This email is already taken. Please choose another.'
+      valid = False
 
-    return True
+    return valid
 
 ####################################
 # Student Form

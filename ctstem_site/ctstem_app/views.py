@@ -1037,8 +1037,13 @@ def user_login(request):
     form = forms.LoginForm(data)
     response_data = {}
     if form.is_valid():
-      username = form.cleaned_data['username'].lower()
+      username_email = form.cleaned_data['username_email'].lower()
       password = form.cleaned_data['password']
+      username = None
+      if User.objects.filter(username=username_email).count() == 1:
+        username = username_email
+      elif User.objects.filter(email=username_email).count() == 1:
+        username = User.objects.get(email=username_email).username.lower()
       user = authenticate(username=username, password=password)
 
       if user.is_active:
@@ -1194,7 +1199,7 @@ def userProfile(request, id=''):
       elif role == 'school_administrator':
         profileform = forms.SchoolAdministratorForm(user=request.user, data=data, instance=school_administrator, prefix='school_administrator')
 
-      if userform.is_valid():
+      if userform.is_valid(id):
         if profileform is None:
           userform.save()
           messages.success(request, "User profile saved successfully")
