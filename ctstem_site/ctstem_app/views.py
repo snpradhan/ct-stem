@@ -2318,6 +2318,10 @@ def assignmentDashboard(request, id=''):
         return http.HttpResponseNotFound('<h1>You do not have the privilege to view this assignment</h1>')
 
       students = assignment.group.members.all()
+      #for researchers filter out students who have opted out
+      if hasattr(request.user, 'researcher'):
+        students = students.filter(consent='A')
+
       instances = models.AssignmentInstance.objects.all().filter(assignment=assignment)
       student_assignment_details = {}
       serial = 1
@@ -2735,9 +2739,13 @@ def feedback(request, assignment_id='', instance_id=''):
 
       school = instance.student.school
       group = instance.assignment.group
+      student = instance.student
 
       if hasattr(request.user, 'researcher'):
-        has_permission = True
+        if student.consent == 'A':
+          has_permission = True
+        else:
+          has_permission = False
       else:
         has_permission = check_group_permission(request, group.id)
 
@@ -2965,6 +2973,10 @@ def export_response(request, assignment_id='', student_id=''):
     group = assignment.group
     if hasattr(request.user, 'researcher'):
       has_permission = True
+      if '' != student_id:
+        student = models.Student.objects.get(id=student_id)
+        if student.consent != 'A':
+          has_permission = False
     else:
       has_permission = check_group_permission(request, group.id)
 
@@ -2978,6 +2990,9 @@ def export_response(request, assignment_id='', student_id=''):
       response['Content-Disposition'] = 'attachment; filename="%s-%s.xls"'% (assignment, student)
     else:
       instances = models.AssignmentInstance.objects.all().filter(assignment=assignment)
+      #for researchers filter out students who have opted out
+      if hasattr(request.user, 'researcher'):
+        instances = instances.filter(student__consent='A')
       response['Content-Disposition'] = 'attachment; filename="%s.xls"'%assignment
 
 
@@ -3089,8 +3104,6 @@ def export_all_response(request, curriculum_id=''):
         columns.insert(0, 'School')
         font_styles.insert(0, font_style)
 
-
-
     curricula = []
 
     if curriculum.curriculum_type != 'U':
@@ -3109,6 +3122,10 @@ def export_all_response(request, curriculum_id=''):
         return http.HttpResponseNotFound('<h1>You do not have the privilege to export student response for the selected curriculum</h1>')
 
       instances = models.AssignmentInstance.objects.all().filter(assignment__in=assignments)
+      #for researchers filter out students who have opted out
+      if hasattr(request.user, 'researcher'):
+        instances = instances.filter(student__consent='A')
+
       sheet_title = curr.title
       for ch in "[]:*?/\\":
         if ch in curr.title:
