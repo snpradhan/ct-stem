@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import User
-from tinymce.models import HTMLField
 from slugify import slugify
 from ckeditor_uploader.fields import RichTextUploadingField
 from ckeditor.fields import RichTextField

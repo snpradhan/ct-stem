@@ -46,10 +46,8 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'ctstem_app',
     'django-dia',
-    'tinymce',
     'ckeditor',
     'ckeditor_uploader',
-    'django_wysiwyg',
     'nested_formset',
     'storages',
     'password_reset',
@@ -91,6 +89,7 @@ CKEDITOR_UPLOAD_PATH = "uploads/"
 CKEDITOR_UPLOAD_SLUGIFY_FILENAME = False
 CKEDITOR_RESTRICT_BY_USER = True
 CKEDITOR_IMAGE_BACKEND = "pillow"
+CKEDITOR_FILENAME_GENERATOR = 'ctstem_site.utils.get_filename'
 CKEDITOR_CONFIGS = {
     'default': {
         'removePlugins': 'stylesheetparser',
@@ -101,7 +100,7 @@ CKEDITOR_CONFIGS = {
         'mathJaxLib': '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_HTMLorMML',
         'codeSnippet_theme': 'monokai_sublime',
         'extraPlugins': ','.join(
-            ['mathjax', 'codesnippet', 'scayt']
+            ['mathjax', 'codesnippet', 'scayt', 'uploadimage']
         ),
         'scayt_autoStartup': True,
         'scayt_sLang': 'en_US',
@@ -114,7 +113,7 @@ CKEDITOR_CONFIGS = {
         'width': '98%',
         'mathJaxLib': '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_HTMLorMML',
         'extraPlugins': ','.join(
-            ['mathjax', 'scayt']
+            ['mathjax', 'scayt', 'uploadimage']
         ),
         'scayt_autoStartup': True,
         'scayt_sLang': 'en_US',
