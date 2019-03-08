@@ -141,6 +141,7 @@
                     </td>
                     <td class="attached_file">
                       <div>{{attachmentForm.file_object}}</div>
+                      <div class="help warning">{{attachmentForm.file_object.help_text|safe}}</div>
                       <div class="error">{{ attachmentForm.file_object.errors }}</div>
                     </td>
                      <td class="teacher_only">

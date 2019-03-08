@@ -150,11 +150,8 @@ $(function (){
       cache:false,
       contentType: false,
       processData: false,
-      success: function(data){
-        if('error' in data){
-          $('#questionMsg .errorlist li').addClass('error').html(data['error']);
-        }
-        else {
+      success: function(data, status){
+        if(data['success'] == true){
           var formset_div = $("input[id="+id_step+"]").parent();
           var question_table = $(formset_div).find("table.table.question");
 
@@ -174,6 +171,11 @@ $(function (){
           $("#questionForm")[0].reset();
           $("#questionModal").modal('toggle');
           rowAddorRemove($(question_table));
+        }
+        else{
+          $('#questionModal').html(data['html']);
+          $("#questionForm input[id='id_step']").val(id_step);
+          $('#questionMsg .errorlist li').addClass('error').html(data['error']);
         }
         return false;
       },

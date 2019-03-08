@@ -13,10 +13,12 @@ from datetime import datetime, date
 from django.contrib.admin.widgets import FilteredSelectMultiple
 from django.forms.widgets import RadioSelect, FileInput, ClearableFileInput
 from django.utils.safestring import mark_safe
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from tinymce.widgets import TinyMCE
 from django.db.models import Q
 from django.db.models.functions import Lower
+from PIL import Image
+import StringIO
 import os
 
 
@@ -264,14 +266,40 @@ class UserProfileForm(ModelForm):
     if not valid:
       return valid
 
-    if self.cleaned_data['password1'] != self.cleaned_data['password2']:
-      self._errors['password1'] = u'Passwords are not identical'
+    cleaned_data = super(UserProfileForm, self).clean()
+    username = cleaned_data.get('username')
+    first_name = cleaned_data.get('first_name')
+    last_name = cleaned_data.get('last_name')
+    password1 = cleaned_data.get('password1')
+    password2 = cleaned_data.get('password2')
+    email = cleaned_data.get('email')
+
+    if username is None or username == '':
+      self.add_error('username', u'Username is required')
       valid = False
-    elif User.objects.filter(email=self.cleaned_data['email']).exclude(id=user_id).count() > 0:
-      self._errors['email'] = u'This email is already taken. Please choose another.'
+    elif User.objects.filter(username=username.lower()).exclude(id=user_id).count() > 0:
+      self.add_error('username', u'This username is already taken. Please choose another.')
+      valid = False
+
+    if password1 != password2:
+      self.add_error('password1', u'Passwords do not match.')
+      valid = False
+
+    if first_name is None or first_name == '':
+      self.add_error('first_name', u'First name is required')
+      valid = False
+    if last_name is None or last_name == '':
+      self.add_error('last_name', u'Last name is required')
+      valid = False
+    if email is None or email == '':
+      self.add_error('email', u'Email is required')
+      valid = False
+    elif User.objects.filter(email=email).exclude(id=user_id).count() > 0:
+      self.add_error('email', u'This email is already taken. Please choose another.')
       valid = False
 
     return valid
+
 
 ####################################
 # Student Form
@@ -314,7 +342,6 @@ class StudentForm (ModelForm):
         field.widget.attrs['placeholder'] = field.help_text
       else:
         field.label = 'Online Consent'
-
 
 ####################################
 # Consent Form
@@ -467,36 +494,41 @@ class CurriculumForm(ModelForm):
       if cleaned_data.get('icon'):
         try:
           cleaned_data.get('icon').read()
+          validateImage(cleaned_data.get('icon'), 400, 289)
         except IOError, e:
-          self._errors['icon'] = u'Icon file is invalid. Please upload a new icon.'
+          self.add_error('icon', u'Icon file is invalid. Please upload a new icon.')
           valid = False
+        except ValidationError, e:
+          self.add_error('icon', e.message)
+          valid = False
+
       if cleaned_data.get('title') == '':
-        self._errors['title'] = u'Title is required'
+        self.add_error('title', u'Title is required')
         valid = False
       if cleaned_data.get('time') == '':
-        self._errors['time'] = u'Time is required'
+        self.add_error('time', u'Time is required')
         valid = False
       if cleaned_data.get('curriculum_type') != 'L' or not cleaned_data.get('unit'):
         if cleaned_data.get('level') == '':
-          self._errors['level'] = u'Level is required'
+          self.add_error('level', u'Level is required')
           valid = False
         if cleaned_data.get('purpose') == '':
-          self._errors['purpose'] = u'Purpose is required'
+          self.add_error('purpose', u'Purpose is required')
           valid = False
         if cleaned_data.get('overview') == '':
-          self._errors['overview'] = u'Overview is required'
+          self.add_error('overview', u'Overview is required')
           valid = False
       if not cleaned_data.get('taxonomy') and not cleaned_data.get('unit'):
-          self._errors['taxonomy'] = u'Standards is required'
+          self.add_error('taxonomy', u'Standards is required')
           valid = False
 
       if cleaned_data.get('curriculum_type') == 'U'  or cleaned_data.get('curriculum_type') == 'L':
         if cleaned_data.get('curriculum_type') != 'L' or not cleaned_data.get('unit'):
           if not cleaned_data.get('subject'):
-            self._errors['subject'] = u'Subject is required'
+            self.add_error('subject', u'Subject is required')
             valid = False
           if cleaned_data.get('content') == '':
-            self._errors['content'] = u'Content is required'
+            self.add_error('content', u'Content is required')
             valid = False
     return valid
 
@@ -552,7 +584,7 @@ class AttachmentForm(ModelForm):
       try:
         cleaned_data.get('file_object').read()
       except IOError, e:
-        self._errors['file_object'] = u'Attached file is invalid. Please upload a new attachment.'
+        self.add_error('file_object', u'Attached file is invalid. Please upload a new attachment.')
         valid = False
 
     return valid
@@ -585,6 +617,26 @@ class QuestionForm(ModelForm):
 
     for field_name, field in self.fields.items():
       field.widget.attrs['class'] = 'form-control'
+
+  def is_valid(self):
+    valid = super(QuestionForm, self).is_valid()
+    if not valid:
+      return valid
+
+    cleaned_data = super(QuestionForm, self).clean()
+
+    if cleaned_data.get('sketch_background'):
+      try:
+        cleaned_data.get('sketch_background').read()
+        validateImage(cleaned_data.get('sketch_background'), 900, 500)
+      except IOError, e:
+        self.add_error('sketch_background', u'Background image file is invalid. Please upload a new file.')
+        valid = False
+      except ValidationError, e:
+        self.add_error('sketch_background', e.message)
+        valid = False
+
+    return valid
 
 ####################################
 #  Research Category Form
@@ -752,7 +804,7 @@ class StandardForm(ModelForm):
       field.widget.attrs['placeholder'] = field.help_text
 
 ####################################
-# Category Form
+# Standards Category Form
 ####################################
 class CategoryForm(ModelForm):
 
@@ -771,7 +823,25 @@ class CategoryForm(ModelForm):
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['placeholder'] = field.help_text
 
+  def is_valid(self):
+    valid = super(CategoryForm, self).is_valid()
+    if not valid:
+      return valid
 
+    cleaned_data = super(CategoryForm, self).clean()
+
+    if cleaned_data.get('icon'):
+      try:
+        cleaned_data.get('icon').read()
+        validateImage(cleaned_data.get('icon'), 400, 289)
+      except IOError, e:
+        self.add_error('icon',  u'Icon file is invalid. Please upload a new file.')
+        valid = False
+      except ValidationError, e:
+        self.add_error('icon', e.message)
+        valid = False
+
+    return valid
 ####################################
 # Publication Form
 ####################################
@@ -820,6 +890,26 @@ class UserGroupForm(ModelForm):
     if self.instance.is_active == False:
       for field_name, field in self.fields.items():
         field.widget.attrs['disabled'] = True
+
+  def is_valid(self):
+    valid = super(UserGroupForm, self).is_valid()
+    if not valid:
+      return valid
+
+    cleaned_data = super(UserGroupForm, self).clean()
+
+    if cleaned_data.get('icon'):
+      try:
+        cleaned_data.get('icon').read()
+        validateImage(cleaned_data.get('icon'), 400, 289)
+      except IOError, e:
+        self.add_error('icon', u'Icon file is invalid. Please upload a new file.')
+        valid = False
+      except ValidationError, e:
+        self.add_error('icon', e.message)
+        valid = False
+
+    return valid
 
   def save(self, commit=True):
     instance = forms.ModelForm.save(self, False)
@@ -1139,6 +1229,25 @@ class SubjectForm(ModelForm):
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['placeholder'] = field.help_text
 
+  def is_valid(self):
+    valid = super(SubjectForm, self).is_valid()
+    if not valid:
+      return valid
+
+    cleaned_data = super(SubjectForm, self).clean()
+
+    if cleaned_data.get('icon'):
+      try:
+        cleaned_data.get('icon').read()
+        validateImage(cleaned_data.get('icon'), 400, 289)
+      except IOError, e:
+        self.add_error('icon', u'Icon file is invalid. Please upload a new file.')
+        valid = False
+      except ValidationError, e:
+        self.add_error('icon', e.message)
+        valid = False
+
+    return valid
 ####################################
 # Team Role Form
 ####################################
@@ -1211,3 +1320,10 @@ class TrainingRequestForm(ModelForm):
     valid = super(TrainingRequestForm, self).is_valid()
     return valid
 
+def validateImage(img, minwidth, minheight):
+  img.seek(0)
+  image = Image.open(StringIO.StringIO(img.read()))
+  width, height = image.size
+  print width, height
+  if width < minwidth or height < minheight:
+    raise ValidationError(_('Uploaded image is smaller than the minimum required resolution of %d x %d' % (minwidth, minheight)), code='invalid')

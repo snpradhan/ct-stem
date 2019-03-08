@@ -40,6 +40,7 @@
         <div class="form-group">
           <label for="id_group-icon">{{ form.icon.label }} {% if form.icon.field.required %}(<span class="required">*</span>){% endif %} </label>
           <div class="controls">{{form.icon}}</div>
+          <div class="help warning">{{form.icon.help_text|safe}}</div>
           <div class="error">{{ form.icon.errors }}</div>
         </div>
 

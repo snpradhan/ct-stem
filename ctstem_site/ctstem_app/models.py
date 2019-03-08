@@ -165,7 +165,7 @@ class Curriculum (models.Model):
   authors = models.ManyToManyField(User, null=False, related_name="curriculum_authors")
   created_date = models.DateTimeField(auto_now_add=True)
   modified_date = models.DateTimeField(auto_now=True)
-  icon = models.ImageField(upload_to=upload_file_to, blank=True, help_text='Upload 400x289 png image that represents this curriculum')
+  icon = models.ImageField(upload_to=upload_file_to, blank=True, help_text='Upload an image at least 400x289 in resolution that represents this curriculum')
   shared_with = models.ManyToManyField('Teacher', null=True, blank=True, help_text='Select teachers to share this curriculum with before it is published.' )
   unit = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, related_name="underlying_curriculum", help_text="Select a unit if this lesson is part of one")
   acknowledgement = RichTextUploadingField(null=True, blank=True)
@@ -181,13 +181,7 @@ class Curriculum (models.Model):
 
   def save(self, *args, **kwargs):
     if self.icon:
-      self.icon.seek(0)
-      image = Image.open(StringIO.StringIO(self.icon.read()))
-      image = image.resize((400,289), Image.ANTIALIAS)
-      output = StringIO.StringIO()
-      image.save(output, format='png', quality=75)
-      output.seek(0)
-      self.icon = InMemoryUploadedFile(output,'ImageField', "%s.png" %self.icon.name, 'image/png', output.len, None)
+      self.icon = resizeImage(self.icon, 400, 289)
 
     super(Curriculum, self).save(*args, **kwargs)
 
@@ -256,32 +250,30 @@ class Question(models.Model):
   answer_field_type = models.CharField(null=False, max_length=2, choices=FIELD_TYPE_CHOICES, default='TF')
   options = models.TextField(null=True, blank=True, help_text="Click on the &#9432; icon to see the Options Guide")
   answer = models.TextField(null=True, blank=True)
-  sketch_background = models.ImageField(upload_to=upload_file_to, blank=True, null=True, help_text='Upload 900x500 png background image for the sketch pad')
+  sketch_background = models.ImageField(upload_to=upload_file_to, blank=True, null=True, help_text='Upload a background image at least 900x500 in resolution for the sketch pad')
   research_category = models.ManyToManyField(ResearchCategory, null=True, blank=True, related_name='questions')
 
   def __unicode__(self):
       return u'%s' % (self.question_text)
 
+  def save(self, *args, **kwargs):
+    if self.sketch_background:
+      self.sketch_background = resizeImage(self.sketch_background, 900, 500)
+
+    super(Question, self).save(*args, **kwargs)
+
 # Subject model
 class Subject(models.Model):
   name = models.CharField(null=False, max_length=256)
   abbrevation = models.CharField(null=True, blank=True, max_length=10)
-  icon = models.ImageField(upload_to=upload_file_to, blank=True, help_text='Upload 400x289 png image that represents this subject')
-
+  icon = models.ImageField(upload_to=upload_file_to, blank=True, help_text='Upload an image at least 400x289 in resolution that represents this subject')
 
   def __unicode__(self):
       return u'%s' % (self.name)
 
   def save(self, *args, **kwargs):
     if self.icon:
-      self.icon.seek(0)
-      image = Image.open(StringIO.StringIO(self.icon.read()))
-      image = image.resize((400,289), Image.ANTIALIAS)
-      output = StringIO.StringIO()
-      image.save(output, format='png', quality=75)
-      output.seek(0)
-      self.icon = InMemoryUploadedFile(output,'ImageField', "%s.png" %self.icon.name, 'image/png', output.len, None)
-
+      self.icon = resizeImage(self.icon, 400, 289)
     super(Subject, self).save(*args, **kwargs)
 
 # Compatible devices and OS
@@ -306,7 +298,7 @@ class Standard(models.Model):
 class Category(models.Model):
   standard = models.ForeignKey(Standard, related_name="category")
   name = models.CharField(null=False, max_length=256)
-  icon = models.ImageField(upload_to=upload_file_to, blank=True, null=True)
+  icon = models.ImageField(upload_to=upload_file_to, blank=True, null=True, help_text='Upload an image at least 400x289 in resolution that represents this category')
   description = models.TextField(null=True, blank=True)
   order = models.IntegerField(null=True)
 
@@ -318,12 +310,7 @@ class Category(models.Model):
 
   def save(self, *args, **kwargs):
     if self.icon:
-      image = Image.open(StringIO.StringIO(self.icon.read()))
-      image = image.resize((400,289), Image.ANTIALIAS)
-      output = StringIO.StringIO()
-      image.save(output, format='png', quality=75)
-      output.seek(0)
-      self.icon = InMemoryUploadedFile(output,'ImageField', "%s.png" %self.icon.name, 'image/png', output.len, None)
+      self.icon = resizeImage(self.icon, 400, 289)
 
     super(Category, self).save(*args, **kwargs)
 
@@ -454,7 +441,7 @@ class UserGroup(models.Model):
   is_active = models.BooleanField(null=False, blank=False, default=True)
   created_date = models.DateTimeField(auto_now_add=True)
   modified_date = models.DateTimeField(auto_now=True)
-  icon = models.ImageField(upload_to=upload_file_to, blank=True, help_text='Upload 400x289 png image that represents this class')
+  icon = models.ImageField(upload_to=upload_file_to, blank=True, help_text='Upload an image at least 400x289 in resolution that represents this class')
 
   def __unicode__(self):
     return u'%s' % (self.title)
@@ -464,13 +451,7 @@ class UserGroup(models.Model):
 
   def save(self, *args, **kwargs):
     if self.icon:
-      self.icon.seek(0)
-      image = Image.open(StringIO.StringIO(self.icon.read()))
-      image = image.resize((400,289), Image.ANTIALIAS)
-      output = StringIO.StringIO()
-      image.save(output, format='png', quality=75)
-      output.seek(0)
-      self.icon = InMemoryUploadedFile(output,'ImageField', "%s.png" %self.icon.name, 'image/png', output.len, None)
+      self.icon = resizeImage(self.icon, 400, 289)
 
     super(UserGroup, self).save(*args, **kwargs)
 
@@ -561,7 +542,7 @@ class QuestionResponse(models.Model):
 
 class QuestionResponseFile(models.Model):
   question_response = models.ForeignKey(QuestionResponse, related_name='response_file', null=False)
-  file = models.FileField(upload_to=upload_file_to, null=False, blank=False)
+  file = models.FileField(upload_to=upload_file_to, null=False, blank=False, help_text='Upload a file less than 5 MB in size.')
 
 #######################################################
 # Assignment Feedback Model
@@ -631,3 +612,12 @@ def active(sender, instance, **kwargs):
             <div><b>CT-STEM Admin</b></div>' % (domain, domain)
 
     send_mail('CT-STEM - Account Activated', body, settings.DEFAULT_FROM_EMAIL, [instance.email], html_message=body)
+
+def resizeImage(img, minwidth, minheight):
+  img.seek(0)
+  image = Image.open(StringIO.StringIO(img.read()))
+  image = image.resize((minwidth, minheight), Image.ANTIALIAS)
+  output = StringIO.StringIO()
+  image.save(output, format='png', quality=75)
+  output.seek(0)
+  return InMemoryUploadedFile(output,'ImageField', "%s.png" %img.name, 'image/png', output.len, None)

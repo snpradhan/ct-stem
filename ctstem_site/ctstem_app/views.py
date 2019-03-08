@@ -2117,7 +2117,7 @@ def group(request, id=''):
         else:
           print form.errors
           messages.error(request, "The class could not be saved because there were errors.  Please check the errors below.")
-          context = {'form': form, 'role': 'group', 'uploadForm': uploadForm, 'assignmentForm': assignmentForm, 'studentSearchForm': studentSearchForm, 'studentAddForm': studentAddForm, 'assignments': assignments, 'keys': key}
+          context = {'form': form, 'role': 'group', 'uploadForm': uploadForm, 'assignmentForm': assignmentForm, 'studentSearchForm': studentSearchForm, 'studentAddForm': studentAddForm, 'assignments': assignments, 'keys': keys}
           return render(request, 'ctstem_app/UserGroup.html', context)
 
     return http.HttpResponseNotAllowed(['GET', 'POST'])
@@ -3242,16 +3242,18 @@ def question(request, id=''):
 
   elif 'POST' == request.method:
     data = request.POST.copy()
-    print data
     questionForm = forms.QuestionForm(data, request.FILES, instance=question)
+    response_data = {}
     if questionForm.is_valid():
       question = questionForm.save()
-      response_data = {'question_id': question.id, 'question_text': question.question_text}
-      return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+      response_data = {'success': True, 'question_id': question.id, 'question_text': question.question_text}
     else:
       print questionForm.errors
-      response_data = {'error': 'Required fields are missing'}
-      return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+      context = {'questionForm': questionForm, 'title': title}
+      html = render_to_string('ctstem_app/Question.html', context, context_instance=RequestContext(request))
+      response_data = {'success': False, 'html': html, 'error': 'The question could not be saved because there were errors. Please check the errors below.'}
+
+    return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 
   return http.HttpResponseNotAllowed(['GET', 'POST'])
 

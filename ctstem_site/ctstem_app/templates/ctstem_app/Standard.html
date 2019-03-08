@@ -72,6 +72,7 @@
               <div class="form-group">
                 <label for="id_{{category.icon.name}}">Icon {% if category.icon.field.required %}(<span class="required">*</span>) {% endif %}</label>
                 <div id="id_{{category.icon.name}}">{{category.icon}}</div>
+                <div class="help warning">{{category.icon.help_text|safe}}</div>
                 <div class="error">{{ category.icon.errors }}</div>
               </div>
               <div class="form-group">

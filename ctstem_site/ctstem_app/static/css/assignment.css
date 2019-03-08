@@ -1,3 +1,17 @@
+:root {
+  --ctstem-font-family: "proxima-nova", sans-serif;
+  --ctstem-color-yellow: #FFD028;
+  --ctstem-color-blue: #00ADFF;
+  --ctstem-color-medium-blue: #3A74E8;
+  --ctstem-color-dark-blue: #343D51;
+  --ctstem-color-dark-gray: #999EA8;
+  --ctstem-color-gray: #A4A7BF;
+  --ctstem-color-light-gray: #C1C4D9;
+  --ctstem-color-red: #F24878;
+  --ctstem-color-green: #0AD35E;
+  --ctstem-color-ornage: #FA7921;
+}
+
 * {
   font-size: 18px; /* All REM units relative to this */
   box-sizing: border-box;
