@@ -167,7 +167,7 @@ main {
 }
 
 .page {
-  margin: 75px 7% 0 7%;
+  margin: 95px 7% 0 7%;
 }
 
 p {
@@ -768,6 +768,13 @@ div.teammates {
 div.past_due.warning {
   margin-top: 5.5em;
   text-align: center;
+}
+
+div.error {
+  margin-left: 2em;
+}
+ul.errorlist {
+  font-size: inherit !important;
 }
 
 
