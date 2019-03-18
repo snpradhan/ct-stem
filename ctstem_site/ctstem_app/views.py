@@ -828,7 +828,7 @@ def register(request, group_code='', email=''):
       #convert username to lowercase
       username = form.cleaned_data['username'].lower()
       user = User.objects.create_user(username,
-                                      form.cleaned_data['email'],
+                                      form.cleaned_data['email'].lower(),
                                       form.cleaned_data['password1'])
       user.first_name = form.cleaned_data['first_name']
       user.last_name = form.cleaned_data['last_name']
@@ -1040,10 +1040,10 @@ def user_login(request):
       username_email = form.cleaned_data['username_email'].lower()
       password = form.cleaned_data['password']
       username = None
-      if User.objects.filter(username=username_email).count() == 1:
+      if User.objects.filter(username__iexact=username_email).count() == 1:
         username = username_email
-      elif User.objects.filter(email=username_email).count() == 1:
-        username = User.objects.get(email=username_email).username.lower()
+      elif User.objects.filter(email__iexact=username_email).count() == 1:
+        username = User.objects.get(email__iexact=username_email).username.lower()
       user = authenticate(username=username, password=password)
 
       if user.is_active:
@@ -1180,8 +1180,9 @@ def userProfile(request, id=''):
           data.__setitem__('author-user', author.user.id)
       elif role == 'school_administrator':
           data.__setitem__('school_administrator-user', school_administrator.user.id)
-      #convert username to lowercase before save
+      #convert username and email to lowercase before save
       data.__setitem__('user-username', data.__getitem__('user-username').lower())
+      data.__setitem__('user-email', data.__getitem__('user-email').lower())
       data.__setitem__('user-password', user.password)
       data.__setitem__('user-last_login', user.last_login)
       data.__setitem__('user-date_joined', user.date_joined)
