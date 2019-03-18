@@ -95,7 +95,7 @@ CKEDITOR_CONFIGS = {
         'removePlugins': 'stylesheetparser',
         'toolbar': None,  # put selected toolbar config here
         'height': 100,
-        'width': '115%',
+        'width': '98%',
         'allowedContent': True,
         'mathJaxLib': '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_HTMLorMML',
         'codeSnippet_theme': 'monokai_sublime',
