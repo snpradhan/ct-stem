@@ -570,6 +570,9 @@ def copyCurriculumMeta(request, id=''):
 
 @login_required
 def copyCurriculumSteps(request, original_curriculum, new_curriculum):
+  import os
+  now = datetime.datetime.now()
+  dt = now.strftime("%Y-%m-%d-%H-%M-%S-%f")
 
   steps = models.Step.objects.all().filter(curriculum=original_curriculum)
   for step in steps:
@@ -582,6 +585,17 @@ def copyCurriculumSteps(request, original_curriculum, new_curriculum):
       question = step_question.question
       question.id = None
       question.pk = None
+      if question.sketch_background:
+        try:
+          source = question.sketch_background
+          filecontent = ContentFile(source.file.read())
+          filename = os.path.split(source.file.name)[-1]
+          filename_array = filename.split('.')
+          filename = filename_array[0][:10] + '_' + dt + '.' + filename_array[1]
+          question.sketch_background.save(filename, filecontent)
+          source.file.close()
+        except IOError, e:
+          question.sketch_background = None
       question.save()
 
       step_question.id = None
