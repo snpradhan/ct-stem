@@ -34,11 +34,12 @@ pathspec==0.3.3
 pbr==1.8.0
 Pillow==3.1.1
 psycopg2==2.7.5
+pyaml==18.11.0
 PyPDF2==1.25.1
 python-dateutil==2.4.2
 python-slugify==1.1.4
 pytz==2017.2
-PyYAML==3.11
+PyYAML==5.1
 reportlab==3.3.0
 requests==2.20.1
 six==1.10.0
