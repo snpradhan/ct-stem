@@ -103,7 +103,7 @@ def upload_file_to(instance, filename):
   now = datetime.datetime.now()
   dt = now.strftime("%Y-%m-%d-%H-%M-%S-%f")
   filename_base, filename_ext = os.path.splitext(filename)
-  print filename, now
+  print filename, now, instance.id
   if isinstance(instance, Curriculum):
     return 'curriculum/%s_%s%s' % (slugify(instance.title[:40]), dt, filename_ext.lower(),)
   elif isinstance(instance, Publication):
@@ -614,10 +614,16 @@ def active(sender, instance, **kwargs):
     send_mail('CT-STEM - Account Activated', body, settings.DEFAULT_FROM_EMAIL, [instance.email], html_message=body)
 
 def resizeImage(img, minwidth, minheight):
-  img.seek(0)
-  image = Image.open(StringIO.StringIO(img.read()))
-  image = image.resize((minwidth, minheight), Image.ANTIALIAS)
-  output = StringIO.StringIO()
-  image.save(output, format='png', quality=75)
-  output.seek(0)
-  return InMemoryUploadedFile(output,'ImageField', "%s.png" %img.name, 'image/png', output.len, None)
+  try:
+    #check if the file actually exists
+    img.read()
+    img.seek(0)
+    image = Image.open(StringIO.StringIO(img.read()))
+    image = image.resize((minwidth, minheight), Image.ANTIALIAS)
+    output = StringIO.StringIO()
+    image.save(output, format='png', quality=75)
+    output.seek(0)
+    return InMemoryUploadedFile(output,'ImageField', "%s.png" %img.name, 'image/png', output.len, None)
+  except IOError, e:
+    #file does not exists
+    return None
