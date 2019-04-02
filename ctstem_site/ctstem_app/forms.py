@@ -39,6 +39,10 @@ class LoginForm (forms.Form):
       field.widget.attrs['aria-describedby'] = field.label
       field.widget.attrs['placeholder'] = field.help_text
 
+
+  def clean_username_email(self):
+    return self.cleaned_data['username_email'].strip()
+
   def clean(self):
     cleaned_data = super(LoginForm, self).clean()
     username_email = cleaned_data.get('username_email')
@@ -107,6 +111,12 @@ class RegistrationForm (forms.Form):
       if field_name != 'school':
         field.error_messages['required'] = '{fieldname} is required'.format(fieldname=field.label)
 
+
+  def clean_username(self):
+    return self.cleaned_data['username'].strip()
+
+  def clean_email(self):
+    return self.cleaned_data['email'].strip()
 
   def clean(self):
     cleaned_data = super(RegistrationForm, self).clean()
@@ -250,6 +260,12 @@ class UserProfileForm(ModelForm):
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['aria-describedby'] = field.label
       field.widget.attrs['placeholder'] = field.help_text
+
+  def clean_username(self):
+    return self.cleaned_data['username'].strip()
+
+  def clean_email(self):
+    return self.cleaned_data['email'].strip()
 
   def save(self, commit=True):
     if self.cleaned_data['password1'] is not None and self.cleaned_data['password1'] != "":
