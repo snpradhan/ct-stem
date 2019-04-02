@@ -161,7 +161,6 @@ class Curriculum (models.Model):
   parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL, related_name="children")
   version = models.IntegerField(default=1)
   taxonomy = models.ManyToManyField('Subcategory', null=True, blank=True)
-  author = models.ForeignKey(User, null=False, related_name='curriculum_author')
   authors = models.ManyToManyField(User, null=False, related_name="curriculum_authors")
   created_date = models.DateTimeField(auto_now_add=True)
   modified_date = models.DateTimeField(auto_now=True)
@@ -387,7 +386,7 @@ class Researcher(models.Model):
       return u'%s' % (self.user.get_full_name())
 
 # Administrator models
-# This model represents a super user
+# This model represents a author user
 class Author(models.Model):
   user = models.OneToOneField(User, unique=True, null=False, related_name="author")
 

@@ -286,24 +286,28 @@
   border: 1px solid #ccc;
   border-radius: 3px;
   padding: 0.25em 1em;
-  width: 8em;
+  width: 10em;
+  display: flex;
+  justify-content: space-between;
+}
+#home .block#three .tile .detail .action .fa-code-fork {
+  color: black;
+  font-size: 2em;
+  margin-top: 2px;
 }
 #home .block#three .tile .detail .action .fa-star-o {
-  float: left;
   color: #ccc;
-  font-size: 1.5em;
+  font-size: 2em;
   margin-top: 2px;
 }
 #home .block#three .tile .detail .action .fa-star {
-  float: left;
-  color: var(--ctstem-color-yellow);;
-  font-size: 1.5em;
+  color: var(--ctstem-color-yellow);
+  font-size: 2em;
   margin-top: 2px;
 }
 #home .block#three .tile .detail .action .fa-long-arrow-right {
-  float: right;
-  color: var(--ctstem-color-blue);;
-  font-size: 2em;
+  color: var(--ctstem-color-blue);
+  font-size: 2.5em;
 }
 
 #home .block#three .btn.btn-yellow {

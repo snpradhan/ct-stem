@@ -123,15 +123,16 @@
                 </div>
               </div>
               <div class="action">
+                {% if curriculum|is_teacher_authored %}
+                  <i class="fa fa-code-fork" title="Teacher authored"></i>
+                {% endif %}
                 {% if user.teacher %}
                   {% with favorite=curriculum.id|is_favorite:user.teacher.id %}
                     <a class="bookmark fa fa-star" href="{% url 'ctstem:removeBookmark' curriculum.id %}" style="{% if favorite %} display: inline-block; {% else %} display: none; {% endif %}" title="Remove from Favorites"></a>
                     <a class="bookmark fa fa-star-o" href="{% url 'ctstem:bookmarkCurriculum' curriculum.id %}" style="{% if favorite %} display: none; {% else %} display: inline-block; {% endif %}" title="Add to Favorites"></a>
                   {% endwith %}
-                {% else %}
-                  <i class="fa fa-star-o"></i>
                 {% endif %}
-                <a class="fa fa-long-arrow-right" href="{% url 'ctstem:previewCurriculum' curriculum.id %}" target="_blank"></a>
+                <a class="fa fa-long-arrow-right" href="{% url 'ctstem:previewCurriculum' curriculum.id %}" target="_blank" title="Preview"></a>
                 </div>
             </div>
           </div>

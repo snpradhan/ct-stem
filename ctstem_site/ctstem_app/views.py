@@ -52,12 +52,8 @@ def home(request):
   if hasattr(request.user, 'student') == True:
     return shortcuts.redirect('ctstem:assignments', bucket='inbox')
   else:
-    curricula = models.Curriculum.objects.all().filter(status='P', unit__isnull=True)[:4]
-    lessons = models.Curriculum.objects.all().filter(curriculum_type = 'L', status='P')[:6]
-    assessments = models.Curriculum.objects.all().filter(curriculum_type = 'A', status='P')[:6]
-    practices = models.Category.objects.all().filter(standard__primary=True).select_related()
-    team = models.Team.objects.all().order_by('role__order', 'order')
-    publications = models.Publication.objects.all()
+    curr_type = ['U', 'L']
+    curricula = models.Curriculum.objects.all().filter(status='P', unit__isnull=True, curriculum_type__in=curr_type)[:4]
     if request.user.is_authenticated():
       if hasattr(request.user, 'administrator'):
         school = None
@@ -82,7 +78,7 @@ def home(request):
       elif 'password_reset' in redirect_url:
         target = '#password'
 
-      context = {'curricula': curricula, 'lessons': lessons, 'assessments' : assessments, 'practices': practices, 'team': team, 'publications': publications, 'redirect_url': redirect_url, 'target': target}
+      context = {'curricula': curricula, 'redirect_url': redirect_url, 'target': target}
       return render(request, 'ctstem_app/Home.html', context)
 
     return http.HttpResponseNotAllowed(['GET'])
@@ -163,12 +159,14 @@ def curriculum(request, id=''):
           return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
     else:
       curriculum = models.Curriculum()
-      curriculum.author = request.user
 
     newQuestionForm = forms.QuestionForm()
 
     if request.method == 'GET':
-      form = forms.CurriculumForm(instance=curriculum, prefix='curriculum')
+      initial = {}
+      if '' == id:
+        initial['authors'] = [request.user.id]
+      form = forms.CurriculumForm(instance=curriculum, prefix='curriculum', initial=initial)
       #AssessmentStepFormSet = inlineformset_factory(models.Assessment, models.AssessmentStep, form=forms.AssessmentStepForm,can_delete=True, can_order=True, extra=1)
 
       StepFormSet = nestedformset_factory(models.Curriculum, models.Step, form=forms.StepForm,
@@ -195,11 +193,7 @@ def curriculum(request, id=''):
       attachment_formset = AttachmentFormSet(data, request.FILES, instance=curriculum, prefix='attachment_form')
 
       if form.is_valid() and formset.is_valid() and attachment_formset.is_valid():
-        savedCurriculum = form.save(commit=False)
-        if '' == id:
-          savedCurriculum.author = request.user
-        savedCurriculum.save()
-        form.save()
+        savedCurriculum = form.save()
         attachment_formset.save()
         formset.save(commit=False)
         for stepform in formset.ordered_forms:

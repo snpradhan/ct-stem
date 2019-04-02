@@ -374,3 +374,12 @@ def class_last_login(group):
       last_login = login
 
   return last_login
+
+@register.filter
+def is_teacher_authored(curriculum):
+  authors = curriculum.authors.all()
+  for author in authors:
+    if hasattr(author, 'teacher'):
+      return True
+
+  return False
