@@ -452,6 +452,10 @@
           $('#id_curriculum-teacher_notes').closest('.form-group').show();
           $('#id_curriculum-compatible_system').closest('.form-group').show();
         }
+        //for assessments show subject
+        else if ($(this).val() == 'A') {
+          $('#id_curriculum-subject').closest('.form-group').show();
+        }
 
         //for lesson, display unit and shared with table
         if($(this).val() == 'L') {
