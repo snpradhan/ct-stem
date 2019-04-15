@@ -156,7 +156,7 @@
                     {% if curriculum.curriculum_type == 'U' %}
                       <tr class="{% if forloop.counter|divisibleby:2 %}  even {% else %} odd {% endif %}">
                         <td rowspan="{{assignment_list|length}}">
-                          <div>Unit: {{curriculum.title}}</div>
+                          <div><b>Unit:</b>&nbsp;{{curriculum.title}}</div>
                         </td>
                     {% endif %}
                     {% for order, assignment in assignment_list.items|sort %}
@@ -165,12 +165,22 @@
                         <tr class="{% if forloop.parentloop.counter|divisibleby:2 %}  even {% else %} odd {% endif %}">
                         {% endif %}
                         <td>
-                          <div>Lesson: {{assignment.curriculum.title}}</div>
+                          <div>
+                            <b>
+                            {% if assignment.curriculum.curriculum_type == 'L' %}
+                              Lesson:
+                            {% elif assignment.curriculum.curriculum_type == 'A' %}
+                              Assessment:
+                            {% endif %}
+                            </b>
+                            &nbsp;{{assignment.curriculum.title}}
+                          </div>
                         </td>
                       {% else %}
                         <tr class="{% if forloop.parentloop.counter|divisibleby:2 %}  even {% else %} odd {% endif %}">
                           <td colspan="2">
                             <div>
+                              <b>
                               {% if curriculum.curriculum_type == 'L' %}
                                 Lesson:
                               {% elif curriculum.curriculum_type == 'A' %}
@@ -178,6 +188,7 @@
                               {% else %}
                                 Survey:
                               {% endif %}
+                              </b>
                             &nbsp;{{curriculum.title}}
                             </div>
                           </td>

@@ -99,7 +99,7 @@
                     {% endif %}
                   </div>
                 {% endif %}
-                {% if field.name == 'icon' or field.name == 'subject' or field.name == 'compatible_system' or field.name == 'unit' or field.name == 'shared_with' %}
+                {% if field.name == 'icon' or field.name == 'subject' or field.name == 'compatible_system' or field.name == 'unit' or field.name == 'shared_with' or field.name == 'order' %}
                 <div class="help warning">{{field.help_text|safe}}</div>
               {% endif %}
               <div class="error">{{ field.errors }}</div>
@@ -457,15 +457,21 @@
           $('#id_curriculum-subject').closest('.form-group').show();
         }
 
-        //for lesson, display unit and shared with table
-        if($(this).val() == 'L') {
+        //for lesson and assessment, display unit
+        if($(this).val() == 'L' || $(this).val() == 'A') {
           $('#id_curriculum-unit').closest('.form-group').show();
-          $('select#id_curriculum-shared_with').closest('.form-group').show();
         }
         else{
           //reset the unit field
           $('#id_curriculum-unit').prop('selectedIndex', 0);
         }
+
+        //for lesson display shared with table
+        if($(this).val() == 'L') {
+          $('select#id_curriculum-shared_with').closest('.form-group').show();
+        }
+
+
 
         //for lesson, assessment and survey show the steps and Add Step button
         if($(this).val() == 'L' || $(this).val() == 'A' || $(this).val() == 'S') {

@@ -485,7 +485,7 @@ class CurriculumForm(ModelForm):
     super(CurriculumForm, self).__init__(*args, **kwargs)
     forms.ModelForm.__init__(self, *args, **kwargs)
     self.fields['taxonomy'].label = "Standards"
-    self.fields['order'].label = "Lesson Order"
+    self.fields['order'].label = "Curriculum Order"
     self.fields['authors'].choices = [(user.pk, user.get_full_name()) for user in models.User.objects.all().filter(Q(administrator__isnull=False) | Q(researcher__isnull=False) | Q(author__isnull=False)).order_by('first_name', 'last_name')]
     self.fields['unit'].queryset = models.Curriculum.objects.filter(curriculum_type='U').order_by(Lower('title'), 'version')
     self.fields['unit'].label_from_instance = lambda obj: "%s - v%d." % (obj.title, obj.version)

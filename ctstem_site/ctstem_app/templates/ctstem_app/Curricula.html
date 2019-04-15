@@ -184,6 +184,7 @@
                           <table class="table table-condensed table-striped table-bordered unit_lesson">
                             <thead>
                               <tr>
+                                <th>Order</th>
                                 <th>Name</th>
                                 {% if user.administrator or user.researcher or user.author %}
                                   <th>Status</th>
@@ -194,6 +195,7 @@
                             <tbody>
                             {% for curr in underlying_curriculum %}
                               <tr>
+                                <td>{{curr.order}}</td>
                                 <td class="title">
                                   {{curr.title}} - v{{curr.version}}.
                                   {% if curr.locked_by %}

@@ -2082,7 +2082,7 @@ def group(request, id=''):
         instances = models.AssignmentInstance.objects.all().filter(assignment=assignment)
         curriculum = assignment.curriculum
 
-        if curriculum.curriculum_type == 'L' and curriculum.unit is not None:
+        if curriculum.curriculum_type in ['L', 'A'] and curriculum.unit is not None:
           key = curriculum.unit
         else:
           key = curriculum
@@ -2172,19 +2172,19 @@ def searchAssignment(request):
           underlying_curriculum_queryset = curriculum.underlying_curriculum.all().filter(status='P')
           underlying_curriculum = []
           unit_assigned = False
-          lesson_assigned_count = 0
-          for lesson in underlying_curriculum_queryset.order_by('order'):
-            lesson_assigned = False
-            assignments = models.Assignment.objects.all().filter(curriculum=lesson, group__id=int(data['group']))
+          curriculum_assigned_count = 0
+          for und_curr in underlying_curriculum_queryset.order_by('order'):
+            curr_assigned = False
+            assignments = models.Assignment.objects.all().filter(curriculum=und_curr, group__id=int(data['group']))
             if assignments.count() > 0:
-              lesson_assigned = True
-              lesson_assigned_count = lesson_assigned_count + 1
-            underlying_curriculum.append({'id': lesson.id, 'title': lesson.title, 'assigned': lesson_assigned})
+              curr_assigned = True
+              curriculum_assigned_count = curriculum_assigned_count + 1
+            underlying_curriculum.append({'id': und_curr.id, 'title': und_curr.title, 'assigned': curr_assigned, 'curriculum_type': und_curr.get_curriculum_type_display()})
 
-          curr['assigned'] = underlying_curriculum_queryset.count() == lesson_assigned_count
+          curr['assigned'] = underlying_curriculum_queryset.count() == curriculum_assigned_count
           curr['underlying_curriculum'] = underlying_curriculum
           curr['underlying_curriculum_count'] = underlying_curriculum_queryset.count()
-          curr['underlying_curriculum_assigned'] = lesson_assigned_count
+          curr['underlying_curriculum_assigned'] = curriculum_assigned_count
         else:
           assigned = False
           assignments = models.Assignment.objects.all().filter(curriculum=curriculum, group__id=int(data['group']))

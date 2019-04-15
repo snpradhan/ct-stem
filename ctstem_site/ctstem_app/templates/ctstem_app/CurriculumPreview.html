@@ -93,7 +93,7 @@
         <!-- SIDE MENU -->
         <nav id="side-nav">
           <ul>
-            <li><a href="{% url 'ctstem:previewCurriculum'  curriculum.id %}" class="lesson">
+            <li><a href="{% url 'ctstem:previewCurriculum'  curr_unit.id %}" class="lesson">
               View
               {% if curr_unit.curriculum_type == 'U' %}
                 Unit
@@ -109,10 +109,10 @@
                 </li>
               {% else %}
                 <li>
-                  <a href="#" class="list_underlying_curriculum">Underlying Lessons</a>
+                  <a href="#" class="list_underlying_curriculum">Underlying Curricula</a>
                   <i class="fa fa-caret-square-o-down underlying_curriculum" aria-hidden="true"></i>
                   <i class="fa fa-caret-square-o-up underlying_curriculum" aria-hidden="true" style="display:none;"></i>
-                  <ul class="underlying_curriculum" style="display:none;">
+                  <ul class="underlying_curriculum">
                     {% for curr in curr_unit|get_underlying_curriculum:user %}
                       <li><a href="{% url 'ctstem:previewCurriculum'  curr.id 0 %}" class="activity"> {{curr.title}}</a></li>
                     {% endfor %}
@@ -126,11 +126,11 @@
               {% else %}
                 <li>
                   <a href="#" class="list_underlying_curriculum">
-                    Underlying Lessons
+                    Underlying Curricula
                     <i class="fa fa-caret-square-o-down underlying_curriculum" aria-hidden="true"></i>
                     <i class="fa fa-caret-square-o-up underlying_curriculum" aria-hidden="true" style="display:none;"></i>
                   </a>
-                  <ul class="underlying_curriculum" style="display:none;">
+                  <ul class="underlying_curriculum">
                     {% for curr in curr_unit|get_underlying_curriculum:user %}
                       <li><a data-toggle="modal" data-target="#login" class="login" href="#">{{curr.title}}</a></li>
                     {% endfor %}
