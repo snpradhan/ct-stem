@@ -461,13 +461,12 @@ class CurriculumForm(ModelForm):
 
   class Meta:
     model = models.Curriculum
-    fields = ['curriculum_type', 'unit', 'authors', 'order', 'title', 'icon', 'time', 'level', 'purpose', 'overview', 'student_overview', 'acknowledgement', 'credits', 'status', 'subject', 'compatible_system', 'taxonomy', 'content', 'teacher_notes', 'shared_with']
+    fields = ['curriculum_type', 'unit', 'authors', 'order', 'title', 'icon', 'time', 'level', 'overview', 'student_overview', 'acknowledgement', 'credits', 'status', 'subject', 'compatible_system', 'taxonomy', 'teacher_notes', 'shared_with']
 
     widgets = {
       'title': forms.TextInput(attrs={'placeholder': 'Lesson Title'}),
       'time': forms.TextInput(attrs={'rows':0, 'cols':60}),
       'level': forms.Textarea(attrs={'rows':0, 'cols':60}),
-      'purpose': forms.Textarea(attrs={'rows':0, 'cols':60}),
       'overview': forms.Textarea(attrs={'rows':0, 'cols':60}),
       'student_overview': forms.Textarea(attrs={'rows':0, 'cols':60}),
       'content': forms.Textarea(attrs={'rows':0, 'cols':60}),
@@ -529,9 +528,6 @@ class CurriculumForm(ModelForm):
         if cleaned_data.get('level') == '':
           self.add_error('level', u'Level is required')
           valid = False
-        if cleaned_data.get('purpose') == '':
-          self.add_error('purpose', u'Purpose is required')
-          valid = False
         if cleaned_data.get('overview') == '':
           self.add_error('overview', u'Overview is required')
           valid = False
@@ -543,9 +539,6 @@ class CurriculumForm(ModelForm):
         if cleaned_data.get('curriculum_type') != 'L' or not cleaned_data.get('unit'):
           if not cleaned_data.get('subject'):
             self.add_error('subject', u'Subject is required')
-            valid = False
-          if cleaned_data.get('content') == '':
-            self.add_error('content', u'Content is required')
             valid = False
     return valid
 

@@ -420,35 +420,31 @@
           $('#id_curriculum-status').closest('.form-group').show();
           $('#id_curriculum-icon').closest('.form-group').show();
         }
-        //for unit, lesson and assessment, display time, teacher overview, student overview, acknowledgement and attachment table
+        //for unit, lesson and assessment, display time, teacher overview, student direction, acknowledgement and attachment table
         if($(this).val() == 'U' || $(this).val() == 'L' || $(this).val() == 'A') {
           $('#id_curriculum-time').closest('.form-group').show();
           $('#id_curriculum-time').closest('.form-group').find('label:first').html('Time (<span class="required">*</span>)');
           $('#id_curriculum-overview').closest('.form-group').show();
-          $('#id_curriculum-overview').closest('.form-group').find('label:first').html('Teacher Overview (<span class="required">*</span>)');
+          $('#id_curriculum-overview').closest('.form-group').find('label:first').html('Overview (<span class="required">*</span>)');
           $('#id_curriculum-student_overview').closest('.form-group').show();
-          $('#id_curriculum-student_overview').closest('.form-group').find('label:first').html('Student Overview (<span class="required">*</span>)');
+          $('#id_curriculum-student_overview').closest('.form-group').find('label:first').html('Student Directions (<span class="required">*</span>)');
           $('div.form-group.attachment_table').show();
           $('#id_curriculum-acknowledgement').closest('.form-group').show();
           $('#id_curriculum-credits').closest('.form-group').show();
         }
 
-        //for unit, stand alone lesson and assessment display level, purpose and taxonomy
+        //for unit, stand alone lesson and assessment display level and taxonomy
         if($(this).val() == 'U' || ($(this).val() == 'L' &&  $('select#id_curriculum-unit').val() == '' )|| $(this).val() == 'A') {
           $('#id_curriculum-level').closest('.form-group').show();
           $('#id_curriculum-level').closest('.form-group').find('label:first').html('Level (<span class="required">*</span>)');
-          $('#id_curriculum-purpose').closest('.form-group').show();
-          $('#id_curriculum-purpose').closest('.form-group').find('label:first').html('Purpose (<span class="required">*</span>)');
           $('#id_curriculum-taxonomy').closest('.form-group').show();
           $('#id_curriculum-taxonomy').closest('.form-group').find('label:first').html('Standards (<span class="required">*</span>)');
         }
 
-        //for unit and stand alone lesson display subject, content, teacher notes and compatible systems
+        //for unit and stand alone lesson display subject, teacher notes and compatible systems
         if($(this).val() == 'U' || ($(this).val() == 'L' &&  $('select#id_curriculum-unit').val() == '' )) {
           $('#id_curriculum-subject').closest('.form-group').show();
           $('#id_curriculum-subject').closest('.form-group').find('label:first').html('Subject (<span class="required">*</span>)');
-          $('#id_curriculum-content').closest('.form-group').show();
-          $('#id_curriculum-content').closest('.form-group').find('label:first').html('Content (<span class="required">*</span>)');
           $('#id_curriculum-teacher_notes').closest('.form-group').show();
           $('#id_curriculum-compatible_system').closest('.form-group').show();
         }
