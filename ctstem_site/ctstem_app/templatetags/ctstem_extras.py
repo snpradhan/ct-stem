@@ -310,11 +310,11 @@ def get_underlying_curriculum(curriculum, user):
     return False
 
   if hasattr(user, 'administrator') == True or hasattr(user, 'researcher') == True or hasattr(user, 'author') == True:
-    return unit.underlying_curriculum.all().order_by('order')
+    return unit.underlying_curriculum.all().order_by('order').distinct()
   elif hasattr(user, 'teacher') == True:
-    return unit.underlying_curriculum.all().filter(Q(status='P') | Q(shared_with=user.teacher)).order_by('order')
+    return unit.underlying_curriculum.all().filter(Q(status='P') | Q(shared_with=user.teacher)).order_by('order').distinct()
   else:
-    return unit.underlying_curriculum.all().filter(status='P').order_by('order')
+    return unit.underlying_curriculum.all().filter(status='P').order_by('order').distinct()
 
 @register.filter
 def get_curriculum_count(queryset, status):
