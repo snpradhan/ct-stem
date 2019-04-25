@@ -101,16 +101,19 @@
                           {% for option in question.options|splitlines%}
                           <option value="{{option}}">{{option}}</option>
                           {% endfor %}
-                          <option value="{{option}}" class="other">Other</option>
-                          <input type="text" placeholder="Enter your response" class="form-control assignment_input other" disabled/>
+                          {% if question.display_other_option %}
+                            <option value="{{option}}" class="other">Other</option>
+                            <input type="text" placeholder="Enter your response" class="form-control assignment_input other" disabled/>
+                          {% endif %}
                         </select>
                       {% elif field_type == 'MC' %}
                         {% for option in question.options|splitlines%}
                           <input type="radio" name="{{question.id}}_mc" id="{{question.id}}_mc" value="{{option}}" />  {{option}}<br>
                         {% endfor %}
-                        <input type="radio" name="{{question.id}}_mc" id="{{question.id}}_mc" value="{{option}}" class="other" />  Other<br>
-                        <input type="text" placeholder="Enter your response" class="form-control assignment_input" name="{{question.id}}_mc" id="{{question.id}}_mc" disabled/>
-
+                        {% if question.display_other_option %}
+                          <input type="radio" name="{{question.id}}_mc" id="{{question.id}}_mc" value="{{option}}" class="other" />  Other<br>
+                          <input type="text" placeholder="Enter your response" class="form-control assignment_input" name="{{question.id}}_mc" id="{{question.id}}_mc" disabled/>
+                        {% endif %}
                       {% elif field_type == 'MI' %}
                         <div class="help warning">You may click the images below to view a larger version</div>
                         {% for option in question.options|splitlines%}

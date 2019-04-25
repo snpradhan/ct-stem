@@ -832,9 +832,15 @@ input[type="tel"], input[type="color"], .uneditable-input {
     height: auto;
     max-width: 100%;
 }
-select, input[type="checkbox"] {
+select {
   width: auto !important;
 }
+input[type="checkbox"] {
+  width: auto !important;
+  height: auto !important;
+  margin-bottom: 0.5em;
+}
+
 
 /***************** end input *******************/
 

@@ -615,7 +615,7 @@ class QuestionForm(ModelForm):
 
   class Meta:
     model = models.Question
-    fields = ['research_category', 'question_text', 'answer_field_type', 'sketch_background', 'options', 'answer']
+    fields = ['research_category', 'question_text', 'answer_field_type', 'sketch_background', 'options', 'display_other_option', 'answer']
     widgets = {
       'question_text': forms.TextInput(attrs={'placeholder': 'Enter question here'}),
       'options': forms.Textarea(attrs={'rows':5, 'cols':60}),

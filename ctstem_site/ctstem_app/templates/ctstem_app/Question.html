@@ -17,11 +17,19 @@
       <input id="id_step" type="hidden" value=""/>
       <div class="modal-body">
         {% for field in questionForm %}
-          <div class="form-group {% if field.name == 'sketch_background' %} sketch {% endif %}" style="{% if field.name == 'sketch_background' %} display: none; {% endif %}" >
+          <div class="form-group {% if field.name == 'sketch_background' %}
+                                      sketch
+                                 {% elif field.name == 'display_other_option' %}
+                                    other
+                                 {% endif %}" >
             <label for="id_{{field.name}}">
               {{ field.label|title }} {% if field.field.required %} (*) {% endif %}
               {% if field.name = 'options' %}
-                <a href="#" class="options_info" rel="popover" data-content="">
+                <a href="#" class="info" id="options_info" rel="popover" data-content="">
+                  <i class="fa fa-info-circle" aria-hidden="true" />
+                </a>
+              {% elif field.name == 'display_other_option' %}
+                <a href="#" class="info" id="other_info" rel="popover" data-content="">
                   <i class="fa fa-info-circle" aria-hidden="true" />
                 </a>
               {% endif %}
@@ -33,6 +41,7 @@
               {% endif %}
               <div class="help warning">{{field.help_text|safe}}</div>
             </div>
+
             <div class="error">{{ field.errors }}</div>
           </div>
         {% endfor %}
@@ -50,7 +59,7 @@
 
 <script type="text/javascript">
 $(function (){
-  $(".options_info").popover({
+  $("#options_info").popover({
     placement: 'right',
     title: 'Options Guide',
     html: true ,
@@ -88,29 +97,46 @@ $(function (){
 
     }
   });
+  $("#other_info").popover({
+    placement: 'right',
+    title: 'Other option',
+    html: true ,
+    content: function(){
+      return 'Select this checkbox if you would like to give students the option to provide their own answer other than the ones provided in the Options field';
 
-  $(".options_info").click(function (e) {
+    }
+  });
+
+  $(".info").click(function (e) {
     e.stopPropagation();
   });
 
   $(document).click(function (e) {
     if (($('.popover').has(e.target).length == 0) || $(e.target).is('.close')) {
-      $(".options_info").popover('hide');
+      $(".info").popover('hide');
     }
   });
+  //hide sketch background field and other option field by default
+  $('div.form-group.sketch').hide();
+  $('div.form-group.other').hide();
 
   $('select#id_answer_field_type').on('change', function(){
     if($(this).val() == 'SK'){
       $('div.form-group.sketch').show();
+      $('div.form-group.other').hide();
     }
-    else{
+    else if($(this).val() == 'DD' || $(this).val() == 'MC'){
       $('div.form-group.sketch').hide();
+      $('div.form-group.other').show();
     }
+    else {
+      $('div.form-group.sketch').hide();
+      $('div.form-group.other').hide();
+    }
+
   });
 
-  if($('select#id_answer_field_type').val() =='SK'){
-    $('div.form-group.sketch').show();
-  }
+  $('select#id_answer_field_type').trigger('change');
 
 
   $('button.close').on('click', function(){
