@@ -40,8 +40,8 @@
 
 {% block content %}
   <header>
-    <h1><a class="navbar-brand" href="{% url 'ctstem:home' %}"><i class="fa fa-home" aria-hidden="true"></i>  CT-STEM</a></h1>
-    {{curriculum.title|title}}
+    <a class="navbar-brand" href="{% url 'ctstem:home' %}"><img src="/static/img/logo/svg/light/wide.svg"></a>
+    <span>{{curriculum.title|title}}</span>
     <nav>
       Page &nbsp;
       {% if step_order|add:0  == 0 %}
@@ -137,7 +137,7 @@
               <div class="help">These questions were answered in the previous steps.  They are provided here for your reference.</div>
               {% for curr_question, response in referenced_questions %}
               {% with question=curr_question.question field_type=curr_question.question.answer_field_type  %}
-                <div class="referenced_question_response {% if forloop.counter|divisibleby:2 %} even {% else %} odd {% endif %}">
+                <div class="referenced_question_response">
                   <div class="question">
                     <label>Question {{curr_question.step.order}}.{{curr_question.order}}</label>
                     <div class="text">
@@ -191,7 +191,6 @@
               {% endwith %}
               {% endfor %}
             {% endwith %}
-            <hr>
           {% endif %}
           </div>
           <div class="question_container">
@@ -281,20 +280,22 @@
                                 {% endif %}
                               {% endfor %}
                               <!-- the OTHER option -->
-                              {% with options=questionObj.options|splitlines%}
-                              {% if questionForm.response.value %}
-                                {% if questionForm.response.value|is_in:options %}
-                                  <option value="{{option}}" class="other">Other</option>
-                                  <input type="text" placeholder="Enter your response" class="form-control assignment_input other" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="" disabled/>
+                              {% if questionObj.display_other_option %}
+                                {% with options=questionObj.options|splitlines%}
+                                {% if questionForm.response.value %}
+                                  {% if questionForm.response.value|is_in:options %}
+                                    <option value="{{option}}" class="other">Other</option>
+                                    <input type="text" placeholder="Enter your response" class="form-control assignment_input other" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="" disabled/>
+                                  {% else %}
+                                    <option value="{{option}}" selected class="other">Other</option>
+                                    <input type="text" placeholder="Enter your response" class="form-control assignment_input other" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{questionForm.response.value}}"/>
+                                  {% endif %}
                                 {% else %}
-                                  <option value="{{option}}" selected class="other">Other</option>
-                                  <input type="text" placeholder="Enter your response" class="form-control assignment_input other" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{questionForm.response.value}}"/>
+                                  <option value="{{option}}" class="other">Other</option>
+                                  <input type="text" placeholder="Enter your response" class="form-control assignment_input other" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{questionForm.response.value}}" disabled/>
                                 {% endif %}
-                              {% else %}
-                                <option value="{{option}}" class="other">Other</option>
-                                <input type="text" placeholder="Enter your response" class="form-control assignment_input other" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{questionForm.response.value}}" disabled/>
+                                {% endwith %}
                               {% endif %}
-                              {% endwith %}
                             </select>
                           {% elif field_type == 'MC' %}
                             <div class="assignment_input" tabindex="-1">
@@ -306,20 +307,22 @@
                                 {% endif %}
                               {% endfor %}
                               <!-- the OTHER option -->
-                              {% with options=questionObj.options|splitlines%}
-                              {% if questionForm.response.value %}
-                                {% if questionForm.response.value|is_in:options %}
-                                  <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}" class="other" />  Other<br>
-                                  <input type="text" placeholder="Enter your response" class="form-control assignment_input other" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="" disabled/>
+                              {% if questionObj.display_other_option %}
+                                {% with options=questionObj.options|splitlines%}
+                                {% if questionForm.response.value %}
+                                  {% if questionForm.response.value|is_in:options %}
+                                    <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}" class="other" />  Other<br>
+                                    <input type="text" placeholder="Enter your response" class="form-control assignment_input other" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="" disabled/>
+                                  {% else %}
+                                    <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}" checked="true" class="other"/>  Other<br>
+                                    <input type="text" placeholder="Enter your response" class="form-control assignment_input other" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{questionForm.response.value}}"/>
+                                  {% endif %}
                                 {% else %}
-                                  <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}" checked="true" class="other"/>  Other<br>
-                                  <input type="text" placeholder="Enter your response" class="form-control assignment_input other" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{questionForm.response.value}}"/>
+                                  <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}" class="other" />  Other<br>
+                                  <input type="text" placeholder="Enter your response" class="form-control assignment_input other" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{questionForm.response.value}}" disabled/>
                                 {% endif %}
-                              {% else %}
-                                <input type="radio" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{option}}" class="other" />  Other<br>
-                                <input type="text" placeholder="Enter your response" class="form-control assignment_input other" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{questionForm.response.value}}" disabled/>
+                                {% endwith %}
                               {% endif %}
-                              {% endwith %}
                             </div>
                           {% elif field_type == 'MI' %}
                             <div class="assignment_input" tabindex="-1">
@@ -349,6 +352,7 @@
                           {% elif field_type == 'FI' %}
                             <div  tabindex="-1">
                               <table class="table table-striped table-condensed table-bordered inner_table collapsible_content">
+                                <caption>Upload files that are less than 5MB in size.</caption>
                                 <thead>
                                   <tr>
                                     <th>File</th>
@@ -801,6 +805,8 @@
         $('#imageModal').modal('show');
         return false;
       });
+
+      $('ul.messages').delay(30000).fadeOut('slow');
 
     });
 

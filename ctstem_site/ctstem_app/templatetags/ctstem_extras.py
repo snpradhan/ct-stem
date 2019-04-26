@@ -4,6 +4,7 @@ from ctstem_app import models
 import datetime
 from django.db.models import Q
 from django.utils import timezone
+from django.utils.datastructures import SortedDict
 
 register = template.Library()
 
@@ -127,6 +128,14 @@ def taxonomyHelper(taxonomies):
 def getTaxonomy(value):
   taxonomy = models.Subcategory.objects.get(id=value)
   return taxonomy
+
+@register.filter
+def getStandards(taxonomies):
+  standards = []
+  for taxonomy in taxonomies:
+    if taxonomy.category.standard not in standards:
+      standards.append(taxonomy.category.standard)
+  return standards
 
 @register.filter
 def getStudentInfo(value):
@@ -301,11 +310,11 @@ def get_underlying_curriculum(curriculum, user):
     return False
 
   if hasattr(user, 'administrator') == True or hasattr(user, 'researcher') == True or hasattr(user, 'author') == True:
-    return unit.underlying_curriculum.all().order_by('order')
+    return unit.underlying_curriculum.all().order_by('order').distinct()
   elif hasattr(user, 'teacher') == True:
-    return unit.underlying_curriculum.all().filter(Q(status='P') | Q(shared_with=user.teacher)).order_by('order')
+    return unit.underlying_curriculum.all().filter(Q(status='P') | Q(shared_with=user.teacher)).order_by('order').distinct()
   else:
-    return unit.underlying_curriculum.all().filter(status='P').order_by('order')
+    return unit.underlying_curriculum.all().filter(status='P').order_by('order').distinct()
 
 @register.filter
 def get_curriculum_count(queryset, status):
@@ -352,3 +361,25 @@ def get_class_assignment_status(assignment_id):
 @register.filter
 def subtract(value, arg):
   return value - arg
+
+@register.filter
+def class_last_login(group):
+  memberships = models.Membership.objects.all().filter(group=group)
+  last_login = None
+  for membership in memberships:
+    login = membership.student.user.last_login
+    if last_login is None and login is not None:
+      last_login = login
+    elif last_login is not None and login is not None and login > last_login:
+      last_login = login
+
+  return last_login
+
+@register.filter
+def is_teacher_authored(curriculum):
+  authors = curriculum.authors.all()
+  for author in authors:
+    if hasattr(author, 'teacher'):
+      return True
+
+  return False

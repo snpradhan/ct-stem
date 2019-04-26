@@ -16,6 +16,7 @@
             <div>
               {{field}}
             </div>
+            <div class="help warning">{{field.help_text|safe}}</div>
             <div class="error">{{ field.errors }}</div>
           </div>
         {% endfor %}

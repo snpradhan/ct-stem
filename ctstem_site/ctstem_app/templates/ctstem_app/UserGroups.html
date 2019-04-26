@@ -1,5 +1,5 @@
 {% extends "ctstem_app/base.html" %}
-
+{% load ctstem_extras %}
 {% block media %}
   {{ block.super }}
   {{ form.media }}
@@ -27,26 +27,35 @@
                 <div class="tile">
 
                   <a href="{% url 'ctstem:group' group.id %}" class="portfolio-link">
-                     <div class="portfolio-hover">
+                    <div class="portfolio-hover">
                       <div class="portfolio-hover-content">
                         <span class="glyphicon glyphicon-pencil gi-3x" aria-hidden="true"></span>
                       </div>
                     </div>
-                    {% if group.subject and group.subject.icon %}
-                      <img src="{{group.subject.icon.url}}" class="img-responsive group_icon" alt="">
+                    <div class="portfolio-icon">
+                    {% if group.icon %}
+                      <img src="{{group.icon.url}}" class="img-responsive" alt="">
+                    {% elif group.subject and group.subject.icon %}
+                      <img src="{{group.subject.icon.url}}" class="img-responsive" alt="">
                     {% else %}
-                      <img src="/static/img/class.png" class="img-responsive group_icon" alt="">
+                      <img src="/static/img/class.png" class="img-responsive group_icon_stock" alt="">
                     {% endif %}
+                    </div>
                   </a>
 
                   <div class="portfolio-caption">
                     <input id="group_{{group.id}}" type="checkbox" class="action-select" value="{{group.id}}" name="group_{{group.id}}"/>
-                    <div class="class_title">{{group.title}}</div>
+                    <div class="class_title">
+                      {{group.title}}
+                      {% if user.teacher in group.shared_with.all %}
+                        <i class="fa fa-share-alt" title="Shared by {{group.teacher}}"></i>
+                      {% endif %}
+                    </div>
 
                     <div class="button_row">
                       {% if group.is_active %}
                         <div>
-                          <a type="button" class="btn btn-yellow invite-modal" href="#" data-toggle="modal" data-target="#invite" data-invite-link="https://{{domain}}/register/group/{{group.group_code}}" data-title="{{group.title}}" title="Student Invitation Link">
+                          <a type="button" class="btn btn-yellow invite-modal" href="#" data-toggle="modal" data-target="#invite" data-invite-link="https://{{domain}}/?next=/preregister/group/{{group.group_code}}/" data-title="{{group.title}}" title="Student Invitation Link">
                             <i class="fa fa-link"></i>
                           </a>
                         </div>
@@ -98,7 +107,9 @@
                       <span class="glyphicon glyphicon-plus gi-3x" aria-hidden="true"></span>
                     </div>
                   </div>
-                  <img src="/static/img/new_class.png" class="img-responsive group_icon" alt="">
+                  <div class="portfolio-icon">
+                    <img src="/static/img/new_class.png" class="img-responsive group_icon_stock" alt="">
+                  </div>
                 </a>
                 <div class="portfolio-caption">
                    <div class="class_title"><h3>ADD NEW CLASS</h3></div>
@@ -116,17 +127,19 @@
               <tr>
                 <th width="1%" class="no-sort"><input id="select-all" type="checkbox" value="0" name="select-all"/></th>
                 <th width="20%"> Class Name </th>
-                <th width="15%"> Subject </th>
+                <th width="10%"> Subject </th>
                 <th width="10%"> Time </th>
                 <th> Status </th>
                 {% if not user.teacher %}
                   <th width="15%"> Teacher </th>
                 {% endif %}
+                <th width="15%">Co-teachers</th>
                 {% if not user.teacher and not user.school_administrator %}
                   <th width="15%"> School </th>
                 {% endif %}
                 <th> Students </th>
                 <th> Assignments </th>
+                <th width="10%"> Created <br> Modified <br> Last Login</th>
               </tr>
               <tr id="filterrow">
                 <th class="no-sort"></th>
@@ -137,11 +150,13 @@
                 {% if not user.teacher %}
                   <th> Teacher </th>
                 {% endif %}
+                <th>Co-teachers</th>
                 {% if not user.teacher and not user.school_administrator %}
                   <th width="15%"> School </th>
                 {% endif %}
                 <th> Students </th>
                 <th> Assignments </th>
+                <th> Created <br> Modified <br> Last Login</th>
               </tr>
             </thead>
             <tbody>
@@ -162,7 +177,7 @@
                             {% endif %}
                         </a>
                         {% if group.is_active %}
-                          <a type="button" class="btn btn-yellow invite-modal" href="#" data-toggle="modal" data-target="#invite" data-invite-link="https://{{domain}}/register/group/{{group.group_code}}" data-title="{{group.title}}" title="Student Invitation Link">
+                          <a type="button" class="btn btn-yellow invite-modal" href="#" data-toggle="modal" data-target="#invite" data-invite-link="https://{{domain}}/?next=/preregister/group/{{group.group_code}}/" data-title="{{group.title}}" title="Student Invitation Link">
                             <i class="fa fa-link"></i>
                           </a>
                           <a type="button" class="btn btn-success upload-modal" href="#" data-toggle="modal" data-target="#upload" data-id="{{group.id}}" data-title="{{group.title}}" title="Upload Students">
@@ -184,6 +199,11 @@
                   {% if not user.teacher %}
                     <td>{{group.teacher}}</td>
                   {% endif %}
+                  <td>
+                    {% for coteacher in group.shared_with.all %}
+                      <div>{{coteacher}}</div>
+                    {% endfor %}
+                  </td>
                   {% if not user.teacher and not user.school_administrator %}
                     <td> {{group.teacher.school}} </td>
                   {% endif %}
@@ -214,6 +234,11 @@
                         No Assignment
                       {% endif %}
                     </div>
+                  </td>
+                  <td>
+                    <div>Cr: {{group.created_date|date}}</div>
+                    <div>Mo: {{group.modified_date|date}}</div>
+                    <div>LL: {{group|class_last_login|date}}</div>
                   </td>
                 </tr>
               {% endfor %}

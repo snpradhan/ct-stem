@@ -1,14 +1,5 @@
-{% extends "ctstem_app/base.html" %}
 {% load i18n %}
+{% blocktrans with ago=timestamp|timesince %}
+An email was sent to {{ email }} {{ ago }} ago. Use the link in the email to reset your password.
+{% endblocktrans %}
 
-{% block title %}{% trans "Password recovery sent" %}{% endblock %}
-
-{% block content %}
-  <div class="content">
-    <ul class="messages">
-      <li class="info">
-        {% blocktrans with ago=timestamp|timesince %}An email was sent to <strong>{{ email }}</strong> {{ ago }} ago. Use the link in it to set a new password.{% endblocktrans %}
-      </li>
-    </ul>
-  </div>
-{% endblock %}

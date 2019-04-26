@@ -1,9 +1,10 @@
 {% extends "ctstem_app/base.html" %}
 {% load base_extras %}
+{% load ctstem_extras %}
 
 {% block media %}
   {{ block.super }}
-  <link rel="stylesheet" href="{% staticfile 'css/landing.css' %}" />
+  {{ form.media }}
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js"></script>
   <script src="{% staticfile 'js/classie.js' %}"></script>
   <script src="{% staticfile 'js/cbpAnimatedHeader.js' %}"></script>
@@ -13,123 +14,317 @@
 
 {% block content %}
   {{block.super}}
-
   <div class="content" id="home">
-
-    <!-- landing banner image -->
-    <img src="/static/img/classroom.png" style="width: 100%; margin-top: 60px;">
-
-
-    <!-- Header -->
-    <header>
-
-      <div class="ctstem-content">
-        <h1>
-          <div style="display: inline-block;">Computational Thinking
-          <div style="display: inline-block;">in Science and Math</div>
-        </h1>
-        <div class="tagline">
-          Promoting computational thinking in high school science and math<br>
-          to empower all students to participate in a computational future.
+    <div class="block" id="one">
+      <div class="col-container">
+        <div class="col text">
+          <div class="heading">
+            <h2>Computational tools for high school STEM</h2>
+            <p>Empower learning and enrich your curriculum with free computational thinking lessons, assessments, and technology.</p>
+            <div class="buttons">
+              {% if user.is_anonymous %}
+                <a type="button" class="btn big blue modal-open" data-toggle="modal" data-target="#register" data-href="{% url 'ctstem:register' %}" href="#" >REGISTER AS A TEACHER</a>
+              {% endif %}
+            </div>
+          </div>
+          <!--<div class="dialog">
+            Learn why computational thinking is important
+            <div class="triangle"></div>
+          </div>-->
         </div>
-
-        <!-- INSTITUTION LOGOS -->
-        <img src="/static/img/nu-seal.png" class="institution" alt="Northwestern University">
-        <img src="/static/img/NSFLogo.png" class="institution" alt="National Science Foundation">
-        <img src="/static/img/spencer-logo.png" class="institution" alt="Spencer Foundation">
-
-
-        <p>
-          We are a team of scientists and educators at Northwestern University working to design and research computationally enhanced high school science and math curriculum. With support from the National Science Foundation and Spencer Foundation, our goal is to enrich science learning while developing foundational computational literacy skills for all students.
-        </p>
+        <div class="col graphic">
+          <div id="video">
+            <iframe src="https://northwestern.hosted.panopto.com/Panopto/Pages/Embed.aspx?id=3e25cc92-36e6-48be-bff9-51b897189215&v=1" style="position:absolute;top:0;left:0;width:100%;height:100%;" frameborder="0" gesture=media allowfullscreen></iframe>
+          </div>
+        </div>
       </div>
-    </header>
+    </div>
 
-
-    <!-- CT Taxonomy Section -->
-    <section id="practices">
-
-      <div class="ctstem-content">
-
-        <h2>What do we mean by Computational Thinking?</h2>
-        <hr>
-
-        <p>
-          Modern scientists, engineers, and mathematicians use an array of computational tools and practices in their everyday work. It is increasingly important for high school students not just to know how to use computers but to be computationally <i>literate</i>. To help guide the creation of CT activities, lessons, and assessments, we have developed a taxonomy of relevant computational practices organized into four strands.
-        </p>
-
-        <div id="video">
-          <iframe src="https://northwestern.hosted.panopto.com/Panopto/Pages/Embed.aspx?id=3e25cc92-36e6-48be-bff9-51b897189215&v=1" frameborder="0" gesture=media allowfullscreen></iframe>
-
-          <!--script src="https://fast.wistia.com/embed/medias/mciwh2a07z.jsonp" async></script><script src="https://fast.wistia.com/assets/external/E-v1.js" async></script><div class="wistia_responsive_padding" style="padding:56.25% 0 0 0;position:relative;"><div class="wistia_responsive_wrapper" style="height:100%;left:0;position:absolute;top:0;width:100%;"><div class="wistia_embed wistia_async_mciwh2a07z videoFoam=true" style="height:100%;width:100%">&nbsp;</div></div></div-->
+    <div class="block" id="two">
+      <div class="col-container">
+        <div class="col one">
+          <div class="graphic">
+            <img src="/static/img/blue_illustration.svg">
+          </div>
+          <div class="text">
+            <h3 class="center">Looking toward the future</h3>
+            <p class="shaded">Computational thinking is a crucial science and engineering practice within the Next Generation Science Standards.</p>
+          </div>
         </div>
+        <div class="col two">
+          <div class="graphic">
+            <img src="/static/img/yellow_illustration.svg">
+          </div>
+          <div class="text">
+            <h3 class="center">It's time for change</h3>
+            <p class="shaded">Scientists, mathematicians and engineers all use computational thinking to solve problems and learn about the world.  Why should classrooms be different?</p>
+          </div>
+        </div>
+        <div class="col three">
+          <div class="graphic">
+            <img src="/static/img/red_illustration.svg">
+          </div>
+          <div class="text">
+            <h3 class="center">Feel empowered</h3>
+            <p class="shaded">Our free classroom resources help teachers confidently integrate computational thinking into their classrooms.</p>
+          </div>
+        </div>
+      </div>
+    </div>
 
-        {% for practice in practices %}
-        <div class="practice">
-          {% if practice.icon %}
-          <img src="{{practice.icon.url}}" style="width: 130px; height: 130px; float: right;">
-          {% endif %}
-          <h3>{{practice.name}}</h3>
-          <p>{{practice.description}}</p>
+    <div class="block" id="three">
+      <h2 class="center">Browser-friendly CT lesson plans for your classroom</h2>
+      <div class="col-container">
+        {% for curriculum in curricula %}
+        <div class="col col-{{forloop.counter}}">
+          <div class="tile">
+            <a href="{% url 'ctstem:previewCurriculum' curriculum.id %}">
+            <div class="icon">
+              {% if curriculum.icon %}
+                <img src="{{curriculum.icon.url}}"/>
+              {% elif curriculum.curriculum_type == 'L' or curriculum.curriculum_type == 'U' %}
+                <img src="/static/img/lesson.png">
+              {% elif curriculum.curriculum_type == 'A' %}
+                <img src="/static/img/assessment.png">
+              {% elif curriculum.curriculum_type == 'S' %}
+                <img src="/static/img/survey.svg">
+              {% endif %}
+            </div>
+            </a>
+            <div class="detail">
+              <div class="type">
+                {{curriculum.get_curriculum_type_display}}
+                {% if curriculum.subject.all %}
+                  - {{curriculum.subject.all|join:", "}}
+                {% endif %}
+              </div>
+              <div class="period">
+                {% if curriculum.curriculum_type == 'U' %}
+                  {{curriculum|get_underlying_curriculum:user|length}} Lessons
+                {% else %}
+                  {{curriculum.time}}
+                {% endif %}
+              </div>
+              <div class="title">{{curriculum.title}}</div>
+              <div class="others">
+                <div class="author">
+                  {% if curriculum.authors.all %}
+                    {% if curriculum.authors.all|length > 1 %}
+                      {{curriculum.authors.all|length}} Authors
+                    {% else %}
+                      {% with curriculum.authors.all|first as author %}
+                        by {{author.get_full_name}}
+                      {% endwith %}
+                    {% endif %}
+                  {% endif %}
+                </div>
+                <div class="standard">
+                  Standards: {{curriculum.taxonomy.all|getStandards|join:", " }}
+                </div>
+              </div>
+              <div class="action">
+                {% if curriculum|is_teacher_authored %}
+                  <i class="fa fa-code-fork" title="Teacher authored"></i>
+                {% endif %}
+                {% if user.teacher %}
+                  {% with favorite=curriculum.id|is_favorite:user.teacher.id %}
+                    <a class="bookmark fa fa-star" href="{% url 'ctstem:removeBookmark' curriculum.id %}" style="{% if favorite %} display: inline-block; {% else %} display: none; {% endif %}" title="Remove from Favorites"></a>
+                    <a class="bookmark fa fa-star-o" href="{% url 'ctstem:bookmarkCurriculum' curriculum.id %}" style="{% if favorite %} display: none; {% else %} display: inline-block; {% endif %}" title="Add to Favorites"></a>
+                  {% endwith %}
+                {% endif %}
+                <a class="fa fa-long-arrow-right" href="{% url 'ctstem:previewCurriculum' curriculum.id %}" target="_blank" title="Preview"></a>
+                </div>
+            </div>
+          </div>
         </div>
         {% endfor %}
+      </div>
+      <a class="btn normal darkblue" href="{% url 'ctstem:curricula' 'units' %}">Browse All</a>
+    </div>
 
-        <div class="explore_more" style="margin-top: 35px;">
-          <a href="/static/doc/weintrop-jost-2015.pdf" target="_blank" class="btn btn-xl">Read More</a>
+    <div class="block" id="four">
+      <div class="col-container">
+        <div class="col text">
+          <div>
+            <h2>Teach with confidence</h2>
+            <p>Our tried and tested lesson plan are NGSS-aligned, browser-friendly and free.
+            </p>
+            <p>
+              Designed to integrate with conventional curricula, CT-STEM lesson plans can be implemented on their own, or used to supplement lessons that you already feel comfortable teaching. Either way, your students will explore authentic computational practices that enrich convententional subject matter learning and nurture computational literacy.
+            </p>
+            <p>
+              Our content is co-designed with teachers, classroom tested, and backed by years of research at Northwestern University.
+            </p>
+             <!--
+            <p>
+            Our workshops, coaching and video resources can help you to formulate CT lesson plans that are right for your classroom.
+            </p>
+             -->
+          </div>
+          <div class="buttons">
+            <a class="btn normal yellow" href="{% url 'ctstem:training' %}">CT-STEM Workshops</a>
+            &nbsp;&nbsp;
+            <!--<a class="btn normal white" href="{% url 'ctstem:training' %}">Video Resources</a>-->
+          </div>
+        </div>
+        <div class="col graphic">
+          <div class="tile yellow">
+            <h3 class="center">You can use our lessons to...</h3>
+            <ul>
+                <li>
+                  <span>
+                    <span class="dark">Enrich conventional content</span><br>
+                    <span class="light">no need to change what content you're teaching</span>
+                  </span>
+                </li>
+                <li>
+                  <span>
+                    <span class="dark">Explore authentic CT practices</span><br>
+                    <span class="light">as relied upon by scientists, mathematicians and engineers</span>
+                  </span>
+                </li>
+                <li>
+                  <span>
+                    <span class="dark">Meet modern education standards</span><br>
+                    <span class="light">guarantee your alignment with the NGSS</span>
+                  </span>
+                </li>
+                <li>
+                  <span>
+                    <span class="dark">Nurture computational literacy</span><br>
+                    <span class="light">see your students develop powerful and transferable computational skills</span>
+                  </span>
+                </li>
+                <li>
+                  <span>
+                    <span class="dark">Spend your time where it matters most</span><br>
+                    <span class="light">our browser-friendly lessons are ready to go</span>
+                  </span>
+                </li>
+            </ul>
+          </div>
         </div>
 
       </div>
-    </section>
-
-    <!-- OFFERINGS -->
-    <section id="offerings">
-      <div class="ctstem-content">
-
-        <h2>What We Offer</h2>
-        <hr>
-        <div>
-
-          <div class="offering">
-            <h3><a href="{% url 'ctstem:curricula' 'lessons' %}">Lessons and Activities</a></h3>
-            <p>Our CT lessons cover a range of science and math concepts and are designed to be embedded in existing coursework.</p>
-          </div>
-
-
-          <div class="offering">
-            <h3><a class="page-scroll" href="#practices">Standards</a></h3>
-            <p>We have developed a taxonomy of CT practices in STEM fields to structure our curriculum and assessments.</p>
-          </div>
-
+    </div>
+    <hr>
+    <div class="block" id="five">
+      <div class="col-container">
+        <div class="col graphic">
+          <img src="/static/img/laptop_illustration.svg">
         </div>
-
-        <div>
-
-          <div class="offering">
-            <h3><a href="{% url 'ctstem:curricula' 'assessments' %}">Assessments</a></h3>
-            <p>Our CT assessments use realistic STEM scenarios to challenge students and measure their progress.</p>
+        <div class="col text">
+          <div>
+            <h2>What is CT?</h2>
+            <p>Computational thinking empowers us to frame problems in a way that computers can help us solve them.
+            </p>
+            <p>
+              People are ingenious, but computers are lightning fast at processing information and following instructions. CT is about learning useful ways to compound our ingenuity with this raw, computational power.
+            </p>
+            <p>
+              Because computation is changing the way we think and learn about the world, understanding and leveraging its abilities has never been a more important skill for students to develop.
+            </p>
           </div>
-
-          <div class="offering">
-            <h3><a class="page-scroll" href="{% url 'ctstem:training' %}">Professional Development</a></h3>
-            <p>Interested in trying CT activities in your classroom? Check out our professional development workshops and resources.</p>
+          <div class="buttons">
+            <a class="btn normal yellow" href="{% url 'ctstem:curricula' 'units' %}">See CT Curricula</a>
+            &nbsp;&nbsp;
+            <a class="btn normal white" href="{% url 'ctstem:publications' %}">Our Research</a>
           </div>
         </div>
-
-        <div>
-
-          <div class="offering">
-            <h3><a class="page-scroll" href="{% url 'ctstem:publications' %}">Research</a></h3>
-            <p>Our ongoing research explores the design and impact of CT activities in science and math classrooms.</p>
-          </div>
-
-          <div class="offering">
-            <h3>Administrator Tools</h3>
-            <p>Check out our new web based tools for students, teachers, admins, and researchers. </p>
-          </div>
       </div>
-    </section>
+    </div>
+    <hr>
+    <div class="block" id="six">
+      <div class="col-container">
+        <div class="col graphic">
+          <img src="/static/img/tablet_illustration.svg">
+        </div>
+        <div class="col text">
+          <div>
+            <h2>Where does CT fit in?</h2>
+            <p>By equipping students with modern tools and challenging them to actively contsruct their understanding, you can boost content engagement while nurturing vital computational skills for the future.</p>
+            <p>Letting students explore and experiment before teaching them content can help to foster a genuine atmosphere of discovery in the classroom.</p>
+            <p>This is important because it provides the ideal context within which students can utilize authentic computational practices: exploring new ideas and developing their own methods of inquiry.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr>
+    <div class="block" id="seven">
+      <div class="col-container">
+        <div class="col text">
+          <div>
+            <h2>Get started</h2>
+            <p>Our site provides access to research-backed CT curricula along with a set of tools to easily manage, review and provide feedback to students on CT assignments.</p>
+          </div>
+          <div class="buttons">
+            {% if user.is_anonymous %}
+              <p>
+                Click below to create your free account.
+              </p>
+              <a type="button" class="btn big blue modal-open" data-toggle="modal" data-target="#register" data-href="{% url 'ctstem:register' %}" href="#" >Create my Teacher Account</a>
+            {% endif %}
+          </div>
+        </div>
+        <div class="col graphic">
+          <div class="tile blue">
+            <h3 class="center">You can use our platform to...</h3>
+            <ul>
+              <li>
+                <span>
+                  <span class="dark">Create and manage student groups</span><br>
+                  <span class="light">easily add students in bulk via email</span>
+                </span>
+              </li>
+              <li>
+                <span>
+                  <span class="dark">Set CT assignments and due dates</span><br>
+                  <span class="light">stay organized and save your favorite lessons</span>
+                </span>
+              </li>
+              <li>
+                <span>
+                  <span class="dark">Track student progress and provide feedback</span><br>
+                  <span class="light">view and export student responses</span>
+                </span>
+              </li>
+              <!--<li>
+                <span>
+                  <span class="dark">Receive professional training</span><br>
+                  <span class="light">via live workshops, discipline specific coaching and video resources</span>
+                </span>
+              </li>-->
 
-    <img src="/static/img/calculator-takeapart.png" style="width: 100%;">
+            </ul>
+          </div>
+        </div>
 
+      </div>
+    </div>
   </div>
+  <script type="text/javascript">
+    $(function(){
+
+      $('a.bookmark').on('click', function( e ){
+        e.preventDefault();
+        var url = $(this).attr('href');
+        var action = $(this).closest('.action');
+
+        $.ajax({
+          type: "GET",
+          url: url,
+          success: function(data){
+            $(action).find('a.bookmark').each(function(){
+              $(this).toggle();
+            });
+            return false;
+          },
+          error: function(xhr, ajaxOptions, thrownError){
+            alert("Something went wrong.  Try again later!");
+          },
+        });
+      });
+    });
+  </script>
+
 {% endblock %}

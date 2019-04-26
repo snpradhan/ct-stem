@@ -1,9 +1,9 @@
 
-  <div class="modal-dialog modal-lg">
+  <div class="modal-dialog modal-md">
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h3 class="modal-title">CT-STEM Training</h3>
+        <h3 class="left">CT-STEM Training Request</h3>
       </div>
       <div id="trainingMsg" class="msg">
       </div>
@@ -11,32 +11,49 @@
         {% csrf_token %}
         <div class="modal-body">
           {{form.management_form}}
-          {% for field in form %}
-            <div class="form-group">
-              <label for="id_{{field.name}}">{{ field.label|title }} {% if field.field.required %}(<span class="required">*</span>){% endif %} </label>
-              <div>{{field}}</div>
-              <div class="error" id="{{field.name}}_error">{{ field.errors }}</div>
-            </div>
-          {% endfor %}
-          {% if user.is_anonymous %}
           <div class="form-group">
-            <script src='https://www.google.com/recaptcha/api.js'></script>
-            <div class="g-recaptcha" data-sitekey="6Lfiv1oUAAAAAO4uGoHA7t8Psp8mATiML0bKg9oc"></div>
-            <div class="error" id="recaptcha_error"></div>
+            <label for="id_{{form.name.name}}">{{ form.name.label }}</label>
+            {{form.name}}
+            <div class="error">{{ form.name.errors }}</div>
+          </div>
+          <div class="form-group">
+            <label for="id_{{form.email.name}}">{{ form.email.label }}</label>
+            {{form.email}}
+            <div class="error">{{ form.email.errors }}</div>
+          </div>
+          <div class="form-group">
+            <label for="id_{{form.school.name}}">{{ form.school.label }}</label>
+            {{form.school}}
+            <div class="error">{{ form.school.errors }}</div>
+          </div>
+          <div class="form-group">
+            <label for="id_{{form.subject.name}}">{{ form.subject.label }}</label>
+            {{form.subject}}
+            <div class="error">{{ form.subject.errors }}</div>
+          </div>
+          {% if user.is_anonymous %}
+          <div class="col-container center">
+            <div class="form-group col left">
+            </div>
+            <div class="form-group col right" id="recaptcha">
+              <script src='https://www.google.com/recaptcha/api.js'></script>
+              <div class="g-recaptcha" data-sitekey="6Lfiv1oUAAAAAO4uGoHA7t8Psp8mATiML0bKg9oc"></div>
+              <div class="error" id="recaptcha_error">
+                <ul class="errorlist">
+                  <li>{{recaptcha_error}}</li>
+                </ul>
+              </div>
+            </div>
           </div>
           {% endif %}
-          <div id="spinner">
+          <div class="form-group" id="spinner">
             <img src="/static/img/page-loader.gif" class="icon"/>
           </div>
         </div>
-
         <div class="modal-footer">
-          <div class="form-group button-row">
-            <button type="submit" class="btn btn-success">
+          <div class="form-group button">
+            <button type="submit" class="btn normal yellow">
               Submit
-            </button>
-            <button type="button" class="btn btn-danger" data-dismiss="modal">
-              Close
             </button>
           </div>
         </div>
@@ -62,16 +79,13 @@
           $('#trainingForm #spinner').hide();
         },
         success: function(data){
-          if(data['result'] == 'Success'){
+          if(data['success'] == true){
+            $('#trainingModal').modal('toggle');
             window.location.reload();
           }
           else{
-            $(".error").empty();
-            for(var field in data['errors']){
-              $("#"+field+"_error").html(data['errors'][field]);
-            }
+            $('#trainingModal').html(data['html']);
           }
-          return false;
         },
         error: function(xhr, ajaxOptions, thrownError){
           alert(thrownError);

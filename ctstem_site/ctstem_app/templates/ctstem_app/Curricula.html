@@ -43,21 +43,17 @@
 
     {% if user.teacher %}
       <ul class="nav nav-tabs">
-        {% if curriculum_type == 'L' or curriculum_type == 'U' %}
-          <li {% if curriculum_type == 'U' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'units' 'published' '0' %}">Units</a></li>
-          <li {% if curriculum_type == 'L' and bookmark == '0' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'lessons' 'published' '0' %}">All Lessons</a></li>
-          <li {% if curriculum_type == 'L' and bookmark == '1' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'lessons' 'published' '1' %}">Favorite Lessons</a></li>
-        {% else %}
-          <li {% if bookmark == '0' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'assessments' 'published' '0' %}">All Assessments</a></li>
-          <li {% if bookmark == '1' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'assessments' 'published' '1' %}">Favorite Assessments</a></li>
-        {% endif %}
+        <li {% if curriculum_type == 'U' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'units' 'published' '0' %}">Units</a></li>
+        <li {% if curriculum_type == 'L' and bookmark == '0' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'lessons' 'published' '0' %}">All Lessons</a></li>
+        <li {% if curriculum_type == 'L' and bookmark == '1' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'lessons' 'published' '1' %}">Favorite Lessons</a></li>
+        <li {% if curriculum_type == 'A' and bookmark == '0' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'assessments' 'published' '0' %}">All Assessments</a></li>
+        <li {% if curriculum_type == 'A' and bookmark == '1' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'assessments' 'published' '1' %}">Favorite Assessments</a></li>
       </ul>
     {% else %}
       <ul class="nav nav-tabs">
-        {% if curriculum_type == 'L' or curriculum_type == 'U' %}
-          <li {% if curriculum_type == 'U' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'units' 'published' '0' %}">Units</a></li>
-          <li {% if curriculum_type == 'L' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'lessons' 'published' '0' %}">Lessons</a></li>
-        {% endif %}
+        <li {% if curriculum_type == 'U' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'units' 'published' '0' %}">Units</a></li>
+        <li {% if curriculum_type == 'L' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'lessons' 'published' '0' %}">Lessons</a></li>
+        <li {% if curriculum_type == 'A' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'assessments' 'published' '0' %}">Assessments</a></li>
       </ul>
       {% if user.administrator or user.researcher or user.author %}
         {% if curriculum_type == 'L' %}
@@ -188,6 +184,7 @@
                           <table class="table table-condensed table-striped table-bordered unit_lesson">
                             <thead>
                               <tr>
+                                <th>Order</th>
                                 <th>Name</th>
                                 {% if user.administrator or user.researcher or user.author %}
                                   <th>Status</th>
@@ -198,6 +195,7 @@
                             <tbody>
                             {% for curr in underlying_curriculum %}
                               <tr>
+                                <td>{{curr.order}}</td>
                                 <td class="title">
                                   {{curr.title}} - v{{curr.version}}.
                                   {% if curr.locked_by %}

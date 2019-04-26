@@ -12,7 +12,7 @@
     {% block media %}
       {% block bootstrap_css %}
         <!-- Bootstrap CSS -->
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">      <!-- Optional theme -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css">
       {% endblock %}
 
@@ -54,10 +54,12 @@
         <link href='https://fonts.googleapis.com/css?family=Kaushan+Script' rel='stylesheet' type='text/css'>
         <link href='https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
         <link href='https://fonts.googleapis.com/css?family=Roboto+Slab:400,100,300,700' rel='stylesheet' type='text/css'>
+        <link href="https://use.typekit.net/vss6edx.css" rel="stylesheet"  type='text/css'>
       {% endblock %}
 
       {% block agency %}
         <link rel="stylesheet" href="{% staticfile 'css/agency.css' %}">
+        <link rel="stylesheet" href="{% staticfile 'css/landing.css' %}">
       {% endblock %}
 
       {% block google_analytics %}
@@ -85,35 +87,6 @@
       {% block inlinejs %}
       <script type="text/javascript">
         $(function (){
-          $("#formLogin").submit(function(e) {
-            e.preventDefault();
-            var data = $(this).serialize();
-            var url = "{% url 'ctstem:login' %}";
-            $.ajax({
-              type: "POST",
-              url: url,
-              data: data,
-              dataType: 'json',
-              success: function(data){
-                if(data['result'] == 'Success'){
-                  if(data['role'] == 'teacher'){
-                    window.location = "{% url 'ctstem:groups' 'active' %}";
-                  }
-                  else{
-                    window.location.reload();
-                  }
-                }
-                else{
-                  $('#loginMsg').html(data['message']);
-                  $('#password').val('');
-                }
-              },
-              error: function(xhr, ajaxOptions, thrownError){
-                $('#loginMsg').html("Something went wrong.  Try again later!");
-                $('#password').val('');
-              },
-            });
-          });
           //check student session every 60 seconds
           {% if user.student %}
             setInterval(check_session, 60000);
@@ -137,6 +110,12 @@
               },
             });
           {% endif %}
+
+          {% if redirect_url and target %}
+            $("{{target}}").load("{{redirect_url}}", function() {
+              $(this).modal('show');
+            });
+          {% endif %}
         });
       </script>
       {% endblock %}
@@ -157,95 +136,129 @@
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="{% url 'ctstem:home' %}">CTSTEM</a>
+            <a class="navbar-brand" href="{% url 'ctstem:home' %}"></a>
           </div>
           <!-- Collect the nav links, forms, and other content for toggling -->
           <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
-              {% if not user.student %}
-                <li class="{% navactive request 'ctstem:curricula' 'lessons'%} {% navactive request 'ctstem:curricula' 'units'%}"><a href="{% url 'ctstem:curricula' 'units' %}">Curricula</a></li>
-                <li class="{% navactive request 'ctstem:curricula' 'assessments' %} "><a href="{% url 'ctstem:curricula' 'assessments' %}">Assessments</a></li>
-                {% if user.is_authenticated%}
-                  {% if user.administrator or user.researcher or user.author %}
-                    <li class="{% navactive request 'ctstem:standards' %} "><a href="{% url 'ctstem:standards' %}">Standards</a></li>
-                  {% else %}
-                    <!--li><a href="http://ct-stem-assess.herokuapp.com/" target="_blank">Assessments</a></li-->
-                    <li><a class="page-scroll" href="{% url 'ctstem:home' %}#practices">Standards</a></li>
-                  {% endif %}
-
-                  <li class="{% navactive request 'ctstem:publications' %}"><a href="{% url 'ctstem:publications' %}">Research</a></li>
-                  {% if user.administrator %}
-                    <li class="dropdown {% navactive request 'ctstem:training'%} {% navactive request 'ctstem:training_requests'%}">
-                      <a href="#" class="dropdown-toggle" data-toggle="dropdown" id="training">Training  <b class="caret"></b></a>
-                      <ul class="dropdown-menu">
-                        <li class="{% navactive request 'ctstem:training' %}"><a href="{% url 'ctstem:training' %}">Training Page</a></li>
-                        <li class="{% navactive request 'ctstem:training_requests' %}"><a href="{% url 'ctstem:training_requests' %}">Training Requests</a></li>
-                      </ul>
-                    </li>
-                  {% else %}
-                    <li class="{% navactive request 'ctstem:training' %}"><a href="{% url 'ctstem:training' %}">Training</a></li>
-                  {% endif %}
-                  <li class="{% navactive request 'ctstem:team' %}"><a href="{% url 'ctstem:team' %}">Team</a></li>
-
-                {% elif request.path == '/' %}
-                  <li><a class="page-scroll" href="#practices">Standards</a></li>
-                  <li class="{% navactive request 'ctstem:publications' %}"><a href="{% url 'ctstem:publications' %}">Research</a></li>
-                  <li class="{% navactive request 'ctstem:training' %}"><a href="{% url 'ctstem:training' %}">Training</a></li>
-                  <li class="{% navactive request 'ctstem:team' %}"><a href="{% url 'ctstem:team' %}">Team</a></li>
-                {% else %}
-                  <li><a class="page-scroll" href="{% url 'ctstem:home' %}#practices">Standards</a></li>
-                  <li class="{% navactive request 'ctstem:publications' %}"><a href="{% url 'ctstem:publications' %}">Research</a></li>
-                  <li class="{% navactive request 'ctstem:training' %}"><a href="{% url 'ctstem:training' %}">Training</a></li>
-                  <li class="{% navactive request 'ctstem:team' %}"><a href="{% url 'ctstem:team' %}">Team</a></li>
-                {% endif %}
-              {% endif %}
               {% if user.student %}
+                <!-- Student role -->
                 <li class="{% navactive request 'ctstem:assignments' 'inbox' %}"><a href="{% url 'ctstem:assignments' 'inbox' %}">My Assignments</a></li>
-              {% endif %}
+              {% else %}
 
-              {% if user.administrator or user.researcher or user.school_administrator %}
-                <li class="dropdown {% navactive request 'ctstem:users' 'students' %} {% navactive request 'ctstem:users' 'teachers' %} {% navactive request 'ctstem:users' 'admins' %} {% navactive request 'ctstem:users' 'researchers' %} {% navactive request 'ctstem:users' 'authors' %} {% navactive request 'ctstem:groups' 'active' %} {% navactive request 'ctstem:groups' 'inactive' %}">
-                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" id="users">Users  <b class="caret"></b></a>
+                <!-- Teaching Resource Menu -->
+                <li class="{% navactive request 'ctstem:curricula' 'lessons'%}
+                           {% navactive request 'ctstem:curricula' 'lessons' 'published' '0' %}
+                           {% navactive request 'ctstem:curricula' 'lessons' 'published' '1' %}
+                           {% navactive request 'ctstem:curricula' 'lessons' 'draft' '0' %}
+                           {% navactive request 'ctstem:curricula' 'lessons' 'archived' '0' %}
+                           {% navactive request 'ctstem:curricula' 'units'%}
+                           {% navactive request 'ctstem:curricula' 'units' 'published' '0' %}
+                           {% navactive request 'ctstem:curricula' 'units' 'published' '1' %}
+                           {% navactive request 'ctstem:curricula' 'units' 'draft' '0' %}
+                           {% navactive request 'ctstem:curricula' 'units' 'archived' '0' %}
+                           {% navactive request 'ctstem:curricula' 'assessments' %}
+                           {% navactive request 'ctstem:curricula' 'assessments' 'published' '0' %}
+                           {% navactive request 'ctstem:curricula' 'assessments' 'published' '1' %}
+                           {% navactive request 'ctstem:curricula' 'assessments' 'draft' '0' %}
+                           {% navactive request 'ctstem:curricula' 'assessments' 'archived' '0' %}">
+                  {% if user.is_authenticated %}
+                    <a href="{% url 'ctstem:curricula' 'units' %}">Teaching Resources</a>
+                  {% elif request.path == '/' %}
+                    <a class="page-scroll" href="#three">Teaching Resources</a>
+                  {% else %}
+                    <a class="page-scroll" href="{% url 'ctstem:home' %}#three">Teaching Resources</a>
+                  {% endif %}
+                </li>
+                <!-- Intro to CT Menu -->
+                <li><a class="page-scroll" href="{% url 'ctstem:home' %}#five">Intro to CT</a></li>
+
+                <!-- Training Menu -->
+                {% if user.administrator %}
+                  <li class="dropdown {% navactive request 'ctstem:training'%} {% navactive request 'ctstem:training_requests'%}">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" id="training">Training  <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                      <li class="{% navactive request 'ctstem:training' %}"><a href="{% url 'ctstem:training' %}">Training Page</a></li>
+                      <li class="{% navactive request 'ctstem:training_requests' %}"><a href="{% url 'ctstem:training_requests' %}">Training Requests</a></li>
+                    </ul>
+                  </li>
+                {% else %}
+                  <li class="{% navactive request 'ctstem:training' %}"><a href="{% url 'ctstem:training' %}">Training</a></li>
+                {% endif %}
+
+                <!-- About Menu with dropdown sub menu (Standards, Research and Team) -->
+                <li class="dropdown {% navactive request 'ctstem:standards' %}
+                     {% navactive request 'ctstem:publications' %} {% navactive request 'ctstem:team' %}">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" id="metadata">About<b class="caret"></b></a>
                   <ul class="dropdown-menu">
-                    {% if user.administrator %}
-                      <li class="{% navactive request 'ctstem:users' 'admins' %}"><a href="{% url 'ctstem:users' 'admins' %}">Site Admins</a></li>
-                      <li class="{% navactive request 'ctstem:users' 'researchers' %}"><a href="{% url 'ctstem:users' 'researchers' %}">Researchers</a></li>
-                      <li class="{% navactive request 'ctstem:users' 'authors' %}"><a href="{% url 'ctstem:users' 'authors' %}">Content Authors</a></li>
-                    {% endif %}
-                    {% if user.administrator or user.researcher %}
-                      <li class="{% navactive request 'ctstem:users' 'school_administrators' %}"><a href="{% url 'ctstem:users' 'school_administrators' %}">School Administrators</a></li>
-                    {% endif %}
-                    {% if user.administrator or user.researcher or user.school_administrator%}
-                      <li class="{% navactive request 'ctstem:users' 'teachers' %}"><a href="{% url 'ctstem:users' 'teachers' %}">Teachers</a></li>
-                      <li class="{% navactive request 'ctstem:users' 'students' %}"><a href="{% url 'ctstem:users' 'students' %}" class="students">Students</a></li>
-                      <li class="divider"></li>
-                      <li class="{% navactive request 'ctstem:groups' 'active' %} {% navactive request 'ctstem:groups' 'inactive' %}"><a href="{% url 'ctstem:groups' 'active' %}">Classes</a></li>
-                    {% endif %}
+                    <li class="{% navactive request 'ctstem:standards' %} "><a href="{% url 'ctstem:standards' %}">Standards</a></li>
+                    <li class="{% navactive request 'ctstem:publications' %}"><a href="{% url 'ctstem:publications' %}">Research</a></li>
+                    <li class="{% navactive request 'ctstem:team' %}"><a href="{% url 'ctstem:team' %}">Team</a></li>
                   </ul>
                 </li>
-              {% elif user.teacher %}
-                <li class="{% navactive request 'ctstem:groups' 'active' %} {% navactive request 'ctstem:groups' 'inactive' %}"><a href="{% url 'ctstem:groups' 'active' %}">My Classes</a></li>
-              {% endif %}
 
-              {% if user.administrator or user.researcher %}
-                <li class="dropdown {% navactive request 'ctstem:subjects' %} {% navactive request 'ctstem:schools' %}">
-                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" id="metadata">Metadata<b class="caret"></b></a>
-                  <ul class="dropdown-menu">
-                    <li class="{% navactive request 'ctstem:subjects' %}"><a href="{% url 'ctstem:subjects' %}">Subjects</a></li>
-                    <li class="{% navactive request 'ctstem:schools' %}"><a href="{% url 'ctstem:schools' %}">Schools</a></li>
-                    <li class="{% navactive request 'ctstem:categories' %}"><a href="{% url 'ctstem:categories' %}">Research Categories</a></li>
-                    {% if user.administrator %}
-                      <li class="{% navactive request 'ctstem:teamMembers' %}"><a href="{% url 'ctstem:teamMembers' %}">Team</a></li>
-                       <li class="{% navactive request 'ctstem:curricula' 'surveys' %} "><a href="{% url 'ctstem:curricula' 'surveys' %}">Surveys</a></li>
-                    {% endif %}
-                  </ul>
-                </li>
+                <!-- Users Menu -->
+
+                {% if user.administrator or user.researcher or user.school_administrator %}
+                  <li class="dropdown {% navactive request 'ctstem:users' 'students' %}
+                                      {% navactive request 'ctstem:users' 'teachers' %}
+                                      {% navactive request 'ctstem:users' 'admins' %}
+                                      {% navactive request 'ctstem:users' 'researchers' %}
+                                      {% navactive request 'ctstem:users' 'authors' %}
+                                      {% navactive request 'ctstem:users' 'school_administrators' %}
+                                      {% navactive request 'ctstem:groups' 'active' %}
+                                      {% navactive request 'ctstem:groups' 'inactive' %}">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" id="users">Users  <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                      {% if user.administrator %}
+                        <li class="{% navactive request 'ctstem:users' 'admins' %}"><a href="{% url 'ctstem:users' 'admins' %}">Site Admins</a></li>
+                        <li class="{% navactive request 'ctstem:users' 'researchers' %}"><a href="{% url 'ctstem:users' 'researchers' %}">Researchers</a></li>
+                        <li class="{% navactive request 'ctstem:users' 'authors' %}"><a href="{% url 'ctstem:users' 'authors' %}">Content Authors</a></li>
+                      {% endif %}
+                      {% if user.administrator or user.researcher %}
+                        <li class="{% navactive request 'ctstem:users' 'school_administrators' %}"><a href="{% url 'ctstem:users' 'school_administrators' %}">School Administrators</a></li>
+                      {% endif %}
+                      {% if user.administrator or user.researcher or user.school_administrator%}
+                        <li class="{% navactive request 'ctstem:users' 'teachers' %}"><a href="{% url 'ctstem:users' 'teachers' %}">Teachers</a></li>
+                        <li class="{% navactive request 'ctstem:users' 'students' %}"><a href="{% url 'ctstem:users' 'students' %}" class="students">Students</a></li>
+                        <li class="divider"></li>
+                        <li class="{% navactive request 'ctstem:groups' 'active' %} {% navactive request 'ctstem:groups' 'inactive' %}"><a href="{% url 'ctstem:groups' 'active' %}">Classes</a></li>
+                      {% endif %}
+                    </ul>
+                  </li>
+                {% endif %}
+
+                <!-- Metadata Menu -->
+                {% if user.administrator or user.researcher %}
+                  <li class="dropdown {% navactive request 'ctstem:subjects' %}
+                                      {% navactive request 'ctstem:schools' %}
+                                      {% navactive request 'ctstem:categories' %}
+                                      {% navactive request 'ctstem:teamMembers' %}
+                                      {% navactive request 'ctstem:curricula' 'surveys' %}">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" id="metadata">Metadata<b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                      <li class="{% navactive request 'ctstem:subjects' %}"><a href="{% url 'ctstem:subjects' %}">Subjects</a></li>
+                      <li class="{% navactive request 'ctstem:schools' %}"><a href="{% url 'ctstem:schools' %}">Schools</a></li>
+                      <li class="{% navactive request 'ctstem:categories' %}"><a href="{% url 'ctstem:categories' %}">Research Categories</a></li>
+                      {% if user.administrator %}
+                        <li class="{% navactive request 'ctstem:teamMembers' %}"><a href="{% url 'ctstem:teamMembers' %}">Team Members</a></li>
+                         <li class="{% navactive request 'ctstem:curricula' 'surveys' %} "><a href="{% url 'ctstem:curricula' 'surveys' %}">Surveys</a></li>
+                      {% endif %}
+                    </ul>
+                  </li>
+                {% endif %}
               {% endif %}
             </ul>
             <ul class="nav navbar-nav navbar-right">
               {% block profile %}
                 {% if user.is_authenticated %}
-                  <li class="dropdown">
+                  {% if user.teacher %}
+                    <li class="{% navactive request 'ctstem:groups' 'active' %}
+                               {% navactive request 'ctstem:groups' 'inactive' %}" >
+                      <a href="{% url 'ctstem:groups' 'active' %}">My Classes</a>
+                    </li>
+                  {% endif %}
+                  <li class="dropdown {% navactive request 'ctstem:userProfile' user.id %}">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" id="welcome">
                       <span class="glyphicon glyphicon-user"></span>
                       <strong>{{ user.first_name}}</strong>
@@ -253,40 +266,36 @@
                     </a>
                     <ul class="dropdown-menu">
                       <li>
-                        <div class="navbar-login">
-                          <div class="row">
-                            <div class="col-lg-4">
-                              <p class="text-center">
-                                <span class="glyphicon glyphicon-user icon-size"></span>
-                              </p>
-                            </div>
-                            <div class="col-lg-8">
-                              <p class="text-left"><a class="profile">{{user.get_full_name|title}}</a></p>
-                              <p class="text-left small"><a class="profile">{{user.email}}</a></p>
-                              <p class="text-left">
-                                <a href="{% url 'ctstem:userProfile' user.id %}" class="btn btn-success btn-block btn-sm">Edit Profile</a>
-                              </p>
-                            </div>
+                        <div class="col-container">
+                          <div class="col">
+                            <span class="glyphicon glyphicon-user icon"></span>
+                          </div>
+                          <div class="col">
+                            <div class="profile">{{user.get_full_name|title}}</div>
+                            <div class="profile">{{user.email}}</div>
                           </div>
                         </div>
                       </li>
-                      <li class="divider"></li>
                       <li>
-                        <div class="navbar-login navbar-login-session">
-                          <div class="row">
-                            <div class="col-lg-12">
-                              <p>
-                                <a href="{% url 'ctstem:logout' %}" class="btn btn-danger btn-block">Logout</a>
-                              </p>
-                            </div>
+                        <div class="col-container">
+                          <div class="col">
+                            <a type="button" href="{% url 'ctstem:userProfile' user.id %}" class="btn normal white">Edit Profile</a>
+                          </div>
+
+                          <div class="col">
+                            <a type="button" href="{% url 'ctstem:logout' %}" class="btn normal red">Logout</a>
                           </div>
                         </div>
+
                       </li>
                     </ul>
                   </li>
                 {% else %}
                   <li>
-                    <a data-toggle="modal" data-target="#login" class="login" href="#">Login / Register</a>
+                    <a type="button" class="btn normal blue modal-open" data-toggle="modal" data-target="#register" data-href="{% url 'ctstem:register' %}" href="#">Register</a>
+                  </li>
+                  <li>
+                    <a type="button" class="btn normal white login modal-open" data-toggle="modal" data-target="#login" data-href="{% url 'ctstem:login' %}" href="#">Login</a>
                   </li>
                 {% endif %}
               {% endblock %}
@@ -309,50 +318,7 @@
       </div>
     {% endblock %}
     {% block modals %}
-      {% block login %}
-        <div class="modal fade" id="login" role="dialog">
-          <div class="modal-dialog modal-sm">
-            <div class="modal-content">
-              <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h3 class="modal-title">Login</h3>
-              </div>
-              <div id="loginMsg" class="msg">
-              </div>
-              <form class="form" id="formLogin" method="post">
-                {% csrf_token %}
-                <div class="modal-body">
-                  <div class="form-group">
-                    <label for="id_username">Username (<span class="required">*</span>)
-                      <span data-toggle="tooltip" data-placement="top" title="Please enter your username in lowercase.">
-                        <i class="fa fa-info-circle" aria-hidden="true"></i>
-                      </span>
-                    </label>
-                    <input name="username" id="username" type="text" class="form-control">
-                  </div>
-                  <div class="form-group">
-                    <label for="id_password">Password (<span class="required">*</span>)</label>
-                    <input name="password" id="password" type="password" class="form-control">
-                  </div>
-                </div>
-                <div class="modal-footer">
-                  <div class="form-group button-row">
-                    <button type="submit" id="btnLogin" class="btn btn-success">
-                      <span class="glyphicon glyphicon-log-in" aria-hidden="true"></span>
-                      Login
-                    </button>
-                  </div>
-                  <div>
-                    <div class="extra"><a href="{% url 'ctstem:register' %}">Teacher Registration</a></div>
-                    <div class="extra"><a href="{% url 'password_reset_recover' %}">Forgot Password</a></div>
-                    <div class="extra"><a href="{% url 'ctstem:validate' %}">Validate Account</a></div>
-                  </div>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      {% endblock %}
+
       {% block session_expiry %}
         <div class="modal fade" id="session_expiry" role="dialog">
           <div class="modal-dialog modal-sm">
@@ -437,46 +403,102 @@
           </div>
         </div>
       </div>
+      <div class="modal fade" id="notification" role="dialog">
+        <div class="modal-dialog modal-md">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <h3 class="left">Notification</h3>
+            </div>
+            <div class="modal-body">
+              <p></p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal fade" id="login" role="dialog">
+      </div>
+      <div class="modal fade" id="password" role="dialog">
+      </div>
       <div class="modal fade" id="curriculum" role="dialog">
       </div>
       <div class="modal fade" id="profile" role="dialog">
       </div>
+      <div class="modal fade" id="register" role="dialog">
+      </div>
+      <div class="modal fade" id="validate" role="dialog">
+      </div>
       <div class="modal fade" id="consent" role="dialog" data-keyboard="false" data-backdrop="static"></div>
+
+      <div class="modal fade" id="teacherModal" role="dialog"></div>
     {% endblock %}
   </body>
 
   {% block footer %}
     <footer>
-      <div class="container">
-        <div class="footer_content">
-          All content and material (including lessons and assessments) copyright © 2016 CT-STEM Project. To inquire about using our material in your school or as part of research, please contact ct-stem@ccl.northwestern.edu.
+      <div class="col-container">
+        <div class="col left">
+          <h4>Questions and feedback</h4>
+          <p>As a teacher, your methodologies, concerns and insights are all extremely important to us.</p>
+          <p>Please contact us if there's anything you'd like to discuss:</p>
+          <p><a href="mailto:ct-stem@ccl.northwestern.edu">ct-stem@ccl.northwestern.edu</a>
         </div>
-        <div class="footer_content">
-          This work was made possible through generous support from the National Science Foundation (grants CNS-1138461, CNS-1441041 and DRL-1020101) and the Spencer Foundation (Award #201600069). Any opinions, findings, or recommendations expressed in this material are those of the author(s) and do not necessarily reflect the views of the funding organizations.
+        <div class="col right">
+          <h4>Professional training</h4>
+          <p>Our CT-STEM workshops are helping educators to enrich their teaching of STEM content using authentic
+          CT practices. We offer discipline-specific coaching to all computing abilities so that teachers can confidently
+          address the Next Generation Science Standards, and so that their students are equipped for the future.</p>
+          <a type="button" class="btn normal yellow" href="{% url 'ctstem:training' %}">More Info</a>
         </div>
-        <div class="row footer_content">
-          <div class="col-md-3">
-            <b>Contact Us: </b><br>
-            CT-STEM Project Investigators <br>
-            Northwestern University<br>
-            2120 Campus Drive<br>
-            Evanston, Illinois 60208<br><br>
+      </div>
 
-            ct-stem@ccl.northwestern.edu<br>
-            http://ct-stem.northwestern.edu<br>
-          </div>
 
-          <div class="col-md-3">
-            <img src="/static/img/nu-logo.png" class="img-responsive img-centered" style="opacity: 0;" alt="">
-          </div>
+      <div class="col-container">
+        <div class="col left resources">
+          <div class="resource">
+            <h4>For you</h4>
+            <ul>
+              <li><a href="{% url 'ctstem:curricula' 'units' %}">Teaching Resources</a></li>
+              <li><a class="page-scroll" href="{% url 'ctstem:home' %}#five">Intro to CT</a></li>
+              <li><a href="{% url 'ctstem:training' %}">Training</a></li>
+              {% if user.is_anonymous %}
+                <li><a data-toggle="modal" data-target="#login" class="login modal-open" data-href="{% url 'ctstem:login' %}" href="#">Login</a></li>
+              {% endif %}
+            </ul>
 
-          <div class="col-md-3">
-            <img src="/static/img/NSFLogo.png" class="img-responsive img-centered" alt="">
           </div>
+          <div class="resource">
+             <h4>About us</h4>
+             <ul>
+              <li><a href="{% url 'ctstem:standards' %}">Standards</a></li>
+              <li><a class="page-scroll" href="{% url 'ctstem:publications' %}#five">Research</a></li>
+              <li><a href="{% url 'ctstem:team' %}">Team</a></li>
+            </ul>
+          </div>
+        </div>
 
-          <div class="col-md-3">
-             <img src="/static/img/nu-logo.png" class="img-responsive img-centered" alt="">
+        <div class="col right">
+          <h4>Sponsors</h4>
+          <p>This project was made possible through generous support from both the National Science Foundation and the Spencer Foundation.</p>
+          <div class="logos">
+            <div class="logo">
+              <img src="/static/img/nsf_logo_white.png" class="logo" alt="">
+            </div>
+            <div class="logo">
+              <img src="/static/img/spencer_logo.png" class="logo">
+            </div>
+            <div class="logo">
+              <img src="/static/img/nu-logo.png" class="logo" alt="">
+            </div>
           </div>
+        </div>
+      </div>
+      <div class="col-container">
+        <div class="col end">
+          <hr>
+          <p>All content and teaching material copyright © {% now "Y" %} CT-STEM Project. All rights reserved.</p>
+          <p>This work was made possible through generous support from the National Science Foundation (grants CNS-1138461, CNS-1441041 and DRL-1020101) and the Spencer Foundation (Award #201600069). Any opinions, findings, or recommendations expressed in this material are those of the author(s) and do not necessarily reflect the views of the funding organizations.
+          </p>
         </div>
       </div>
     </footer>

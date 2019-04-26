@@ -2,10 +2,13 @@
 <div class="modal-dialog modal-lg">
   <div class="modal-content">
     <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal">&times;</button>
+      <button type="button" class="close">&times;</button>
       <h3 class="modal-title">{{title}}</h3>
     </div>
     <div id="questionMsg" class="msg">
+      <ul class="errorlist">
+        <li></li>
+      </ul>
     </div>
     <form class="form" id="questionForm" method="post" enctype="multipart/form-data" action="{% if questionForm.instance.id %} {% url 'ctstem:question' questionForm.instance.id %} {% else %} {% url 'ctstem:newQuestion' %} {% endif %}">
       {% csrf_token %}
@@ -14,11 +17,19 @@
       <input id="id_step" type="hidden" value=""/>
       <div class="modal-body">
         {% for field in questionForm %}
-          <div class="form-group {% if field.name == 'sketch_background' %} sketch {% endif %}" style="{% if field.name == 'sketch_background' %} display: none; {% endif %}" >
+          <div class="form-group {% if field.name == 'sketch_background' %}
+                                      sketch
+                                 {% elif field.name == 'display_other_option' %}
+                                    other
+                                 {% endif %}" >
             <label for="id_{{field.name}}">
               {{ field.label|title }} {% if field.field.required %} (*) {% endif %}
               {% if field.name = 'options' %}
-                <a href="#" class="options_info" rel="popover" data-content="">
+                <a href="#" class="info" id="options_info" rel="popover" data-content="">
+                  <i class="fa fa-info-circle" aria-hidden="true" />
+                </a>
+              {% elif field.name == 'display_other_option' %}
+                <a href="#" class="info" id="other_info" rel="popover" data-content="">
                   <i class="fa fa-info-circle" aria-hidden="true" />
                 </a>
               {% endif %}
@@ -30,13 +41,14 @@
               {% endif %}
               <div class="help warning">{{field.help_text|safe}}</div>
             </div>
+
             <div class="error">{{ field.errors }}</div>
           </div>
         {% endfor %}
       </div>
       <div class="modal-footer">
-        <div class="form-group button-row">
-          <button type="submit" id="saveQuestion" class="btn btn-success">
+        <div class="form-group">
+          <button type="submit" id="saveQuestion" class="btn normal yellow">
             Save
           </button>
         </div>
@@ -47,67 +59,93 @@
 
 <script type="text/javascript">
 $(function (){
-  $(".options_info").popover({
+  $("#options_info").popover({
     placement: 'right',
     title: 'Options Guide',
     html: true ,
     content: function(){
       return '<ul> \
                 <li><b>Dropdown, Multi-Select, Multiple Choice</b></li> \
-                <p> Provide one option per line. </p> \
+                <div> Provide one option per line. </div> \
                 <li><b>Multiple Choice w/Images</b></li> \
-                <p> Provide one image url per line. </p> \
+                <div> Provide one image url per line. </div> \
                 <li><b>Multiple Choice w/Horizontal Layout</b></li> \
-                <p> Provide one option per line.  Radio buttons will be displayed horizontally. </p> \
+                <div> Provide one option per line.  Radio buttons will be displayed horizontally. </div> \
                 <li><b>Sketch</b></li> \
-                <p> You may optionally provide a background image for the sketch pad in the Sketch Background field. </p> \
+                <div> You may optionally provide a background image for the sketch pad in the Sketch Background field. </div> \
                 <li><b>Data Table</b></li> \
                 <ul> \
                  <li>Data Table w/fixed columns and variable rows </li> \
-                 <p>Provide one column header per line. </p> \
+                 <div>Provide one column header per line. </div> \
                  <li>Data Table w/fixed columns and rows </li>\
-                 <p>Provide one column header and one row header per line separated by |.  <br> \
+                 <div>Provide one column header and one row header per line separated by |.  <br> \
                  See example below. </br> \
                    Col 1 | Row 1 <br> \
                    Col 2 | Row 2 <br> \
                    Col 3 | Row 3 <br> \
                    Col 4 | \
-                 </p> \
-                 <p>If you need the headers to be blank, replace the header names with &amp;nbsp;  <br> \
+                 </div> \
+                 <div>If you need the headers to be blank, replace the header names with &amp;nbsp;  <br> \
                  See example below. </br> \
                    &amp;nbsp; | &amp;nbsp; <br> \
                    &amp;nbsp; | &amp;nbsp; <br> \
                    &amp;nbsp; | &amp;nbsp; <br> \
                    &amp;nbsp; | \
-                 </p> \
+                 </div> \
                 </ul>\
               </ul>';
 
     }
   });
+  $("#other_info").popover({
+    placement: 'right',
+    title: 'Other option',
+    html: true ,
+    content: function(){
+      return 'Select this checkbox if you would like to give students the option to provide their own answer other than the ones provided in the Options field';
 
-  $(".options_info").click(function (e) {
+    }
+  });
+
+  $(".info").click(function (e) {
     e.stopPropagation();
   });
 
   $(document).click(function (e) {
     if (($('.popover').has(e.target).length == 0) || $(e.target).is('.close')) {
-      $(".options_info").popover('hide');
+      $(".info").popover('hide');
     }
   });
+  //hide sketch background field and other option field by default
+  $('div.form-group.sketch').hide();
+  $('div.form-group.other').hide();
 
   $('select#id_answer_field_type').on('change', function(){
     if($(this).val() == 'SK'){
       $('div.form-group.sketch').show();
+      $('div.form-group.other').hide();
     }
-    else{
+    else if($(this).val() == 'DD' || $(this).val() == 'MC'){
       $('div.form-group.sketch').hide();
+      $('div.form-group.other').show();
     }
+    else {
+      $('div.form-group.sketch').hide();
+      $('div.form-group.other').hide();
+    }
+
   });
 
-  if($('select#id_answer_field_type').val() =='SK'){
-    $('div.form-group.sketch').show();
-  }
+  $('select#id_answer_field_type').trigger('change');
+
+
+  $('button.close').on('click', function(){
+    close = confirm('The question has not been saved. Do you want to close the window?');
+    if(close) {
+      $("#questionForm")[0].reset();
+      $("#questionModal").modal('toggle');
+    }
+  });
 
   $("#questionForm").submit(function(e) {
 
@@ -138,11 +176,8 @@ $(function (){
       cache:false,
       contentType: false,
       processData: false,
-      success: function(data){
-        if('error' in data){
-          $('#questionMsg').html(data['error']);
-        }
-        else {
+      success: function(data, status){
+        if(data['success'] == true){
           var formset_div = $("input[id="+id_step+"]").parent();
           var question_table = $(formset_div).find("table.table.question");
 
@@ -161,6 +196,12 @@ $(function (){
           }
           $("#questionForm")[0].reset();
           $("#questionModal").modal('toggle');
+          rowAddorRemove($(question_table));
+        }
+        else{
+          $('#questionModal').html(data['html']);
+          $("#questionForm input[id='id_step']").val(id_step);
+          $('#questionMsg .errorlist li').addClass('error').html(data['error']);
         }
         return false;
       },

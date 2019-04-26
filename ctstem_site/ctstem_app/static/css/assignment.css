@@ -1,3 +1,17 @@
+:root {
+  --ctstem-font-family: "proxima-nova", sans-serif;
+  --ctstem-color-yellow: #FFD028;
+  --ctstem-color-blue: #00ADFF;
+  --ctstem-color-medium-blue: #3A74E8;
+  --ctstem-color-dark-blue: #343D51;
+  --ctstem-color-dark-gray: #999EA8;
+  --ctstem-color-gray: #A4A7BF;
+  --ctstem-color-light-gray: #C1C4D9;
+  --ctstem-color-red: #F24878;
+  --ctstem-color-green: #0AD35E;
+  --ctstem-color-ornage: #FA7921;
+}
+
 * {
   font-size: 18px; /* All REM units relative to this */
   box-sizing: border-box;
@@ -19,7 +33,7 @@ header {
   color: rgba(255, 255, 255, 0.9);
   width: 100%;
   min-width: 700px;
-  height: 55px;
+  height: 60px;
   line-height: 55px;
   padding: 0 25px 0 50px;
   vertical-align: middle;
@@ -36,6 +50,10 @@ header nav {
   position: absolute;
   top: 0;
   right: 30px;
+}
+
+header span {
+  font-family: 'Roboto Condensed', sans-serif;
 }
 
 header nav.activated {
@@ -133,8 +151,9 @@ header nav .page-link {
 header nav .page-link.selected { background-color: white; color: rgb(70, 160, 215); }
 header nav .page-link:hover { background-color: rgba(255, 255, 255, 0.8); color: rgb(70, 160, 215); }
 header nav .page-link:active { background-color: white; }
-header h1 a.navbar-brand {
-  color: inherit;
+header a.navbar-brand img{
+  width: 150px;
+  margin-right: 50px;
 }
 
 
@@ -148,7 +167,7 @@ main {
 }
 
 .page {
-  margin: 75px 7% 0 7%;
+  margin: 95px 7% 0 7%;
 }
 
 p {
@@ -487,12 +506,17 @@ ul.messages {
 div.help {
   font-size: 1em;
 }
+
+div.referenced_question_container {
+  background-color: #ccc;
+  padding: 0.01em 1em;
+}
 div.question_response_feedback {
   margin: 1em 0;
   padding: 1em 2em;
 }
  div.referenced_question_response {
-  padding: 1em 2em;
+  padding: 0em 2em;
  }
 
 div.question_response_feedback.odd, div.referenced_question_response.odd{
@@ -744,6 +768,13 @@ div.teammates {
 div.past_due.warning {
   margin-top: 5.5em;
   text-align: center;
+}
+
+div.error {
+  margin-left: 2em;
+}
+ul.errorlist {
+  font-size: inherit !important;
 }
 
 

@@ -2,9 +2,12 @@
   <div class="modal-content">
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal">&times;</button>
-      <h3 class="modal-title">Search Teachers</h3>
+      <h3 class="left">Search Teachers</h3>
     </div>
     <div id="teacherMsg" class="msg">
+      <ul class="errorlist">
+        <li></li>
+      </ul>
     </div>
     <form class="form" id="teacherForm" method="post" action="{% url 'ctstem:searchTeachers' %}">
       {% csrf_token %}
@@ -31,7 +34,7 @@
       </div>
       <div class="modal-footer">
         <div class="form-group button-row">
-          <button type="submit" id="search" class="btn btn-success">
+          <button type="submit" id="search" class="btn normal yellow">
             Search
           </button>
         </div>
@@ -72,43 +75,46 @@ $(function (){
       context: this,
       success: function(data){
         if('error' in data){
-          $('#teacherMsg').html(data['error']);
+          $('#teacherMsg .errorlist li').addClass('error').html(data['error']);
         }
         else {
           var teacher = "";
           var teacher_row = "";
           $.each(data, function(key, value){
-            teacher += "<tr><td>"+value['username']+"</td><td>"+value['name']+"</td><<td>"+value['email']+"</td><td><button type='button' class='btn btn-info select_teacher' id='"+value['teacher_id']+"'>Share</a></td></tr>";
+            teacher += "<tr><td>"+value['username']+"</td><td>"+value['name']+"</td><<td>"+value['email']+"</td><td><button type='button' class='btn small blue select_teacher' id='"+value['teacher_id']+"'>Share</a></td></tr>";
           });
 
           if(teacher.length == 0){
-            $('#teacherMsg').html('No matching teachers found');
+            $('#teacherMsg .errorlist li').addClass('error').html('No matching teachers found');
             $("#teacherResults").hide();
           }
           else{
-            $('#teacherMsg').html('');
+            $('#teacherMsg .errorlist li').html('');
             $("#teacherResults table tbody").append(teacher);
             $("#teacherResults").show();
             $("#teacherResults button.select_teacher").click(function(){
               if($('select[id^="id"][id$="shared_with"] option[value="'+$(this).attr('id')+'"]').prop('selected') == false){
                //select the teacher id in the hidden select field
                 $('select[id^="id"][id$="shared_with"] option[value="'+$(this).attr('id')+'"]').prop('selected', true);
+                console.log($('select[id^="id"][id$="shared_with"] option[value="'+$(this).attr('id')+'"]').prop('selected'));
                 //add the selected teacher to the shared with table
                 teacher_row = $(this).closest('tr');
                 teacher = "<tr id='"+$(this).attr('id')+"'>";
                 $(teacher_row).find('td:not(:last)').each(function(){
                   teacher += "<td>"+$(this).html()+"</td>";
                 });
-                teacher += "<td> <button type='button' class='btn btn-warning unshare' aria-label='Unshare curriculum with this teacher' title='Unshare curriculum with this teacher'> \
+                teacher += "<td> <button type='button' class='btn btn-warning unshare' aria-label='Unshare resource with this teacher' title='Unshare resource with this teacher'> \
                             <span class='glyphicon glyphicon-trash' aria-hidden='true'></span>\
                           </button></td>";
-                $('div.curriculum_content table#teachers tbody').append(teacher);
+                $('table#teachers tbody').append(teacher);
+                rowAddorRemove($('table#teachers'));
 
                 //bind remove function
                 $("button.unshare").click(function(e){
                   var teacher_id = $(this).closest('tr').attr('id');
                   $('select[id^="id"][id$="shared_with"] option[value="'+teacher_id+'"]').prop('selected', false);
-                  $('div.curriculum_content table#teachers tbody tr#'+teacher_id).remove();
+                  $('table#teachers tbody tr#'+teacher_id).remove();
+                  rowAddorRemove($('table#teachers'));
                 });
               }
 

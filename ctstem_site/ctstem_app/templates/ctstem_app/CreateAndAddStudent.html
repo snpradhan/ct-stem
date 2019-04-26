@@ -6,6 +6,9 @@
         <h3 class="modal-title">Create New Student</h3>
       </div>
       <div id="studentAddMsg" class="msg">
+        <ul class="errorlist">
+          <li></li>
+        </ul>
       </div>
       <form class="form" id="studentAddForm" method="post" action="{% url 'ctstem:createStudent' form.instance.id %}">
         {% csrf_token %}
@@ -29,8 +32,8 @@
           </div>
         </div>
         <div class="modal-footer">
-          <div class="form-group button-row">
-            <button type="submit" id="add" class="btn btn-success">
+          <div class="form-group">
+            <button type="submit" id="add" class="btn normal yellow">
               Add to Class
             </button>
           </div>
@@ -58,7 +61,7 @@
         },
         success: function(data){
           if('error' in data){
-            $('#studentAddMsg').html(data['error']);
+            $('#studentAddMsg .errorlist li').removeClass('success').addClass('error').html(data['error']);
           }
           else if(data['result'] == 'Success') {
             $("#addStudent").modal('toggle');

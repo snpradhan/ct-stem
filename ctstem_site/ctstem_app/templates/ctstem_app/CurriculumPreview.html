@@ -64,8 +64,8 @@
     {% endif %}
     <!-- TOP HEADER BAR -->
     <header>
-      <h1><a class="navbar-brand" href="{% url 'ctstem:home' %}"><i class="fa fa-home" aria-hidden="true"></i>  CT-STEM</a></h1>
-      {{curr_unit.title|title}} - Preview
+      <a class="navbar-brand" href="{% url 'ctstem:home' %}"><img src="/static/img/logo/svg/light/wide.svg"></a>
+      <span>{{curr_unit.title|title}} - Preview </span>
       <nav>
         <span id="activity-nav">
         {% if step_order|add:0 >= 0 %}
@@ -93,7 +93,7 @@
         <!-- SIDE MENU -->
         <nav id="side-nav">
           <ul>
-            <li><a href="{% url 'ctstem:previewCurriculum'  curriculum.id %}" class="lesson">
+            <li><a href="{% url 'ctstem:previewCurriculum'  curr_unit.id %}" class="lesson">
               View
               {% if curr_unit.curriculum_type == 'U' %}
                 Unit
@@ -109,10 +109,10 @@
                 </li>
               {% else %}
                 <li>
-                  <a href="#" class="list_underlying_curriculum">Underlying Lessons</a>
+                  <a href="#" class="list_underlying_curriculum">Underlying Curricula</a>
                   <i class="fa fa-caret-square-o-down underlying_curriculum" aria-hidden="true"></i>
                   <i class="fa fa-caret-square-o-up underlying_curriculum" aria-hidden="true" style="display:none;"></i>
-                  <ul class="underlying_curriculum" style="display:none;">
+                  <ul class="underlying_curriculum">
                     {% for curr in curr_unit|get_underlying_curriculum:user %}
                       <li><a href="{% url 'ctstem:previewCurriculum'  curr.id 0 %}" class="activity"> {{curr.title}}</a></li>
                     {% endfor %}
@@ -126,11 +126,11 @@
               {% else %}
                 <li>
                   <a href="#" class="list_underlying_curriculum">
-                    Underlying Lessons
+                    Underlying Curricula
                     <i class="fa fa-caret-square-o-down underlying_curriculum" aria-hidden="true"></i>
                     <i class="fa fa-caret-square-o-up underlying_curriculum" aria-hidden="true" style="display:none;"></i>
                   </a>
-                  <ul class="underlying_curriculum" style="display:none;">
+                  <ul class="underlying_curriculum">
                     {% for curr in curr_unit|get_underlying_curriculum:user %}
                       <li><a data-toggle="modal" data-target="#login" class="login" href="#">{{curr.title}}</a></li>
                     {% endfor %}
@@ -255,7 +255,6 @@
                 <h2>Lesson Overview</h2>
               {% endif %}
               {{curr_unit.overview|safe}}
-              {{curr_unit.content|safe}}
 
               {% if curr_unit.curriculum_type == 'U' %}
                 <div class="underlying_lessons_overview">
@@ -332,11 +331,7 @@
               </div>
             {% endif %}
 
-            <!-- FACEBOOK MESSAGE BOARD -->
-            <div class="comments">
-              <h2>Comments, Feedback, and Questions</h2>
-              <div class="fb-comments"  data-width="600" data-numposts="5"></div>
-            </div>
+
           </div>
         </lesson-summary>
 
@@ -417,8 +412,6 @@
   <script type="text/javascript">
     $(function(){
       loadDataTable(true);
-
-      $('.fb-comments').data('href', window.location.href);
 
       $('body').on('click', 'button.fa-facebook', function(){
         window.open('https://www.facebook.com/sharer/sharer.php?u='+window.location.href+'&title={{curr_unit.title}}', 'Facebook', 'width=640,height=300');

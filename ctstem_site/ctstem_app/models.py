@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import User
-from tinymce.models import HTMLField
 from slugify import slugify
 from ckeditor_uploader.fields import RichTextUploadingField
 from ckeditor.fields import RichTextField
@@ -14,6 +13,7 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db.models import signals
 from django.dispatch import receiver
 from django.db.models.signals import pre_save, post_save
+from django.db.models.functions import Upper
 from django.conf import settings
 from django.core.mail import send_mail
 from django.contrib.sites.models import Site
@@ -103,7 +103,7 @@ def upload_file_to(instance, filename):
   now = datetime.datetime.now()
   dt = now.strftime("%Y-%m-%d-%H-%M-%S-%f")
   filename_base, filename_ext = os.path.splitext(filename)
-  print filename, now
+  print filename, now, instance.id
   if isinstance(instance, Curriculum):
     return 'curriculum/%s_%s%s' % (slugify(instance.title[:40]), dt, filename_ext.lower(),)
   elif isinstance(instance, Publication):
@@ -120,6 +120,8 @@ def upload_file_to(instance, filename):
     return 'questionResponse/%s/%s_%s%s' % (instance.step_response.instance.student.user, slugify(filename_base.lower()[:10]), dt, filename_ext.lower(),)
   elif isinstance(instance, Question):
     return 'question/%s_%s%s' % (slugify(filename_base.lower()[:40]), dt, filename_ext.lower(),)
+  elif isinstance(instance, UserGroup):
+    return 'group/%s_%s%s' % (slugify(filename_base.lower()[:40]), dt, filename_ext.lower(),)
   elif isinstance(instance, QuestionResponseFile):
     return 'questionResponse/%s/%s_%s%s' % (instance.question_response.step_response.instance.student.user, slugify(filename_base.lower()[:10]), dt, filename_ext.lower(),)
 
@@ -159,15 +161,14 @@ class Curriculum (models.Model):
   parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL, related_name="children")
   version = models.IntegerField(default=1)
   taxonomy = models.ManyToManyField('Subcategory', null=True, blank=True)
-  author = models.ForeignKey(User, null=False, related_name='curriculum_author')
   authors = models.ManyToManyField(User, null=False, related_name="curriculum_authors")
   created_date = models.DateTimeField(auto_now_add=True)
   modified_date = models.DateTimeField(auto_now=True)
-  icon = models.ImageField(upload_to=upload_file_to, blank=True, help_text='Upload 400x289 png image that represents this curriculum')
+  icon = models.ImageField(upload_to=upload_file_to, blank=True, help_text='Upload an image at least 400x289 in resolution that represents this curriculum')
   shared_with = models.ManyToManyField('Teacher', null=True, blank=True, help_text='Select teachers to share this curriculum with before it is published.' )
-  unit = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, related_name="underlying_curriculum", help_text="Select a unit if this lesson is part of one")
+  unit = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, related_name="underlying_curriculum", help_text="Select a unit if this curriculum is part of one")
   acknowledgement = RichTextUploadingField(null=True, blank=True)
-  order = models.IntegerField(null=True, blank=True)
+  order = models.IntegerField(null=True, blank=True, help_text="Order within the Unit")
   credits = RichTextUploadingField(null=True, blank=True)
   locked_by = models.ForeignKey(User, null=True)
 
@@ -179,13 +180,7 @@ class Curriculum (models.Model):
 
   def save(self, *args, **kwargs):
     if self.icon:
-      self.icon.seek(0)
-      image = Image.open(StringIO.StringIO(self.icon.read()))
-      image = image.resize((400,289), Image.ANTIALIAS)
-      output = StringIO.StringIO()
-      image.save(output, format='png', quality=75)
-      output.seek(0)
-      self.icon = InMemoryUploadedFile(output,'ImageField', "%s.png" %self.icon.name, 'image/png', output.len, None)
+      self.icon = resizeImage(self.icon, 400, 289)
 
     super(Curriculum, self).save(*args, **kwargs)
 
@@ -253,22 +248,33 @@ class Question(models.Model):
   question_text = RichTextUploadingField(null=False, blank=False, config_name='question_ckeditor')
   answer_field_type = models.CharField(null=False, max_length=2, choices=FIELD_TYPE_CHOICES, default='TF')
   options = models.TextField(null=True, blank=True, help_text="Click on the &#9432; icon to see the Options Guide")
+  display_other_option = models.BooleanField(null=False, blank=False, default=False)
   answer = models.TextField(null=True, blank=True)
-  sketch_background = models.ImageField(upload_to=upload_file_to, blank=True, null=True, help_text='Upload 900x500 png background image for the sketch pad')
+  sketch_background = models.ImageField(upload_to=upload_file_to, blank=True, null=True, help_text='Upload a background image at least 900x500 in resolution for the sketch pad')
   research_category = models.ManyToManyField(ResearchCategory, null=True, blank=True, related_name='questions')
 
   def __unicode__(self):
       return u'%s' % (self.question_text)
 
+  def save(self, *args, **kwargs):
+    if self.sketch_background:
+      self.sketch_background = resizeImage(self.sketch_background, 900, 500)
+
+    super(Question, self).save(*args, **kwargs)
+
 # Subject model
 class Subject(models.Model):
   name = models.CharField(null=False, max_length=256)
   abbrevation = models.CharField(null=True, blank=True, max_length=10)
-  icon = models.ImageField(upload_to=upload_file_to, blank=True, help_text='Upload 400x289 png image that represents this subject')
-
+  icon = models.ImageField(upload_to=upload_file_to, blank=True, help_text='Upload an image at least 400x289 in resolution that represents this subject')
 
   def __unicode__(self):
       return u'%s' % (self.name)
+
+  def save(self, *args, **kwargs):
+    if self.icon:
+      self.icon = resizeImage(self.icon, 400, 289)
+    super(Subject, self).save(*args, **kwargs)
 
 # Compatible devices and OS
 class System(models.Model):
@@ -292,7 +298,7 @@ class Standard(models.Model):
 class Category(models.Model):
   standard = models.ForeignKey(Standard, related_name="category")
   name = models.CharField(null=False, max_length=256)
-  icon = models.ImageField(upload_to=upload_file_to, blank=True, null=True)
+  icon = models.ImageField(upload_to=upload_file_to, blank=True, null=True, help_text='Upload an image at least 400x289 in resolution that represents this category')
   description = models.TextField(null=True, blank=True)
   order = models.IntegerField(null=True)
 
@@ -304,12 +310,7 @@ class Category(models.Model):
 
   def save(self, *args, **kwargs):
     if self.icon:
-      image = Image.open(StringIO.StringIO(self.icon.read()))
-      image = image.resize((400,289), Image.ANTIALIAS)
-      output = StringIO.StringIO()
-      image.save(output, format='png', quality=75)
-      output.seek(0)
-      self.icon = InMemoryUploadedFile(output,'ImageField', "%s.png" %self.icon.name, 'image/png', output.len, None)
+      self.icon = resizeImage(self.icon, 400, 289)
 
     super(Category, self).save(*args, **kwargs)
 
@@ -371,6 +372,9 @@ class Teacher(models.Model):
   consent = models.CharField(null=False, max_length=1, default='U', choices=CONSENT_CHOICES)
   validation_code = models.CharField(null=False, max_length=5)
 
+  class Meta:
+      ordering = ['user__first_name', 'user__last_name']
+
   def __unicode__(self):
       return u'%s' % (self.user.get_full_name())
 
@@ -383,7 +387,7 @@ class Researcher(models.Model):
       return u'%s' % (self.user.get_full_name())
 
 # Administrator models
-# This model represents a super user
+# This model represents a author user
 class Author(models.Model):
   user = models.OneToOneField(User, unique=True, null=False, related_name="author")
 
@@ -432,18 +436,25 @@ class UserGroup(models.Model):
   teacher = models.ForeignKey(Teacher, related_name='groups')
   description = models.TextField(null=True)
   members = models.ManyToManyField(Student, through='Membership', blank=True, null=True, related_name='member_of')
+  shared_with = models.ManyToManyField(Teacher, null=True, blank=True, help_text='Select teachers to share this class with.' )
   group_code = models.CharField(null=False, blank=False, max_length=10, unique=True, default=generate_code_helper)
   is_active = models.BooleanField(null=False, blank=False, default=True)
+  created_date = models.DateTimeField(auto_now_add=True)
+  modified_date = models.DateTimeField(auto_now=True)
+  icon = models.ImageField(upload_to=upload_file_to, blank=True, help_text='Upload an image at least 400x289 in resolution that represents this class')
 
   def __unicode__(self):
     return u'%s' % (self.title)
 
-class GroupInvitee(models.Model):
-  group = models.ForeignKey(UserGroup, related_name='groups')
-  email = models.EmailField(max_length=255, blank=False, null=False, help_text="Email")
-
   class Meta:
-    unique_together = ('group', 'email')
+    ordering = ['title']
+
+  def save(self, *args, **kwargs):
+    if self.icon:
+      self.icon = resizeImage(self.icon, 400, 289)
+
+    super(UserGroup, self).save(*args, **kwargs)
+
 
 #######################################################
 # Assignment model
@@ -465,7 +476,8 @@ class Membership(models.Model):
   group = models.ForeignKey(UserGroup, related_name="group_members")
   joined_on = models.DateTimeField(auto_now_add=True)
 
-
+  class Meta:
+    ordering = ('student__user__first_name', 'student__user__last_name')
 #######################################################
 # Assignment Instance Model
 #######################################################
@@ -530,7 +542,7 @@ class QuestionResponse(models.Model):
 
 class QuestionResponseFile(models.Model):
   question_response = models.ForeignKey(QuestionResponse, related_name='response_file', null=False)
-  file = models.FileField(upload_to=upload_file_to, null=False, blank=False)
+  file = models.FileField(upload_to=upload_file_to, null=False, blank=False, help_text='Upload a file less than 5 MB in size.')
 
 #######################################################
 # Assignment Feedback Model
@@ -600,3 +612,18 @@ def active(sender, instance, **kwargs):
             <div><b>CT-STEM Admin</b></div>' % (domain, domain)
 
     send_mail('CT-STEM - Account Activated', body, settings.DEFAULT_FROM_EMAIL, [instance.email], html_message=body)
+
+def resizeImage(img, minwidth, minheight):
+  try:
+    #check if the file actually exists
+    img.read()
+    img.seek(0)
+    image = Image.open(StringIO.StringIO(img.read()))
+    image = image.resize((minwidth, minheight), Image.ANTIALIAS)
+    output = StringIO.StringIO()
+    image.save(output, format='png', quality=75)
+    output.seek(0)
+    return InMemoryUploadedFile(output,'ImageField', "%s.png" %img.name, 'image/png', output.len, None)
+  except IOError, e:
+    #file does not exists
+    return None

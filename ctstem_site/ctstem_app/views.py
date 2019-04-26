@@ -3,6 +3,7 @@ from django.contrib.auth.models import User, Group
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
+from django.db.models.functions import Lower
 from django import http, shortcuts, template
 from django.shortcuts import render
 from django.contrib import auth, messages
@@ -51,11 +52,8 @@ def home(request):
   if hasattr(request.user, 'student') == True:
     return shortcuts.redirect('ctstem:assignments', bucket='inbox')
   else:
-    lessons = models.Curriculum.objects.all().filter(curriculum_type = 'L', status='P')[:6]
-    assessments = models.Curriculum.objects.all().filter(curriculum_type = 'A', status='P')[:6]
-    practices = models.Category.objects.all().filter(standard__primary=True).select_related()
-    team = models.Team.objects.all().order_by('role__order', 'order')
-    publications = models.Publication.objects.all()
+    curr_type = ['U', 'L']
+    curricula = models.Curriculum.objects.all().filter(status='P', unit__isnull=True, curriculum_type__in=curr_type)[:4]
     if request.user.is_authenticated():
       if hasattr(request.user, 'administrator'):
         school = None
@@ -71,7 +69,16 @@ def home(request):
         requester_role = ''
 
     if request.method == 'GET':
-      context = {'lessons': lessons, 'assessments' : assessments, 'practices': practices, 'team': team, 'publications': publications}
+      redirect_url = request.GET.get('next', '')
+      target = None
+      if 'register' in redirect_url:
+        target = '#register'
+      elif 'validate' in redirect_url:
+        target = '#validate'
+      elif 'password_reset' in redirect_url:
+        target = '#password'
+
+      context = {'curricula': curricula, 'redirect_url': redirect_url, 'target': target}
       return render(request, 'ctstem_app/Home.html', context)
 
     return http.HttpResponseNotAllowed(['GET'])
@@ -152,12 +159,14 @@ def curriculum(request, id=''):
           return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
     else:
       curriculum = models.Curriculum()
-      curriculum.author = request.user
 
     newQuestionForm = forms.QuestionForm()
 
     if request.method == 'GET':
-      form = forms.CurriculumForm(instance=curriculum, prefix='curriculum')
+      initial = {}
+      if '' == id:
+        initial['authors'] = [request.user.id]
+      form = forms.CurriculumForm(instance=curriculum, prefix='curriculum', initial=initial)
       #AssessmentStepFormSet = inlineformset_factory(models.Assessment, models.AssessmentStep, form=forms.AssessmentStepForm,can_delete=True, can_order=True, extra=1)
 
       StepFormSet = nestedformset_factory(models.Curriculum, models.Step, form=forms.StepForm,
@@ -184,11 +193,7 @@ def curriculum(request, id=''):
       attachment_formset = AttachmentFormSet(data, request.FILES, instance=curriculum, prefix='attachment_form')
 
       if form.is_valid() and formset.is_valid() and attachment_formset.is_valid():
-        savedCurriculum = form.save(commit=False)
-        if '' == id:
-          savedCurriculum.author = request.user
-        savedCurriculum.save()
-        form.save()
+        savedCurriculum = form.save()
         attachment_formset.save()
         formset.save(commit=False)
         for stepform in formset.ordered_forms:
@@ -559,6 +564,9 @@ def copyCurriculumMeta(request, id=''):
 
 @login_required
 def copyCurriculumSteps(request, original_curriculum, new_curriculum):
+  import os
+  now = datetime.datetime.now()
+  dt = now.strftime("%Y-%m-%d-%H-%M-%S-%f")
 
   steps = models.Step.objects.all().filter(curriculum=original_curriculum)
   for step in steps:
@@ -571,6 +579,17 @@ def copyCurriculumSteps(request, original_curriculum, new_curriculum):
       question = step_question.question
       question.id = None
       question.pk = None
+      if question.sketch_background:
+        try:
+          source = question.sketch_background
+          filecontent = ContentFile(source.file.read())
+          filename = os.path.split(source.file.name)[-1]
+          filename_array = filename.split('.')
+          filename = filename_array[0][:10] + '_' + dt + '.' + filename_array[1]
+          question.sketch_background.save(filename, filecontent)
+          source.file.close()
+        except IOError, e:
+          question.sketch_background = None
       question.save()
 
       step_question.id = None
@@ -663,7 +682,7 @@ def assignCurriculum(request, id=''):
     elif hasattr(request.user, 'school_administrator'):
       groups = models.UserGroup.objects.all().filter(teacher__school = request.user.school_administrator.school, is_active=True)
     elif hasattr(request.user, 'teacher'):
-      groups = models.UserGroup.objects.all().filter(teacher = request.user.teacher, is_active=True)
+      groups = models.UserGroup.objects.all().filter(Q(teacher=request.user.teacher) | Q(shared_with=request.user.teacher), Q(is_active=True)).distinct()
     else:
       return http.HttpResponseNotFound('<h1>You do not have the privilege to assign this curriculum</h1>')
 
@@ -724,10 +743,58 @@ def assignCurriculum(request, id=''):
   except models.Curriculum.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested curriculum not found</h1>')
 
+
+
+####################################
+# PRE-REGISTER
+# if student email exists, add them to the class
+# else redirect to the full registration page with prepopulated email
+####################################
+def preregister(request, group_code=''):
+  if group_code:
+    group = models.UserGroup.objects.get(group_code=group_code)
+    group_id = group.id
+    school = group.teacher.school
+
+    if request.method == 'GET':
+      form = forms.PreRegistrationForm()
+      context = {'form': form, 'group_code': group_code}
+      return render(request, 'ctstem_app/PreRegistration.html', context)
+
+    elif request.method == 'POST':
+      response_data = {}
+      form = forms.PreRegistrationForm(data=request.POST)
+      if form.is_valid(group_id):
+        email = form.cleaned_data['email']
+        try:
+          #if student exists, add them to the class and send a notification
+          student = models.Student.objects.get(user__email=email)
+          membership, created = models.Membership.objects.get_or_create(student=student, group=group)
+          send_added_to_group_confirmation_email(email, group)
+          response_data['success'] = True
+          response_data['message'] ='You have been added to the class %s.  You may now login to do your assignments. An email has been sent with instructions on resetting your password.' % group.title
+          response_data['redirect_url'] = '/'
+
+        except models.Student.DoesNotExist:
+          # if student does not exist, redirect to a full registration form
+          response_data['success'] = True
+          response_data['redirect_url'] = "/?next=/register/group/%s/%s" %(group_code, email)
+
+      else:
+        context = {'form': form, 'group_code': group_code}
+        response_data['success'] = False
+        response_data['html'] = render_to_string('ctstem_app/PreRegistration.html', context, context_instance=RequestContext(request))
+
+      return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+
+    return http.HttpResponseNotAllowed(['GET', 'POST'])
+  else:
+    return http.HttpResponseNotFound('<h1>Invalid URL</h1>')
+
 ####################################
 # REGISTER
 ####################################
-def register(request, group_code=''):
+def register(request, group_code='', email=''):
   group_id = None
   if group_code:
     group = models.UserGroup.objects.get(group_code=group_code)
@@ -747,6 +814,7 @@ def register(request, group_code=''):
     #print request.POST.copy()
     school_form = None
     new_school = None
+    response_data = {}
     if group_id:
       form = forms.RegistrationForm(user=request.user, data=request.POST, group_id=group_id)
     else:
@@ -756,17 +824,19 @@ def register(request, group_code=''):
     if form.is_valid():
       # checking for bot signup
       # anonymous users signing up as teachers need to go through recaptcha validation
-      if request.user.is_anonymous() and group_id == '':
+      if request.user.is_anonymous() and group_id is None:
         recaptcha_response = request.POST.get('g-recaptcha-response')
         is_human = validate_recaptcha(request, recaptcha_response)
         if not is_human:
           context = {'form': form, 'school_form': school_form, 'other_school': other_school, 'recaptcha_error':  'Invalid reCAPTCHA'}
-          return render(request, 'ctstem_app/Registration.html', context)
+          response_data['success'] = False
+          response_data['html'] = render_to_string('ctstem_app/RegistrationModal.html', context, context_instance=RequestContext(request))
+          return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 
       #convert username to lowercase
       username = form.cleaned_data['username'].lower()
       user = User.objects.create_user(username,
-                                      form.cleaned_data['email'],
+                                      form.cleaned_data['email'].lower(),
                                       form.cleaned_data['password1'])
       user.first_name = form.cleaned_data['first_name']
       user.last_name = form.cleaned_data['last_name']
@@ -802,8 +872,9 @@ def register(request, group_code=''):
             print school_form.errors
             user.delete()
             context = {'form': form, 'school_form': school_form, 'other_school': other_school }
-            return render(request, 'ctstem_app/Registration.html', context)
-
+            response_data['success'] = False
+            response_data['html'] = render_to_string('ctstem_app/RegistrationModal.html', context, context_instance=RequestContext(request))
+            return http.HttpResponse(json.dumps(response_data), content_type="application/json")
         else:
           newUser.school = form.cleaned_data['school']
         newUser.user = user
@@ -819,10 +890,6 @@ def register(request, group_code=''):
         newUser.save()
         if group_id:
           membership, created = models.Membership.objects.get_or_create(student=newUser, group=group)
-          #check if the student was a group invitee and remove the student invitation
-          invitation = models.GroupInvitee.objects.filter(email=user.email, group=group)
-          if invitation:
-            invitation.delete()
 
         role = 'student'
 
@@ -843,7 +910,6 @@ def register(request, group_code=''):
         newUser.save()
         role = 'content author'
 
-
       current_site = Site.objects.get_current()
       domain = current_site.domain
 
@@ -852,17 +918,18 @@ def register(request, group_code=''):
         #account type created is Admin, Researcher, Content Author, School Principal
         if form.cleaned_data['account_type'] in ['A', 'R', 'C', 'P']:
           #send an email to the registering user
-          messages.info(request, 'Your account is pending admin approval.  You will be notified once your account is approved.')
-          #send email confirmation
           send_account_pending_email(role, newUser.user)
-          return shortcuts.redirect('ctstem:home')
+          response_data['success'] = True
+          response_data['message'] = 'Your account is pending admin approval.  You will be notified once your account is approved.'
+
 
         #account type created is Teacher
         elif form.cleaned_data['account_type'] == 'T':
           #send an email with the username and validation code to validate the account
-          messages.info(request, 'An email has been sent to %s to validate your account.  Please validate your account with in 24 hours.' % newUser.user.email)
           send_teacher_account_validation_email(newUser)
-          return shortcuts.redirect('ctstem:home')
+          response_data['success'] = True
+          response_data['message'] = 'An email has been sent to %s to validate your account.  Please validate your account with in 24 hours.' % newUser.user.email
+
 
         #account type created is Student
         elif form.cleaned_data['account_type'] == 'S':
@@ -872,35 +939,47 @@ def register(request, group_code=''):
           messages.info(request, 'Your have successfully registered.')
 
           send_student_account_by_self_confirmation_email(newUser.user, group)
-          return shortcuts.redirect('ctstem:home')
+          response_data['success'] = True
+
+        else:
+          response_data['success'] = False
+          messages.error(request, 'Sorry you cannot create this user account')
+
+        response_data['redirect_url'] = '/'
 
       else:
-        messages.info(request, '%s account has been created.' % role.title())
+        response_data['message'] = '%s account has been created.' % role.title()
         send_account_by_admin_confirmation_email(role, newUser.user, form.cleaned_data['password1'])
-
+        url = '/'
         if form.cleaned_data['account_type'] == 'A':
-          return shortcuts.redirect('ctstem:users', role='admins')
+          url = '/users/admins'
         elif form.cleaned_data['account_type'] == 'R':
-          return shortcuts.redirect('ctstem:users', role='researchers')
+          url = '/users/researchers'
         elif form.cleaned_data['account_type'] == 'P':
-          return shortcuts.redirect('ctstem:users', role='school_administrators')
+          url = '/users/school_administrators'
         elif form.cleaned_data['account_type'] == 'C':
-          return shortcuts.redirect('ctstem:users', role='authors')
+          url = '/users/authors'
         elif form.cleaned_data['account_type'] == 'T':
-          return shortcuts.redirect('ctstem:users', role='teachers')
+          url = '/users/teachers'
         elif form.cleaned_data['account_type'] == 'S':
-          return shortcuts.redirect('ctstem:users', role='students')
-        return render(request, 'ctstem_app/About_us.html')
+          url = '/users/students'
+
+        response_data['success'] = True
+        response_data['redirect_url'] = url
 
     else:
       print form.errors
       if group_id:
-        context = {'form': form, 'group_id': group_id, 'school_id': school.id}
+        context = {'form': form, 'group_id': group_id, 'school_id': school.id, 'group_code': group_code, 'email': email}
       else:
+        school_form.is_valid()
         context = {'form': form, 'school_form': school_form, 'other_school': other_school }
+      response_data['success'] = False
+      response_data['html'] = render_to_string('ctstem_app/RegistrationModal.html', context, context_instance=RequestContext(request))
 
-      return render(request, 'ctstem_app/Registration.html', context)
+    return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 
+  ########### GET ###################
   else:
     print request.user
 
@@ -909,18 +988,12 @@ def register(request, group_code=''):
       return shortcuts.redirect('ctstem:home')
 
     if group_id:
-      if 'email' in request.GET:
-        email = request.GET['email']
-        #validate the email is a valid group invitee
-        try:
-          invitee = models.GroupInvitee.objects.get(email=email, group__id=group_id)
-        except models.GroupInvitee.DoesNotExist:
-          return http.HttpResponseNotFound('<h1>Invalid invitation link.  Please use the link found to your email.</h1>')
-
+      if email:
         form = forms.RegistrationForm(initial={'email': email}, user=request.user, group_id=group_id)
+        context = {'form': form, 'group_id': group_id, 'school_id': school.id, 'group_code': group_code, 'email': email}
       else:
         form = forms.RegistrationForm(user=request.user, group_id=group_id)
-      context = {'form': form, 'group_id': group_id, 'school_id': school.id}
+        context = {'form': form, 'group_id': group_id, 'school_id': school.id, 'group_code': group_code}
     elif request.user.is_anonymous():
       form = forms.RegistrationForm(user=request.user)
       school_form = forms.SchoolForm(instance=school, prefix='school')
@@ -939,7 +1012,7 @@ def register(request, group_code=''):
       school_form = forms.SchoolForm(instance=school, prefix='school')
       context = {'form': form, 'school_form': school_form, 'other_school': other_school}
 
-    return render(request, 'ctstem_app/Registration.html', context)
+    return render(request, 'ctstem_app/RegistrationModal.html', context)
 
 ####################################
 # Validate reCAPTCHA response during
@@ -966,30 +1039,50 @@ def validate_recaptcha(request, recaptcha_response):
 ####################################
 def user_login(request):
   username = password = ''
-  if 'POST' == request.method:
-    username = request.POST.get('username').lower()
-    password = request.POST.get('password')
-    user = authenticate(username=username, password=password)
+  print request.method
+  if request.method == 'POST':
+    data = request.POST.copy()
+    form = forms.LoginForm(data)
     response_data = {}
-    if user is not None and user.is_active:
-      login(request, user)
-      response_data['result'] = 'Success'
-      if hasattr(user, 'teacher'):
-        response_data['role'] = 'teacher'
-        messages.success(request, "Welcome to the CT-STEM website.  If you need help with using the site, you can checkout the help videos on the Training page <a href='/training#help_videos'>here</a>", extra_tags='safe');
-      else:
-        response_data['role'] = 'non-teacher'
-        messages.success(request, "You have logged in")
-    else:
-      response_data['result'] = 'Failed'
-      if user and user.is_active == False:
-        response_data['message'] = 'Your account has not been activated'
-      else:
-        response_data['message'] = 'Your username and/or password is invalid'
-    return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+    if form.is_valid():
+      username_email = form.cleaned_data['username_email'].lower()
+      password = form.cleaned_data['password']
+      username = None
+      if User.objects.filter(username__iexact=username_email).count() == 1:
+        username = username_email
+      elif User.objects.filter(email__iexact=username_email).count() == 1:
+        username = User.objects.get(email__iexact=username_email).username.lower()
+      user = authenticate(username=username, password=password)
 
-  elif 'GET' == request.method:
-    return shortcuts.redirect('ctstem:home')
+      if user.is_active:
+        login(request, user)
+        if hasattr(user, 'teacher'):
+          messages.success(request, "Welcome to the CT-STEM website.  If you need help with using the site, you can checkout the help videos on the Training page <a href='/training#help_videos'>here</a>", extra_tags='safe');
+          response_data['success'] = True
+          response_data['redirect_url'] = '/groups/active/'
+
+        else:
+          messages.success(request, "You have logged in")
+          response_data['success'] = True
+          response_data['redirect_url'] = '/'
+
+      else:
+        messages.error(request, 'Your account has not been activated')
+        context = {'form': form}
+        response_data['success'] = False
+        response_data['html'] = render_to_string('ctstem_app/LoginModal.html', context, context_instance=RequestContext(request))
+    else:
+      context = {'form': form}
+      response_data['success'] = False
+      response_data['html'] = render_to_string('ctstem_app/LoginModal.html', context, context_instance=RequestContext(request))
+
+    return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+  elif request.method == 'GET':
+    form = forms.LoginForm()
+    context = {'form': form}
+    return render(request, 'ctstem_app/LoginModal.html', context)
+
+  return http.HttpResponseNotAllowed(['GET', 'POST'])
 
 ####################################
 # USER LOGOUT
@@ -1095,8 +1188,9 @@ def userProfile(request, id=''):
           data.__setitem__('author-user', author.user.id)
       elif role == 'school_administrator':
           data.__setitem__('school_administrator-user', school_administrator.user.id)
-      #convert username to lowercase before save
+      #convert username and email to lowercase before save
       data.__setitem__('user-username', data.__getitem__('user-username').lower())
+      data.__setitem__('user-email', data.__getitem__('user-email').lower())
       data.__setitem__('user-password', user.password)
       data.__setitem__('user-last_login', user.last_login)
       data.__setitem__('user-date_joined', user.date_joined)
@@ -1114,7 +1208,7 @@ def userProfile(request, id=''):
       elif role == 'school_administrator':
         profileform = forms.SchoolAdministratorForm(user=request.user, data=data, instance=school_administrator, prefix='school_administrator')
 
-      if userform.is_valid():
+      if userform.is_valid(id):
         if profileform is None:
           userform.save()
           messages.success(request, "User profile saved successfully")
@@ -1189,10 +1283,10 @@ def consent(request):
     response_data = {}
     if form.is_valid():
       form.save()
-      response_data['result'] = 'Success'
+      response_data['success'] = True
       messages.success(request, "Thank you for submitting the opt-in form")
     else:
-      response_data['result'] = 'Failed'
+      response_data['success'] = False
       response_data['message'] = 'Please select "I Agree" or "I Disagree" and submit this form to proceed'
     return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 
@@ -1270,18 +1364,12 @@ def transferCurriculum(request, user):
 def removeStudent(request, group_id='', student_id=''):
   try:
     # check if the user has permission to create or modify a group
-    if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'school_administrator') == False and hasattr(request.user, 'teacher') == False :
-      return http.HttpResponseNotFound('<h1>You do not have the privilege to remove users from this group</h1>')
-    # check if the lesson exists
+    has_permission = check_group_permission(request, group_id)
+    if not has_permission:
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to remove users from this class</h1>')
 
     group = models.UserGroup.objects.get(id=group_id)
     student = models.Student.objects.get(id=student_id)
-    if hasattr(request.user, 'teacher'):
-      if request.user.teacher != group.teacher:
-        return http.HttpResponseNotFound('<h1>You do not have the privilege to remove users from this group</h1>')
-    elif hasattr(request.user, 'school_administrator'):
-      if request.user.school_administrator.school != group.teacher.school:
-        return http.HttpResponseNotFound('<h1>You do not have the privilege to remove users from this group</h1>')
 
     if request.method == 'GET' or request.method == 'POST':
       membership = models.Membership.objects.get(group=group, student=student)
@@ -1292,7 +1380,7 @@ def removeStudent(request, group_id='', student_id=''):
     return http.HttpResponseNotAllowed(['GET', 'POST'])
 
   except models.UserGroup.DoesNotExist:
-    return http.HttpResponseNotFound('<h1>Requested group not found</h1>')
+    return http.HttpResponseNotFound('<h1>Requested class not found</h1>')
   except models.Student.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested student not found</h1>')
 
@@ -1303,18 +1391,12 @@ def removeStudent(request, group_id='', student_id=''):
 def addStudent(request, group_id='', student_id=''):
   try:
     # check if the user has permission to create or modify a group
-    if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'school_administrator') == False and hasattr(request.user, 'teacher') == False :
-      return http.HttpResponseNotFound('<h1>You do not have the privilege to add users from this group</h1>')
-    # check if the lesson exists
+    has_permission = check_group_permission(request, group_id)
+    if not has_permission:
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to add students to this class</h1>')
 
     group = models.UserGroup.objects.get(id=group_id)
     student = models.Student.objects.get(id=student_id)
-    if hasattr(request.user, 'teacher'):
-      if request.user.teacher != group.teacher:
-        return http.HttpResponseNotFound('<h1>You do not have the privilege to remove users from this group</h1>')
-    elif hasattr(request.user, 'school_administrator'):
-      if request.user.school_administrator.school != group.teacher.school:
-        return http.HttpResponseNotFound('<h1>You do not have the privilege to remove users from this group</h1>')
 
     if request.method == 'POST':
       membership = models.Membership.objects.get_or_create(group=group, student=student)
@@ -1325,7 +1407,7 @@ def addStudent(request, group_id='', student_id=''):
     return http.HttpResponseNotAllowed(['POST'])
 
   except models.UserGroup.DoesNotExist:
-    return http.HttpResponseNotFound('<h1>Requested group not found</h1>')
+    return http.HttpResponseNotFound('<h1>Requested class not found</h1>')
   except models.Student.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested student not found</h1>')
 
@@ -1337,8 +1419,11 @@ def createStudent(request, group_id=''):
   try:
     # check if the user has permission to create a student
     import re
-    if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'school_administrator') == False and hasattr(request.user, 'teacher') == False :
-      return http.HttpResponseNotFound('<h1>You do not have the privilege to create a student</h1>')
+    # check if the user has permission to create or modify a group
+    has_permission = check_group_permission(request, group_id)
+    if not has_permission:
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to add students from this class</h1>')
+
     if request.method == 'POST':
       data=request.POST
       response_data = {}
@@ -1378,7 +1463,7 @@ def createStudent(request, group_id=''):
     return http.HttpResponseNotAllowed(['POST'])
 
   except models.UserGroup.DoesNotExist:
-    return http.HttpResponseNotFound('<h1>Requested group not found</h1>')
+    return http.HttpResponseNotFound('<h1>Requested class not found</h1>')
   except models.Student.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested student not found</h1>')
 
@@ -1581,7 +1666,7 @@ def searchStudents(request):
 @login_required
 def searchTeachers(request):
   # check if the user has permission to add a question
-  if hasattr(request.user, 'author') == False and hasattr(request.user, 'researcher') == False and  hasattr(request.user, 'administrator') == False:
+  if request.user.is_anonymous() or hasattr(request.user, 'student'):
     return http.HttpResponseNotFound('<h1>You do not have the privilege search teachers</h1>')
 
   if 'GET' == request.method:
@@ -1601,6 +1686,11 @@ def searchTeachers(request):
       query_filter['user__last_name__icontains'] = str(data['last_name'])
     if data['email']:
       query_filter['user__email__icontains'] = str(data['email'])
+
+    if hasattr(request.user, 'teacher'):
+      query_filter['school'] = request.user.teacher.school
+    elif hasattr(request.user, 'school_administrator'):
+      query_filter['school'] = request.user.school_administrator.school
 
     print query_filter
     teacherList = models.Teacher.objects.filter(**query_filter)
@@ -1693,7 +1783,7 @@ def _do_action(request, id_list, model, object_id=None):
     if u'remove_selected' == action_params.get(u'action'):
       for user in users:
         removeStudent(request, object_id, user.student.id)
-      messages.success(request, "Selected student(s) removed from group.")
+      messages.success(request, "Selected student(s) removed from class.")
       return True
     elif u'activate_selected' == action_params.get(u'action'):
       for user in users:
@@ -1741,13 +1831,13 @@ def _do_action(request, id_list, model, object_id=None):
     if u'activate_selected' == action_params.get(u'action'):
       groups.update(is_active=True)
       print 'activation done'
-      messages.success(request, "Selected group(s) activated.")
+      messages.success(request, "Selected class(es) activated.")
       return True
     elif u'inactivate_selected' == action_params.get(u'action'):
       groups.update(is_active=False)
       #archive assignments
       archiveAssignments(request, id_list)
-      messages.success(request, "Selected group(s) inactivated.")
+      messages.success(request, "Selected class(es) inactivated.")
       return True
   else:
     return False
@@ -1896,6 +1986,7 @@ def publication(request, slug=''):
   except models.Publication.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested publication not found</h1>')
 
+
 ####################################
 # DELETE PUBLICATION
 ####################################
@@ -1940,9 +2031,9 @@ def groups(request, status='active'):
     if status == 'inactive':
       is_active = False
     if hasattr(request.user, 'administrator') or hasattr(request.user, 'researcher'):
-      groups = models.UserGroup.objects.all().filter(is_active=is_active).order_by('title')
+      groups = models.UserGroup.objects.all().filter(is_active=is_active)
     elif hasattr(request.user, 'school_administrator'):
-      groups = models.UserGroup.objects.all().filter(is_active=is_active, teacher__school=request.user.school_administrator.school).order_by('title')
+      groups = models.UserGroup.objects.all().filter(is_active=is_active, teacher__school=request.user.school_administrator.school)
     elif hasattr(request.user, 'teacher'):
       if is_active == True:
         group_count = models.UserGroup.objects.all().filter(teacher=request.user.teacher).count()
@@ -1950,10 +2041,11 @@ def groups(request, status='active'):
           new_group = models.UserGroup(title='My Class 1', teacher=request.user.teacher, is_active=True)
           new_group.save()
 
-      groups = models.UserGroup.objects.all().filter(is_active=is_active, teacher=request.user.teacher).order_by('title')
+      groups = models.UserGroup.objects.all().filter(Q(is_active=is_active), Q(teacher=request.user.teacher) | Q(shared_with=request.user.teacher)).distinct()
+      print groups
 
     else:
-      return http.HttpResponseNotFound('<h1>You do not have the privilege to view student groups</h1>')
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to view classes</h1>')
     current_site = Site.objects.get_current()
     domain = current_site.domain
     uploadForm = forms.UploadFileForm(user=request.user)
@@ -1970,37 +2062,40 @@ def groups(request, status='active'):
 def group(request, id=''):
   try:
     # check if the user has permission to create or modify a group
-    if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'school_administrator') == False and hasattr(request.user, 'teacher') == False :
-      return http.HttpResponseNotFound('<h1>You do not have the privilege to create/modify a class</h1>')
-    # check if the lesson exists
+    group = None
     if '' != id:
-      group = models.UserGroup.objects.get(id=id)
-      if hasattr(request.user, 'teacher'):
-        if request.user.teacher != group.teacher:
-          return http.HttpResponseNotFound('<h1>You do not have the privilege to view/modify this class</h1>')
-      elif hasattr(request.user, 'school_administrator'):
-        if request.user.school_administrator.school != group.teacher.school:
-          return http.HttpResponseNotFound('<h1>You do not have the privilege to view/modify this class</h1>')
+      has_permission = check_group_permission(request, id)
+      if has_permission:
+        group = models.UserGroup.objects.get(id=id)
+      else:
+        return http.HttpResponseNotFound('<h1>You do not have the privilege to view/modify this class</h1>')
     else:
-      group = models.UserGroup()
+      if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'school_administrator') == False and hasattr(request.user, 'teacher') == False:
+        return http.HttpResponseNotFound('<h1>You do not have the privilege to create/modify a class</h1>')
+      else:
+        group = models.UserGroup()
 
     if request.method in ['GET', 'POST']:
       assignments = {}
-
+      keys = []
       for assignment in models.Assignment.objects.all().filter(group=group).order_by('curriculum__unit__title', 'curriculum__order'):
         instances = models.AssignmentInstance.objects.all().filter(assignment=assignment)
         curriculum = assignment.curriculum
 
-        if curriculum.curriculum_type == 'L' and curriculum.unit is not None:
+        if curriculum.curriculum_type in ['L', 'A'] and curriculum.unit is not None:
           key = curriculum.unit
         else:
           key = curriculum
 
-        if key in assignments:
-          assignments[key].append(assignment)
-        else:
-            assignments[key] = [assignment]
+        if key not in keys:
+          keys.append(key)
 
+        if key in assignments:
+          assignments[key][curriculum.order] = assignment
+        else:
+          assignments[key] = {curriculum.order: assignment}
+
+      keys.sort(key=lambda x:x.title)
       uploadForm = forms.UploadFileForm(user=request.user)
       assignmentForm = forms.AssignmentSearchForm(user=request.user)
       studentSearchForm = forms.StudentSearchForm()
@@ -2008,13 +2103,13 @@ def group(request, id=''):
 
       if request.method == 'GET':
           form = forms.UserGroupForm(user=request.user, instance=group, prefix='group')
-          context = {'form': form, 'role': 'group', 'uploadForm': uploadForm, 'assignmentForm': assignmentForm, 'studentSearchForm': studentSearchForm, 'studentAddForm': studentAddForm, 'assignments': assignments}
+          context = {'form': form, 'role': 'group', 'uploadForm': uploadForm, 'assignmentForm': assignmentForm, 'studentSearchForm': studentSearchForm, 'studentAddForm': studentAddForm, 'assignments': assignments, 'keys': keys}
           return render(request, 'ctstem_app/UserGroup.html', context)
 
       elif request.method == 'POST':
         data = request.POST.copy()
-        #print data
-        form = forms.UserGroupForm(user=request.user, data=data, instance=group, prefix="group")
+        form = forms.UserGroupForm(user=request.user, data=data, files=request.FILES, instance=group, prefix="group")
+
         if form.is_valid():
           savedGroup = form.save()
           #if group is being inactivated, archive the associated assignments
@@ -2031,7 +2126,7 @@ def group(request, id=''):
         else:
           print form.errors
           messages.error(request, "The class could not be saved because there were errors.  Please check the errors below.")
-          context = {'form': form, 'role': 'group', 'uploadForm': uploadForm, 'assignmentForm': assignmentForm, 'studentSearchForm': studentSearchForm, 'studentAddForm': studentAddForm, 'assignments': assignments}
+          context = {'form': form, 'role': 'group', 'uploadForm': uploadForm, 'assignmentForm': assignmentForm, 'studentSearchForm': studentSearchForm, 'studentAddForm': studentAddForm, 'assignments': assignments, 'keys': keys}
           return render(request, 'ctstem_app/UserGroup.html', context)
 
     return http.HttpResponseNotAllowed(['GET', 'POST'])
@@ -2077,19 +2172,19 @@ def searchAssignment(request):
           underlying_curriculum_queryset = curriculum.underlying_curriculum.all().filter(status='P')
           underlying_curriculum = []
           unit_assigned = False
-          lesson_assigned_count = 0
-          for lesson in underlying_curriculum_queryset.order_by('order'):
-            lesson_assigned = False
-            assignments = models.Assignment.objects.all().filter(curriculum=lesson, group__id=int(data['group']))
+          curriculum_assigned_count = 0
+          for und_curr in underlying_curriculum_queryset.order_by('order'):
+            curr_assigned = False
+            assignments = models.Assignment.objects.all().filter(curriculum=und_curr, group__id=int(data['group']))
             if assignments.count() > 0:
-              lesson_assigned = True
-              lesson_assigned_count = lesson_assigned_count + 1
-            underlying_curriculum.append({'id': lesson.id, 'title': lesson.title, 'assigned': lesson_assigned})
+              curr_assigned = True
+              curriculum_assigned_count = curriculum_assigned_count + 1
+            underlying_curriculum.append({'id': und_curr.id, 'title': und_curr.title, 'assigned': curr_assigned, 'curriculum_type': und_curr.get_curriculum_type_display()})
 
-          curr['assigned'] = underlying_curriculum_queryset.count() == lesson_assigned_count
+          curr['assigned'] = underlying_curriculum_queryset.count() == curriculum_assigned_count
           curr['underlying_curriculum'] = underlying_curriculum
           curr['underlying_curriculum_count'] = underlying_curriculum_queryset.count()
-          curr['underlying_curriculum_assigned'] = lesson_assigned_count
+          curr['underlying_curriculum_assigned'] = curriculum_assigned_count
         else:
           assigned = False
           assignments = models.Assignment.objects.all().filter(curriculum=curriculum, group__id=int(data['group']))
@@ -2150,7 +2245,7 @@ def deleteGroup(request, id=''):
       raise models.UserGroup.DoesNotExist
 
   except models.UserGroup.DoesNotExist:
-    return http.HttpResponseNotFound('<h1>Requested group not found</h1>')
+    return http.HttpResponseNotFound('<h1>Requested class not found</h1>')
 
 ####################################
 # Group Dashboard
@@ -2160,29 +2255,22 @@ def groupDashboard(request, id=''):
   try:
     if request.method == 'GET':
       group = models.UserGroup.objects.get(id=id)
-
-      privilege = 1
-      if hasattr(request.user, 'administrator') or hasattr(request.user, 'researcher'):
-        privilege = 1
-      elif hasattr(request.user, 'school_administrator'):
-        if group.teacher.school != request.user.school_administrator.school:
-          privilege = 0
-      elif hasattr(request.user, 'teacher'):
-        if group.teacher != request.user.teacher:
-          privilege = 0
+      if hasattr(request.user, 'researcher'):
+        has_permission = True
       else:
-        privilege = 0
+        has_permission = check_group_permission(request, id)
 
-      if privilege == 0:
-        return http.HttpResponseNotFound('<h1>You do not have the privilege to view this group</h1>')
+      if not has_permission:
+        return http.HttpResponseNotFound('<h1>You do not have the privilege to view this class</h1>')
 
       assignments = {}
       serial = 0
       status_map = {'N': 'New', 'P': 'In Progress', 'S': 'Submitted', 'F': 'Feedback Ready', 'A': 'Archived'}
       status_color = {'N': 'gray', 'P': 'blue', 'S': 'green', 'F': 'orange', 'A': 'black'}
+      students = group.members.all()
+      keys = []
 
-      for assignment in models.Assignment.objects.all().filter(group=group).order_by('assigned_date'):
-        students = assignment.group.members.all()
+      for assignment in models.Assignment.objects.all().filter(group=group).order_by('curriculum__unit__title', 'curriculum__order'):
         instances = models.AssignmentInstance.objects.all().filter(assignment=assignment)
         curriculum = models.Curriculum.objects.get(id=assignment.curriculum.id)
         assignment_status = {}
@@ -2208,18 +2296,22 @@ def groupDashboard(request, id=''):
         else:
           key = curriculum
 
-        if key in assignments:
-          assignments[key].append({'assignment': assignment, 'status': status, 'serial': serial})
-        else:
-            assignments[key] = [{'assignment': assignment, 'status': status, 'serial': serial}]
+        if key not in keys:
+          keys.append(key)
 
-      context = {'group': group, 'assignments': assignments}
+        if key in assignments:
+          assignments[key][curriculum.order] = {'assignment': assignment, 'status': status, 'serial': serial}
+        else:
+          assignments[key] = {curriculum.order : {'assignment': assignment, 'status': status, 'serial': serial}}
+
+      keys.sort(key=lambda x:x.title)
+      context = {'group': group, 'assignments': assignments, 'keys': keys}
       return render(request, 'ctstem_app/GroupDashboard.html', context)
 
     return http.HttpResponseNotAllowed(['GET'])
 
   except models.UserGroup.DoesNotExist:
-    return http.HttpResponseNotFound('<h1>Requested group not found</h1>')
+    return http.HttpResponseNotFound('<h1>Requested class not found</h1>')
 
 ####################################
 # Assignment Dashboard
@@ -2229,23 +2321,21 @@ def assignmentDashboard(request, id=''):
   try:
     if request.method == 'GET':
       assignment = models.Assignment.objects.get(id=id)
+      group = assignment.group
 
-      privilege = 1
-      if hasattr(request.user, 'administrator') or hasattr(request.user, 'researcher'):
-        privilege = 1
-      elif hasattr(request.user, 'school_administrator'):
-        if assignment.group.teacher.school !=  request.user.school_administrator.school:
-          privilege = 0
-      elif hasattr(request.user, 'teacher'):
-        if assignment.group.teacher != request.user.teacher:
-          privilege = 0
+      if hasattr(request.user, 'researcher'):
+        has_permission = True
       else:
-        privilege = 0
+        has_permission = check_group_permission(request, group.id)
 
-      if privilege == 0:
-        return http.HttpResponseNotFound('<h1>You do not have the privilege to view this grassignmentoup</h1>')
+      if not has_permission:
+        return http.HttpResponseNotFound('<h1>You do not have the privilege to view this assignment</h1>')
 
       students = assignment.group.members.all()
+      #for researchers filter out students who have opted out
+      if hasattr(request.user, 'researcher'):
+        students = students.filter(consent='A')
+
       instances = models.AssignmentInstance.objects.all().filter(assignment=assignment)
       student_assignment_details = {}
       serial = 1
@@ -2253,7 +2343,7 @@ def assignmentDashboard(request, id=''):
         try:
           instance = instances.get(student=student)
           total_questions = models.CurriculumQuestion.objects.all().filter(step__curriculum=assignment.curriculum).count()
-          attempted_questions = models.QuestionResponse.objects.all().filter(step_response__instance=instance).exclude(response__exact='', responseFile__exact='').count()
+          attempted_questions = models.QuestionResponse.objects.all().filter(step_response__instance=instance).exclude(response__exact='', response_file__isnull=True).count()
           total_steps = instance.assignment.curriculum.steps.count()
           last_step = instance.last_step
           if total_questions > 0:
@@ -2290,7 +2380,7 @@ def assignments(request, bucket=''):
       groups = models.Membership.objects.all().filter(student=student).values_list('group', flat=True)
       #for each group
       tomorrow = datetime.date.today() + datetime.timedelta(days=1)
-      assignments = models.Assignment.objects.all().filter(group__in=groups, assigned_date__lt=tomorrow)
+      assignments = models.Assignment.objects.all().filter(group__in=groups, assigned_date__lt=tomorrow).order_by('curriculum__unit__title', 'curriculum__order')
       assignment_list = []
       active_list = []
       archived_list = []
@@ -2298,10 +2388,11 @@ def assignments(request, bucket=''):
       serial = 1
       status_list = {'N': 1, 'P': 2, 'S': 3, 'F': 4, 'A': 5}
       for assignment in assignments:
+        title = assignment.curriculum.unit.title if assignment.curriculum.unit is not None else assignment.curriculum.title
         try:
           instance = models.AssignmentInstance.objects.get(assignment=assignment, student=student)
           total_questions = models.CurriculumQuestion.objects.all().filter(step__curriculum=assignment.curriculum).count()
-          attempted_questions = models.QuestionResponse.objects.all().filter(step_response__instance=instance).exclude(response__exact='', responseFile__exact='').count()
+          attempted_questions = models.QuestionResponse.objects.all().filter(step_response__instance=instance).exclude(response__exact='', response_file__isnull=True).count()
           total_steps = instance.assignment.curriculum.steps.count()
           last_step = instance.last_step
           percent_complete = 0
@@ -2311,9 +2402,9 @@ def assignments(request, bucket=''):
             percent_complete = float(last_step)/float(total_steps)*100
 
           if instance.status in ['N', 'P', 'S', 'F']:
-            active_list.append({'serial': serial, 'assignment': assignment, 'instance': instance, 'status': status_list[instance.status], 'percent_complete': percent_complete, 'modified_date': instance.modified_date})
+            active_list.append({'serial': serial, 'title': title, 'assignment': assignment, 'instance': instance, 'status': status_list[instance.status], 'percent_complete': percent_complete, 'modified_date': instance.modified_date})
           else:
-            archived_list.append({'serial': serial, 'assignment': assignment, 'instance': instance, 'status': status_list[instance.status], 'percent_complete': percent_complete, 'modified_date': instance.modified_date})
+            archived_list.append({'serial': serial, 'title': title, 'assignment': assignment, 'instance': instance, 'status': status_list[instance.status], 'percent_complete': percent_complete, 'modified_date': instance.modified_date})
         except models.AssignmentInstance.DoesNotExist:
           if assignment.group.is_active:
             #only display new assignments for active groups
@@ -2321,7 +2412,7 @@ def assignments(request, bucket=''):
             new_count += 1
             status = 'N'
             percent_complete = 0
-            active_list.append({'serial': serial, 'assignment': assignment, 'instance': instance, 'status': status_list[status], 'percent_complete': percent_complete, 'modified_date': timezone.now()})
+            active_list.append({'serial': serial, 'title': title, 'assignment': assignment, 'instance': instance, 'status': status_list[status], 'percent_complete': percent_complete, 'modified_date': timezone.now()})
 
         serial += 1
 
@@ -2338,17 +2429,18 @@ def assignments(request, bucket=''):
         sort_by = data['sort_by']
         sort_form = forms.InboxSortForm(data)
 
-      print sort_by
-      if sort_by == 'assigned':
-        assignment_list.sort(key=lambda item:item['assignment'].assigned_date)
-      elif sort_by == 'group':
-        assignment_list.sort(key=lambda item:item['assignment'].group)
-      elif sort_by == 'status':
-        assignment_list.sort(key=lambda item:item['status'])
-      elif sort_by == 'percent':
-        assignment_list.sort(key=lambda item:item['percent_complete'])
-      elif sort_by == 'modified':
-        assignment_list.sort(key=lambda item:item['modified_date'])
+      # print sort_by
+      # if sort_by == 'assigned':
+      #   assignment_list.sort(key=lambda item:item['assignment'].assigned_date)
+      # elif sort_by == 'group':
+      #   assignment_list.sort(key=lambda item:item['assignment'].group)
+      # elif sort_by == 'status':
+      #   assignment_list.sort(key=lambda item:item['status'])
+      # elif sort_by == 'percent':
+      #   assignment_list.sort(key=lambda item:item['percent_complete'])
+      # elif sort_by == 'modified':
+      #   assignment_list.sort(key=lambda item:item['modified_date'])
+      assignment_list.sort(key=lambda item:item['title'])
 
       context = {'assignment_list': assignment_list, 'new': new_count, 'inbox': len(active_list), 'archived': len(archived_list), 'sort_form': sort_form, 'consent': student.consent}
       return render(request, 'ctstem_app/MyAssignments.html', context)
@@ -2661,15 +2753,17 @@ def feedback(request, assignment_id='', instance_id=''):
 
       school = instance.student.school
       group = instance.assignment.group
-      privilege = 0
-      if hasattr(request.user, 'researcher') or hasattr(request.user, 'administrator'):
-        privilege = 1
-      elif hasattr(request.user, 'teacher') and request.user.teacher == group.teacher:
-          privilege = 1
-      elif hasattr(request.user, 'school_administrator') and request.user.school_administrator.school == school:
-        privilege = 1
+      student = instance.student
 
-      if privilege == 0:
+      if hasattr(request.user, 'researcher'):
+        if student.consent == 'A':
+          has_permission = True
+        else:
+          has_permission = False
+      else:
+        has_permission = check_group_permission(request, group.id)
+
+      if not has_permission:
         return http.HttpResponseNotFound('<h1>You do not have the privilege to provide feedback on this assignment</h1>')
 
       feedback, created = models.AssignmentFeedback.objects.get_or_create(instance=instance)
@@ -2696,7 +2790,7 @@ def feedback(request, assignment_id='', instance_id=''):
         return render(request, 'ctstem_app/Feedback.html', context)
       elif 'POST' == request.method:
         data = request.POST.copy()
-        print data
+
         form = forms.FeedbackForm(data, instance=feedback, prefix='feedback')
         #AssessmentStepFormSet = inlineformset_factory(models.Assessment, models.AssessmentStep, form=forms.AssessmentStepForm,can_delete=True, can_order=True, extra=1)
 
@@ -2706,8 +2800,6 @@ def feedback(request, assignment_id='', instance_id=''):
 
 
         formset = StepFeedbackFormSet(data, instance=feedback, prefix='form')
-        print form.is_valid()
-        print formset.is_valid()
         if form.is_valid() and formset.is_valid():
           form.save()
           formset.save()
@@ -2793,6 +2885,7 @@ def deleteAssignment(request, assignment_id=''):
   # check if the user has permission to do this operation
   has_permission = check_assignment_permission(request, assignment_id)
   response_data = {'success': False }
+
   if has_permission:
     assignment = models.Assignment.objects.get(id=assignment_id)
     assignment_instances = models.AssignmentInstance.objects.all().filter(assignment__id=assignment_id)
@@ -2804,13 +2897,17 @@ def deleteAssignment(request, assignment_id=''):
     if status == 'N':
       assignment.delete()
       response_data['success'] = True
+
   if request.is_ajax():
     return http.HttpResponse(json.dumps(response_data), content_type="application/json")
   else:
-    if status == 'N':
-      messages.success(request, 'The assignment %s has been deleted' % (assignment.curriculum))
+    if has_permission:
+      if status == 'N':
+        messages.success(request, 'The assignment %s has been deleted' % (assignment.curriculum))
+      else:
+        messages.error(request, 'The assignment %s is in progress and cannot be deleted' % (assignment.curriculum))
     else:
-      messages.error(request, 'The assignment %s is in progress and cannot be deleted' % (assignment.curriculum))
+      messages.error(request, 'You do not have the permission to delete this assignment')
 
     return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
@@ -2845,41 +2942,37 @@ def addAssignment(request, curriculum_id='', group_id=''):
 ####################################
 @login_required
 def check_group_permission(request, group_id=''):
-  has_permission = False
+  has_permission = True
   try:
     group = models.UserGroup.objects.get(id=group_id)
-    if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'researcher') == False and hasattr(request.user, 'teacher') == False and hasattr(request.user, 'school_administrator') == False:
+    if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'teacher') == False and hasattr(request.user, 'school_administrator') == False:
       has_permission = False
-    elif hasattr(request.user, 'school_administrator') and group.teacher.school !=  request.user.school_administrator.school:
+    elif hasattr(request.user, 'school_administrator') and group.teacher.school != request.user.school_administrator.school:
       has_permission = False
-    elif hasattr(request.user, 'teacher') and group.teacher != request.user.teacher:
+    elif hasattr(request.user, 'teacher') and group.teacher != request.user.teacher and request.user.teacher not in group.shared_with.all():
       has_permission = False
-    else:
-      has_permission = True
+
   except models.UserGroup.DoesNotExist:
     has_permission = False
 
   return has_permission
+
 
 ####################################
 # check if the user has permission to do this operation on assignment
 ####################################
 @login_required
 def check_assignment_permission(request, assignment_id=''):
-  has_permission = False
+  has_permission = True
   try:
     assignment = models.Assignment.objects.get(id=assignment_id)
-    print assignment
-    if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'researcher') == False and hasattr(request.user, 'teacher') == False and hasattr(request.user, 'school_administrator') == False:
-      has_permission = False
-    elif hasattr(request.user, 'school_administrator') and assignment.group.teacher.school !=  request.user.school_administrator.school:
-      has_permission = False
-    elif hasattr(request.user, 'teacher') and assignment.group.teacher != request.user.teacher:
-      has_permission = False
-    else:
-      has_permission = True
+    group = assignment.group
+    has_permission = check_group_permission(request, group.id)
+
   except models.Assignment.DoesNotExist:
     has_permission = False
+  except models.UserGroup.DoesNotExist:
+     has_permission = False
 
   return has_permission
 
@@ -2889,17 +2982,20 @@ def check_assignment_permission(request, assignment_id=''):
 ####################################
 @login_required
 def export_response(request, assignment_id='', student_id=''):
-  # check if the user has permission to add a question
-  if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'researcher') == False and hasattr(request.user, 'teacher') == False and hasattr(request.user, 'school_administrator') == False:
-    return http.HttpResponseNotFound('<h1>You do not have the privilege to export student response</h1>')
   try:
     assignment = models.Assignment.objects.get(id=assignment_id)
-    if hasattr(request.user, 'school_administrator'):
-      if assignment.group.teacher.school !=  request.user.school_administrator.school:
-        return http.HttpResponseNotFound('<h1>You do not have the privilege to export student responses for this assignment</h1>')
-    elif hasattr(request.user, 'teacher'):
-      if assignment.group.teacher != request.user.teacher:
-        return http.HttpResponseNotFound('<h1>You do not have the privilege to export student responses for this assignment</h1>')
+    group = assignment.group
+    if hasattr(request.user, 'researcher'):
+      has_permission = True
+      if '' != student_id:
+        student = models.Student.objects.get(id=student_id)
+        if student.consent != 'A':
+          has_permission = False
+    else:
+      has_permission = check_group_permission(request, group.id)
+
+    if not has_permission:
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to export student response for this assignment</h1>')
 
     response = http.HttpResponse(content_type='application/ms-excel')
     if '' != student_id:
@@ -2908,6 +3004,9 @@ def export_response(request, assignment_id='', student_id=''):
       response['Content-Disposition'] = 'attachment; filename="%s-%s.xls"'% (assignment, student)
     else:
       instances = models.AssignmentInstance.objects.all().filter(assignment=assignment)
+      #for researchers filter out students who have opted out
+      if hasattr(request.user, 'researcher'):
+        instances = instances.filter(student__consent='A')
       response['Content-Disposition'] = 'attachment; filename="%s.xls"'%assignment
 
 
@@ -3019,8 +3118,6 @@ def export_all_response(request, curriculum_id=''):
         columns.insert(0, 'School')
         font_styles.insert(0, font_style)
 
-
-
     curricula = []
 
     if curriculum.curriculum_type != 'U':
@@ -3034,11 +3131,15 @@ def export_all_response(request, curriculum_id=''):
       elif hasattr(request.user, 'school_administrator') == True:
         assignments = models.Assignment.objects.all().filter(curriculum__id = curr.id, group__teacher__school = request.user.school_administrator.school)
       elif hasattr(request.user, 'teacher') == True:
-        assignments = models.Assignment.objects.all().filter(curriculum__id = curr.id, group__teacher = request.user.teacher)
+        assignments = models.Assignment.objects.all().filter(Q(curriculum__id = curr.id), Q(group__teacher = request.user.teacher) | Q(group__shared_with = request.user.teacher))
       else:
         return http.HttpResponseNotFound('<h1>You do not have the privilege to export student response for the selected curriculum</h1>')
 
       instances = models.AssignmentInstance.objects.all().filter(assignment__in=assignments)
+      #for researchers filter out students who have opted out
+      if hasattr(request.user, 'researcher'):
+        instances = instances.filter(student__consent='A')
+
       sheet_title = curr.title
       for ch in "[]:*?/\\":
         if ch in curr.title:
@@ -3116,7 +3217,7 @@ def get_response_text(request, instance_id, questionResponse):
   if answer_field_type == 'SK' or answer_field_type == 'DT':
     current_site = Site.objects.get_current()
     domain = current_site.domain
-    response_text = 'http://%s/response/%d/%d'%(domain, instance_id, questionResponse.id)
+    response_text = 'https://%s/response/%d/%d'%(domain, instance_id, questionResponse.id)
   elif answer_field_type == 'FI':
     uploaded_files = questionResponse.response_file.all()
     response_text = ''
@@ -3150,16 +3251,18 @@ def question(request, id=''):
 
   elif 'POST' == request.method:
     data = request.POST.copy()
-    print data
     questionForm = forms.QuestionForm(data, request.FILES, instance=question)
+    response_data = {}
     if questionForm.is_valid():
       question = questionForm.save()
-      response_data = {'question_id': question.id, 'question_text': question.question_text}
-      return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+      response_data = {'success': True, 'question_id': question.id, 'question_text': question.question_text}
     else:
       print questionForm.errors
-      response_data = {'error': 'Required fields are missing'}
-      return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+      context = {'questionForm': questionForm, 'title': title}
+      html = render_to_string('ctstem_app/Question.html', context, context_instance=RequestContext(request))
+      response_data = {'success': False, 'html': html, 'error': 'The question could not be saved because there were errors. Please check the errors below.'}
+
+    return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 
   return http.HttpResponseNotAllowed(['GET', 'POST'])
 
@@ -3268,42 +3371,51 @@ def user_upload(request):
           invalid +=1
         else:
           #check if email exists
-          if User.objects.filter(email=email).exists():
+          user_count = User.objects.filter(email=email).count()
+          if user_count == 1:
             #check if email belongs to a student
             if models.Student.objects.filter(user__email=email).exists():
-              #add student to group
-              #TODO
               student = models.Student.objects.get(user__email=email)
-              membership, created = models.Membership.objects.get_or_create(student=student, group=group)
-              student_consent = 'Unknown'
-              if student.consent == 'A':
-                student_consent = 'Agree'
-              elif student.consent == 'D':
-                student_consent = 'Disagree'
-              added_students[student.id] = {'user_id': student.user.id, 'username': student.user.username,
-                                            'full_name': student.user.get_full_name(), 'email': student.user.email,
-                                            'status': 'Active' if student.user.is_active else 'Inactive',
-                                            'student_consent':  student_consent, 'parental_consent': student.get_parental_consent_display(),
-                                            'member_since': student.user.date_joined.strftime('%b %d, %Y'),
-                                            'last_login': student.user.last_login.strftime('%b %d, %Y') if student.user.last_login else '', 'group': group.id}
-              send_added_to_group_confirmation_email(email, group)
-              added += 1
+              #if student belongs to the same school as the teacher
+              if group.teacher.school == student.school:
+                membership, created = models.Membership.objects.get_or_create(student=student, group=group)
+                student_consent = 'Unknown'
+                if student.consent == 'A':
+                  student_consent = 'Agree'
+                elif student.consent == 'D':
+                  student_consent = 'Disagree'
+                added_students[student.id] = {'user_id': student.user.id, 'username': student.user.username,
+                                              'full_name': student.user.get_full_name(), 'email': student.user.email,
+                                              'status': 'Active' if student.user.is_active else 'Inactive',
+                                              'student_consent':  student_consent, 'parental_consent': student.get_parental_consent_display(),
+                                              'member_since': student.user.date_joined.strftime('%b %d, %Y'),
+                                              'last_login': student.user.last_login.strftime('%b %d, %Y') if student.user.last_login else '', 'group': group.id}
+                send_added_to_group_confirmation_email(email, group)
+                added += 1
+              else:
+                #error out email does not belong to the same school
+                msg['error'].append('Email %d belongs to a student in a different school' % count)
+                messages.error(request, 'Email %d belongs to a student in a different school' % count)
+                invalid += 1
             else:
-              #error out email in use and does not belong to a student account
+              #error out email in use does not belong to a student account
               msg['error'].append('Email %d does not belong to a student account' % count)
               messages.error(request, 'Email %d does not belong to a student account' % count)
               invalid += 1
+          elif user_count > 1:
+            #error out email because there is more than one account with that email
+            msg['error'].append('Email %d used in more than one user account' % count)
+            messages.error(request, 'Email %d used in more than one user account' % count)
+            invalid += 1
           else:
             #email does not exist.  Send and email with registration link
             send_student_account_request_email(email, group)
-            #add email to group invitee list
-            group_invitee, created = models.GroupInvitee.objects.get_or_create(group=group, email=email)
 
             new += 1
 
       if added:
-        msg['success'].append('Existing students added to the group: %d' % (added))
-        messages.success(request, 'Existing students added to the group: %d' % (added))
+        msg['success'].append('Existing students added to the class: %d' % (added))
+        messages.success(request, 'Existing students added to the class: %d' % (added))
       if new:
         msg['success'].append('Email sent to new students to create an account: %d' % (new))
         messages.success(request, 'Email sent to new students to create an account: %d' % (new))
@@ -3311,10 +3423,11 @@ def user_upload(request):
         msg['error'].append('Invalid emails found: %d' % (invalid))
         messages.error(request, 'Invalid emails found: %d' % (invalid))
 
-      response_data = {'result': 'Success', 'new_students': added_students, 'messages': msg}
+      response_data = {'success': True, 'new_students': added_students, 'messages': msg}
     else:
       print form.errors
-      response_data = {'result': 'Failure', 'message': 'Please select a group and either a list of student emails or a student email csv to upload.'}
+      response_data = {'success': False, 'message': 'Please select a class and either a list of student emails or a student email csv to upload.'}
+
     return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 
   return http.HttpResponseNotAllowed(['POST'])
@@ -3327,13 +3440,13 @@ def send_account_pending_email(role, user):
   current_site = Site.objects.get_current()
   domain = current_site.domain
   #send an email to registering user about pending account
-  body = '<div> Welcome to Computational Thinking in STEM website http://%s.  <div> \
+  body = '<div> Welcome to Computational Thinking in STEM website https://%s.  <div> \
           <div> Your <b>%s</b> account is pending admin approval, and you will be notified once approved. </div>  <br>\
           <div><b>CT-STEM Admin</b></div>' % (domain, role.title())
   send_mail('CT-STEM - %s Account Pending' % role.title(), body, settings.DEFAULT_FROM_EMAIL, [user.email], html_message=body)
 
   #send an email to the site admin
-  body = '<div>%s has requested <b>%s</b> account on http://%s.  You may approve the user account here http://%s/user/%d/.  </div>  <br>\
+  body = '<div>%s has requested <b>%s</b> account on https://%s.  You may approve the user account here https://%s/user/%d/.  </div>  <br>\
           <div><b>CT-STEM Admin</b></div>' % (user.get_full_name(), role.title(), user.username, domain, domain, user.id)
   send_mail('CT-STEM - %s Account Approval Request' % role.title(), body, settings.DEFAULT_FROM_EMAIL, [settings.DEFAULT_FROM_EMAIL], html_message=body)
 
@@ -3347,7 +3460,7 @@ def send_student_account_request_email(email, group):
   domain = current_site.domain
   body = '<div>Your teacher has requested you to create an account on Computational Thinking in STEM website </div><br> \
           <div>Click the link below and follow the instructions on the webpage to create a student account. </div><br> \
-          <div>http://%s/register/group/%s?email=%s  </div><br> \
+          <div>https://%s?next=/register/group/%s/%s/  </div><br> \
           <div>If clicking the link does not seem to work, you can copy and paste the link into your browser&#39;s address window, </div> \
           <div>or retype it there. Once you have returned to CT-STEM, we will give instructions for creating an account. </div><br> \
           <div><b>CT-STEM Admin</b></div>'%(domain, group.group_code, email)
@@ -3362,7 +3475,7 @@ def send_account_by_admin_confirmation_email(role, user, password):
   #email user the  user name and password
   current_site = Site.objects.get_current()
   domain = current_site.domain
-  body = '<div>Your <b>%s</b> account has been created on Computational Thinking in STEM website http://%s.  </div> \
+  body = '<div>Your <b>%s</b> account has been created on Computational Thinking in STEM website https://%s.  </div> \
           <div>Please login to the site using the credentials below and change your password immediately.  </div><br> \
           <div><b>Username:</b> %s </div> \
           <div><b>Temporary Password:</b> %s </div><br>\
@@ -3373,10 +3486,10 @@ def send_account_by_admin_confirmation_email(role, user, password):
 def send_student_account_by_self_confirmation_email(user, group):
   current_site = Site.objects.get_current()
   domain = current_site.domain
-  body = '<div>Welcome to Computational Thinking in STEM website http://%s.  <div> \
-          <div>You have successfully created a student account on our site.  You have also been added to the group <b>%s</b>. </div> \
+  body = '<div>Welcome to Computational Thinking in STEM website https://%s.  <div> \
+          <div>You have successfully created a student account on our site.  You have also been added to the class <b>%s</b>. </div> \
           <div>Now you can login to complete your assignments. <div> <br>\
-          <div>If you have forgotten your password since you last logged in, you can reset your password here http://%s/password_reset/recover/  </div><br> \
+          <div>If you have forgotten your password since you last logged in, you can reset your password here https://%s/?next=/password_reset/recover/  </div><br> \
           <div><b>CT-STEM Admin</b></div>' % (domain, group.title.title(), domain)
 
   send_mail('CT-STEM - Student Account Created', body, settings.DEFAULT_FROM_EMAIL, [user.email], html_message=body)
@@ -3390,8 +3503,8 @@ def send_added_to_group_confirmation_email(email, group):
   current_site = Site.objects.get_current()
   domain = current_site.domain
   body = '<div>Your teacher has added you to the class <b>%s</b> on Computational Thinking in STEM website. </div><br> \
-          <div>You may login with your credentials here http://%s </div><br> \
-          <div>If you have forgotten your password since you last logged in, you can reset your password here http://%s/password_reset/recover/  </div><br> \
+          <div>You may login with your credentials here https://%s </div><br> \
+          <div>If you have forgotten your password since you last logged in, you can reset your password here https://%s/?next=/password_reset/recover/  </div><br> \
           <div>If clicking the link does not seem to work, you can copy and paste the link into your browser&#39;s address window, </div> \
           <div>or retype it there. Once you have returned to CT-STEM, we will give instructions to proceed. </div><br> \
           <div><b>CT-STEM Admin</b></div>'%(group.title.title(), domain, domain)
@@ -3407,7 +3520,7 @@ def send_feedback_ready_email(email, curriculum):
   current_site = Site.objects.get_current()
   domain = current_site.domain
   body = '<div>Your teacher has provided feedback on the assignment %s. </div><br> \
-          <div>Please login to our website http://%s to review the feedback. </div><br> \
+          <div>Please login to our website https://%s to review the feedback. </div><br> \
           <div><b>CT-STEM Admin</b></div>'%(curriculum.title, domain)
 
   send_mail('CT-STEM - Assignment Feedback Ready', body, settings.DEFAULT_FROM_EMAIL, [email], html_message=body)
@@ -3421,7 +3534,7 @@ def send_teacher_account_validation_email(teacher):
   domain = current_site.domain
   body =  '<div>Welcome to Computational Thinking in STEM. </div><br> \
            <div>Your e-mail address was used to create a teacher account on our website. If you made this request, please follow the instructions below.<div><br> \
-           <div>Please click this link http://%s/validate  and use the credentials below to validate your account. </div><br> \
+           <div>Please click this link https://%s?next=/validate/  and use the credentials below to validate your account. </div><br> \
            <div><b>Username:</b> %s </div> \
            <div><b>Validation code:</b> %s </div><br> \
            <div>If you did not request this account you can safely ignore this email. Rest assured your e-mail address and the associated account will be deleted from our system in 24 hours.</div><br> \
@@ -3436,7 +3549,7 @@ def send_teacher_account_validation_email(teacher):
 def send_account_approval_email(user):
   current_site = Site.objects.get_current()
   domain = current_site.domain
-  body = '<div>Your account has been approved on Computational Thinking in STEM website http://%s.  </div> \
+  body = '<div>Your account has been approved on Computational Thinking in STEM website https://%s.  </div> \
           <div>Please login to the site using the the credentials created during registration. </div><br> \
           <div><b>CT-STEM Admin</b></div>'%(domain)
 
@@ -3776,23 +3889,26 @@ def request_training(request):
         recaptcha_response = request.POST.get('g-recaptcha-response')
         is_human = validate_recaptcha(request, recaptcha_response)
         if not is_human:
-          response_data['result'] = 'Failed'
-          response_data['errors'] = {'recaptcha': 'Invalid reCAPTCHA'}
+          response_data['success'] = False
+          context = {'form': form, 'recaptcha_error':  'Invalid reCAPTCHA'}
+          response_data['html'] = render_to_string('ctstem_app/TrainingRequestModal.html', context, context_instance=RequestContext(request))
+
           return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 
       training = form.save()
       messages.success(request, "Your request has been sent to the site admin")
-      response_data['result'] = 'Success'
+      response_data['success'] = True
       #send email to the sender and admin
       send_training_request_email(training)
 
       return http.HttpResponse(json.dumps(response_data), content_type="application/json")
     else:
       print form.errors
-      return JsonResponse({
-          'result': 'Failed',
-          'errors': dict(form.errors.items()),
-      })
+      response_data['success'] = False
+      context = {'form': form}
+      response_data['html'] = render_to_string('ctstem_app/TrainingRequestModal.html', context, context_instance=RequestContext(request))
+
+      return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 
   return http.HttpResponseNotAllowed(['GET', 'POST'])
 
@@ -3803,8 +3919,9 @@ def validate(request):
   if request.method == 'GET':
     form = forms.ValidationForm()
     context = {'form': form}
-    return render(request, 'ctstem_app/Validation.html', context)
+    return render(request, 'ctstem_app/ValidationModal.html', context)
   elif request.method == 'POST':
+    response_data = {}
     data = request.POST.copy()
     form = forms.ValidationForm(data)
     if form.is_valid():
@@ -3813,8 +3930,11 @@ def validate(request):
       user = authenticate(username=username, password=password)
       user.is_active = True
       user.save()
+
+      response_data['redirect_url'] = '/'
       #check if this user added a new school
       if hasattr(user, 'teacher'):
+        response_data['redirect_url'] = '/groups/active/'
         school = models.School.objects.get(id=user.teacher.school.id)
         if not school.is_active:
           school.is_active = True
@@ -3822,10 +3942,16 @@ def validate(request):
 
       login(request, user)
       messages.success(request, "Your account has been validated")
-      return shortcuts.redirect('ctstem:home')
+      response_data['success'] = True
+
     else:
+      print form.errors
       context = {'form': form}
-      return render(request, 'ctstem_app/Validation.html', context)
+      response_data['success'] = False
+      response_data['html'] = render_to_string('ctstem_app/ValidationModal.html', context, context_instance=RequestContext(request))
+
+    return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+
 
 
   return http.HttpResponseNotAllowed(['GET', 'POST'])

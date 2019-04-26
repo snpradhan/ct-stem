@@ -6,9 +6,12 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h3 class="modal-title">Search Curriculum to Assign <span></span></h3>
+        <h3 class="left">Search Curriculum to Assign <span></span></h3>
       </div>
       <div id="assignmentMsg" class="msg">
+        <ul class="errorlist">
+          <li></li>
+        </ul>
       </div>
       <form class="form" id="assignmentForm" method="post" action="{% url 'ctstem:searchAssignment' %}">
         {% csrf_token %}
@@ -17,7 +20,6 @@
             <div class="form-group">
               <label for="id_group">Class (<span class="required">*</span>)</label>
               <div>{{assignmentForm.group_class}}</div>
-              <hr>
             </div>
           </div>
 
@@ -27,7 +29,7 @@
               <div>{{assignmentForm.curriculum_type}}</div>
             </div>
             <div class="form-group">
-              <label for="id_title">Title</label>
+              <label for="id_title">Curriculum Title</label>
               <div>{{assignmentForm.title}}</div>
             </div>
             <div class="form-group">
@@ -37,11 +39,11 @@
           </div>
         </div>
         <div class="modal-footer">
-          <div class="form-group button-row">
-            <button type="submit" id="search" class="btn btn-success">
+          <div class="form-group">
+            <a type="button" class="btn normal red" data-dismiss="modal">Cancel</a>
+            <button type="submit" id="search" class="btn normal yellow">
               Search
             </button>
-            <a type="button" class="btn btn-danger" data-dismiss="modal">Close</a>
           </div>
         </div>
       </form>
@@ -65,6 +67,7 @@ $(function (){
   $("#assignmentForm").submit(function(e) {
     e.preventDefault();
     if($("#id_group_class").val()){
+      $('#assignmentMsg .errorlist .error').html('');
       var csrf_token = $('#assignmentForm').find('input:hidden').eq(0).val();
       data = {}
       data['group'] = $("#id_group_class").val();
@@ -92,7 +95,7 @@ $(function (){
       });
     }
     else{
-      $('#assignmentMsg').removeClass('success').html("Select a Class to search assignments");
+      $('#assignmentMsg .errorlist li').removeClass('success').addClass('error').html("Select a Class to search assignments");
     }
   });
 

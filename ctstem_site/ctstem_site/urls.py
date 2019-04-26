@@ -20,7 +20,7 @@ from ckeditor_uploader import views
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^tinymce/', include('tinymce.urls')),
+    #url(r'^tinymce/', include('tinymce.urls')),
     #url(r'^ckeditor/', include('ckeditor_uploader.urls')),
     url(r'^password_reset/', include('password_reset.urls')),
     url(r'^', include('ctstem_app.urls', namespace="ctstem")),

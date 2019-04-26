@@ -1,0 +1,35 @@
+{% load ctstem_extras %}
+<button class="btn btn-info search_teachers" name="search_teachers" data-form="{% url 'ctstem:searchTeachers' %}">
+  <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+</button>
+<div class="controls table_container">
+  <div style="display:none;">
+    {{field}}
+  </div>
+  <table class="table table-striped table-bordered table-condensed inner_table" id="teachers">
+    <thead>
+      <tr>
+        <th> Username </th>
+        <th> Name </th>
+        <th> Email </th>
+        <th> Unshare </th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for x in field.value %}
+        {% with teacher=x|getTeacherInfo %}
+        <tr id="{{teacher.id}}">
+          <td>{{teacher.user.username}}</td>
+          <td>{{teacher.user.get_full_name}}</td>
+          <td>{{teacher.user.email}}</td>
+          <td>
+            <button type="button" class="btn btn-warning unshare" aria-label="Unshare resource with this teacher" title="Unshare resource with this teacher" href="#">
+              <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+            </button>
+          </td>
+        </tr>
+        {% endwith %}
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

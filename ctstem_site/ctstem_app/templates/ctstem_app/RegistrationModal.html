@@ -1,0 +1,280 @@
+
+<div class="modal-dialog modal-md">
+  <div class="modal-content">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal">&times;</button>
+      {% if user.is_authenticated %}
+         <h3 class="left">Create User</h3>
+      {% else %}
+        {% if group_id and school_id %}
+           <h3 class="left">Create Student Account</h3>
+          <div id="signup_note" class="warning">(Note: You are signing up as a student.  Enter the info below to sign on to your teacher's classroom)</div>
+        {% else %}
+           <h3 class="left">Create Teacher Account</h3>
+          <div id="signup_note" class="warning">(Note: You are signing up as a teacher.  If you are a student please use the link found in your student email. Sometimes it is in your spam folder.)</div>
+        {% endif %}
+      {% endif %}
+    </div>
+    <div id="registerMsg" class="msg">
+      <ul class="errorlist">
+        {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message|safe }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <form class="form" id="formRegister" method="post"
+              action="{% if group_code and email %}
+                        {% url 'ctstem:register' group_code email %}
+                      {% elif group_code %}
+                        {% url 'ctstem:register' group_code %}
+                      {% else %}
+                        {% url 'ctstem:register'%}
+                      {% endif %}">
+      <div class="modal-body">
+        {% csrf_token %}
+        {{form.management_form}}
+
+        <div class="form-group">
+          <label for="id_{{form.email.name}}">{{ form.email.label }}</label>
+          {{form.email}}
+          <div class="error">{{ form.email.errors }}</div>
+        </div>
+
+        <div class="col-container">
+          <div class="form-group col left">
+            <label for="id_{{form.first_name.name}}">{{ form.first_name.label }}</label>
+            {{form.first_name}}
+            <div class="error">{{ form.first_name.errors }}</div>
+          </div>
+          <div class="form-group col right">
+            <label for="id_{{form.last_name.name}}">{{ form.last_name.label }}</label>
+            {{form.last_name}}
+            <div class="error">{{ form.last_name.errors }}</div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="id_{{form.username.name}}">{{ form.username.label }}</label>
+          {{form.username}}
+          <div class="error">{{ form.username.errors }}</div>
+        </div>
+        <div class="col-container">
+          <div class="form-group col left">
+            <label for="id_{{form.password1.name}}">{{ form.password1.label }}</label>
+            {{form.password1}}
+            <div class="error">{{ form.password1.errors }}</div>
+          </div>
+          <div class="form-group col right">
+            <label for="id_{{form.password2.name}}">{{ form.password2.label }}</label>
+            {{form.password2}}
+            <div class="error">{{ form.password2.errors }}</div>
+          </div>
+        </div>
+
+        {% if user.is_anonymous %}
+          {% if group_id %}
+            <input id="id_account_type" name="account_type" type="hidden" value="S">
+          {% else %}
+            <input id="id_account_type" name="account_type" type="hidden" value="T">
+          {% endif %}
+        {% else %}
+          <div class="form-group">
+            <label for="id_{{form.account_type.name}}">{{ form.account_type.label }}</label>
+            {{form.account_type}}
+            <div class="error">{{ form.account_type.errors }}</div>
+          </div>
+        {% endif %}
+
+        {% if group_id or user.school_administrator or user.teacher %}
+          <input id="id_school" name="school" type="hidden" value="{{school_id}}">
+        {% else %}
+          <div class="form-group" id="div_school">
+            <label for="id_{{form.school.name}}">{{ form.school.label }}</label>
+            {{form.school}}
+            <div class="error">{{ form.school.errors }}</div>
+          </div>
+          <div id="school_form" style="display:none;">
+            <div class="col-container">
+              <div class="form-group col left">
+                <label for="id_{{school_form.name.name}}">{{ school_form.name.label }}</label>
+                {{school_form.name}}
+                <div class="error">{{ school_form.name.errors }}</div>
+              </div>
+              <div class="form-group col right">
+                <label for="id_{{school_form.city.name}}">{{ school_form.city.label }}</label>
+                {{school_form.city}}
+                <div class="error">{{ school_form.city.errors }}</div>
+              </div>
+            </div>
+            <div class="form-group">
+              {{school_form.school_code.as_hidden}}
+            </div>
+            <div class="form-group">
+              {{school_form.is_active.as_hidden}}
+            </div>
+          </div>
+        {% endif %}
+        {% if user.is_anonymous %}
+          <div class="col-container center">
+            <div class="form-group col left" id="agree_terms">
+                <input type="checkbox" id="agree" name="agree"/>
+                <label id="terms">I agree to the <a data-toggle="modal" data-target="#terms" class="terms" href="#">Terms of Use</a></label>
+
+            </div>
+            {% if not group_id %}
+              <div class="form-group col right" id="recaptcha">
+                <script src='https://www.google.com/recaptcha/api.js'></script>
+                <div class="g-recaptcha" data-sitekey="6Lfiv1oUAAAAAO4uGoHA7t8Psp8mATiML0bKg9oc"></div>
+                <div class="error" id="recaptcha_error">
+                  <ul class="errorlist">
+                    <li>{{recaptcha_error}}</li>
+                  </ul>
+                </div>
+              </div>
+            {% endif %}
+          </div>
+        {% endif %}
+        <div class="form-group" id="spinner">
+          <img src="/static/img/page-loader.gif" class="icon"/>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div class="form-group">
+          {% if user.is_authenticated %}
+            <input type="submit" class="btn normal yellow" id="submit" value="Add User"/>
+          {% else %}
+            <input type="submit" class="btn normal yellow" id="submit" value="{% if group_id and school_id %} Register as a Student {% else %} Register as a Teacher {% endif %}" disabled/>
+          {% endif %}
+      </div>
+    </form>
+  </div>
+</div>
+
+
+<script type="text/javascript">
+  $(function (){
+
+    set_user_fields();
+
+    $('#id_account_type').change(function() {
+      set_user_fields();
+    });
+
+    function set_user_fields(){
+      var account_type = $('#id_account_type').val();
+      var restricted_accounts = ['A', 'R', 'C'];
+      if(restricted_accounts.indexOf(account_type) !== -1){
+        $('#div_school').hide();
+      }
+      else {
+        $('#div_school').show();
+      }
+    }
+
+    $("#signupTerms").popover({
+        placement: 'right',
+        title: 'Terms of Use',
+        html: true ,
+        content: ''
+     });
+
+    // popoverPropogationEvent(){
+    $("#signupTerms").click(function (e) {
+        e.stopPropagation();
+    });
+    /**************************/
+
+    // closePopoverEvent(){
+    $(document).click(function (e) {
+      if (($('.popover').has(e.target).length == 0) || $(e.target).is('.close')) {
+        $("#signupTerms").popover('hide');
+      }
+    });
+
+    $('#agree').change(function(){
+        if( $(this).is(':checked') ){
+          $('#submit').removeAttr('disabled');
+        } else {
+          $('#submit').attr("disabled","disabled");
+        }
+    });
+    /**************************/
+    var selected_school = $('select#id_school').val();
+    $('select#id_school option[value="{{other_school.id}}"]').remove();
+    $('select#id_school').prepend($('<option>', {
+        value: '{{other_school.id}}',
+        text: '{{other_school.name}}'
+    }));
+    $('select#id_school').val(selected_school);
+
+    $('select#id_school').on('change', function(){
+      if($(this).val() == "{{other_school.id}}"){
+        $("div#school_form").show();
+        generate_code();
+      }
+      else{
+        $("div#school_form").hide();
+      }
+    });
+    $('select#id_school').trigger('change');
+
+    {% if user.is_anonymous %}
+      {% if group_id and school_id %}
+        //this is student registration, hide the menu items
+        $('ul.nav.navbar-nav').hide();
+      {% endif %}
+    {% endif %}
+
+    $("#formRegister").submit(function(e){
+      e.preventDefault();
+      $.ajax({
+        type: $(this).attr('method'),
+        url: this.action,
+        data: $(this).serialize(),
+        context: this,
+        beforeSend: function(){
+          $('#formRegister #spinner').show();
+        },
+        complete: function(){
+          $('#formRegister #spinner').hide();
+        },
+        success: function(data, status) {
+          if(data['success'] == true){
+            $('#register').modal('toggle');
+            if(data['message']){
+              $('#notification .modal-body p').html(data['message']);
+              $('#notification').modal('toggle');
+            }
+            else {
+              window.parent.location.href = data['redirect_url'];
+            }
+          }
+          else{
+            $('#register').html(data['html']);
+          }
+        },
+        error: function(){
+          alert("Something went wrong.");
+        }
+      });
+    });
+
+    function generate_code(){
+      var url = "/generate_code/";
+      $.ajax({
+        type: 'GET',
+        url: url,
+        dataType: 'json',
+        success: function(data){
+          $('#school_form').find("input[id^='id'][id$='code']").val(data['code']);
+        },
+        error: function(){
+          alert("Please try generating the user code again.")
+        }
+      });
+    }
+  });
+</script>
+
+
