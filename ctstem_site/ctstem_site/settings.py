@@ -93,7 +93,15 @@ CKEDITOR_FILENAME_GENERATOR = 'ctstem_site.utils.get_filename'
 CKEDITOR_CONFIGS = {
     'default': {
         'removePlugins': 'stylesheetparser',
-        'toolbar': None,  # put selected toolbar config here
+        'toolbar': [
+             ['Bold', 'Italic', 'Underline','-', 'Subscript', 'Superscript', '-', 'NumberedList',
+            'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', '-', 'JustifyLeft', 'JustifyCenter',
+            'JustifyRight', 'JustifyBlock', 'Image', 'Table', 'HorizontalRule', 'SpecialChar', 'Iframe' ,
+             '-','Link', 'Unlink'] ,
+             "/",
+             ['Styles', 'Format', 'Font', 'FontSize', 'TextColor',
+             'BGColor', 'Maximize', 'ShowBlocks', '-','Source','-','RemoveFormat']
+        ],
         'height': 100,
         'width': '98%',
         'allowedContent': True,
@@ -108,7 +116,15 @@ CKEDITOR_CONFIGS = {
     },
     'question_ckeditor': {
         'removePlugins': 'stylesheetparser',
-        'toolbar': None,  # put selected toolbar config here
+        'toolbar': [
+                 ['Bold', 'Italic', 'Underline','-', 'Subscript', 'Superscript', '-', 'NumberedList',
+                'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', '-', 'JustifyLeft', 'JustifyCenter',
+                'JustifyRight', 'JustifyBlock', 'Image', 'Table', 'HorizontalRule', 'SpecialChar', 'Iframe' ,
+                 '-','Link', 'Unlink'] ,
+                 "/",
+                 ['Styles', 'Format', 'Font', 'FontSize', 'TextColor',
+                 'BGColor', 'Maximize', 'ShowBlocks', '-','Source','-','RemoveFormat']
+        ],
         'height': 100,
         'width': '98%',
         'mathJaxLib': '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_HTMLorMML',

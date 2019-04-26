@@ -533,22 +533,6 @@
         });
       })
 
-      CKEDITOR.on( 'instanceReady', function( evt ) {
-        var editor = evt.editor;
-        $('div#cke_'+editor.name).find('span.cke_top').addClass('blur');
-        $('div#cke_'+editor.name).find('span.cke_bottom').addClass('blur');
-
-        editor.on( 'focus', function() {
-          $('div#cke_'+editor.name).find('span.cke_top').removeClass('blur').addClass('focus');
-          $('div#cke_'+editor.name).find('span.cke_bottom').removeClass('blur').addClass('focus');
-        });
-
-        editor.on( 'blur', function() {
-          $('div#cke_'+editor.name).find('span.cke_top').removeClass('focus').addClass('blur');
-          $('div#cke_'+editor.name).find('span.cke_bottom').removeClass('focus').addClass('blur');
-        });
-      });
-
     });
   </script>
 

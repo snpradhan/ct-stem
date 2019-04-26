@@ -1737,7 +1737,7 @@ div.modal select.form-control {
 
 /************************* CKEDITOR ***********************/
 div.django-ckeditor-widget {
-  min-width: 85%;
+  min-width: 100%;
 }
 span.cke_top.blur, span.cke_bottom.blur {
   display: none !important;
