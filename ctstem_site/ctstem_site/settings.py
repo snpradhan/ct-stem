@@ -108,8 +108,9 @@ CKEDITOR_CONFIGS = {
         'mathJaxLib': '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_HTMLorMML',
         'codeSnippet_theme': 'monokai_sublime',
         'extraPlugins': ','.join(
-            ['mathjax', 'codesnippet', 'scayt', 'uploadimage']
+            ['mathjax', 'codesnippet', 'scayt', 'uploadimage', 'autogrow']
         ),
+        'autoGrow_onStartup': True, 
         'scayt_autoStartup': True,
         'scayt_sLang': 'en_US',
         'disableNativeSpellChecker': False,
