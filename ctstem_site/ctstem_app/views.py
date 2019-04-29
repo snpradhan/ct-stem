@@ -778,7 +778,7 @@ def preregister(request, group_code=''):
         except models.Student.DoesNotExist:
           # if student does not exist, redirect to a full registration form
           response_data['success'] = True
-          response_data['redirect_url'] = "/?next=/register/group/%s/%s" %(group_code, email)
+          response_data['redirect_url'] = "/?next=/register/group/%s/%s/" %(group_code, email)
 
       else:
         context = {'form': form, 'group_code': group_code}
