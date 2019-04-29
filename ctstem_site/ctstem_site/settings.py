@@ -96,7 +96,7 @@ CKEDITOR_CONFIGS = {
         'toolbar': [
              ['Bold', 'Italic', 'Underline','-', 'Subscript', 'Superscript', '-', 'NumberedList',
             'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', '-', 'JustifyLeft', 'JustifyCenter',
-            'JustifyRight', 'JustifyBlock', 'Image', 'Table', 'HorizontalRule', 'SpecialChar', 'Iframe' ,
+            'JustifyRight', 'JustifyBlock', 'Image', 'Table', 'HorizontalRule', 'SpecialChar', 'Mathjax', 'Iframe' ,
              '-','Link', 'Unlink'] ,
              "/",
              ['Styles', 'Format', 'Font', 'FontSize', 'TextColor',
@@ -110,7 +110,7 @@ CKEDITOR_CONFIGS = {
         'extraPlugins': ','.join(
             ['mathjax', 'codesnippet', 'scayt', 'uploadimage', 'autogrow']
         ),
-        'autoGrow_onStartup': True, 
+        'autoGrow_onStartup': True,
         'scayt_autoStartup': True,
         'scayt_sLang': 'en_US',
         'disableNativeSpellChecker': False,
@@ -120,7 +120,7 @@ CKEDITOR_CONFIGS = {
         'toolbar': [
                  ['Bold', 'Italic', 'Underline','-', 'Subscript', 'Superscript', '-', 'NumberedList',
                 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', '-', 'JustifyLeft', 'JustifyCenter',
-                'JustifyRight', 'JustifyBlock', 'Image', 'Table', 'HorizontalRule', 'SpecialChar', 'Iframe' ,
+                'JustifyRight', 'JustifyBlock', 'Image', 'Table', 'HorizontalRule', 'SpecialChar', 'Mathjax', 'Iframe' ,
                  '-','Link', 'Unlink'] ,
                  "/",
                  ['Styles', 'Format', 'Font', 'FontSize', 'TextColor',
