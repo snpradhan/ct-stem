@@ -752,7 +752,7 @@ def assignCurriculum(request, id=''):
 ####################################
 def preregister(request, group_code=''):
   if group_code:
-    group = models.UserGroup.objects.get(group_code=group_code)
+    group = models.UserGroup.objects.get(group_code__iexact=group_code)
     group_id = group.id
     school = group.teacher.school
 
@@ -797,7 +797,7 @@ def preregister(request, group_code=''):
 def register(request, group_code='', email=''):
   group_id = None
   if group_code:
-    group = models.UserGroup.objects.get(group_code=group_code)
+    group = models.UserGroup.objects.get(group_code__iexact=group_code)
     group_id = group.id
     school = group.teacher.school
   else:
