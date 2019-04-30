@@ -224,15 +224,15 @@
                           <a type="button" class="btn btn-warning" href="{% url 'ctstem:groupDashboard' group.id %}" aria-label="View Class Dashboard" title="View Class Dashboard">
                             <img src="/static/img/dashboard.png" class="icon" />
                           </a>
-
-                          <a type="button" class="btn btn-info assignment-modal" href="#" data-toggle="modal" data-target="#assignment" data-id="{{group.id}}" data-title="{{group.title}}" title="Search and Add Assignments">
-                            <i class="fa fa-tasks"></i>
-                          </a>
-
-                        </div>
                       {% else %}
                         No Assignment
+                        <div>
+
                       {% endif %}
+                        <a type="button" class="btn btn-info assignment-modal" href="#" data-toggle="modal" data-target="#assignment" data-id="{{group.id}}" data-title="{{group.title}}" data-subject="{{group.subject.id}}" title="Search and Add Assignments">
+                            <i class="fa fa-tasks"></i>
+                          </a>
+                      </div>
                     </div>
                   </td>
                   <td>

@@ -6,7 +6,8 @@
   <table class="table table-bordered table-striped table-condensed inner_table">
     <thead>
       <tr>
-        <th>Curriculum</th>
+        <th>Curriculum Type</th>
+        <th>Curriculum Title</th>
         <th>Assign</th>
       </tr>
     </thead>
@@ -14,8 +15,9 @@
       {% for curriculum in curricula %}
         {% if curriculum.curriculum_type|slugify == 'Unit'|slugify %}
           <tr class="unit unit_{{curriculum.id}} {% if forloop.counter|divisibleby:2 %} even {% else %} odd {% endif %}" id="curr_{{curriculum.id}}">
+            <td>Unit</td>
             <td>
-              <b>{{curriculum.curriculum_type}}:</b> {{curriculum.title}}
+              {{curriculum.title}}
               <span class="ec_lessons" id="unit_{{curriculum.id}}">
                 <span><i class="fa fa-caret-square-o-down fa-lg" aria-hidden="true"></i></span>
                 <span style="display:none;"><i class="fa fa-caret-square-o-up fa-lg" aria-hidden="true"></i></span>
@@ -35,7 +37,8 @@
           </tr>
           {% for curr in curriculum.underlying_curriculum %}
             <tr class="lesson unit_{{curriculum.id}} {% if forloop.parentloop.counter|divisibleby:2 %} even {% else %} odd {% endif %}" id="curr_{{curr.id}}" >
-              <td style="display:none;">&emsp;&emsp;&emsp;&emsp;<b>{{curr.curriculum_type}}:</b> {{curr.title}}</td>
+              <td style="display:none;">&emsp;&emsp;&emsp;&emsp;{{curr.curriculum_type}}</td>
+              <td style="display:none;">&emsp;&emsp;&emsp;&emsp;{{curr.title}}</td>
               <td style="display:none; text-align:center;">
                 {% if curr.assigned|slugify == 'False'|slugify %}
                   <button class="btn small blue select_assignment lesson" id="{{curr.id}}" name="{{curr.title}}">Assign {{curr.curriculum_type}}</button>
@@ -47,7 +50,8 @@
           {% endfor %}
         {% else %}
           <tr class="{% if forloop.counter|divisibleby:2 %} even {% else %} odd {% endif %}" id="curr_{{curriculum.id}}">
-            <td>{{curriculum.curriculum_type}}: {{curriculum.title}}</td>
+            <td>{{curriculum.curriculum_type}}</td>
+            <td>{{curriculum.title}}</td>
             <td style="text-align:center;">
               {% if curriculum.assigned|slugify == 'False'|slugify %}
                 <button class="btn small blue select_assignment" id="{{curriculum.id}}" name="{{curriculum.title}}">Assign {{curriculum.curriculum_type|title}}</button>

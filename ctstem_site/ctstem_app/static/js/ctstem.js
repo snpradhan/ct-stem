@@ -301,12 +301,17 @@ $(function (){
     $("div.modal#assignment select#id_group_class option[value='"+$(this).data('id')+"']").prop('selected', true);
     var title = 'to Class';
     if($(this).data('title') !== undefined){
-      title = 'to <div>'+$(this).data('title')+'</div>';
+      title = 'to '+$(this).data('title');
     }
     $("div.modal#assignment .modal-title span").html(title);
 
     if($(this).data('id') != null){
       $("div.modal#assignment select#id_group_class").closest('.form-group').hide();
+      if($(this).data('subject') != null) {
+        $("div.modal#assignment select#id_subject option:selected").prop('selected', false);
+        $("div.modal#assignment select#id_subject option[value='"+$(this).data('subject')+"']").prop('selected', true);
+        $("div.modal#assignment form").submit();
+      }
     }
     else{
       $("div.modal#assignment select#id_group_class").closest('.form-group').show();

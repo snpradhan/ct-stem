@@ -123,17 +123,17 @@ def curricula(request, curriculum_type='', status='published', bookmark='0'):
   bookmarked = None
 
   if hasattr(request.user, 'administrator') or hasattr(request.user, 'researcher') or hasattr(request.user, 'author'):
-    curricula = models.Curriculum.objects.all().filter(curriculum_type__in = curr_type, status = stat).order_by('title')
+    curricula = models.Curriculum.objects.all().filter(curriculum_type__in = curr_type, status = stat).order_by(Lower('title'))
   elif hasattr(request.user, 'teacher'):
     if bookmark == '1':
-      curricula = models.Curriculum.objects.all().filter(curriculum_type__in = curr_type, status='P', bookmarked__teacher=request.user.teacher).order_by('title')
+      curricula = models.Curriculum.objects.all().filter(curriculum_type__in = curr_type, status='P', bookmarked__teacher=request.user.teacher).order_by(Lower('title'))
       bookmarked = curricula
     else:
-      curricula = models.Curriculum.objects.all().filter(Q(curriculum_type__in = curr_type), Q(status='P') | Q(shared_with=request.user.teacher)).order_by('title')
+      curricula = models.Curriculum.objects.all().filter(Q(curriculum_type__in = curr_type), Q(status='P') | Q(shared_with=request.user.teacher)).order_by(Lower('title'))
       bookmarked = curricula.filter(bookmarked__teacher=request.user.teacher)
     status = 'published'
   else:
-    curricula = models.Curriculum.objects.all().filter(curriculum_type__in = curr_type, status='P').order_by('title')
+    curricula = models.Curriculum.objects.all().filter(curriculum_type__in = curr_type, status='P').order_by(Lower('title'))
     status = 'published'
 
   curricula = curricula.filter(unit__isnull=True)
@@ -2150,13 +2150,16 @@ def searchAssignment(request):
       query_filter = {}
       if data['curriculum_type']:
         query_filter['curriculum_type'] = str(data['curriculum_type'])
+      else:
+        query_filter['curriculum_type__in'] = ['U', 'L']
+
       if data['title']:
         query_filter['title__icontains'] = str(data['title'])
       if data['subject']:
         query_filter['subject__id'] = data['subject']
 
       query_filter['status'] = 'P'
-      curriculumQueryset = models.Curriculum.objects.filter(**query_filter)
+      curriculumQueryset = models.Curriculum.objects.filter(**query_filter).order_by(Lower('title'))
       curriculumList = []
       if data['curriculum_type'] == 'U':
         for curriculum in curriculumQueryset:
