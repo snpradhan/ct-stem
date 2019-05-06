@@ -223,9 +223,11 @@
             </button>
           </a>
         {% else %}
-          <button type="button" class="bright save" title="Submit Assignment" onclick="window.close()">
-            Exit
-          </button>
+          <a href="{% url 'ctstem:previewCurriculum'  curriculum.id %}">
+            <button type="button" class="bright save"  title="Submit Assignment">
+              Exit
+            </button>
+          </a>
         {% endif %}
       </div>
     </form>

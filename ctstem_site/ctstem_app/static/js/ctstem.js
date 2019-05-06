@@ -356,10 +356,30 @@ $(function (){
 
   //hide table header if no rows
   $('table.inner_table').each(function(){
-    if(!$(this).parent().hasClass('results')) {
+    if(!$(this).parent().hasClass('results') && !$(this).parent().hasClass('dt_input')) {
       rowAddorRemove($(this));
     }
   });
+
+  if($('div.button-group-fixed').length > 0) {
+    var fix_button_top = $('div.button-group-fixed').offset().top;
+
+    $(window).scroll(function() {
+      var currentScroll = $(window).scrollTop() + 100;
+      if (currentScroll >= fix_button_top) {
+        // apply position: fixed if you
+        $('div.button-group-fixed').css({
+          position: 'fixed',
+          top: '6em',
+          right: '6.75em',
+        });
+      } else {
+        $('div.button-group-fixed').css({
+          position: 'static'
+        });
+      }
+    });
+  }
 
 });
 

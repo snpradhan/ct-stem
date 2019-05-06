@@ -23,312 +23,315 @@
     {% include "ctstem_app/Tabs.html" with tab='group' group=form.instance role='group'%}
     <form method="post" id="userGroupForm" enctype="multipart/form-data">
       {% csrf_token %}
-      <div class="table" id="group">
-        {{form.management_form}}
-        <div class="form-group">
-          <label for="id_group-title">{{ form.title.label }} {% if form.title.field.required %}(<span class="required">*</span>){% endif %} </label>
-          <div class="controls">{{form.title}}</div>
-          <div class="error">{{ form.title.errors }}</div>
-        </div>
-
-        <div class="form-group">
-          <label for="id_group-subject">{{ form.subject.label }} {% if form.subject.field.required %}(<span class="required">*</span>){% endif %} </label>
-          <div class="controls">{{form.subject}}</div>
-          <div class="error">{{ form.subject.errors }}</div>
-        </div>
-
-        <div class="form-group">
-          <label for="id_group-icon">{{ form.icon.label }} {% if form.icon.field.required %}(<span class="required">*</span>){% endif %} </label>
-          <div class="controls">{{form.icon}}</div>
-          <div class="help warning">{{form.icon.help_text|safe}}</div>
-          <div class="error">{{ form.icon.errors }}</div>
-        </div>
-
-        <div class="form-group">
-          <label for="id_group-time">{{ form.time.label }} {% if form.time.field.required %}(<span class="required">*</span>){% endif %} </label>
-          <div class="controls">{{form.time}}</div>
-          <div class="error">{{ form.time.errors }}</div>
-        </div>
-
-        {% if user.teacher %}
-          {% if form.teacher.value %}
-            <input type="hidden" id="id_group-teacher" name="group-teacher" value="{{form.teacher.value}}"/>
-          {% else %}
-            <input type="hidden" id="id_group-teacher" name="group-teacher" value="{{user.teacher.id}}"/>
-          {% endif %}
-          {% if form.instance.id and user.teacher.id != form.teacher.value %}
+      <div class="row">
+        <div class="col-md-11">
+          <div class="table" id="group">
+            {{form.management_form}}
             <div class="form-group">
-              <label for="id_group-teacher">Teacher</label>
-              <div class="controls"><input type="text" class="form-control" name="teacher" value="{{form.instance.teacher.user.get_full_name}}" disabled style="width: auto;"></input></div>
+              <label for="id_group-title">{{ form.title.label }} {% if form.title.field.required %}(<span class="required">*</span>){% endif %} </label>
+              <div class="controls">{{form.title}}</div>
+              <div class="error">{{ form.title.errors }}</div>
             </div>
-          {% endif %}
-        {% else %}
-          <div class="form-group">
-            <label for="id_group-teacher">{{ form.teacher.label }} {% if form.teacher.field.required %}(<span class="required">*</span>){% endif %} </label>
-            <div class="controls">{{form.teacher}}</div>
-            <div class="error">{{ form.teacher.errors }}</div>
-          </div>
-        {% endif %}
 
-        {% if user.teacher and user.teacher.id in form.shared_with.value %}
-          {{form.shared_with.as_hidden}}
-        {% else %}
-          <div class="form-group">
-            <label for="id_group-coteachers">{{ form.shared_with.label }} {% if form.shared_with.field.required %}(<span class="required">*</span>){% endif %} </label>
-            {% include "ctstem_app/SharedTeachers.html" with resource='group' field=form.shared_with %}
-            <div class="help warning">{{form.shared_with.help_text|safe}}</div>
-          </div>
-        {% endif %}
-        <div class="form-group">
-          <label for="id_group-description">{{ form.description.label }} {% if form.description.field.required %}(<span class="required">*</span>){% endif %} </label>
-          <div class="controls">{{form.description}}</div>
-          <div class="error">{{ form.description.errors }}</div>
-        </div>
-
-        <div class="form-group">
-          <label for="id_group-group_code">{{ form.group_code.label }} {% if form.group_code.field.required %}(<span class="required">*</span>){% endif %} </label>
-          <div class="input-group">
-            {{form.group_code}}
-            <span class="input-group-btn">
-              <input type="button" class="btn btn-info" id="generate_code" value="Generate"/>
-            </span>
-          </div>
-          <div class="error">{{ form.group_code.errors }}</div>
-        </div>
-
-        <div class="form-group">
-          <label for="id_group-is_active">{{ form.is_active.label|title }} {% if form.is_active.field.required %}(<span class="required">*</span>){% endif %} </label>
-          <div class="controls">{{form.is_active}}</div>
-          <div class="error">{{ form.is_active.errors }}</div>
-        </div>
-
-        {% if form.instance.id %}
-        <div class="form-group">
-          <label for="id_group-dates">Dates </label>
-          <div class="controls table_container">
-            <table class="table table-striped table-bordered table-condensed inner_table" id="members">
-              <thead>
-                <tr>
-                  <th> Class Created Date </th>
-                  <th> Class Last Modified </th>
-                  <th> Last Student Login </th>
-                </tr>
-              </thead>
-              <tbody>
-                <td>{{form.instance.created_date|date}}</td>
-                <td>{{form.instance.modified_date|date}}</td>
-                <td>{{form.instance|class_last_login|date}}</td>
-              </tbody>
-            </table>
-          </div>
-        </div>
-        {% endif %}
-        {% if form.instance.id %}
-          <div class="form-group assignment_table">
-            {{formset.management_form}}
-            {{formset.id}}
-            <div>
-              <label for="id_assignment_table">Assignments (<span id="assignment_count">{{assignments|length}}</span>)</label>
+            <div class="form-group">
+              <label for="id_group-subject">{{ form.subject.label }} {% if form.subject.field.required %}(<span class="required">*</span>){% endif %} </label>
+              <div class="controls">{{form.subject}}</div>
+              <div class="error">{{ form.subject.errors }}</div>
             </div>
-             <div>
-            {% if form.instance.is_active %}
-              <a type="button" class="btn btn-info assignment-modal" href="#" data-toggle="modal" data-target="#assignment" data-id="{{form.instance.id}}" data-title="{{form.instance.title}}" title="Search and Add Assignments">
-                  <i class="fa fa-tasks"></i>
-              </a>
-            {% endif %}
-            <a type="button" class="btn btn-warning" href="{% url 'ctstem:groupDashboard' form.instance.id %}" aria-label="View Class Dashboard" title="View Class Dashboard">
-              <img src="/static/img/dashboard.png" class="icon" />
-            </a>
+
+            <div class="form-group">
+              <label for="id_group-icon">{{ form.icon.label }} {% if form.icon.field.required %}(<span class="required">*</span>){% endif %} </label>
+              <div class="controls">{{form.icon}}</div>
+              <div class="help warning">{{form.icon.help_text|safe}}</div>
+              <div class="error">{{ form.icon.errors }}</div>
             </div>
-            <div class="table_container">
-              <table class="table table-striped table-condensed table-bordered inner_table">
-                <thead>
-                  <tr>
-                    <th style="width:70%;" colspan="2">Assigned Curriculum</th>
-                    <th style="width:10%;">Assigned On</th>
-                    <th style="width:10%;">Lock on Completion <i class="fa fa-info-circle" aria-hidden="true" title="When locked, students will be unable to open and view the assignment once they submit"></i></th>
-                    <th style="width:10%;">Delete</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for curriculum in keys %}
-                  {% with assignment_list=assignments|get_item:curriculum %}
-                    {% if curriculum.curriculum_type == 'U' %}
-                      <tr class="{% if forloop.counter|divisibleby:2 %}  even {% else %} odd {% endif %}">
-                        <td rowspan="{{assignment_list|length}}">
-                          <div><b>Unit:</b>&nbsp;{{curriculum.title}}</div>
-                        </td>
-                    {% endif %}
-                    {% for order, assignment in assignment_list.items|sort %}
-                      {% if curriculum.curriculum_type == 'U'  %}
-                        {% if forloop.counter > 1 %}
-                        <tr class="{% if forloop.parentloop.counter|divisibleby:2 %}  even {% else %} odd {% endif %}">
-                        {% endif %}
-                        <td>
-                          <div>
-                            <b>
-                            {% if assignment.curriculum.curriculum_type == 'L' %}
-                              Lesson:
-                            {% elif assignment.curriculum.curriculum_type == 'A' %}
-                              Assessment:
-                            {% endif %}
-                            </b>
-                            &nbsp;{{assignment.curriculum.title}}
-                          </div>
-                        </td>
-                      {% else %}
-                        <tr class="{% if forloop.parentloop.counter|divisibleby:2 %}  even {% else %} odd {% endif %}">
-                          <td colspan="2">
-                            <div>
-                              <b>
-                              {% if curriculum.curriculum_type == 'L' %}
-                                Lesson:
-                              {% elif curriculum.curriculum_type == 'A' %}
-                                Assessment:
-                              {% else %}
-                                Survey:
-                              {% endif %}
-                              </b>
-                            &nbsp;{{curriculum.title}}
-                            </div>
-                          </td>
-                      {% endif %}
 
-                          <td style="vertical-align:middle;">
-                            {{assignment.assigned_date|date }}
-                          </td>
-                          <td class="lock_on_completion" style="text-align:center;">
-                            <input type="checkbox" class="lock_assignment" {% if assignment.lock_on_completion %} checked {% endif %} data-id="{{assignment.id}}" data-title="{{assignment.curriculum.title}}" {% if not form.instance.is_active %} disabled {% endif %}/>
-                          </td>
-                          <td style="text-align:center;">
-                            <!-- only allow assignments to be deleted if the class is active and the assignment in question is still New -->
-                            {% if form.instance.is_active %}
-                              {% if assignment.id|get_class_assignment_status == 'N' %}
-                                <a type="button" class="btn btn-danger delete_assignment" name="delete_assignment" aria-label="Delete Assignment" title="Delete this Assignment" href="{% url 'ctstem:deleteAssignment' assignment.id %}" onclick="return confirm('Are you sure you want to delete this assignment?')">
-                                  <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-                                </a>
-                              {% else %}
-                                <div class="assignment_status">Assignment In Progress</div>
-                              {% endif %}
-                            {% endif %}
-
-                          </td>
-                        </tr>
-                    {% endfor %}
-                  {% endwith %}
-                  {% endfor %}
-                </tbody>
-              </table>
+            <div class="form-group">
+              <label for="id_group-time">{{ form.time.label }} {% if form.time.field.required %}(<span class="required">*</span>){% endif %} </label>
+              <div class="controls">{{form.time}}</div>
+              <div class="error">{{ form.time.errors }}</div>
             </div>
-          </div>
 
-          <div class="form-group">
-            <div>
-              <label for="id_{{title}}"> Students (<span id="student_count">{{form.members.value|length}}</span>) </label>
-            </div>
-            <div>
-              {% if form.instance.is_active %}
-                <a type="button" class="btn btn-info upload-modal" href="#" data-toggle="modal" data-target="#studentSearch" data-id="{{form.instance.id}}" title="Search and Add existing Students to this class">
-                  <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
-                </a>
-                <a type="button" class="btn btn-success upload-modal" href="#" data-toggle="modal" data-target="#upload" data-id="{{form.instance.id}}" data-title="{{form.instance.title}}" title="Upload new and existing Students to this class">
-                  <i class="fa fa-user-plus"></i>
-                </a>
-                <a type="button" class="btn btn-info upload-modal" href="#" data-toggle="modal" data-target="#addStudent" data-id="{{form.instance.id}}" title="Create and Add new Student to this class">
-                  <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-                </a>
-
-                {% if user.administrator %}
-                  {% student_in_group_admin_actions %}
-                {% else %}
-                  {% student_in_group_teacher_actions %}
-                {% endif %}
+            {% if user.teacher %}
+              {% if form.teacher.value %}
+                <input type="hidden" id="id_group-teacher" name="group-teacher" value="{{form.teacher.value}}"/>
+              {% else %}
+                <input type="hidden" id="id_group-teacher" name="group-teacher" value="{{user.teacher.id}}"/>
               {% endif %}
-            </div>
-            <div class="controls table_container">
-              {{form.members.as_hidden}}
-              <table class="table table-striped table-bordered table-condensed inner_table" id="members">
-                <thead>
-                  <tr>
-                    <th width="3%" class="no-sort">
-                      {% if form.instance.is_active %}
-                        <input id="select-all" type="checkbox" value="0" name="select-all"/>
-                      {% endif %}
-                    </th>
-                    <th> Username </th>
-                    <th> Name </th>
-                    <th> Email </th>
-                    <th> Status </th>
-                    <th> Student Consent </th>
-                    <th> Parental Consent </th>
-                    <th> Member Since</th>
-                    <th> Last Login </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for x in form.members.value %}
-                    {% with student=x|getStudentInfo %}
-                    <tr id="{{student.id}}">
-                      <td>
-                        {% if form.instance.is_active %}
-                          <input id="student_{{student.id}}" type="checkbox" class="action-select" value="{{student.id}}" name="student_{{student.id}}" />
-                        {% endif %}
-                      </td>
-                      <td>{{student.user.username}}
-                      {% if form.instance.is_active %}
-                        <div class="controls">
-                          <a type="button" class="btn btn-success edit" aria-label="Edit Student profile" title="Edit Student profile" href="{% url 'ctstem:userProfile' student.user.id %}">
-                            <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
-                          </a>
-                          <a type="button" class="btn btn-warning removeUser" aria-label="Remove Student from this group" title="Remove Student from this group" href="{% url 'ctstem:removeStudent' form.instance.id student.id  %}" data-id="{{forloop.counter0}}">
-                            <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-                          </a>
-                          <button type="button" class="btn btn-info reset_email" aria-label="Send password reset email" title="Send password reset email" onclick="this.disabled=true; return send_password_reset_email('{{student.user.username}}','{{csrf_token}}')">
-                            <span class="glyphicon glyphicon-send" aria-hidden="true"></span>
-                          </button>
-                          {% if user.administrator or user.teacher %}
-                            <button type="button" class="btn btn-gray reset" aria-label="Reset Student Password" title="Reset Student Password" onclick="return reset_password('{{student.user.get_full_name}}','{{student.user.id}}','{{csrf_token}}')">
-                              <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
-                            </button>
-                          {% endif %}
-                        </div>
-                      {% endif %}
-                      </td>
-                      <td>{{student.user.get_full_name}}</td>
-                      <td>{{student.user.email}}</td>
-                      <td>{{student.user.is_active|yesno:"Active,Inactive"}}</td>
-                      <td>
-                        {% if student.consent == 'A' %}
-                          Agree
-                        {% elif consent == 'D' %}
-                          Disagree
-                        {% else %}
-                          Unknown
-                        {% endif %}
-                      </td>
-                      <td>{{student.get_parental_consent_display}}</td>
-                      <td>{{student.user.date_joined|date}} </td>
-                      <td>{{student.user.last_login|date}}</td>
-                    </tr>
-                    {% endwith %}
-                  {% endfor %}
-                </tbody>
-              </table>
-            </div>
-            <div class="error">{{ form.members.errors }}</div>
-          </div>
-        {% else %}
-          <h4 class="warning"> Save the Class and then add Assignments and Students </h4>
-          {{formset.management_form}}
-          {{formset.id}}
-          {{formset.as_hidden}}
-        {% endif %}
+              {% if form.instance.id and user.teacher.id != form.teacher.value %}
+                <div class="form-group">
+                  <label for="id_group-teacher">Teacher</label>
+                  <div class="controls"><input type="text" class="form-control" name="teacher" value="{{form.instance.teacher.user.get_full_name}}" disabled style="width: auto;"></input></div>
+                </div>
+              {% endif %}
+            {% else %}
+              <div class="form-group">
+                <label for="id_group-teacher">{{ form.teacher.label }} {% if form.teacher.field.required %}(<span class="required">*</span>){% endif %} </label>
+                <div class="controls">{{form.teacher}}</div>
+                <div class="error">{{ form.teacher.errors }}</div>
+              </div>
+            {% endif %}
 
-        {% if form.instance.is_active %}
-          <div class="form-group button-group-fixed">
-            <input type="submit" class="btn btn-success" id="submit" value="Save Class"/>
+            {% if user.teacher and user.teacher.id in form.shared_with.value %}
+              {{form.shared_with.as_hidden}}
+            {% else %}
+              <div class="form-group">
+                <label for="id_group-coteachers">{{ form.shared_with.label }} {% if form.shared_with.field.required %}(<span class="required">*</span>){% endif %} </label>
+                {% include "ctstem_app/SharedTeachers.html" with resource='group' field=form.shared_with %}
+                <div class="help warning">{{form.shared_with.help_text|safe}}</div>
+              </div>
+            {% endif %}
+            <div class="form-group">
+              <label for="id_group-description">{{ form.description.label }} {% if form.description.field.required %}(<span class="required">*</span>){% endif %} </label>
+              <div class="controls">{{form.description}}</div>
+              <div class="error">{{ form.description.errors }}</div>
+            </div>
+
+            <div class="form-group">
+              <label for="id_group-group_code">{{ form.group_code.label }} {% if form.group_code.field.required %}(<span class="required">*</span>){% endif %} </label>
+              <div class="input-group">
+                {{form.group_code}}
+                <span class="input-group-btn">
+                  <input type="button" class="btn btn-info" id="generate_code" value="Generate"/>
+                </span>
+              </div>
+              <div class="error">{{ form.group_code.errors }}</div>
+            </div>
+
+            <div class="form-group">
+              <label for="id_group-is_active">{{ form.is_active.label|title }} {% if form.is_active.field.required %}(<span class="required">*</span>){% endif %} </label>
+              <div class="controls">{{form.is_active}}</div>
+              <div class="error">{{ form.is_active.errors }}</div>
+            </div>
+
+            {% if form.instance.id %}
+            <div class="form-group">
+              <label for="id_group-dates">Dates </label>
+              <div class="controls table_container">
+                <table class="table table-striped table-bordered table-condensed inner_table" id="members">
+                  <thead>
+                    <tr>
+                      <th> Class Created Date </th>
+                      <th> Class Last Modified </th>
+                      <th> Last Student Login </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <td>{{form.instance.created_date|date}}</td>
+                    <td>{{form.instance.modified_date|date}}</td>
+                    <td>{{form.instance|class_last_login|date}}</td>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            {% endif %}
+            {% if form.instance.id %}
+              <div class="form-group assignment_table">
+                {{formset.management_form}}
+                {{formset.id}}
+                <div>
+                  <label for="id_assignment_table">Assignments (<span id="assignment_count">{{assignments|length}}</span>)</label>
+                </div>
+                 <div>
+                {% if form.instance.is_active %}
+                  <a type="button" class="btn btn-info assignment-modal" href="#" data-toggle="modal" data-target="#assignment" data-id="{{form.instance.id}}" data-title="{{form.instance.title}}" data-subject="{{form.instance.subject.id}}" title="Search and Add Assignments">
+                      <i class="fa fa-tasks"></i>
+                  </a>
+                {% endif %}
+                <a type="button" class="btn btn-warning" href="{% url 'ctstem:groupDashboard' form.instance.id %}" aria-label="View Class Dashboard" title="View Class Dashboard">
+                  <img src="/static/img/dashboard.png" class="icon" />
+                </a>
+                </div>
+                <div class="table_container">
+                  <table class="table table-striped table-condensed table-bordered inner_table">
+                    <thead>
+                      <tr>
+                        <th style="width:70%;" colspan="2">Assigned Curriculum</th>
+                        <th style="width:10%;">Assigned On</th>
+                        <th style="width:10%;">Lock on Completion <i class="fa fa-info-circle" aria-hidden="true" title="When locked, students will be unable to open and view the assignment once they submit"></i></th>
+                        <th style="width:10%;">Delete</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for curriculum in keys %}
+                      {% with assignment_list=assignments|get_item:curriculum %}
+                        {% if curriculum.curriculum_type == 'U' %}
+                          <tr class="{% if forloop.counter|divisibleby:2 %}  even {% else %} odd {% endif %}">
+                            <td rowspan="{{assignment_list|length}}">
+                              <div><b>Unit:</b>&nbsp;{{curriculum.title}}</div>
+                            </td>
+                        {% endif %}
+                        {% for order, assignment in assignment_list.items|sort %}
+                          {% if curriculum.curriculum_type == 'U'  %}
+                            {% if forloop.counter > 1 %}
+                            <tr class="{% if forloop.parentloop.counter|divisibleby:2 %}  even {% else %} odd {% endif %}">
+                            {% endif %}
+                            <td>
+                              <div>
+                                <b>
+                                {% if assignment.curriculum.curriculum_type == 'L' %}
+                                  Lesson:
+                                {% elif assignment.curriculum.curriculum_type == 'A' %}
+                                  Assessment:
+                                {% endif %}
+                                </b>
+                                &nbsp;{{assignment.curriculum.title}}
+                              </div>
+                            </td>
+                          {% else %}
+                            <tr class="{% if forloop.parentloop.counter|divisibleby:2 %}  even {% else %} odd {% endif %}">
+                              <td colspan="2">
+                                <div>
+                                  <b>
+                                  {% if curriculum.curriculum_type == 'L' %}
+                                    Lesson:
+                                  {% elif curriculum.curriculum_type == 'A' %}
+                                    Assessment:
+                                  {% else %}
+                                    Survey:
+                                  {% endif %}
+                                  </b>
+                                &nbsp;{{curriculum.title}}
+                                </div>
+                              </td>
+                          {% endif %}
+
+                              <td style="vertical-align:middle;">
+                                {{assignment.assigned_date|date }}
+                              </td>
+                              <td class="lock_on_completion" style="text-align:center;">
+                                <input type="checkbox" class="lock_assignment" {% if assignment.lock_on_completion %} checked {% endif %} data-id="{{assignment.id}}" data-title="{{assignment.curriculum.title}}" {% if not form.instance.is_active %} disabled {% endif %}/>
+                              </td>
+                              <td style="text-align:center;">
+                                <!-- only allow assignments to be deleted if the class is active and the assignment in question is still New -->
+                                {% if form.instance.is_active %}
+                                  {% if assignment.id|get_class_assignment_status == 'N' %}
+                                    <a type="button" class="btn btn-danger delete_assignment" name="delete_assignment" aria-label="Delete Assignment" title="Delete this Assignment" href="{% url 'ctstem:deleteAssignment' assignment.id %}" onclick="return confirm('Are you sure you want to delete this assignment?')">
+                                      <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                                    </a>
+                                  {% else %}
+                                    <div class="assignment_status">Assignment In Progress</div>
+                                  {% endif %}
+                                {% endif %}
+
+                              </td>
+                            </tr>
+                        {% endfor %}
+                      {% endwith %}
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <div>
+                  <label for="id_{{title}}"> Students (<span id="student_count">{{form.members.value|length}}</span>) </label>
+                </div>
+                <div>
+                  {% if form.instance.is_active %}
+                    <a type="button" class="btn btn-info upload-modal" href="#" data-toggle="modal" data-target="#studentSearch" data-id="{{form.instance.id}}" title="Search and Add existing Students to this class">
+                      <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                    </a>
+                    <a type="button" class="btn btn-success upload-modal" href="#" data-toggle="modal" data-target="#upload" data-id="{{form.instance.id}}" data-title="{{form.instance.title}}" title="Upload new and existing Students to this class">
+                      <i class="fa fa-user-plus"></i>
+                    </a>
+                    <a type="button" class="btn btn-info upload-modal" href="#" data-toggle="modal" data-target="#addStudent" data-id="{{form.instance.id}}" title="Create and Add new Student to this class">
+                      <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                    </a>
+
+                    {% if user.administrator %}
+                      {% student_in_group_admin_actions %}
+                    {% else %}
+                      {% student_in_group_teacher_actions %}
+                    {% endif %}
+                  {% endif %}
+                </div>
+                <div class="controls table_container">
+                  {{form.members.as_hidden}}
+                  <table class="table table-striped table-bordered table-condensed inner_table" id="members">
+                    <thead>
+                      <tr>
+                        <th width="3%" class="no-sort">
+                          {% if form.instance.is_active %}
+                            <input id="select-all" type="checkbox" value="0" name="select-all"/>
+                          {% endif %}
+                        </th>
+                        <th> Username </th>
+                        <th> Name </th>
+                        <th> Email </th>
+                        <th> Status </th>
+                        <th> Student Consent </th>
+                        <th> Parental Consent </th>
+                        <th> Member Since</th>
+                        <th> Last Login </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for x in form.members.value %}
+                        {% with student=x|getStudentInfo %}
+                        <tr id="{{student.id}}">
+                          <td>
+                            {% if form.instance.is_active %}
+                              <input id="student_{{student.id}}" type="checkbox" class="action-select" value="{{student.id}}" name="student_{{student.id}}" />
+                            {% endif %}
+                          </td>
+                          <td>{{student.user.username}}
+                          {% if form.instance.is_active %}
+                            <div class="controls">
+                              <a type="button" class="btn btn-success edit" aria-label="Edit Student profile" title="Edit Student profile" href="{% url 'ctstem:userProfile' student.user.id %}">
+                                <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+                              </a>
+                              <a type="button" class="btn btn-warning removeUser" aria-label="Remove Student from this group" title="Remove Student from this group" href="{% url 'ctstem:removeStudent' form.instance.id student.id  %}" data-id="{{forloop.counter0}}">
+                                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                              </a>
+                              <button type="button" class="btn btn-info reset_email" aria-label="Send password reset email" title="Send password reset email" onclick="this.disabled=true; return send_password_reset_email('{{student.user.username}}','{{csrf_token}}')">
+                                <span class="glyphicon glyphicon-send" aria-hidden="true"></span>
+                              </button>
+                              {% if user.administrator or user.teacher %}
+                                <button type="button" class="btn btn-gray reset" aria-label="Reset Student Password" title="Reset Student Password" onclick="return reset_password('{{student.user.get_full_name}}','{{student.user.id}}','{{csrf_token}}')">
+                                  <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+                                </button>
+                              {% endif %}
+                            </div>
+                          {% endif %}
+                          </td>
+                          <td>{{student.user.get_full_name}}</td>
+                          <td>{{student.user.email}}</td>
+                          <td>{{student.user.is_active|yesno:"Active,Inactive"}}</td>
+                          <td>
+                            {% if student.consent == 'A' %}
+                              Agree
+                            {% elif consent == 'D' %}
+                              Disagree
+                            {% else %}
+                              Unknown
+                            {% endif %}
+                          </td>
+                          <td>{{student.get_parental_consent_display}}</td>
+                          <td>{{student.user.date_joined|date}} </td>
+                          <td>{{student.user.last_login|date}}</td>
+                        </tr>
+                        {% endwith %}
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+                <div class="error">{{ form.members.errors }}</div>
+              </div>
+            {% else %}
+              <h4 class="warning"> Save the Class and then add Assignments and Students </h4>
+              {{formset.management_form}}
+              {{formset.id}}
+              {{formset.as_hidden}}
+            {% endif %}
           </div>
-        {% endif %}
+        </div>
+        <div class="form-group button-group-fixed col-md-1">
+          {% if form.instance.is_active %}
+            <input type="submit" class="btn btn-success" id="submit" value="Save Class"/>
+          {% endif %}
+        </div>
       </div>
     </form>
   </div>

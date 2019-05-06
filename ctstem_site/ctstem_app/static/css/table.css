@@ -106,8 +106,24 @@ table.table#assignment_info, table.table#feedback_header {
   font-weight: bold;
   margin-bottom: 2em;
 }
+
+table.table#question_header {
+  text-align: left;
+  margin-bottom: 2em;
+}
+
+table.table#assignment_info .switch {
+  float: none;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 table.table#feedback_header {
   width: 100%;
+}
+
+table.table#feedback_header td {
+  width: auto;
 }
 
 table.table#subcategory_1 thead {

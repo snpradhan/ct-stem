@@ -26,7 +26,7 @@
           <tr>
             <th>Student</th>
             <th>Teammates</th>
-            <th>Group</th>
+            <th>Class</th>
             <th>Assignment</th>
             <th>Assigned On</th>
             <th>Status</th>
@@ -60,109 +60,110 @@
           </tr>
         </tbody>
       </table>
-      <div>
-        {{ formset.management_form }}
-        {% for step in formset %}
-          <div class="table feedback">
-            {{step.id}}
-            <h3> {{step.instance.step_response.step.title}} ({{step.instance.step_response.step.order}}/{{formset|length}})</h3>
-            {{step.nested.management_form}}
-            {% for question in step.nested %}
-              <div class="row question_answer_feedback">
-                {{question.id}}
-                <div class="col-md-8">
-                  <div>
-                    <label>
-                      Question:
-                      {% if question.instance.response.curriculum_question.optional %}
-                        <span class="optional">(optional)</span>
-                      {% else %}
-                        <span class="mandatory">*</span>
-                      {% endif %}
-                      :
-                    </label>
-                    <div class="question"> {{question.instance.response.curriculum_question.question|safe}}</div>
-                  </div>
-                  <div>
-                    <label>Response: </label>
-                    <div class="response">
-                      {% if question.instance.response.response %}
-                        {% if question.instance.response.curriculum_question.question.answer_field_type == 'MI' %}
-                          <img src="{{question.instance.response.response}}" class="image_option"/>
-                        {% elif question.instance.response.curriculum_question.question.answer_field_type == 'SK' %}
-                          <canvas id="{{question.instance.id}}_sketch" width="900" height="500" class="assignment_sketch" style="{% if question.instance.response.curriculum_question.question.sketch_background %} background: url({{question.instance.response.curriculum_question.question.sketch_background.url}}) no-repeat;{% endif %}"></canvas>
-                          <input type="hidden" name="{{question.instance.id}}_sketch_response" id="{{question.instance.id}}_sketch_response" value="{{question.instance.response.response}}"/>
-                        {% elif question.instance.response.curriculum_question.question.answer_field_type == 'DT' %}
-                          <div class="dt_input" id="dt_input_{{forloop.counter}}">
-                            <input type="hidden" name="{{question.instance.id}}_dt_response" id="{{question.instance.id}}_dt_response" value='{{question.instance.response.response}}'/>
-                            <input type="hidden" name="column_headers" id="dt_col_headers_{{forloop.counter}}" value="{{question.instance.response.curriculum_question.question.options}}"/>
-                            <table class="table table-condensed table-bordered inner_table" id="dt_table_{{forloop.counter}}">
-                              <thead>
-                              </thead>
-                              <tbody>
-                              </tbody>
-                            </table>
-                          </div>
-                        {% elif question.instance.response.curriculum_question.question.answer_field_type == 'TA' %}
-                          {{question.instance.response.response|safe}}
+      <div class="row">
+        <div class="col-md-10">
+          {{ formset.management_form }}
+          {% for step in formset %}
+            <div class="table feedback">
+              {{step.id}}
+              <h3> {{step.instance.step_response.step.title}} ({{step.instance.step_response.step.order}}/{{formset|length}})</h3>
+              {{step.nested.management_form}}
+              {% for question in step.nested %}
+                <div class="row question_answer_feedback">
+                  {{question.id}}
+                  <div class="col-md-8">
+                    <div>
+                      <label>
+                        Question:
+                        {% if question.instance.response.curriculum_question.optional %}
+                          <span class="optional">(optional)</span>
                         {% else %}
-                          {{question.instance.response.response}}
+                          <span class="mandatory">*</span>
                         {% endif %}
-                      {% elif question.instance.response.response_file.all %}
-                        Uploaded file(s):
-                        {% for response_file in question.instance.response.response_file.all %}
-                          <div>
-                            <a href="{{response_file.file.url}}" target="_blank">{{response_file.file}}</a>
-                          </div>
-                        {% endfor %}
-                      {% else %}
-                        <span style="font-style: italic;">No response yet</span>
-                      {% endif %}
+                        :
+                      </label>
+                      <div class="question"> {{question.instance.response.curriculum_question.question|safe}}</div>
                     </div>
-                  </div>
-                </div>
-                <div class="col-md-4">
-                  {% if form.instance.instance.status == 'P' or form.instance.instance.status == 'S' or form.instance.instance.status == 'F' %}
-                    {% if question.instance.response.response or question.instance.response.response_file.all %}
-                      <label>Feedback: </label>
-                      <div class="feedback">
-                        {% if form.instance.instance.status == 'P' or form.instance.instance.status == 'S' %}
-                          {{question.feedback}}
-                          <a data-toggle="modal" data-target="#emojis" class="emoji-modal" href="#" data-id="{{question.feedback.auto_id}}">
-                            <i class="fa fa-smile-o" aria-hidden="true"></i>
-                          </a>
-                        {% elif form.instance.instance.status == 'F' %}
-                          {{question.feedback.value}}
+                    <div>
+                      <label>Response: </label>
+                      <div class="response">
+                        {% if question.instance.response.response %}
+                          {% if question.instance.response.curriculum_question.question.answer_field_type == 'MI' %}
+                            <img src="{{question.instance.response.response}}" class="image_option"/>
+                          {% elif question.instance.response.curriculum_question.question.answer_field_type == 'SK' %}
+                            <canvas id="{{question.instance.id}}_sketch" width="900" height="500" class="assignment_sketch" style="{% if question.instance.response.curriculum_question.question.sketch_background %} background: url({{question.instance.response.curriculum_question.question.sketch_background.url}}) no-repeat;{% endif %}"></canvas>
+                            <input type="hidden" name="{{question.instance.id}}_sketch_response" id="{{question.instance.id}}_sketch_response" value="{{question.instance.response.response}}"/>
+                          {% elif question.instance.response.curriculum_question.question.answer_field_type == 'DT' %}
+                            <div class="dt_input" id="dt_input_{{forloop.counter}}">
+                              <input type="hidden" name="{{question.instance.id}}_dt_response" id="{{question.instance.id}}_dt_response" value='{{question.instance.response.response}}'/>
+                              <input type="hidden" name="column_headers" id="dt_col_headers_{{forloop.counter}}" value="{{question.instance.response.curriculum_question.question.options}}"/>
+                              <table class="table table-condensed table-bordered inner_table" id="dt_table_{{forloop.counter}}">
+                                <thead>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                              </table>
+                            </div>
+                          {% elif question.instance.response.curriculum_question.question.answer_field_type == 'TA' %}
+                            {{question.instance.response.response|safe}}
+                          {% else %}
+                            {{question.instance.response.response}}
+                          {% endif %}
+                        {% elif question.instance.response.response_file.all %}
+                          Uploaded file(s):
+                          {% for response_file in question.instance.response.response_file.all %}
+                            <div>
+                              <a href="{{response_file.file.url}}" target="_blank">{{response_file.file}}</a>
+                            </div>
+                          {% endfor %}
+                        {% else %}
+                          <span style="font-style: italic;">No response yet</span>
                         {% endif %}
                       </div>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    {% if form.instance.instance.status == 'P' or form.instance.instance.status == 'S' or form.instance.instance.status == 'F' %}
+                      {% if question.instance.response.response or question.instance.response.response_file.all %}
+                        <label>Feedback: </label>
+                        <div class="feedback">
+                          {% if form.instance.instance.status == 'P' or form.instance.instance.status == 'S' %}
+                            {{question.feedback}}
+                            <a data-toggle="modal" data-target="#emojis" class="emoji-modal" href="#" data-id="{{question.feedback.auto_id}}">
+                              <i class="fa fa-smile-o" aria-hidden="true"></i>
+                            </a>
+                          {% elif form.instance.instance.status == 'F' %}
+                            {{question.feedback.value}}
+                          {% endif %}
+                        </div>
+                      {% endif %}
                     {% endif %}
-                  {% endif %}
+                  </div>
                 </div>
-              </div>
-              <hr>
-            {% endfor %}
-          </div>
-        {% endfor %}
-      </div>
-      <div>
-        <input type="hidden" name="save_and_close" id="save_and_close" value="false" />
-      </div>
-      <div class="form-group button-group-fixed">
-        {% if form.instance.instance.status == 'P' %}
-          <input type="submit" class="btn btn-info" id="save" value="Save"/>
-        {% elif form.instance.instance.status == 'S' %}
-          <input type="submit" class="btn btn-info" id="save" value="Save"/>
-          <br><br>
-          <input type="button" class="btn btn-success" id="close" value="Save and Close"/>
-          <br><br>
-        {% endif %}
-        {% if prevInstance %}
-          <a type="button" class="btn btn-warning" id="prev" href="{% url 'ctstem:feedback' form.instance.instance.assignment.id prevInstance.id %}"> Previous Student </a>
-          <br><br>
-        {% endif %}
-        {% if nextInstance %}
-          <a type="button" class="btn btn-warning" id="prev" href="{% url 'ctstem:feedback' form.instance.instance.assignment.id nextInstance.id %}"> Next Student </a>
-        {% endif %}
+                <hr>
+              {% endfor %}
+            </div>
+          {% endfor %}
+        </div>
+
+        <div class="form-group button-group-fixed col-md-2">
+          <input type="hidden" name="save_and_close" id="save_and_close" value="false" />
+          {% if form.instance.instance.status == 'P' %}
+            <input type="submit" class="btn btn-info" id="save" value="Save"/>
+          {% elif form.instance.instance.status == 'S' %}
+            <input type="submit" class="btn btn-info" id="save" value="Save"/>
+            <br><br>
+            <input type="button" class="btn btn-success" id="close" value="Save and Close"/>
+            <br><br>
+          {% endif %}
+          {% if prevInstance %}
+            <a type="button" class="btn btn-warning" id="prev" href="{% url 'ctstem:feedback' form.instance.instance.assignment.id prevInstance.id %}"> Previous Student </a>
+            <br><br>
+          {% endif %}
+          {% if nextInstance %}
+            <a type="button" class="btn btn-warning" id="prev" href="{% url 'ctstem:feedback' form.instance.instance.assignment.id nextInstance.id %}"> Next Student </a>
+          {% endif %}
+        </div>
       </div>
     </form>
     {% include "ctstem_app/EmojiModal.html" %}
