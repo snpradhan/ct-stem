@@ -2335,6 +2335,7 @@ def assignmentDashboard(request, id=''):
         return http.HttpResponseNotFound('<h1>You do not have the privilege to view this assignment</h1>')
 
       students = assignment.group.members.all()
+      questions = models.CurriculumQuestion.objects.all().filter(step__curriculum=assignment.curriculum).order_by('step__order', 'order')
       #for researchers filter out students who have opted out
       if hasattr(request.user, 'researcher'):
         students = students.filter(consent='A')
@@ -2361,7 +2362,8 @@ def assignmentDashboard(request, id=''):
         student_assignment_details[student] = {'serial': serial, 'instance': instance, 'percent_complete': percent_complete}
         serial += 1
 
-      context = {'assignment': assignment, 'student_assignment_details': student_assignment_details}
+
+      context = {'assignment': assignment, 'student_assignment_details': student_assignment_details, 'question_details': questions}
       return render(request, 'ctstem_app/AssignmentDashboard.html', context)
 
     return http.HttpResponseNotAllowed(['GET'])
@@ -2830,6 +2832,60 @@ def feedback(request, assignment_id='', instance_id=''):
     return http.HttpResponseNotFound('<h1>Requested assignment not found</h1>')
   except models.Step.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Curriculum Step not found </h1>')
+
+####################################
+# Teacher feedback
+####################################
+@login_required
+def question_response_review(request, assignment_id='', curriculum_question_id=''):
+  try:
+    if '' != assignment_id:
+      assignment = models.Assignment.objects.get(id=assignment_id)
+      school = assignment.group.teacher.school
+      group = assignment.group
+
+
+      if hasattr(request.user, 'researcher'):
+        has_permission = True
+      else:
+        has_permission = check_group_permission(request, group.id)
+
+      if not has_permission:
+        return http.HttpResponseNotFound('<h1>You do not have the privilege to review responses for this question</h1>')
+
+      curriculum_question = models.CurriculumQuestion.objects.get(id=curriculum_question_id)
+      question_responses = models.QuestionResponse.objects.all().filter(step_response__instance__assignment__id=assignment.id, curriculum_question__id=curriculum_question_id).order_by(Lower('step_response__instance__student__user__first_name'), Lower('step_response__instance__student__user__last_name'))
+
+      if hasattr(request.user, 'researcher'):
+        question_responses = question_responses.filter(step_response__instance__student__consent='A')
+
+      #get the previous and next student instances
+      curriculum_questions = models.CurriculumQuestion.objects.all().filter(step__curriculum__id=curriculum_question.step.curriculum.id).order_by('step__order', 'order')
+      count = curriculum_questions.count()
+      prevIdx = nextIdx = 0
+      prevQuestion = nextQuestion = None
+      for idx, quest in enumerate(curriculum_questions):
+        if curriculum_question == quest:
+          prevIdx = idx - 1
+          nextIdx = idx + 1
+      if prevIdx >= 0 and prevIdx < count:
+        prevQuestion = curriculum_questions[prevIdx]
+      if nextIdx >= 0 and nextIdx < count:
+        nextQuestion = curriculum_questions[nextIdx]
+
+      if 'GET' == request.method:
+        context = {'group': group, 'assignment': assignment, 'curriculum_question': curriculum_question, 'question_responses': question_responses, 'nextQuestion': nextQuestion, 'prevQuestion': prevQuestion}
+        return render(request, 'ctstem_app/QuestionReview.html', context)
+      return http.HttpResponseNotAllowed(['GET'])
+
+    else:
+      raise models.Assignment.DoesNotExist
+
+  except models.Assignment.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested assignment not found</h1>')
+  except models.CurriculumQuestion.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Question not found </h1>')
+
 
 ####################################
 # Unlock submitted assignment

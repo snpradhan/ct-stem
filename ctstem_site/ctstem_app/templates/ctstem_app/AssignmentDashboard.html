@@ -16,9 +16,10 @@
     <table class="table table-striped table-bordered table-condensed inner_table" id="assignment_info">
       <thead>
         <tr>
-          <th>Group</th>
+          <th>Class</th>
           <th>Assignment</th>
           <th>Assigned On</th>
+          <th>Review By</th>
         </tr>
       </thead>
       <tbody>
@@ -26,10 +27,17 @@
           <td><a href="{% url 'ctstem:groupDashboard' assignment.group.id %}">{{assignment.group}}</a></td>
           <td>{{assignment.curriculum.title}}</td>
           <td>{{assignment.assigned_date|date}}</td>
+          <td>
+            <label class="switch">
+              <input class="switch-input" type="checkbox" />
+              <span class="switch-label" data-on="Question" data-off="Student"></span>
+              <span class="switch-handle"></span>
+            </label>
         </tr>
       </tbody>
     </table>
     {% if student_assignment_details %}
+    <div id="student_assignment_details_table">
       <table class="table table-striped table-bordered table-condensed dt" id="student_assignment_details">
         <thead>
           <tr>
@@ -111,75 +119,103 @@
           {% endfor %}
         </tbody>
       </table>
+    </div>
     {% else %}
       <p>No assignments available.</p>
+    {% endif %}
+
+    {% if question_details %}
+     <div id="question_details_table">
+      <table class="table table-striped table-bordered table-condensed dt" id="question_details">
+        <thead>
+          <tr>
+            <th width="5%">Question No. </th>
+            <th>Question </th>
+            <th width="15%"> Action </th>
+          </tr>
+          <tr id="filterrow">
+            <th width="5%">Question No. </th>
+            <th>Question </th>
+            <th width="15%"> Action </th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for question in question_details %}
+            <tr>
+              <td>{{question.step.order}}.{{question.order}}</td>
+              <td>{{question.question.question_text|safe}}</td>
+              <td><a type="button" class="btn btn-success" href="{% url 'ctstem:question_response_review' assignment.id  question.id %}" title="Review Question Response"> Review </a></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
     {% endif %}
   </div>
 
   <script type="text/javascript">
-   /* $(".chart").each(function(){
-      var id = $(this).attr('id');
-      var percentage = $(this).attr('name');
-      $("#"+id).circliful({
-        animationStep: 10,
-        foregroundBorderWidth: 25,
-        backgroundBorderWidth: 25,
-        percent: percentage,
-        fontColor: '#000',
-        foregroundColor: '#006000',
-        text: 'Complete'
-      });
-    });*/
-    $(".chart").each(function(){
-      var id = $(this).attr('id');
-      var complete = parseInt($(this).attr('name'));
-      var remaining = 100-complete;
-      $("#"+id).highcharts({
-        chart: {
-          type: 'pie',
-          height:130,
-          backgroundColor: 'rgba(0,0,0,0)',
-        },
-        title: {
-          text: complete+'%',
-          align: 'center',
-          verticalAlign: 'middle',
-          y: 0,
-          style: {
-            fontSize: '1.2em',
-            color: 'black',
+
+    $(function() {
+
+      $(".chart").each(function(){
+        var id = $(this).attr('id');
+        var complete = parseInt($(this).attr('name'));
+        var remaining = 100-complete;
+        $("#"+id).highcharts({
+          chart: {
+            type: 'pie',
+            height:130,
+            backgroundColor: 'rgba(0,0,0,0)',
           },
-        },
-        tooltip: false,
-        plotOptions: {
-          pie: {
-            dataLabels: {
-              enabled: false,
+          title: {
+            text: complete+'%',
+            align: 'center',
+            verticalAlign: 'middle',
+            y: 0,
+            style: {
+              fontSize: '1.2em',
+              color: 'black',
             },
-            startAngle: 0,
-            endAngle: 360,
-          }
-        },
-        credits: {
-          enabled: false
-        },
-        series: [{
-          type: 'pie',
-          name: 'Work',
-          innerSize: '80%',
-          data: [
-            {
-              name: 'Complete',
-              y: complete,
-              color: 'green',
-            },
-            {
-              name: 'Remaining',
-              y: remaining,
-              color: 'grey',
-            },
-          ]
-        }]
+          },
+          tooltip: false,
+          plotOptions: {
+            pie: {
+              dataLabels: {
+                enabled: false,
+              },
+              startAngle: 0,
+              endAngle: 360,
+            }
+          },
+          credits: {
+            enabled: false
+          },
+          series: [{
+            type: 'pie',
+            name: 'Work',
+            innerSize: '80%',
+            data: [
+              {
+                name: 'Complete',
+                y: complete,
+                color: 'green',
+              },
+              {
+                name: 'Remaining',
+                y: remaining,
+                color: 'grey',
+              },
+            ]
+          }]
+        });
+      });
+
+      $("div#question_details_table").hide();
+      $("div#student_assignment_details_table").show();
+
+      $('.switch-input').change(function() {
+        $("div#question_details_table").toggle();
+        $("div#student_assignment_details_table").toggle();
       });
     });
   </script>
