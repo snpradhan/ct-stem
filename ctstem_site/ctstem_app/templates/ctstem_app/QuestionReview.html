@@ -90,7 +90,16 @@
           <table class="table table-striped table-bordered table-condensed inner_table">
             <thead>
               <tr>
-                <th width="15%">Student/Teammates</th>
+                <th width="15%">
+                  Student/Teammates
+                  {% if not user.researcher %}
+                    <label class="switch">
+                      <input class="switch-input" type="checkbox" />
+                      <span class="switch-label" data-on="Hide Names" data-off="Show Names"></span>
+                      <span class="switch-handle"></span>
+                    </label>
+                  {% endif %}
+                </th>
                 <th>Response</th>
                 <th width="30%">Feedback</th>
               </tr>
@@ -99,18 +108,23 @@
               {% for resp_feed in response_feedback %}
                 <tr>
                   <td>
-                    {% if user.researcher %}
-                      <b>{{resp_feed.student.user.id}}</b> <br>
-                    {% else %}
-                      <b>{{resp_feed.student}}</b> <br>
-                    {% endif %}
-                    {% for teammate in resp_feed.question_response.step_response.instance.teammates.all %}
+                    <div class="student_name">
                       {% if user.researcher %}
-                        {{teammate.user.id}} (T) <br>
+                        <b>{{resp_feed.student.user.id}}</b> <br>
                       {% else %}
-                        {{teammate}} (T) <br>
+                        <b>{{resp_feed.student}}</b> <br>
                       {% endif %}
-                    {% endfor %}
+                      {% for teammate in resp_feed.question_response.step_response.instance.teammates.all %}
+                        {% if user.researcher %}
+                          {{teammate.user.id}} (T) <br>
+                        {% else %}
+                          {{teammate}} (T) <br>
+                        {% endif %}
+                      {% endfor %}
+                    </div>
+                    <div class="student_mask">
+                      xxxxxxxxxxx
+                    </div>
                   </td>
                   <td>
                     <div class="response">
@@ -201,6 +215,13 @@
 
       loadCanvasData();
       loadDataTable(false);
+
+      $("div.student_name").show();
+      $("div.student_mask").hide();
+      $('.switch-input').change(function() {
+        $("div.student_name").toggle();
+        $("div.student_mask").toggle();
+      });
 
     });
 
