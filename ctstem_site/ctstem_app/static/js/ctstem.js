@@ -381,6 +381,16 @@ $(function (){
     });
   }
 
+  $('a.emoji-modal').click(function(){
+    $("div.modal#emojis input#emoji_feedback_area").val($(this).data('id'));
+  });
+
+  $('div.emoji span').click(function(){
+    var id = $('input#emoji_feedback_area').val();
+    var val = $('textarea#'+id).val();
+    $('textarea#'+id).val(val + $(this).html());
+  });
+
 });
 
 function rowAddorRemove(tbl){

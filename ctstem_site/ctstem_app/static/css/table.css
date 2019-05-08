@@ -71,6 +71,10 @@ table.table.inner_table thead tr {
 table.table.inner_table tbody tr {
   font-size: 0.9em;
 }
+
+div#feedback table.table.inner_table tr, div#question_review table.table.inner_table tr {
+  font-size: 14px !important;
+}
 table.table.unit_lesson {
   font-size: 0.7em;
 }

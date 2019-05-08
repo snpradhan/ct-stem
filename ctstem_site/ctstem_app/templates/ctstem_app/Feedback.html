@@ -13,7 +13,7 @@
 
 {% block content %}
   {{block.super}}
-  <div class="content">
+  <div class="content" id="feedback">
     <h2> Assignment Feedback </h2>
     {% include "ctstem_app/Tabs.html" with tab='assignment' group=form.instance.instance.assignment.group assignment=form.instance.instance.assignment %}
 
@@ -132,8 +132,12 @@
                             <a data-toggle="modal" data-target="#emojis" class="emoji-modal" href="#" data-id="{{question.feedback.auto_id}}">
                               <i class="fa fa-smile-o" aria-hidden="true"></i>
                             </a>
-                          {% elif form.instance.instance.status == 'F' %}
-                            {{question.feedback.value}}
+                          {% elif form.instance.instance.status == 'F' or form.instance.instance.status == 'A'%}
+                            {% if question.feedback.value %}
+                              {{question.feedback.value}}
+                            {% else %}
+                              <span style="font-style: italic;">Feedback not provided</span>
+                            {% endif %}
                           {% endif %}
                         </div>
                       {% endif %}
@@ -174,14 +178,6 @@
       $('#close').click(function(){
         $("input#save_and_close").val('true');
         this.form.submit();
-      });
-      $('a.emoji-modal').click(function(){
-        $("div.modal#emojis input#emoji_feedback_area").val($(this).data('id'));
-      });
-      $('div.emoji').click(function(){
-        var id = $('input#emoji_feedback_area').val();
-        var val = $('textarea#'+id).val();
-        $('textarea#'+id).val(val + $(this).html());
       });
 
       loadCanvasData();

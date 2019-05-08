@@ -2843,6 +2843,7 @@ def question_response_review(request, assignment_id='', curriculum_question_id='
       assignment = models.Assignment.objects.get(id=assignment_id)
       school = assignment.group.teacher.school
       group = assignment.group
+      allow_save = False
 
 
       if hasattr(request.user, 'researcher'):
@@ -2853,11 +2854,53 @@ def question_response_review(request, assignment_id='', curriculum_question_id='
       if not has_permission:
         return http.HttpResponseNotFound('<h1>You do not have the privilege to review responses for this question</h1>')
 
-      curriculum_question = models.CurriculumQuestion.objects.get(id=curriculum_question_id)
-      question_responses = models.QuestionResponse.objects.all().filter(step_response__instance__assignment__id=assignment.id, curriculum_question__id=curriculum_question_id).order_by(Lower('step_response__instance__student__user__first_name'), Lower('step_response__instance__student__user__last_name'))
+      members = group.members
 
       if hasattr(request.user, 'researcher'):
-        question_responses = question_responses.filter(step_response__instance__student__consent='A')
+        members = members.filter(consent='A')
+
+      members = members.order_by(Lower('user__first_name'), Lower('user__last_name'))
+      curriculum_question = models.CurriculumQuestion.objects.get(id=curriculum_question_id)
+      response_feedback = []
+      for member in members:
+        try:
+          instance = models.AssignmentInstance.objects.get(assignment=assignment, student=member)
+          question_response = models.QuestionResponse.objects.get(step_response__instance=instance, curriculum_question=curriculum_question)
+
+          feedback = create_feedback_hierarchy(request, instance)
+          step_feedback = models.StepFeedback.objects.get(assignment_feedback=feedback, step_response=question_response.step_response)
+          question_feedback = models.QuestionFeedback.objects.get(step_feedback=step_feedback, response=question_response)
+          status = instance.status
+
+          if status in ['P', 'S']:
+            if question_response.response or question_response.response_file.all():
+              question_feedback_form = forms.QuestionFeedbackForm(instance=question_feedback, prefix=question_feedback.id)
+              allow_save = True
+              message = None
+            else:
+              question_response = None
+              question_feedback_form = None
+              message = 'Question not attempted'
+          else:
+            question_feedback_form = None
+            if question_feedback.feedback:
+              message = question_feedback.feedback
+            else:
+              message = 'Feedback not provided'
+
+        except models.AssignmentInstance.DoesNotExist:
+          #assignment not started
+          question_response = None
+          question_feedback_form = None
+          message = 'Assignment not started'
+          status = 'N'
+        except models.QuestionResponse.DoesNotExist:
+          #question not attempted
+          question_response = None
+          question_feedback_form = None
+          message = 'Question not attempted'
+
+        response_feedback.append({'student': member, 'question_response': question_response, 'question_feedback_form': question_feedback_form, 'message': message, 'status': status})
 
       #get the previous and next student instances
       curriculum_questions = models.CurriculumQuestion.objects.all().filter(step__curriculum__id=curriculum_question.step.curriculum.id).order_by('step__order', 'order')
@@ -2874,9 +2917,25 @@ def question_response_review(request, assignment_id='', curriculum_question_id='
         nextQuestion = curriculum_questions[nextIdx]
 
       if 'GET' == request.method:
-        context = {'group': group, 'assignment': assignment, 'curriculum_question': curriculum_question, 'question_responses': question_responses, 'nextQuestion': nextQuestion, 'prevQuestion': prevQuestion}
+        context = {'group': group, 'assignment': assignment, 'curriculum_question': curriculum_question, 'response_feedback': response_feedback, 'nextQuestion': nextQuestion, 'prevQuestion': prevQuestion, 'allow_save': allow_save}
         return render(request, 'ctstem_app/QuestionReview.html', context)
-      return http.HttpResponseNotAllowed(['GET'])
+
+      elif 'POST' == request.method:
+        data = request.POST.copy()
+        feedback_saved = False
+        for k, v in data.iterlists():
+          if 'feedback' in k:
+            feedback_id = int(k[:k.index('-')])
+            question_feedback = models.QuestionFeedback.objects.get(id=feedback_id)
+            question_feedback.feedback = v[0]
+            question_feedback.save()
+            feedback_saved = True
+        if feedback_saved:
+          messages.success(request, "Feedback Saved.")
+
+        return shortcuts.redirect('ctstem:question_response_review', assignment_id, curriculum_question_id)
+
+      return http.HttpResponseNotAllowed(['GET', 'POST'])
 
     else:
       raise models.Assignment.DoesNotExist
@@ -2886,6 +2945,17 @@ def question_response_review(request, assignment_id='', curriculum_question_id='
   except models.CurriculumQuestion.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Question not found </h1>')
 
+@login_required
+def create_feedback_hierarchy(request, instance):
+  feedback, created = models.AssignmentFeedback.objects.get_or_create(instance=instance)
+  curriculum_id = instance.assignment.curriculum.id
+  question_responses = models.QuestionResponse.objects.all().filter(step_response__instance=instance)
+
+  for question_response in question_responses:
+    step_feedback, created = models.StepFeedback.objects.get_or_create(assignment_feedback=feedback, step_response=question_response.step_response)
+    question_feedback, created = models.QuestionFeedback.objects.get_or_create(step_feedback=step_feedback, response=question_response)
+
+  return feedback
 
 ####################################
 # Unlock submitted assignment

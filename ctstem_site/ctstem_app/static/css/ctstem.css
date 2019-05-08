@@ -490,7 +490,7 @@ div.table.feedback {
   padding: 2em 5em;
 }
 
-div.table.feedback div.question_answer_feedback {
+div.question_answer_feedback {
   font-size: 14px;
   padding: 1em;
 }
@@ -499,15 +499,19 @@ div.row.question_answer_feedback:nth-of-type(odd){
   background-color: #f9f9f9;
 }
 
-div.table.feedback div.question_answer_feedback div.question, div.question_table div.question_text div.question {
+div.question_answer_feedback div.question, div.question_table div.question_text div.question {
   color: #428bca;
 }
 
-div.table.feedback div.question_answer_feedback div.response, div.question_table div.answer_field div.response div.readonly div.text {
+div.question_answer_feedback div.response,
+div.question_table div.answer_field div.response div.readonly div.text {
   color: #5cb85c;
 }
 
-div.table.feedback div.question_answer_feedback div.feedback , div.table.feedback div.question_answer_feedback div.feedback textarea, div.question_table div.feedback div.feedback{
+div.question_answer_feedback div.feedback ,
+div.question_answer_feedback div.feedback textarea,
+div.question_table div.feedback div.feedback
+{
   color: #d9534f !important;
 }
 
@@ -1687,6 +1691,15 @@ div.emoji {
   font-size: 3rem;
   height: 1.5em;
   cursor: pointer;
+}
+div.emoji span {
+  padding: 0.2em;
+}
+div.emoji span:hover {
+  background-color: var(--ctstem-color-light-gray) !important;;
+}
+div.emoji span:active {
+  background-color: var(--ctstem-color-gray) !important;;
 }
 
 a.emoji-modal {
