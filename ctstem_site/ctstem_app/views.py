@@ -2334,15 +2334,16 @@ def assignmentDashboard(request, id=''):
       if not has_permission:
         return http.HttpResponseNotFound('<h1>You do not have the privilege to view this assignment</h1>')
 
-      students = assignment.group.members.all()
+      students = assignment.group.members.all().order_by(Lower('user__last_name'), Lower('user__first_name'))
       questions = models.CurriculumQuestion.objects.all().filter(step__curriculum=assignment.curriculum).order_by('step__order', 'order')
       #for researchers filter out students who have opted out
       if hasattr(request.user, 'researcher'):
         students = students.filter(consent='A')
 
       instances = models.AssignmentInstance.objects.all().filter(assignment=assignment)
-      student_assignment_details = {}
+      student_assignment_details = []
       serial = 1
+
       for student in students:
         try:
           instance = instances.get(student=student)
@@ -2359,9 +2360,8 @@ def assignmentDashboard(request, id=''):
           instance = None
           percent_complete = 0
 
-        student_assignment_details[student] = {'serial': serial, 'instance': instance, 'percent_complete': percent_complete}
+        student_assignment_details.append({'serial': serial, 'student': student, 'instance': instance, 'percent_complete': percent_complete})
         serial += 1
-
 
       context = {'assignment': assignment, 'student_assignment_details': student_assignment_details, 'question_details': questions}
       return render(request, 'ctstem_app/AssignmentDashboard.html', context)
@@ -2859,7 +2859,7 @@ def question_response_review(request, assignment_id='', curriculum_question_id='
       if hasattr(request.user, 'researcher'):
         members = members.filter(consent='A')
 
-      members = members.order_by(Lower('user__first_name'), Lower('user__last_name'))
+      members = members.order_by(Lower('user__last_name'), Lower('user__first_name'))
       curriculum_question = models.CurriculumQuestion.objects.get(id=curriculum_question_id)
       response_feedback = []
       for member in members:

@@ -8,7 +8,7 @@
 
 {% block content %}
   {{block.super}}
- <div class="content">
+ <div class="content" id="publication">
   <div class="col-lg-12">
 
     <h2>Research</h2>
@@ -18,7 +18,6 @@
     {% if user.administrator %}
       <div class="btn-group">
         <a type="button" class="btn btn-info" href="{% url 'ctstem:newPublication' %}" title="Create new publication">Create Publication</a>
-
         <label class="switch">
           <input class="switch-input" type="checkbox" />
           <span class="switch-label" data-on="Table" data-off="Bibliography"></span>

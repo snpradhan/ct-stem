@@ -346,7 +346,7 @@ class Student(models.Model):
   parental_consent = models.CharField(null=False, max_length=1, default='U', choices=PARENTAL_CONSENT_CHOICES)
 
   def __unicode__(self):
-      return u'%s' % (self.user.get_full_name())
+      return u'%s, %s' % (self.user.last_name, self.user.first_name)
 
   def get_consent(self):
     if self.consent == 'A':

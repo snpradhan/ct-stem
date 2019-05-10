@@ -24,38 +24,36 @@
       <table class="table table-striped table-bordered table-condensed inner_table" id="feedback_header">
         <thead>
           <tr>
-            <th>Student</th>
-            <th>Teammates</th>
+            <th>Student/Teammates</th>
+            <th>Time Spent(hh:mm:ss)</th>
+            <th>Status</th>
             <th>Class</th>
             <th>Assignment</th>
             <th>Assigned On</th>
-            <th>Status</th>
-            <th>Time Spent(hh:mm:ss)</th>
             <th>Last Modified</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td>
-            {% if user.researcher %}
-              {{form.instance.instance.student.user.id}}
-            {% else %}
-              {{form.instance.instance.student}}
-            {% endif %}</td>
-            <td>
+              {% if user.researcher %}
+                <b>{{form.instance.instance.student.user.id}}<b><br>
+              {% else %}
+                <b>{{form.instance.instance.student}}<b><br>
+              {% endif %}
               {% for teammate in form.instance.instance.teammates.all %}
                 {% if user.researcher %}
-                  {{teammate.user.id}} <br>
+                  {{teammate.user.id}} (T) <br>
                 {% else %}
-                  {{teammate}} <br>
+                  {{teammate}} (T) <br>
                 {% endif %}
               {% endfor %}
             </td>
+            <td>{{form.instance.instance.time_spent|format_time}}</td>
+            <td>{{form.instance.instance.get_status_display}}</td>
             <td><a href="{% url 'ctstem:groupDashboard' form.instance.instance.assignment.group.id %}">{{form.instance.instance.assignment.group}}</a></td>
             <td><a href="{% url 'ctstem:assignmentDashboard' form.instance.instance.assignment.id %}">{{form.instance.instance.assignment.curriculum.title}}</a></td>
             <td>{{form.instance.instance.assignment.assigned_date|date}}</td>
-            <td>{{form.instance.instance.get_status_display}}</td>
-            <td>{{form.instance.instance.time_spent|format_time}}</td>
             <td>{{form.instance.instance.modified_date|date}}</td>
           </tr>
         </tbody>
