@@ -2865,12 +2865,12 @@ def question_response_review(request, assignment_id='', curriculum_question_id='
       for member in members:
         try:
           instance = models.AssignmentInstance.objects.get(assignment=assignment, student=member)
+          status = instance.status
           question_response = models.QuestionResponse.objects.get(step_response__instance=instance, curriculum_question=curriculum_question)
 
           feedback = create_feedback_hierarchy(request, instance)
           step_feedback = models.StepFeedback.objects.get(assignment_feedback=feedback, step_response=question_response.step_response)
           question_feedback = models.QuestionFeedback.objects.get(step_feedback=step_feedback, response=question_response)
-          status = instance.status
 
           if status in ['P', 'S']:
             if question_response.response or question_response.response_file.all():
