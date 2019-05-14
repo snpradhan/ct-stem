@@ -434,7 +434,7 @@ class UserGroup(models.Model):
   subject = models.ForeignKey(Subject, null=True, blank=True)
   time = models.CharField(null=False, max_length=256)
   teacher = models.ForeignKey(Teacher, related_name='groups')
-  description = models.TextField(null=True)
+  description = models.TextField(null=True, blank=True)
   members = models.ManyToManyField(Student, through='Membership', blank=True, null=True, related_name='member_of')
   shared_with = models.ManyToManyField(Teacher, null=True, blank=True, help_text='Select teachers to share this class with.' )
   group_code = models.CharField(null=False, blank=False, max_length=10, unique=True, default=generate_code_helper)
