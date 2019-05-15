@@ -559,6 +559,7 @@ class StepFeedback(models.Model):
 
   class Meta:
     ordering = ('step_response__step__order',)
+    unique_together = ('assignment_feedback', 'step_response')
 
 #######################################################
 # Question Feedback Model
@@ -572,6 +573,7 @@ class QuestionFeedback(models.Model):
 
   class Meta:
     ordering = ('response__curriculum_question__order',)
+    unique_together = ('step_feedback', 'response')
 
 #######################################################
 # Team Model
