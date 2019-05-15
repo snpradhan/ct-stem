@@ -557,6 +557,9 @@ class StepFeedback(models.Model):
   assignment_feedback = models.ForeignKey(AssignmentFeedback)
   step_response = models.ForeignKey(AssignmentStepResponse)
 
+  class Meta:
+    ordering = ('step_response__step__order',)
+
 #######################################################
 # Question Feedback Model
 #######################################################
@@ -567,6 +570,8 @@ class QuestionFeedback(models.Model):
   created_date = models.DateTimeField(auto_now_add=True)
   modified_date = models.DateTimeField(auto_now=True)
 
+  class Meta:
+    ordering = ('response__curriculum_question__order',)
 
 #######################################################
 # Team Model
