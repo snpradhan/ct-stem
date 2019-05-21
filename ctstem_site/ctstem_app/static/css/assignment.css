@@ -417,6 +417,14 @@ input[type="text"].other {
   margin-top: 1em;
 }
 
+.input_error {
+  border: 2px solid var(--ctstem-color-red);
+}
+
+.assignment_input input[type="radio"], .assignment_input input[type="checkbox"] {
+  margin-left: 0.5em;
+}
+
 .mc-options {
   margin: 1.5rem;
   line-height: 170%;
@@ -533,6 +541,8 @@ hr.light {
 table.likert {
   border-collapse: collapse;
   width: 100%;
+  margin-bottom: 0.5em;
+
   /*border-top: 1px solid #888;
   border-bottom: 1px solid #888;*/
 }
@@ -558,8 +568,10 @@ td.likert-prompt {
   padding-bottom: 1em;
   padding-top: 1em;
   vertical-align: middle;
-  width: 60%;
-
+  width: 53%;
+}
+td.likert-prompt p {
+  margin-bottom: 0;
 }
 
 td.likert-number {
@@ -591,7 +603,7 @@ th.likert-instructions {
   text-align: left;
   vertical-align: top;
   padding: 1.2em 0.5em 1.2em 0;
-  width: 65%;
+  width: 58%;
 }
 a.add_attachment {
   margin-top: 1em;

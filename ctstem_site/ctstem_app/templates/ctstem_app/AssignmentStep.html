@@ -218,8 +218,8 @@
                       </div>
 
                       <div class="response">
-                        <!-- completed assignment -->
                         {% if instance.status == 'F' or instance.status == 'S' or instance.status == 'A' %}
+                         <!-- completed assignment -->
                           <label>Response:</label>
                           <div class="readonly text">
                             {% if field_type == 'FI' %}
@@ -262,8 +262,8 @@
                               </div>
                             {% endif %}
                           </div>
-                        <!-- New and In Progress assignment -->
                         {% else %}
+                         <!-- New and In Progress assignment -->
                           <div class="text">
                           {% if field_type == 'TA' %}
                             {{questionForm.response}}
@@ -368,7 +368,9 @@
                                           <a href="{{fileform.instance.file.url}}">{{fileform.file.value}}</a>
                                           {{fileform.file.as_hidden}}
                                         {% else %}
-                                          {{fileform.file}}
+                                          <div class="assignment_input">
+                                            {{fileform.file}}
+                                          </div>
                                         {% endif %}
                                           <div class="error">
                                             {{fileform.file.errors}}
@@ -441,17 +443,20 @@
                   <!-- SURVEY SECTION -->
                     <table class="likert">
                       <tbody>
-                        <tr class="likert-item assignment_input" tabindex="-1">
+                        <tr class="likert-item" tabindex="-1">
                           <td class="likert-number">
                             {{questionForm.id}}
                             {{questionForm.nested.management_form}}
                             {{questionForm.nested.id}}
-                            {{forloop.counter}}.
+                            {{step_order}}.{{forloop.counter}}.
                           </td>
                           <td class="likert-prompt">
                               {{questionObj.question_text|inline_style|safe}}
                               {{questionForm.curriculum_question.as_hidden}}
                               {{questionForm.save.as_hidden}}
+                              <div class="error" style="display:none;">
+                                {{questionForm.response.errors}}
+                              </div>
                           </td>
                           {% for option in questionObj.options|splitlines%}
                             <td class="likert-option">
@@ -806,7 +811,16 @@
         return false;
       });
 
-      $('ul.messages').delay(30000).fadeOut('slow');
+      $('ul.messages').delay(5000).fadeOut('slow');
+
+      //for each error message highlight the field causing the error
+      $('div.error').each(function(){
+        var error_length = $.trim($(this).text()).length;
+        if(error_length > 0) {
+          $(this).closest('.question_response_feedback').find('.assignment_input, .django-ckeditor-widget').addClass('input_error');
+          $(this).closest('.likert-item').addClass('input_error');
+        }
+      });
 
     });
 
