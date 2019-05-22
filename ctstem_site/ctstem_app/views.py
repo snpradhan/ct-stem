@@ -2546,11 +2546,9 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
         messages.error(request, 'Please use the buttons below to navigate between steps')
         return shortcuts.redirect('ctstem:resumeAssignment', assignment_id=assignment_id, instance_id=instance.id, step_order=last_step)
 
-    #starting a new assignment
+    #starting a new assignment or retrieve an existing assignment
     else:
-      status = 'N'
-      instance = models.AssignmentInstance(assignment=assignment, student=request.user.student, status=status)
-      instance.save()
+      instance, created = models.AssignmentInstance.objects.get_or_create(assignment=assignment, student=request.user.student)
       step_order = 0
 
     if 'GET' == request.method or 'POST' == request.method:
@@ -2562,31 +2560,25 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
         return render(request, 'ctstem_app/AssignmentStep.html', context)
       else:
         step = steps.get(order=step_order)
-        initial_data = []
+        #create step response object
+        assignmentStepResponse, created = models.AssignmentStepResponse.objects.get_or_create(instance=instance, step=step)
+        curriculumQuestions = models.CurriculumQuestion.objects.all().filter(step=step).order_by('order')
+        #create notes object
+        notes, created = models.AssignmentNotes.objects.get_or_create(instance=instance)
 
-        try:
-          assignmentStepResponse = models.AssignmentStepResponse.objects.get(instance=instance, step=step)
-          extra = 0
-        except models.AssignmentStepResponse.DoesNotExist:
-          #unsaved object
-          assignmentStepResponse = models.AssignmentStepResponse(instance=instance, step=step)
-          curriculumQuestions = models.CurriculumQuestion.objects.all().filter(step=step).order_by('order')
-          extra = curriculumQuestions.count()
-          for curriculumQuestion in curriculumQuestions:
-            initial_data.append({'curriculum_question': curriculumQuestion.id, 'response': ''})
-
-        #get notes
-        try:
-          notes = models.AssignmentNotes.objects.get(instance=instance)
-        except models.AssignmentNotes.DoesNotExist:
-          notes = models.AssignmentNotes(instance=instance)
+        #create empty question responses if one does not exist
+        for curriculumQuestion in curriculumQuestions:
+          questionResponse, created = models.QuestionResponse.objects.get_or_create(step_response=assignmentStepResponse, curriculum_question=curriculumQuestion)
+          if questionResponse.response is None:
+            questionResponse.response = ''
+            questionResponse.save()
 
         if 'GET' == request.method:
           #get the assignment step
           form = forms.AssignmentStepResponseForm(instance=assignmentStepResponse, prefix="step_response")
           questionResponseFormset = nestedformset_factory(models.AssignmentStepResponse, models.QuestionResponse, form=forms.QuestionResponseForm,
                                                     nested_formset=inlineformset_factory(models.QuestionResponse, models.QuestionResponseFile, form=forms.QuestionResponseFileForm, can_delete=True, extra=2),
-                                                    can_delete=False, can_order=True, extra=extra)
+                                                    can_delete=False, can_order=True, extra=0)
 
           #questionResponseFormset=inlineformset_factory(models.AssignmentStepResponse, models.QuestionResponse, form=forms.QuestionResponseForm, can_delete=False, can_order=True, extra=extra)
           formset = questionResponseFormset(instance=assignmentStepResponse, prefix='form')
@@ -2598,12 +2590,6 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
 
           notesform = forms.AssignmentNotesForm(instance=notes, prefix="notes")
 
-          if len(initial_data):
-            for subform, data in zip(formset.forms, initial_data):
-              subform.initial = data
-
-          if instance.status == 'N' or instance.status == 'P':
-            instance.save()
           context = {'curriculum': curriculum, 'instance': instance, 'instanceform': instanceform, 'notesform': notesform, 'form': form, 'formset': formset, 'total_steps': total_steps, 'step_order': step_order}
           return render(request, 'ctstem_app/AssignmentStep.html', context)
 
@@ -2656,8 +2642,6 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
               notesform.save()
 
             #save assignment step response
-            assignmentStepResponse = form.save(commit=False)
-            assignmentStepResponse.instance = instance
             assignmentStepResponse.save()
 
             questionCount = 0

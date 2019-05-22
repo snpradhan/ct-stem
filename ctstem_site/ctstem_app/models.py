@@ -485,7 +485,7 @@ class AssignmentInstance(models.Model):
   assignment = models.ForeignKey(Assignment)
   student = models.ForeignKey(Student, related_name='instance')
   teammates = models.ManyToManyField(Student, blank=True, null=True, help_text='On Windows use Ctrl+Click to make multiple selection.  On a Mac use Cmd+Click to make multiple selection')
-  status = models.CharField(max_length=255, choices=ASSIGNMENT_STATUS)
+  status = models.CharField(max_length=255, choices=ASSIGNMENT_STATUS, default='N')
   last_step = models.IntegerField(null=False, blank=False, default=0)
   time_spent = models.FloatField(null=False, blank=False, default=0.0)
   created_date = models.DateTimeField(auto_now_add=True)
