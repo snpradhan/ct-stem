@@ -466,7 +466,7 @@ class CurriculumForm(ModelForm):
     widgets = {
       'title': forms.TextInput(attrs={'placeholder': 'Lesson Title'}),
       'time': forms.TextInput(attrs={'rows':0, 'cols':60}),
-      'level': forms.Textarea(attrs={'rows':0, 'cols':60}),
+      'level': forms.TextInput(attrs={'rows':0, 'cols':60}),
       'overview': forms.Textarea(attrs={'rows':0, 'cols':60}),
       'student_overview': forms.Textarea(attrs={'rows':0, 'cols':60}),
       'content': forms.Textarea(attrs={'rows':0, 'cols':60}),
