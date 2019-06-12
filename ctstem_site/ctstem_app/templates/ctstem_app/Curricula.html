@@ -201,6 +201,7 @@
                                 {% if user.administrator or user.researcher or user.author %}
                                   <th>Status</th>
                                 {% endif %}
+                                <th>Last Updated</th>
                                 <th>Actions</th>
                               </tr>
                             </thead>
@@ -219,6 +220,7 @@
                                 {% if user.administrator or user.researcher or user.author %}
                                   <td>{{ curr.get_status_display }}</td>
                                 {% endif %}
+                                <td>{{curr.modified_date|date}}</td>
                                 <td class="action">
                                   {% include "ctstem_app/CurriculaActions.html" with curriculum=curr %}
                                 </td>
@@ -230,6 +232,12 @@
                       </div>
                       {% endwith %}
                     {% endif %}
+                    <div class="row">
+                      <div class="col-md-2 title">Last Updated:</div>
+                      <div class="col-md-10">
+                        {{curriculum.modified_date|date}}
+                      </div>
+                    </div>
                   </td>
                   <td class="action">
                     {% include "ctstem_app/CurriculaActions.html" with curriculum=curriculum %}

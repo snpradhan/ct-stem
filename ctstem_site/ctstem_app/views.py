@@ -123,28 +123,29 @@ def curricula(request, bucket='unit', status='public'):
         stat = ['P']
     else:
       stat = ['P']
-    curricula = models.Curriculum.objects.all().filter(unit__isnull=True, curriculum_type__in = curriculum_type, status__in = stat).order_by('title')
+    curricula = models.Curriculum.objects.all().filter(unit__isnull=True, curriculum_type__in = curriculum_type, status__in = stat)
 
   elif bucket == 'teacher_authored':
     if hasattr(request.user, 'administrator') or hasattr(request.user, 'researcher') or hasattr(request.user, 'author'):
       stat = ['D', 'P', 'A']
-      curricula = models.Curriculum.objects.all().filter(unit__isnull=True, curriculum_type__in = curriculum_type, status__in = stat, authors__teacher__isnull=False).distinct().order_by(Lower('title'))
+      curricula = models.Curriculum.objects.all().filter(unit__isnull=True, curriculum_type__in = curriculum_type, status__in = stat, authors__teacher__isnull=False).distinct()
 
   elif bucket == 'my' and hasattr(request.user, 'teacher'):
     stat = ['D', 'P', 'A']
-    curricula = models.Curriculum.objects.all().filter(unit__isnull=True, curriculum_type__in = curriculum_type, status__in = stat, authors=request.user).order_by(Lower('title'))
+    curricula = models.Curriculum.objects.all().filter(unit__isnull=True, curriculum_type__in = curriculum_type, status__in = stat, authors=request.user)
 
   elif bucket == 'favorite' and hasattr(request.user, 'teacher'):
     stat = ['P']
-    curricula = models.Curriculum.objects.all().filter(Q(unit__isnull=True), Q(curriculum_type__in=curriculum_type), Q(bookmarked__teacher=request.user.teacher), Q(status__in=stat) | Q(shared_with=request.user.teacher)).distinct().order_by(Lower('title'))
+    curricula = models.Curriculum.objects.all().filter(Q(unit__isnull=True), Q(curriculum_type__in=curriculum_type), Q(bookmarked__teacher=request.user.teacher), Q(status__in=stat) | Q(shared_with=request.user.teacher)).distinct()
 
   elif bucket == 'shared' and hasattr(request.user, 'teacher'):
     stat = ['D', 'P']
-    curricula = models.Curriculum.objects.all().filter(unit__isnull=True, curriculum_type__in = curriculum_type, status__in = stat, shared_with=request.user.teacher).order_by(Lower('title'))
-
+    curricula = models.Curriculum.objects.all().filter(unit__isnull=True, curriculum_type__in = curriculum_type, status__in = stat, shared_with=request.user.teacher)
   else:
     messages.error(request, "There are no curricula for the requested category.")
 
+  if curricula:
+    curricula = curricula.order_by('-modified_date', Lower('title'))
   context = {'curricula': curricula, 'bucket': bucket, 'status': status}
 
   return render(request, 'ctstem_app/Curricula.html', context)
@@ -224,6 +225,10 @@ def curriculum(request, id=''):
         #if archiving a unit, also archive the underlying lessons
         if savedCurriculum.curriculum_type == 'U' and savedCurriculum.status == 'A':
           archiveCurriculum(request, savedCurriculum.id)
+        # update the last modified timestamp on the unit
+        if savedCurriculum.curriculum_type == 'L' and savedCurriculum.unit:
+          unit = savedCurriculum.unit
+          unit.save()
         if request.is_ajax():
           response_data = {'status': 1, 'message': 'Curriculum Saved.'}
           return http.HttpResponse(json.dumps(response_data), content_type = 'application/json')
