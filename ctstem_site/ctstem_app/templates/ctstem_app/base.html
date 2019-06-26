@@ -155,7 +155,7 @@
                            {% navactive request 'ctstem:curricula' 'teacher_authored' %}
                            {% navactive request 'ctstem:curricula' 'my' %}
                            {% navactive request 'ctstem:curricula' 'shared' %}
-                           {% navactive request 'ctstem:curricula' 'favorite' %}"><a href="{% url 'ctstem:curricula' 'unit' %}">Teaching Resources</a></li>
+                           {% navactive request 'ctstem:curricula' 'favorite' %}"><a href="{% url 'ctstem:curricula' 'unit' %}">Curricula</a></li>
                 <!-- Intro to CT Menu -->
                 <li><a class="page-scroll" href="{% url 'ctstem:home' %}#five">Intro to CT</a></li>
 
@@ -425,7 +425,7 @@
            <div class="resource">
              <h4>For you</h4>
              <ul>
-               <li><a href="{% url 'ctstem:curricula' 'units' %}">Teaching Resources</a></li>
+               <li><a href="{% url 'ctstem:curricula' 'units' %}">Curricula</a></li>
                <li><a class="page-scroll" href="{% url 'ctstem:home' %}#five">Intro to CT</a></li>
                <li><a href="{% url 'ctstem:training' %}">Training</a></li>
                {% if user.is_anonymous %}
