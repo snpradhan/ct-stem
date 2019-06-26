@@ -421,45 +421,28 @@
   {% block footer %}
     <footer>
       <div class="col-container">
-        <div class="col left">
-          <h4>Questions and feedback</h4>
-          <p>As a teacher, your methodologies, concerns and insights are all extremely important to us.</p>
-          <p>Please contact us if there's anything you'd like to discuss:</p>
-          <p><a href="mailto:ctstem@northwestern.edu">ctstem@northwestern.edu</a>
-        </div>
-        <div class="col right">
-          <h4>Professional training</h4>
-          <p>Our CT-STEM workshops are helping educators to enrich their teaching of STEM content using authentic
-          CT practices. We offer discipline-specific coaching to all computing abilities so that teachers can confidently
-          address the Next Generation Science Standards, and so that their students are equipped for the future.</p>
-          <a type="button" class="btn normal yellow" href="{% url 'ctstem:training' %}">More Info</a>
-        </div>
-      </div>
-
-
-      <div class="col-container">
-        <div class="col left resources">
-          <div class="resource">
-            <h4>For you</h4>
-            <ul>
-              <li><a href="{% url 'ctstem:curricula' 'units' %}">Teaching Resources</a></li>
-              <li><a class="page-scroll" href="{% url 'ctstem:home' %}#five">Intro to CT</a></li>
-              <li><a href="{% url 'ctstem:training' %}">Training</a></li>
-              {% if user.is_anonymous %}
-                <li><a data-toggle="modal" data-target="#login" class="login modal-open" data-href="{% url 'ctstem:login' %}" href="#">Login</a></li>
-              {% endif %}
-            </ul>
-
-          </div>
-          <div class="resource">
-             <h4>About us</h4>
+         <div class="col left resources">
+           <div class="resource">
+             <h4>For you</h4>
              <ul>
-              <li><a href="{% url 'ctstem:standards' %}">Standards</a></li>
-              <li><a class="page-scroll" href="{% url 'ctstem:publications' %}#five">Research</a></li>
-              <li><a href="{% url 'ctstem:team' %}">Team</a></li>
-            </ul>
-          </div>
-        </div>
+               <li><a href="{% url 'ctstem:curricula' 'units' %}">Teaching Resources</a></li>
+               <li><a class="page-scroll" href="{% url 'ctstem:home' %}#five">Intro to CT</a></li>
+               <li><a href="{% url 'ctstem:training' %}">Training</a></li>
+               {% if user.is_anonymous %}
+                 <li><a data-toggle="modal" data-target="#login" class="login modal-open" data-href="{% url 'ctstem:login' %}" href="#">Login</a></li>
+               {% endif %}
+             </ul>
+
+           </div>
+           <div class="resource">
+              <h4>About us</h4>
+              <ul>
+               <li><a href="{% url 'ctstem:standards' %}">Standards</a></li>
+               <li><a class="page-scroll" href="{% url 'ctstem:publications' %}#five">Research</a></li>
+               <li><a href="{% url 'ctstem:team' %}">Team</a></li>
+             </ul>
+           </div>
+         </div>
 
         <div class="col right">
           <h4>Sponsors</h4>
@@ -477,6 +460,16 @@
           </div>
         </div>
       </div>
+
+      <div class="col-container">
+         <div class="col end">
+          <h4>Questions and feedback</h4>
+          <p>As a teacher, your methodologies, concerns and insights are all extremely important to us.</p>
+          <p>Please contact us if there's anything you'd like to discuss:</p>
+          <p><a href="mailto:ctstem@northwestern.edu">ctstem@northwestern.edu</a></p>
+         </div>
+      </div>
+      
       <div class="col-container">
         <div class="col end">
           <hr>
