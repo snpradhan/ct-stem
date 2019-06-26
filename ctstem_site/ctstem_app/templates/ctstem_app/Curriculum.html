@@ -15,7 +15,7 @@
           <div class="table" id="curriculum">
             <h4>
               <span>&nbsp;</span>
-              <span class="curriculum_title" style="font-weight: bold; text-decoration: underline;">{{form.title.value|default_if_none:"  "}}</span>
+              <span class="curriculum_title" style="font-weight: bold; text-decoration: underline;">{{form.title.value|default_if_none:" "}}</span>
               <span>&nbsp;</span>
               <span class="controls">
                 <span class="expand_collapse">
@@ -105,7 +105,7 @@
                         {% endif %}
                       </div>
                     {% endif %}
-                    {% if field.name == 'icon' or field.name == 'subject' or field.name == 'compatible_system' or field.name == 'unit' or field.name == 'shared_with' or field.name == 'order' or field.name == 'authors' %}
+                    {% if field.name == 'student_overview' or field.name == 'overview' or field.name == 'credits' or field.name == 'acknowledgement' or field.name == 'icon' or field.name == 'subject' or field.name == 'compatible_system' or field.name == 'unit' or field.name == 'shared_with' or field.name == 'order' or field.name == 'authors' %}
                     <div class="help warning">{{field.help_text|safe}}</div>
                   {% endif %}
                   <div class="error">{{ field.errors }}</div>
@@ -435,7 +435,7 @@
           $('#id_curriculum-overview').closest('.form-group').show();
           $('#id_curriculum-overview').closest('.form-group').find('label:first').html('Overview (<span class="required">*</span>)');
           $('#id_curriculum-student_overview').closest('.form-group').show();
-          $('#id_curriculum-student_overview').closest('.form-group').find('label:first').html('Student Directions (<span class="required">*</span>)');
+          $('#id_curriculum-student_overview').closest('.form-group').find('label:first').html('Student Directions & Learning Objectives (<span class="required">*</span>)');
           $('div.form-group.attachment_table').show();
           $('#id_curriculum-acknowledgement').closest('.form-group').show();
           $('#id_curriculum-credits').closest('.form-group').show();
