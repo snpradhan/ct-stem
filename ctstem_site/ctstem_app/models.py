@@ -188,7 +188,7 @@ class Curriculum (models.Model):
 # A curriculum may have one or more step/activity
 class Step(models.Model):
   curriculum = models.ForeignKey(Curriculum, null=False, related_name="steps")
-  title = models.CharField(null=True, blank=True, max_length=256, help_text="Step title")
+  title = models.CharField(null=True, blank=True, max_length=256, help_text="Page title")
   order = models.IntegerField(null=True)
   content = RichTextUploadingField(null=True, blank=True)
   teacher_notes = RichTextUploadingField(null=True, blank=True)
