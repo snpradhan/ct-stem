@@ -178,16 +178,16 @@
                 <span>&nbsp;</span>
                 <span class="controls">
                   <span>
-                    <button type="button" class="btn btn-danger delete_step" name="delete_step" aria-label="Delete Step" title="Delete Step">
+                    <button type="button" class="btn btn-danger delete_step" name="delete_step" aria-label="Delete Page" title="Delete Page">
                       <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
                     </button>
                     {{step.DELETE.as_hidden}}
                   </span>
                   <span class="expand_collapse">
-                    <button type="button" class="btn btn-warning" name="collapse_step" aria-label="Collapse Step" title="Collapse Step">
+                    <button type="button" class="btn btn-warning" name="collapse_step" aria-label="Collapse Page" title="Collapse Page">
                       <span class="glyphicon glyphicon-collapse-up" aria-hidden="true"></span>
                     </button>
-                    <button type="button" class="btn btn-success" style="display:none;" name="expand_step" aria-label="Expand Step" title="Expand Step">
+                    <button type="button" class="btn btn-success" style="display:none;" name="expand_step" aria-label="Expand Page" title="Expand Page">
                       <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
                     </button>
                   </span>
@@ -198,7 +198,7 @@
               {{step.id}}
               <div class="curriculum_content collapsible_content">
                 <div class="form-group order">
-                  <label for="id_{{step.ORDER.name}}"> Step #.</label>
+                  <label for="id_{{step.ORDER.name}}"> Page #.</label>
                   <div>{{step.ORDER}}</div>
                   <div class="error">{{ step.ORDER.errors }}</div>
                 </div>
@@ -233,7 +233,7 @@
                 <div class="form-group question_table">
                   {{step.nested.management_form}}
                   {{step.nested.id}}
-                  <label for="id_question_table">Step Question(s)</label>
+                  <label for="id_question_table">Question(s)</label>
                   <button class="btn btn-info edit_question" name="add_question" data-form="{% url 'ctstem:newQuestion' %}" aria-label="Add New Question" title="Add New Question">
                     <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
                   </button>
@@ -252,7 +252,7 @@
                         <th class="question_text">Question</th>
                         <th class="referenced_by">
                           Referenced By
-                          <span data-toggle="tooltip" data-placement="top" title="Provide a comma separated list of Step Numbers that will reference this question. This question will be available on those steps as readonly.">
+                          <span data-toggle="tooltip" data-placement="top" title="Provide a comma separated list of Page Numbers that will reference this question. This question will be available on those steps as readonly.">
                             <i class="fa fa-info-circle" aria-hidden="true"></i>
                           </span>
                         </th>
@@ -382,7 +382,7 @@
       });
 
       $('button.delete_step').click(function(){
-        var r = confirm("Are you sure you want to delete this step?");
+        var r = confirm("Are you sure you want to delete this page?");
         if (r == true) {
           $(this).next('input').val('on');
           $(this).closest('div.table.step').hide();
