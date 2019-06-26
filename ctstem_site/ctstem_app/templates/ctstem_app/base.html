@@ -161,15 +161,15 @@
 
                 <!-- Training Menu -->
                 {% if user.administrator %}
-                  <li class="dropdown {% navactive request 'ctstem:training'%} {% navactive request 'ctstem:training_requests'%}">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" id="training">Training  <b class="caret"></b></a>
+                  <li class="dropdown {% navactive request 'ctstem:teacherSupport'%} {% navactive request 'ctstem:training_requests'%}">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" id="training">Teacher Support  <b class="caret"></b></a>
                     <ul class="dropdown-menu">
-                      <li class="{% navactive request 'ctstem:training' %}"><a href="{% url 'ctstem:training' %}">Training Page</a></li>
+                      <li class="{% navactive request 'ctstem:teacherSupport' %}"><a href="{% url 'ctstem:teacherSupport' %}">Training Page</a></li>
                       <li class="{% navactive request 'ctstem:training_requests' %}"><a href="{% url 'ctstem:training_requests' %}">Training Requests</a></li>
                     </ul>
                   </li>
                 {% else %}
-                  <li class="{% navactive request 'ctstem:training' %}"><a href="{% url 'ctstem:training' %}">Training</a></li>
+                  <li class="{% navactive request 'ctstem:teacherSupport' %}"><a href="{% url 'ctstem:teacherSupport' %}">Teacher Support</a></li>
                 {% endif %}
 
                 <!-- About Menu with dropdown sub menu (Standards, Research and Team) -->
@@ -427,7 +427,7 @@
              <ul>
                <li><a href="{% url 'ctstem:curricula' 'units' %}">Curricula</a></li>
                <li><a class="page-scroll" href="{% url 'ctstem:home' %}#five">Intro to CT</a></li>
-               <li><a href="{% url 'ctstem:training' %}">Training</a></li>
+               <li><a href="{% url 'ctstem:teacherSupport' %}">Teacher Support</a></li>
                {% if user.is_anonymous %}
                  <li><a data-toggle="modal" data-target="#login" class="login modal-open" data-href="{% url 'ctstem:login' %}" href="#">Login</a></li>
                {% endif %}

@@ -4186,8 +4186,8 @@ def check_session(request):
 ####################################
 # PROFESSIONAL DEVELOPMENT PAGE
 ####################################
-def training(request):
-  return render(request, 'ctstem_app/Training.html')
+def teacherSupport(request):
+  return render(request, 'ctstem_app/TeacherSupport.html')
 
 
 ####################################
