@@ -490,7 +490,7 @@ class CurriculumForm(ModelForm):
     self.fields['unit'].queryset = models.Curriculum.objects.filter(curriculum_type='U').order_by(Lower('title'), 'version')
     self.fields['unit'].label_from_instance = lambda obj: "%s - v%d." % (obj.title, obj.version)
     if hasattr(usr, 'teacher'):
-      self.fields['unit'].widget.attrs['disabled'] = True
+      self.fields['unit'].queryset = models.Curriculum.objects.filter(curriculum_type='U', authors=usr).order_by(Lower('title'), 'version')
       self.fields.pop('status')
 
 

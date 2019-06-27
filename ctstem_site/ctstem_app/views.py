@@ -3121,7 +3121,7 @@ def check_curriculum_permission(request, curriculum_id, action):
     ############ CREATE ############
     if action == 'create':
       # only admin, researcher and author can create a new curriculum
-      if is_admin or is_researcher or is_author:
+      if is_admin or is_researcher or is_author or is_teacher:
         has_permission = True
       else:
         has_permission = False
