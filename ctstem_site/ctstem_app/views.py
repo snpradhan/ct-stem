@@ -258,7 +258,7 @@ def curriculum(request, id=''):
 def previewCurriculum(request, id='', step_order=-1):
   try:
     # check curriculum permission
-    has_permission = check_curriculum_permission(request, id, 'preview')
+    has_permission = check_curriculum_permission(request, id, 'preview', step_order)
     if has_permission:
       curriculum = models.Curriculum.objects.get(id=id)
     else:
@@ -3102,7 +3102,7 @@ def addAssignment(request, curriculum_id='', group_id=''):
 # to perform the specified action on the
 # curriculum
 ####################################
-def check_curriculum_permission(request, curriculum_id, action):
+def check_curriculum_permission(request, curriculum_id, action, step_order=-1):
   try:
     has_permission = False
     is_admin = is_researcher = is_author = is_school_admin = is_teacher = False
@@ -3222,9 +3222,10 @@ def check_curriculum_permission(request, curriculum_id, action):
 
       ############ PREVIEW ############
       elif action == 'preview':
-        # admin, researcher and author can preview any curriculum
+        # admin, researcher and author can preview any curricula
         if is_admin or is_researcher or is_author:
           has_permission = True
+        # school admins can preview published curricula
         elif is_school_admin and curriculum.status == 'P':
           has_permission = True
         # teacher can only preview curriculum that are public, shared with them or that they own
@@ -3234,6 +3235,9 @@ def check_curriculum_permission(request, curriculum_id, action):
           elif request.user in curriculum.authors.all():
             has_permission = True
           elif request.user.teacher in curriculum.shared_with.all():
+            has_permission = True
+        else:
+          if curriculum.curriculum_type in ['U', 'L'] and step_order == -1:
             has_permission = True
 
         if not has_permission:

@@ -21,6 +21,7 @@
   <script type="text/javascript" src="{% staticfile 'js/session.js' %}"></script>
   <script type="text/javascript" src="{% staticfile 'js/clone_more.js' %}"></script>
   <script type="text/javascript" src="{% staticfile 'js/assignment.js' %}"></script>
+  <script type="text/javascript" src="{% staticfile 'js/modal.js' %}"></script>
 {% endblock %}
 
 {% block custom_media %}
@@ -120,9 +121,9 @@
                 </li>
               {% endif %}
             {% elif user.is_anonymous %}
-              <li><a data-toggle="modal" data-target="#login" class="login" href="#">View Teacher Notes</a></li>
+              <li><a data-toggle="modal" data-target="#login" class="notes" href="#">View Teacher Notes</a></li>
               {% if curr_unit.curriculum_type == 'L' %}
-                <li><a data-toggle="modal" data-target="#login" class="login" href="#">View Student Activity </a></li>
+                <li><a data-toggle="modal" data-target="#login" class="activity" href="#">View Student Activity </a></li>
               {% else %}
                 <li>
                   <a href="#" class="list_underlying_curriculum">
@@ -132,15 +133,17 @@
                   </a>
                   <ul class="underlying_curriculum">
                     {% for curr in curr_unit|get_underlying_curriculum:user %}
-                      <li><a data-toggle="modal" data-target="#login" class="login" href="#">{{curr.title}}</a></li>
+                      <li><a data-toggle="modal" data-target="#login" class="activity" href="#">{{curr.title}}</a></li>
                     {% endfor %}
                    </ul>
                 </li>
               {% endif %}
             {% endif %}
             <!-- TODO: LINK TO ATTACHMENT -->
-            {% if attachments %}
-              <li><a href="{% url 'ctstem:downloadAttachments' curr_unit.id%}">Download Attachment(s) <span class="fa fa-paperclip"></span></a></li>
+            {% if user.administrator or user.school_administrator or user.researcher or user.author or user.teacher %}
+              {% if attachments %}
+                <li><a href="{% url 'ctstem:downloadAttachments' curr_unit.id%}">Download Attachment(s) <span class="fa fa-paperclip"></span></a></li>
+              {% endif %}
             {% endif %}
             <li class="divider"></li>
             {% check_curriculum_permission curr_unit.id 'assign' as has_assign_permission %}
@@ -166,7 +169,7 @@
             <li class="divider"></li>
             <li><a href="#" class="faq"">View CT FAQ</a></li>
             {% if user.is_anonymous %}
-              <li><a data-toggle="modal" data-target="#login" class="login" href="#">Login</a></li>
+              <li><a data-toggle="modal" data-target="#login" class="login modal-open" data-href="{% url 'ctstem:login' %}" href="#">Login</a></li>
             {% else %}
               <li><a href="{% url 'ctstem:logout' %}">Logout</a></li>
             {% endif %}
@@ -458,7 +461,7 @@
       });
       $('body').on('click', 'a.activity', function(){
         {% if user.is_anonymous %}
-          alert('Please login to view student activity');
+          alert('Please login to view lesson activity');
           return false;
         {% else %}
           $('main').hide();

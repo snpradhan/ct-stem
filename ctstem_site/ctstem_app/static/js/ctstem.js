@@ -62,13 +62,6 @@ function reset_password(user_full_name, user_id, csrf_token){
 
 $(function (){
 
-  $('.modal').on('hidden.bs.modal', function(){
-    $(this).find('form')[0].reset();
-    $(this).find('.msg .errorlist .error').html('');
-    $(this).find('.results').hide();
-    $(this).find('.results tbody').html('');
-  });
-
   //user code generation
   $("#generate_code").click(function(){
     var url = "/generate_code/";
@@ -86,16 +79,6 @@ $(function (){
 
     });
   });
-
-  $("a.modal-open").click(function(e){
-    e.preventDefault();
-    var url = $(this).data('href');
-    var target = $(this).data('target');
-    $(target).load(url, function() {
-      $(this).modal('show');
-    });
-  });
-
 
   //datatables configuration
   $('table.table.dt thead tr#filterrow th:not(.no-sort)').each( function () {
