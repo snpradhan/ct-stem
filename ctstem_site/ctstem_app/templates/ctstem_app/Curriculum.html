@@ -100,8 +100,6 @@
                         {{field}}
                         {% if field.name == 'curriculum_type' and form.instance.id %}
                           {{field.as_hidden}}
-                        {% elif field.name == 'unit' and user.teacher %}
-                          {{field.as_hidden}}
                         {% endif %}
                       </div>
                     {% endif %}

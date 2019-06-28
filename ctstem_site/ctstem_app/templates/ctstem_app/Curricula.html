@@ -38,47 +38,8 @@
           <a type="button" class="btn btn-success" href="{% url 'ctstem:newCurriculum' %}" title="Create new curriculum">Create Curriculum</a>
         {% endif %}
       </div>
+      {% include "ctstem_app/CurriculaTabs.html" %}
 
-      {% if user.teacher %}
-        <ul class="nav nav-tabs">
-            <li {% if bucket == 'unit' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'unit' 'public' %}">Units</a></li>
-            <li {% if bucket == 'lesson' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'lesson' 'public' %}">Lessons</a></li>
-            <li {% if bucket == 'assessment' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'assessment' 'public' %}">Assessment</a></li>
-            <li {% if bucket == 'my' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'my' %}">My Curricula</a></li>
-            <li {% if bucket == 'shared'%} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'shared' %}">Shared Curricula</a></li>
-            <li {% if bucket == 'favorite' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'favorite' %}">Favorite Curricula</a></li>
-        </ul>
-      {% else %}
-        <ul class="nav nav-tabs">
-          <li {% if bucket == 'unit' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'unit' 'public' %}">Units</a></li>
-          <li {% if bucket == 'lesson' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'lesson' 'public' %}">Lessons</a></li>
-          <li {% if bucket == 'assessment' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'assessment' 'public' %}">Assessment</a></li>
-          {% if user.administrator or user.researcher or user.author %}
-            <li {% if bucket == 'teacher_authored' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'teacher_authored' %}">Teacher Authored Curricula</a></li>
-          {% endif %}
-        </ul>
-        {% if user.administrator or user.researcher or user.author %}
-          {% if bucket == 'unit' %}
-             <ul class="nav nav-tabs">
-              <li {% if status == 'private' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'unit' 'private'%}">Private</a></li>
-              <li {% if status == 'public' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'unit' 'public' %}">Public</a></li>
-              <li {% if status == 'archived' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'unit' 'archived' %}">Archived</a></li>
-            </ul>
-          {% elif bucket == 'lesson' %}
-            <ul class="nav nav-tabs">
-              <li {% if status == 'private' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'lesson' 'private' %}">Private</a></li>
-              <li {% if status == 'public' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'lesson' 'public' %}">Public</a></li>
-              <li {% if status == 'archived' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'lesson' 'archived' %}">Archived</a></li>
-            </ul>
-          {% elif bucket == 'assessment' %}
-            <ul class="nav nav-tabs">
-              <li {% if status == 'private' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'assessment' 'private' %}">Private</a></li>
-              <li {% if status == 'public' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'assessment' 'public' %}">Public</a></li>
-              <li {% if status == 'archived' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'assessment' 'archived' %}">Archived</a></li>
-            </ul>
-          {% endif %}
-        {% endif %}
-      {% endif %}
       {% if curricula %}
         <div id="curricula_table">
           <table class="table table-striped dt" id="curricula">
