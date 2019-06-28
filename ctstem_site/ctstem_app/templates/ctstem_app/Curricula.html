@@ -35,7 +35,7 @@
 
       <div class="btn-group">
         {% if user.administrator or user.researcher or user.author or user.teacher %}
-          <a type="button" class="btn btn-success" href="{% url 'ctstem:newCurriculum' %}" title="Create new curriculum">Create Curriculum</a>
+          <a type="button" class="btn btn-success" href="{% url 'ctstem:newCurriculum' %}?back_url={{ request.path }}" title="Create new curriculum">Create Curriculum</a>
         {% endif %}
       </div>
       {% include "ctstem_app/CurriculaTabs.html" %}

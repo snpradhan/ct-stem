@@ -296,15 +296,23 @@
         </div>
 
         <div class="form-group button-group-fixed col-md-1">
-          {% if form.instance.id %}
-            <input type="button" class="btn btn-warning" id="preview" value="Preview"/>
-          {% else %}
-            <input type="button" class="btn btn-warning" id="preview" value="Preview" title="Save this curriculum for the Preview button to be enabled" disabled/>
+          <input type="hidden" name="back" id="back" value="0"/>
+          {% if back_url %}
+            <input type="submit" class="btn" id="backBtn" value="Back"/>
           {% endif %}
+           <br><br>
+          {% if form.instance.id %}
+            <input type="submit" class="btn btn-warning" id="previewBtn" value="Preview"/>
+          {% else %}
+            <input type="submit" class="btn btn-warning" id="previewBtn" value="Preview" title="Save this curriculum for the Preview button to be enabled" disabled/>
+          {% endif %}
+          <input type="hidden" name="preview" id="preview" value="0"/>
           <br><br>
           <input type="submit" class="btn btn-success" id="submit" value="Save"/>
           <br><br>
           <input type="button" class="btn btn-info" id="addStep" value="Add Page" style="display:none;"/>
+
+
         </div>
     </div>
     </form>
@@ -512,8 +520,11 @@
       }
 
       //on click of preview, first save the curriculum and then generate the preview
-      $('input#preview').on('click', function(){
+      $('input#previewBtn').click(function(e){
+        $('input#preview').val("1");
+        $('form#curriculumForm').submit();
 
+        /*
         for ( instance in CKEDITOR.instances )
           CKEDITOR.instances[instance].updateElement();
 
@@ -522,7 +533,7 @@
            success: function(data){
             if(data["status"]){
               setTimeout(function(){
-                window.location.href = '/curriculum/{{form.instance.id}}';
+                window.location.href = '/curriculum/{{form.instance.id}}?back={{back}}';
                 window.open('/curriculum/preview/{{form.instance.id}}', '_blank');
               }, 1000);
             }
@@ -537,7 +548,13 @@
             $('ul.messages').html("<li class='error'>The curriculum could not be saved because there were errors.  Please manually save the curriculum to see specific errors.</li>");
            },
         });
-      })
+        */
+      });
+      //on click of Back button, save the curriculum and redirect to previous page
+      $('input#backBtn').click(function(e){
+        $('input#back').val("1");
+        $('form#curriculumForm').submit();
+      });
 
     });
   </script>

@@ -173,6 +173,9 @@ def curriculum(request, id=''):
          return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
     newQuestionForm = forms.QuestionForm()
+    back_url = None
+    if 'back_url' in request.GET:
+      back_url = request.GET['back_url']
 
     if request.method == 'GET':
       initial = {}
@@ -188,11 +191,14 @@ def curriculum(request, id=''):
 
       formset = StepFormSet(instance=curriculum, prefix='form')
       attachment_formset = AttachmentFormSet(instance=curriculum, prefix='attachment_form')
-      context = {'form': form, 'attachment_formset': attachment_formset, 'formset':formset, 'newQuestionForm': newQuestionForm}
+      context = {'form': form, 'attachment_formset': attachment_formset, 'formset':formset, 'newQuestionForm': newQuestionForm, 'back_url': back_url }
       return render(request, 'ctstem_app/Curriculum.html', context)
 
     elif request.method == 'POST':
       data = request.POST.copy()
+      preview = data['preview']
+      back = data['back']
+
       form = forms.CurriculumForm(user=request.user, data=data, files=request.FILES, instance=curriculum, prefix="curriculum")
       #AssessmentStepFormSet = inlineformset_factory(models.Assessment, models.AssessmentStep, form=forms.AssessmentStepForm,
                                                     #can_delete=True, can_order=True, extra=0)
@@ -233,8 +239,14 @@ def curriculum(request, id=''):
           response_data = {'status': 1, 'message': 'Curriculum Saved.'}
           return http.HttpResponse(json.dumps(response_data), content_type = 'application/json')
         else:
+          #check which submit button was clicked and redirect accordingly
           messages.success(request, "Curriculum Saved.")
-          return shortcuts.redirect('ctstem:curriculum', id=savedCurriculum.id)
+          if preview == '1':
+            return shortcuts.redirect('ctstem:previewCurriculum', id=savedCurriculum.id)
+          elif back == '1':
+            return shortcuts.redirect(back_url)
+          else:
+            return shortcuts.redirect('/curriculum/%s?back_url=%s' % (savedCurriculum.id, back_url))
       else:
         print form.errors
         print formset.errors
@@ -243,8 +255,12 @@ def curriculum(request, id=''):
           response_data = {'status': 0, 'message': 'The preview could not be generated because some mandatory fields are missing.  Please manually save the curriculum to see specific errors.'}
           return http.HttpResponse(json.dumps(response_data), content_type = 'application/json')
         else:
-          messages.error(request, "The curriculum could not be saved because there were errors.  Please check the errors below.")
-          context = {'form': form, 'attachment_formset': attachment_formset, 'formset':formset, 'newQuestionForm': newQuestionForm}
+          #check which submit button was clicked and display error message accordingly
+          if preview == '1':
+            messages.error(request, "The preview could not be generated because some mandatory fields are missing.")
+          else:
+            messages.error(request, "The curriculum could not be saved because there were errors.  Please check the errors below.")
+          context = {'form': form, 'attachment_formset': attachment_formset, 'formset':formset, 'newQuestionForm': newQuestionForm, 'back_url': back_url}
           return render(request, 'ctstem_app/Curriculum.html', context)
 
     return http.HttpResponseNotAllowed(['GET', 'POST'])

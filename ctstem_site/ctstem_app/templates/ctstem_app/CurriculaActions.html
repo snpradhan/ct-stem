@@ -11,15 +11,15 @@
   {% endif %}
 {% endif %}
 
-<!-- Assign -->
+<!-- Edit -->
 {% check_curriculum_permission curriculum.id 'modify' as has_modify_permission %}
 {% if has_modify_permission == True %}
   {% if curriculum.status == 'A' %}
-    <a class="util-button fa fa-pencil" aria-hidden="true" aria-label="Edit Curriculum" title="Edit Curriculum" href="{% url 'ctstem:curriculum' curriculum.id %}"
+    <a class="util-button fa fa-pencil" aria-hidden="true" aria-label="Edit Curriculum" title="Edit Curriculum" href="{% url 'ctstem:curriculum' curriculum.id %}?back_url={{ request.path }}"
     onclick="return confirm('This curriculum has been archived.  Are you sure you want to edit this curriculum?');">
     </a>
   {% else %}
-    <a class="util-button fa fa-pencil" aria-hidden="true" aria-label="Edit Curriculum" title="Edit Curriculum" href="{% url 'ctstem:curriculum' curriculum.id %}"></a>
+    <a class="util-button fa fa-pencil" aria-hidden="true" aria-label="Edit Curriculum" title="Edit Curriculum" href="{% url 'ctstem:curriculum' curriculum.id %}?back_url={{ request.path }}"></a>
   {% endif %}
 {% endif %}
 <!-- Delete -->
