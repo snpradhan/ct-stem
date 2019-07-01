@@ -1,0 +1,17 @@
+{% extends "ctstem_app/base.html" %}
+
+{% block media %}
+  {{ block.super }}
+  {{ form.media }}
+{% endblock %}
+{% block title %}Terms of Use and Privacy Policy |{% endblock %}
+
+{% block content %}
+  {{block.super}}
+ <div class="content">
+  <div class="col-lg-12">
+    <iframe width="1200" height="1200" src="https://docs.google.com/document/d/e/2PACX-1vTQ-d7kNcxe6lrMmaWCrUg-VN_ZGH906Z0yPTJez-9mKCiscARu7s--Pshk1hiE_ZX0lCXAjWZWHnel/pub?embedded=true"></iframe>
+  </div>
+</div>
+
+{% endblock %}

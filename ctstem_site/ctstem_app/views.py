@@ -4388,3 +4388,7 @@ def is_curriculum_assigned(request, curriculum_id):
     if assignment_count > 0:
       is_assigned = True
   return is_assigned
+
+def terms(request):
+  context = {}
+  return render(request, 'ctstem_app/TermsOfUse.html', context)

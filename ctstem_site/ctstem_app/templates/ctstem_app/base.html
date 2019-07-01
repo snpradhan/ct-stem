@@ -429,6 +429,7 @@
                <li><a href="{% url 'ctstem:curricula' 'units' %}">Curricula</a></li>
                <li><a class="page-scroll" href="{% url 'ctstem:home' %}#five">Intro to CT</a></li>
                <li><a href="{% url 'ctstem:teacherSupport' %}">Teacher Support</a></li>
+               <li><a href="{% url 'ctstem:terms' %}">Terms of Use</a></li>
                {% if user.is_anonymous %}
                  <li><a data-toggle="modal" data-target="#login" class="login modal-open" data-href="{% url 'ctstem:login' %}" href="#">Login</a></li>
                {% endif %}
