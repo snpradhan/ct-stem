@@ -1032,6 +1032,9 @@ div.content#assignments .chart_container {
   margin-right: auto;
 }
 
+div.content#team h3 {
+  margin-bottom: 1.5em;
+}
 
 td.lock_on_completion input{
   width: auto;

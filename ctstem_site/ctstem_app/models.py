@@ -590,6 +590,7 @@ class TeamRole(models.Model):
 
 class Team(models.Model):
   role = models.ForeignKey(TeamRole, related_name='members')
+  current = models.BooleanField(default=True)
   name = models.CharField(max_length=255, blank=False)
   description = models.TextField(null=True)
   url = models.URLField(null=True, max_length=500, blank=True)

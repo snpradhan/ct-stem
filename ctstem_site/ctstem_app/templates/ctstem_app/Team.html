@@ -3,7 +3,7 @@
 {% block content %}
   {{block.super}}
 
-<div class="content">
+<div class="content" id="team">
   <div class="col-lg-12">
 
     <h2>Our Team</h2>
@@ -13,8 +13,9 @@
 
     <!-- Team Section -->
     <div class="container">
+      <h3 class="left">Current Members</h3>
       <div class="row">
-        {% for member in team %}
+        {% for member in current_members %}
         <div class="col-md-3 col-sm-6">
           <div class="team-member">
             <a data-form="{% url 'ctstem:teamProfile' member.id %}" data-toggle="modal" class="profile">
@@ -27,6 +28,22 @@
         {% endfor %}
       </div>
 
+      {% if past_members %}
+      <h3 class="left">Past Members</h3>
+      <div class="row">
+        {% for member in past_members %}
+        <div class="col-md-3 col-sm-6">
+          <div class="team-member">
+            <a data-form="{% url 'ctstem:teamProfile' member.id %}" data-toggle="modal" class="profile">
+              <img class="profile" src="{{member.image.url}}" class="img-responsive img-circle" alt="">
+            </a>
+            <h4>{{member.name}}</h4>
+            <p class="text-muted">{{member.role}}</p>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
 
       <!-- PARTICIPAtING ORGANIZATIONS -->
       <h3 class="left">Affiliated Research Groups and Organizations</h3>

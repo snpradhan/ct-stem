@@ -92,8 +92,9 @@ def send_email(subject, message, sender, to_list):
 # ABOUT US
 ####################################
 def team(request):
-  team = models.Team.objects.all().order_by('order')
-  context = {'team': team}
+  current_members = models.Team.objects.all().filter(current=True).order_by('order')
+  past_members = models.Team.objects.all().filter(current=False).order_by('order')
+  context = {'current_members': current_members, 'past_members': past_members}
   return render(request, 'ctstem_app/Team.html', context)
 
 ####################################
@@ -4115,7 +4116,7 @@ def teamMembers(request):
   if hasattr(request.user, 'administrator') == False:
     return http.HttpResponseNotFound('<h1>You do not have the privilege to edit team roles</h1>')
 
-  members = models.Team.objects.all().order_by('order')
+  members = models.Team.objects.all().order_by('-current', 'order')
   context = {'members': members}
   return render(request, 'ctstem_app/TeamMembers.html', context)
 

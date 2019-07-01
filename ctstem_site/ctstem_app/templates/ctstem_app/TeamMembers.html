@@ -28,6 +28,7 @@
             <th> Order </th>
             <th> Name </th>
             <th> Role </th>
+            <th> Current Member?</th>
             <th> Description </th>
             <th> Personal URL </th>
             <th> Image </th>
@@ -36,6 +37,7 @@
             <th> Order </th>
             <th> Name </th>
             <th> Role </th>
+            <th> Current Member?</th>
             <th> Description </th>
             <th> Personal URL </th>
             <th> Image </th>
@@ -56,6 +58,7 @@
                 </div>
               </td>
               <td>{{member.role}}</td>
+              <td>{{member.current|yesno:"Yes,No"}}</td>
               <td>{{member.description}}</td>
               <td>{{member.url}}</td>
               <td><img class="icon" src="{{member.image.url}}"/></td>

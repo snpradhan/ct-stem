@@ -1272,6 +1272,9 @@ class TeamMemberForm(ModelForm):
   class Meta:
     model = models.Team
     exclude = ('id',)
+    labels = {
+      'current': 'Current Member?',
+    }
 
   def __init__(self, *args, **kwargs):
     super(TeamMemberForm, self).__init__(*args, **kwargs)
