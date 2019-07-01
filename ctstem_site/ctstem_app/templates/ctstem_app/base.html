@@ -160,18 +160,20 @@
                 <!-- Intro to CT Menu -->
                 <li><a class="page-scroll" href="{% url 'ctstem:home' %}#five">Intro to CT</a></li>
 
-                <!-- Training Menu -->
-                {% if user.administrator %}
-                  <li class="dropdown {% navactive request 'ctstem:teacherSupport'%} {% navactive request 'ctstem:training_requests'%}">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" id="training">Teacher Support  <b class="caret"></b></a>
-                    <ul class="dropdown-menu">
-                      <li class="{% navactive request 'ctstem:teacherSupport' %}"><a href="{% url 'ctstem:teacherSupport' %}">Training Page</a></li>
+                <!-- Teacher Support Menu -->
+
+                <li class="dropdown {% navactive request 'ctstem:teacherSupport'%} {% navactive request 'ctstem:training_requests'%}
+                {% navactive request 'ctstem:help'%}">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" id="training">Teacher Support  <b class="caret"></b></a>
+                  <ul class="dropdown-menu">
+                    <li class="{% navactive request 'ctstem:teacherSupport' %}"><a href="{% url 'ctstem:teacherSupport' %}">Professional Development</a></li>
+                    <li class="{% navactive request 'ctstem:help' %}"><a href="{% url 'ctstem:help' %}">Help and FAQ</a></li>
+                    {% if user.administrator %}
                       <li class="{% navactive request 'ctstem:training_requests' %}"><a href="{% url 'ctstem:training_requests' %}">Training Requests</a></li>
-                    </ul>
-                  </li>
-                {% else %}
-                  <li class="{% navactive request 'ctstem:teacherSupport' %}"><a href="{% url 'ctstem:teacherSupport' %}">Teacher Support</a></li>
-                {% endif %}
+                    {% endif %}
+                  </ul>
+                </li>
+
 
                 <!-- About Menu with dropdown sub menu (Standards, Research and Team) -->
                 <li class="dropdown {% navactive request 'ctstem:standards' %}

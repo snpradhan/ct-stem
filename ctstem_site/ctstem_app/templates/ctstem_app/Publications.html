@@ -14,182 +14,184 @@
     <h2>Research</h2>
     <p class="page-blurb">STEM education faces two related challenges. First, our education system is not producing enough computational professionals to fill demand. Second, women and minorities remain significantly underrepresented. We are conducting a Design-Based Implementation Research project to study a model in which computational literacy curricula are embedded throughout required biology, chemistry, physics, and mathematics coursework. This would ensure that every high school student is exposed to computational literacy activities in a context that demonstrates its relevance to real world career paths. We are interested how such curriculum affects student and teachers’ attitudes, identity, and learning. We are also working to understand individual and institutional factors that affect the success of this model in resource-constrained public schools.</p>
 
-    <h3 class="left">Publications</h3>
-    {% if user.administrator %}
-      <div class="btn-group">
-        <a type="button" class="btn btn-info" href="{% url 'ctstem:newPublication' %}" title="Create new publication">Create Publication</a>
-        <label class="switch">
-          <input class="switch-input" type="checkbox" />
-          <span class="switch-label" data-on="Table" data-off="Bibliography"></span>
-          <span class="switch-handle"></span>
-        </label>
-      </div>
-
-    {% endif %}
-    {% if publications %}
+    <div class="page-blurb">
+      <h3 class="left">Publications</h3>
       {% if user.administrator %}
-        <div id="publications_table">
-          <table class="table table-striped table-bordered table-condensed dt" id="publications">
-            <thead>
-              <tr>
-                <th> Title </th>
-                <th> Year </th>
-                <th> Author(s) </th>
-                <th> URL </th>
-                <th> Type </th>
-              </tr>
-              <tr id="filterrow">
-                <th> Title </th>
-                <th> Year </th>
-                <th> Author(s) </th>
-                <th> URL </th>
-                <th> Type </th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for pub in publications %}
-                <tr>
-                  <td class="title">{{pub.title}}
-                    <div class="controls">
-                      {% if user.administrator %}
-                        <a type="button" class="btn btn-success" aria-label="Edit Publication" title="Edit Publication" href="{% url 'ctstem:publication' pub.slug %}">
-                          <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
-                        </a>
-                        <a type="button" class="btn btn-danger" aria-label="Delete Publication" title="Delete Publication" href="{% url 'ctstem:deletePublication' pub.slug %}" onclick="return confirm('Are you sure you want to delete {{pub.title}}?')">
-                          <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-                        </a>
-                      {% endif %}
-                      {% if pub.local_copy %}
-                        <a type="button" class="btn btn-default" aria-label="Download Publication" title="Download Publication" href="{{pub.local_copy.url}}" download target="_blank">
-                          <span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span>
-                        </a>
-                      {% endif %}
-                    </div>
-                  </td>
-                  <td>{{pub.year}}</td>
-                  <td>{{pub.authors}}</td>
-                  <td><a href="{{pub.web_link}}" target="_blank">Link</a></td>
-                  <td>{{pub.get_publication_type_display}}</td>
-                </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+        <div class="btn-group">
+          <a type="button" class="btn btn-info" href="{% url 'ctstem:newPublication' %}" title="Create new publication">Create Publication</a>
+          <label class="switch">
+            <input class="switch-input" type="checkbox" />
+            <span class="switch-label" data-on="Table" data-off="Bibliography"></span>
+            <span class="switch-handle"></span>
+          </label>
         </div>
+
       {% endif %}
-      <div id="publications_bib">
-        <ul id="publications" class="publication-list">
-          {% for pub in publications %}
-            <li class="publication">
-              <span class="authors">{{pub.authors}} </span>
-              <span class="year">({{pub.year}}). </span>
-              <span class="title">
-                {% if pub.web_link %}
-                  <a href="{{pub.web_link}}" target="_blank">{{pub.title}}</a>
-                {% else %}
-                  {{pub.title}}
-                {% endif %}
-              </span>
-              <span class="journal">{{pub.journal}}</span>
-              <span class="pages"> {% if pub.pages %} ({{pub.pages}}) {% endif %}</span>
-            </li>
-          {% endfor %}
-        </ul>
-      </div>
-    {% else %}
-      <p>No publications available.</p>
-    {% endif %}
+      {% if publications %}
+        {% if user.administrator %}
+          <div id="publications_table">
+            <table class="table table-striped table-bordered table-condensed dt" id="publications">
+              <thead>
+                <tr>
+                  <th> Title </th>
+                  <th> Year </th>
+                  <th> Author(s) </th>
+                  <th> URL </th>
+                  <th> Type </th>
+                </tr>
+                <tr id="filterrow">
+                  <th> Title </th>
+                  <th> Year </th>
+                  <th> Author(s) </th>
+                  <th> URL </th>
+                  <th> Type </th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for pub in publications %}
+                  <tr>
+                    <td class="title">{{pub.title}}
+                      <div class="controls">
+                        {% if user.administrator %}
+                          <a type="button" class="btn btn-success" aria-label="Edit Publication" title="Edit Publication" href="{% url 'ctstem:publication' pub.slug %}">
+                            <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+                          </a>
+                          <a type="button" class="btn btn-danger" aria-label="Delete Publication" title="Delete Publication" href="{% url 'ctstem:deletePublication' pub.slug %}" onclick="return confirm('Are you sure you want to delete {{pub.title}}?')">
+                            <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                          </a>
+                        {% endif %}
+                        {% if pub.local_copy %}
+                          <a type="button" class="btn btn-default" aria-label="Download Publication" title="Download Publication" href="{{pub.local_copy.url}}" download target="_blank">
+                            <span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span>
+                          </a>
+                        {% endif %}
+                      </div>
+                    </td>
+                    <td>{{pub.year}}</td>
+                    <td>{{pub.authors}}</td>
+                    <td><a href="{{pub.web_link}}" target="_blank">Link</a></td>
+                    <td>{{pub.get_publication_type_display}}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% endif %}
+        <div id="publications_bib">
+          <ul id="publications" class="publication-list">
+            {% for pub in publications %}
+              <li class="publication">
+                <span class="authors">{{pub.authors}} </span>
+                <span class="year">({{pub.year}}). </span>
+                <span class="title">
+                  {% if pub.web_link %}
+                    <a href="{{pub.web_link}}" target="_blank">{{pub.title}}</a>
+                  {% else %}
+                    {{pub.title}}
+                  {% endif %}
+                </span>
+                <span class="journal">{{pub.journal}}</span>
+                <span class="pages"> {% if pub.pages %} ({{pub.pages}}) {% endif %}</span>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% else %}
+        <p>No publications available.</p>
+      {% endif %}
 
 
 
-    <!-- EXTERNAL PUBLICATIONS -->
-    <h3 class="left">Other Useful CT Publications</h3>
-    <ul class="publication-list">
-      <li class="publication">
-        <span class="authors">Jeannette M. Wing</span>
-        <span class="year">(2006).</span>
-        <span class="title">
-          <a href="https://www.cs.cmu.edu/afs/cs/usr/wing/www/publications/Wing06.pdf" target="_blank">Computational Thinking.</a>
-        </span>
-        <span class="journal">Communications of the ACM, Vol. 49, No. 3</span>
-        <span class="pages">(33-35).</span>
-      </li>
+      <!-- EXTERNAL PUBLICATIONS -->
+      <h3 class="left">Other Useful CT Publications</h3>
+      <ul class="publication-list">
+        <li class="publication">
+          <span class="authors">Jeannette M. Wing</span>
+          <span class="year">(2006).</span>
+          <span class="title">
+            <a href="https://www.cs.cmu.edu/afs/cs/usr/wing/www/publications/Wing06.pdf" target="_blank">Computational Thinking.</a>
+          </span>
+          <span class="journal">Communications of the ACM, Vol. 49, No. 3</span>
+          <span class="pages">(33-35).</span>
+        </li>
 
-      <li class="publication">
-        <span class="authors">Mark Guzdial</span>
-        <span class="year">(2008).</span>
-        <span class="title">
-          <a href="https://dl.acm.org/citation.cfm?id=1378713" target="_blank">Education: Paving the way for computational thinking.</a>
-        </span>
-        <span class="journal">Communications of the ACM, Vol. 51, Issue 8</span>
-        <span class="pages">(25-27).</span>
-      </li>
+        <li class="publication">
+          <span class="authors">Mark Guzdial</span>
+          <span class="year">(2008).</span>
+          <span class="title">
+            <a href="https://dl.acm.org/citation.cfm?id=1378713" target="_blank">Education: Paving the way for computational thinking.</a>
+          </span>
+          <span class="journal">Communications of the ACM, Vol. 51, Issue 8</span>
+          <span class="pages">(25-27).</span>
+        </li>
 
-      <li class="publication">
-        <span class="authors">Jeannette M. Wing</span>
-        <span class="year">(2008).</span>
-        <span class="title">
-          <a href="https://www.cs.cmu.edu/%7Ewing/publications/Wing08a.pdf" target="_blank">Computational thinking and thinking about computing.</a>
-        </span>
-        <span class="journal">Philosophical Transactions of the Royal Society A, 366</span>
-        <span class="pages">(3717-3725).</span>
-      </li>
+        <li class="publication">
+          <span class="authors">Jeannette M. Wing</span>
+          <span class="year">(2008).</span>
+          <span class="title">
+            <a href="https://www.cs.cmu.edu/%7Ewing/publications/Wing08a.pdf" target="_blank">Computational thinking and thinking about computing.</a>
+          </span>
+          <span class="journal">Philosophical Transactions of the Royal Society A, 366</span>
+          <span class="pages">(3717-3725).</span>
+        </li>
 
-      <li class="publication">
-        <span class="authors">Seymour Papert</span>
-        <span class="year">(1993).</span>
-        <span class="title"><i>Mindstorms: Children, Computers, and Powerful Ideas</i></span>. Basic Books
-      </li>
-    </ul>
-
-
-    <h3 class="left">Tools, Software, &amp; Curricula</h3>
-
-    <ul class="links">
-      <li><a href="https://ccl.northwestern.edu/netlogo/" target="_blank">NetLogo</a>, Northwestern CCL Lab's multi-agent programming environment. Lessons in biology, genetics, physics, chemistry, etc.</li>
-
-      <li><a href="https://www.ilabcentral.org/" target="_blank">iLab</a></span>, Northwestern's access to real physics, chemistry, and biology labs through the internet</li>
-
-      <li><a href="http://www.concord.org/activities" target="_blank">Concord Consortium</a>, CT lesson plans and simulation environments for topics across STEM</li>
-
-      <li><a href="http://mw.concord.org/modeler/showcase/index.html" target="_blank">Molecular Workbench</a>, by concord consortium</li>
-
-      <li><a href="http://www.kcvs.ca/site/index.html" target="_blank">The King's Centre for Visualization in Science</a> has a lot of high-quality applets covering many areas of science.</li>
-
-      <li><a href="http://phet.colorado.edu/" target="_blank">PHET</a>, has lots of high-quality applets covering many areas of science</li>
-
-      <li><a href="http://www.searchingspot.com/datadiscovery/index.htm" target="_blank">Data Discovery Lessons</a>: using real-world data and computer-based technology, such as  spreadsheets and Python programs, students learn how to gather,  organize, analyze and interpret data; Python lessons guide students in  computational thinking. Lessons provide teachers and students with  instructions and guidance in using these technologies.</li>
-
-      <li><a href="http://www.merlot.org/" target="_blank">MERLOT</a></span>, repository for STEM lesson plans, applets, resources, etc.</li>
-
-      <li><a href="http://ccl.northwestern.edu/curriculum/ConnectedChemistry/" target="_blank">Connected Chemistry</a></li>
-
-      <li><a rel="nofollow" href="http://CSunplugged.org" target="_blank">CSunplugged.org</a></li>
-
-      <li><a href="http://www.nsf.gov/nsb/sei/edTool/" target="_blank">NSF STEM Education Data Resources</a></li>
-
-    </ul>
-
-    <h3 class="left">Other Resources</h3>
-    <ul class="links">
-      <li><a href="http://www.cs.cmu.edu/%7ECompThink/" target="_blank">Center for Computational Thinking at Carnegie Mellon</a></li>
-      <li><a href="https://advancesinap.collegeboard.org/stem/computer-science-principles?MTG77-ED-1-apcs=" target="_blank">AP CS Principles Course</a></li>
-      <li><a href="http://www.cs.washington.edu/WhyCSE/" target="_blank">University of Washington: Why Choose Computer Science &amp; Engineering?</a></li>
-      <li><a href="http://csta.acm.org" target="_blank">Computer Science Teachers Association</a></li>
-      <li><a href="http://women.acm.org" target="_blank">ACM's Women in Computing</a></li>
-      <li><a href="http://www.securityweek.com/obama-administration-places-200-million-bet-big-data" target="_blank">Obama Administration Places $200 Million Bet On Big Data</a></li>
-      <li><a href="http://www.edweek.org/ew/articles/2014/02/26/22computer_ep.h33.html?cmp=ENL-CM-NEWS1" target="_blank">Computer Science: Not Just an Elective Anymore</a></li>
-      <li><a href="http://www.code.org/" target="_blank">http://www.code.org/</a></li>
-      <li><a href="http://www.onlinecollege.org/2013/03/12/the-stem-jobs-everyone-wants-how-get-them/" target="_blank">The STEM Jobs Everyone Wants and How to Get Them (OnlineCollege.org)</a></li>
-      <li><a href="http://gk12northwestern.wikispaces.com/CT+resources" target="_blank">Other CT Resources</a></li>
-    </ul>
+        <li class="publication">
+          <span class="authors">Seymour Papert</span>
+          <span class="year">(1993).</span>
+          <span class="title"><i>Mindstorms: Children, Computers, and Powerful Ideas</i></span>. Basic Books
+        </li>
+      </ul>
 
 
-    <h3 class="left">Videos</h3>
-    <ul class="links">
-      <li><a href="http://www.nsf.gov/news/news_videos.jsp?cntn_id=123607&amp;media_id=72174&amp;org=NSF" target="_blank">http://www.nsf.gov/news/news_videos.jsp?cntn_id=123607&amp;media_id=72174&amp;org=NSF</a></li>
-      <li><a href="http://www.youtube.com/user/ECEILLINOIS" target="_blank">ECE Illinois Media Center</a></li>
-      <li><a href="http://www.youtube.com/watch?v=qaOvHKG0Tio" target="_blank">Microsoft Super Bowl Ad - Technology Empower</a></li>
-    </ul>
+      <h3 class="left">Tools, Software, &amp; Curricula</h3>
+
+      <ul class="links">
+        <li><a href="https://ccl.northwestern.edu/netlogo/" target="_blank">NetLogo</a>, Northwestern CCL Lab's multi-agent programming environment. Lessons in biology, genetics, physics, chemistry, etc.</li>
+
+        <li><a href="https://www.ilabcentral.org/" target="_blank">iLab</a></span>, Northwestern's access to real physics, chemistry, and biology labs through the internet</li>
+
+        <li><a href="http://www.concord.org/activities" target="_blank">Concord Consortium</a>, CT lesson plans and simulation environments for topics across STEM</li>
+
+        <li><a href="http://mw.concord.org/modeler/showcase/index.html" target="_blank">Molecular Workbench</a>, by concord consortium</li>
+
+        <li><a href="http://www.kcvs.ca/site/index.html" target="_blank">The King's Centre for Visualization in Science</a> has a lot of high-quality applets covering many areas of science.</li>
+
+        <li><a href="http://phet.colorado.edu/" target="_blank">PHET</a>, has lots of high-quality applets covering many areas of science</li>
+
+        <li><a href="http://www.searchingspot.com/datadiscovery/index.htm" target="_blank">Data Discovery Lessons</a>: using real-world data and computer-based technology, such as  spreadsheets and Python programs, students learn how to gather,  organize, analyze and interpret data; Python lessons guide students in  computational thinking. Lessons provide teachers and students with  instructions and guidance in using these technologies.</li>
+
+        <li><a href="http://www.merlot.org/" target="_blank">MERLOT</a></span>, repository for STEM lesson plans, applets, resources, etc.</li>
+
+        <li><a href="http://ccl.northwestern.edu/curriculum/ConnectedChemistry/" target="_blank">Connected Chemistry</a></li>
+
+        <li><a rel="nofollow" href="http://CSunplugged.org" target="_blank">CSunplugged.org</a></li>
+
+        <li><a href="http://www.nsf.gov/nsb/sei/edTool/" target="_blank">NSF STEM Education Data Resources</a></li>
+
+      </ul>
+
+      <h3 class="left">Other Resources</h3>
+      <ul class="links">
+        <li><a href="http://www.cs.cmu.edu/%7ECompThink/" target="_blank">Center for Computational Thinking at Carnegie Mellon</a></li>
+        <li><a href="https://advancesinap.collegeboard.org/stem/computer-science-principles?MTG77-ED-1-apcs=" target="_blank">AP CS Principles Course</a></li>
+        <li><a href="http://www.cs.washington.edu/WhyCSE/" target="_blank">University of Washington: Why Choose Computer Science &amp; Engineering?</a></li>
+        <li><a href="http://csta.acm.org" target="_blank">Computer Science Teachers Association</a></li>
+        <li><a href="http://women.acm.org" target="_blank">ACM's Women in Computing</a></li>
+        <li><a href="http://www.securityweek.com/obama-administration-places-200-million-bet-big-data" target="_blank">Obama Administration Places $200 Million Bet On Big Data</a></li>
+        <li><a href="http://www.edweek.org/ew/articles/2014/02/26/22computer_ep.h33.html?cmp=ENL-CM-NEWS1" target="_blank">Computer Science: Not Just an Elective Anymore</a></li>
+        <li><a href="http://www.code.org/" target="_blank">http://www.code.org/</a></li>
+        <li><a href="http://www.onlinecollege.org/2013/03/12/the-stem-jobs-everyone-wants-how-get-them/" target="_blank">The STEM Jobs Everyone Wants and How to Get Them (OnlineCollege.org)</a></li>
+        <li><a href="http://gk12northwestern.wikispaces.com/CT+resources" target="_blank">Other CT Resources</a></li>
+      </ul>
+
+
+      <h3 class="left">Videos</h3>
+      <ul class="links">
+        <li><a href="http://www.nsf.gov/news/news_videos.jsp?cntn_id=123607&amp;media_id=72174&amp;org=NSF" target="_blank">http://www.nsf.gov/news/news_videos.jsp?cntn_id=123607&amp;media_id=72174&amp;org=NSF</a></li>
+        <li><a href="http://www.youtube.com/user/ECEILLINOIS" target="_blank">ECE Illinois Media Center</a></li>
+        <li><a href="http://www.youtube.com/watch?v=qaOvHKG0Tio" target="_blank">Microsoft Super Bowl Ad - Technology Empower</a></li>
+      </ul>
+    </div>
   </div>
 </div>
   <br clear="all">

@@ -1644,11 +1644,39 @@ span.ec .glyphicon-collapse-up, span.ec_lessons .fa-caret-square-o-up{
 
 
 .page-blurb {
+  margin-left: 12rem;
+  margin-right: 12rem;
+
+}
+.page-blurb p,  .page-blurb ul, .page-blurb ol {
   color: #777;
   line-height: 160%;
   text-align: justify;
   font-size: 1.7rem;
-  margin: 4rem 12rem;
+}
+.page-blurb p.text-muted {
+  text-align: center;
+}
+.page-blurb ol > li {
+  font-size: 1.2em;
+  font-weight: 700;
+  margin: 1em 0;
+}
+.page-blurb ol > ul > li {
+  font-size: 1em;
+  font-weight: 700;
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+}
+p.page-blurb, ul.page-blurb,  ul.page-blurb {
+  color: #777;
+  line-height: 160%;
+  text-align: justify;
+  font-size: 1.7rem;
+}
+p.page-blurb {
+  margin-top: 4rem;
+  margin-right: 4rem;
 }
 
 img.page-blurb-image {

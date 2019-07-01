@@ -104,6 +104,7 @@ urlpatterns = [
     url(r'^category/delete/(?P<id>[\d]+)/$', views.deleteCategory, name='deleteCategory'),
     url(r'^categories/$', views.research_categories, name='categories'),
     url(r'^terms/$', views.terms, name='terms'),
+    url(r'^help/$', views.help, name='help'),
 
 
 ]

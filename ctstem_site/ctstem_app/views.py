@@ -4393,3 +4393,7 @@ def is_curriculum_assigned(request, curriculum_id):
 def terms(request):
   context = {}
   return render(request, 'ctstem_app/TermsOfUse.html', context)
+
+def help(request):
+  context = {}
+  return render(request, 'ctstem_app/HelpFAQ.html', context)
