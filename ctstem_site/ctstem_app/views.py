@@ -1072,7 +1072,7 @@ def user_login(request):
       if user.is_active:
         login(request, user)
         if hasattr(user, 'teacher'):
-          messages.success(request, "Welcome to the CT-STEM website.  If you need help with using the site, you can checkout the help videos on the Training page <a href='/training#help_videos'>here</a>", extra_tags='safe');
+          messages.success(request, "Welcome to the CT-STEM website. If you need help with using the site, you can go to the <a href='/help'>Help and FAQ</a> page.", extra_tags='safe');
           response_data['success'] = True
           response_data['redirect_url'] = '/groups/active/'
 
