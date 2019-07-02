@@ -151,7 +151,7 @@ class Curriculum (models.Model):
   time = models.CharField(null=True, blank=True, max_length=256, help_text='Estimated time students would spend on this curriculum (ex. 7-9 class periods of 45-50 minutes)')
   level = models.TextField(null=True, blank=True, help_text="(ex. high school AP or Advanced Physics course)")
   purpose = RichTextUploadingField(null=True, blank=True, help_text="Purpose of this curriculum")
-  overview = RichTextUploadingField(null=True, blank=True, help_text="Description of the unit; This text is shown to teachers and researchers only")
+  overview = RichTextUploadingField(null=True, blank=True, help_text="Description of the curriculum; This text is shown to teachers and researchers only")
   student_overview = RichTextUploadingField(null=True, blank=True, help_text="Description of what students will learn in this curriculum; This text is shown to students only")
   content = RichTextUploadingField(null=True, blank=True)
   teacher_notes = RichTextUploadingField(null=True, blank=True)
