@@ -1674,7 +1674,7 @@ p.page-blurb, ul.page-blurb,  ul.page-blurb {
   text-align: justify;
   font-size: 1.7rem;
 }
-p.page-blurb {
+p.page-blurb, div.page-blurb {
   margin-top: 4rem;
   margin-right: 4rem;
 }
