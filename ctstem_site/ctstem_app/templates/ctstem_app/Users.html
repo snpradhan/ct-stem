@@ -1,5 +1,12 @@
 {% extends "ctstem_app/base.html" %}
 {% load ctstem_extras %}
+{% block ctstem %}
+  <script>
+    var order_by = "{{ order_by }}";
+    var direction = "{{ direction }}"
+  </script>
+  {{block.super}}
+{% endblock %}
 {% block content %}
   {{block.super}}
   <div class="content">
@@ -10,30 +17,33 @@
       {% include "ctstem_app/UserControls.html" with tab='user' %}
       {% include "ctstem_app/Tabs.html" with tab='user' %}
       {% if users %}
-        <table class="table table-striped table-bordered table-condensed dt" id="users">
+        <table class="table table-striped table-bordered table-condensed inner_table paginate_sort" id="users">
           <thead>
             <tr>
-              <th width="1%" class="no-sort"><input id="select-all" type="checkbox" value="0" name="select-all"/></th>
-              <th> Username </th>
-              <th> Name </th>
-              <th> Email </th>
-              <th> Account Status </th>
+              <th width="1%" class="no-sort">Select All<br><input id="select-all" type="checkbox" value="0" name="select-all"/></th>
+              <th id="user__username" class="ignorecase">Username</th>
+              <th id="user__first_name" class="ignorecase"> Name </th>
+              <th id="user__email" class="ignorecase"> Email </th>
+              <th id="user__is_active"> Account Status </th>
               {% if role == 'students' or role == 'teachers' %}
                 <th> Active Classes </th>
               {% endif %}
               {% if user.administrator or user.researcher %}
                 {% if role == 'school_administrators' or role == 'teachers' or role == 'students' %}
-                  <th> School </th>
+                  <th id="{% if role == 'school_administrators' %}user__school_administrator__school__name
+                  {% elif role == 'teachers' %}user__teacher__school__name
+                  {% elif role == 'students' %}user__student__school__name
+                  {% endif %}" class="ignorecase"> School </th>
                 {% endif %}
                 {% if role == 'students' %}
-                  <th> Student Consent </th>
-                  <th> Parental Consent </th>
+                  <th id="user__student__consent"> Student Consent </th>
+                  <th id="user__student__parental_consent"> Parental Consent </th>
                 {% endif %}
               {% endif %}
-              <th>Member Since</th>
-              <th> Last Login </th>
+              <th id="user__date_joined">Member Since</th>
+              <th id="user__last_login"> Last Login </th>
             </tr>
-            <tr id="filterrow">
+            <!--tr id="filterrow">
               <th class="no-sort"></th>
               <th> Username </th>
               <th> Name </th>
@@ -53,7 +63,7 @@
               {% endif %}
               <th>Member Since</th>
               <th> Last Login </th>
-            </tr>
+            </tr-->
           </thead>
           <tbody>
             {% for userProfile in users %}
@@ -136,6 +146,7 @@
             {% endfor %}
           </tbody>
         </table>
+        {% include "ctstem_app/Pagination.html" with model=users %}
       {% else %}
         <p>No Users</p>
       {% endif %}

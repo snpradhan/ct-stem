@@ -58,7 +58,8 @@ div.dt_input {
 
 table.table.dt thead tr:not(#filterrow),
 table.table.inner_table thead tr,
-table.table.inner_table tbody tr th {
+table.table.inner_table tbody tr th,
+table.table.unit_lesson thead tr {
   background-color: #666666;
   color: #e5e5e5;
 }
@@ -231,4 +232,12 @@ table.table.question th.optional {
 }
 table.table.question td.optional, table.table.question td.question_edit {
   text-align: center;
+}
+table.table th .fa-sort, table.table th .fa-sort-asc, table.table th .fa-sort-desc {
+  float: right;
+  color: white;
+  font-size: 1.2em;
+}
+table.table th .fa-sort-asc, table.table th .fa-sort-desc {
+  color: var(--ctstem-color-green);
 }

@@ -1,5 +1,12 @@
 {% extends "ctstem_app/base.html" %}
 {% load ctstem_extras %}
+{% block ctstem %}
+  <script>
+    var order_by = "{{ order_by }}";
+    var direction = "{{ direction }}"
+  </script>
+  {{block.super}}
+{% endblock %}
 {% block media %}
   {{ block.super }}
   {{ form.media }}
@@ -122,26 +129,26 @@
 
       {% else %}
         {% if groups %}
-          <table class="table table-striped table-bordered table-condensed dt" id="groups">
+          <table class="table table-striped table-bordered table-condensed inner_table paginate_sort" id="groups">
             <thead>
               <tr>
-                <th width="1%" class="no-sort"><input id="select-all" type="checkbox" value="0" name="select-all"/></th>
-                <th width="20%"> Class Name </th>
-                <th width="10%"> Subject </th>
-                <th width="10%"> Time </th>
-                <th> Status </th>
+                <th width="1%" class="no-sort">Select All <br> <input id="select-all" type="checkbox" value="0" name="select-all"/></th>
+                <th width="20%" id="title" class="ignorecase"> Class Name </th>
+                <th width="10%" id="subject__name" class="ignorecase"> Subject </th>
+                <th width="10%" id="time" class="ignorecase"> Time </th>
+                <th width="5%" id="is_active"> Status </th>
                 {% if not user.teacher %}
-                  <th width="15%"> Teacher </th>
+                  <th width="15%" id="teacher__user__first_name" class="ignorecase"> Teacher </th>
                 {% endif %}
                 <th width="15%">Co-teachers</th>
                 {% if not user.teacher and not user.school_administrator %}
-                  <th width="15%"> School </th>
+                  <th width="15%" id="teacher__school__name" class="ignorecase"> School </th>
                 {% endif %}
                 <th> Students </th>
                 <th> Assignments </th>
-                <th width="10%"> Created <br> Modified <br> Last Login</th>
+                <th width="8%"> Created <br> Modified <br> Last Login</th>
               </tr>
-              <tr id="filterrow">
+              <!--tr id="filterrow">
                 <th class="no-sort"></th>
                 <th> Class Name </th>
                 <th> Subject </th>
@@ -157,7 +164,7 @@
                 <th> Students </th>
                 <th> Assignments </th>
                 <th> Created <br> Modified <br> Last Login</th>
-              </tr>
+              </tr-->
             </thead>
             <tbody>
               {% for group in groups %}
@@ -244,7 +251,7 @@
               {% endfor %}
             </tbody>
           </table>
-
+          {% include "ctstem_app/Pagination.html" with model=groups %}
         {% else %}
           <p>No classes available.</p>
         {% endif %}

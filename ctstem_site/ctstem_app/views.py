@@ -41,6 +41,7 @@ from django.http import JsonResponse
 from django.utils.crypto import get_random_string
 from django.db.models import Max, Min
 import logging
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 logger = logging.getLogger('django')
 
@@ -113,7 +114,9 @@ def curricula(request, bucket='unit', status='public'):
     curriculum_type = ['U', 'L', 'A', 'S']
 
   stat = []
-  curricula = None
+  curricula = models.Curriculum.objects.extra(select={'modified_year': 'EXTRACT(YEAR FROM modified_date)',
+                          'modified_month': 'EXTRACT(MONTH FROM modified_date)',
+                          'modified_day': 'EXTRACT(DAY FROM modified_date)'})
   if bucket in ['unit', 'lesson', 'assessment']:
     if hasattr(request.user, 'administrator') or hasattr(request.user, 'researcher') or hasattr(request.user, 'author'):
       if status == 'archived':
@@ -124,30 +127,48 @@ def curricula(request, bucket='unit', status='public'):
         stat = ['P']
     else:
       stat = ['P']
-    curricula = models.Curriculum.objects.all().filter(unit__isnull=True, curriculum_type__in = curriculum_type, status__in = stat)
+    curricula = curricula.filter(unit__isnull=True, curriculum_type__in = curriculum_type, status__in = stat)
 
   elif bucket == 'teacher_authored':
     if hasattr(request.user, 'administrator') or hasattr(request.user, 'researcher') or hasattr(request.user, 'author'):
       stat = ['D', 'P', 'A']
-      curricula = models.Curriculum.objects.all().filter(unit__isnull=True, curriculum_type__in = curriculum_type, status__in = stat, authors__teacher__isnull=False).distinct()
+      curricula = curricula.filter(unit__isnull=True, curriculum_type__in = curriculum_type, status__in = stat, authors__teacher__isnull=False).distinct()
 
   elif bucket == 'my' and hasattr(request.user, 'teacher'):
     stat = ['D', 'P', 'A']
-    curricula = models.Curriculum.objects.all().filter(unit__isnull=True, curriculum_type__in = curriculum_type, status__in = stat, authors=request.user)
+    curricula = curricula.filter(unit__isnull=True, curriculum_type__in = curriculum_type, status__in = stat, authors=request.user)
 
   elif bucket == 'favorite' and hasattr(request.user, 'teacher'):
     stat = ['P']
-    curricula = models.Curriculum.objects.all().filter(Q(unit__isnull=True), Q(curriculum_type__in=curriculum_type), Q(bookmarked__teacher=request.user.teacher), Q(status__in=stat) | Q(shared_with=request.user.teacher)).distinct()
+    curricula = curricula.filter(Q(unit__isnull=True), Q(curriculum_type__in=curriculum_type), Q(bookmarked__teacher=request.user.teacher), Q(status__in=stat) | Q(shared_with=request.user.teacher)).distinct()
 
   elif bucket == 'shared' and hasattr(request.user, 'teacher'):
     stat = ['D', 'P']
-    curricula = models.Curriculum.objects.all().filter(unit__isnull=True, curriculum_type__in = curriculum_type, status__in = stat, shared_with=request.user.teacher)
+    curricula = curricula.filter(unit__isnull=True, curriculum_type__in = curriculum_type, status__in = stat, shared_with=request.user.teacher)
   else:
     messages.error(request, "There are no curricula for the requested category.")
 
-  if curricula:
-    curricula = curricula.order_by('-modified_date', Lower('title'))
-  context = {'curricula': curricula, 'bucket': bucket, 'status': status}
+  #search
+  search_criteria = None
+  if request.method == 'POST':
+    data = request.POST.copy()
+    if 'search_criteria' in data:
+      search_criteria = data['search_criteria']
+    searchForm = forms.SearchForm(data)
+  else:
+    searchForm = forms.SearchForm()
+
+  if search_criteria:
+    curricula = searchCurricula(request, curricula, search_criteria)
+
+  sort_order = [{'order_by': 'modified_year', 'direction': 'desc', 'ignorecase': 'false'},
+                {'order_by': 'modified_month', 'direction': 'desc', 'ignorecase': 'false'},
+                {'order_by': 'modified_day', 'direction': 'desc', 'ignorecase': 'false'},
+                {'order_by': 'title', 'direction': 'asc', 'ignorecase': 'true'}]
+  curricula_list = paginate(request, curricula, sort_order, 25)
+  #if curricula:
+  #  curricula = curricula.order_by('-modified_date', Lower('title'))
+  context = {'curricula': curricula_list, 'bucket': bucket, 'status': status, 'searchForm': searchForm}
 
   return render(request, 'ctstem_app/Curricula.html', context)
 
@@ -1773,13 +1794,24 @@ def users(request, role):
 
   if request.method == 'GET' or request.method == 'POST':
 
+    search_criteria = None
+
     if request.method == 'POST':
       data = request.POST.copy()
+      # bulk update
       id_list = []
       for key in data:
         if 'user_' in key:
           id_list.append(data[key])
-      _do_action(request, id_list, 'user')
+      if len(id_list):
+        _do_action(request, id_list, 'user')
+
+      #search
+      if 'search_criteria' in data:
+        search_criteria = data['search_criteria']
+      searchForm = forms.SearchForm(data)
+    else:
+      searchForm = forms.SearchForm()
 
     privilege = 0
     if hasattr(request.user, 'administrator'):
@@ -1816,14 +1848,116 @@ def users(request, role):
     else:
       return http.HttpResponseNotFound('<h1>You do not have the privilege view %s</h1>'% role)
 
+    if search_criteria:
+      users = searchUsers(request, users, role, search_criteria)
+
+    order_by = request.GET.get('order_by') or 'user__username'
+    direction = request.GET.get('direction') or 'asc'
+    ignorecase = request.GET.get('ignorecase') or 'false'
+    sort_order = [{'order_by': order_by, 'direction': direction, 'ignorecase': ignorecase}]
+    user_list = paginate(request, users, sort_order, 100)
+
     uploadForm = forms.UploadFileForm(user=request.user)
     assignmentForm = forms.AssignmentSearchForm(user=request.user)
-    context = {'users': users, 'role': role, 'uploadForm': uploadForm, 'assignmentForm': assignmentForm}
+
+    context = {'users': user_list, 'role': role, 'uploadForm': uploadForm, 'assignmentForm': assignmentForm, 'searchForm': searchForm, 'order_by': order_by, 'direction': direction}
 
     return render(request, 'ctstem_app/Users.html', context)
 
   return http.HttpResponseNotAllowed(['GET', 'POST'])
 
+####################################
+#paginate the queryset based on the items per page and sort order
+####################################
+def paginate(request, queryset, sort_order, count=10):
+
+  ordering_list = []
+
+  if sort_order:
+    for order in sort_order:
+      order_by = order['order_by']
+      direction = order['direction']
+      ignorecase = order['ignorecase']
+
+      ordering = order_by
+
+      if ignorecase == 'true':
+        ordering = Lower(ordering)
+        if direction == 'desc':
+          ordering = ordering.desc()
+      else:
+        if direction == 'desc':
+          ordering = '-{}'.format(ordering)
+
+      ordering_list.append(ordering)
+
+    print ordering_list
+    queryset = queryset.order_by(*ordering_list)
+
+  paginator = Paginator(queryset, count)
+  page = request.GET.get('page')
+  try:
+    object_list = paginator.page(page)
+  except PageNotAnInteger:
+    # If page is not an integer, deliver first page.
+    object_list = paginator.page(1)
+  except EmptyPage:
+    # If page is out of range (e.g. 9999), deliver last page of results.
+    object_list = paginator.page(paginator.num_pages)
+
+  return object_list
+
+####################################
+# filter user queryset based on role and search criteria
+####################################
+def searchUsers(request, queryset, role, search_criteria):
+  query_filter = Q(user__username__icontains=search_criteria)
+  query_filter.add(Q(user__first_name__icontains=search_criteria), Q.OR)
+  query_filter.add(Q(user__last_name__icontains=search_criteria), Q.OR)
+  query_filter.add(Q(user__email__icontains=search_criteria), Q.OR)
+  if role == 'students':
+    query_filter.add(Q(school__name__icontains=search_criteria), Q.OR)
+    query_filter.add(Q(student_membership__group__title__icontains=search_criteria), Q.OR)
+  elif role == 'teachers':
+    query_filter.add(Q(school__name__icontains=search_criteria), Q.OR)
+    query_filter.add(Q(groups__title__icontains=search_criteria), Q.OR)
+  elif role == 'school_administrators':
+    query_filter.add(Q(school__name__icontains=search_criteria), Q.OR)
+
+  result = queryset.filter(query_filter).distinct()
+  return result
+
+
+####################################
+# filter group queryset based on search criteria
+####################################
+def searchGroups(request, queryset, search_criteria):
+  query_filter = Q(title__icontains=search_criteria)
+  query_filter.add(Q(subject__name__icontains=search_criteria), Q.OR)
+  query_filter.add(Q(time__icontains=search_criteria), Q.OR)
+  query_filter.add(Q(teacher__user__first_name__icontains=search_criteria), Q.OR)
+  query_filter.add(Q(teacher__user__last_name__icontains=search_criteria), Q.OR)
+  query_filter.add(Q(shared_with__user__first_name__icontains=search_criteria), Q.OR)
+  query_filter.add(Q(shared_with__user__last_name__icontains=search_criteria), Q.OR)
+  query_filter.add(Q(teacher__school__name__icontains=search_criteria), Q.OR)
+  result = queryset.filter(query_filter).distinct()
+  return result
+
+####################################
+# filter curricula queryset based on search criteria
+####################################
+def searchCurricula(request, queryset, search_criteria):
+  query_filter = Q(title__icontains=search_criteria)
+  query_filter.add(Q(subject__name__icontains=search_criteria), Q.OR)
+  query_filter.add(Q(time__icontains=search_criteria), Q.OR)
+  query_filter.add(Q(authors__first_name__icontains=search_criteria), Q.OR)
+  query_filter.add(Q(authors__last_name__icontains=search_criteria), Q.OR)
+  query_filter.add(Q(taxonomy__title__icontains=search_criteria), Q.OR)
+  query_filter.add(Q(taxonomy__category__name__icontains=search_criteria), Q.OR)
+  query_filter.add(Q(taxonomy__category__standard__name__icontains=search_criteria), Q.OR)
+  query_filter.add(Q(status__icontains=search_criteria), Q.OR)
+  result = queryset.filter(query_filter).distinct()
+  return result
 ####################################
 # BULK ACTION FOR ALL MODELS
 ####################################
@@ -2083,6 +2217,7 @@ def deletePublication(request, slug=''):
 @login_required
 def groups(request, status='active'):
   if request.method == 'GET' or request.method == 'POST':
+    search_criteria = None
     if request.method == 'POST':
       data = request.POST.copy()
       id_list = []
@@ -2090,6 +2225,12 @@ def groups(request, status='active'):
         if 'group_' in key:
           id_list.append(data[key])
       _do_action(request, id_list, 'group')
+      #search
+      if 'search_criteria' in data:
+        search_criteria = data['search_criteria']
+      searchForm = forms.SearchForm(data)
+    else:
+      searchForm = forms.SearchForm()
 
     is_active = True
     if status == 'inactive':
@@ -2106,15 +2247,23 @@ def groups(request, status='active'):
           new_group.save()
 
       groups = models.UserGroup.objects.all().filter(Q(is_active=is_active), Q(teacher=request.user.teacher) | Q(shared_with=request.user.teacher)).distinct()
-      print groups
-
     else:
       return http.HttpResponseNotFound('<h1>You do not have the privilege to view classes</h1>')
+
+    if search_criteria:
+      groups = searchGroups(request, groups, search_criteria)
+
+    order_by = request.GET.get('order_by') or 'title'
+    direction = request.GET.get('direction') or 'asc'
+    ignorecase = request.GET.get('ignorecase') or 'false'
+    sort_order = [{'order_by': order_by, 'direction': direction, 'ignorecase': ignorecase}]
+    group_list = paginate(request, groups, sort_order, 25)
+
     current_site = Site.objects.get_current()
     domain = current_site.domain
     uploadForm = forms.UploadFileForm(user=request.user)
     assignmentForm = forms.AssignmentSearchForm(user=request.user)
-    context = {'groups': groups, 'role':'groups', 'uploadForm': uploadForm, 'group_status': status, 'domain': domain, 'assignmentForm': assignmentForm}
+    context = {'groups': group_list, 'role':'groups', 'uploadForm': uploadForm, 'group_status': status, 'domain': domain, 'assignmentForm': assignmentForm, 'searchForm': searchForm, 'order_by': order_by, 'direction': direction}
     return render(request, 'ctstem_app/UserGroups.html', context)
 
   return http.HttpResponseNotAllowed(['GET', 'POST'])

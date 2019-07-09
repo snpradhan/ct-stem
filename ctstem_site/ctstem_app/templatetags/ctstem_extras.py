@@ -400,3 +400,11 @@ def check_curriculum_permission(context, curriculum_id, action):
 
   list(messages.get_messages(request))
   return has_permission
+
+@register.filter
+def get_page_start_index(paginator, page_number):
+  return paginator.page(page_number).start_index()
+
+@register.filter
+def get_page_end_index(paginator, page_number):
+  return paginator.page(page_number).end_index()

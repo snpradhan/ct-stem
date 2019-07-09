@@ -103,6 +103,41 @@ $(function (){
           .draw();
   });
 
+  //paginate sort table
+  $('table.table.paginate_sort thead  th:not(.no-sort)').each( function () {
+    var id = $(this).attr('id');
+    var td_class = $(this).attr('class');
+    var href = "?order_by=1&direction=2&ignorecase=3";
+    var fa_class = '';
+    sort_html = '';
+    if(id) {
+      id = id.trim()
+      href = href.replace('1', id);
+      if(order_by == id){
+        if(direction == 'asc') {
+          href = href.replace('2', 'desc');
+          fa_class = 'fa fa-sort-asc';
+        }
+        else {
+          href = href.replace('2', 'asc');
+          fa_class = 'fa fa-sort-desc';
+        }
+      }
+      else {
+        href = href.replace('2', 'asc');
+        fa_class = 'fa fa-sort'
+      }
+      if(td_class == 'ignorecase') {
+        href = href.replace('3', 'true');
+      }
+      else{
+        href = href.replace('3', 'false');
+      }
+      sort_html = '<a class="'+fa_class+'" href="'+href+'"></a>'
+      $(this).append(sort_html);
+    }
+  });
+
   $('#select-all').click(function(event) {
     var $that = $(this);
     // Iterate each checkbox
@@ -378,6 +413,12 @@ $(function (){
     var id = $('input#emoji_feedback_area').val();
     var val = $('textarea#'+id).val();
     $('textarea#'+id).val(val + $(this).html());
+  });
+
+  $('input#clear[type="submit"]').click(function(e){
+    e.preventDefault();
+    $('form')[0].reset();
+    $('form').submit();
   });
 
 });

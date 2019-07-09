@@ -38,11 +38,13 @@
           <a type="button" class="btn btn-success" href="{% url 'ctstem:newCurriculum' %}?back_url={{ request.path }}" title="Create new curriculum">Create Curriculum</a>
         {% endif %}
       </div>
-      {% include "ctstem_app/CurriculaTabs.html" %}
-
+      <form method="post">
+        {% csrf_token %}
+        {% include "ctstem_app/CurriculaTabs.html" %}
+      </form>
       {% if curricula %}
         <div id="curricula_table">
-          <table class="table table-striped dt" id="curricula">
+          <table class="table table-striped paginate_sort" id="curricula">
             <thead>
               <tr id="filterrow">
                 <th class="no-sort"> </th>
@@ -207,6 +209,7 @@
               {% endfor %}
             </tbody>
           </table>
+          {% include "ctstem_app/Pagination.html" with model=curricula %}
         </div>
       {% else %}
         <p>No curricula exists for the selected category.</p>

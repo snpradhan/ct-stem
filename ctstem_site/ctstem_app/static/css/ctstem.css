@@ -1097,6 +1097,18 @@ div.content #pagination {
   font-size: 2em;
 }
 
+div.pagination {
+  font-size: 1.5em;
+  font-weight: 700;
+  width: 100%;
+}
+div.pagination .counter {
+  float: left;
+}
+div.pagination .step-links {
+  float: right;
+}
+
 div.content #curricula_tile  .row.button {
   margin: 1em 0;
 }
@@ -1612,6 +1624,13 @@ div.content#publication .switch {
   background-color: #e6e6e6;
 }
 
+.nav-tabs > div.search {
+  float: right;
+}
+
+.nav-tabs > div.search input[type='text'] {
+  width: 20em;
+}
 /******* glyphicon colors and behavior ********/
 .glyphicon {
   cursor: pointer;

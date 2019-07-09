@@ -1,0 +1,21 @@
+{% load ctstem_extras %}
+<div class="pagination">
+  <span class="counter">
+    Showing {{model.paginator|get_page_start_index:model.number}} to {{model.paginator|get_page_end_index:model.number}} of {{model.paginator.count}} entries.
+  </span>
+  <span class="step-links">
+    {% if model.has_previous %}
+      <a href="?page={{ model.previous_page_number }}&order_by={{ order_by }}&direction={{ direction }}">Previous</a>
+      &nbsp;
+    {% endif %}
+
+    <span class="current">
+      Page {{ model.number }} of {{ model.paginator.num_pages }}.
+    </span>
+
+    {% if model.has_next %}
+      &nbsp;
+      <a href="?page={{ model.next_page_number }}&order_by={{ order_by }}&direction={{ direction }}">Next</a>
+    {% endif %}
+  </span>
+</div>

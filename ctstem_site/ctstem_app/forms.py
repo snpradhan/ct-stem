@@ -785,6 +785,20 @@ class AssignmentSearchForm(forms.Form):
 
 
 ####################################
+# Search Form
+####################################
+class SearchForm(forms.Form):
+  search_criteria = forms.CharField(required=False, max_length=30, label=u'Search Criteria', help_text='Enter your search text')
+
+  def __init__(self, *args, **kwargs):
+    super(SearchForm, self).__init__(*args, **kwargs)
+
+    for field_name, field in self.fields.items():
+      field.widget.attrs['class'] = 'form-control'
+      if field.help_text:
+        field.widget.attrs['placeholder'] = field.help_text
+
+####################################
 # Standards Form
 ####################################
 class StandardForm(ModelForm):

@@ -34,6 +34,13 @@
       <li {% if role == 'assignment_dashboard' %} class="active"{% endif %}><a href="{% url 'ctstem:assignmentDashboard' assignment.id %}">Assignment Dashboard</a></li>
     {% endif %}
   {% endif %}
+  {% if tab == 'user' or tab == 'group' %}
+    <div class="search">
+      {{searchForm.search_criteria}}
+      <input type="submit" class="btn btn-success" id="submit" value="Search"/>
+      <input type="submit" class="btn btn-warning" id="clear" value="Clear"/>
+    </div>
+  {% endif %}
 </ul>
 {% if tab == 'group' %}
   {% if user.administrator or user.researcher or user.school_administrator or user.teacher %}
