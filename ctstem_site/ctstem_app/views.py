@@ -54,7 +54,7 @@ def home(request):
     return shortcuts.redirect('ctstem:assignments', bucket='inbox')
   else:
     curr_type = ['U', 'L']
-    curricula = models.Curriculum.objects.all().filter(status='P', unit__isnull=True, curriculum_type__in=curr_type)[:4]
+    curricula = models.Curriculum.objects.all().filter(status='P', unit__isnull=True, curriculum_type__in=curr_type, feature_rank__isnull=False).order_by('feature_rank')[:4]
     if request.user.is_authenticated():
       if hasattr(request.user, 'administrator'):
         school = None
@@ -161,7 +161,8 @@ def curricula(request, bucket='unit', status='public'):
   if search_criteria:
     curricula = searchCurricula(request, curricula, search_criteria)
 
-  sort_order = [{'order_by': 'modified_year', 'direction': 'desc', 'ignorecase': 'false'},
+  sort_order = [{'order_by': 'feature_rank', 'direction': 'asc', 'ignorecase': 'false'},
+                {'order_by': 'modified_year', 'direction': 'desc', 'ignorecase': 'false'},
                 {'order_by': 'modified_month', 'direction': 'desc', 'ignorecase': 'false'},
                 {'order_by': 'modified_day', 'direction': 'desc', 'ignorecase': 'false'},
                 {'order_by': 'title', 'direction': 'asc', 'ignorecase': 'true'}]

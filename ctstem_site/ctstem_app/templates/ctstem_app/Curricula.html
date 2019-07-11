@@ -78,6 +78,9 @@
                           {% endif %}
                         {% endif %}
                       {% endif %}
+                      {% if curriculum.feature_rank %}
+                        <i class="fa fa-certificate" aria-hidden="true" title="This is a featured curriculum"></i>
+                      {% endif %}
                     </div>
                     {% if user.administrator or user.researcher or user.author or user.teacher %}
                       {% if bucket == 'teacher_authored' or bucket == 'my' or bucket == 'shared' or bucket == 'favorite' %}

@@ -171,6 +171,7 @@ class Curriculum (models.Model):
   order = models.IntegerField(null=True, blank=True, help_text="Order within the Unit")
   credits = RichTextUploadingField(null=True, blank=True, help_text="Author contributions")
   locked_by = models.ForeignKey(User, null=True)
+  feature_rank = models.IntegerField(null=True, blank=True, help_text="Order in the feature pool")
 
   class Meta:
       ordering = ['-id']

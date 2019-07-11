@@ -461,7 +461,7 @@ class CurriculumForm(ModelForm):
 
   class Meta:
     model = models.Curriculum
-    fields = ['curriculum_type', 'unit', 'authors', 'order', 'title', 'icon', 'time', 'level', 'overview', 'student_overview', 'acknowledgement', 'credits', 'status', 'subject', 'compatible_system', 'taxonomy', 'teacher_notes', 'shared_with']
+    fields = ['curriculum_type', 'unit', 'authors', 'order', 'feature_rank', 'title', 'icon', 'time', 'level', 'overview', 'student_overview', 'acknowledgement', 'credits', 'status', 'subject', 'compatible_system', 'taxonomy', 'teacher_notes', 'shared_with']
 
     widgets = {
       'title': forms.TextInput(attrs={'placeholder': 'Lesson Title'}),
@@ -498,7 +498,7 @@ class CurriculumForm(ModelForm):
       self.fields['curriculum_type'].widget.attrs['disabled'] = True
 
     for field_name, field in self.fields.items():
-      if field_name == 'order':
+      if field_name == 'order' or field_name == 'feature_rank':
         field.widget.attrs['class'] = 'form-control order'
       else:
         field.widget.attrs['class'] = 'form-control'
