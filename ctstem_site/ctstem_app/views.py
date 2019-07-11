@@ -264,7 +264,10 @@ def curriculum(request, id=''):
           #check which submit button was clicked and redirect accordingly
           messages.success(request, "Curriculum Saved.")
           if preview == '1':
-            return shortcuts.redirect('ctstem:previewCurriculum', id=savedCurriculum.id)
+            if savedCurriculum.unit is None:
+              return shortcuts.redirect('ctstem:previewCurriculum', id=savedCurriculum.id)
+            else:
+              return shortcuts.redirect('ctstem:previewCurriculum', id=savedCurriculum.id, step_order=0)
           elif back == '1':
             return shortcuts.redirect(back_url)
           else:
