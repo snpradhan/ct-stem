@@ -321,7 +321,11 @@ def get_underlying_curriculum(curriculum, user):
   if hasattr(user, 'administrator') == True or hasattr(user, 'researcher') == True or hasattr(user, 'author') == True:
     return unit.underlying_curriculum.all().order_by('order').distinct()
   elif hasattr(user, 'teacher') == True:
-    return unit.underlying_curriculum.all().filter(Q(status='P') | Q(shared_with=user.teacher) | Q(authors=user)).order_by('order').distinct()
+    # if unit is shared with the teacher, display all underlying curricula regardless of status
+    if user.teacher in unit.shared_with.all():
+      return unit.underlying_curriculum.all().order_by('order').distinct()
+    else:
+      return unit.underlying_curriculum.all().filter(Q(status='P') | Q(shared_with=user.teacher) | Q(authors=user)).order_by('order').distinct()
   else:
     return unit.underlying_curriculum.all().filter(status='P').order_by('order').distinct()
 

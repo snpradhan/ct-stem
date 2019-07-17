@@ -144,7 +144,9 @@ def curricula(request, bucket='unit', status='public'):
 
   elif bucket == 'shared' and hasattr(request.user, 'teacher'):
     stat = ['D', 'P']
-    curricula = curricula.filter(unit__isnull=True, curriculum_type__in = curriculum_type, status__in = stat, shared_with=request.user.teacher)
+    shared_lessons = curricula.filter(unit__isnull=False, curriculum_type__in = 'L', status__in = stat, shared_with=request.user.teacher).distinct()
+    shared_lessons_units = shared_lessons.values_list('unit', flat=True)
+    curricula = curricula.filter(Q(unit__isnull=True), Q(curriculum_type__in = curriculum_type), Q(status__in = stat), Q(shared_with=request.user.teacher) | Q(id__in=shared_lessons_units)).distinct()
   else:
     messages.error(request, "There are no curricula for the requested category.")
 
@@ -564,6 +566,7 @@ def copyCurriculumMeta(request, id=''):
     curriculum.subject = original_curriculum.subject.all()
     curriculum.taxonomy = original_curriculum.taxonomy.all()
     curriculum.locked_by = None
+    curriculum.feature_rank = None
 
     if original_curriculum.icon:
       try:
@@ -721,7 +724,7 @@ def assignCurriculum(request, id=''):
     if not has_permission:
       return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
     # check if the user has permission to assign a curriculum
-    if hasattr(request.user, 'administrator') or hasattr(request.user, 'researcher'):
+    if hasattr(request.user, 'administrator'):
       groups = models.UserGroup.objects.all().filter(is_active=True)
     elif hasattr(request.user, 'school_administrator'):
       groups = models.UserGroup.objects.all().filter(teacher__school = request.user.school_administrator.school, is_active=True)
@@ -731,7 +734,10 @@ def assignCurriculum(request, id=''):
     curriculum = models.Curriculum.objects.get(id=id)
     #check if curriculum is stand alone or a unit
     if curriculum.curriculum_type == 'U':
-      curriculum_list = models.Curriculum.objects.all().filter(unit=curriculum).order_by('order')
+      if hasattr(request.user, 'administrator') or hasattr(request.user, 'school_administrator'):
+        curriculum_list = models.Curriculum.objects.all().filter(Q(unit=curriculum), Q(status='P') | Q(status='D') & Q(locked_by__isnull=False)).order_by('order').distinct()
+      elif hasattr(request.user, 'teacher'):
+        curriculum_list = models.Curriculum.objects.all().filter(Q(unit=curriculum), Q(status='P') | Q(status='D') & Q(locked_by__isnull=False) & Q(shared_with=request.user.teacher) | Q(authors=request.user)).order_by('order').distinct()
     else:
       curriculum_list = models.Curriculum.objects.all().filter(id=curriculum.id)
 
@@ -1895,7 +1901,6 @@ def paginate(request, queryset, sort_order, count=10):
 
       ordering_list.append(ordering)
 
-    print ordering_list
     queryset = queryset.order_by(*ordering_list)
 
   paginator = Paginator(queryset, count)
@@ -2371,51 +2376,47 @@ def searchAssignment(request):
       else:
         query_filter['curriculum_type__in'] = ['U', 'L']
 
+      query_filter['unit__isnull'] = True
+
       if data['title']:
         query_filter['title__icontains'] = str(data['title'])
       if data['subject']:
         query_filter['subject__id'] = data['subject']
 
-      query_filter['status'] = 'P'
+
       curriculumQueryset = models.Curriculum.objects.filter(**query_filter).order_by(Lower('title'))
-      curriculumList = []
-      if data['curriculum_type'] == 'U':
-        for curriculum in curriculumQueryset:
-          if curriculum.underlying_curriculum.all().filter(status='P').count() > 0:
-            curriculumList.append(curriculum)
-      else:
-        curriculumList = curriculumQueryset
 
-      for curriculum in curriculumList:
-        curr = {'id': curriculum.id, 'curriculum_type': curriculum.get_curriculum_type_display(), 'title': curriculum.title, 'subject': [subject.name for subject in curriculum.subject.all()]}
+      for curriculum in curriculumQueryset:
+        if check_curriculum_permission(request, curriculum.id, 'assign'):
+          curr = {'id': curriculum.id, 'curriculum_type': curriculum.get_curriculum_type_display(), 'title': curriculum.title, 'subject': [subject.name for subject in curriculum.subject.all()]}
 
-        if curriculum.curriculum_type == 'U':
-          underlying_curriculum_queryset = curriculum.underlying_curriculum.all().filter(status='P')
-          underlying_curriculum = []
-          unit_assigned = False
-          curriculum_assigned_count = 0
-          for und_curr in underlying_curriculum_queryset.order_by('order'):
-            curr_assigned = False
-            assignments = models.Assignment.objects.all().filter(curriculum=und_curr, group__id=int(data['group']))
+          if curriculum.curriculum_type == 'U':
+            underlying_curriculum_queryset = get_assignable_underlying_curriculum(request, curriculum.id)
+            underlying_curriculum = []
+            unit_assigned = False
+            curriculum_assigned_count = 0
+            for und_curr in underlying_curriculum_queryset:
+              curr_assigned = False
+              assignments = models.Assignment.objects.all().filter(curriculum=und_curr, group__id=int(data['group']))
+              if assignments.count() > 0:
+                curr_assigned = True
+                curriculum_assigned_count = curriculum_assigned_count + 1
+              underlying_curriculum.append({'id': und_curr.id, 'order': und_curr.order, 'title': und_curr.title, 'assigned': curr_assigned, 'curriculum_type': und_curr.get_curriculum_type_display()})
+
+            curr['assigned'] = len(underlying_curriculum_queryset) == curriculum_assigned_count
+            curr['underlying_curriculum'] = underlying_curriculum
+            curr['underlying_curriculum_count'] = len(underlying_curriculum_queryset)
+            curr['underlying_curriculum_assigned'] = curriculum_assigned_count
+          else:
+            assigned = False
+            assignments = models.Assignment.objects.all().filter(curriculum=curriculum, group__id=int(data['group']))
             if assignments.count() > 0:
-              curr_assigned = True
-              curriculum_assigned_count = curriculum_assigned_count + 1
-            underlying_curriculum.append({'id': und_curr.id, 'title': und_curr.title, 'assigned': curr_assigned, 'curriculum_type': und_curr.get_curriculum_type_display()})
+              assigned = True
 
-          curr['assigned'] = underlying_curriculum_queryset.count() == curriculum_assigned_count
-          curr['underlying_curriculum'] = underlying_curriculum
-          curr['underlying_curriculum_count'] = underlying_curriculum_queryset.count()
-          curr['underlying_curriculum_assigned'] = curriculum_assigned_count
-        else:
-          assigned = False
-          assignments = models.Assignment.objects.all().filter(curriculum=curriculum, group__id=int(data['group']))
-          if assignments.count() > 0:
-            assigned = True
+            curr['assigned'] = assigned
+            curr['underlying_curriculum'] = None
 
-          curr['assigned'] = assigned
-          curr['underlying_curriculum'] = None
-
-        curricula.append(curr)
+          curricula.append(curr)
 
     context = {'curricula': curricula, 'group_id': data['group'] }
     html = render_to_string('ctstem_app/AssignmentSearchResult.html', context, context_instance=RequestContext(request))
@@ -2423,6 +2424,23 @@ def searchAssignment(request):
 
   return http.HttpResponseNotAllowed(['POST'])
 
+@login_required
+def get_assignable_underlying_curriculum(request, id=''):
+  if hasattr(request.user, 'school_administrator') == False and hasattr(request.user, 'teacher') == False and  hasattr(request.user, 'administrator') == False:
+    return http.HttpResponseNotFound('<h1>You do not have the privilege search assignments</h1>')
+
+  if request.method == 'GET' or request.method == 'POST':
+    curriculum = models.Curriculum.objects.get(id=id)
+    underlying_curriculum =  curriculum.underlying_curriculum.all().order_by('order').distinct()
+    assignable_curriculum = []
+    for curr in underlying_curriculum:
+      has_permission = check_curriculum_permission(request, curr.id, 'assign')
+      if has_permission:
+        assignable_curriculum.append(curr)
+
+    return assignable_curriculum
+
+  return http.HttpResponseNotAllowed(['GET', 'POST'])
 ####################################
 # Get underlying lessons when assigning a Unit
 ####################################
@@ -2433,7 +2451,7 @@ def underlyingCurriculum(request, id=''):
 
   if 'GET' == request.method:
     curriculum = models.Curriculum.objects.get(id=id)
-    underlying_curriculum = curriculum.underlying_curriculum.all().filter(status='P').order_by('order')
+    underlying_curriculum =  get_assignable_underlying_curriculum(request, curriculum.id)
     curriculum_list = [{'id': curr.id, 'title': curr.title} for curr in underlying_curriculum]
     print curriculum_list
     return http.HttpResponse(json.dumps(curriculum_list), content_type="application/json")
@@ -2512,8 +2530,8 @@ def groupDashboard(request, id=''):
           status.append({'name': status_map[key], 'y': value, 'color': status_color[key]})
         serial += 1
 
-        if curriculum.curriculum_type == 'L' and curriculum.unit is not None:
-          key = curriculum.unit
+        if curriculum.unit is not None:
+         key = curriculum.unit
         else:
           key = curriculum
 
@@ -3256,7 +3274,7 @@ def addAssignment(request, curriculum_id='', group_id=''):
     group = models.UserGroup.objects.get(id=group_id)
     lock_on_completion = False
     if curriculum.curriculum_type == 'U':
-      curricula = curriculum.underlying_curriculum.all().filter(status='P')
+      curricula = get_assignable_underlying_curriculum(request, curriculum.id)
     else:
       if curriculum.curriculum_type == 'A':
         lock_on_completion = True
@@ -3406,6 +3424,13 @@ def check_curriculum_permission(request, curriculum_id, action, step_order=-1):
             has_permission = True
           elif request.user.teacher in curriculum.shared_with.all():
             has_permission = True
+          elif curriculum.unit and request.user.teacher in curriculum.unit.shared_with.all():
+            has_permission = True
+          elif curriculum.curriculum_type == 'U':
+            for lesson in curriculum.underlying_curriculum.all():
+              has_permission = check_curriculum_permission(request, lesson.id, action)
+              if has_permission:
+                break;
         else:
           if curriculum.curriculum_type in ['U', 'L'] and step_order == -1:
             has_permission = True
@@ -3415,19 +3440,27 @@ def check_curriculum_permission(request, curriculum_id, action, step_order=-1):
 
       ############ ASSIGN ############
       elif action == 'assign':
-        # admin, school_admin and teacher can assign public curriculum
-        if curriculum.status == 'P':
-          if is_admin or is_school_admin or is_teacher:
-            has_permission = True
-        #only teachers can assign private curriculum that they own and that is locked
-        elif curriculum.status == 'D':
-          if is_teacher and curriculum.locked_by and request.user in curriculum.authors.all():
-            has_permission = True
+        if curriculum.curriculum_type != 'U':
+          # if a non-unit curriculum is published, allow admin, school_admin and teacher to assign
+          if curriculum.status == 'P':
+            if is_admin or is_school_admin or is_teacher:
+              has_permission = True
+          #if a non-unit curriculum is private and locked, allow admins and teachers who authored the curriculum and with
+          #whom the curriculum is shared with assign
+          elif curriculum.status == 'D' and curriculum.locked_by:
+            if is_admin:
+              has_permission = True
+            elif is_teacher:
+              if request.user in curriculum.authors.all() or request.user.teacher in curriculum.shared_with.all():
+                has_permission = True
+        else:
+          #allow a unit to be assigned only if at least one of the underlying lessons can be assigned by the user
+          for lesson in curriculum.underlying_curriculum.all():
+            has_permission = check_curriculum_permission(request, lesson.id, action)
+            if has_permission:
+              break;
 
-        if not has_permission:
-          messages.error(request, 'You do not have the privilege to assign this curriculum')
-
-      ############ ASSIGN ############
+      ############ EXPORT RESPONSE ############
       elif action == 'export_response':
         # admin, school_admin and teacher can export student data of public curriculum
         if curriculum.status == 'P' or curriculum.status == 'A':

@@ -1659,6 +1659,9 @@ span.ec .glyphicon-collapse-up, span.ec_lessons .fa-caret-square-o-up{
 .order input[type='number'], input[type='number'].order {
   width: 5em;
 }
+.fa.disabled {
+  color: gray !important;
+}
 /*************************************/
 
 

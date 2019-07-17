@@ -165,7 +165,7 @@ class Curriculum (models.Model):
   created_date = models.DateTimeField(auto_now_add=True)
   modified_date = models.DateTimeField(auto_now=True)
   icon = models.ImageField(upload_to=upload_file_to, blank=True, help_text='Upload an image at least 400x289 in resolution that represents this curriculum')
-  shared_with = models.ManyToManyField('Teacher', null=True, blank=True, help_text='Select teachers to share this curriculum with before it is published' )
+  shared_with = models.ManyToManyField('Teacher', null=True, blank=True, help_text='Select teachers to share this curriculum with before it is public' )
   unit = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, related_name="underlying_curriculum", help_text="Select a unit if this curriculum is part of one")
   acknowledgement = RichTextUploadingField(null=True, blank=True, help_text="Resources, models, and other material used in this curriculum; past authors/contributors")
   order = models.IntegerField(null=True, blank=True, help_text="Order within the Unit")

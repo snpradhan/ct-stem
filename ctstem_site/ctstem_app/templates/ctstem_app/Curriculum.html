@@ -478,12 +478,10 @@
           $('#id_curriculum-unit').prop('selectedIndex', 0);
         }
 
-        //for lesson display shared with table
-        if($(this).val() == 'L') {
+        //for unit and lesson, display shared with table
+        if($(this).val() == 'U' || $(this).val() == 'L') {
           $('select#id_curriculum-shared_with').closest('.form-group').show();
         }
-
-
 
         //for lesson, assessment and survey show the steps and Add Step button
         if($(this).val() == 'L' || $(this).val() == 'A' || $(this).val() == 'S') {

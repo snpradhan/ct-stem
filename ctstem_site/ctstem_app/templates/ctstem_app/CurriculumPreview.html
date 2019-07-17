@@ -115,7 +115,7 @@
                   <i class="fa fa-caret-square-o-up underlying_curriculum" aria-hidden="true" style="display:none;"></i>
                   <ul class="underlying_curriculum">
                     {% for curr in curr_unit|get_underlying_curriculum:user %}
-                      <li><a href="{% url 'ctstem:previewCurriculum'  curr.id 0 %}" class="activity"> {{curr.title}}</a></li>
+                      <li><a href="{% url 'ctstem:previewCurriculum'  curr.id 0 %}" class="activity">{{curr.order}}. {{curr.title}}</a></li>
                     {% endfor %}
                    </ul>
                 </li>

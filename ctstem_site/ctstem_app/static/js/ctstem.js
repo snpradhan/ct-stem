@@ -420,6 +420,10 @@ $(function (){
     $('form')[0].reset();
     $('form').submit();
   });
+  $('.fa.disabled').click(function(){
+    var msg = $(this).data('title');
+    alert(msg);
+  });
 
 });
 
