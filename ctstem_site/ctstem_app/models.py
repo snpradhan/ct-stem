@@ -318,7 +318,7 @@ class Category(models.Model):
 # Subcategory model
 class Subcategory(models.Model):
   category = models.ForeignKey(Category, related_name="subcategory")
-  title = models.CharField(null=False, max_length=256)
+  title = models.CharField(null=False, max_length=512)
   code = models.CharField(null=True, max_length=256, blank=True)
   description = models.CharField(null=True, max_length=256, blank=True)
   link = models.URLField(null=True, max_length=500, blank=True)
