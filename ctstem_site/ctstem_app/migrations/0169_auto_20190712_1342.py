@@ -7,7 +7,7 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('ctstem_app', '0167_curriculum_feature_rank'),
+        ('ctstem_app', '0168_auto_20190717_1514'),
     ]
 
     operations = [
