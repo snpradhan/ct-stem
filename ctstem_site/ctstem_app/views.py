@@ -1662,7 +1662,7 @@ def searchTaxonomy(request):
     if data['code']:
       query_filter['code__icontains'] = str(data['code'])
     print query_filter
-    taxonomyList = models.Subcategory.objects.filter(**query_filter)
+    taxonomyList = models.Subcategory.objects.filter(**query_filter).annotate(code_isnull=models.IsNull('code')).order_by('code_isnull', Lower('code'), Lower('category__standard__short_name'), Lower('category__name'), Lower('title'))
     taxonomy_list = [{'standard': subcategory.category.standard.short_name, 'category': subcategory.category.name, 'title': subcategory.title, 'code': subcategory.code, 'id': subcategory.id} for subcategory in taxonomyList]
     return http.HttpResponse(json.dumps(taxonomy_list), content_type="application/json")
 

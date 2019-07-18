@@ -17,6 +17,7 @@ from django.db.models.functions import Upper
 from django.conf import settings
 from django.core.mail import send_mail
 from django.contrib.sites.models import Site
+from django.db.models import Func
 
 
 CURRICULUM_STATUS_CHOICES = (
@@ -97,6 +98,9 @@ PARENTAL_CONSENT_CHOICES = (
   (u'A', u'Agree'),
   (u'D', u'Disagree'),
 )
+
+class IsNull(Func):
+  template = "%(expressions)s IS NULL or %(expressions)s = ''"
 
 def upload_file_to(instance, filename):
   import os
@@ -325,6 +329,9 @@ class Subcategory(models.Model):
 
   def __unicode__(self):
       return u'%s' % (self.title)
+
+  class Meta:
+    ordering = ['code']
 
 # School model
 class School(models.Model):
