@@ -737,7 +737,7 @@ def assignCurriculum(request, id=''):
       if hasattr(request.user, 'administrator') or hasattr(request.user, 'school_administrator'):
         curriculum_list = models.Curriculum.objects.all().filter(Q(unit=curriculum), Q(status='P') | Q(status='D') & Q(locked_by__isnull=False)).order_by('order').distinct()
       elif hasattr(request.user, 'teacher'):
-        curriculum_list = models.Curriculum.objects.all().filter(Q(unit=curriculum), Q(status='P') | Q(status='D') & Q(locked_by__isnull=False) & Q(shared_with=request.user.teacher) | Q(authors=request.user)).order_by('order').distinct()
+        curriculum_list = models.Curriculum.objects.all().filter(Q(unit=curriculum), Q(status='P') | Q(status='D') & Q(locked_by__isnull=False) & Q(shared_with=request.user.teacher) | Q(unit__shared_with=request.user.teacher) | Q(authors=request.user)).order_by('order').distinct()
     else:
       curriculum_list = models.Curriculum.objects.all().filter(id=curriculum.id)
 
@@ -3452,6 +3452,8 @@ def check_curriculum_permission(request, curriculum_id, action, step_order=-1):
               has_permission = True
             elif is_teacher:
               if request.user in curriculum.authors.all() or request.user.teacher in curriculum.shared_with.all():
+                has_permission = True
+              elif curriculum.unit and request.user.teacher in curriculum.unit.shared_with.all():
                 has_permission = True
         else:
           #allow a unit to be assigned only if at least one of the underlying lessons can be assigned by the user
