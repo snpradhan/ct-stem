@@ -241,3 +241,7 @@ table.table th .fa-sort, table.table th .fa-sort-asc, table.table th .fa-sort-de
 table.table th .fa-sort-asc, table.table th .fa-sort-desc {
   color: var(--ctstem-color-green);
 }
+
+table.table td.donotwrap {
+  white-space: nowrap;
+}

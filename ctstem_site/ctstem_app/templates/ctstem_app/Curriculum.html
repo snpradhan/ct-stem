@@ -54,8 +54,8 @@
                           <tr>
                             <th>Standard</th>
                             <th>Category</th>
-                            <th>Title</th>
                             <th>Code</th>
+                            <th>Title</th>
                             <th>Remove?</th>
                           </tr>
                         </thead>
@@ -63,10 +63,10 @@
                           {% for x in field.value %}
                             {% with taxonomy=x|getTaxonomy %}
                             <tr id="{{taxonomy.id}}">
-                              <td>{{taxonomy.category.standard.short_name}}</td>
+                              <td class="donotwrap">{{taxonomy.category.standard.short_name}}</td>
                               <td>{{taxonomy.category.name}}</td>
+                              <td class="donotwrap">{{taxonomy.code}}</td>
                               <td>{{taxonomy.title}}</td>
-                              <td>{{taxonomy.code}}</td>
                               <td>
                                 <button type="button" class="btn btn-danger remove_taxonomy" title="Remove Taxonomy">
                                   <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>

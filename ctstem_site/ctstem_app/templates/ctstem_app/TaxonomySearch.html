@@ -48,8 +48,8 @@
           <tr>
             <th>Standard</th>
             <th>Category</th>
-            <th>Title</th>
             <th>Code</th>
+            <th>Title</th>
             <th>Select?</th>
           </tr>
         </thead>
@@ -111,7 +111,7 @@ $(function (){
         else {
           var taxonomy = "";
           $.each(data, function(key, value){
-            taxonomy += "<tr><td>"+value['standard']+"</td><<td>"+value['category']+"</td><<td>"+value['title']+"</td><td>"+value['code']+"</td><td><button type='button' class='btn small blue select_taxonomy' id='"+value['id']+"''>Select</a></td></tr>";
+            taxonomy += "<tr><td class='donotwrap'>"+value['standard']+"</td><<td>"+value['category']+"</td><<td class='donotwrap'>"+value['code']+"</td><td>"+value['title']+"</td><td><button type='button' class='btn small blue select_taxonomy' id='"+value['id']+"''>Select</a></td></tr>";
           });
           if(taxonomy.length == 0){
             $('#taxonomyMsg').html('No matching standards found');
