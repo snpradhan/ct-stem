@@ -177,12 +177,13 @@
                                 <td>{{curr.order}}</td>
                                 <td class="title">
                                   {{curr.title}} - v{{curr.version}}.
-                                  {% if curr.locked_by %}
+                                  {% get_curriculum_locked_by curr.id as locked_by %}
+                                  {% if locked_by %}
                                     {% if user.administrator or user.researcher or user.author %}
-                                      <i class="fa fa-lock" aria-hidden="true" title="Locked by {{curr.locked_by}}"></i>
+                                      <i class="fa fa-lock" aria-hidden="true" title="Locked by {{locked_by}}"></i>
                                     {% elif user.teacher %}
                                       {% if user in curr.authors.all or user.teacher in curr.shared_with.all or user.teacher in curriculum.shared_with.all %}
-                                        <i class="fa fa-lock" aria-hidden="true" title="Locked by {{curr.locked_by}}"></i>
+                                        <i class="fa fa-lock" aria-hidden="true" title="Locked by {{locked_by}}"></i>
                                       {% endif %}
                                     {% endif %}
                                   {% endif %}

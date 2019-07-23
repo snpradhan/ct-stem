@@ -405,6 +405,12 @@ def check_curriculum_permission(context, curriculum_id, action):
   list(messages.get_messages(request))
   return has_permission
 
+@register.assignment_tag(takes_context=True)
+def get_curriculum_locked_by(context, curriculum_id):
+  request = context.get('request')
+  locked_by = views.get_curriculum_locked_by(request, curriculum_id)
+  return locked_by
+
 @register.filter
 def get_page_start_index(paginator, page_number):
   return paginator.page(page_number).start_index()

@@ -345,6 +345,12 @@ def lockCurriculum(request, id=''):
       curriculum = models.Curriculum.objects.get(id=id)
       curriculum.locked_by = request.user
       curriculum.save()
+      #if locking a unit, unlock all underlying curriculum because the unit lock takes precedent
+      if curriculum.curriculum_type == 'U':
+        for curr in curriculum.underlying_curriculum.all():
+          if curr.locked_by:
+            curr.locked_by = None
+            curr.save()
       messages.success(request, "The curriculum %s has been locked.  Only you or a site admin can modify and/or unlock this curriculum " % curriculum.title)
 
     return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
@@ -734,10 +740,7 @@ def assignCurriculum(request, id=''):
     curriculum = models.Curriculum.objects.get(id=id)
     #check if curriculum is stand alone or a unit
     if curriculum.curriculum_type == 'U':
-      if hasattr(request.user, 'administrator') or hasattr(request.user, 'school_administrator'):
-        curriculum_list = models.Curriculum.objects.all().filter(Q(unit=curriculum), Q(status='P') | Q(status='D') & Q(locked_by__isnull=False)).order_by('order').distinct()
-      elif hasattr(request.user, 'teacher'):
-        curriculum_list = models.Curriculum.objects.all().filter(Q(unit=curriculum), Q(status='P') | Q(status='D') & Q(locked_by__isnull=False) & Q(shared_with=request.user.teacher) | Q(unit__shared_with=request.user.teacher) | Q(authors=request.user)).order_by('order').distinct()
+      curriculum_list = get_assignable_underlying_curriculum(request, curriculum.id)
     else:
       curriculum_list = models.Curriculum.objects.all().filter(id=curriculum.id)
 
@@ -3342,24 +3345,26 @@ def check_curriculum_permission(request, curriculum_id, action, step_order=-1):
             messages.error(request, 'You do not have the privilege to %s this curriculum because it is archived' % (action))
 
         #check if the curriculum is locked
-        elif curriculum.locked_by:
-          # only and admin or the user holding the lock can edit/delete
-          if is_admin or curriculum.locked_by == request.user:
-            has_permission = True
-          else:
-            has_permission = False
-            messages.error(request, 'You do not have the privilege to %s this curriculum because it is locked by %s' % (action, curriculum.locked_by))
         else:
-          # admin, researcher and author can edit any unlocked curriculum
-          if is_admin or is_researcher or is_author:
-            has_permission = True
-          # teacher can only edit their own curriculum that is unlocked
-          elif is_teacher:
-            if request.user in curriculum.authors.all():
+          locked_by = get_curriculum_locked_by(request, curriculum.id)
+          if locked_by:
+            # only and admin or the user holding the lock can edit/delete
+            if is_admin or locked_by == request.user:
               has_permission = True
             else:
               has_permission = False
-              messages.error(request, 'You do not have the privilege to %s this curriculum'% (action))
+              messages.error(request, 'You do not have the privilege to %s this curriculum because it is locked by %s' % (action, locked_by))
+          else:
+            # admin, researcher and author can edit any unlocked curriculum
+            if is_admin or is_researcher or is_author:
+              has_permission = True
+            # teacher can only edit their own curriculum that is unlocked
+            elif is_teacher:
+              if request.user in curriculum.authors.all():
+                has_permission = True
+              else:
+                has_permission = False
+                messages.error(request, 'You do not have the privilege to %s this curriculum'% (action))
 
         # has permission so far
         if has_permission:
@@ -3382,12 +3387,10 @@ def check_curriculum_permission(request, curriculum_id, action, step_order=-1):
 
       ############ LOCK ############
       elif action == 'lock':
-        if curriculum.locked_by:
+        locked_by = get_curriculum_locked_by(request, curriculum.id)
+        if locked_by:
           has_permission = False
-          if curriculum.locked_by == request.user:
-            messages.warning(request, "You have already locked this curriculum")
-          else:
-            messages.error(request, "The curriculum has already been locked by %s" % curriculum.locked_by)
+          messages.error(request, "This curriculum is already locked")
         elif is_admin or is_researcher or is_author:
           has_permission = True
         elif is_teacher and request.user in curriculum.authors.all():
@@ -3399,7 +3402,7 @@ def check_curriculum_permission(request, curriculum_id, action, step_order=-1):
       ############ UNLOCK ############
       elif action == 'unlock':
         if curriculum.locked_by:
-          if is_admin or request.user in curriculum.authors.all():
+          if is_admin or curriculum.locked_by == request.user:
             has_permission = True
           else:
             has_permission = False
@@ -3447,7 +3450,7 @@ def check_curriculum_permission(request, curriculum_id, action, step_order=-1):
               has_permission = True
           #if a non-unit curriculum is private and locked, allow admins and teachers who authored the curriculum and with
           #whom the curriculum is shared with assign
-          elif curriculum.status == 'D' and curriculum.locked_by:
+          elif curriculum.status == 'D' and get_curriculum_locked_by(request, curriculum.id):
             if is_admin:
               has_permission = True
             elif is_teacher:
@@ -3489,6 +3492,25 @@ def check_curriculum_permission(request, curriculum_id, action, step_order=-1):
 
   except models.Curriculum.DoesNotExist:
     return False
+
+####################################
+# check if curriculum is locked
+# for a curriculum to be locked, either the curriculum itself
+# or its unit should be locked.
+# return the user who locked the curriculum or None
+####################################
+@login_required
+def get_curriculum_locked_by(request, curriculum_id=''):
+  curriculum = models.Curriculum.objects.get(id=curriculum_id)
+  if curriculum.unit is None:
+    return curriculum.locked_by
+  else:
+    if curriculum.unit.locked_by:
+      return curriculum.unit.locked_by
+    elif curriculum.locked_by:
+      return curriculum.locked_by
+    else:
+      return None
 
 ####################################
 # check if the user has permission to do this operation on a group
