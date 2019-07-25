@@ -934,6 +934,10 @@ div.content section.portfolio .portfolio-item .portfolio-caption{
   padding: 10px;
 }
 
+div.content#assignments div[class^="col-"] {
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+}
 div.content#assignments section.portfolio .portfolio-item, div.content#classes section.portfolio .portfolio-item {
   margin-bottom: 4em;
 }
@@ -1647,6 +1651,9 @@ div.content#publication .switch {
 }
 .gi-5x{
   font-size: 5em;
+}
+.glyphicon-option-horizontal {
+  vertical-align: bottom;
 }
 
 span.ec .glyphicon-collapse-down, span.ec_lessons .fa-caret-square-o-down {

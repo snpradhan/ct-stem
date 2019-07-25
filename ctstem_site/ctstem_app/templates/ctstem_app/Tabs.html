@@ -35,11 +35,13 @@
     {% endif %}
   {% endif %}
   {% if tab == 'user' or tab == 'group' %}
-    <div class="search">
-      {{searchForm.search_criteria}}
-      <input type="submit" class="btn btn-success" id="submit" value="Search"/>
-      <input type="submit" class="btn btn-warning" id="clear" value="Clear"/>
-    </div>
+    {% if not group.id %}
+      <div class="search">
+        {{searchForm.search_criteria}}
+        <input type="submit" class="btn btn-success" id="submit" value="Search"/>
+        <input type="submit" class="btn btn-warning" id="clear" value="Clear"/>
+      </div>
+    {% endif %}
   {% endif %}
 </ul>
 {% if tab == 'group' %}
