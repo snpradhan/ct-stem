@@ -309,9 +309,9 @@ def get_teacher_groups(id):
   groups = teacher.groups.all().filter(is_active=True)
   return groups
 
-@register.filter
-def get_underlying_curriculum(curriculum, user):
-  if curriculum.curriculum_type == 'U':
+@register.assignment_tag(takes_context=True)
+def get_underlying_curriculum(context, curriculum_id):
+  '''if curriculum.curriculum_type == 'U':
     unit = curriculum
   elif curriculum.curriculum_type == 'L' and curriculum.unit:
     unit = curriculum.unit
@@ -327,7 +327,11 @@ def get_underlying_curriculum(curriculum, user):
     else:
       return unit.underlying_curriculum.all().filter(Q(status='P') | Q(shared_with=user.teacher) | Q(authors=user)).order_by('order').distinct()
   else:
-    return unit.underlying_curriculum.all().filter(status='P').order_by('order').distinct()
+    return unit.underlying_curriculum.all().filter(status='P').order_by('order').distinct()'''
+
+  request = context.get('request')
+  underlying_curriculum = views.underlyingCurriculum(request, 'preview', curriculum_id)
+  return underlying_curriculum
 
 @register.filter
 def get_curriculum_count(queryset, status):

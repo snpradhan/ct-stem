@@ -1,0 +1,44 @@
+{% load ctstem_extras %}
+{% load base_extras %}
+<link rel="stylesheet" href="{% staticfile 'css/table.css' %}" media="screen">
+
+<table class="table table-condensed table-striped table-bordered unit_lesson">
+  <thead>
+    <tr>
+      <th>Order</th>
+      <th>Name</th>
+      {% if bucket == 'my' or bucket == 'shared' or user.administrator or user.researcher or user.author %}
+        <th>Status</th>
+      {% endif %}
+      <th>Last Updated</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for curr in underlying_curriculum %}
+    <tr>
+      <td>{{curr.order}}</td>
+      <td class="title">
+        {{curr.title}} - v{{curr.version}}.
+        {% get_curriculum_locked_by curr.id as locked_by %}
+        {% if locked_by %}
+          {% if user.administrator or user.researcher or user.author %}
+            <i class="fa fa-lock" aria-hidden="true" title="Locked by {{locked_by}}"></i>
+          {% elif user.teacher %}
+            {% if user in curr.authors.all or user.teacher in curr.shared_with.all or user.teacher in curriculum.shared_with.all %}
+              <i class="fa fa-lock" aria-hidden="true" title="Locked by {{locked_by}}"></i>
+            {% endif %}
+          {% endif %}
+        {% endif %}
+      </td>
+      {% if bucket == 'my' or bucket == 'shared' or user.administrator or user.researcher or user.author %}
+        <td>{{ curr.get_status_display }}</td>
+      {% endif %}
+      <td>{{curr.modified_date|date}}</td>
+      <td class="action">
+        {% include "ctstem_app/CurriculaActions.html" with curriculum=curr back_url=back_url %}
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>

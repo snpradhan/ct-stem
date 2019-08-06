@@ -2,26 +2,37 @@
 <!-- Preview -->
 {% check_curriculum_permission curriculum.id 'preview' as has_preview_permission %}
 {% if has_preview_permission == True %}
+  <!-- unit and stand alone curricula -->
   {% if curriculum.unit|slugify == 'None'|slugify %}
     <a class="util-button fa fa-eye" aria-hidden="true" title="Preview Curriculum" href="{% url 'ctstem:previewCurriculum' curriculum.id %}" target="_blank">
     <a class="util-button fa fa-print" aria-hidden="true" title="Print" href="{% url 'ctstem:previewCurriculum' curriculum.id %}"></a>
   {% else %}
-    <a class="util-button fa fa-eye" aria-hidden="true" title="Preview Curriculum" href="{% url 'ctstem:previewCurriculum' curriculum.id 0 %}" target="_blank">
-    </a>
+  <!-- underlying curricula can only be previewed if user is logged in -->
+    {% if user.is_authenticated %}
+      <a class="util-button fa fa-eye" aria-hidden="true" title="Preview Curriculum" href="{% url 'ctstem:previewCurriculum' curriculum.id 0 %}" target="_blank">
+      </a>
+    {% else %}
+      {% with msg='Please login to preview this curricula' %}
+      <a class="fa fa-eye disabled" aria-hidden="true" onclick="alert('{{msg}}');"></a>
+      {% endwith %}
+    {% endif %}
   {% endif %}
 {% endif %}
 
 <!-- Edit -->
 {% check_curriculum_permission curriculum.id 'modify' as has_modify_permission %}
+
+{% with back_url=back_url|default:request.path %}
 {% if has_modify_permission == True %}
   {% if curriculum.status == 'A' %}
-    <a class="util-button fa fa-pencil" aria-hidden="true" aria-label="Edit Curriculum" title="Edit Curriculum" href="{% url 'ctstem:curriculum' curriculum.id %}?back_url={{ request.path }}"
+    <a class="util-button fa fa-pencil" aria-hidden="true" aria-label="Edit Curriculum" title="Edit Curriculum" href="{% url 'ctstem:curriculum' curriculum.id %}?back_url={{ back_url }}"
     onclick="return confirm('This curriculum has been archived.  Are you sure you want to edit this curriculum?');">
     </a>
   {% else %}
-    <a class="util-button fa fa-pencil" aria-hidden="true" aria-label="Edit Curriculum" title="Edit Curriculum" href="{% url 'ctstem:curriculum' curriculum.id %}?back_url={{ request.path }}"></a>
+    <a class="util-button fa fa-pencil" aria-hidden="true" aria-label="Edit Curriculum" title="Edit Curriculum" href="{% url 'ctstem:curriculum' curriculum.id %}?back_url={{ back_url }}"></a>
   {% endif %}
 {% endif %}
+{% endwith %}
 <!-- Delete -->
 {% check_curriculum_permission curriculum.id 'delete' as has_delete_permission %}
 {% if has_delete_permission == True %}
@@ -49,14 +60,14 @@
 {% check_curriculum_permission curriculum.id 'assign' as has_assign_permission %}
 {% if has_assign_permission == True %}
   <a class="assign util-button fa fa-calendar-check-o" aria-hidden="true" data-form="{% url 'ctstem:assignCurriculum' curriculum.id%}" aria-label="Assign Curriculum" title="Assign Curriculum"></a>
-{% else %}
+{% elif user.is_authenticated %}
   {% if curriculum.curriculum_type == 'U' %}
-    {% with msg='This unit cannot be assigned because all the underlying lessons are private and not locked.  If you need to assign this unit please ask the author to lock one or more lessons or make them public' %}
-    <a class="fa fa-calendar-check-o disabled" aria-hidden="true" data-title="{{msg}}"></a>
+    {% with msg="This unit cannot be assigned because all the underlying lessons are private and not locked.  If you need to assign this unit please ask the author to lock one or more lessons or make them public" %}
+    <a class="fa fa-calendar-check-o disabled" aria-hidden="true" onclick="alert('{{msg}}');"></a>
     {% endwith %}
   {% else %}
-    {% with msg='This curriculum cannot be assigned because it is private and not locked.  If you need to assign this curriculum please ask the author to lock the curriculum or make it public' %}
-    <a class="fa fa-calendar-check-o disabled" aria-hidden="true" data-title="{{msg}}"></a>
+    {% with msg="This curriculum cannot be assigned because it is private and not locked.  If you need to assign this curriculum please ask the author to lock the curriculum or make it public" %}
+    <a class="fa fa-calendar-check-o disabled" aria-hidden="true" onclick="alert('{{msg}}');"></a>
     {% endwith %}
   {% endif %}
 {% endif %}

@@ -740,7 +740,7 @@ def assignCurriculum(request, id=''):
     curriculum = models.Curriculum.objects.get(id=id)
     #check if curriculum is stand alone or a unit
     if curriculum.curriculum_type == 'U':
-      curriculum_list = get_assignable_underlying_curriculum(request, curriculum.id)
+      curriculum_list = underlyingCurriculum(request, 'assign', curriculum.id)
     else:
       curriculum_list = models.Curriculum.objects.all().filter(id=curriculum.id)
 
@@ -2394,7 +2394,7 @@ def searchAssignment(request):
           curr = {'id': curriculum.id, 'curriculum_type': curriculum.get_curriculum_type_display(), 'title': curriculum.title, 'subject': [subject.name for subject in curriculum.subject.all()]}
 
           if curriculum.curriculum_type == 'U':
-            underlying_curriculum_queryset = get_assignable_underlying_curriculum(request, curriculum.id)
+            underlying_curriculum_queryset = underlyingCurriculum(request, 'assign', curriculum.id)
             underlying_curriculum = []
             unit_assigned = False
             curriculum_assigned_count = 0
@@ -2427,37 +2427,34 @@ def searchAssignment(request):
 
   return http.HttpResponseNotAllowed(['POST'])
 
-@login_required
-def get_assignable_underlying_curriculum(request, id=''):
-  if hasattr(request.user, 'school_administrator') == False and hasattr(request.user, 'teacher') == False and  hasattr(request.user, 'administrator') == False:
-    return http.HttpResponseNotFound('<h1>You do not have the privilege search assignments</h1>')
+####################################
+# Get underlying lessons when assigning or previewing
+####################################
+def underlyingCurriculum(request, action, id=''):
 
   if request.method == 'GET' or request.method == 'POST':
     curriculum = models.Curriculum.objects.get(id=id)
     underlying_curriculum =  curriculum.underlying_curriculum.all().order_by('order').distinct()
-    assignable_curriculum = []
+    filtered_curriculum = []
     for curr in underlying_curriculum:
-      has_permission = check_curriculum_permission(request, curr.id, 'assign')
+      has_permission = check_curriculum_permission(request, curr.id, action)
       if has_permission:
-        assignable_curriculum.append(curr)
+        filtered_curriculum.append(curr)
 
-    return assignable_curriculum
-
+    #curriculum_list = [{'id': curr.id, 'title': curr.title} for curr in filtered_curriculum]
+    return filtered_curriculum
   return http.HttpResponseNotAllowed(['GET', 'POST'])
-####################################
-# Get underlying lessons when assigning a Unit
-####################################
-@login_required
-def underlyingCurriculum(request, id=''):
-  if hasattr(request.user, 'school_administrator') == False and hasattr(request.user, 'teacher') == False and  hasattr(request.user, 'administrator') == False:
-    return http.HttpResponseNotFound('<h1>You do not have the privilege search assignments</h1>')
 
+####################################
+# Get underlying lessons to display on
+# the curricula page
+####################################
+def underlyingCurriculumTable(request, id=''):
   if 'GET' == request.method:
-    curriculum = models.Curriculum.objects.get(id=id)
-    underlying_curriculum =  get_assignable_underlying_curriculum(request, curriculum.id)
-    curriculum_list = [{'id': curr.id, 'title': curr.title} for curr in underlying_curriculum]
-    print curriculum_list
-    return http.HttpResponse(json.dumps(curriculum_list), content_type="application/json")
+    underlying_curriculum = underlyingCurriculum(request, 'preview', id)
+    context = {'underlying_curriculum': underlying_curriculum, 'back_url': request.GET['back_url']}
+    html = render_to_string('ctstem_app/UnderlyingCurricula.html', context, context_instance=RequestContext(request))
+    return http.HttpResponse(html)
 
   return http.HttpResponseNotAllowed(['GET'])
 
@@ -3277,7 +3274,7 @@ def addAssignment(request, curriculum_id='', group_id=''):
     group = models.UserGroup.objects.get(id=group_id)
     lock_on_completion = False
     if curriculum.curriculum_type == 'U':
-      curricula = get_assignable_underlying_curriculum(request, curriculum.id)
+      curricula = underlyingCurriculum(request, 'assign', curriculum.id)
     else:
       if curriculum.curriculum_type == 'A':
         lock_on_completion = True
@@ -3435,11 +3432,9 @@ def check_curriculum_permission(request, curriculum_id, action, step_order=-1):
               if has_permission:
                 break;
         else:
-          if curriculum.curriculum_type in ['U', 'L'] and step_order == -1:
+          #only allow anonymous users to preview curriculum overview
+          if curriculum.status == 'P' and step_order == -1:
             has_permission = True
-
-        if not has_permission:
-          messages.error(request, 'You do not have the privilege to preview this curriculum')
 
       ############ ASSIGN ############
       elif action == 'assign':

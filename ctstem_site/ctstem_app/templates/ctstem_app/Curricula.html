@@ -145,63 +145,21 @@
                         {% endfor %}
                       </div>
                     </div>
-                    {% if curriculum.curriculum_type == 'U' and curriculum|get_underlying_curriculum:user %}
-                      {% with underlying_curriculum=curriculum|get_underlying_curriculum:user %}
+                    {% if curriculum.curriculum_type == 'U'%}
                       <div class="row">
-                        <div class="col-md-2 title">Lessons:</div>
+                        <div class="col-md-2 title">Underlying Curricula:</div>
                         <div class="col-md-10">
-                          {{underlying_curriculum|length}}
-                          <span class="ec">
+                          <span class="ec unit_lesson" data-unit-id="{{curriculum.id}}" data-back-url="{{request.path}}">
                             <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
                             <span class="glyphicon glyphicon-collapse-up" aria-hidden="true" style="display:none;"></span>
                           </span>
                         </div>
                       </div>
-                      <div class="row" style="display:none;">
+                      <div class="row" id="underlying_curricula" style="display:none;">
                         <div class="col-md-12">
-                          <table class="table table-condensed table-striped table-bordered unit_lesson">
-                            <thead>
-                              <tr>
-                                <th>Order</th>
-                                <th>Name</th>
-                                {% if bucket == 'my' or bucket == 'shared' or user.administrator or user.researcher or user.author %}
-                                  <th>Status</th>
-                                {% endif %}
-                                <th>Last Updated</th>
-                                <th>Actions</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                            {% for curr in underlying_curriculum %}
-                              <tr>
-                                <td>{{curr.order}}</td>
-                                <td class="title">
-                                  {{curr.title}} - v{{curr.version}}.
-                                  {% get_curriculum_locked_by curr.id as locked_by %}
-                                  {% if locked_by %}
-                                    {% if user.administrator or user.researcher or user.author %}
-                                      <i class="fa fa-lock" aria-hidden="true" title="Locked by {{locked_by}}"></i>
-                                    {% elif user.teacher %}
-                                      {% if user in curr.authors.all or user.teacher in curr.shared_with.all or user.teacher in curriculum.shared_with.all %}
-                                        <i class="fa fa-lock" aria-hidden="true" title="Locked by {{locked_by}}"></i>
-                                      {% endif %}
-                                    {% endif %}
-                                  {% endif %}
-                                </td>
-                                {% if bucket == 'my' or bucket == 'shared' or user.administrator or user.researcher or user.author %}
-                                  <td>{{ curr.get_status_display }}</td>
-                                {% endif %}
-                                <td>{{curr.modified_date|date}}</td>
-                                <td class="action">
-                                  {% include "ctstem_app/CurriculaActions.html" with curriculum=curr %}
-                                </td>
-                              </tr>
-                            {% endfor %}
-                            </tbody>
-                          </table>
+                          <table></table>
                         </div>
                       </div>
-                      {% endwith %}
                     {% endif %}
                     <div class="row">
                       <div class="col-md-2 title">Last Updated:</div>

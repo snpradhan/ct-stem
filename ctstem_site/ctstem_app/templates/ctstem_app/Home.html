@@ -100,7 +100,8 @@
               </div>
               <div class="period">
                 {% if curriculum.curriculum_type == 'U' %}
-                  {{curriculum|get_underlying_curriculum:user|length}} Lessons
+                  {% get_underlying_curriculum curriculum.id as underlying_curriculum %}
+                  {{underlying_curriculum|length}} Lessons
                 {% else %}
                   {{curriculum.time}}
                 {% endif %}

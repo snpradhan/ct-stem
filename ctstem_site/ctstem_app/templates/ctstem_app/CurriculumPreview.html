@@ -42,6 +42,7 @@
 
 {% block content %}
 {% with curr_unit=curriculum.unit|default:curriculum %}
+{% get_underlying_curriculum curr_unit.id as underlying_curriculum %}
 <!--if curriculum is a unit or a lesson inside a unit then curr_unit is the unit otherwise it is the curriculum  -->
   <div>
     {% if curr_unit.curriculum_type == 'L' or curr_unit.curriculum_type == 'U' %}
@@ -114,7 +115,8 @@
                   <i class="fa fa-caret-square-o-down underlying_curriculum" aria-hidden="true"></i>
                   <i class="fa fa-caret-square-o-up underlying_curriculum" aria-hidden="true" style="display:none;"></i>
                   <ul class="underlying_curriculum">
-                    {% for curr in curr_unit|get_underlying_curriculum:user %}
+
+                    {% for curr in underlying_curriculum %}
                       <li><a href="{% url 'ctstem:previewCurriculum'  curr.id 0 %}" class="activity">{{curr.order}}. {{curr.title}}</a></li>
                     {% endfor %}
                    </ul>
@@ -132,7 +134,7 @@
                     <i class="fa fa-caret-square-o-up underlying_curriculum" aria-hidden="true" style="display:none;"></i>
                   </a>
                   <ul class="underlying_curriculum">
-                    {% for curr in curr_unit|get_underlying_curriculum:user %}
+                    {% for curr in underlying_curriculum %}
                       <li><a data-toggle="modal" data-target="#login" class="activity" href="#">{{curr.title}}</a></li>
                     {% endfor %}
                    </ul>
@@ -263,10 +265,9 @@
 
               {% if curr_unit.curriculum_type == 'U' %}
                 <div class="underlying_lessons_overview">
-                  {% with underlying_lessons=curr_unit|get_underlying_curriculum:request.user %}
-                  {% if underlying_lessons %}
+                  {% if underlying_curriculum %}
                     <h2>Lessons Overview</h2>
-                    {% for lesson in underlying_lessons%}
+                    {% for lesson in underlying_curriculum %}
                       <div class="lesson_overview">
                         {% if lesson.overview %}
                           <a class="lesson_overview_link">{{lesson.order}}. {{lesson.title}} Overview</a>
@@ -275,7 +276,6 @@
                       </div>
                     {% endfor %}
                   {% endif %}
-                  {% endwith %}
                 </div>
               {% endif %}
             </div>
@@ -461,7 +461,7 @@
       });
       $('body').on('click', 'a.activity', function(){
         {% if user.is_anonymous %}
-          alert('Please login to view lesson activity');
+          alert('Please login to view curriculum activity');
           return false;
         {% else %}
           $('main').hide();
