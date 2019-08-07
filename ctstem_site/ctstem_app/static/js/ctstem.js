@@ -264,21 +264,24 @@ $(function (){
     if($(this).hasClass('unit_lesson')){
       var table_row = $(this).closest('.row').next('.row#underlying_curricula')
       var lesson_table = $(table_row).find('table')[0];
-      var unit_id = $(this).data('unit-id');
-      data = {'back_url': $(this).data('back-url')};
-      var data = $.param(data);
-      $.ajax({
-        type: 'GET',
-        url: '/curriculum/underlying/'+unit_id+'/',
-        data: data,
-        success: function(data){
-          $(lesson_table).html(data);
-          return false;
-        },
-        error: function(xhr, ajaxOptions, thrownError){
-          alert(thrownError);
-        },
-      });
+      //only make the ajax call if the table is not yet populated
+      if($(lesson_table).html().length == 0){
+        var unit_id = $(this).data('unit-id');
+        data = {'back_url': $(this).data('back-url')};
+        var data = $.param(data);
+        $.ajax({
+          type: 'GET',
+          url: '/curriculum/underlying/'+unit_id+'/',
+          data: data,
+          success: function(data){
+            $(lesson_table).html(data);
+            return false;
+          },
+          error: function(xhr, ajaxOptions, thrownError){
+            alert(thrownError);
+          },
+        });
+      }
       $(table_row).toggle();
     }
 
