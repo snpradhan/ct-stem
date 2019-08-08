@@ -102,45 +102,26 @@
               {% else %}
                 Lesson
               {% endif %}
-              Summary</a></li>
-            {% if user.administrator or user.researcher or user.school_administrator or user.author or user.teacher %}
-              <li><a href="#" class="notes">View Teacher Notes</a></li>
-              {% if curr_unit.curriculum_type == 'L'%}
-                <li>
-                  <a href="{% url 'ctstem:previewCurriculum'  curriculum.id 0 %}" class="activity">View Student Activity</a>
-                </li>
-              {% else %}
-                <li>
-                  <a href="#" class="list_underlying_curriculum">Underlying Curricula</a>
-                  <i class="fa fa-caret-square-o-down underlying_curriculum" aria-hidden="true"></i>
-                  <i class="fa fa-caret-square-o-up underlying_curriculum" aria-hidden="true" style="display:none;"></i>
-                  <ul class="underlying_curriculum">
+              Summary</a>
+            </li>
 
-                    {% for curr in underlying_curriculum %}
-                      <li><a href="{% url 'ctstem:previewCurriculum'  curr.id 0 %}" class="activity">{{curr.order}}. {{curr.title}}</a></li>
-                    {% endfor %}
-                   </ul>
-                </li>
-              {% endif %}
-            {% elif user.is_anonymous %}
-              <li><a data-toggle="modal" data-target="#login" class="notes" href="#">View Teacher Notes</a></li>
-              {% if curr_unit.curriculum_type == 'L' %}
-                <li><a data-toggle="modal" data-target="#login" class="activity" href="#">View Student Activity </a></li>
-              {% else %}
-                <li>
-                  <a href="#" class="list_underlying_curriculum">
-                    Underlying Curricula
-                    <i class="fa fa-caret-square-o-down underlying_curriculum" aria-hidden="true"></i>
-                    <i class="fa fa-caret-square-o-up underlying_curriculum" aria-hidden="true" style="display:none;"></i>
-                  </a>
-                  <ul class="underlying_curriculum">
-                    {% for curr in underlying_curriculum %}
-                      <li><a data-toggle="modal" data-target="#login" class="activity" href="#">{{curr.title}}</a></li>
-                    {% endfor %}
-                   </ul>
-                </li>
-              {% endif %}
+            {% if curr_unit.curriculum_type == 'L'%}
+              <li>
+                <a href="{% url 'ctstem:previewCurriculum'  curriculum.id 0 %}" class="activity">View Student Activity</a>
+              </li>
+            {% else %}
+              <li>
+                <a href="#" class="list_underlying_curriculum">Underlying Curricula</a>
+                <i class="fa fa-caret-square-o-down underlying_curriculum" aria-hidden="true"></i>
+                <i class="fa fa-caret-square-o-up underlying_curriculum" aria-hidden="true" style="display:none;"></i>
+                <ul class="underlying_curriculum">
+                  {% for curr in underlying_curriculum %}
+                    <li><a href="{% url 'ctstem:previewCurriculum'  curr.id 0 %}" class="activity">{{curr.order}}. {{curr.title}}</a></li>
+                  {% endfor %}
+                 </ul>
+              </li>
             {% endif %}
+
             <!-- TODO: LINK TO ATTACHMENT -->
             {% if user.administrator or user.school_administrator or user.researcher or user.author or user.teacher %}
               {% if attachments %}
@@ -295,7 +276,6 @@
             <div class="next">
               <h2>What's Next?</h2>
               <ul>
-                <li><a href="#" class="notes">Read the teacher notes</a></li>
                 {% if curr_unit.curriculum_type != 'U' %}
                   <li><a href="{% url 'ctstem:previewCurriculum'  curriculum.id 0 %}" class="activity">Look at the student activity</a></li>
                 {% endif %}
@@ -341,15 +321,6 @@
 
           </div>
         </lesson-summary>
-
-        <notes>
-          <div class="page">
-          {% if user.administrator or user.researcher or user.school_administrator or user.author or user.teacher %}
-            <h2>Teacher Notes</h2>
-            {{curr_unit.teacher_notes|safe}}
-          {% endif %}
-          </div>
-        </notes>
 
         <faq>
           <div class="page">
@@ -443,37 +414,18 @@
       $('body').on('click', 'a.lesson', function(){
         $('lesson-summary').show();
         $('activity').hide();
-        $('notes').hide();
         $('faq').hide();
         $('nav span#activity-nav').hide();
       });
-      $('body').on('click', 'a.notes', function(){
-        {% if user.is_anonymous %}
-          alert('Please login to view teacher notes');
-          return false;
-        {% else %}
-          $('lesson-summary').hide();
-          $('activity').hide();
-          $('notes').show();
-          $('faq').hide();
-          $('nav span#activity-nav').hide();
-        {% endif %}
-      });
+
       $('body').on('click', 'a.activity', function(){
-        {% if user.is_anonymous %}
-          alert('Please login to view curriculum activity');
-          return false;
-        {% else %}
-          $('main').hide();
-          $('activity').show();
-          $('notes').hide();
-          $('faq').hide();
-        {% endif %}
+        $('main').hide();
+        $('activity').show();
+        $('faq').hide();
       });
       $('body').on('click', 'a.faq', function(){
         $('lesson-summary').hide();
         $('activity').hide();
-        $('notes').hide();
         $('faq').show();
         $('nav span#activity-nav').hide();
       });

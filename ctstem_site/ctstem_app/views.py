@@ -3410,17 +3410,15 @@ def check_curriculum_permission(request, curriculum_id, action, step_order=-1):
 
       ############ PREVIEW ############
       elif action == 'preview':
-        # admin, researcher and author can preview any curricula
-        if is_admin or is_researcher or is_author:
+        #allow everyone to preview public curricula
+        if curriculum.status == 'P':
           has_permission = True
-        # school admins can preview published curricula
-        elif is_school_admin and curriculum.status == 'P':
+        # admin, researcher and author can preview any curricula
+        elif is_admin or is_researcher or is_author:
           has_permission = True
         # teacher can only preview curriculum that are public, shared with them or that they own
         elif is_teacher:
-          if curriculum.status == 'P':
-            has_permission = True
-          elif request.user in curriculum.authors.all():
+          if request.user in curriculum.authors.all():
             has_permission = True
           elif request.user.teacher in curriculum.shared_with.all():
             has_permission = True
@@ -3431,10 +3429,6 @@ def check_curriculum_permission(request, curriculum_id, action, step_order=-1):
               has_permission = check_curriculum_permission(request, lesson.id, action)
               if has_permission:
                 break;
-        else:
-          #only allow anonymous users to preview curriculum overview
-          if curriculum.status == 'P' and step_order == -1:
-            has_permission = True
 
       ############ ASSIGN ############
       elif action == 'assign':
