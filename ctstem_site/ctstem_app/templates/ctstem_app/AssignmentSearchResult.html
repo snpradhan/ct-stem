@@ -24,14 +24,14 @@
               </span>
             </td>
             <td style="text-align:center;">
-              {% if curriculum.underlying_curriculum_assigned > 0 %}
-                <div class="assignment_status">{{curriculum.underlying_curriculum_assigned}}/{{curriculum.underlying_curriculum_count}} Curricula Assigned</div>
-                {% if curriculum.underlying_curriculum_assigned < curriculum.underlying_curriculum_count %}
-                  <button class="btn small blue select_assignment unit" id="{{curriculum.id}}" name="{{curriculum.title}}">
-                  Assign Remaining {{curriculum.underlying_curriculum_count|subtract:curriculum.underlying_curriculum_assigned}} Curricula</button>
+              {% if curriculum.underlying_curriculum_assigned == curriculum.underlying_curriculum_count %}
+                <div class="assignment_status">Unit Assigned</div>
+              {% elif curriculum.underlying_curriculum_assigned < curriculum.underlying_curriculum_count %}
+                {% if curriculum.underlying_curriculum_assigned > 0 %}
+                  <div class="assignment_status">{{curriculum.underlying_curriculum_assigned}}/{{curriculum.underlying_curriculum_count}} Curricula Assigned</div>
                 {% endif %}
-              {% else %}
-                <button class="btn small blue select_assignment unit" id="{{curriculum.id}}" name="{{curriculum.title}}">Assign All {{curriculum.underlying_curriculum_count}} Curricula</button>
+                <button class="btn small blue select_assignment unit" id="{{curriculum.id}}" name="{{curriculum.title}}">
+                  Assign Unit</button>
               {% endif %}
             </td>
           </tr>
