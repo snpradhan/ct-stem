@@ -44,6 +44,7 @@
       </form>
       {% if curricula %}
         <div id="curricula_table">
+          {% include "ctstem_app/Pagination.html" with model=curricula %}
           <table class="table table-striped paginate_sort" id="curricula">
             <thead>
               <tr id="filterrow">
