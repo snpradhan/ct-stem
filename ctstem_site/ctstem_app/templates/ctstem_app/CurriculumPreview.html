@@ -152,7 +152,7 @@
             <li class="divider"></li>
             <li><a href="#" class="faq"">View CT FAQ</a></li>
             {% if user.is_anonymous %}
-              <li><a data-toggle="modal" data-target="#login" class="login modal-open" data-href="{% url 'ctstem:login' %}" href="#">Login</a></li>
+              <li><a data-toggle="modal" data-target="#login" class="login modal-open" data-href="{% url 'ctstem:login' %}" href="#">Login/Register</a></li>
             {% else %}
               <li><a href="{% url 'ctstem:logout' %}">Logout</a></li>
             {% endif %}
