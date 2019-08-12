@@ -42,6 +42,7 @@ from django.utils.crypto import get_random_string
 from django.db.models import Max, Min
 import logging
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from dal import autocomplete
 
 logger = logging.getLogger('django')
 
@@ -4596,3 +4597,15 @@ def terms(request):
 def help(request):
   context = {}
   return render(request, 'ctstem_app/HelpFAQ.html', context)
+
+class SchoolAutocomplete(autocomplete.Select2QuerySetView):
+  def get_queryset(self):
+    qs = models.School.objects.all().filter(is_active=True).exclude(school_code='OTHER').order_by(Lower('name'))
+    if self.q:
+      qs = qs.filter(name__icontains=self.q)
+    if self.request.user.is_authenticated():
+      return qs
+    else:
+      create_school = models.School.objects.all().filter(school_code='OTHER')
+      return list(create_school) + list(qs)
+

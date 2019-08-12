@@ -80,28 +80,32 @@ $(function (){
     });
   });
 
-  //datatables configuration
-  $('table.table.dt thead tr#filterrow th:not(.no-sort)').each( function () {
-        var title = $(this).text();
-        $(this).html( '<input type="text" placeholder="Search '+title+'" />' );
-    } );
+  if($('table.table.dt').length){
+    //datatables configuration
+    $('table.table.dt thead tr#filterrow th:not(.no-sort)').each( function () {
+      var title = $(this).text();
+      $(this).html( '<input type="text" placeholder="Search '+title+'" />' );
+    });
 
-  var table = $('table.table.dt').DataTable({
-    order: [],
-    orderCellsTop: true,
-    lengthMenu: [[100, -1], [100, "All"]],
-    columnDefs: [
-      { targets: 'no-sort', orderable: false }
-    ]
-  });
 
-  // Apply the filter
-  $("table.table.dt thead tr#filterrow input").on( 'keyup change', function () {
-      table
-          .column( $(this).parent().index()+':visible' )
-          .search( this.value )
-          .draw();
-  });
+    var table = $('table.table.dt').DataTable({
+      order: [],
+      orderCellsTop: true,
+      lengthMenu: [[100, -1], [100, "All"]],
+      columnDefs: [
+        { targets: 'no-sort', orderable: false }
+      ]
+    });
+
+
+    // Apply the filter
+    $("table.table.dt thead tr#filterrow input").on( 'keyup change', function () {
+        table
+            .column( $(this).parent().index()+':visible' )
+            .search( this.value )
+            .draw();
+    });
+  }
 
   //paginate sort table
   $('table.table.paginate_sort thead  th:not(.no-sort)').each( function () {

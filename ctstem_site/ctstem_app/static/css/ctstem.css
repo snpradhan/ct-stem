@@ -451,6 +451,7 @@ div.table#register div#school_form {
   background: #e5e5e5;
   border-radius: 1em;
 }
+
 div.table#register #id_account_type {
   display: inline-block;
 }
@@ -1804,14 +1805,14 @@ div.modal select.form-control {
 }
 
 .form-control {
-  border: 2px solid var(--ctstem-color-gray);
+  border: 2px solid var(--ctstem-color-gray) !important;
   color: black;
 }
 .form-control.error {
-  border: 2px solid var(--ctstem-color-red);
+  border: 2px solid var(--ctstem-color-red) !important;
 }
 .form-control:focus {
-  border-color: var(--ctstem-color-yellow);
+  border-color: var(--ctstem-color-yellow) !important;
   box-shadow: unset;
   color: black;
 }
@@ -1826,4 +1827,16 @@ span.cke_top.blur, span.cke_bottom.blur {
 
 span.cke_top.focus, span.cke_bottom.focus {
   display: block !important;
+}
+
+/******** autocomplete field ******************/
+.select2-container {
+  width: auto !important;
+  display: block !important;
+}
+.select2-selection {
+  height: 2.5em !important;
+}
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+  line-height: unset !important;
 }

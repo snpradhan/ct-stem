@@ -20,6 +20,7 @@ from django.db.models.functions import Lower
 from PIL import Image
 import StringIO
 import os
+from dal import autocomplete
 
 
 ####################################
@@ -81,7 +82,11 @@ class RegistrationForm (forms.Form):
   password1 = forms.CharField(required=True, widget=forms.PasswordInput(render_value=False), label=u'Password')
   password2 = forms.CharField(required=True, widget=forms.PasswordInput(render_value=False), label=u'Confirm Password')
   account_type = forms.ChoiceField(required=True, choices = models.USER_ROLE_CHOICES)
-  school = forms.ModelChoiceField(required=False, queryset=models.School.objects.all().filter(is_active=True).order_by('name'))
+  school = forms.ModelChoiceField(required=False,
+                                  queryset=models.School.objects.all().filter(is_active=True).order_by('name'),
+                                  widget=autocomplete.ModelSelect2(url='school-autocomplete',
+                                                                   attrs={'data-placeholder': 'Start typing the school name ...',}),
+                                  )
 
   def __init__(self, *args, **kwargs):
     user = kwargs.pop('user')
@@ -326,7 +331,8 @@ class StudentForm (ModelForm):
     model = models.Student
     fields = ['school', 'consent', 'parental_consent']
     widgets = {
-      'consent': forms.RadioSelect()
+      'consent': forms.RadioSelect(),
+      'school': autocomplete.ModelSelect2(url='school-autocomplete', attrs={'data-placeholder': 'Start typing the school name ...',})
     }
 
   def __init__(self, *args, **kwargs):
@@ -380,6 +386,9 @@ class TeacherForm (ModelForm):
   class Meta:
     model = models.Teacher
     fields = ['school']
+    widgets = {
+      'school': autocomplete.ModelSelect2(url='school-autocomplete', attrs={'data-placeholder': 'Start typing the school name ...',})
+    }
 
   def __init__(self, *args, **kwargs):
     user = kwargs.pop('user')

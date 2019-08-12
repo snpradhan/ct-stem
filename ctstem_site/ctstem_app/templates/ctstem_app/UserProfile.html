@@ -1,8 +1,4 @@
 {% extends "ctstem_app/base.html" %}
-{% block media %}
-  {{ block.super }}
-  {{ form.media }}
-{% endblock %}
 {% block title %}User Profile |{% endblock %}
 
 {% block content %}
@@ -74,4 +70,8 @@
       {% include 'ctstem_app/ConsentModal.html' with parent='profile' %}
     </div>
   </div>
+{% endblock %}
+{% block footer %}
+  {{ userform.media }}
+  {{ profileform.media }}
 {% endblock %}

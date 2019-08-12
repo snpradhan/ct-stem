@@ -17,6 +17,7 @@ from django.conf import settings
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from ckeditor_uploader import views
+from ctstem_app.views import SchoolAutocomplete
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
@@ -27,6 +28,7 @@ urlpatterns = [
     url(r'^ckeditor/upload/', views.upload, name='ckeditor_upload'),
     url(r'^ckeditor/browse/', views.browse, name='ckeditor_browse'),
     url(r'^chaining/', include('smart_selects.urls')),
+    url(r'^school-autocomplete/$', SchoolAutocomplete.as_view(), name='school-autocomplete',),
 
 ]
 
