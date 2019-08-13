@@ -107,11 +107,11 @@
 
             {% if curr_unit.curriculum_type == 'L'%}
               <li>
-                <a href="{% url 'ctstem:previewCurriculum'  curriculum.id 0 %}" class="activity">View Student Activity</a>
+                <a href="{% url 'ctstem:previewCurriculum'  curriculum.id 0 %}" class="activity">Preview Student Activity</a>
               </li>
             {% else %}
               <li>
-                <a href="#" class="list_underlying_curriculum">Underlying Curricula</a>
+                <a href="#" class="list_underlying_curriculum">Preview Underlying Curricula</a>
                 <i class="fa fa-caret-square-o-down underlying_curriculum" aria-hidden="true"></i>
                 <i class="fa fa-caret-square-o-up underlying_curriculum" aria-hidden="true" style="display:none;"></i>
                 <ul class="underlying_curriculum">
@@ -247,15 +247,27 @@
               {% if curr_unit.curriculum_type == 'U' %}
                 <div class="underlying_lessons_overview">
                   {% if underlying_curriculum %}
-                    <h2>Lessons Overview</h2>
+                    <h2>Lessons</h2>
+                    <ul>
                     {% for lesson in underlying_curriculum %}
-                      <div class="lesson_overview">
-                        {% if lesson.overview %}
-                          <a class="lesson_overview_link">{{lesson.order}}. {{lesson.title}} Overview</a>
-                          <div class="lesson_overview_content">{{lesson.overview|safe}}</div>
-                        {% endif %}
-                      </div>
+                      <li>
+                        <div class="lesson_overview">
+                          <div>{{lesson.title}}</div>
+                          <ul>
+                            {% if lesson.overview %}
+                            <li>
+                              <a class="lesson_overview_link">Overview</a>
+                              <div class="lesson_overview_content">{{lesson.overview|safe}}</div>
+                            </li>
+                            <li>
+                              <a target="_blank" href="{% url 'ctstem:previewCurriculum' lesson.id 0 %}">Preview as Student</a>
+                            </li>
+                            {% endif %}
+                          </ul>
+                        </div>
+                      </li>
                     {% endfor %}
+                  </ul>
                   {% endif %}
                 </div>
               {% endif %}
@@ -277,7 +289,7 @@
               <h2>What's Next?</h2>
               <ul>
                 {% if curr_unit.curriculum_type != 'U' %}
-                  <li><a href="{% url 'ctstem:previewCurriculum'  curriculum.id 0 %}" class="activity">Look at the student activity</a></li>
+                  <li><a href="{% url 'ctstem:previewCurriculum'  curr_unit.id 0 %}" class="activity">Preview student activity</a></li>
                 {% endif %}
 
                 {% check_curriculum_permission curr_unit.id 'assign' as has_assign_permission %}
