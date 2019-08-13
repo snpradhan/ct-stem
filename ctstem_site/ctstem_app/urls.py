@@ -98,6 +98,7 @@ urlpatterns = [
     url(r'^consent/$', views.consent, name='consent'),
     url(r'^load_consent/$', views.load_consent, name='load_consent'),
     url(r'^validate/$', views.validate, name='validate'),
+    url(r'^validate/(?P<username>[a-zA-Z0-9_]+)/(?P<validation_code>[a-zA-Z0-9_]+)/$', views.validate, name='validate'),
     url(r'^subaction/(?P<action>[\d]+)/$', views.subaction, name='subaction'),
     url(r'^category/new/$', views.research_category, name='newCategory'),
     url(r'^category/(?P<id>[\d]+)/$', views.research_category, name='research_category'),

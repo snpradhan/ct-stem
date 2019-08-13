@@ -4098,9 +4098,7 @@ def send_teacher_account_validation_email(teacher):
   domain = current_site.domain
   body =  '<div>Welcome to Computational Thinking in STEM. </div><br> \
            <div>Your e-mail address was used to create a teacher account on our website. If you made this request, please follow the instructions below.<div><br> \
-           <div>Please click this link https://%s?next=/validate/  and use the credentials below to validate your account. </div><br> \
-           <div><b>Username:</b> %s </div> \
-           <div><b>Validation code:</b> %s </div><br> \
+           <div>Please click this link https://%s?next=/validate/%s/%s/ to validate your account. </div><br><br> \
            <div>If you did not request this account you can safely ignore this email. Rest assured your e-mail address and the associated account will be deleted from our system in 24 hours.</div><br> \
            <div><b>CT-STEM Admin</b></div>' % (domain, teacher.user.username, teacher.validation_code)
 
@@ -4479,9 +4477,9 @@ def request_training(request):
 ####################################
 # Validate account
 ####################################
-def validate(request):
+def validate(request, username='', validation_code=''):
   if request.method == 'GET':
-    form = forms.ValidationForm()
+    form = forms.ValidationForm(initial={'username': username, 'validation_code': validation_code})
     context = {'form': form}
     return render(request, 'ctstem_app/ValidationModal.html', context)
   elif request.method == 'POST':

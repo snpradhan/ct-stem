@@ -204,9 +204,9 @@ class PreRegistrationForm(forms.Form):
 # Validation Form
 ####################################
 class ValidationForm (forms.Form):
-  username = forms.RegexField(required=True, regex=r'^\w+$', max_length=30, label=u'Username')
-  password = forms.CharField(required=True, widget=forms.PasswordInput(render_value=False), label=u'Password')
-  validation_code = forms.CharField(required=True, label=u'Validation Code')
+  username = forms.RegexField(required=True, regex=r'^\w+$', max_length=30, label=u'Username', help_text="Enter your username")
+  password = forms.CharField(required=True, widget=forms.PasswordInput(render_value=False), label=u'Password', help_text="Enter your password")
+  validation_code = forms.CharField(required=True, label=u'Validation Code', help_text="Enter the validation code")
 
   def __init__(self, *args, **kwargs):
     super(ValidationForm, self).__init__(*args, **kwargs)
