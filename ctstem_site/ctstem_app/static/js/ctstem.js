@@ -266,7 +266,7 @@ $(function (){
     //expand/collapse the unit lessons
 
     if($(this).hasClass('unit_lesson')){
-      var table_row = $(this).closest('.row').next('.row#underlying_curricula')
+      var table_row = $(this).next('#underlying_curricula')
       var lesson_table = $(table_row).find('table')[0];
       //only make the ajax call if the table is not yet populated
       if($(lesson_table).html().length == 0){

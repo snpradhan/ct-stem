@@ -154,14 +154,23 @@
                             <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
                             <span class="glyphicon glyphicon-collapse-up" aria-hidden="true" style="display:none;"></span>
                           </span>
-                        </div>
-                      </div>
-                      <div class="row" id="underlying_curricula" style="display:none;">
-                        <div class="col-md-12">
-                          <table></table>
+                          <div id="underlying_curricula" style="display:none;">
+                            <table></table>
+                          </div>
                         </div>
                       </div>
                     {% endif %}
+                    <div class="row">
+                      <div class="col-md-2 title">Used By:</div>
+                      <div class="col-md-10">
+                        <ul>
+                          <li>{{curriculum.usage_by_school}} Schools </li>
+                          <li>{{curriculum.usage_by_class}} Classes </li>
+                          <li>{{curriculum.usage_by_teacher}} Teachers </li>
+                          <li>{{curriculum.usage_by_student}} Students</li>
+                        </ul>
+                      </div>
+                    </div>
                     <div class="row">
                       <div class="col-md-2 title">Last Updated:</div>
                       <div class="col-md-10">

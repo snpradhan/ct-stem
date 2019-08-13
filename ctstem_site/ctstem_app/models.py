@@ -189,6 +189,34 @@ class Curriculum (models.Model):
 
     super(Curriculum, self).save(*args, **kwargs)
 
+  def usage_by_class(self):
+    if self.curriculum_type == 'U':
+      class_count = UserGroup.objects.all().filter(assignments__curriculum__unit=self).distinct().count()
+    else:
+      class_count = UserGroup.objects.all().filter(assignments__curriculum=self).distinct().count()
+    return class_count
+
+  def usage_by_teacher(self):
+    if self.curriculum_type == 'U':
+      teacher_count = Teacher.objects.all().filter(groups__assignments__curriculum__unit=self).distinct().count()
+    else:
+      teacher_count = Teacher.objects.all().filter(groups__assignments__curriculum=self).distinct().count()
+    return teacher_count
+
+  def usage_by_school(self):
+    if self.curriculum_type == 'U':
+      school_count = School.objects.all().filter(teachers__groups__assignments__curriculum__unit=self).distinct().count()
+    else:
+      school_count = School.objects.all().filter(teachers__groups__assignments__curriculum=self).distinct().count()
+    return school_count
+
+  def usage_by_student(self):
+    if self.curriculum_type == 'U':
+      student_count = Student.objects.all().filter(member_of__assignments__curriculum__unit=self).distinct().count()
+    else:
+      student_count = Student.objects.all().filter(member_of__assignments__curriculum=self).distinct().count()
+    return student_count
+
 # Curriculum Step model
 # A curriculum may have one or more step/activity
 class Step(models.Model):
@@ -379,7 +407,7 @@ class Student(models.Model):
 # This is a user class model
 class Teacher(models.Model):
   user = models.OneToOneField(User, unique=True, null=False, related_name="teacher")
-  school = models.ForeignKey(School)
+  school = models.ForeignKey(School, related_name="teachers")
   consent = models.CharField(null=False, max_length=1, default='U', choices=CONSENT_CHOICES)
   validation_code = models.CharField(null=False, max_length=5)
 
