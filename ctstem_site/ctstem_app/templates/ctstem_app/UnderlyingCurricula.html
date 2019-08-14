@@ -10,7 +10,7 @@
       {% if bucket == 'my' or bucket == 'shared' or user.administrator or user.researcher or user.author %}
         <th>Status</th>
       {% endif %}
-      <th width="20%">Used By</th>
+      <th width="17%">Used By</th>
       <th>Last Updated</th>
       <th>Actions</th>
     </tr>
@@ -36,12 +36,7 @@
         <td>{{ curr.get_status_display }}</td>
       {% endif %}
       <td>
-        <ul>
-          <li>{{curr.usage_by_school}} Schools </li>
-          <li>{{curr.usage_by_class}} Classes </li>
-          <li>{{curr.usage_by_teacher}} Teachers </li>
-          <li>{{curr.usage_by_student}} Students</li>
-      </ul>
+        {{curr.usage_by_student}} Students
       </td>
       <td>{{curr.modified_date|date}}</td>
       <td class="action">
