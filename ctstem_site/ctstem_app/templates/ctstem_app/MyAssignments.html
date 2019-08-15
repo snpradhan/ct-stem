@@ -52,9 +52,9 @@
                      <span class="glyphicon glyphicon-folder-open gi-3x" aria-hidden="true"></span>
                   </div>
                 </div>
-                {% if assignment_details.assignment.curriculum.icon %}
+                {% if assignment_details.assignment.curriculum.icon and assignment_details.assignment.curriculum.icon.url %}
                   <img src="{{assignment_details.assignment.curriculum.icon.url}}" class="img-responsive" alt=""/>
-                {% elif assignment_details.assignment.curriculum.unit and assignment_details.assignment.curriculum.unit.icon %}
+                {% elif assignment_details.assignment.curriculum.unit and assignment_details.assignment.curriculum.unit.icon and assignment_details.assignment.curriculum.unit.icon.url %}
                   <img src="{{assignment_details.assignment.curriculum.unit.icon.url}}" class="img-responsive" alt=""/>
                 {% else %}
                   <img src="/static/img/assessment.png" class="img-responsive" alt="">
@@ -62,7 +62,15 @@
               </a>
               <div class="portfolio-caption">
                 <div class="assignment_title">
-                  {{assignment_details.assignment.curriculum.title}}
+                  {{assignment_details.title}}
+                  {% if assignment_details.assignment.curriculum.unit %}
+                    <br>
+                    {% if assignment_details.assignment.curriculum.order %}
+                      {{assignment_details.assignment.curriculum.order}}.
+                    {% endif %}
+                    {{assignment_details.assignment.curriculum.title}}
+                  {% endif %}
+
                 </div>
                 <div class="row">
                   <div class="col-md-8 dates">

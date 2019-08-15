@@ -2682,7 +2682,7 @@ def assignments(request, bucket=''):
       #   assignment_list.sort(key=lambda item:item['percent_complete'])
       # elif sort_by == 'modified':
       #   assignment_list.sort(key=lambda item:item['modified_date'])
-      assignment_list.sort(key=lambda item:item['title'])
+      assignment_list.sort(key=lambda item:item['title'].lower())
 
       context = {'assignment_list': assignment_list, 'new': new_count, 'inbox': len(active_list), 'archived': len(archived_list), 'sort_form': sort_form, 'consent': student.consent}
       return render(request, 'ctstem_app/MyAssignments.html', context)

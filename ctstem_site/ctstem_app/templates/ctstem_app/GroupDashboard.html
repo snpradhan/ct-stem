@@ -50,7 +50,15 @@
                 <tr style="background-color: {% if forloop.parentloop.counter|divisibleby:2 %}  white; {% else %} #f9f9f9; {% endif %}">
                 {% endif %}
                 <td>
-                  <label>Lesson:</label>
+                  <label>
+                    {% if assignment.assignment.curriculum.curriculum_type == 'L' %}
+                      Lesson:
+                    {% elif assignment.assignment.curriculum.curriculum_type == 'A' %}
+                      Assessment:
+                    {% else %}
+                      Survey:
+                    {% endif %}
+                  </label>
                   <div>{{assignment.assignment.curriculum.title}}</div>
                 </td>
               {% else %}
