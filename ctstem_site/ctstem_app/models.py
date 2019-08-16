@@ -189,32 +189,43 @@ class Curriculum (models.Model):
 
     super(Curriculum, self).save(*args, **kwargs)
 
-  def usage_by_class(self):
-    if self.curriculum_type == 'U':
-      class_count = UserGroup.objects.all().filter(assignments__curriculum__unit=self).distinct().count()
+  #get a list of direct ancestors
+  def get_ancestors(self):
+    if self.parent is None:
+      return [self.id]
     else:
-      class_count = UserGroup.objects.all().filter(assignments__curriculum=self).distinct().count()
+      return [self.id] + self.parent.get_ancestors()
+
+  def usage_by_class(self):
+    ancestors = self.get_ancestors()
+    if self.curriculum_type == 'U':
+      class_count = UserGroup.objects.all().filter(assignments__curriculum__unit__id__in=ancestors).distinct().count()
+    else:
+      class_count = UserGroup.objects.all().filter(assignments__curriculum__id__in=ancestors).distinct().count()
     return class_count
 
   def usage_by_teacher(self):
+    ancestors = self.get_ancestors()
     if self.curriculum_type == 'U':
-      teacher_count = Teacher.objects.all().filter(groups__assignments__curriculum__unit=self).distinct().count()
+      teacher_count = Teacher.objects.all().filter(groups__assignments__curriculum__unit__id__in=ancestors).distinct().count()
     else:
-      teacher_count = Teacher.objects.all().filter(groups__assignments__curriculum=self).distinct().count()
+      teacher_count = Teacher.objects.all().filter(groups__assignments__curriculum__id__in=ancestors).distinct().count()
     return teacher_count
 
   def usage_by_school(self):
+    ancestors = self.get_ancestors()
     if self.curriculum_type == 'U':
-      school_count = School.objects.all().filter(teachers__groups__assignments__curriculum__unit=self).distinct().count()
+      school_count = School.objects.all().filter(teachers__groups__assignments__curriculum__unit__id__in=ancestors).distinct().count()
     else:
-      school_count = School.objects.all().filter(teachers__groups__assignments__curriculum=self).distinct().count()
+      school_count = School.objects.all().filter(teachers__groups__assignments__curriculum__id__in=ancestors).distinct().count()
     return school_count
 
   def usage_by_student(self):
+    ancestors = self.get_ancestors()
     if self.curriculum_type == 'U':
-      student_count = Student.objects.all().filter(member_of__assignments__curriculum__unit=self).distinct().count()
+      student_count = Student.objects.all().filter(member_of__assignments__curriculum__unit__id__in=ancestors).distinct().count()
     else:
-      student_count = Student.objects.all().filter(member_of__assignments__curriculum=self).distinct().count()
+      student_count = Student.objects.all().filter(member_of__assignments__curriculum__id__in=ancestors).distinct().count()
     return student_count
 
 # Curriculum Step model
