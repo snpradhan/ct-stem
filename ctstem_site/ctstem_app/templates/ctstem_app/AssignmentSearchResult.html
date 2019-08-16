@@ -15,7 +15,7 @@
       {% for curriculum in curricula %}
         {% if curriculum.curriculum_type|slugify == 'Unit'|slugify %}
           <tr class="unit unit_{{curriculum.id}} {% if forloop.counter|divisibleby:2 %} even {% else %} odd {% endif %}" id="curr_{{curriculum.id}}">
-            <td>Unit</td>
+            <td rowspan="{{curriculum.underlying_curriculum|length|add:1}}">Unit</td>
             <td>
               {{curriculum.title}}
               <span class="ec_lessons" id="unit_{{curriculum.id}}">
@@ -37,8 +37,8 @@
           </tr>
           {% for curr in curriculum.underlying_curriculum %}
             <tr class="lesson unit_{{curriculum.id}} {% if forloop.parentloop.counter|divisibleby:2 %} even {% else %} odd {% endif %}" id="curr_{{curr.id}}" >
-              <td style="display:none;">&emsp;&emsp;&emsp;&emsp;{{curr.curriculum_type}}</td>
-              <td style="display:none;">&emsp;&emsp;&emsp;&emsp;{{curr.order}}. {{curr.title}}</td>
+              <!--td style="display:none;">&emsp;&emsp;&emsp;&emsp;{{curr.curriculum_type}}</td-->
+              <td style="display:none; padding-left: 3em;">{{curr.order}}. {{curr.title}}</td>
               <td style="display:none; text-align:center;">
                 {% if curr.assigned|slugify == 'False'|slugify %}
                   <button class="btn small blue select_assignment lesson" id="{{curr.id}}" name="{{curr.title}}">Assign {{curr.curriculum_type}}</button>
