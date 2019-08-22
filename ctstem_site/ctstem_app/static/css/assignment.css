@@ -788,6 +788,13 @@ ul.errorlist {
   font-size: inherit !important;
 }
 
+/* hide iframe until fully loaded */
+iframe {
+  position: absolute;
+  top: -9999em;
+  visibility: hidden;
+}
+
 
 /* STYLES FOR NICE PRINTING */
 @media print {
