@@ -8,6 +8,7 @@ urlpatterns = [
     url(r'^$', views.home, name='home'),
     url(r'^curricula/(?P<bucket>[\w-]+)/$', views.curricula, name='curricula'),
     url(r'^curricula/(?P<bucket>[\w-]+)/(?P<status>[\w-]+)/$', views.curricula, name='curricula'),
+    url(r'^curriculatiles/$', views.curriculatiles, name='curriculatiles'),
     url(r'^curriculum/new/$', views.curriculum, name='newCurriculum'),
     url(r'^curriculum/(?P<id>[\d]+)/$', views.curriculum, name='curriculum'),
     url(r'^curriculum/bookmark/(?P<id>[\d]+)/$', views.bookmarkCurriculum, name='bookmarkCurriculum'),

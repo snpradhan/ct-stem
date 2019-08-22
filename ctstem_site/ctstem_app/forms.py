@@ -856,6 +856,43 @@ class SearchForm(forms.Form):
       if field.help_text:
         field.widget.attrs['placeholder'] = field.help_text
 
+
+####################################
+# Curricula Search Form
+####################################
+class CurriculaSearchForm(forms.Form):
+  subjects = forms.ModelMultipleChoiceField(required=False, widget=forms.CheckboxSelectMultiple(), queryset=models.Subject.objects.all().order_by('name'))
+  curricula_types = forms.MultipleChoiceField(required=False, widget=forms.CheckboxSelectMultiple(), choices=models.CURRICULUM_TYPE_CHOICES)
+  buckets = forms.MultipleChoiceField(required=False, widget=forms.CheckboxSelectMultiple(), choices=models.CURRICULUM_BUCKET_CHOICES)
+  status = forms.MultipleChoiceField(required=False, widget=forms.CheckboxSelectMultiple(), choices=models.CURRICULUM_STATUS_CHOICES)
+  keywords = forms.CharField(required=False, max_length=30, label=u'Search by Keyword')
+
+  def __init__(self, *args, **kwargs):
+    user = kwargs.pop('user')
+    super(CurriculaSearchForm, self).__init__(*args, **kwargs)
+
+    disabled_options = []
+    status_choices = models.CURRICULUM_STATUS_CHOICES
+
+    for value, label in models.CURRICULUM_BUCKET_CHOICES:
+      if hasattr(user, 'teacher'):
+        print 'is teacher'
+        self.fields['buckets'].choices = models.CURRICULUM_BUCKET_CHOICES[1:]
+      if not hasattr(user, 'teacher'):
+        print 'not teacher'
+        self.fields['buckets'].choices = models.CURRICULUM_BUCKET_CHOICES[:1]
+
+    if user.is_anonymous() or hasattr(user, 'student') or hasattr(user, 'school_administrator'):
+      self.fields.pop('status')
+      self.fields.pop('buckets')
+    elif hasattr(user, 'teacher'):
+      self.fields.pop('status')
+
+    for field_name, field in self.fields.items():
+      field.widget.attrs['class'] = 'form-control'
+      if field.help_text:
+        field.widget.attrs['placeholder'] = field.help_text
+
 ####################################
 # Standards Form
 ####################################

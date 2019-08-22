@@ -231,85 +231,6 @@
   flex-flow: wrap;
 }
 
-#home .block#three .tile {
-  border: 2px solid white;
-  margin: 1em;
-  border-radius: 4px;
-  width: 35em;
-  /*height: 45em;*/
-  box-shadow: -0.8em 0.8em var(--ctstem-color-medium-blue);
-}
-
-#home .block#three .tile .icon {
-  background-color: #ccc;
-  height: 24em;
-}
-
-#home .block#three .tile .detail {
-  background-color: white;
-  height: 21em;
-  text-align: left;
-  padding: 1.6em;
-  position: relative;
-}
-#home .block#three .tile .detail .type {
-  text-transform: uppercase;
-  margin-bottom: 0.6em;
-  font-size: 1.4em;
-  font-weight: 600;
-}
-#home .block#three .tile .detail .period {
-  color: #7d7d7d;
-  margin-bottom: 1.6em;
-  font-size: 1.3em;
-  font-weight: 400;
-}
-#home .block#three .tile .detail .title {
-  font-size: 1.7em;
-  font-weight: 600;
-  line-height: 1em;
-}
-#home .block#three .tile .detail .others {
-  color: #ccc;
-  position: absolute;
-  bottom: 0.8em;
-  font-size: 1.3em;
-  font-weight: 400;
-}
-#home .block#three .tile .detail .others .author {
-  margin-bottom: 0.6em;
-}
-#home .block#three .tile .detail .action {
-  position: absolute;
-  bottom: 0.8em;
-  right: 0.8em;
-  border: 1px solid #ccc;
-  border-radius: 3px;
-  padding: 0.25em 1em;
-  width: 10em;
-  display: flex;
-  justify-content: space-between;
-}
-#home .block#three .tile .detail .action .fa-code-fork {
-  color: black;
-  font-size: 2em;
-  margin-top: 2px;
-}
-#home .block#three .tile .detail .action .fa-star-o {
-  color: #ccc;
-  font-size: 2em;
-  margin-top: 2px;
-}
-#home .block#three .tile .detail .action .fa-star {
-  color: var(--ctstem-color-yellow);
-  font-size: 2em;
-  margin-top: 2px;
-}
-#home .block#three .tile .detail .action .fa-long-arrow-right {
-  color: var(--ctstem-color-blue);
-  font-size: 2.5em;
-}
-
 #home .block#three .btn.btn-yellow {
   margin-top: 3.2em;
 }
@@ -514,10 +435,6 @@
     width: 80%;
   }
 
-  #home .block#three .tile {
-    margin-left: auto;
-    margin-right: auto;
-  }
   #home .block#three .col-container .col.col-4 {
     display: inline-block !important;
   }

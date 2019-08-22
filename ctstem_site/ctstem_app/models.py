@@ -32,6 +32,12 @@ CURRICULUM_TYPE_CHOICES = (
     ('L', 'Lesson Plan'),
     ('A', 'Assessment'),
 )
+CURRICULUM_BUCKET_CHOICES = (
+    (u'teacher_authored', u'Teacher Authored'),
+    (u'my_curricula', u'My Curricula'),
+    (u'shared_curricula', u'Shared Curricula'),
+    (u'favorite_curricula', u'Favorite Curricula'),
+)
 
 CURRICULUM_PRIVILEGE_CHOICES = (
     ('V', 'View'),

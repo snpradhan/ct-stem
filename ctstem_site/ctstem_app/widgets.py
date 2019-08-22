@@ -4,6 +4,7 @@ from django.utils.translation import ugettext_lazy
 from django.utils.html import format_html
 from django.utils.encoding import force_text
 from django.utils.safestring import mark_safe
+from django import forms
 
 
 class NotClearableFileInput(FileInput):
@@ -29,3 +30,19 @@ class NotClearableFileInput(FileInput):
                                                force_text(value))
 
         return mark_safe(template % substitutions)
+
+class CheckboxSelectMultipleWithDisabledOption(forms.CheckboxSelectMultiple):
+
+    def __init__(self, *args, **kwargs):
+        self.disabled_options = kwargs.pop('disabled_options')
+        print self.disabled_options
+        super(CheckboxSelectMultipleWithDisabledOption, self).__init__(*args, **kwargs)
+
+    def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
+        option = super(forms.CheckboxSelectMultiple, self).create_option(name, value, label, selected, index, subindex, attrs)
+
+
+        if value in self.disabled_options:
+            option['attrs']['disabled'] = ''
+
+        return option

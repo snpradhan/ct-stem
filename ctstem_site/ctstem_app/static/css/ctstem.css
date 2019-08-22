@@ -640,7 +640,7 @@ div.standards img.icon {
   max-width: 100%;
 }
 
-div.content #curricula_tile span.status img.icon , div.content #curricula_tile span.status span.icon, div.content#dashboard img.icon{
+div.content#dashboard img.icon{
   height: 30px;
   width: auto;
   float: right;
@@ -649,19 +649,59 @@ div.content#dashboard div.highcharts-container {
   text-align: center !important;
   width: auto !important;
 }
-div.content #curricula_tile span.status span.icon {
-  font-size: 1.2em;
-  color: gray;
-}
-div.content #curricula_tile span.status span.icon.bookmarked {
-  color: #fed136;
-}
-div.content #curricula_tile div.portfolio-caption h5 {
-  margin-bottom: 1.5em;
-}
 
 div.content#question_review .dataTables_wrapper {
   width: 100%;
+}
+
+div.content#curricula {
+  width: 100%;
+}
+div.content#curricula > * {
+  padding-left: 5%;
+  padding-right: 5%;
+}
+div.content#curricula div.row_container {
+  background-color: var(--ctstem-color-blue);
+}
+div.content#curricula div.row {
+  flex-flow: wrap;
+  display: flex;
+  margin-left: auto;
+  margin-right: auto;
+}
+div.content#curricula div.row#curricula_filters {
+  color: white;
+  padding-top: 3em;
+}
+
+div.content#curricula div.row#curricula_filters .col {
+  flex: 1 1 auto;
+}
+
+div.content#curricula div.row#curricula_filters input {
+  display: inline-block;
+}
+div.content#curricula div.row#curricula_filters .search {
+  text-align: right;
+  margin-top: 2em;
+}
+div.content#curricula div.row#curricula_tiles {
+
+  margin-bottom: 4em;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 5em;
+
+}
+
+div.content#curricula div.row#curricula_tiles .col {
+  flex: 1 1 25%;
+  text-align: center;
+  margin: 2em auto;
+}
+div.content#curricula  div.row#curricula_tiles .col .tile {
+  display: inline-block;
 }
 /***********   CONTENT DIV END   ************/
 
@@ -719,6 +759,7 @@ div.form-group {
 div.form-group label{
   font-size: 1.5em;
   margin-bottom: 0.5em;
+  margin-top: 0.25em;
 }
 div.form-group label a {
   color: var(--ctstem-color-gray);

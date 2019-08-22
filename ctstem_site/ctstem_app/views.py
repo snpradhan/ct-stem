@@ -186,6 +186,111 @@ def curricula(request, bucket='unit', status='public'):
   context = {'curricula': curricula_list, 'bucket': bucket, 'status': status, 'searchForm': searchForm}
   return render(request, 'ctstem_app/Curricula.html', context)
 
+####################################
+# Curricula Tile VIEW
+####################################
+def curriculatiles(request):
+
+  if request.method == 'GET' or request.method == 'POST':
+    curricula = models.Curriculum.objects.extra(select={'modified_year': 'EXTRACT(YEAR FROM modified_date)',
+                          'modified_month': 'EXTRACT(MONTH FROM modified_date)',
+                          'modified_day': 'EXTRACT(DAY FROM modified_date)'})
+
+    search_criteria = None
+    if request.method == 'GET':
+      searchForm = forms.CurriculaSearchForm(user=request.user)
+
+    elif request.method == 'POST':
+      data = request.POST.copy()
+      print 'data', data
+      searchForm = forms.CurriculaSearchForm(user=request.user, data=data)
+      search_criteria = eval(json.dumps(dict(data.iterlists())))
+
+    curricula = searchCurriculaTiles(request, curricula, search_criteria)
+
+    sort_order = [{'order_by': 'feature_rank', 'direction': 'asc', 'ignorecase': 'false'},
+                {'order_by': 'modified_year', 'direction': 'desc', 'ignorecase': 'false'},
+                {'order_by': 'modified_month', 'direction': 'desc', 'ignorecase': 'false'},
+                {'order_by': 'modified_day', 'direction': 'desc', 'ignorecase': 'false'},
+                {'order_by': 'title', 'direction': 'asc', 'ignorecase': 'true'}]
+    curricula_list = paginate(request, curricula, sort_order, 25)
+    context = {'curricula': curricula_list, 'searchForm': searchForm }
+
+    return render(request, 'ctstem_app/CurriculaTile.html', context)
+  return http.HttpResponseNotAllowed(['GET', 'POST'])
+
+  '''curriculum_type = []
+  if bucket == 'unit':
+    curriculum_type = ['U']
+  elif bucket == 'lesson':
+    curriculum_type = ['L']
+  elif bucket == 'assessment':
+    curriculum_type = ['A', 'S']
+  elif bucket in ['teacher_authored', 'my', 'favorite', 'shared']:
+    curriculum_type = ['U', 'L', 'A', 'S']
+
+  stat = []
+  curricula = models.Curriculum.objects.extra(select={'modified_year': 'EXTRACT(YEAR FROM modified_date)',
+                          'modified_month': 'EXTRACT(MONTH FROM modified_date)',
+                          'modified_day': 'EXTRACT(DAY FROM modified_date)'})
+  if bucket in ['unit', 'lesson', 'assessment']:
+    if hasattr(request.user, 'administrator') or hasattr(request.user, 'researcher') or hasattr(request.user, 'author'):
+      if status == 'archived':
+        stat = ['A']
+      elif status == 'private':
+        stat = ['D']
+      else:
+        stat = ['P']
+    else:
+      stat = ['P']
+    curricula = curricula.filter(unit__isnull=True, curriculum_type__in = curriculum_type, status__in = stat)
+
+  elif bucket == 'teacher_authored':
+    if hasattr(request.user, 'administrator') or hasattr(request.user, 'researcher') or hasattr(request.user, 'author'):
+      stat = ['D', 'P', 'A']
+      curricula = curricula.filter(unit__isnull=True, curriculum_type__in = curriculum_type, status__in = stat, authors__teacher__isnull=False).distinct()
+
+  elif bucket == 'my' and hasattr(request.user, 'teacher'):
+    stat = ['D', 'P', 'A']
+    curricula = curricula.filter(unit__isnull=True, curriculum_type__in = curriculum_type, status__in = stat, authors=request.user)
+
+  elif bucket == 'favorite' and hasattr(request.user, 'teacher'):
+    stat = ['P']
+    curricula = curricula.filter(Q(unit__isnull=True), Q(curriculum_type__in=curriculum_type), Q(bookmarked__teacher=request.user.teacher), Q(status__in=stat) | Q(shared_with=request.user.teacher)).distinct()
+
+  elif bucket == 'shared' and hasattr(request.user, 'teacher'):
+    stat = ['D', 'P']
+    shared_lessons = curricula.filter(unit__isnull=False, curriculum_type__in = 'L', status__in = stat, shared_with=request.user.teacher).distinct()
+    shared_lessons_units = shared_lessons.values_list('unit', flat=True)
+    curricula = curricula.filter(Q(unit__isnull=True), Q(curriculum_type__in = curriculum_type), Q(status__in = stat), Q(shared_with=request.user.teacher) | Q(id__in=shared_lessons_units)).distinct()
+  else:
+    messages.error(request, "There are no curricula for the requested category.")
+
+  #search
+  search_criteria = None
+  if request.method == 'POST':
+    data = request.POST.copy()
+    if 'search_criteria' in data:
+      search_criteria = data['search_criteria']
+    searchForm = forms.SearchForm(data)
+  else:
+    searchForm = forms.SearchForm()
+
+  if search_criteria:
+    curricula = searchCurricula(request, curricula, search_criteria)
+
+  sort_order = [{'order_by': 'feature_rank', 'direction': 'asc', 'ignorecase': 'false'},
+                {'order_by': 'modified_year', 'direction': 'desc', 'ignorecase': 'false'},
+                {'order_by': 'modified_month', 'direction': 'desc', 'ignorecase': 'false'},
+                {'order_by': 'modified_day', 'direction': 'desc', 'ignorecase': 'false'},
+                {'order_by': 'title', 'direction': 'asc', 'ignorecase': 'true'}]
+  curricula_list = paginate(request, curricula, sort_order, 25)
+  #if curricula:
+  #  curricula = curricula.order_by('-modified_date', Lower('title'))
+
+  context = {'curricula': curricula_list, 'bucket': bucket, 'status': status, 'searchForm': searchForm, 'subjects': models.Subject.objects.all(), 'curricula_types': models.CURRICULUM_TYPE_CHOICES, 'buckets': }
+
+  return render(request, 'ctstem_app/Curricula.html', context)'''
 
 ####################################
 # CREATE MODIFY a curriculum
@@ -2079,6 +2184,118 @@ def searchCurricula(request, queryset, search_criteria):
   query_filter.add(Q(status__icontains=search_criteria), Q.OR)
   result = queryset.filter(query_filter).distinct()
   return result
+
+####################################
+# filter curricula queryset based on search criteria
+####################################
+def searchCurriculaTiles(request, queryset, search_criteria):
+  print 'search_criteria', search_criteria
+  query_filter = Q()
+
+  base_filter = Q()
+  keyword_filter = None
+  subject_filter = None
+  curricula_type_filter = None
+  status_filter = None
+  teacher_authored_filter = None
+  my_curricula_filter =  None
+  favorite_curricula_filter = None
+  shared_curricula_filter = None
+  search_units = True
+
+  if search_criteria:
+    if 'keywords' in search_criteria and search_criteria['keywords'][0] != '':
+
+      keywords = search_criteria['keywords'][0]
+      print 'keywords', keywords
+
+      #keyword search for units and standalone curricula
+      keyword_filter = Q(title__icontains=keywords) | Q(time__icontains=keywords)
+      keyword_filter = keyword_filter | Q(authors__first_name__icontains=keywords)
+      keyword_filter = keyword_filter | Q(authors__last_name__icontains=keywords)
+      keyword_filter = keyword_filter | Q(taxonomy__title__icontains=keywords)
+      keyword_filter = keyword_filter | Q(taxonomy__category__name__icontains=keywords)
+      keyword_filter = keyword_filter | Q(taxonomy__category__standard__name__icontains=keywords)
+
+    if 'subjects' in search_criteria:
+      subjects = map(int, search_criteria['subjects'])
+      subject_filter = Q(subject__id__in=subjects)
+
+    if 'curricula_types' in search_criteria:
+      curricula_types = search_criteria['curricula_types']
+      curricula_type_filter = Q(curriculum_type__in=curricula_types)
+      if 'U' not in curricula_types:
+        search_units = False
+
+    if 'status' in search_criteria:
+      status = search_criteria['status']
+      status_filter = Q(status__in=status)
+
+    if keyword_filter:
+      base_filter = base_filter & keyword_filter
+    if subject_filter:
+      base_filter = base_filter & subject_filter
+    if curricula_type_filter:
+      base_filter = base_filter & curricula_type_filter
+    if status_filter:
+      base_filter = base_filter & status_filter
+    print 'base_filter', base_filter
+
+    if 'buckets' in search_criteria:
+      buckets = search_criteria['buckets']
+      if 'teacher_authored' in buckets:
+        #teacher authored units and standalone curricula
+        teacher_authored_filter = Q(authors__teacher__isnull=False)
+        teacher_authored_filter = base_filter & teacher_authored_filter
+        query_filter = query_filter | teacher_authored_filter
+
+      if 'my_curricula' in buckets:
+        #my unit and standalone curricula
+        my_curricula_filter = Q(authors=request.user)
+        my_curricula_filter = base_filter & my_curricula_filter
+        query_filter = query_filter | my_curricula_filter
+
+      if 'favorite_curricula' in buckets:
+        favorite_curricula_filter = Q(bookmarked__teacher=request.user.teacher)
+        favorite_curricula_filter = base_filter & favorite_curricula_filter
+        query_filter = query_filter | favorite_curricula_filter
+      if 'shared_curricula' in buckets:
+        #shared unit and standalone curricula
+        shared_curricula_filter = Q(shared_with=request.user.teacher)
+        shared_curricula_filter = base_filter & shared_curricula_filter
+        query_filter = query_filter | shared_curricula_filter
+
+    #no bucket selected
+    else:
+      if request.user.is_anonymous() or hasattr(request.user, 'student') or hasattr(request.user, 'school_administrator'):
+        query_filter = base_filter & Q(status='P')
+      elif hasattr(request.user, 'teacher'):
+        query_filter = Q(status='P') | Q(authors=request.user)
+        query_filter = query_filter | Q(bookmarked__teacher=request.user.teacher)
+        query_filter = query_filter | Q(shared_with=request.user.teacher)
+        query_filter = base_filter & query_filter
+      else:
+        query_filter = base_filter
+
+  #no filter provided
+  else:
+    if request.user.is_anonymous() or hasattr(request.user, 'student') or hasattr(request.user, 'school_administrator'):
+      query_filter = Q(status='P')
+    elif hasattr(request.user, 'teacher'):
+      query_filter = Q(status='P') | Q(authors=request.user)
+      query_filter = query_filter | Q(bookmarked__teacher=request.user.teacher)
+      query_filter = query_filter | Q(shared_with=request.user.teacher)
+
+
+  print 'query_filter', query_filter
+  raw_result = queryset.filter(query_filter)
+  if search_units:
+    units = raw_result.values_list('unit', flat=True).distinct().order_by()
+    print 'units', units
+    filtered_result = queryset.filter(Q(Q(unit__isnull=True), query_filter) | Q(id__in=units)).distinct()
+  else:
+    filtered_result = queryset.filter(Q(unit__isnull=True), query_filter).distinct()
+  return filtered_result
 ####################################
 # BULK ACTION FOR ALL MODELS
 ####################################
