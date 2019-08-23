@@ -130,6 +130,7 @@ CKEDITOR_CONFIGS = {
         ],
         'height': 100,
         'width': '98%',
+        'allowedContent': True,
         'mathJaxLib': '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_HTMLorMML',
         'extraPlugins': ','.join(
             ['mathjax', 'scayt', 'uploadimage']
