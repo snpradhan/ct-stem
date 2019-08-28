@@ -286,6 +286,11 @@ class ResearchCategory(models.Model):
   class Meta:
     ordering = ['category']
 
+  def save(self, *args, **kwargs):
+    if self.description is None or self.description == '':
+      self.description = self.category
+    super(ResearchCategory, self).save(*args, **kwargs)
+
 # Question model
 # A bank of questions that can be resued across assessments and lessons
 class Question(models.Model):
