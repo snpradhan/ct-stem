@@ -1,12 +1,3 @@
-$(function(){
-  //display iframe after page is fully loaded
-  window.onload = function(){
-    $('iframe').each(function(){
-      $(this).css('position', 'static');
-      $(this).css('visibility', 'visible');
-    });
-  }
-});
 /**
   function dtmInsertRow creates new row based on the input parameters:
   tableId - table id

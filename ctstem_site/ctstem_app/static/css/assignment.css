@@ -789,11 +789,11 @@ ul.errorlist {
 }
 
 /* hide iframe until fully loaded */
-iframe {
+/*iframe {
   position: absolute;
   top: -9999em;
   visibility: hidden;
-}
+}*/
 
 
 /* STYLES FOR NICE PRINTING */
