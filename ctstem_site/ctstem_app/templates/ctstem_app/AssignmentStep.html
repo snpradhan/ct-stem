@@ -417,9 +417,7 @@
                       </div>
 
                       <div class="error">
-                        {% if field_type == 'FI' %}
-                          {{questionForm.responseFile.errors}}
-                        {% else %}
+                        {% if field_type != 'FI' %}
                           {{questionForm.response.errors}}
                         {% endif %}
                       </div>

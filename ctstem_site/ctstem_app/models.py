@@ -582,7 +582,6 @@ class QuestionResponse(models.Model):
   step_response = models.ForeignKey(AssignmentStepResponse)
   curriculum_question = models.ForeignKey(CurriculumQuestion)
   response = RichTextField(null=True, blank=True, config_name='student_response_ckeditor')
-  responseFile = models.FileField(upload_to=upload_file_to, blank=True)
   created_date = models.DateTimeField(auto_now_add=True)
   modified_date = models.DateTimeField(auto_now=True)
 

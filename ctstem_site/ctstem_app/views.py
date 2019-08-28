@@ -2888,13 +2888,6 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
               # get the question response ids to update the front end
               for questionform in formset:
                 questionCount = questionCount + 1
-                # if questionResponse.curriculum_question.question.answer_field_type == 'SK':
-                #   if questionResponse.response is not None and questionResponse.response != '':
-                #     base64String = questionResponse.response.split(',')[1]
-                #     sketch = base64.b64decode(base64String)
-                #     image = ContentFile(sketch, 'sketch.png')
-                #     questionResponse.responseFile = image
-                #     questionResponse.response = None
                 if questionform.instance.curriculum_question.question.answer_field_type != 'FI':
                   questionResponse = questionform.save()
                 else:
