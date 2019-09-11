@@ -80,6 +80,9 @@ def home(request):
       elif 'password_reset' in redirect_url:
         target = '#password'
 
+      if target and request.user.is_authenticated():
+        logout(request)
+
       context = {'curricula': curricula, 'redirect_url': redirect_url, 'target': target}
       return render(request, 'ctstem_app/Home.html', context)
 
