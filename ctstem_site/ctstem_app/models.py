@@ -121,13 +121,13 @@ def upload_file_to(instance, filename):
   elif isinstance(instance, Category):
     return 'standard/%s_%s%s' % (slugify(filename_base.lower()[:40]), dt, filename_ext.lower(),)
   elif isinstance(instance, QuestionResponse):
-    return 'questionResponse/%s/%s_%s%s' % (instance.step_response.instance.student.user, slugify(filename_base.lower()[:10]), dt, filename_ext.lower(),)
+    return 'questionResponse/%s/%s_%s%s' % (instance.step_response.instance.student.user.id, slugify(filename_base.lower()[:10]), dt, filename_ext.lower(),)
   elif isinstance(instance, Question):
     return 'question/%s_%s%s' % (slugify(filename_base.lower()[:40]), dt, filename_ext.lower(),)
   elif isinstance(instance, UserGroup):
     return 'group/%s_%s%s' % (slugify(filename_base.lower()[:40]), dt, filename_ext.lower(),)
   elif isinstance(instance, QuestionResponseFile):
-    return 'questionResponse/%s/%s_%s%s' % (instance.question_response.step_response.instance.student.user, slugify(filename_base.lower()[:10]), dt, filename_ext.lower(),)
+    return 'questionResponse/%s/%s_%s%s' % (instance.question_response.step_response.instance.student.user.id, slugify(filename_base.lower()[:10]), dt, filename_ext.lower(),)
 
   return 'misc/%s_%s%s' % (filename_base.lower(), dt, filename_ext.lower(),)
 

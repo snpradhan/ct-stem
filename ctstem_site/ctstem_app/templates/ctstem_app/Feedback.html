@@ -109,11 +109,11 @@
                           {% endif %}
                         {% elif question.instance.response.response_file.all %}
                           Uploaded file(s):
+                          <ul>
                           {% for response_file in question.instance.response.response_file.all %}
-                            <div>
-                              <a href="{{response_file.file.url}}" target="_blank">{{response_file.file}}</a>
-                            </div>
+                            <li><a href="{{response_file.file.url}}" target="_blank">Click here to view file {{forloop.counter}}</a></li>
                           {% endfor %}
+                          </ul>
                         {% else %}
                           <span style="font-style: italic;">No response yet</span>
                         {% endif %}
