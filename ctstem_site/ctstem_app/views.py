@@ -3319,6 +3319,8 @@ def check_curriculum_permission(request, curriculum_id, action, step_order=-1):
         elif is_teacher:
           if request.user in curriculum.authors.all():
             has_permission = True
+          elif curriculum.unit and request.user in curriculum.unit.authors.all():
+            has_permission = True
           elif curriculum.status == 'P' and curriculum.unit is None:
             has_permission = True
           else:
@@ -3353,6 +3355,8 @@ def check_curriculum_permission(request, curriculum_id, action, step_order=-1):
             elif is_teacher:
               if request.user in curriculum.authors.all():
                 has_permission = True
+              elif curriculum.unit and request.user in curriculum.unit.authors.all():
+                has_permission = True
               else:
                 has_permission = False
                 messages.error(request, 'You do not have the privilege to %s this curriculum'% (action))
@@ -3386,6 +3390,8 @@ def check_curriculum_permission(request, curriculum_id, action, step_order=-1):
           has_permission = True
         elif is_teacher and request.user in curriculum.authors.all():
           has_permission = True
+        elif is_teacher and curriculum.unit and request.user in curriculum.unit.authors.all():
+            has_permission = True
         else:
           has_permission = False
           messages.error(request, 'You do not have the privilege to lock this curriculum')
@@ -3414,6 +3420,8 @@ def check_curriculum_permission(request, curriculum_id, action, step_order=-1):
         elif is_teacher:
           if request.user in curriculum.authors.all():
             has_permission = True
+          elif curriculum.unit and request.user in curriculum.unit.authors.all():
+            has_permission = True
           elif request.user.teacher in curriculum.shared_with.all():
             has_permission = True
           elif curriculum.unit and request.user.teacher in curriculum.unit.shared_with.all():
@@ -3441,6 +3449,8 @@ def check_curriculum_permission(request, curriculum_id, action, step_order=-1):
                 has_permission = True
               elif curriculum.unit and request.user.teacher in curriculum.unit.shared_with.all():
                 has_permission = True
+              elif curriculum.unit and request.user in curriculum.unit.authors.all():
+                has_permission = True
         else:
           #allow a unit to be assigned only if at least one of the underlying lessons can be assigned by the user
           for lesson in curriculum.underlying_curriculum.all():
@@ -3456,8 +3466,11 @@ def check_curriculum_permission(request, curriculum_id, action, step_order=-1):
             has_permission = True
         #only teachers can export student data of private curriculum that they own
         elif curriculum.status == 'D':
-          if is_teacher and request.user in curriculum.authors.all():
-            has_permission = True
+          if is_teacher:
+            if request.user in curriculum.authors.all():
+              has_permission = True
+            elif curriculum.unit and request.user in curriculum.unit.authors.all():
+              has_permission = True
 
         if not has_permission:
           messages.error(request, 'You do not have the privilege to export student data of this curriculum')
