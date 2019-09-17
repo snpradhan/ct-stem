@@ -1121,81 +1121,82 @@ div.content #curricula_tile  .row.button a {
   margin-right: 1em;
 }
 
-.btn {
+.btn, button[class*="btn"]  {
   font-family: var(--ctstem-font-family) !important;
   text-transform: uppercase !important;
   font-weight: 600 !important;
 
 }
 
-.btn.big {
+.btn.big, button[class*="big"] {
   font-size: 1.6em !important;
   padding: 1em 1.6em !important;
 }
 
-.btn.normal {
+.btn.normal, button[class*="normal"] {
   font-size: 1.4em !important;
   padding: 0.8em 1.6em !important;
 }
 
-.btn.small {
+.btn.small, button[class*="small"] {
   font-size: 1em !important;
   padding: 0.6em 1em !important;
 }
-.btn.blue {
+.btn.blue, button[class*="blue"] {
   background-color: var(--ctstem-color-blue) !important;
   color: white !important;
 }
-.btn.blue:hover {
+.btn.blue:hover, button[class*="blue"]:hover  {
   border: 1px solid var(--ctstem-color-blue) !important;
   background-color: #ffffff !important;
   color: var(--ctstem-color-blue) !important;
 }
-.btn.darkblue {
+.btn.darkblue, button[class*="darkblue"]  {
   background-color: var(--ctstem-color-dark-blue) !important;
   color: white !important;
 }
-.btn.darkblue:hover {
+.btn.darkblue:hover, button[class*="darkblue"]:hover {
   border: 1px solid var(--ctstem-color-dark-blue) !important;
   background-color: #ffffff !important;
   color: var(--ctstem-color-darkblue) !important;
 }
-.btn.yellow {
+.btn.yellow, button[class*="yellow"] {
   background-color: var(--ctstem-color-yellow) !important;
   color: black !important;
 }
-.btn.yellow:hover {
+.btn.yellow:hover, button[class*="yellow"]:hover {
   border: 1px solid var(--ctstem-color-yellow) !important;
   background-color: #ffffff !important;
   color: var(--ctstem-color-yellow) !important;
 }
-.btn.white {
+.btn.white, button[class*="white"] {
   border: 1px solid var(--ctstem-color-light-gray) !important;
   background-color: #ffffff !important;
   color: black !important;
 }
-.btn.white:hover {
+.btn.white:hover, button[class*="white"]:hover {
   background-color: var(--ctstem-color-light-gray) !important;
   color: #ffffff !important;
 }
 
-.btn.gray {
+.btn.gray, button[class*="gray"] {
   border: 1px solid var(--ctstem-color-light-gray) !important;
   background-color: var(--ctstem-color-light-gray) !important;
   color: black !important;
 }
-.btn.gray:hover {
+.btn.gray:hover, button[class*="gray"]:hover {
   background-color: #ffffff !important;
 }
-.btn.red {
+.btn.red, button[class*="red"] {
   background-color: var(--ctstem-color-red) !important;
   color: white !important;
 }
-.btn.red:hover {
+.btn.red:hover, button[class*="red"]:hover {
   border: 1px solid var(--ctstem-color-red) !important;
   background-color: #ffffff !important;
   color: var(--ctstem-color-red) !important;
 }
+
 
 /********************/
 
@@ -1273,6 +1274,9 @@ div.modal-content div.link {
   font-weight: bold;
   text-align: center;
   line-height: 1.25em;
+}
+div.modal-content div.modal-body p {
+  font-size: 1.5em;
 }
 
 /***** Consent Form Modal *****/

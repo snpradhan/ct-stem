@@ -20,6 +20,7 @@ urlpatterns = [
     url(r'^curriculum/attachments/(?P<id>[\d]+)/$', views.downloadAttachments, name='downloadAttachments'),
     url(r'^curriculum/lock/(?P<id>[\d]+)/$', views.lockCurriculum, name='lockCurriculum'),
     url(r'^curriculum/unlock/(?P<id>[\d]+)/$', views.unlockCurriculum, name='unlockCurriculum'),
+    url(r'^curriculum/is_assigned/(?P<id>[\d]+)/$', views.is_curriculum_assigned, name='is_curriculum_assigned'),
     url(r'^publication/(?P<slug>[\w-]+)/$', views.publication, name='publication'),
     url(r'^publication/delete/(?P<slug>[\w-]+)/$', views.deletePublication, name='deletePublication'),
     url(r'^publication/new/$', views.publication, name='newPublication'),

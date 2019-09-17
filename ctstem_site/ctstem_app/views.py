@@ -4588,14 +4588,18 @@ def iframe_state(request, instance_id, iframe_id):
   return http.HttpResponse(status=400)
 
 @login_required
-def is_curriculum_assigned(request, curriculum_id):
-  curriculum = models.Curriculum.objects.get(id=curriculum_id)
+def is_curriculum_assigned(request, id):
+  curriculum = models.Curriculum.objects.get(id=id)
   is_assigned = False
   if curriculum.curriculum_type != 'U':
     assignment_count = models.Assignment.objects.all().filter(curriculum=curriculum).count()
     if assignment_count > 0:
       is_assigned = True
-  return is_assigned
+  if request.is_ajax():
+    response_data = {'is_assigned': is_assigned}
+    return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+  else:
+    return is_assigned
 
 def terms(request):
   context = {}

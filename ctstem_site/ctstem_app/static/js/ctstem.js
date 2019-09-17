@@ -618,3 +618,20 @@ function confirmAction(){
   }
   return true;
 }
+
+function is_curriculum_assigned(id) {
+  var is_assigned = false;
+  $.ajax({
+    type: 'GET',
+    url: '/curriculum/is_assigned/'+id+'/',
+    async: false,
+    success: function(data){
+      is_assigned = data['is_assigned'];
+    },
+    error: function(xhr, ajaxOptions, thrownError){
+      alert("Something went wrong...");
+    },
+  });
+  return is_assigned;
+
+}
