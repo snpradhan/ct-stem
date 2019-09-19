@@ -59,6 +59,8 @@
                   <td class="icon">
                     {% if curriculum.icon %}
                       <img class="big_icon" src="{{curriculum.icon.url}}"/>
+                    {% elif curriculum.curriculum_type == 'U' %}
+                      <img class="big_icon" src="/static/img/unit.png">
                     {% elif curriculum.curriculum_type == 'L' %}
                       <img class="big_icon" src="/static/img/lesson.png">
                     {% elif curriculum.curriculum_type == 'A' %}

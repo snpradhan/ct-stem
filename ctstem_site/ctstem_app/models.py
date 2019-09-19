@@ -168,7 +168,7 @@ class Curriculum (models.Model):
   authors = models.ManyToManyField(User, null=False, related_name="curriculum_authors", help_text='Select authors for this curriculum')
   created_date = models.DateTimeField(auto_now_add=True)
   modified_date = models.DateTimeField(auto_now=True)
-  icon = models.ImageField(upload_to=upload_file_to, blank=True, help_text='Upload an image at least 400x289 in resolution that represents this curriculum')
+  icon = models.ImageField(upload_to=upload_file_to, blank=True, null=True, help_text='Upload an image at least 400x289 in resolution that represents this curriculum')
   shared_with = models.ManyToManyField('Teacher', null=True, blank=True, help_text='Select teachers to share this curriculum with before it is public' )
   unit = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, related_name="underlying_curriculum", help_text="Select a unit if this curriculum is part of one")
   acknowledgement = RichTextUploadingField(null=True, blank=True, help_text="Resources, models, and other material used in this curriculum; past authors/contributors")
@@ -314,8 +314,8 @@ class Question(models.Model):
 # Subject model
 class Subject(models.Model):
   name = models.CharField(null=False, max_length=256)
+  icon = models.ImageField(upload_to=upload_file_to, blank=True, null=True, help_text='Upload an image at least 400x289 in resolution that represents this subject')
   abbrevation = models.CharField(null=True, blank=True, max_length=10)
-  icon = models.ImageField(upload_to=upload_file_to, blank=True, help_text='Upload an image at least 400x289 in resolution that represents this subject')
 
   def __unicode__(self):
       return u'%s' % (self.name)
@@ -494,9 +494,9 @@ class UserGroup(models.Model):
   shared_with = models.ManyToManyField(Teacher, null=True, blank=True, help_text='Select teachers to share this class with.' )
   group_code = models.CharField(null=False, blank=False, max_length=10, unique=True, default=generate_code_helper)
   is_active = models.BooleanField(null=False, blank=False, default=True)
+  icon = models.ImageField(upload_to=upload_file_to, blank=True, null=True, help_text='Upload an image at least 400x289 in resolution that represents this class')
   created_date = models.DateTimeField(auto_now_add=True)
   modified_date = models.DateTimeField(auto_now=True)
-  icon = models.ImageField(upload_to=upload_file_to, blank=True, help_text='Upload an image at least 400x289 in resolution that represents this class')
 
   def __unicode__(self):
     return u'%s' % (self.title)
