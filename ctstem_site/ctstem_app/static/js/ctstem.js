@@ -619,11 +619,11 @@ function confirmAction(){
   return true;
 }
 
-function is_curriculum_assigned(id) {
+function is_curriculum_assigned_ajax(id) {
   var is_assigned = false;
   $.ajax({
     type: 'GET',
-    url: '/curriculum/is_assigned/'+id+'/',
+    url: '/curriculum/is_assigned/ajax/'+id+'/',
     async: false,
     success: function(data){
       is_assigned = data['is_assigned'];

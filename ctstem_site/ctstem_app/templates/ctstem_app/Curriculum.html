@@ -392,7 +392,7 @@
         var is_assigned = false;
         if("{{form.instance}}"){
           var id = "{{form.instance.id}}";
-          is_assigned = is_curriculum_assigned(id);
+          is_assigned = is_curriculum_assigned_ajax(id);
         }
         if(is_assigned){
           bootbox.alert({ title: '<h3 class="left">Warning</h3>',
@@ -433,7 +433,7 @@
         var is_assigned = false;
         if("{{form.instance}}"){
           var id = "{{form.instance.id}}";
-          is_assigned = is_curriculum_assigned(id);
+          is_assigned = is_curriculum_assigned_ajax(id);
         }
         if(is_assigned){
           bootbox.alert({ title: '<h3 class="left">Warning</h3>',

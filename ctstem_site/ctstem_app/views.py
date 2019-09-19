@@ -4595,11 +4595,15 @@ def is_curriculum_assigned(request, id):
     assignment_count = models.Assignment.objects.all().filter(curriculum=curriculum).count()
     if assignment_count > 0:
       is_assigned = True
-  if request.is_ajax():
-    response_data = {'is_assigned': is_assigned}
-    return http.HttpResponse(json.dumps(response_data), content_type="application/json")
-  else:
-    return is_assigned
+
+  return is_assigned
+
+@login_required
+def is_curriculum_assigned_ajax(request, id):
+  is_assigned = is_curriculum_assigned(request, id)
+  response_data = {'is_assigned': is_assigned}
+  return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+
 
 def terms(request):
   context = {}
