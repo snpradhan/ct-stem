@@ -44,6 +44,7 @@ urlpatterns = [
     url(r'^generate_code/$', views.generate_code, name='generate_code'),
     url(r'^upload/users/$', views.user_upload, name='user_upload'),
     url(r'^login/$', views.user_login, name='login'),
+    url(r'^login/(?P<user_name>[A-Za-z0-9._@+\-]+)/$', views.user_login, name='login'),
     url(r'^logout/$', views.user_logout, name='logout'),
     url(r'^user/(?P<id>[\d]+)/$', views.userProfile, name='userProfile'),
     url(r'^user/delete/(?P<id>[\d]+)/$', views.deleteUser, name='deleteUser'),

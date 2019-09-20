@@ -79,6 +79,8 @@ def home(request):
         target = '#validate'
       elif 'password_reset' in redirect_url:
         target = '#password'
+      elif 'login' in redirect_url:
+        target ='#login'
 
       if target and request.user.is_authenticated():
         logout(request)
@@ -1090,7 +1092,7 @@ def validate_recaptcha(request, recaptcha_response):
 ####################################
 # USER LOGIN
 ####################################
-def user_login(request):
+def user_login(request, user_name=''):
   username = password = ''
   print request.method
   if request.method == 'POST':
@@ -1131,7 +1133,10 @@ def user_login(request):
 
     return http.HttpResponse(json.dumps(response_data), content_type="application/json")
   elif request.method == 'GET':
-    form = forms.LoginForm()
+    if user_name:
+      form = forms.LoginForm(initial={'username_email': user_name})
+    else:
+      form = forms.LoginForm()
     context = {'form': form}
     return render(request, 'ctstem_app/LoginModal.html', context)
 
@@ -4075,12 +4080,13 @@ def send_added_to_group_confirmation_email(email, group):
   #email user the  user name and password
   current_site = Site.objects.get_current()
   domain = current_site.domain
+  student = models.Student.objects.get(user__email=email)
   body = '<div>Your teacher has added you to the class <b>%s</b> on Computational Thinking in STEM website. </div><br> \
-          <div>You may login with your credentials here https://%s </div><br> \
+          <div>You may login with your username, <b>%s</b> and password here https://%s?next=/login/%s/ </div><br> \
           <div>If you have forgotten your password since you last logged in, you can reset your password here https://%s/?next=/password_reset/recover/  </div><br> \
           <div>If clicking the link does not seem to work, you can copy and paste the link into your browser&#39;s address window, </div> \
           <div>or retype it there. Once you have returned to CT-STEM, we will give instructions to proceed. </div><br> \
-          <div><b>CT-STEM Admin</b></div>'%(group.title.title(), domain, domain)
+          <div><b>CT-STEM Admin</b></div>'%(group.title.title(), student.user.username, domain, student.user.username, domain)
   subject = 'CT-STEM - Student Account added to %s' % group.title.title()
 
   send_mail(subject, body, settings.DEFAULT_FROM_EMAIL, [email], html_message=body)
