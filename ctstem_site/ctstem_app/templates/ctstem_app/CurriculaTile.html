@@ -1,6 +1,6 @@
 {% extends "ctstem_app/base.html" %}
 {% load ctstem_extras %}
-{% load endless %}
+{% load base_extras %}
 {% block media %}
   {{ block.super }}
   {{ form.media }}
@@ -19,122 +19,59 @@
         {% endif %}
       </div>
       <div class="row_container">
-        <form method="post">
+        <form method="post" action="{% url 'ctstem:curriculatiles' %}" id="curricula_search">
           {% csrf_token %}
           <div class="row" id="curricula_filters">
-            <div class="col form-group">
-              <label>{{searchForm.subjects.label|title}}</label>
-              {% for subject in searchForm.subjects %}
-                <div>{{subject.tag}} &nbsp; <label>{{subject.choice_label}}</label></div>
-              {% endfor %}
-            </div>
+            {% if searchForm.subjects %}
+              <div class="col form-group">
+                <label>{{searchForm.subjects.label|title}}</label>
+                {% for subject in searchForm.subjects %}
+                  <div>{{subject.tag}} &nbsp; <label>{{subject.choice_label}}</label></div>
+                {% endfor %}
+              </div>
+            {% endif %}
+            {% if searchForm.curricula_types %}
             <div class="col form-group">
               <label>{{searchForm.curricula_types.label|title}}</label>
               {% for curricula_type in searchForm.curricula_types %}
                 <div>{{curricula_type.tag}} &nbsp; <label>{{curricula_type.choice_label}}</label></div>
               {% endfor %}
             </div>
+            {% endif %}
+            {% if searchForm.buckets %}
             <div class="col form-group">
               <label>{{searchForm.buckets.label|title}}</label>
               {% for bucket in searchForm.buckets %}
                 <div>{{bucket.tag}} &nbsp; <label>{{bucket.choice_label}}</label></div>
               {% endfor %}
             </div>
+            {% endif %}
+            {% if searchForm.status %}
             <div class="col form-group">
               <label>{{searchForm.status.label|title}}</label>
               {% for stat in searchForm.status %}
                 <div>{{stat.tag}} &nbsp; <label>{{stat.choice_label}}</label></div>
               {% endfor %}
             </div>
+            {% endif %}
+            {% if searchForm.keywords %}
             <div class="col form-group">
               <label>{{searchForm.keywords.label|title}}</label>
               <div>{{searchForm.keywords}}</div>
               <div class="search">
-                <input type="submit" class="btn btn-success" id="submit" value="Search"/>
-                <input type="reset" class="btn btn-warning" id="clear" value="Clear"/>
+                <input type="submit" class="btn normal darkblue" id="submit" value="Search"/>
+                <input type="button" class="btn normal yellow" id="clear" value="Clear"/>
               </div>
             </div>
-
+            {% endif %}
+          </div>
+          <div class="row_container">
+            <div class="row" id="curricula_tiles">
+              {% include "ctstem_app/CurriculaTilePaging.html"%}
+            </div>
           </div>
         </form>
       </div>
-      {% if curricula %}
-        <div class="row_container">
-          <div class="row" id="curricula_tiles">
-            {% include "ctstem_app/Pagination.html" with model=curricula %}
-            {% for curriculum in curricula %}
-              <div class="col">
-                <div class="tile">
-                  <a href="{% url 'ctstem:previewCurriculum' curriculum.id %}">
-                  <div class="icon">
-                    {% if curriculum.icon %}
-                      <img src="{{curriculum.icon.url}}"/>
-                    {% elif curriculum.curriculum_type == 'L' or curriculum.curriculum_type == 'U' %}
-                      <img src="/static/img/lesson.png">
-                    {% elif curriculum.curriculum_type == 'A' %}
-                      <img src="/static/img/assessment.png">
-                    {% elif curriculum.curriculum_type == 'S' %}
-                      <img src="/static/img/survey.svg">
-                    {% endif %}
-                  </div>
-                  </a>
-                  <div class="detail">
-                    <div class="type">
-                      {{curriculum.get_curriculum_type_display}}
-                      {% if curriculum.subject.all %}
-                        - {{curriculum.subject.all|join:", "}}
-                      {% endif %}
-                    </div>
-                    <div class="period">
-                      {% if curriculum.curriculum_type == 'U' %}
-                        {% get_underlying_curriculum curriculum.id as underlying_curriculum %}
-                        {{underlying_curriculum|length}} Lessons
-                      {% else %}
-                        {{curriculum.time}}
-                      {% endif %}
-                    </div>
-                    <div class="title">{{curriculum.title}}</div>
-                    <div class="others">
-                      <div class="author">
-                        {% if curriculum.authors.all %}
-                          {% if curriculum.authors.all|length > 1 %}
-                            {{curriculum.authors.all|length}} Authors
-                          {% else %}
-                            {% with curriculum.authors.all|first as author %}
-                              by {{author.get_full_name}}
-                            {% endwith %}
-                          {% endif %}
-                        {% endif %}
-                      </div>
-                      <div class="standard">
-                        Standards: {{curriculum.taxonomy.all|getStandards|join:", " }}
-                      </div>
-                      <div class="used_by">
-                        Used by {{curriculum.usage_by_student}} Students
-                      </div>
-                    </div>
-                    <div class="action">
-                      {% if curriculum|is_teacher_authored %}
-                        <i class="fa fa-code-fork" title="Teacher authored"></i>
-                      {% endif %}
-                      {% if user.teacher %}
-                        {% with favorite=curriculum.id|is_favorite:user.teacher.id %}
-                          <a class="bookmark fa fa-star" href="{% url 'ctstem:removeBookmark' curriculum.id %}" style="{% if favorite %} display: inline-block; {% else %} display: none; {% endif %}" title="Remove from Favorites"></a>
-                          <a class="bookmark fa fa-star-o" href="{% url 'ctstem:bookmarkCurriculum' curriculum.id %}" style="{% if favorite %} display: none; {% else %} display: inline-block; {% endif %}" title="Add to Favorites"></a>
-                        {% endwith %}
-                      {% endif %}
-                      <a class="fa fa-long-arrow-right" href="{% url 'ctstem:previewCurriculum' curriculum.id %}" target="_blank" title="Preview"></a>
-                      </div>
-                  </div>
-                </div>
-              </div>
-            {% endfor %}
-            {% include "ctstem_app/Pagination.html" with model=curricula %}
-          </div>
-        </div>
-      {% else %}
-        <p>No curricula exists for the selected category.</p>
-      {% endif %}
     </div>
 
   <div class="modal fade" id="assignmentModal" role="dialog"></div>
@@ -142,6 +79,10 @@
   <script type="text/javascript">
     $(function(){
 
+      $('input#clear').on("click", function(){
+        $('#curricula_search').find(':radio, :checkbox').removeAttr('checked').end()
+            .find('textarea, :text, select').val('')
+      });
       $('.content').on("click", 'a.fa-print', function(e){
         e.preventDefault();
         var url = $(this).attr('href');
@@ -186,6 +127,37 @@
           },
         });
       });
+      function bind_paging() {
+        $('a.page').on('click', function(e){
+          e.preventDefault();
+          var param = $(this).attr('href');
+          var url = $('form').attr('action') + param;
+
+          $.ajax({
+            type: "POST",
+            url: url,
+            data: $('form').serialize(),
+            beforeSend: function(){
+              $('.step-links').replaceWith('<div id="spinner"> \
+                                              <img src="/static/img/page-loader.gif" class="icon"/>\
+                                            </div>');
+              $('#spinner').show();
+            },
+            complete: function(){
+              $('#spinner').hide();
+            },
+            success: function(data){
+              $('.pagination').replaceWith(data);
+              bind_paging();
+              return false;
+            },
+            error: function(xhr, ajaxOptions, thrownError){
+              alert("Something went wrong.  Try again later!");
+            },
+          });
+        });
+      }
+      bind_paging();
     });
   </script>
 

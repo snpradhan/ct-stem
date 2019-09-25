@@ -1,0 +1,74 @@
+{% load ctstem_extras %}
+{% if curricula %}
+  {% for curriculum in curricula %}
+    <div class="col">
+      <div class="tile">
+        <a href="{% url 'ctstem:previewCurriculum' curriculum.id %}">
+        <div class="icon">
+          {% if curriculum.icon %}
+            <img src="{{curriculum.icon.url}}"/>
+          {% elif curriculum.curriculum_type == 'U' %}
+            <img src="/static/img/unit.png">
+          {% elif curriculum.curriculum_type == 'L' %}
+            <img src="/static/img/lesson.png">
+          {% elif curriculum.curriculum_type == 'A' or curriculum.curriculum_type == 'S'%}
+            <img src="/static/img/assessment.png">
+          {% endif %}
+        </div>
+        </a>
+        <div class="detail">
+          <div class="type">
+            {{curriculum.get_curriculum_type_display}}
+            {% if curriculum.subject.all %}
+              - {{curriculum.subject.all|join:", "}}
+            {% endif %}
+          </div>
+          <div class="period">
+            {% if curriculum.curriculum_type == 'U' %}
+              {% get_underlying_curriculum curriculum.id as underlying_curriculum %}
+              {{underlying_curriculum|length}} Lessons
+            {% else %}
+              {{curriculum.time}}
+            {% endif %}
+          </div>
+          <div class="title">{{curriculum.title}}</div>
+          <div class="others">
+            <div class="author">
+              {% if curriculum.authors.all %}
+                {% if curriculum.authors.all|length > 1 %}
+                  {{curriculum.authors.all|length}} Authors
+                {% else %}
+                  {% with curriculum.authors.all|first as author %}
+                    by {{author.get_full_name}}
+                  {% endwith %}
+                {% endif %}
+              {% endif %}
+            </div>
+            <div class="standard">
+              Standards: {{curriculum.taxonomy.all|getStandards|join:", " }}
+            </div>
+            <div class="used_by">
+              Used by {{curriculum.usage_by_student}} Students
+            </div>
+          </div>
+          <div class="action">
+            {% if curriculum|is_teacher_authored %}
+              <i class="fa fa-code-fork" title="Teacher authored"></i>
+            {% endif %}
+            {% if user.teacher %}
+              {% with favorite=curriculum.id|is_favorite:user.teacher.id %}
+                <a class="bookmark fa fa-star" href="{% url 'ctstem:removeBookmark' curriculum.id %}" style="{% if favorite %} display: inline-block; {% else %} display: none; {% endif %}" title="Remove from Favorites"></a>
+                <a class="bookmark fa fa-star-o" href="{% url 'ctstem:bookmarkCurriculum' curriculum.id %}" style="{% if favorite %} display: none; {% else %} display: inline-block; {% endif %}" title="Add to Favorites"></a>
+              {% endwith %}
+            {% endif %}
+            <a class="fa fa-long-arrow-right" href="{% url 'ctstem:previewCurriculum' curriculum.id %}" target="_blank" title="Preview"></a>
+            </div>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+  {% include "ctstem_app/LoadMore.html" with model=curricula %}
+
+{% else %}
+  <p>No curricula exists for the selected category.</p>
+{% endif %}

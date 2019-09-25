@@ -656,6 +656,7 @@ div.content#question_review .dataTables_wrapper {
 
 div.content#curricula {
   width: 100%;
+  margin-bottom: 0;
 }
 div.content#curricula > * {
   padding-left: 5%;
@@ -687,16 +688,12 @@ div.content#curricula div.row#curricula_filters .search {
   margin-top: 2em;
 }
 div.content#curricula div.row#curricula_tiles {
-
-  margin-bottom: 4em;
   justify-content: center;
   align-items: center;
-  padding-bottom: 5em;
-
 }
 
 div.content#curricula div.row#curricula_tiles .col {
-  flex: 1 1 25%;
+  flex: 1 1 30%;
   text-align: center;
   margin: 2em auto;
 }
@@ -993,6 +990,20 @@ div.pagination .counter {
 }
 div.pagination .step-links {
   float: right;
+}
+
+div#curricula div.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin: 5em 0;
+}
+div#curricula div.pagination .counter2 {
+  visibility: hidden
+}
+div#curricula div.pagination .step-links {
+  float: unset;
+  display: block;
 }
 
 div.content #curricula_tile  .row.button {

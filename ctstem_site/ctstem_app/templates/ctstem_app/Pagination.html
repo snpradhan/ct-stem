@@ -5,7 +5,7 @@
   </span>
   <span class="step-links">
     {% if model.has_previous %}
-      <a href="?page={{ model.previous_page_number }}&order_by={{ order_by }}&direction={{ direction }}">Previous</a>
+      <a href="?page={{ model.previous_page_number }}&order_by={{ order_by }}&direction={{ direction }}" class="page">Previous</a>
       &nbsp;
     {% endif %}
 
@@ -15,7 +15,7 @@
 
     {% if model.has_next %}
       &nbsp;
-      <a href="?page={{ model.next_page_number }}&order_by={{ order_by }}&direction={{ direction }}">Next</a>
+      <a href="?page={{ model.next_page_number }}&order_by={{ order_by }}&direction={{ direction }}" class="page">Next</a>
     {% endif %}
   </span>
 </div>

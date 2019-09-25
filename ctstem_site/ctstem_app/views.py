@@ -5,7 +5,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.db.models.functions import Lower
 from django import http, shortcuts, template
-from django.shortcuts import render
+from django.shortcuts import render, render_to_response
 from django.contrib import auth, messages
 from django.forms.models import inlineformset_factory, modelformset_factory
 from nested_formset import nestedformset_factory
@@ -199,6 +199,8 @@ def curriculatiles(request):
     search_criteria = None
     if request.method == 'GET':
       searchForm = forms.CurriculaSearchForm(user=request.user)
+      #data = request.POST.copy()
+      #print 'data', data
 
     elif request.method == 'POST':
       data = request.POST.copy()
@@ -213,84 +215,16 @@ def curriculatiles(request):
                 {'order_by': 'modified_month', 'direction': 'desc', 'ignorecase': 'false'},
                 {'order_by': 'modified_day', 'direction': 'desc', 'ignorecase': 'false'},
                 {'order_by': 'title', 'direction': 'asc', 'ignorecase': 'true'}]
-    curricula_list = paginate(request, curricula, sort_order, 25)
+    curricula_list = paginate(request, curricula, sort_order, 12)
     context = {'curricula': curricula_list, 'searchForm': searchForm }
 
-    return render(request, 'ctstem_app/CurriculaTile.html', context)
+    template = 'ctstem_app/CurriculaTile.html'
+    if request.is_ajax():
+      template = 'ctstem_app/CurriculaTilePaging.html'
+
+    #return render(request, 'ctstem_app/CurriculaTile.html', context)
+    return render_to_response(template, context, context_instance=RequestContext(request))
   return http.HttpResponseNotAllowed(['GET', 'POST'])
-
-  '''curriculum_type = []
-  if bucket == 'unit':
-    curriculum_type = ['U']
-  elif bucket == 'lesson':
-    curriculum_type = ['L']
-  elif bucket == 'assessment':
-    curriculum_type = ['A', 'S']
-  elif bucket in ['teacher_authored', 'my', 'favorite', 'shared']:
-    curriculum_type = ['U', 'L', 'A', 'S']
-
-  stat = []
-  curricula = models.Curriculum.objects.extra(select={'modified_year': 'EXTRACT(YEAR FROM modified_date)',
-                          'modified_month': 'EXTRACT(MONTH FROM modified_date)',
-                          'modified_day': 'EXTRACT(DAY FROM modified_date)'})
-  if bucket in ['unit', 'lesson', 'assessment']:
-    if hasattr(request.user, 'administrator') or hasattr(request.user, 'researcher') or hasattr(request.user, 'author'):
-      if status == 'archived':
-        stat = ['A']
-      elif status == 'private':
-        stat = ['D']
-      else:
-        stat = ['P']
-    else:
-      stat = ['P']
-    curricula = curricula.filter(unit__isnull=True, curriculum_type__in = curriculum_type, status__in = stat)
-
-  elif bucket == 'teacher_authored':
-    if hasattr(request.user, 'administrator') or hasattr(request.user, 'researcher') or hasattr(request.user, 'author'):
-      stat = ['D', 'P', 'A']
-      curricula = curricula.filter(unit__isnull=True, curriculum_type__in = curriculum_type, status__in = stat, authors__teacher__isnull=False).distinct()
-
-  elif bucket == 'my' and hasattr(request.user, 'teacher'):
-    stat = ['D', 'P', 'A']
-    curricula = curricula.filter(unit__isnull=True, curriculum_type__in = curriculum_type, status__in = stat, authors=request.user)
-
-  elif bucket == 'favorite' and hasattr(request.user, 'teacher'):
-    stat = ['P']
-    curricula = curricula.filter(Q(unit__isnull=True), Q(curriculum_type__in=curriculum_type), Q(bookmarked__teacher=request.user.teacher), Q(status__in=stat) | Q(shared_with=request.user.teacher)).distinct()
-
-  elif bucket == 'shared' and hasattr(request.user, 'teacher'):
-    stat = ['D', 'P']
-    shared_lessons = curricula.filter(unit__isnull=False, curriculum_type__in = 'L', status__in = stat, shared_with=request.user.teacher).distinct()
-    shared_lessons_units = shared_lessons.values_list('unit', flat=True)
-    curricula = curricula.filter(Q(unit__isnull=True), Q(curriculum_type__in = curriculum_type), Q(status__in = stat), Q(shared_with=request.user.teacher) | Q(id__in=shared_lessons_units)).distinct()
-  else:
-    messages.error(request, "There are no curricula for the requested category.")
-
-  #search
-  search_criteria = None
-  if request.method == 'POST':
-    data = request.POST.copy()
-    if 'search_criteria' in data:
-      search_criteria = data['search_criteria']
-    searchForm = forms.SearchForm(data)
-  else:
-    searchForm = forms.SearchForm()
-
-  if search_criteria:
-    curricula = searchCurricula(request, curricula, search_criteria)
-
-  sort_order = [{'order_by': 'feature_rank', 'direction': 'asc', 'ignorecase': 'false'},
-                {'order_by': 'modified_year', 'direction': 'desc', 'ignorecase': 'false'},
-                {'order_by': 'modified_month', 'direction': 'desc', 'ignorecase': 'false'},
-                {'order_by': 'modified_day', 'direction': 'desc', 'ignorecase': 'false'},
-                {'order_by': 'title', 'direction': 'asc', 'ignorecase': 'true'}]
-  curricula_list = paginate(request, curricula, sort_order, 25)
-  #if curricula:
-  #  curricula = curricula.order_by('-modified_date', Lower('title'))
-
-  context = {'curricula': curricula_list, 'bucket': bucket, 'status': status, 'searchForm': searchForm, 'subjects': models.Subject.objects.all(), 'curricula_types': models.CURRICULUM_TYPE_CHOICES, 'buckets': }
-
-  return render(request, 'ctstem_app/Curricula.html', context)'''
 
 ####################################
 # CREATE MODIFY a curriculum
