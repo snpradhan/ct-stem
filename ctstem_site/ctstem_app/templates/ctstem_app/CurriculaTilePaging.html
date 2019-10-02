@@ -4,18 +4,27 @@
     <div class="col">
       <div class="tile">
         <a href="{% url 'ctstem:previewCurriculum' curriculum.id %}">
-        <div class="icon">
-          {% if curriculum.icon %}
-            <img src="{{curriculum.icon.url}}"/>
-          {% elif curriculum.curriculum_type == 'U' %}
-            <img src="/static/img/unit.png">
-          {% elif curriculum.curriculum_type == 'L' %}
-            <img src="/static/img/lesson.png">
-          {% elif curriculum.curriculum_type == 'A' or curriculum.curriculum_type == 'S'%}
-            <img src="/static/img/assessment.png">
+          <div class="icon">
+            {% if curriculum.icon %}
+              <img src="{{curriculum.icon.url}}"/>
+            {% elif curriculum.curriculum_type == 'U' %}
+              <img src="/static/img/unit.png">
+            {% elif curriculum.curriculum_type == 'L' %}
+              <img src="/static/img/lesson.png">
+            {% elif curriculum.curriculum_type == 'A' or curriculum.curriculum_type == 'S'%}
+              <img src="/static/img/assessment.png">
+            {% endif %}
+          </div>
+        </a>
+        <div class="favorite">
+          {% check_curriculum_permission curriculum.id 'favorite' as has_favorite_permission %}
+          {% if has_favorite_permission == True %}
+            <a class="bookmark bookmarked util-button fa fa-star" href="{% url 'ctstem:removeBookmark' curriculum.id %}" style="{% if curriculum|is_bookmarked:user.teacher %} display: inline-block; {% else %} display: none; {% endif %}" title="Remove from Favorites"></a>
+            <a class="bookmark util-button fa fa-star" href="{% url 'ctstem:bookmarkCurriculum' curriculum.id %}" style="{% if curriculum|is_bookmarked:user.teacher %} display: none; {% else %} display: inline-block; {% endif %}" title="Add to Favorites"></a>
+          {% else %}
+            <a class="bookmark util-button fa fa-star" data-title="You need to be logged in as a teacher to favorite this curriculum"></a>
           {% endif %}
         </div>
-        </a>
         <div class="detail">
           <div class="type">
             {{curriculum.get_curriculum_type_display}}
@@ -54,12 +63,6 @@
           <div class="action">
             {% if curriculum|is_teacher_authored %}
               <i class="fa fa-code-fork" title="Teacher authored"></i>
-            {% endif %}
-            {% if user.teacher %}
-              {% with favorite=curriculum.id|is_favorite:user.teacher.id %}
-                <a class="bookmark fa fa-star" href="{% url 'ctstem:removeBookmark' curriculum.id %}" style="{% if favorite %} display: inline-block; {% else %} display: none; {% endif %}" title="Remove from Favorites"></a>
-                <a class="bookmark fa fa-star-o" href="{% url 'ctstem:bookmarkCurriculum' curriculum.id %}" style="{% if favorite %} display: none; {% else %} display: inline-block; {% endif %}" title="Add to Favorites"></a>
-              {% endwith %}
             {% endif %}
             <a class="fa fa-long-arrow-right" href="{% url 'ctstem:previewCurriculum' curriculum.id %}" target="_blank" title="Preview"></a>
             </div>

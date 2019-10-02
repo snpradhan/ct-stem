@@ -104,29 +104,33 @@
         }
       });
 
-      $('.content').on("click", "a.bookmark", function(e){
-        e.preventDefault();
-        var url = $(this).attr('href');
-        var tr = $(this).closest('tr');
-
-        $.ajax({
-          type: "GET",
-          url: url,
-          success: function(data){
-            {% if bucket == 'favorite' %}
-              $(tr).hide();
-            {% else %}
-              $(tr).find('a.bookmark').each(function(){
-                $(this).toggle();
-              });
-            {% endif %}
-            return false;
-          },
-          error: function(xhr, ajaxOptions, thrownError){
-            alert("Something went wrong.  Try again later!");
-          },
+      function bind_bookmark(){
+        $('a.bookmark').off("click");
+        $('a.bookmark').on("click", function(e){
+          e.preventDefault();
+          var url = $(this).attr('href');
+          if(url){
+            var favorite_container = $(this).parent();
+            $.ajax({
+              type: "GET",
+              url: url,
+              success: function(data){
+                $(favorite_container).find('a.bookmark').each(function(){
+                  $(this).toggle();
+                });
+                return false;
+              },
+              error: function(xhr, ajaxOptions, thrownError){
+                alert("Something went wrong.  Try again later!");
+              },
+            });
+          }
+          else{
+            var msg = $(this).data('title');
+            alert(msg);
+          }
         });
-      });
+      }
       function bind_paging() {
         $('a.page').on('click', function(e){
           e.preventDefault();
@@ -149,6 +153,7 @@
             success: function(data){
               $('.pagination').replaceWith(data);
               bind_paging();
+              bind_bookmark();
               return false;
             },
             error: function(xhr, ajaxOptions, thrownError){
@@ -158,6 +163,7 @@
         });
       }
       bind_paging();
+      bind_bookmark();
     });
   </script>
 

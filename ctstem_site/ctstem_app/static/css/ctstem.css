@@ -699,6 +699,21 @@ div.content#curricula div.row#curricula_tiles .col {
 }
 div.content#curricula  div.row#curricula_tiles .col .tile {
   display: inline-block;
+  position: relative;
+}
+div.content#curricula  div.row#curricula_tiles .col .tile .bookmark {
+  position: absolute;
+  top:5px;
+  right:5px;
+  font-size: 3em;
+  z-index: 99;
+  text-decoration: none;
+}
+div.content#curricula  div.row#curricula_tiles .col .tile .bookmark.bookmarked.fa-star {
+  color: var(--ctstem-color-yellow);
+}
+div.content#curricula  div.row#curricula_tiles .col .tile .bookmark.fa-star {
+  color: white;
 }
 /***********   CONTENT DIV END   ************/
 
