@@ -58,12 +58,14 @@
             <div class="col form-group">
               <label>{{searchForm.keywords.label|title}}</label>
               <div>{{searchForm.keywords}}</div>
-              <div class="search">
-                <input type="submit" class="btn normal darkblue" id="submit" value="Search"/>
-                <input type="button" class="btn normal yellow" id="clear" value="Clear"/>
-              </div>
             </div>
             {% endif %}
+            <div class="col form-group">
+              <div class="search">
+                <!--input type="submit" class="btn normal darkblue" id="submit" value="Search"/-->
+                <input type="button" class="btn normal yellow" id="clear" value="Clear Filter"/>
+              </div>
+            </div>
           </div>
           <div class="row_container">
             <div class="row" id="curricula_tiles">
@@ -81,8 +83,19 @@
 
       $('input#clear').on("click", function(){
         $('#curricula_search').find(':radio, :checkbox').removeAttr('checked').end()
-            .find('textarea, :text, select').val('')
+            .find('textarea, :text, select').val('');
+        var url = $('form').attr('action');
+        submit_search(url, null);
       });
+      var timeout = null;
+      $('#curricula_search :radio, #curricula_search :checkbox, #curricula_search select').on('change', function(){
+        auto_submit_search();
+      });
+
+      $('#curricula_search textarea, #curricula_search :text').on('keyup', function(){
+        auto_submit_search();
+      });
+
       $('.content').on("click", 'a.fa-print', function(e){
         e.preventDefault();
         var url = $(this).attr('href');
@@ -135,31 +148,57 @@
         $('a.page').on('click', function(e){
           e.preventDefault();
           var param = $(this).attr('href');
-          var url = $('form').attr('action') + param;
+          var url = $('form').attr('action');
+          submit_search(url, param);
+        });
+      }
 
-          $.ajax({
-            type: "POST",
-            url: url,
-            data: $('form').serialize(),
-            beforeSend: function(){
+      function auto_submit_search() {
+        clearTimeout(timeout);
+        timeout = setTimeout(function(){
+          var url = $('form').attr('action');
+          submit_search(url, null);
+        }, 800);
+      }
+
+      function submit_search(url, param) {
+        if(param) {
+          url = url + param;
+        }
+        $.ajax({
+          type: "POST",
+          url: url,
+          data: $('form').serialize(),
+          beforeSend: function(){
+            if(param){
               $('.step-links').replaceWith('<div id="spinner"> \
                                               <img src="/static/img/page-loader.gif" class="icon"/>\
                                             </div>');
-              $('#spinner').show();
-            },
-            complete: function(){
-              $('#spinner').hide();
-            },
-            success: function(data){
+            }
+            else {
+              $('#curricula_tiles').html('<div id="spinner"> \
+                                              <img src="/static/img/page-loader.gif" class="icon"/>\
+                                            </div>');
+            }
+            $('#spinner').show();
+          },
+          complete: function(){
+            $('#spinner').hide();
+          },
+          success: function(data){
+            if(param){
               $('.pagination').replaceWith(data);
-              bind_paging();
-              bind_bookmark();
-              return false;
-            },
-            error: function(xhr, ajaxOptions, thrownError){
-              alert("Something went wrong.  Try again later!");
-            },
-          });
+            }
+            else{
+              $('#curricula_tiles').html(data);
+            }
+            bind_paging();
+            bind_bookmark();
+            return false;
+          },
+          error: function(xhr, ajaxOptions, thrownError){
+            alert("Something went wrong.  Try again later!");
+          },
         });
       }
       bind_paging();
