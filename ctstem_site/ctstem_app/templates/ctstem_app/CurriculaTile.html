@@ -26,7 +26,7 @@
               <div class="col form-group">
                 <label>{{searchForm.subjects.label|title}}</label>
                 {% for subject in searchForm.subjects %}
-                  <div>{{subject.tag}} &nbsp; <label>{{subject.choice_label}}</label></div>
+                  <div>{{subject.tag}} &nbsp; <label for="{{subject.id_for_label}}">{{subject.choice_label}}</label></div>
                 {% endfor %}
               </div>
             {% endif %}
@@ -34,7 +34,7 @@
             <div class="col form-group">
               <label>{{searchForm.curricula_types.label|title}}</label>
               {% for curricula_type in searchForm.curricula_types %}
-                <div>{{curricula_type.tag}} &nbsp; <label>{{curricula_type.choice_label}}</label></div>
+                <div>{{curricula_type.tag}} &nbsp; <label for="{{curricula_type.id_for_label}}">{{curricula_type.choice_label}}</label></div>
               {% endfor %}
             </div>
             {% endif %}
@@ -42,7 +42,7 @@
             <div class="col form-group">
               <label>{{searchForm.buckets.label|title}}</label>
               {% for bucket in searchForm.buckets %}
-                <div>{{bucket.tag}} &nbsp; <label>{{bucket.choice_label}}</label></div>
+                <div>{{bucket.tag}} &nbsp; <label for="{{bucket.id_for_label}}">{{bucket.choice_label}}</label></div>
               {% endfor %}
             </div>
             {% endif %}
@@ -50,7 +50,7 @@
             <div class="col form-group">
               <label>{{searchForm.status.label|title}}</label>
               {% for stat in searchForm.status %}
-                <div>{{stat.tag}} &nbsp; <label>{{stat.choice_label}}</label></div>
+                <div>{{stat.tag}} &nbsp; <label for="{{stat.id_for_label}}">{{stat.choice_label}}</label></div>
               {% endfor %}
             </div>
             {% endif %}
@@ -81,12 +81,18 @@
   <script type="text/javascript">
     $(function(){
 
+      //add a class to checkbox and radio button in search form on Safari only
+      if (navigator.userAgent.search("Safari") >= 0 && navigator.userAgent.search("Chrome") < 0) {
+        $('#curricula_search :radio, #curricula_search :checkbox').addClass('safari');
+      }
+
       $('input#clear').on("click", function(){
         $('#curricula_search').find(':radio, :checkbox').removeAttr('checked').end()
             .find('textarea, :text, select').val('');
         var url = $('form').attr('action');
         submit_search(url, null);
       });
+
       var timeout = null;
       $('#curricula_search :radio, #curricula_search :checkbox, #curricula_search select').on('change', function(){
         auto_submit_search();

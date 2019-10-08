@@ -682,7 +682,20 @@ div.content#curricula div.row#curricula_filters .col {
 
 div.content#curricula div.row#curricula_filters input {
   display: inline-block;
+
 }
+div.content#curricula div.row#curricula_filters input[type='checkbox'] {
+
+  margin-left: 1em;
+  -ms-transform: scale(1.5);
+  -moz-transform: scale(1.5);
+  -webkit-transform:scale(1.5);
+  -o-transform: scale(1.5);
+}
+div.content#curricula div.row#curricula_filters input[type='checkbox'].safari {
+  zoom: 1.05;
+}
+
 div.content#curricula div.row#curricula_filters .search {
   text-align: right;
   margin-top: 2em;
