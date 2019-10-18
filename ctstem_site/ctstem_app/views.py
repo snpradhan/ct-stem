@@ -115,9 +115,9 @@ def curricula(request, bucket='unit', status='public'):
   elif bucket == 'lesson':
     curriculum_type = ['L']
   elif bucket == 'assessment':
-    curriculum_type = ['A', 'S']
+    curriculum_type = ['A']
   elif bucket in ['teacher_authored', 'my', 'favorite', 'shared']:
-    curriculum_type = ['U', 'L', 'A', 'S']
+    curriculum_type = ['U', 'L', 'A']
 
   stat = []
   curricula = models.Curriculum.objects.extra(select={'modified_year': 'EXTRACT(YEAR FROM modified_date)',
@@ -325,7 +325,7 @@ def previewCurriculum(request, id='', step_order=-1):
       systems = models.System.objects.all()
       total_steps = len(steps)
 
-      # for assessment and survey go to the first step
+      # for assessment go to the first step
       if curriculum.curriculum_type != 'U' and curriculum.curriculum_type != 'L' and step_order == -1:
         step_order = 0
 
@@ -3329,7 +3329,7 @@ def check_curriculum_permission(request, curriculum_id, action, step_order=-1):
         # admin, researcher and author can copy any curriculum
         if is_admin or is_researcher or is_author:
           has_permission = True
-        # teacher can only copy units, stand alone lessons, assessments and surveys that are public or something that they own
+        # teacher can only copy units, stand alone lessons, assessments that are public or something that they own
         elif is_teacher:
           if request.user in curriculum.authors.all():
             has_permission = True

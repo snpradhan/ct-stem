@@ -76,10 +76,7 @@
         <h1>{{curriculum.title}}</h1>
         <hr>
         <p class="item">
-          {% if curriculum.curriculum_type == 'S' %}
-            Thanks for taking this survey about computational thinking!
-            There are no right or wrong answers to these questions, we just want to know what you think.
-          {% elif curriculum.curriculum_type == 'A' %}
+          {% if curriculum.curriculum_type == 'A' %}
             {% if curriculum.student_overview %}
               {{curriculum.student_overview|safe}}
             {% endif %}

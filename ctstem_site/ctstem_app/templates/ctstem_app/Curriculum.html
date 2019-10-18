@@ -495,7 +495,7 @@
         reset_curriculum_metadata();
 
         //for all curriculum types, display author, title, status and icon
-        if($(this).val() == 'U' || $(this).val() == 'L' || $(this).val() == 'A' || $(this).val() == 'S') {
+        if($(this).val() == 'U' || $(this).val() == 'L' || $(this).val() == 'A') {
           $('#id_curriculum-author').closest('.form-group').show();
           $('#id_curriculum-authors').closest('.form-group').show();
           $('#id_curriculum-title').closest('.form-group').show();
@@ -551,8 +551,8 @@
           $('select#id_curriculum-shared_with').closest('.form-group').show();
         }
 
-        //for lesson, assessment and survey show the steps and Add Step button
-        if($(this).val() == 'L' || $(this).val() == 'A' || $(this).val() == 'S') {
+        //for lesson, assessment show the steps and Add Step button
+        if($(this).val() == 'L' || $(this).val() == 'A') {
           $('div.table.step div.form-group.order').show();
           $('div.table.step div.form-group.step_title').show();
           $('div.table.step div.form-group.step_content').show();

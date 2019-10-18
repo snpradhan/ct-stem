@@ -55,8 +55,6 @@
                       Lesson:
                     {% elif assignment.assignment.curriculum.curriculum_type == 'A' %}
                       Assessment:
-                    {% else %}
-                      Survey:
                     {% endif %}
                   </label>
                   <div>{{assignment.assignment.curriculum.title}}</div>
@@ -68,8 +66,6 @@
                       <label>Lesson:</label>
                     {% elif curriculum.curriculum_type == 'A' %}
                       <label>Assessment:</label>
-                    {% else %}
-                      <label>Survey</label>
                     {% endif %}
                     <div>{{curriculum.title}}</div>
 

@@ -21,8 +21,6 @@
         </p>
       {% elif bucket == 'assessment' %}
         <h2> Assessments </h2>
-      {% elif bucket == 'survey' %}
-        <h2> Surveys </h2>
       {% elif bucket == 'teacher_authored' %}
         <h2> Teacher Authored Curricula </h2>
       {% elif bucket == 'my' %}
@@ -65,8 +63,6 @@
                       <img class="big_icon" src="/static/img/lesson.png">
                     {% elif curriculum.curriculum_type == 'A' %}
                       <img class="big_icon" src="/static/img/assessment.png">
-                    {% elif curriculum.curriculum_type == 'S' %}
-                      <img class="big_icon" src="/static/img/survey.svg">
                     {% endif %}
                   </td>
                   <td class="information">

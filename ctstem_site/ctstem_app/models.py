@@ -30,7 +30,6 @@ CURRICULUM_TYPE_CHOICES = (
     (u'U', u'Unit'),
     (u'L', u'Lesson Plan'),
     (u'A', u'Assessment'),
-    (u'S', u'Survey'),
 )
 
 FIELD_TYPE_CHOICES = (

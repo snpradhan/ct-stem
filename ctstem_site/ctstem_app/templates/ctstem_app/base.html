@@ -223,8 +223,7 @@
                   <li class="dropdown {% navactive request 'ctstem:subjects' %}
                                       {% navactive request 'ctstem:schools' %}
                                       {% navactive request 'ctstem:categories' %}
-                                      {% navactive request 'ctstem:teamMembers' %}
-                                      {% navactive request 'ctstem:curricula' 'surveys' %}">
+                                      {% navactive request 'ctstem:teamMembers' %}">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" id="metadata">Metadata<b class="caret"></b></a>
                     <ul class="dropdown-menu">
                       <li class="{% navactive request 'ctstem:subjects' %}"><a href="{% url 'ctstem:subjects' %}">Subjects</a></li>
@@ -232,7 +231,6 @@
                       <li class="{% navactive request 'ctstem:categories' %}"><a href="{% url 'ctstem:categories' %}">Research Categories</a></li>
                       {% if user.administrator %}
                         <li class="{% navactive request 'ctstem:teamMembers' %}"><a href="{% url 'ctstem:teamMembers' %}">Team Members</a></li>
-                         <li class="{% navactive request 'ctstem:curricula' 'surveys' %} "><a href="{% url 'ctstem:curricula' 'surveys' %}">Surveys</a></li>
                       {% endif %}
                     </ul>
                   </li>
