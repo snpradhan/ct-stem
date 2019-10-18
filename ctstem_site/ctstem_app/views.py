@@ -3375,8 +3375,9 @@ def check_curriculum_permission(request, curriculum_id, action, step_order=-1):
           is_assigned = is_curriculum_assigned(request, curriculum_id)
           if is_assigned:
             if action == 'modify':
-              #admins can edit curriculum that are assigned
-              if is_admin:
+              #admins can edit any curriculum that are assigned
+              #teachers can edit their curriculum that are assigned
+              if is_admin or is_teacher:
                 has_permission = True
                 messages.warning(request, 'This curriculum has already been assigned, please be careful with the modification')
               else:
