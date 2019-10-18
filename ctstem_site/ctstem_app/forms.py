@@ -873,13 +873,16 @@ class PublicationForm(ModelForm):
 
   class Meta:
     model = models.Publication
-    exclude = ('created','slug')
+    exclude = ('created_date', 'modified_date', 'slug')
 
   def __init__(self, *args, **kwargs):
     super(PublicationForm, self).__init__(*args, **kwargs)
 
     for field_name, field in self.fields.items():
-      field.widget.attrs['class'] = 'form-control'
+      if field_name == 'order':
+        field.widget.attrs['class'] = 'form-control order'
+      else:
+        field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['placeholder'] = field.help_text
 
 ####################################

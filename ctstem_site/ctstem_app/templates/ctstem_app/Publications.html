@@ -33,6 +33,7 @@
             <table class="table table-striped table-bordered table-condensed dt" id="publications">
               <thead>
                 <tr>
+                  <th> Order </th>
                   <th> Title </th>
                   <th> Year </th>
                   <th> Author(s) </th>
@@ -40,6 +41,7 @@
                   <th> Type </th>
                 </tr>
                 <tr id="filterrow">
+                  <th> Order </th>
                   <th> Title </th>
                   <th> Year </th>
                   <th> Author(s) </th>
@@ -50,6 +52,7 @@
               <tbody>
                 {% for pub in publications %}
                   <tr>
+                    <td>{{pub.order}}</td>
                     <td class="title">{{pub.title}}
                       <div class="controls">
                         {% if user.administrator %}
@@ -169,21 +172,6 @@
         <li><a href="http://www.nsf.gov/nsb/sei/edTool/" target="_blank">NSF STEM Education Data Resources</a></li>
 
       </ul>
-
-      <h3 class="left">Other Resources</h3>
-      <ul class="links">
-        <li><a href="http://www.cs.cmu.edu/%7ECompThink/" target="_blank">Center for Computational Thinking at Carnegie Mellon</a></li>
-        <li><a href="https://advancesinap.collegeboard.org/stem/computer-science-principles?MTG77-ED-1-apcs=" target="_blank">AP CS Principles Course</a></li>
-        <li><a href="http://www.cs.washington.edu/WhyCSE/" target="_blank">University of Washington: Why Choose Computer Science &amp; Engineering?</a></li>
-        <li><a href="http://csta.acm.org" target="_blank">Computer Science Teachers Association</a></li>
-        <li><a href="http://women.acm.org" target="_blank">ACM's Women in Computing</a></li>
-        <li><a href="http://www.securityweek.com/obama-administration-places-200-million-bet-big-data" target="_blank">Obama Administration Places $200 Million Bet On Big Data</a></li>
-        <li><a href="http://www.edweek.org/ew/articles/2014/02/26/22computer_ep.h33.html?cmp=ENL-CM-NEWS1" target="_blank">Computer Science: Not Just an Elective Anymore</a></li>
-        <li><a href="http://www.code.org/" target="_blank">http://www.code.org/</a></li>
-        <li><a href="http://www.onlinecollege.org/2013/03/12/the-stem-jobs-everyone-wants-how-get-them/" target="_blank">The STEM Jobs Everyone Wants and How to Get Them (OnlineCollege.org)</a></li>
-        <li><a href="http://gk12northwestern.wikispaces.com/CT+resources" target="_blank">Other CT Resources</a></li>
-      </ul>
-
 
       <h3 class="left">Videos</h3>
       <ul class="links">
