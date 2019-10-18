@@ -243,6 +243,11 @@ def curriculum(request, id=''):
 
       if form.is_valid() and formset.is_valid() and attachment_formset.is_valid():
         savedCurriculum = form.save()
+
+        #make sure curriculum order is present and unique in a unit
+        if savedCurriculum.curriculum_type != 'U' and savedCurriculum.unit:
+          reorder_underlying_curricula(request, savedCurriculum.unit.id)
+
         attachment_formset.save()
         formset.save(commit=False)
         for stepform in formset.ordered_forms:
@@ -4611,6 +4616,17 @@ def is_curriculum_assigned_ajax(request, id):
   response_data = {'is_assigned': is_assigned}
   return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 
+
+@login_required
+def reorder_underlying_curricula(request, unit_id):
+  curricula = models.Curriculum.objects.all().filter(unit__id=unit_id).order_by('order', '-modified_date')
+  order = 1
+  for curriculum in curricula:
+    #fix curriculum order if it is out of order
+    if curriculum.order != order:
+      curriculum.order = order
+      curriculum.save()
+    order = order + 1
 
 def terms(request):
   context = {}
