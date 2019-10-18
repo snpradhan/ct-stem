@@ -221,6 +221,7 @@ def curriculatiles(request):
     template = 'ctstem_app/CurriculaTile.html'
     if request.is_ajax():
       template = 'ctstem_app/CurriculaTilePaging.html'
+      context['parent'] = 'curricula'
 
     #return render(request, 'ctstem_app/CurriculaTile.html', context)
     return render_to_response(template, context, context_instance=RequestContext(request))
@@ -406,6 +407,32 @@ def previewCurriculum(request, id='', step_order=-1):
       context['steps'] = steps
 
       return render(request, 'ctstem_app/CurriculumPreview.html', context)
+
+    return http.HttpResponseNotAllowed(['GET'])
+
+  except models.Curriculum.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested curriculum not found</h1>')
+
+####################################
+# PREVIEW A Curriculum NEW
+####################################
+def previewCurriculumNew(request, id=''):
+  try:
+    # check curriculum permission
+    has_permission = check_curriculum_permission(request, id, 'preview', -1)
+    if has_permission:
+      curriculum = models.Curriculum.objects.get(id=id)
+    else:
+      return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+    if request.method == 'GET':
+
+      systems = models.System.objects.all()
+
+
+      context = {'curriculum': curriculum, 'systems': systems}
+
+      return render(request, 'ctstem_app/CurriculumPreviewNew.html', context)
 
     return http.HttpResponseNotAllowed(['GET'])
 

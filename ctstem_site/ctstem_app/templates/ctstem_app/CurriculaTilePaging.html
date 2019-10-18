@@ -3,7 +3,7 @@
   {% for curriculum in curricula %}
     <div class="col">
       <div class="tile">
-        <a href="{% url 'ctstem:previewCurriculum' curriculum.id %}">
+        <a href="{% url 'ctstem:previewCurriculumNew' curriculum.id %}">
           <div class="icon">
             {% if curriculum.icon %}
               <img src="{{curriculum.icon.url}}"/>
@@ -64,13 +64,15 @@
             {% if curriculum|is_teacher_authored %}
               <i class="fa fa-code-fork" title="Teacher authored"></i>
             {% endif %}
-            <a class="fa fa-long-arrow-right" href="{% url 'ctstem:previewCurriculum' curriculum.id %}" target="_blank" title="Preview"></a>
+            <a class="fa fa-long-arrow-right" href="{% url 'ctstem:previewCurriculumNew' curriculum.id %}" target="_blank" title="Preview"></a>
             </div>
         </div>
       </div>
     </div>
   {% endfor %}
-  {% include "ctstem_app/LoadMore.html" with model=curricula %}
+  {% if parent == 'curricula' %}
+    {% include "ctstem_app/LoadMore.html" with model=curricula %}
+  {% endif %}
 
 {% else %}
   <p>No curricula exists for the selected category.</p>

@@ -1,0 +1,130 @@
+{% extends "ctstem_app/base.html" %}
+{% load ctstem_extras %}
+{% load base_extras %}
+{% block media %}
+  {{ block.super }}
+  {{ form.media }}
+{% endblock %}
+
+{% block content %}
+  {{block.super}}
+  <div class="content" id="preview">
+    <div class="row" id="preview_head">
+      <div class="col">
+        <div class="icon">
+          {% if curriculum.icon %}
+            <img src="{{curriculum.icon.url}}"/>
+          {% elif curriculum.curriculum_type == 'U' %}
+            <img src="/static/img/unit.png">
+          {% elif curriculum.curriculum_type == 'L' %}
+            <img src="/static/img/lesson.png">
+          {% elif curriculum.curriculum_type == 'A' or curriculum.curriculum_type == 'S'%}
+            <img src="/static/img/assessment.png">
+          {% endif %}
+        </div>
+
+        <div class="favorite">
+          {% check_curriculum_permission curriculum.id 'favorite' as has_favorite_permission %}
+          {% if has_favorite_permission == True %}
+            <a class="bookmark bookmarked util-button fa fa-star" href="{% url 'ctstem:removeBookmark' curriculum.id %}" style="{% if curriculum|is_bookmarked:user.teacher %} display: inline-block; {% else %} display: none; {% endif %}" title="Remove from Favorites"></a>
+            <a class="bookmark util-button fa fa-star" href="{% url 'ctstem:bookmarkCurriculum' curriculum.id %}" style="{% if curriculum|is_bookmarked:user.teacher %} display: none; {% else %} display: inline-block; {% endif %}" title="Add to Favorites"></a>
+          {% else %}
+            <a class="bookmark util-button fa fa-star" data-title="You need to be logged in as a teacher to favorite this curriculum"></a>
+          {% endif %}
+        </div>
+      </div>
+      <div class="col">
+        <div class="meta">
+          <h3 class="left">{{curriculum.title}} - v{{curriculum.version}}.</h3>
+          <div>
+            Subject:
+            {% if curriculum.subject.all %}
+              {{curriculum.subject.all|join:", "}}
+            {% endif %}
+          </div>
+          <div>
+            Time: {{curriculum.time}}
+          </div>
+          <div>
+            Level: {{curriculum.level}}
+          </div>
+        </div>
+      </div>
+    </div>
+    {% include "ctstem_app/CurriculumPreviewActions.html" with curriculum=curriculum %}
+    {% if curriculum.credits %}
+      <div class="credits">
+        <h3 class="left">Credits</h3>
+        <div>{{curriculum.credits|safe}}</div>
+      </div>
+    {% endif %}
+    {% if curriculum.curriculum_type == 'U' %}
+      {% get_underlying_curriculum curriculum.id as underlying_curriculum %}
+      {% if underlying_curriculum %}
+        <h3 class="left">Underlying Curricula</h3>
+        <div class="row underlying_curricula" id="curricula_tiles">
+          {% include "ctstem_app/CurriculaTilePaging.html" with curricula=underlying_curriculum parent='preview' %}
+        </div>
+      {% endif %}
+    {% else %}
+    <!-- get underlying pages -->
+      <h3 class="left">Pages</h3>
+      <div class="row underlying_curricula" id="curricula_tiles">
+        {% include "ctstem_app/CurriculumStepsTile.html" with curriculum=curriculum %}
+      </div>
+    {% endif %}
+
+    <h3 class="left">Standards</h3>
+    <div class="row" id="standards">
+      {% for standard, categories in curriculum.taxonomy.all|taxonomyHelper %}
+        <div class="col">
+          <b>{{standard}}</b>
+          <ul>
+            {% for category, taxonomies in categories.items %}
+              <li>{{category}} <span class="fa fa-plus-circle"></span><span class="fa fa-minus-circle" style="display:none;"></span></li>
+              <ul style="display:none;">
+                {% for taxonomy in taxonomies %}
+                  <li>{% if taxonomy.code %}<a href="#">[{{taxonomy.code}}]</a>{% endif %} {{taxonomy}}</li>
+                {% endfor %}
+              </ul>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endfor %}
+    </div>
+
+    <h3 class="left">Compatibility</h3>
+    <div class="row" id="compatibility">
+      {% for system in systems %}
+        <div class="col compatible-item {% if system not in curriculum.compatible_system.all %} incompatible {% endif %}">
+          <span class="fa fa-{{system.icon}}"></span><br>
+          {{system.name}}
+        </div>
+      {% endfor %}
+    </div>
+
+    <div class="overview">
+      <h3 class="left">Overview</h3>
+      <div>{{curriculum.overview|safe}}</div>
+    </div>
+
+    <!-- ACKNOWLEDGEMENT -->
+    {% if curriculum.acknowledgement %}
+      <h3 class="left">Acknowledgement</h3>
+      <div class="acknowledgement" id="acknowledgement">
+        {{curriculum.acknowledgement|safe}}
+      </div>
+    {% endif %}
+    {% include "ctstem_app/CurriculumPreviewActions.html" with curriculum=curriculum %}
+  </div>
+  <script type="text/javascript">
+    $(function(){
+      $('#standards span.fa').click(function(){
+        var li = $(this).closest('li');
+        var next = $(li).next();
+        $(li).find('span.fa').toggle();
+        $(next).toggle();
+      });
+    });
+  </script>
+{% endblock %}

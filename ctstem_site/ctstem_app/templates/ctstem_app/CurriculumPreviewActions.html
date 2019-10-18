@@ -1,0 +1,35 @@
+{% load ctstem_extras %}
+<div class="row buttons">
+  <div class="col">
+    <a type="button" class="btn normal blue" href="#">Print</a>
+  </div>
+  <div class="col">
+    {% check_curriculum_permission curriculum.id 'assign' as has_assign_permission %}
+    {% if has_assign_permission == True %}
+      <a type="button" class="assign btn normal blue" aria-hidden="true" data-form="{% url 'ctstem:assignCurriculum' curriculum.id %}" aria-label="Assign Curriculum" title="Assign Curriculum">Assign</a>
+    {% elif user.is_authenticated %}
+      {% if curriculum.curriculum_type == 'U' %}
+        {% with msg="This unit cannot be assigned because all the underlying lessons are private and not locked.  If you need to assign this unit please ask the author to lock one or more lessons or make them public" %}
+        <a type="button" class="assign btn normal blue" aria-hidden="true" onclick="alert('{{msg}}');">Assign</a>
+        {% endwith %}
+      {% else %}
+        {% with msg="This curriculum cannot be assigned because it is private and not locked.  If you need to assign this curriculum please ask the author to lock the curriculum or make it public" %}
+        <a type="button" class="assign btn normal blue" aria-hidden="true" onclick="alert('{{msg}}');">Assign</a>
+        {% endwith %}
+      {% endif %}
+    {% endif %}
+  </div>
+  <div class="col">
+    {% check_curriculum_permission curriculum.id 'copy' as has_copy_permission %}
+    {% if has_copy_permission == True %}
+      <a type="button" class="btn normal orange" aria-hidden="true" aria-label="Create New Copy" title="Create New Copy" href="{% url 'ctstem:copyCurriculum' curriculum.id %}">Remix</a>
+    {% else %}
+      {% with msg="This curriculum cannot be assigned because it is private and not locked.  If you need to assign this curriculum please ask the author to lock the curriculum or make it public" %}
+      <a type="button" class="btn normal orange" aria-hidden="true" aria-label="Create New Copy" title="Create New Copy" onclick="alert('{{msg}}');">Remix</a>
+      {% endwith %}
+    {% endif %}
+  </div>
+  <div class="col">
+    <a type="button" class="btn normal white" href="#">Teacher Guide</a>
+  </div>
+</div>

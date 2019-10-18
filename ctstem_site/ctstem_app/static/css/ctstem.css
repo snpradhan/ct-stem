@@ -700,21 +700,21 @@ div.content#curricula div.row#curricula_filters .search {
   text-align: right;
   margin-top: 2em;
 }
-div.content#curricula div.row#curricula_tiles {
+div.row#curricula_tiles {
   justify-content: center;
   align-items: center;
 }
 
-div.content#curricula div.row#curricula_tiles .col {
+div.row#curricula_tiles .col {
   flex: 1 1 30%;
   text-align: center;
   margin: 2em auto;
 }
-div.content#curricula  div.row#curricula_tiles .col .tile {
+div.row#curricula_tiles .col .tile {
   display: inline-block;
   position: relative;
 }
-div.content#curricula  div.row#curricula_tiles .col .tile .bookmark {
+div.row#curricula_tiles .col .tile .bookmark, div.row#preview_head .col .bookmark {
   position: absolute;
   top:5px;
   right:5px;
@@ -722,12 +722,81 @@ div.content#curricula  div.row#curricula_tiles .col .tile .bookmark {
   z-index: 99;
   text-decoration: none;
 }
-div.content#curricula  div.row#curricula_tiles .col .tile .bookmark.bookmarked.fa-star {
+div.row#curricula_tiles .col .tile .bookmark.bookmarked.fa-star {
   color: var(--ctstem-color-yellow);
 }
-div.content#curricula  div.row#curricula_tiles .col .tile .bookmark.fa-star {
+div.row#curricula_tiles .col .tile .bookmark.fa-star {
   color: white;
 }
+
+div.content#preview {
+  width: 80%;
+}
+div.content#preview div.row#preview_head .col{
+  position: relative;
+}
+div.content#preview div.row#preview_head .col .icon{
+  width: 35em;
+}
+div.content#preview .icon img{
+  max-height: 100%;
+  max-width: 100%;
+}
+div.content#preview div.row {
+  display: flex;
+  margin-left: auto;
+  margin-right: auto;
+}
+div.content#preview div.row.underlying_curricula {
+  flex-flow: wrap;
+}
+div.content#preview > div {
+  margin-bottom: 5em;
+}
+div.content#preview p {
+  font-size: 1.5em;
+  line-height: 1.5em;
+}
+
+div.content#preview div.row .col .meta {
+  padding: 0 3em;
+}
+
+div.content#preview div.row .col .meta > div {
+  font-size: 1.6em;
+  font-weight: 600;
+  margin-bottom: 0.5em;
+}
+
+div.content#preview div.row.buttons .col {
+  margin-right: 3em;
+}
+
+div.content#preview div.row#compatibility .col.compatible-item {
+  font-family: Helvetica, sans-serif;
+  display: inline-block;
+  text-align: center;
+  color: black;
+  vertical-align: top;
+  margin-right: 3em;
+}
+
+div.content#preview div.row#compatibility .col.compatible-item span.fa {
+  font-size: 4em;
+}
+
+div.content#preview div.row#compatibility .col.compatible-item.incompatible {
+  text-decoration: line-through;
+  color: #ccc;
+}
+
+div.content#preview div.row#standards .col {
+  flex: 1;
+  font-size: 1.5em;
+  line-height: 1.5em;
+}
+
+
 /***********   CONTENT DIV END   ************/
 
 /******************
@@ -1115,6 +1184,16 @@ div.content #curricula_tile  .row.button a {
   border: 1px solid var(--ctstem-color-red) !important;
   background-color: #ffffff !important;
   color: var(--ctstem-color-red) !important;
+}
+
+.btn.orange,  button[class*="ornage"] {
+  background-color: var(--ctstem-color-ornage) !important;
+  color: white !important;
+}
+.btn.orange:hover, button[class*="orange"]:hover {
+  border: 1px solid var(--ctstem-color-orange) !important;
+  background-color: #ffffff !important;
+  color: var(--ctstem-color-orange) !important;
 }
 
 
