@@ -638,7 +638,15 @@ class QuestionForm(ModelForm):
     }
 
   def __init__(self, *args, **kwargs):
+    disable_fields = False
+    if 'disable_fields' in kwargs:
+      disable_fields = kwargs.pop('disable_fields')
+
     super(QuestionForm, self).__init__(*args, **kwargs)
+
+    if disable_fields:
+      self.fields['answer_field_type'].widget.attrs['disabled'] = True
+      self.fields['options'].widget.attrs['disabled'] = True
 
     for field_name, field in self.fields.items():
       field.widget.attrs['class'] = 'form-control'

@@ -3822,28 +3822,37 @@ def question(request, id=''):
   # check if the user has permission to add a question
   if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'researcher') == False and hasattr(request.user, 'author') == False and hasattr(request.user, 'teacher') == False:
     return http.HttpResponseNotFound('<h1>You do not have the privilege to add a question</h1>')
+  disable_fields = False
   if '' == id:
     question = models.Question()
     title = 'Add Question'
   else:
     question = models.Question.objects.get(id=id)
+    curricula = models.Curriculum.objects.all().filter(steps__curriculumquestion__question=question)
+    is_assigned = False
+    for curriculum in curricula:
+      is_assigned = is_curriculum_assigned(request, curriculum.id)
+      if is_assigned:
+        break
+    if hasattr(request.user, 'administrator') == False and is_assigned:
+      disable_fields = True
     title = 'Edit Question'
 
   if 'GET' == request.method:
-    questionForm = forms.QuestionForm(instance=question)
-    context = {'questionForm': questionForm, 'title': title}
+    questionForm = forms.QuestionForm(instance=question, disable_fields=disable_fields)
+    context = {'questionForm': questionForm, 'title': title, 'disable_fields': disable_fields}
     return render(request, 'ctstem_app/Question.html', context)
 
   elif 'POST' == request.method:
     data = request.POST.copy()
-    questionForm = forms.QuestionForm(data, request.FILES, instance=question)
+    questionForm = forms.QuestionForm(data, request.FILES, instance=question, disable_fields=disable_fields)
     response_data = {}
     if questionForm.is_valid():
       question = questionForm.save()
       response_data = {'success': True, 'question_id': question.id, 'question_text': question.question_text}
     else:
       print questionForm.errors
-      context = {'questionForm': questionForm, 'title': title}
+      context = {'questionForm': questionForm, 'title': title, 'disable_fields': disable_fields}
       html = render_to_string('ctstem_app/Question.html', context, context_instance=RequestContext(request))
       response_data = {'success': False, 'html': html, 'error': 'The question could not be saved because there were errors. Please check the errors below.'}
 

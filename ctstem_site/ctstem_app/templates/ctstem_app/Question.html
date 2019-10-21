@@ -8,6 +8,9 @@
     <div id="questionMsg" class="msg">
       <ul class="errorlist">
         <li></li>
+        {% if disable_fields %}
+        <li class="warning">The curriculum has already been assigned and so some of the fields below cannot be modified</li>
+        {% endif %}
       </ul>
     </div>
     <form class="form" id="questionForm" method="post" enctype="multipart/form-data" action="{% if questionForm.instance.id %} {% url 'ctstem:question' questionForm.instance.id %} {% else %} {% url 'ctstem:newQuestion' %} {% endif %}">
@@ -38,6 +41,10 @@
               {{field}}
               {% if field.name == 'question_text' %}
                 <input type="hidden" id="question_html" name="question_html" />
+              {% elif field.name == 'answer_field_type' or field.name == 'options' %}
+                {% if disable_fields %}
+                  {{field.as_hidden}}
+                {% endif %}
               {% endif %}
               <div class="help warning">{{field.help_text|safe}}</div>
             </div>
@@ -201,7 +208,7 @@ $(function (){
         else{
           $('#questionModal').html(data['html']);
           $("#questionForm input[id='id_step']").val(id_step);
-          $('#questionMsg .errorlist li').addClass('error').html(data['error']);
+          $('#questionMsg .errorlist li:first-child').addClass('error').html(data['error']);
         }
         return false;
       },
