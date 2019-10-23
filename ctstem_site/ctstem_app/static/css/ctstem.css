@@ -5,6 +5,7 @@
 :root {
   --ctstem-font-family: "proxima-nova", sans-serif;
   --ctstem-color-yellow: #FFD028;
+  --ctstem-color-pale-yellow: #FFF8DF;
   --ctstem-color-blue: #00ADFF;
   --ctstem-color-medium-blue: #3A74E8;
   --ctstem-color-dark-blue: #343D51;
@@ -714,6 +715,9 @@ div.row#curricula_tiles .col .tile {
   display: inline-block;
   position: relative;
 }
+div.row#curricula_tiles .col .tile .detail{
+  color: black;
+}
 div.row#curricula_tiles .col .tile .detail .period{
   color: inherit;
 }
@@ -722,15 +726,18 @@ div.row#curricula_tiles .col .tile .detail .others{
 }
 div.row#curricula_tiles .col .tile.unit .detail {
   background-color: var(--ctstem-color-yellow);
-  color: black;
 }
 div.row#curricula_tiles .col .tile.lesson .detail {
-  background-color: var(--ctstem-color-orange);
-  color: white;
+  background-color: var(--ctstem-color-pale-yellow);
 }
 div.row#curricula_tiles .col .tile.assessment .detail {
-  background-color: var(--ctstem-color-green);
-  color: var(--ctstem-color-dark-blue);
+  background-color: white;
+}
+div.row#curricula_tiles .col .tile.archived .detail {
+  background-color: lightgray;
+}
+div.row#curricula_tiles .col .tile.archived .icon img{
+  opacity: 0.4;
 }
 div.row#curricula_tiles .col .tile .bookmark, div.row#preview_head .col .bookmark {
   position: absolute;
