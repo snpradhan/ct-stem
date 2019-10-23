@@ -532,6 +532,11 @@ def copyCurriculum(request, id=''):
       # non unit copy
       if original_curriculum.curriculum_type != 'U':
         copyCurriculumSteps(request, original_curriculum, new_curriculum)
+        # if copying an underlying curricula, add the new curriculum at the end of the list
+        if new_curriculum.unit:
+          new_curriculum.order = None
+          new_curriculum.save()
+          reorder_underlying_curricula(request, new_curriculum.unit.id)
       else:
         #unit copy
         #copy underlying lessons
@@ -545,6 +550,8 @@ def copyCurriculum(request, id=''):
           copyCurriculumSteps(request, lesson, new_lesson)
           new_lesson.unit = new_curriculum
           new_lesson.save()
+        reorder_underlying_curricula(request, new_curriculum.id)
+
 
       if hasattr(request.user, 'teacher'):
         messages.success(request, "A new curriculum '%s - v%s.' has been created and added to your My Curricula folder." % (new_curriculum.title, new_curriculum.version))
