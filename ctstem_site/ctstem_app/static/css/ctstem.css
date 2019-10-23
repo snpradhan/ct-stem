@@ -13,7 +13,7 @@
   --ctstem-color-light-gray: #C1C4D9;
   --ctstem-color-red: #F24878;
   --ctstem-color-green: #0AD35E;
-  --ctstem-color-ornage: #FA7921;
+  --ctstem-color-orange: #FA7921;
 }
 html {
   height: 100%;
@@ -714,6 +714,24 @@ div.row#curricula_tiles .col .tile {
   display: inline-block;
   position: relative;
 }
+div.row#curricula_tiles .col .tile .detail .period{
+  color: inherit;
+}
+div.row#curricula_tiles .col .tile .detail .others{
+  color: inherit;
+}
+div.row#curricula_tiles .col .tile.unit .detail {
+  background-color: var(--ctstem-color-yellow);
+  color: black;
+}
+div.row#curricula_tiles .col .tile.lesson .detail {
+  background-color: var(--ctstem-color-orange);
+  color: white;
+}
+div.row#curricula_tiles .col .tile.assessment .detail {
+  background-color: var(--ctstem-color-green);
+  color: var(--ctstem-color-dark-blue);
+}
 div.row#curricula_tiles .col .tile .bookmark, div.row#preview_head .col .bookmark {
   position: absolute;
   top:5px;
@@ -1186,8 +1204,8 @@ div.content #curricula_tile  .row.button a {
   color: var(--ctstem-color-red) !important;
 }
 
-.btn.orange,  button[class*="ornage"] {
-  background-color: var(--ctstem-color-ornage) !important;
+.btn.orange,  button[class*="orange"] {
+  background-color: var(--ctstem-color-orange) !important;
   color: white !important;
 }
 .btn.orange:hover, button[class*="orange"]:hover {

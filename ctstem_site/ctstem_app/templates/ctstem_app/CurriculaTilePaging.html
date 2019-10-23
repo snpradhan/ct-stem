@@ -2,7 +2,15 @@
 {% if curricula %}
   {% for curriculum in curricula %}
     <div class="col">
-      <div class="tile">
+      <div class="tile
+            {% if curriculum.curriculum_type == 'U' %}
+              unit
+            {% elif curriculum.curriculum_type == 'L' %}
+              lesson
+            {% else %}
+              assessment
+            {% endif %}
+            ">
         <a href="{% url 'ctstem:previewCurriculumNew' curriculum.id %}">
           <div class="icon">
             {% if curriculum.icon %}
@@ -11,7 +19,7 @@
               <img src="/static/img/unit.png">
             {% elif curriculum.curriculum_type == 'L' %}
               <img src="/static/img/lesson.png">
-            {% elif curriculum.curriculum_type == 'A' or curriculum.curriculum_type == 'S'%}
+            {% elif curriculum.curriculum_type == 'A' %}
               <img src="/static/img/assessment.png">
             {% endif %}
           </div>

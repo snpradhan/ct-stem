@@ -36,7 +36,7 @@ ul.errorlist li, ul.messages li {
   color: var(--ctstem-color-green);
 }
 .warning {
-  color: var(--ctstem-color-ornage);
+  color: var(--ctstem-color-orange);
 }
 .info {
   color: var(--ctstem-color-blue);;

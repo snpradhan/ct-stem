@@ -17,6 +17,10 @@
         <a type="button" class="assign btn normal blue" aria-hidden="true" onclick="alert('{{msg}}');">Assign</a>
         {% endwith %}
       {% endif %}
+    {% else %}
+      {% with msg="Please login to assign this curriculum" %}
+      <a type="button" class="assign btn normal blue" aria-hidden="true" onclick="alert('{{msg}}');">Assign</a>
+      {% endwith %}
     {% endif %}
   </div>
   <div class="col">
@@ -24,12 +28,19 @@
     {% if has_copy_permission == True %}
       <a type="button" class="btn normal orange" aria-hidden="true" aria-label="Create New Copy" title="Create New Copy" href="{% url 'ctstem:copyCurriculum' curriculum.id %}">Remix</a>
     {% else %}
-      {% with msg="This curriculum cannot be assigned because it is private and not locked.  If you need to assign this curriculum please ask the author to lock the curriculum or make it public" %}
-      <a type="button" class="btn normal orange" aria-hidden="true" aria-label="Create New Copy" title="Create New Copy" onclick="alert('{{msg}}');">Remix</a>
-      {% endwith %}
+      {% if user.is_authenticated %}
+        {% with msg="This curriculum cannot be assigned because it is private and not locked.  If you need to assign this curriculum please ask the author to lock the curriculum or make it public" %}
+        <a type="button" class="btn normal orange" aria-hidden="true" aria-label="Create New Copy" title="Create New Copy" onclick="alert('{{msg}}');">Remix</a>
+        {% endwith %}
+      {% else %}
+        {% with msg="Please login to remix this curriculum" %}
+        <a type="button" class="btn normal orange" aria-hidden="true" aria-label="Create New Copy" title="Create New Copy" onclick="alert('{{msg}}');">Remix</a>
+        {% endwith %}
+      {% endif %}
     {% endif %}
   </div>
   <div class="col">
-    <a type="button" class="btn normal white" href="#">Teacher Guide</a>
+    <a type="button" class="btn normal white teacher_guide" href="#">Teacher Guide</a>
+    <a type="button" class="btn normal white preview" href="#" style="display:none;">Preview</a>
   </div>
 </div>

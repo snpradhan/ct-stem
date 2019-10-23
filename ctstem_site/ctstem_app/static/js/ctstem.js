@@ -315,7 +315,6 @@ $(function (){
   $('body').on("click", "a.assign", function(e){
     e.preventDefault();
     var url = $(this).data("form");
-    alert(url);
     $("#assignmentModal").load(url, function() {
       $(this).modal('show');
     });
