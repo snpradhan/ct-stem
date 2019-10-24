@@ -4,6 +4,7 @@
 /* Page Element Styles */
 :root {
   --ctstem-font-family: "proxima-nova", sans-serif;
+  --ctstem-color-dark-yellow: #B2911C;
   --ctstem-color-yellow: #FFD028;
   --ctstem-color-light-yellow: #FFDF6F;
   --ctstem-color-pale-yellow: #FFF8DF;
@@ -758,13 +759,15 @@ div.row#curricula_tiles .col .tile .bookmark, div.row#preview_head .col .bookmar
   z-index: 99;
   text-decoration: none;
 }
-div.row#curricula_tiles .col .tile .bookmark.bookmarked.fa-star {
+div.row .col .bookmark.fa-star {
   color: var(--ctstem-color-yellow);
 }
-div.row#curricula_tiles .col .tile .bookmark.fa-star {
-  color: white;
+div.row .col .bookmark.fa-star-o{
+  color: var(--ctstem-color-yellow);
 }
-
+div.row .col .bookmark.fa:hover {
+  cursor: pointer;
+}
 div.content#preview {
   width: 80%;
 }

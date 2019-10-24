@@ -665,3 +665,31 @@ function add_to_collaborator_table(collaborator_table, current_user_id, user_id,
 
   $(collaborator_row).show();
 }
+
+function bind_bookmark(){
+  $('a.bookmark').off("click");
+  $('a.bookmark').on("click", function(e){
+    e.preventDefault();
+    var url = $(this).attr('href');
+    if(url){
+      var favorite_container = $(this).parent();
+      $.ajax({
+        type: "GET",
+        url: url,
+        success: function(data){
+          $(favorite_container).find('a.bookmark').each(function(){
+            $(this).toggle();
+          });
+          return false;
+        },
+        error: function(xhr, ajaxOptions, thrownError){
+          alert("Something went wrong.  Try again later!");
+        },
+      });
+    }
+    else{
+      var msg = $(this).data('title');
+      alert(msg);
+    }
+  });
+}

@@ -29,10 +29,10 @@
           <div class="favorite">
             {% check_curriculum_permission curriculum.id 'favorite' as has_favorite_permission %}
             {% if has_favorite_permission == True %}
-              <a class="bookmark bookmarked util-button fa fa-star" href="{% url 'ctstem:removeBookmark' curriculum.id %}" style="{% if curriculum|is_bookmarked:user.teacher %} display: inline-block; {% else %} display: none; {% endif %}" title="Remove from Favorites"></a>
-              <a class="bookmark util-button fa fa-star" href="{% url 'ctstem:bookmarkCurriculum' curriculum.id %}" style="{% if curriculum|is_bookmarked:user.teacher %} display: none; {% else %} display: inline-block; {% endif %}" title="Add to Favorites"></a>
+              <a class="bookmark util-button fa fa-star" href="{% url 'ctstem:removeBookmark' curriculum.id %}" style="{% if curriculum|is_bookmarked:user.teacher %} display: inline-block; {% else %} display: none; {% endif %}" title="Remove from Favorites"></a>
+              <a class="bookmark util-button fa fa-star-o" href="{% url 'ctstem:bookmarkCurriculum' curriculum.id %}" style="{% if curriculum|is_bookmarked:user.teacher %} display: none; {% else %} display: inline-block; {% endif %}" title="Add to Favorites"></a>
             {% else %}
-              <a class="bookmark util-button fa fa-star" data-title="You need to be logged in as a teacher to favorite this curriculum"></a>
+              <a class="bookmark util-button fa fa-star-o" data-title="You need to be logged in as a teacher to favorite this curriculum"></a>
             {% endif %}
           </div>
         {% endif %}
@@ -153,6 +153,8 @@
         $('a.teacher_guide').show();
         $('a.preview').hide();
       });
+
+      bind_bookmark();
     });
   </script>
 {% endblock %}
