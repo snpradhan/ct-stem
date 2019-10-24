@@ -9,6 +9,7 @@
 
 .tile .icon {
   background-color: lightgray;
+  border-bottom: 2px solid white;
   /*height: 24em;*/
 }
 .tile .icon img {
