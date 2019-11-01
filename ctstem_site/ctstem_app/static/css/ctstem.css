@@ -17,6 +17,7 @@
   --ctstem-color-red: #F24878;
   --ctstem-color-green: #0AD35E;
   --ctstem-color-orange: #FA7921;
+  --ctstem-color-purple: #5050C9;
 }
 html {
   height: 100%;
@@ -723,6 +724,18 @@ div.row#curricula_tiles .col .tile {
   position: relative;
   box-shadow: unset;
 }
+
+div.row#curricula_tiles .col .tile:hover {
+  z-index: 2;
+  -webkit-transition: all 200ms ease-in;
+  -webkit-transform: scale(1.1);
+  -ms-transition: all 200ms ease-in;
+  -ms-transform: scale(1.1);
+  -moz-transition: all 200ms ease-in;
+  -moz-transform: scale(1.1);
+  transition: all 200ms ease-in;
+  transform: scale(1.1);
+}
 div.row#curricula_tiles .col .tile .detail{
   color: black;
 }
@@ -779,6 +792,7 @@ div.content#preview div.row#preview_head .col{
 }
 div.content#preview div.row#preview_head .col .icon{
   width: 35em;
+  background-color: #b5b5b5;
 }
 div.content#preview .icon img{
   max-height: 100%;
@@ -800,14 +814,28 @@ div.content#preview p {
   line-height: 1.5em;
 }
 
-div.content#preview div.row .col .meta {
+div.content#preview div.row .col.meta {
   padding: 0 3em;
+  flex-grow: 1;
 }
 
-div.content#preview div.row .col .meta > div {
+div.content#preview div.row .col.meta > div {
   font-size: 1.6em;
   font-weight: 600;
   margin-bottom: 0.5em;
+}
+
+div.content#preview div.row.unit#preview_head .col.meta {
+  background-color: var(--ctstem-color-yellow);
+}
+div.content#preview div.row.lesson#preview_head .col.meta{
+  background-color: var(--ctstem-color-pale-yellow);
+}
+div.content#preview div.row.assessment#preview_head .col.meta{
+  background-color: white;
+}
+div.content#preview div.row.archived#preview_head .col.meta{
+  background-color: lightgray;
 }
 
 div.content#preview div.row.buttons .col {
@@ -1238,6 +1266,24 @@ div.content #curricula_tile  .row.button a {
   color: var(--ctstem-color-orange) !important;
 }
 
+.btn.green,  button[class*="green"] {
+  background-color: var(--ctstem-color-green) !important;
+  color: white !important;
+}
+.btn.green:hover, button[class*="green"]:hover {
+  border: 1px solid var(--ctstem-color-green) !important;
+  background-color: #ffffff !important;
+  color: var(--ctstem-color-green) !important;
+}
+.btn.purple,  button[class*="purple"] {
+  background-color: var(--ctstem-color-purple) !important;
+  color: white !important;
+}
+.btn.purple:hover, button[class*="purple"]:hover {
+  border: 1px solid var(--ctstem-color-purple) !important;
+  background-color: #ffffff !important;
+  color: var(--ctstem-color-purple) !important;
+}
 
 /********************/
 

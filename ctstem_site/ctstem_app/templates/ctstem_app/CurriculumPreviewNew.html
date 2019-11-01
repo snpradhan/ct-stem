@@ -9,9 +9,19 @@
 {% block content %}
   {{block.super}}
   <div class="content" id="preview">
-    <div class="row" id="preview_head">
+    <div id="preview_head" class="row
+            {% if curriculum.curriculum_type == 'U' %}
+              unit
+            {% elif curriculum.curriculum_type == 'L' %}
+              lesson
+            {% else %}
+              assessment
+            {% endif %}
+            {% if curriculum.status == 'A' %}
+              archived
+            {% endif %}
+            ">
       <div class="col">
-
         <div class="icon">
           {% if curriculum.unit and curriculum.unit.icon %}
             <img src="{{curriculum.unit.icon.url}}"/>
@@ -37,21 +47,33 @@
           </div>
         {% endif %}
       </div>
-      <div class="col">
-        <div class="meta">
-          <h3 class="left">{{curriculum.title}} - v{{curriculum.version}}.</h3>
-          <div>
-            Subject:
-            {% if curriculum.subject.all %}
-              {{curriculum.subject.all|join:", "}}
+      <div class="col meta">
+        <h3 class="left">
+          {{curriculum.title}}
+          {% if curriculum.locked_by %}
+            {% if user.administrator or user.researcher or user.author %}
+              <i class="fa fa-lock" aria-hidden="true" title="Locked by {{curriculum.locked_by}}"></i>
+            {% elif user.teacher %}
+              {% if user in curriculum.authors.all or user.teacher in curriculum.shared_with.all %}
+                <i class="fa fa-lock" aria-hidden="true" title="Locked by {{curriculum.locked_by}}"></i>
+              {% endif %}
             {% endif %}
-          </div>
-          <div>
-            Time: {{curriculum.time}}
-          </div>
-          <div>
-            Level: {{curriculum.level}}
-          </div>
+          {% endif %}
+        </h3>
+        <div>
+          Subject:
+          {% if curriculum.subject.all %}
+            {{curriculum.subject.all|join:", "}}
+          {% endif %}
+        </div>
+        <div>
+          Time: {{curriculum.time}}
+        </div>
+        <div>
+          Level: {{curriculum.level}}
+        </div>
+        <div>
+          Version: v{{curriculum.version}}.
         </div>
       </div>
     </div>

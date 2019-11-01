@@ -3658,7 +3658,15 @@ def check_curriculum_permission(request, curriculum_id, action, step_order=-1):
           # has permission so far
           if has_permission:
             #check if the curriculum is assigned
-            is_assigned = is_curriculum_assigned(request, curriculum_id)
+            is_assigned = False
+            if curriculum.curriculum_type == 'U':
+              for lesson in curriculum.underlying_curriculum.all():
+                is_assigned = is_curriculum_assigned(request, lesson.id)
+                if is_assigned:
+                  break;
+            else:
+              is_assigned = is_curriculum_assigned(request, curriculum_id)
+
             if is_assigned:
               if action == 'modify':
                 #admins can edit any curriculum that are assigned
