@@ -21,7 +21,11 @@
       <div class="row_container">
         <form method="post" action="{% url 'ctstem:curriculatiles' %}" id="curricula_search">
           {% csrf_token %}
-          <div class="row" id="curricula_filters">
+          <div class="form-group" id="curricula_filters_toggle">
+            <label>Show Filters <span class="fa fa-plus-circle"></span></label>
+            <label style="display:none;">Hide Filters <span class="fa fa-minus-circle"></span></label>
+          </div>
+          <div class="row" id="curricula_filters" style="display:none;">
             {% if searchForm.subjects %}
               <div class="col form-group">
                 <label>{{searchForm.subjects.label|title}}</label>
@@ -122,6 +126,11 @@
           $(this).hide();
         }
       });
+
+      $('#curricula_filters_toggle label').click(function(){
+        $('#curricula_filters_toggle label').toggle();
+        $('#curricula_filters').toggle();
+      })
 
       function bind_paging() {
         $('a.page').on('click', function(e){

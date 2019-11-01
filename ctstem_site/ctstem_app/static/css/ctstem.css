@@ -674,11 +674,13 @@ div.content#curricula div.row {
   margin-left: auto;
   margin-right: auto;
 }
-div.content#curricula div.row#curricula_filters {
+div.content#curricula div.row#curricula_filters, div.content#curricula div#curricula_filters_toggle {
   color: white;
-  padding-top: 3em;
+  padding-top: 1em;
 }
-
+div.content#curricula div#curricula_filters_toggle {
+  text-align: right;
+}
 div.content#curricula div.row#curricula_filters .col {
   flex: 1 1 auto;
 }
