@@ -683,6 +683,7 @@ div.content#curricula div#curricula_filters_toggle {
 }
 div.content#curricula div.row#curricula_filters .col {
   flex: 1 1 auto;
+  width: auto !important;
 }
 
 div.content#curricula div.row#curricula_filters input {
