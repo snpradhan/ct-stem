@@ -55,7 +55,7 @@
                 {{curriculum.time}}
               {% endif %}
             </div>
-            <div class="title">{{curriculum.title}} - v{{curriculum.version}}.</div>
+            <div class="title">{{curriculum.title}}</div>
             <div class="others">
               <div class="author">
                 {% if curriculum.authors.all %}
@@ -74,6 +74,9 @@
               <div class="used_by">
                 Used by {{curriculum.usage_by_student}} Students
               </div>
+            </div>
+            <div class="title version">
+              v{{curriculum.version}}.
             </div>
           </div>
         </a>

@@ -48,6 +48,11 @@
   font-size: 1.3em;
   font-weight: 400;
 }
+.tile .detail .version {
+  position: absolute;
+  bottom: 0.8em;
+  right: 0.8em;
+}
 .tile .detail .others .author {
   margin-bottom: 0.6em;
 }
