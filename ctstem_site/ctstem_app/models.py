@@ -669,6 +669,22 @@ def active(sender, instance, **kwargs):
 
     send_mail('CT-STEM - Account Activated', body, settings.DEFAULT_FROM_EMAIL, [instance.email], html_message=body)
 
+#signal to check if curriculum status has changed
+@receiver(pre_save, sender=Curriculum)
+def check_curriculum_status_change(sender, instance, **kwargs):
+  try:
+    obj = sender.objects.get(pk=instance.pk)
+  except sender.DoesNotExist:
+    pass # Object is new, so field hasn't technically changed, but you may want to do something else here.
+  else:
+    if not obj.status == instance.status: # status has changed
+      # if changing the status of a unit, also update the status of underlying curricula
+      if obj.curriculum_type == 'U':
+        Curriculum.objects.filter(unit=obj).update(status=instance.status)
+      # if changing the status of underlying curriculum to Public, also make Unit Public
+      elif obj.unit and obj.unit.status != 'P' and instance.status == 'P':
+        Curriculum.objects.filter(id=obj.unit.id).update(status='P')
+
 def resizeImage(img, minwidth, minheight):
   try:
     #check if the file actually exists

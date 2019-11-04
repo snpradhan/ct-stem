@@ -268,13 +268,6 @@ def curriculum(request, id=''):
         for obj in formset.deleted_objects:
           obj.delete()
 
-        #if archiving a unit, also archive the underlying lessons
-        if savedCurriculum.curriculum_type == 'U' and savedCurriculum.status == 'A':
-          archiveCurriculum(request, savedCurriculum.id)
-        # update the last modified timestamp on the unit
-        if savedCurriculum.curriculum_type == 'L' and savedCurriculum.unit:
-          unit = savedCurriculum.unit
-          unit.save()
         if request.is_ajax():
           response_data = {'status': 1, 'message': 'Curriculum Saved.'}
           return http.HttpResponse(json.dumps(response_data), content_type = 'application/json')
