@@ -194,7 +194,8 @@ def curriculatiles(request):
   if request.method == 'GET' or request.method == 'POST':
     curricula = models.Curriculum.objects.extra(select={'modified_year': 'EXTRACT(YEAR FROM modified_date)',
                           'modified_month': 'EXTRACT(MONTH FROM modified_date)',
-                          'modified_day': 'EXTRACT(DAY FROM modified_date)'})
+                          'modified_day': 'EXTRACT(DAY FROM modified_date)',
+                          'is_active': "status <> 'A'"})
 
     search_criteria = None
     if request.method == 'GET':
@@ -204,13 +205,13 @@ def curriculatiles(request):
 
     elif request.method == 'POST':
       data = request.POST.copy()
-      print 'data', data
       searchForm = forms.CurriculaSearchForm(user=request.user, data=data)
       search_criteria = eval(json.dumps(dict(data.iterlists())))
 
     curricula = searchCurriculaTiles(request, curricula, search_criteria)
 
-    sort_order = [{'order_by': 'feature_rank', 'direction': 'asc', 'ignorecase': 'false'},
+    sort_order = [{'order_by': 'is_active', 'direction': 'desc', 'ignorecase': 'false'},
+                {'order_by': 'feature_rank', 'direction': 'asc', 'ignorecase': 'false'},
                 {'order_by': 'modified_year', 'direction': 'desc', 'ignorecase': 'false'},
                 {'order_by': 'modified_month', 'direction': 'desc', 'ignorecase': 'false'},
                 {'order_by': 'modified_day', 'direction': 'desc', 'ignorecase': 'false'},
