@@ -705,7 +705,7 @@ def check_curriculum_status_change(sender, instance, **kwargs):
       # if changing the status of a unit, also update the status of underlying curricula
       if obj.curriculum_type == 'U':
         Curriculum.objects.filter(unit=obj).update(status=instance.status)
-      # if changing the status of underlying curriculum to Public, also make Unit Public
+      # if changing the status of an underlying curriculum to Public, also make Unit Public
       elif obj.unit and obj.unit.status != 'P' and instance.status == 'P':
         Curriculum.objects.filter(id=obj.unit.id).update(status='P')
 

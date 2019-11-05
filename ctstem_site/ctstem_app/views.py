@@ -2168,7 +2168,6 @@ def searchCurriculaTiles(request, queryset, search_criteria):
     if 'keywords' in search_criteria and search_criteria['keywords'][0] != '':
 
       keywords = search_criteria['keywords'][0]
-      print 'keywords', keywords
 
       #keyword search for units and standalone curricula
       keyword_filter = Q(title__icontains=keywords) | Q(time__icontains=keywords)
@@ -2247,12 +2246,9 @@ def searchCurriculaTiles(request, queryset, search_criteria):
       query_filter = query_filter | Q(bookmarked__teacher=request.user.teacher)
       query_filter = query_filter | Q(shared_with=request.user.teacher)
 
-
-  print 'query_filter', query_filter
   raw_result = queryset.filter(query_filter)
   if search_units:
     units = raw_result.values_list('unit', flat=True).distinct().order_by()
-    print 'units', units
     filtered_result = queryset.filter(Q(Q(unit__isnull=True), query_filter) | Q(id__in=units)).distinct()
   else:
     filtered_result = queryset.filter(Q(unit__isnull=True), query_filter).distinct()
