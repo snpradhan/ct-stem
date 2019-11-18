@@ -838,8 +838,15 @@ div.content#preview div.row.archived#preview_head .col.meta{
   background-color: lightgray;
 }
 
+div.content#preview div.row.buttons {
+  flex-wrap: wrap;
+}
+
 div.content#preview div.row.buttons .col {
   margin-right: 3em;
+  margin-left: unset;
+  width: auto !important;
+  margin-bottom: 1.5em;
 }
 
 div.content#preview div.row#compatibility .col.compatible-item {
