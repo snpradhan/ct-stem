@@ -79,12 +79,11 @@
     </div>
     {% include "ctstem_app/CurriculumPreviewActions.html" with curriculum=curriculum %}
     <div class="preview">
-      {% if curriculum.credits %}
-        <div class="credits">
-          <h3 class="left">Credits</h3>
-          <div>{{curriculum.credits|safe}}</div>
-        </div>
-      {% endif %}
+      <div class="overview">
+        <h3 class="left">Overview</h3>
+        <div>{{curriculum.overview|safe}}</div>
+      </div>
+
       {% if curriculum.curriculum_type == 'U' %}
         {% get_underlying_curriculum curriculum.id as underlying_curriculum %}
         {% if underlying_curriculum %}
@@ -130,10 +129,12 @@
         {% endfor %}
       </div>
 
-      <div class="overview">
-        <h3 class="left">Overview</h3>
-        <div>{{curriculum.overview|safe}}</div>
-      </div>
+      {% if curriculum.credits %}
+        <div class="credits">
+          <h3 class="left">Credits</h3>
+          <div>{{curriculum.credits|safe}}</div>
+        </div>
+      {% endif %}
 
       <!-- ACKNOWLEDGEMENT -->
       {% if curriculum.acknowledgement %}
