@@ -26,15 +26,15 @@
   <div class="col">
     {% check_curriculum_permission curriculum.id 'copy' as has_copy_permission %}
     {% if has_copy_permission == True %}
-      <a type="button" class="btn normal orange" aria-hidden="true" aria-label="Create New Copy" title="Create New Copy" href="{% url 'ctstem:copyCurriculum' curriculum.id %}">Remix</a>
+      <a type="button" class="btn normal blue" aria-hidden="true" aria-label="Create New Copy" title="Create New Copy" href="{% url 'ctstem:copyCurriculum' curriculum.id %}">Remix</a>
     {% else %}
       {% if user.is_authenticated %}
         {% with msg="This curriculum cannot be assigned because it is private and not locked.  If you need to assign this curriculum please ask the author to lock the curriculum or make it public" %}
-        <a type="button" class="btn normal orange" aria-hidden="true" aria-label="Create New Copy" title="Create New Copy" onclick="alert('{{msg}}');">Remix</a>
+        <a type="button" class="btn normal blue" aria-hidden="true" aria-label="Create New Copy" title="Create New Copy" onclick="alert('{{msg}}');">Remix</a>
         {% endwith %}
       {% else %}
         {% with msg="Please login to remix this curriculum" %}
-        <a type="button" class="btn normal orange" aria-hidden="true" aria-label="Create New Copy" title="Create New Copy" onclick="alert('{{msg}}');">Remix</a>
+        <a type="button" class="btn normal blue" aria-hidden="true" aria-label="Create New Copy" title="Create New Copy" onclick="alert('{{msg}}');">Remix</a>
         {% endwith %}
       {% endif %}
     {% endif %}
@@ -46,12 +46,12 @@
   {% if has_modify_permission == True %}
     <div class="col">
       {% if curriculum.status == 'A' %}
-        <a type="button" class="btn normal green" aria-hidden="true" aria-label="Edit Curriculum" title="Edit Curriculum" href="{% url 'ctstem:curriculum' curriculum.id %}?back_url={{ back_url }}"
+        <a type="button" class="btn normal blue" aria-hidden="true" aria-label="Edit Curriculum" title="Edit Curriculum" href="{% url 'ctstem:curriculum' curriculum.id %}?back_url={{ back_url }}"
         onclick="return confirm('This curriculum has been archived.  Are you sure you want to edit this curriculum?');">
           Edit
         </a>
       {% else %}
-        <a type="button" class="btn normal green" aria-hidden="true" aria-label="Edit Curriculum" title="Edit Curriculum" href="{% url 'ctstem:curriculum' curriculum.id %}?back_url={{ back_url }}">Edit</a>
+        <a type="button" class="btn normal blue" aria-hidden="true" aria-label="Edit Curriculum" title="Edit Curriculum" href="{% url 'ctstem:curriculum' curriculum.id %}?back_url={{ back_url }}">Edit</a>
       {% endif %}
     </div>
   {% endif %}
@@ -61,7 +61,7 @@
   {% check_curriculum_permission curriculum.id 'delete' as has_delete_permission %}
   {% if has_delete_permission == True %}
     <div class="col">
-      <a type="button" class="btn normal red" aria-hidden="true" aria-label="Delete Curriculum" title="Delete Curriculum" href="{% url 'ctstem:deleteCurriculum' curriculum.id %}" onclick="return confirm('Are you sure you want to delete {{curriculum.title}}?')">
+      <a type="button" class="btn normal blue" aria-hidden="true" aria-label="Delete Curriculum" title="Delete Curriculum" href="{% url 'ctstem:deleteCurriculum' curriculum.id %}" onclick="return confirm('Are you sure you want to delete {{curriculum.title}}?')">
         Delete
       </a>
      </div>
@@ -71,7 +71,7 @@
   {% check_curriculum_permission curriculum.id 'lock' as has_lock_permission %}
   {% if has_lock_permission == True %}
     <div class="col">
-      <a type="button" class="btn normal yellow" aria-hidden="true" aria-label="Lock Curriculum" title="Lock Curriculum" href="{% url 'ctstem:lockCurriculum' curriculum.id %}">Lock</a>
+      <a type="button" class="btn normal blue" aria-hidden="true" aria-label="Lock Curriculum" title="Lock Curriculum" href="{% url 'ctstem:lockCurriculum' curriculum.id %}">Lock</a>
     </div>
   {% endif %}
 
@@ -79,13 +79,13 @@
   {% check_curriculum_permission curriculum.id 'unlock' as has_unlock_permission %}
   {% if has_unlock_permission == True %}
     <div class="col">
-      <a type="button" class="btn normal yellow" aria-hidden="true" aria-label="Unlock Curriculum" title="Unlock Curriculum" href="{% url 'ctstem:unlockCurriculum' curriculum.id %}">Unlock</a>
+      <a type="button" class="btn normal blue" aria-hidden="true" aria-label="Unlock Curriculum" title="Unlock Curriculum" href="{% url 'ctstem:unlockCurriculum' curriculum.id %}">Unlock</a>
     </div>
   {% endif %}
   <!-- Teacher Guide -->
   <div class="col">
-    <a type="button" class="btn normal white teacher_guide" href="#">Teacher Guide</a>
-    <a type="button" class="btn normal white preview" href="#" style="display:none;">Preview</a>
+    <a type="button" class="btn normal blue teacher_guide" href="#">Teacher Guide</a>
+    <a type="button" class="btn normal blue preview" href="#" style="display:none;">Preview</a>
   </div>
 
   <!-- Export Student Data -->
@@ -93,7 +93,7 @@
   {% if has_export_permission == True %}
     {% if curriculum|has_response:request.user %}
       <div class="col">
-        <a type="button" class="btn normal purple" aria-hidden="true" aria-label="Export Student Response" title="Export Student Response" href="{% url 'ctstem:export_all_response' curriculum.id %}">
+        <a type="button" class="btn normal blue" aria-hidden="true" aria-label="Export Student Response" title="Export Student Response" href="{% url 'ctstem:export_all_response' curriculum.id %}">
           Export Student Responses
         </a>
       </div>
