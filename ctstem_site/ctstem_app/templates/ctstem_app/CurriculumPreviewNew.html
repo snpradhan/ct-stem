@@ -38,6 +38,9 @@
 
       <div class="col meta">
         <h3 class="left">
+          {% if curriculum.unit %}
+            {{curriculum.order}}.
+          {% endif %}
           {{curriculum.title}}
           {% if curriculum.locked_by %}
             {% if user.administrator or user.researcher or user.author %}
@@ -102,6 +105,27 @@
         </div>
       {% endif %}
 
+      {% if curriculum.unit %}
+        <div class="row buttons">
+          <div class="col">
+            <a type="button" class="btn normal blue" aria-hidden="true" href="{% url 'ctstem:previewCurriculumNew' curriculum.unit.id %}" aria-label="Back to Unit" title="Back to Unit">Back to Unit</a>
+          </div>
+          <div class="col">
+            {% with previous_curriculum=curriculum.id|get_previous_curriculum %}
+              {% if previous_curriculum %}
+                <a type="button" class="btn normal blue" aria-hidden="true" href="{% url 'ctstem:previewCurriculumNew' previous_curriculum.id %}" aria-label="Previous Lesson" title="Previous Lesson">Previous Lesson</a>
+              {% endif %}
+            {% endwith %}
+          </div>
+          <div class="col">
+            {% with next_curriculum=curriculum.id|get_next_curriculum %}
+              {% if next_curriculum %}
+                <a type="button" class="btn normal blue" aria-hidden="true" href="{% url 'ctstem:previewCurriculumNew' next_curriculum.id %}" aria-label="Next Lesson" title="Next Lesson">Next Lesson</a>
+              {% endif %}
+            {% endwith %}
+          </div>
+        </div>
+      {% endif %}
       <div class="section" id="standards">
         <h3 class="left">Standards</h3>
         <div class="row">

@@ -328,6 +328,26 @@ def get_underlying_curriculum(context, curriculum_id):
   underlying_curriculum = views.underlyingCurriculum(request, action, curriculum_id)
   return underlying_curriculum
 
+# get the next lesson in the sequence for an underlying lesson
+@register.filter
+def get_next_curriculum(curriculum_id):
+  curriculum = models.Curriculum.objects.get(id=curriculum_id)
+  next_curriculum = models.Curriculum.objects.all().filter(unit=curriculum.unit, order=curriculum.order+1)
+  if len(next_curriculum) > 0:
+    return next_curriculum[0]
+  else:
+    return None
+
+# get the previous lesson in the sequence for an underlying lesson
+@register.filter
+def get_previous_curriculum(curriculum_id):
+  curriculum = models.Curriculum.objects.get(id=curriculum_id)
+  previous_curriculum = models.Curriculum.objects.all().filter(unit=curriculum.unit, order=curriculum.order-1)
+  if len(previous_curriculum) > 0:
+    return previous_curriculum[0]
+  else:
+    return None
+
 @register.filter
 def get_curriculum_count(queryset, status):
   return queryset.filter(status=status).count()

@@ -43,6 +43,9 @@
           <div class="detail">
             <div class="type">
               {{curriculum.get_curriculum_type_display}}
+              {% if curriculum.unit %}
+                {{curriculum.order}}
+              {% endif %}
               {% if curriculum.subject.all %}
                 - {{curriculum.subject.all|join:", "}}
               {% endif %}
