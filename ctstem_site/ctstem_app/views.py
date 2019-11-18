@@ -429,9 +429,19 @@ def previewCurriculumNew(request, id=''):
     if request.method == 'GET':
 
       systems = models.System.objects.all()
+      if curriculum.unit and curriculum.unit.icon:
+        icon = curriculum.unit.icon.url
+      elif curriculum.icon:
+        icon = curriculum.icon.url
+      elif curriculum.curriculum_type == 'U':
+        icon = '/static/img/unit.png'
+      elif curriculum.curriculum_type == 'L':
+        icon = '/static/img/lesson.png'
+      else:
+        icon = '/static/img/assessment.png'
 
 
-      context = {'curriculum': curriculum, 'systems': systems}
+      context = {'curriculum': curriculum, 'systems': systems, 'icon': icon}
 
       return render(request, 'ctstem_app/CurriculumPreviewNew.html', context)
 

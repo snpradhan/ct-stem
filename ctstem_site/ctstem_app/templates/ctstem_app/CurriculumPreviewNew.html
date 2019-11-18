@@ -22,8 +22,8 @@
             {% endif %}
             ">
       <div class="col">
-        <div class="icon">
-          {% if curriculum.unit and curriculum.unit.icon %}
+        <div class="icon" style="background-image: url('{{icon}}');">
+          <!--{% if curriculum.unit and curriculum.unit.icon %}
             <img src="{{curriculum.unit.icon.url}}"/>
           {% elif curriculum.icon %}
             <img src="{{curriculum.icon.url}}"/>
@@ -33,10 +33,11 @@
             <img src="/static/img/lesson.png">
           {% elif curriculum.curriculum_type == 'A' %}
             <img src="/static/img/assessment.png">
-          {% endif %}
-        </div>
+          {% endif %}-->
+
+
           {% if curriculum.unit|slugify == 'None'|slugify %}
-          <div class="favorite">
+
             {% check_curriculum_permission curriculum.id 'favorite' as has_favorite_permission %}
             {% if has_favorite_permission == True %}
               <a class="bookmark util-button fa fa-star" href="{% url 'ctstem:removeBookmark' curriculum.id %}" style="{% if curriculum|is_bookmarked:user.teacher %} display: inline-block; {% else %} display: none; {% endif %}" title="Remove from Favorites"></a>
@@ -44,8 +45,9 @@
             {% else %}
               <a class="bookmark util-button fa fa-star-o" data-title="You need to be logged in as a teacher to favorite this curriculum"></a>
             {% endif %}
-          </div>
+
         {% endif %}
+        </div>
       </div>
       <div class="col meta">
         <h3 class="left">
@@ -73,7 +75,7 @@
           Level: {{curriculum.level}}
         </div>
         <div>
-          Version: v{{curriculum.version}}.
+          Version: v{{curriculum.version}}
         </div>
       </div>
     </div>
