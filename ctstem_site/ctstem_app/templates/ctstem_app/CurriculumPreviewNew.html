@@ -9,7 +9,8 @@
 {% block content %}
   {{block.super}}
   <div class="content" id="preview">
-    <div id="preview_head" class="row
+
+    <div id="preview_head" class="row section
             {% if curriculum.curriculum_type == 'U' %}
               unit
             {% elif curriculum.curriculum_type == 'L' %}
@@ -23,21 +24,7 @@
             ">
       <div class="col">
         <div class="icon" style="background-image: url('{{icon}}');">
-          <!--{% if curriculum.unit and curriculum.unit.icon %}
-            <img src="{{curriculum.unit.icon.url}}"/>
-          {% elif curriculum.icon %}
-            <img src="{{curriculum.icon.url}}"/>
-          {% elif curriculum.curriculum_type == 'U' %}
-            <img src="/static/img/unit.png">
-          {% elif curriculum.curriculum_type == 'L' %}
-            <img src="/static/img/lesson.png">
-          {% elif curriculum.curriculum_type == 'A' %}
-            <img src="/static/img/assessment.png">
-          {% endif %}-->
-
-
           {% if curriculum.unit|slugify == 'None'|slugify %}
-
             {% check_curriculum_permission curriculum.id 'favorite' as has_favorite_permission %}
             {% if has_favorite_permission == True %}
               <a class="bookmark util-button fa fa-star" href="{% url 'ctstem:removeBookmark' curriculum.id %}" style="{% if curriculum|is_bookmarked:user.teacher %} display: inline-block; {% else %} display: none; {% endif %}" title="Remove from Favorites"></a>
@@ -45,10 +32,10 @@
             {% else %}
               <a class="bookmark util-button fa fa-star-o" data-title="You need to be logged in as a teacher to favorite this curriculum"></a>
             {% endif %}
-
         {% endif %}
         </div>
       </div>
+
       <div class="col meta">
         <h3 class="left">
           {{curriculum.title}}
@@ -79,60 +66,76 @@
         </div>
       </div>
     </div>
+
     {% include "ctstem_app/CurriculumPreviewActions.html" with curriculum=curriculum %}
+
     <div class="preview">
-      <div class="overview">
+
+      <div class="section" id="overview">
         <h3 class="left">Overview</h3>
         <div>{{curriculum.overview|safe}}</div>
       </div>
 
       {% if curriculum.curriculum_type == 'U' %}
         {% get_underlying_curriculum curriculum.id as underlying_curriculum %}
-        {% if underlying_curriculum %}
-          <h3 class="left">Underlying Curricula</h3>
-          <div class="row underlying_curricula" id="curricula_tiles">
-            {% include "ctstem_app/CurriculaTilePaging.html" with curricula=underlying_curriculum parent='preview' %}
-          </div>
-        {% endif %}
+        <div class="section">
+          {% if underlying_curriculum %}
+            <h3 class="left">Underlying Lessons</h3>
+            <div class="row underlying_curricula" id="curricula_tiles">
+              {% include "ctstem_app/CurriculaTilePaging.html" with curricula=underlying_curriculum parent='preview' %}
+            </div>
+          {% endif %}
+        </div>
       {% else %}
       <!-- get underlying pages -->
-        <h3 class="left">Pages</h3>
-        <div class="row underlying_curricula" id="curricula_tiles">
-          {% include "ctstem_app/CurriculumStepsTile.html" with curriculum=curriculum %}
+        <div class="section">
+          <h3 class="left">Underlying Pages</h3>
+          <ul class="page_links">
+          {% for step in curriculum.steps.all %}
+            <li>
+              <a href="{% url 'ctstem:previewCurriculum' curriculum.id step.order %}" target="_blank" title="Preview">
+                <h5 class="left">{{step.order}}. {{step.title}}</h5>
+              </a>
+            </li>
+          {% endfor %}
+          </ul>
         </div>
       {% endif %}
 
-      <h3 class="left">Standards</h3>
-      <div class="row" id="standards">
-        {% for standard, categories in curriculum.taxonomy.all|taxonomyHelper %}
-          <div class="col">
-            <b>{{standard}}</b>
-            <ul>
-              {% for category, taxonomies in categories.items %}
-                <li>{{category}} <span class="fa fa-plus-circle"></span><span class="fa fa-minus-circle" style="display:none;"></span></li>
-                <ul style="display:none;">
-                  {% for taxonomy in taxonomies %}
-                    <li>{% if taxonomy.code %}<a href="#">[{{taxonomy.code}}]</a>{% endif %} {{taxonomy}}</li>
-                  {% endfor %}
-                </ul>
-              {% endfor %}
-            </ul>
-          </div>
-        {% endfor %}
+      <div class="section" id="standards">
+        <h3 class="left">Standards</h3>
+        <div class="row">
+          {% for standard, categories in curriculum.taxonomy.all|taxonomyHelper %}
+            <div class="col">
+              <h5 class="left">{{standard}}</h5>
+              <ul>
+                {% for category, taxonomies in categories.items %}
+                  <li>{{category}} <span class="fa fa-plus-circle"></span><span class="fa fa-minus-circle" style="display:none;"></span></li>
+                  <ul style="display:none;">
+                    {% for taxonomy in taxonomies %}
+                      <li>{% if taxonomy.code %}<a href="#">[{{taxonomy.code}}]</a>{% endif %} {{taxonomy}}</li>
+                    {% endfor %}
+                  </ul>
+                {% endfor %}
+              </ul>
+            </div>
+          {% endfor %}
+        </div>
       </div>
-
-      <h3 class="left">Compatibility</h3>
-      <div class="row" id="compatibility">
-        {% for system in systems %}
-          <div class="col compatible-item {% if system not in curriculum.compatible_system.all %} incompatible {% endif %}">
-            <span class="fa fa-{{system.icon}}"></span><br>
-            {{system.name}}
-          </div>
-        {% endfor %}
+      <div class="section" id="compatibility">
+        <h3 class="left">Compatibility</h3>
+        <div class="row">
+          {% for system in systems %}
+            <div class="col compatible-item {% if system not in curriculum.compatible_system.all %} incompatible {% endif %}">
+              <span class="fa fa-{{system.icon}}"></span><br>
+              {{system.name}}
+            </div>
+          {% endfor %}
+        </div>
       </div>
 
       {% if curriculum.credits %}
-        <div class="credits">
+        <div class="section" id="credits">
           <h3 class="left">Credits</h3>
           <div>{{curriculum.credits|safe}}</div>
         </div>
@@ -140,13 +143,14 @@
 
       <!-- ACKNOWLEDGEMENT -->
       {% if curriculum.acknowledgement %}
-        <h3 class="left">Acknowledgement</h3>
-        <div class="acknowledgement" id="acknowledgement">
-          {{curriculum.acknowledgement|safe}}
+        <div class="section" id="acknowledgement">
+          <h3 class="left">Acknowledgement</h3>
+          <div>{{curriculum.acknowledgement|safe}}</div>
         </div>
       {% endif %}
     </div>
-    <div class="teacher_guide">
+
+    <div class="section" id="teacher_guide section">
       {% if curriculum.teacher_notes %}
         <h3 class="left">Teacher Guide</h3>
         <div>{{curriculum.teacher_notes|safe}}</div>

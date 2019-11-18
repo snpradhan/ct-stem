@@ -789,12 +789,7 @@ div.content#preview {
 }
 
 
-@media only screen and (min-width: 320px) and (max-width: 667px) {
-  body div.content#preview div.row#preview_head {
-    flex-wrap: wrap;
-  }
-}
-@media only screen and (min-width: 668px) and (max-width: 767px) {
+@media only screen and (min-width: 320px) and (max-width: 1024px) {
   body div.content#preview div.row#preview_head {
     flex-wrap: wrap;
   }
@@ -824,7 +819,7 @@ div.content#preview div.row {
 div.content#preview div.row.underlying_curricula {
   flex-flow: wrap;
 }
-div.content#preview > div {
+div.content#preview div.section {
   margin-bottom: 5em;
 }
 div.content#preview p {
@@ -874,7 +869,7 @@ div.content#preview div.row.buttons .col {
   margin-bottom: 1.5em;
 }
 
-div.content#preview div.row#compatibility .col.compatible-item {
+div.content#preview div#compatibility div.row .col.compatible-item {
   font-family: Helvetica, sans-serif;
   display: inline-block;
   text-align: center;
@@ -883,21 +878,25 @@ div.content#preview div.row#compatibility .col.compatible-item {
   margin-right: 3em;
 }
 
-div.content#preview div.row#compatibility .col.compatible-item span.fa {
+div.content#preview div#compatibility div.row .col.compatible-item span.fa {
   font-size: 4em;
 }
 
-div.content#preview div.row#compatibility .col.compatible-item.incompatible {
+div.content#preview div#compatibility div.row .col.compatible-item.incompatible {
   text-decoration: line-through;
   color: #ccc;
 }
 
-div.content#preview div.row#standards .col {
+div.content#preview div#standards div.row .col {
   flex: 1;
+}
+div.content#preview div#standards div.row .col ul {
   font-size: 1.5em;
   line-height: 1.5em;
 }
-
+div.content#preview ul.page_links  {
+  list-style-type: none;
+}
 
 /***********   CONTENT DIV END   ************/
 
@@ -1553,7 +1552,7 @@ h1, h2, h3, h4, h5, h6 {
   text-transform: none;
 }
 
-h2.left, h3.left, h4.left {
+h1.left, h2.left, h3.left, h4.left, h5.left, h6.left {
   text-align: left;
 }
 
@@ -1569,7 +1568,12 @@ h3 {
 h4 {
   font-size: 2em;
 }
-
+h5 {
+  font-size: 1.7em;
+}
+h6 {
+  font-size: 1.5em;
+}
 .col-container {
   display: flex;
   width: 100%;
