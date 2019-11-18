@@ -22,10 +22,10 @@
         <form method="post" action="{% url 'ctstem:curriculatiles' %}" id="curricula_search">
           {% csrf_token %}
           <div class="form-group" id="curricula_filters_toggle">
-            <label>Show Filters <span class="fa fa-plus-circle"></span></label>
-            <label style="display:none;">Hide Filters <span class="fa fa-minus-circle"></span></label>
+            <label style="display:none;">Show Filters <span class="fa fa-plus-circle"></span></label>
+            <label>Hide Filters <span class="fa fa-minus-circle"></span></label>
           </div>
-          <div class="row" id="curricula_filters" style="display:none;">
+          <div class="row" id="curricula_filters">
             {% if searchForm.subjects %}
               <div class="col form-group">
                 <label>{{searchForm.subjects.label|title}}</label>
