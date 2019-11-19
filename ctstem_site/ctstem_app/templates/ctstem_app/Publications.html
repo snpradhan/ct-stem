@@ -18,87 +18,29 @@
       <h3 class="left">Publications</h3>
       {% if user.administrator %}
         <div class="btn-group">
-          <a type="button" class="btn btn-info" href="{% url 'ctstem:newPublication' %}" title="Create new publication">Create Publication</a>
-          <label class="switch">
-            <input class="switch-input" type="checkbox" />
-            <span class="switch-label" data-on="Table" data-off="Bibliography"></span>
-            <span class="switch-handle"></span>
-          </label>
+          <a class="btn normal blue" href="{% url 'ctstem:newPublication' %}" title="Create new publication">Create Publication</a>
         </div>
 
       {% endif %}
       {% if publications %}
-        {% if user.administrator %}
-          <div id="publications_table">
-            <table class="table table-striped table-bordered table-condensed dt" id="publications">
-              <thead>
-                <tr>
-                  <th> Order </th>
-                  <th> Title </th>
-                  <th> Year </th>
-                  <th> Author(s) </th>
-                  <th> URL </th>
-                  <th> Type </th>
-                </tr>
-                <tr id="filterrow">
-                  <th> Order </th>
-                  <th> Title </th>
-                  <th> Year </th>
-                  <th> Author(s) </th>
-                  <th> URL </th>
-                  <th> Type </th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for pub in publications %}
-                  <tr>
-                    <td>{{pub.order}}</td>
-                    <td class="title">{{pub.title}}
-                      <div class="controls">
-                        {% if user.administrator %}
-                          <a type="button" class="btn btn-success" aria-label="Edit Publication" title="Edit Publication" href="{% url 'ctstem:publication' pub.slug %}">
-                            <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
-                          </a>
-                          <a type="button" class="btn btn-danger" aria-label="Delete Publication" title="Delete Publication" href="{% url 'ctstem:deletePublication' pub.slug %}" onclick="return confirm('Are you sure you want to delete {{pub.title}}?')">
-                            <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-                          </a>
-                        {% endif %}
-                        {% if pub.local_copy %}
-                          <a type="button" class="btn btn-default" aria-label="Download Publication" title="Download Publication" href="{{pub.local_copy.url}}" download target="_blank">
-                            <span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span>
-                          </a>
-                        {% endif %}
-                      </div>
-                    </td>
-                    <td>{{pub.year}}</td>
-                    <td>{{pub.authors}}</td>
-                    <td><a href="{{pub.web_link}}" target="_blank">Link</a></td>
-                    <td>{{pub.get_publication_type_display}}</td>
-                  </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        {% endif %}
-        <div id="publications_bib">
-          <ul id="publications" class="publication-list">
-            {% for pub in publications %}
-              <li class="publication">
-                <span class="authors">{{pub.authors}} </span>
-                <span class="year">({{pub.year}}). </span>
-                <span class="title">
-                  {% if pub.web_link %}
-                    <a href="{{pub.web_link}}" target="_blank">{{pub.title}}</a>
-                  {% else %}
-                    {{pub.title}}
-                  {% endif %}
-                </span>
-                <span class="journal">{{pub.journal}}</span>
-                <span class="pages"> {% if pub.pages %} ({{pub.pages}}) {% endif %}</span>
-              </li>
-            {% endfor %}
-          </ul>
-        </div>
+        <table id="publications">
+          {% for pub in publications %}
+            <tr class="publication">
+              <td class="description">
+                <span>{{pub.description|safe}}</span>
+                {% if pub.web_link %}
+                  <span><a href="{{pub.web_link}}" target="_blank">Link</a></span>
+                {% endif %}
+              </td>
+              <td class="action">
+                {% if user.administrator %}
+                  <a class="fa fa-pencil" title="Edit Publication" href="{% url 'ctstem:publication' pub.id %}"></a>
+                  <a class="fa fa-trash" title="Delete Publication" href="{% url 'ctstem:deletePublication' pub.id %}" onclick="return confirm('Are you sure you want to delete {{pub.title}}?')"></a>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </table>
       {% else %}
         <p>No publications available.</p>
       {% endif %}
@@ -182,27 +124,7 @@
     </div>
   </div>
 </div>
-  <br clear="all">
-  <script type="text/javascript">
-    $(document).ready(function(){
-      $("div#publications_table").hide();
-      $("div#publications_bib").show();
-
-      $('.switch-input').change(function() {
-        $("div#publications_table").toggle();
-        $("div#publications_bib").toggle();
-
-        /*if($(this).is(":checked")) {
-          $("div#publications_table").show();
-          $("div#publications_bib").hide();
-        }
-        else{
-          $("div#publications_table").hide();
-          $("div#publications_bib").show();
-        }*/
-      });
-    });
-  </script>
+<br clear="all">
 
 {% endblock %}
 

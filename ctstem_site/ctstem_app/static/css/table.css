@@ -160,7 +160,7 @@ table.table#curricula td {
 table.table#curricula td.icon,  table.table#curricula td.action{
   text-align: center;
 }
-table.table#curricula td.action a {
+table td.action a {
   display: inline-block;
   font-size: 2rem;
   width: 2rem;
@@ -170,11 +170,11 @@ table.table#curricula td.action a {
   background-color: transparent;
   color: black;
 }
-table.table#curricula td.action a:hover {
+table td.action a:hover {
   color: rgb(70, 160, 215);
   text-decoration: none;
 }
-table.table#curricula td.action a.fa-trash:hover { color: red; }
+table td.action a.fa-trash:hover { color: red; }
 
 table.table#curricula td.action a.fa-star {
   color: orange;
@@ -244,4 +244,25 @@ table.table th .fa-sort-asc, table.table th .fa-sort-desc {
 
 table.table td.donotwrap {
   white-space: nowrap;
+}
+
+/*
+ * PUBLICATION LISTS
+ */
+table#publications {
+  font-size: 1.7em;
+  color: #777;
+  width: 100%;
+}
+table#publications td {
+  padding: 0.5em 0;
+}
+table#publications td.description {
+  width: 93%;
+  line-height: 1.5em;
+  padding-right: 0.5em;
+}
+
+table#publications td.action {
+  width: 7%;
 }

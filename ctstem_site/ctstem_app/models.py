@@ -468,19 +468,11 @@ class SchoolAdministrator(models.Model):
 # Publication model
 #######################################################
 class Publication(models.Model):
-  authors = models.CharField(max_length=255, help_text='Publication Author')
-  year = models.CharField(max_length=255, help_text='Publication Year')
-  title = models.CharField(max_length=255, help_text='Publication Title')
-  journal = models.CharField(max_length=255)
-  pages = models.CharField(max_length=255, blank=True)
-  award = models.CharField(max_length=255, blank=True)
-  slug = models.SlugField(unique=True, max_length=255)
+  order = models.IntegerField(null=True, blank=True)
+  description = RichTextField(null=False, blank=False, default="Enter publication", help_text="Enter publication details")
+  web_link = models.URLField(blank=True)
   created_date = models.DateTimeField(auto_now_add=True)
   modified_date = models.DateTimeField(auto_now=True)
-  local_copy = models.FileField(upload_to=upload_file_to, blank=True)
-  web_link = models.URLField(blank=True)
-  publication_type = models.CharField(max_length=255, choices=PUBLICATION_TYPES)
-  order = models.IntegerField(null=True, blank=True)
 
 #######################################################
 # Group model

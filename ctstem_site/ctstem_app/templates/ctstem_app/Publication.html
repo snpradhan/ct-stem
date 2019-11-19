@@ -1,4 +1,5 @@
 {% extends "ctstem_app/base.html" %}
+{% load ctstem_extras %}
 
 {% block title %}Publication |{% endblock %}
 
@@ -10,12 +11,14 @@
       {% csrf_token %}
       <div class="table" id="metadata">
         {{form.management_form}}
+         {{form.media}}
         {% for field in form %}
           <div class="form-group">
             <label for="id_{{field.name}}">{{ field.label|title }} {% if field.field.required %}(<span class="required">*</span>){% endif %} </label>
             <div>
               {{field}}
             </div>
+            <div class="help warning">{{field.help_text|safe}}</div>
             <div class="error">{{ field.errors }}</div>
           </div>
         {% endfor %}

@@ -754,39 +754,6 @@ div.table_container {
   width: 100%;
 }
 
-/*
- * PUBLICATION LISTS
- */
-ul.publication-list {
-  font-size: 1.7rem;
-  line-height: 150%;
-  color: #777;
-  list-style: none;
-  width: 100%;
-  margin: 1em auto 4em auto;
-  padding: 0;
-}
-
-ul.publication-list li.publication {
-  margin: 1em 1em 1em 3em;
-  text-indent: -3em;
-}
-
-ul.publication-list li.publication span.journal {
-  font-style: italic;
-}
-
-ul.links {
-  font-size: 1.7rem;
-  line-height: 150%;
-  color: #777;
-  margin-bottom: 4em;
-}
-
-ul.links li {
-  padding-bottom: 0.8em;
-}
-
 div#categories {
   margin-top: 2em;
 }

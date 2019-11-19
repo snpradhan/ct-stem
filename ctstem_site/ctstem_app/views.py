@@ -2179,14 +2179,14 @@ def publications(request):
 # CREATE MODIFY A PUBLICATION
 ####################################
 @login_required
-def publication(request, slug=''):
+def publication(request, id=''):
   try:
     # check if the user has permission to create or modify a lesson
     if hasattr(request.user, 'administrator') == False:
       return http.HttpResponseNotFound('<h1>You do not have the privilege to modify this publication</h1>')
     # check if the lesson exists
-    if 'new' != slug:
-      publication = models.Publication.objects.get(slug=slug)
+    if '' != id:
+      publication = models.Publication.objects.get(id=id)
     else:
       publication = models.Publication()
 
@@ -2197,11 +2197,9 @@ def publication(request, slug=''):
 
     elif request.method == 'POST':
       data = request.POST.copy()
-      print request.FILES
-      form = forms.PublicationForm(data, request.FILES, instance=publication, prefix="publication")
+      form = forms.PublicationForm(data, instance=publication, prefix="publication")
       if form.is_valid():
         savedPublication = form.save(commit=False)
-        savedPublication.slug = slugify(savedPublication.title)
         savedPublication.save()
         form.save()
         reorder_publications(request)
@@ -2222,14 +2220,14 @@ def publication(request, slug=''):
 ####################################
 # DELETE PUBLICATION
 ####################################
-def deletePublication(request, slug=''):
+def deletePublication(request, id=''):
   try:
     # check if the user has permission to delete a lesson
     if hasattr(request.user, 'administrator') == False:
       return http.HttpResponseNotFound('<h1>You do not have the privilege to delete this publication</h1>')
     # check if the lesson exists
-    if '' != slug:
-      publication = models.Publication.objects.get(slug=slug)
+    if '' != id:
+      publication = models.Publication.objects.get(id=id)
     else:
       raise models.Publication.DoesNotExist
 
