@@ -73,7 +73,7 @@
           </div>
           <div class="row_container">
             <div class="row" id="curricula_tiles">
-              {% include "ctstem_app/CurriculaTilePaging.html" with parent='curricula' %}
+              <!--{% include "ctstem_app/CurriculaTilePaging.html" with parent='curricula' %}-->
             </div>
           </div>
         </form>
@@ -84,6 +84,9 @@
 
   <script type="text/javascript">
     $(function(){
+
+      //on page load, apply existing filters and load results
+      auto_submit_search();
 
       //add a class to checkbox and radio button in search form on Safari only
       if (navigator.userAgent.search("Safari") >= 0 && navigator.userAgent.search("Chrome") < 0) {
