@@ -661,14 +661,14 @@ div.content#question_review .dataTables_wrapper {
 div.content#curricula {
   width: 100%;
   margin-bottom: 0;
+  background-color: var(--ctstem-color-blue);
 }
 div.content#curricula > * {
   padding-left: 5%;
   padding-right: 5%;
+  color: white;
 }
-div.content#curricula div.row_container {
-  background-color: var(--ctstem-color-blue);
-}
+
 div.content#curricula div.row {
   flex-flow: wrap;
   display: flex;
@@ -1128,8 +1128,16 @@ div.btn-group {
   margin-bottom: 10px;
   width: 100%;
 }
+div.btn-group.center {
+  text-align: center;
+}
+
 div.btn-group a{
   margin-right: 1em;
+}
+
+div.btn-group.center a {
+  float: unset;
 }
 a.btn.pdf img {
   height: 20px;
@@ -1834,6 +1842,7 @@ img.page-blurb-image {
   justify-content: space-between;
   padding: 2em 0;
 }
+
 .page-blurb .col-container > div {
   width: 48%;
 }
@@ -1843,6 +1852,7 @@ img.page-blurb-image {
   height: auto !important;
   display: inline !important;
 }
+
 .service-blurb {
   color: #777;
   line-height: 160%;

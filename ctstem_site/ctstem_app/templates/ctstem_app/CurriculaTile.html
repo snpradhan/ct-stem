@@ -10,12 +10,12 @@
   {{block.super}}
   <div class="content" id="curricula">
       <h2> Curricula </h2>
-      <p class="page-blurb">
-        Our computational thinking lesson plans are designed to embed authentic CT practices into high school science and mathematics classrooms while enriching disciplinary content learning.
+      <p class="page-blurb center">
+        Our curricular units are developed and tested with high school teachers to bring authentic CT practices with disciplinary content to your classroom. Find or create curriculum below.
       </p>
-      <div class="btn-group">
+      <div class="btn-group center">
         {% if user.administrator or user.researcher or user.author or user.teacher %}
-          <a type="button" class="btn btn-success" href="{% url 'ctstem:newCurriculum' %}?back_url={{ request.path }}" title="Create new curriculum">Create Curriculum</a>
+          <a type="button" class="btn normal green" href="{% url 'ctstem:newCurriculum' %}?back_url={{ request.path }}" title="Create new curriculum">Create Curriculum</a>
         {% endif %}
       </div>
       <div class="row_container">
