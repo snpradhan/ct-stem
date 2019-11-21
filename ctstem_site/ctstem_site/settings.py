@@ -76,15 +76,17 @@ DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
 AWS_STORAGE_BUCKET_NAME = 'ct-stem'
 AWS_S3_SECURE_URLS = True       # use http instead of https
 AWS_QUERYSTRING_AUTH = False
+AWS_S3_HOST = 's3-us-west-1.amazonaws.com'
 
 #database backup storage
-DBBACKUP_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
-DBBACKUP_STORAGE_OPTIONS = {
-    'access_key': AWS_ACCESS_KEY_ID,
-    'secret_key': AWS_SECRET_ACCESS_KEY,
-    'bucket_name': 'ct-stem-db-backup',
-    'host': 's3-us-west-1.amazonaws.com'
-}
+#DBBACKUP_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
+#DBBACKUP_STORAGE_OPTIONS = {
+#    'access_key': AWS_ACCESS_KEY_ID,
+#    'secret_key': AWS_SECRET_ACCESS_KEY,
+#    'bucket_name': 'ct-stem-db-backup',
+#}
+DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
+DBBACKUP_STORAGE_OPTIONS = {'location': '/var/backups'}
 
 #CKEDITOR_JQUERY_URL = 'https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js'
 CKEDITOR_UPLOAD_PATH = "uploads/"
