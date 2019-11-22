@@ -395,14 +395,11 @@ def restoreCurriculum(request, id=''):
 
     if has_permission:
       curriculum = models.Curriculum.objects.get(id=id)
-      #archive unit lessons first
-      if curriculum.curriculum_type == 'U':
-        for lesson in curriculum.underlying_curriculum.all():
-          lesson.status = 'A'
-          lesson.save()
-        reorder_underlying_curricula(request, curriculum.id)
       curriculum.status = 'A'
       curriculum.save()
+      if curriculum.curriculum_type == 'U':
+        reorder_underlying_curricula(request, curriculum.id)
+
       messages.success(request, "The curriculum %s has been restored and marked as Archived" % curriculum.title)
 
     return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
@@ -530,13 +527,8 @@ def deleteCurriculum(request, id=''):
 
       curriculum.status = 'R'
       curriculum.save()
-      #delete unit lessons first
-      if curriculum.curriculum_type == 'U':
-        for lesson in curriculum.underlying_curriculum.all():
-          lesson.status = 'R'
-          lesson.save()
-        reorder_underlying_curricula(request, curriculum.id)
-      elif curriculum.unit:
+      #reorder remaining underlying curricula in the unit
+      if curriculum.unit:
         reorder_underlying_curricula(request, curriculum.unit.id)
 
       messages.success(request, "Curriculum '%s - v%s.' has been deleted" % (curriculum.title, curriculum.version))
