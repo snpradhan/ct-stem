@@ -250,7 +250,6 @@ table.table td.donotwrap {
  * PUBLICATION LISTS
  */
 table#publications {
-  font-size: 1.7em;
   color: #777;
   width: 100%;
 }
@@ -262,7 +261,9 @@ table#publications td.description {
   line-height: 1.5em;
   padding-right: 0.5em;
 }
-
+table#publications td.description p {
+  display: inline;
+}
 table#publications td.action {
   width: 7%;
 }

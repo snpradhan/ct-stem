@@ -9,12 +9,12 @@
 {% block content %}
   {{block.super}}
  <div class="content" id="publication">
-  <div class="col-lg-12">
+  <div class="page-blurb">
 
     <h2>Research</h2>
-    <p class="page-blurb">STEM education faces two related challenges. First, our education system is not producing enough computational professionals to fill demand. Second, women and minorities remain significantly underrepresented. We are conducting a Design-Based Implementation Research project to study a model in which computational literacy curricula are embedded throughout required biology, chemistry, physics, and mathematics coursework. This would ensure that every high school student is exposed to computational literacy activities in a context that demonstrates its relevance to real world career paths. We are interested how such curriculum affects student and teachers’ attitudes, identity, and learning. We are also working to understand individual and institutional factors that affect the success of this model in resource-constrained public schools.</p>
+    <p>STEM education faces two related challenges. First, our education system is not producing enough computational professionals to fill demand. Second, women and minorities remain significantly underrepresented. We are conducting a Design-Based Implementation Research project to study a model in which computational literacy curricula are embedded throughout required biology, chemistry, physics, and mathematics coursework. This would ensure that every high school student is exposed to computational literacy activities in a context that demonstrates its relevance to real world career paths. We are interested how such curriculum affects student and teachers’ attitudes, identity, and learning. We are also working to understand individual and institutional factors that affect the success of this model in resource-constrained public schools.</p>
 
-    <div class="page-blurb">
+    <div>
       <h3 class="left">Publications</h3>
       {% if user.administrator %}
         <div class="btn-group">
@@ -27,9 +27,9 @@
           {% for pub in publications %}
             <tr class="publication">
               <td class="description">
-                <span>{{pub.description|safe}}</span>
+                {{pub.description|safe}}
                 {% if pub.web_link %}
-                  <span><a href="{{pub.web_link}}" target="_blank">Link</a></span>
+                  <p>&nbsp;&nbsp;<a href="{{pub.web_link}}" target="_blank">Link</a></p>
                 {% endif %}
               </td>
               <td class="action">
