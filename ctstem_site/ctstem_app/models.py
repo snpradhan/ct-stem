@@ -24,6 +24,7 @@ CURRICULUM_STATUS_CHOICES = (
     (u'D', u'Private'),
     (u'P', u'Public'),
     (u'A', u'Archived'),
+    (u'R', u'Deleted'),
 )
 
 CURRICULUM_TYPE_CHOICES = (

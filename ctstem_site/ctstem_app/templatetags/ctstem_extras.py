@@ -311,26 +311,13 @@ def get_teacher_groups(id):
 
 @register.assignment_tag(takes_context=True)
 def get_underlying_curriculum(context, curriculum_id):
-  '''if curriculum.curriculum_type == 'U':
-    unit = curriculum
-  elif curriculum.curriculum_type == 'L' and curriculum.unit:
-    unit = curriculum.unit
-  else:
-    return False
-
-  if hasattr(user, 'administrator') == True or hasattr(user, 'researcher') == True or hasattr(user, 'author') == True:
-    return unit.underlying_curriculum.all().order_by('order').distinct()
-  elif hasattr(user, 'teacher') == True:
-    # if unit is shared with the teacher, display all underlying curricula regardless of status
-    if user.teacher in unit.shared_with.all():
-      return unit.underlying_curriculum.all().order_by('order').distinct()
-    else:
-      return unit.underlying_curriculum.all().filter(Q(status='P') | Q(shared_with=user.teacher) | Q(authors=user)).order_by('order').distinct()
-  else:
-    return unit.underlying_curriculum.all().filter(status='P').order_by('order').distinct()'''
-
   request = context.get('request')
-  underlying_curriculum = views.underlyingCurriculum(request, 'preview', curriculum_id)
+  curriculum = models.Curriculum.objects.get(id=curriculum_id)
+  if curriculum.status != 'R':
+    action = 'preview'
+  else:
+    action = 'restore'
+  underlying_curriculum = views.underlyingCurriculum(request, action, curriculum_id)
   return underlying_curriculum
 
 @register.filter

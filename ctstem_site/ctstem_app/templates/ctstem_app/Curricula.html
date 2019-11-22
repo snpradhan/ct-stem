@@ -29,6 +29,8 @@
         <h2> Shared Curricula </h2>
       {% elif bucket == 'favorite' %}
         <h2> Favorite Curricula </h2>
+      {% elif bucket == 'deleted' %}
+        <h2> Deleted Curricula </h2>
       {% endif %}
 
       <div class="btn-group">
@@ -82,7 +84,7 @@
                       {% endif %}
                     </div>
                     {% if user.administrator or user.researcher or user.author or user.teacher %}
-                      {% if bucket == 'teacher_authored' or bucket == 'my' or bucket == 'shared' or bucket == 'favorite' %}
+                      {% if bucket == 'teacher_authored' or bucket == 'my' or bucket == 'shared' or bucket == 'favorite' or bucket == 'deleted' %}
                         <div class="row">
                           <div class="col-md-2 title">Curriculum Type:</div>
                           <div class="col-md-10">{{ curriculum.get_curriculum_type_display }}</div>
@@ -168,7 +170,7 @@
                       </div>
                     </div>
                     <div class="row">
-                      <div class="col-md-2 title">Last Updated:</div>
+                      <div class="col-md-2 title">{% if curriculum.status == 'R' %} Deleted On: {% else %} Last Updated: {% endif %}</div>
                       <div class="col-md-10">
                         {{curriculum.modified_date|date}}
                       </div>

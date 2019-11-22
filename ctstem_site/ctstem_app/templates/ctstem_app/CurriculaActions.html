@@ -53,7 +53,7 @@
 {% check_curriculum_permission curriculum.id 'assign' as has_assign_permission %}
 {% if has_assign_permission == True %}
   <a class="assign util-button fa fa-calendar-check-o" aria-hidden="true" data-form="{% url 'ctstem:assignCurriculum' curriculum.id%}" aria-label="Assign Curriculum" title="Assign Curriculum"></a>
-{% elif user.is_authenticated %}
+{% elif user.is_authenticated and curriculum.status != 'R' %}
   {% if curriculum.curriculum_type == 'U' %}
     {% with msg="This unit cannot be assigned because all the underlying lessons are private and not locked.  If you need to assign this unit please ask the author to lock one or more lessons or make them public" %}
     <a class="fa fa-calendar-check-o disabled" aria-hidden="true" onclick="alert('{{msg}}');"></a>
@@ -79,5 +79,11 @@
     <a class="util-button fa fa-external-link" aria-hidden="true" aria-label="Export Student Response" title="Export Student Response" href="{% url 'ctstem:export_all_response' curriculum.id %}">
     </a>
   {% endif %}
+{% endif %}
+<!-- Restore deleted curriculum -->
+{% check_curriculum_permission curriculum.id 'restore' as has_restore_permission %}
+{% if has_restore_permission == True %}
+  <a class="util-button fa fa-rotate-left" aria-hidden="true" aria-label="Restore" title="Restore" href="{% url 'ctstem:restoreCurriculum' curriculum.id %}">
+  </a>
 {% endif %}
 

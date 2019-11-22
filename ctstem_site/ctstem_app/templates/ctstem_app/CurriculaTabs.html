@@ -13,6 +13,9 @@
     {% if user.administrator or user.researcher or user.author %}
       <li {% if bucket == 'teacher_authored' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'teacher_authored' %}">Teacher Authored Curricula</a></li>
     {% endif %}
+    {% if user.administrator %}
+      <li {% if bucket == 'deleted' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'deleted' %}">Deleted Curricula</a></li>
+    {% endif %}
   {% endif %}
 
   <div class="search">

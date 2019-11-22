@@ -515,6 +515,8 @@ class CurriculumForm(ModelForm):
       self.fields['unit'].queryset = models.Curriculum.objects.filter(curriculum_type='U', authors=usr).order_by(Lower('title'), 'version')
       self.fields.pop('status')
       self.fields.pop('feature_rank')
+    else:
+      self.fields['status'].choices = models.CURRICULUM_STATUS_CHOICES[:3]
 
 
     if self.instance.id:
