@@ -75,6 +75,7 @@ class LoginForm (forms.Form):
 ####################################
 class RegistrationForm (forms.Form):
   email = forms.EmailField(required=True, max_length=75, label=u'Email')
+  confirm_email = forms.EmailField(required=True, max_length=75, label=u'Confirm Email')
   username = forms.RegexField(required=True, regex=r'^\w+$', max_length=30, label=u'Username',
                               error_messages={'invalid': 'Usernames may only contain letters, numbers, and underscores (_)'})
   first_name = forms.CharField(required=True, max_length=30, label=u'First name')
@@ -95,6 +96,7 @@ class RegistrationForm (forms.Form):
       group_id = kwargs.pop('group_id')
     super(RegistrationForm, self).__init__(*args, **kwargs)
     if user.is_authenticated():
+      self.fields.pop('confirm_email')
       if hasattr(user, 'school_administrator'):
         self.fields['account_type'].choices = models.USER_ROLE_CHOICES[4:]
         self.fields['school'].queryset = models.School.objects.filter(id=user.school_administrator.school.id)
@@ -103,6 +105,8 @@ class RegistrationForm (forms.Form):
         self.fields['school'].queryset = models.School.objects.filter(id=user.teacher.school.id)
 
     elif group_id:
+      self.fields.pop('confirm_email')
+
       self.fields['account_type'].choices = models.USER_ROLE_CHOICES[3:]
       if kwargs.get('initial', None) and kwargs['initial']['email']:
         self.fields['email'].widget.attrs['readonly'] = True
@@ -123,6 +127,9 @@ class RegistrationForm (forms.Form):
   def clean_email(self):
     return self.cleaned_data['email'].strip()
 
+  def clean_confirm_email(self):
+    return self.cleaned_data['confirm_email'].strip()
+
   def clean(self):
     cleaned_data = super(RegistrationForm, self).clean()
     username = cleaned_data.get('username')
@@ -131,6 +138,7 @@ class RegistrationForm (forms.Form):
     password1 = cleaned_data.get('password1')
     password2 = cleaned_data.get('password2')
     email = cleaned_data.get('email')
+    confirm_email = cleaned_data.get('confirm_email')
     account_type = cleaned_data.get('account_type')
     school = cleaned_data.get('school')
 
@@ -147,6 +155,7 @@ class RegistrationForm (forms.Form):
     if password1 != password2:
       self.add_error('password1', u'Passwords do not match.')
       self.fields['password1'].widget.attrs['class'] += ' error'
+      self.fields['password2'].widget.attrs['class'] += ' error'
 
     if first_name is None:
       self.fields['first_name'].widget.attrs['class'] += ' error'
@@ -157,6 +166,10 @@ class RegistrationForm (forms.Form):
     elif User.objects.filter(email=email).count() > 0:
       self.add_error('email', u'This email is already taken. Please choose another.')
       self.fields['email'].widget.attrs['class'] += ' error'
+    elif 'confirm_email' in self.fields and email != confirm_email:
+      self.add_error('confirm_email', u'Emails do not match.')
+      self.fields['email'].widget.attrs['class'] += ' error'
+      self.fields['confirm_email'].widget.attrs['class'] += ' error'
     #check fields for Teacher, Student and School Administrator
     if account_type in ['T', 'S', 'P'] and school is None:
       self.fields['school'].widget.attrs['class'] += ' error'

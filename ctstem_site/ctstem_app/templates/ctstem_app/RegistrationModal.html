@@ -39,7 +39,13 @@
           {{form.email}}
           <div class="error">{{ form.email.errors }}</div>
         </div>
-
+        {% if form.confirm_email %}
+        <div class="form-group">
+          <label for="id_{{form.confirm_email.name}}">{{ form.confirm_email.label }}</label>
+          {{form.confirm_email}}
+          <div class="error">{{ form.confirm_email.errors }}</div>
+        </div>
+        {% endif %}
         <div class="col-container">
           <div class="form-group col left">
             <label for="id_{{form.first_name.name}}">{{ form.first_name.label }}</label>
