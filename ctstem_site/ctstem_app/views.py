@@ -1761,11 +1761,6 @@ def searchTeachers(request):
     if data['email']:
       query_filter['user__email__icontains'] = str(data['email'])
 
-    if hasattr(request.user, 'teacher'):
-      query_filter['school'] = request.user.teacher.school
-    elif hasattr(request.user, 'school_administrator'):
-      query_filter['school'] = request.user.school_administrator.school
-
     print query_filter
     teacherList = models.Teacher.objects.filter(**query_filter)
     print teacherList
@@ -1803,12 +1798,8 @@ def searchAuthors(request):
     if data['email']:
       query_filter['email__icontains'] = str(data['email'])
 
-    if hasattr(request.user, 'teacher'):
-      school = request.user.teacher.school
-      authorList = User.objects.filter(teacher__school=school).exclude(id=request.user.id)
-    elif hasattr(request.user, 'school_administrator'):
-      school = request.user.school_administrator.school
-      authorList = User.objects.filter(teacher__school=school)
+    if hasattr(request.user, 'teacher') or hasattr(request.user, 'school_administrator'):
+      authorList = User.objects.filter(teacher__isnull=False).exclude(id=request.user.id)
     else:
       authorList = User.objects.filter(Q(administrator__isnull=False) | Q(researcher__isnull=False) | Q(author__isnull=False) |  Q(teacher__isnull=False))
 
