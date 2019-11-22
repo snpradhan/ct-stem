@@ -9,7 +9,7 @@
 {% block content %}
   {{block.super}}
  <div class="content">
-  <div class="col-lg-12">
+  <div class="page-blurb">
 
     <h2>Teacher Support</h2>
     {% if user.is_authenticated and user.administrator %}
@@ -22,32 +22,59 @@
       </div>
       <div class="modal fade" id="trainingModal" role="dialog"></div>
     {% endif %}
-    <p class="page-blurb">
+    <p>
       From spreadsheets to high-performance simulations, computational thinking (CT) tools permeate the way that scientists, engineers, and mathematicians conduct research and make sense of the world. CT has allowed for breakthroughs in sequencing the human genome, predicting hurricane paths, modeling black holes, and optimizing food pantry routes. Support your students in acquiring these essential 21st century skills by using or developing a CT-STEM curricula. Our teacher-tested CT-STEM curricula are discipline-specific (math, physics, biology, & chemistry) and designed for use within conventional curricula to address the Next Generation Science Standards.
     </p>
-    <p class="page-blurb">
+    <p>
       We offer structured brainstorming and coaching on developing or enhancing CT-STEM lesson plans. <a href="mailto:ctstem@northwestern.edu">Email us</a> to speak with a member of our team who can help you integrate CT tools into existing or new lessons in your classroom. You can also find support on how to use our site at our <a href="{% url 'ctstem:help' %}">Help and FAQ page</a>.
     </p>
 
-    <img src="/static/img/training.png" class="page-blurb-image">
+    <div>
+      <div class="pd1">
+        <img src="/static/img/pd1.png">
+      </div>
+      <div class="pd2">
+        <div>
+          <img src="/static/img/pd2.png">
+        </div>
+        <div>
+          <img src="/static/img/pd3.png">
+        </div>
+      </div>
+    </div>
 
-    <p class="page-blurb">
-      If you are interested in designing a curriculum with fellow teachers or our team, join us at Northwestern’s <i>Computational Thinking in STEM</i> summer workshop. Upon completion of the summer workshop, 9th–12th grade science and math teachers will be able to:
+    <p>
+      If you are interested in designing a curriculum with fellow teachers or our team, join us at <a href="https://www.sesp.northwestern.edu/news-center/news/2019/08/ct-stem-helps-teachers-reimagine-curriculum.html" target="_blank">Northwestern’s <i>Computational Thinking in STEM</i> summer workshop.</a> Upon completion of the summer workshop, 9th–12th grade science and math teachers will be able to:
     </p>
-    <ul class="page-blurb" style="margin-top: 1em;">
+    <ul style="margin-top: 1em;">
       <li>Enhance student STEM learning with existing CT tools </li>
       <li>Guide student analysis of computational problems with and without a computer</li>
       <li>Support students in developing algorithms and models to analyze real-world data and problems</li>
       <li>Advance their own understanding of CT in STEM</li>
-      <li>Enhance or develop a 2-week curriculum for their classroom</li>
+      <li>Enhance or develop a curriculum for their classroom</li>
     </ul>
 
-    <p class="page-blurb">
+    <p>
       To date, we’ve trained over 50 teachers from many Chicago-area schools in four summer CT-STEM workshops.
-   </p>
+    </p>
+    <hr>
+    <p>
+      <i>
+      “It was really helpful to have people with a different background who could offer insight on what would work best and be most practical” - High school physics teachers
+      </i>
+    </p>
 
+    <p>
+      <i>“If I didn't have a co-design partner, I would probably spend like a whole day on three lines of code and figuring out how that works. I felt I didn't have to struggle through that aspect of it and it was more thinking about: here's what I want my students to take away.” - High school mathematics teacher
+      </i>
+    </p>
+    <p>
+      <i>
+      “[My co-design partner] made something that seemed unobtainable and foreign to me -not- and he found a way that it worked for me, which might be different for everyone [else]” - High school biology teacher</i>
+    </p>
+    <hr>
 
-    <div class="page-blurb" id="help_videos">
+    <div id="help_videos">
       <h3 class="left">Co-designed CT-STEM Curriculum</h3>
       <ul class="links">
         <li><a href="https://www.youtube.com/watch?v=puQlTZvCqZA" target="_blank">Creating User Groups</a></li>
@@ -68,7 +95,7 @@
     </div>
 
 
-    <p class="page-blurb">
+    <p>
       For more information, contact <a href="mailto:ctstem@northwestern.edu">ctstem@northwestern.edu</a>.
     </p>
   </div>
