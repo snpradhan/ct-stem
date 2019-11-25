@@ -1677,22 +1677,17 @@ img.page-blurb-image {
   width: 600px;
   margin: 1rem 12rem;
 }
-.page-blurb .pd1 {
+.page-blurb .pd1, .page-blurb .pd2{
   margin-bottom: 0.5em;
+  text-align: center;
 }
 .page-blurb .pd1 img {
-  width: 100%;
-}
-.page-blurb .pd2 {
-  display: flex;
-  justify-content: space-between;
-
-}
-.page-blurb .pd2 div {
-  flex-basis: 49.8%;
+  max-width: 100%;
+  width: 80em;
 }
 .page-blurb .pd2 img {
-  width: 100%;
+  max-width: 100%;
+  width: 39.75em;
 }
 .service-blurb {
   color: #777;
