@@ -86,7 +86,8 @@ AWS_S3_HOST = 's3-us-west-1.amazonaws.com'
 #    'bucket_name': 'ct-stem-db-backup',
 #}
 DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
-DBBACKUP_STORAGE_OPTIONS = {'location': '/var/backups'}
+DBBACKUP_STORAGE_OPTIONS = {'location': '/var/backups/ctstem'}
+DBBACKUP_AWS_S3_BUCKET = 'ct-stem-db-backup'
 
 #CKEDITOR_JQUERY_URL = 'https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js'
 CKEDITOR_UPLOAD_PATH = "uploads/"
