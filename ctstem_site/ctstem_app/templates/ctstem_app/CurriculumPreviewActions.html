@@ -3,6 +3,7 @@
   <!--div class="col">
     <a type="button" class="btn normal blue" href="#">Print</a>
   </div-->
+  {% with back_url=back_url|default:request.path %}
   <div class="col">
     {% check_curriculum_permission curriculum.id 'assign' as has_assign_permission %}
     {% if has_assign_permission == True %}
@@ -26,10 +27,10 @@
   <div class="col">
     {% check_curriculum_permission curriculum.id 'copy' as has_copy_permission %}
     {% if has_copy_permission == True %}
-      <a type="button" class="btn normal blue" aria-hidden="true" aria-label="Create New Copy" title="Create New Copy" href="{% url 'ctstem:copyCurriculum' curriculum.id %}">Remix</a>
+      <a type="button" class="btn normal blue" aria-hidden="true" aria-label="Create New Copy" title="Create New Copy" href="{% url 'ctstem:copyCurriculum' curriculum.id %}?back_url={{ back_url }}">Remix</a>
     {% else %}
       {% if user.is_authenticated %}
-        {% with msg="This curriculum cannot be assigned because it is private and not locked.  If you need to assign this curriculum please ask the author to lock the curriculum or make it public" %}
+        {% with msg="You do not have the permission to remix this curriculum" %}
         <a type="button" class="btn normal blue" aria-hidden="true" aria-label="Create New Copy" title="Create New Copy" onclick="alert('{{msg}}');">Remix</a>
         {% endwith %}
       {% else %}
@@ -42,7 +43,6 @@
 
   <!-- Edit -->
   {% check_curriculum_permission curriculum.id 'modify' as has_modify_permission %}
-  {% with back_url=back_url|default:request.path %}
   {% if has_modify_permission == True %}
     <div class="col">
       {% if curriculum.status == 'A' %}
@@ -55,7 +55,6 @@
       {% endif %}
     </div>
   {% endif %}
-  {% endwith %}
 
   <!-- Delete -->
   {% check_curriculum_permission curriculum.id 'delete' as has_delete_permission %}
@@ -106,5 +105,5 @@
       </div>
     {% endif %}
   {% endif %}
-
+   {% endwith %}
 </div>

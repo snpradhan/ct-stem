@@ -690,7 +690,12 @@ def copyCurriculum(request, id=''):
       else:
         messages.success(request, "A new curriculum '%s - v%s.' has been created and added to the Private folder.  Please archive the original curriculum" % (new_curriculum.title, new_curriculum.version))
 
-      return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+      back_url = None
+      if 'back_url' in request.GET:
+        back_url = request.GET['back_url']
+
+      return shortcuts.redirect('/curriculum/%s?back_url=%s' % (new_curriculum.id, back_url))
+
     return http.HttpResponseNotAllowed(['GET', 'POST'])
 
   except models.Curriculum.DoesNotExist:
