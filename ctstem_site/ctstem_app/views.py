@@ -2250,7 +2250,7 @@ def deletePublication(request, id=''):
     if request.method == 'GET' or request.method == 'POST':
 
       publication.delete()
-      messages.success(request, '%s deleted' % publication.title)
+      messages.success(request, 'Publication deleted')
       return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
     return http.HttpResponseNotAllowed(['GET', 'POST'])
