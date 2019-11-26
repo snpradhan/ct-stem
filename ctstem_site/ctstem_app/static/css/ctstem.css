@@ -8,16 +8,37 @@
   --ctstem-color-yellow: #FFD028;
   --ctstem-color-light-yellow: #FFDF6F;
   --ctstem-color-pale-yellow: #FFF8DF;
+
+  --ctstem-color-dark-blue: #343D51;
   --ctstem-color-blue: #00ADFF;
   --ctstem-color-medium-blue: #3A74E8;
-  --ctstem-color-dark-blue: #343D51;
-  --ctstem-color-dark-gray: #999EA8;
-  --ctstem-color-gray: #A4A7BF;
-  --ctstem-color-light-gray: #C1C4D9;
+  --ctstem-color-light-blue: #54C8FF;
+  --ctstem-color-pale-blue: #E5F7FF;
+
+  --ctstem-color-dark-gray: #242B39;
+  --ctstem-color-gray: #343D51;
+  --ctstem-color-light-gray: #808593;
+  --ctstem-color-pale-gray: #D8DAE2;
+
+  --ctstem-color-dark-red: #A93254;
   --ctstem-color-red: #F24878;
-  --ctstem-color-green: #0AD35E;
-  --ctstem-color-orange: #FA7921;
-  --ctstem-color-purple: #5050C9;
+  --ctstem-color-light-red: #F684A4;
+  --ctstem-color-pale-red: #FDE4EB;
+
+  --ctstem-color-dark-green: #079342;
+  --ctstem-color-green: #0ad35e;
+  --ctstem-color-light-green: #5be193;
+  --ctstem-color-pale-green: #daf8e7;
+
+  --ctstem-color-dark-orange: #af5417;
+  --ctstem-color-orange: #fa7921;
+  --ctstem-color-light-orange: #fca56a;
+  --ctstem-color-pale-orange: #feedbe;
+
+  --ctstem-color-dark-purple: #38388c;
+  --ctstem-color-purple: #5050c9;
+  --ctstem-color-light-purple: #8a8adb;
+  --ctstem-color-pale-purple: #e5e5f7;
 }
 html {
   height: 100%;
@@ -668,7 +689,10 @@ div.content#curricula > * {
   padding-right: 5%;
   color: white;
 }
-
+div.content#curricula .page-blurb > * {
+  color: inherit !important;
+  text-align: center !important;
+}
 div.content#curricula div.row {
   flex-flow: wrap;
   display: flex;
@@ -746,20 +770,20 @@ div.row#curricula_tiles .col .tile .detail .others{
   color: inherit;
 }
 div.row#curricula_tiles .col .tile.unit .detail {
-  background-color: var(--ctstem-color-yellow);
-}
-div.row#curricula_tiles .col .tile.lesson .detail {
-  background-color: var(--ctstem-color-pale-yellow);
-}
-div.row#curricula_tiles .col .tile.assessment .detail {
   background-color: white;
 }
+div.row#curricula_tiles .col .tile.lesson .detail {
+  background-color: var(--ctstem-color-pale-purple);
+}
+div.row#curricula_tiles .col .tile.assessment .detail {
+  background-color: var(--ctstem-color-pale-red);
+}
 div.row#curricula_tiles .col .tile.step .detail {
-  background-color: lightgray;
+  background-color: var(--ctstem-color-pale-purple);
   height: 15em;
 }
 div.row#curricula_tiles .col .tile.archived .detail {
-  background-color: lightgray;
+  background-color: var(--ctstem-color-light-gray);
 }
 div.row#curricula_tiles .col .tile.archived .icon img{
   opacity: 0.5;
@@ -846,16 +870,16 @@ div.content#preview div.row .col.meta > div {
 }
 
 div.content#preview div.row.unit#preview_head .col.meta {
-  background-color: var(--ctstem-color-yellow);
+  background-color: white
 }
 div.content#preview div.row.lesson#preview_head .col.meta{
-  background-color: var(--ctstem-color-pale-yellow);
+  background-color: var(--ctstem-color-pale-purple);
 }
 div.content#preview div.row.assessment#preview_head .col.meta{
-  background-color: white;
+  background-color: var(--ctstem-color-pale-red);
 }
 div.content#preview div.row.archived#preview_head .col.meta{
-  background-color: lightgray;
+  background-color: var(--ctstem-color-light-gray);
 }
 
 div.content#preview div.row.buttons {
@@ -1256,7 +1280,7 @@ div.content #curricula_tile  .row.button a {
 .btn.darkblue:hover, button[class*="darkblue"]:hover {
   border: 1px solid var(--ctstem-color-dark-blue) !important;
   background-color: #ffffff !important;
-  color: var(--ctstem-color-darkblue) !important;
+  color: var(--ctstem-color-dark-blue) !important;
 }
 .btn.yellow, button[class*="yellow"] {
   background-color: var(--ctstem-color-yellow) !important;
@@ -1943,7 +1967,7 @@ div.modal select.form-control {
 }
 
 .form-control {
-  border: 2px solid var(--ctstem-color-gray) !important;
+  border: 2px solid var(--ctstem-color-light-gray) !important;
   color: black;
 }
 .form-control.error {
