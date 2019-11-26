@@ -173,13 +173,14 @@
         </div>
       {% endif %}
     </div>
-
-    <div class="section" id="teacher_guide section">
-      {% if curriculum.teacher_notes %}
-        <h3 class="left">Teacher Guide</h3>
-        <div>{{curriculum.teacher_notes|safe}}</div>
+    {% if curriculum.teacher_notes %}
+      {% if user.administrator or user.researcher or user.school_administrator or user.teacher or user.author %}
+        <div class="section" id="teacher_notes">
+          <h3 class="left">Teacher Notes</h3>
+          <div>{{curriculum.teacher_notes|safe}}</div>
+        </div>
       {% endif %}
-    </div>
+    {% endif %}
 
     {% include "ctstem_app/CurriculumPreviewActions.html" with curriculum=curriculum %}
   </div>
@@ -191,20 +192,11 @@
         $(li).find('span.fa').toggle();
         $(next).toggle();
       });
-      $('div.teacher_guide').hide();
 
-      $('a.teacher_guide').click(function(){
-        $('div.preview').hide();
-        $('div.teacher_guide').show();
-        $('a.preview').show();
-         $('a.teacher_guide').hide();
-      });
-
-      $('a.preview').click(function(){
-        $('div.preview').show();
-        $('div.teacher_guide').hide();
-        $('a.teacher_guide').show();
-        $('a.preview').hide();
+      $('#teacher_notes_link').click(function(){
+        $('html, body').animate({
+          scrollTop: $($(this).attr('href')).offset().top - 100,
+        }, 1000,'swing');
       });
 
       bind_bookmark();

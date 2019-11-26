@@ -922,6 +922,10 @@ div.content#preview ul.page_links  {
   list-style-type: none;
 }
 
+div.content#preview a > h5 {
+  color: inherit !important;
+  text-decoration: underline;
+}
 /***********   CONTENT DIV END   ************/
 
 /******************
