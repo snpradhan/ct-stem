@@ -688,14 +688,12 @@ def check_curriculum_status_change(sender, instance, **kwargs):
 def resizeImage(img, minwidth, minheight):
   try:
     #check if the file actually exists
-    img.read()
-    img.seek(0)
-    image = Image.open(io.StringIO(img.read()))
+    image = Image.open(img)
     image = image.resize((minwidth, minheight), Image.ANTIALIAS)
-    output = io.StringIO()
+    output = io.BytesIO()
     image.save(output, format='png', quality=75)
     output.seek(0)
-    return InMemoryUploadedFile(output,'ImageField', "%s.png" %img.name, 'image/png', output.len, None)
+    return InMemoryUploadedFile(output,'ImageField', "%s.png" %img.name, 'image/png', output.tell, None)
   except IOError as e:
     #file does not exists
     return None

@@ -1372,8 +1372,7 @@ class TrainingRequestForm(ModelForm):
     return valid
 
 def validateImage(img, minwidth, minheight):
-  img.seek(0)
-  image = Image.open(io.StringIO(img.read()))
+  image = Image.open(img)
   width, height = image.size
   print(width, height)
   if width < minwidth or height < minheight:

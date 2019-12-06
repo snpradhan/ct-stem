@@ -14,10 +14,11 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include(blog_urls))
 """
 from django.conf import settings
-from django.conf.urls import patterns, include, url
+from django.conf.urls import include, url
 from django.contrib import admin
 from ckeditor_uploader import views
 from ctstem_app.views import SchoolAutocomplete
+from django.conf.urls.static import static
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
@@ -30,9 +31,9 @@ urlpatterns = [
     url(r'^chaining/', include('smart_selects.urls')),
     url(r'^school-autocomplete/$', SchoolAutocomplete.as_view(), name='school-autocomplete',),
 
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-urlpatterns += patterns('',
+'''urlpatterns += patterns('',
     (r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT}),
-)
+)'''
 

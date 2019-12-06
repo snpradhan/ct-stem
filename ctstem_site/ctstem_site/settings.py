@@ -55,7 +55,6 @@ INSTALLED_APPS = (
     'password_reset',
     'smart_selects',
     'django_cleanup',
-    'endless_pagination',
     'django_crontab',
     'dbbackup', #django-dbbackup
 )
@@ -72,11 +71,14 @@ MIDDLEWARE_CLASSES = (
     'ctstem_app.middleware.UpdateSession',
 )
 
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 AWS_STORAGE_BUCKET_NAME = 'ct-stem'
+AWS_S3_HOST = 's3-us-west-1.amazonaws.com'
+AWS_S3_URL = '%s.%s/' % (AWS_STORAGE_BUCKET_NAME, AWS_S3_HOST)
 AWS_S3_SECURE_URLS = True       # use http instead of https
 AWS_QUERYSTRING_AUTH = False
-AWS_S3_HOST = 's3-us-west-1.amazonaws.com'
+AWS_DEFAULT_ACL = None
+
 
 #database backup storage
 #DBBACKUP_STORAGE = 'storages.backends.s3boto.S3BotoStorage'

@@ -1,11 +1,10 @@
 from django import template
-from django.utils.encoding import force_unicode
 from ctstem_app import models, views
 from django.contrib import messages
 import datetime
 from django.db.models import Q
 from django.utils import timezone
-from django.utils.datastructures import SortedDict
+from collections import OrderedDict
 
 register = template.Library()
 
@@ -75,7 +74,7 @@ def is_in(var, obj):
 @register.filter(name='sort')
 def listsort(value):
   if isinstance(value,dict):
-    new_dict = SortedDict()
+    new_dict = OrderedDict()
     key_list = list(value.keys())
     key_list.sort()
     for key in key_list:

@@ -34,7 +34,7 @@ from django.core.files import File
 import urllib.request, urllib.parse, urllib.error, urllib.request, urllib.error, urllib.parse
 from urllib.request import urlretrieve
 import base64
-from django.utils.encoding import smart_str, smart_unicode
+from django.utils.encoding import smart_str
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.http import JsonResponse
