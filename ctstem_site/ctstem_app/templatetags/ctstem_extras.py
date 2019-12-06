@@ -76,7 +76,7 @@ def is_in(var, obj):
 def listsort(value):
   if isinstance(value,dict):
     new_dict = SortedDict()
-    key_list = value.keys()
+    key_list = list(value.keys())
     key_list.sort()
     for key in key_list:
       new_dict[key] = value[key]
@@ -123,7 +123,7 @@ def taxonomyHelper(taxonomies):
     else:
       taxonomy_dictionary[taxonomy.category.standard.name] = {taxonomy.category.name: [taxonomy]}
 
-  return taxonomy_dictionary.items()
+  return list(taxonomy_dictionary.items())
 
 @register.filter
 def getTaxonomy(value):
@@ -155,7 +155,7 @@ def getUserInfo(value):
 
 @register.filter
 def iterate(value):
-  return range(1, value+1)
+  return list(range(1, value+1))
 
 @register.filter
 def is_bookmarked(curriculum, teacher):
@@ -186,7 +186,7 @@ def get_type(value):
 
 @register.filter
 def get_ascii_char(value):
-  return [chr(i) for i in xrange(65,91)][int(value)]
+  return [chr(i) for i in range(65,91)][int(value)]
 
 @register.filter
 def format_time(value):
@@ -331,7 +331,7 @@ def get_referenced_questions(step, instance=False):
   referenced_question = []
   for curr_question in curriculum_questions:
     if curr_question.referenced_by:
-      referenced_by = map(int, curr_question.referenced_by.split(','))
+      referenced_by = list(map(int, curr_question.referenced_by.split(',')))
       if step_order in referenced_by:
         if instance:
           #get the response for the question

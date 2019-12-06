@@ -9,7 +9,7 @@ import subprocess
 def cleanup_teacher_accounts():
   #get a list of teacher account created prior to 24 hrs and still inactive
   regEnd = datetime.today() - timedelta(hours = 24)
-  print 'finding teachers registered before ', regEnd
+  print('finding teachers registered before ', regEnd)
   teachers = models.Teacher.objects.all().filter(user__is_active = False, user__date_joined__lt=regEnd)
   count = len(teachers)
   for teacher in teachers:
@@ -20,7 +20,7 @@ def cleanup_teacher_accounts():
       school.delete()
     #send_deletion_email(teacher.user)
     teacher.user.delete()
-  print '%d teacher accounts purged' % count
+  print('%d teacher accounts purged' % count)
 
 def send_deletion_email(user):
   send_mail('CT-STEM Account Deletion',
@@ -33,7 +33,7 @@ def send_deletion_email(user):
 
 
 def backup_db():
-  print 'start db backup', datetime.today()
+  print('start db backup', datetime.today())
   #remove old backups from the file system
   cmd = 'rm %s/*'% settings.DBBACKUP_STORAGE_OPTIONS['location']
   subprocess.call(cmd, shell=True)
@@ -43,5 +43,5 @@ def backup_db():
                                                                                settings.DBBACKUP_STORAGE_OPTIONS['location'],
                                                                                settings.DBBACKUP_AWS_S3_BUCKET)
   subprocess.call(cmd, shell=True)
-  print 'end db backup', datetime.today()
+  print('end db backup', datetime.today())
 

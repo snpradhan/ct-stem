@@ -14,7 +14,7 @@ import json
 from django_xhtml2pdf.utils import render_to_pdf_response
 from django.template.loader import render_to_string, get_template
 from django.template import RequestContext, Context
-import cStringIO as StringIO
+import io as StringIO
 import xhtml2pdf.pisa as pisa
 import os
 from django.conf import settings
@@ -31,8 +31,8 @@ from django.contrib.sites.models import Site
 from django.core import serializers
 import zipfile
 from django.core.files import File
-import urllib, urllib2
-from urllib import urlretrieve
+import urllib.request, urllib.parse, urllib.error, urllib.request, urllib.error, urllib.parse
+from urllib.request import urlretrieve
 import base64
 from django.utils.encoding import smart_str, smart_unicode
 from django.core.validators import validate_email
@@ -284,9 +284,9 @@ def curriculum(request, id=''):
           else:
             return shortcuts.redirect('/curriculum/%s?back_url=%s' % (savedCurriculum.id, back_url))
       else:
-        print form.errors
-        print formset.errors
-        print attachment_formset.errors
+        print(form.errors)
+        print(formset.errors)
+        print(attachment_formset.errors)
         if request.is_ajax():
           response_data = {'status': 0, 'message': 'The preview could not be generated because some mandatory fields are missing.  Please manually save the curriculum to see specific errors.'}
           return http.HttpResponse(json.dumps(response_data), content_type = 'application/json')
@@ -629,7 +629,7 @@ def copyCurriculumMeta(request, id=''):
         source.file.close()
         original_curriculum.icon.save(filename, filecontent)
         original_curriculum.save()
-      except IOError, e:
+      except IOError as e:
         curriculum.save()
     else:
       curriculum.save()
@@ -648,7 +648,7 @@ def copyCurriculumMeta(request, id=''):
           attachment.file_object.save(filename, filecontent)
           attachment.save()
           source.file.close()
-        except IOError, e:
+        except IOError as e:
           continue
 
     return curriculum
@@ -681,7 +681,7 @@ def copyCurriculumSteps(request, original_curriculum, new_curriculum):
           filename = filename_array[0][:10] + '_' + dt + '.' + filename_array[1]
           question.sketch_background.save(filename, filecontent)
           source.file.close()
-        except IOError, e:
+        except IOError as e:
           question.sketch_background = None
       question.save()
 
@@ -961,7 +961,7 @@ def register(request, group_code='', email=''):
             new_school.save()
             newUser.school = new_school
           else:
-            print school_form.errors
+            print(school_form.errors)
             user.delete()
             context = {'form': form, 'school_form': school_form, 'other_school': other_school }
             response_data['success'] = False
@@ -1060,7 +1060,7 @@ def register(request, group_code='', email=''):
         response_data['redirect_url'] = url
 
     else:
-      print form.errors
+      print(form.errors)
       if group_id:
         context = {'form': form, 'group_id': group_id, 'school_id': school.id, 'group_code': group_code, 'email': email}
       else:
@@ -1073,7 +1073,7 @@ def register(request, group_code='', email=''):
 
   ########### GET ###################
   else:
-    print request.user
+    print(request.user)
 
     if hasattr(request.user, 'researcher') or hasattr(request.user, 'author') or hasattr(request.user, 'student'):
       messages.error(request, 'You do not have the privilege to register any other user')
@@ -1092,7 +1092,7 @@ def register(request, group_code='', email=''):
       context = {'form': form, 'school_form': school_form, 'other_school': other_school}
     elif hasattr(request.user, 'school_administrator'):
       school = request.user.school_administrator.school
-      print school.id
+      print(school.id)
       form = forms.RegistrationForm(user=request.user)
       context = {'form': form, 'school_id': school.id}
     elif hasattr(request.user, 'teacher'):
@@ -1116,9 +1116,9 @@ def validate_recaptcha(request, recaptcha_response):
     'secret': settings.GOOGLE_RECAPTCHA_SECRET_KEY,
     'response': recaptcha_response
   }
-  data = urllib.urlencode(values)
-  req = urllib2.Request(url, data)
-  response = urllib2.urlopen(req)
+  data = urllib.parse.urlencode(values)
+  req = urllib.request.Request(url, data)
+  response = urllib.request.urlopen(req)
   result = json.load(response)
 
   if result['success']:
@@ -1131,7 +1131,7 @@ def validate_recaptcha(request, recaptcha_response):
 ####################################
 def user_login(request, user_name=''):
   username = password = ''
-  print request.method
+  print(request.method)
   if request.method == 'POST':
     data = request.POST.copy()
     form = forms.LoginForm(data)
@@ -1320,13 +1320,13 @@ def userProfile(request, id=''):
           messages.success(request, "User profile saved successfully")
           context = {'profileform': profileform, 'userform': userform, 'role': role.replace('_', ' ')}
         else:
-          print profileform.errors
+          print(profileform.errors)
           messages.error(request, "User profile could not be saved. Please check the errors below.")
           context = {'profileform': profileform, 'userform': userform, 'role': role.replace('_', ' ')}
       else:
-        print userform.errors
+        print(userform.errors)
         if profileform:
-          print profileform.errors
+          print(profileform.errors)
         messages.error(request, "User profile could not be saved. Please check the errors below.")
         context = {'profileform': profileform, 'userform': userform, 'role': role.replace('_', ' ')}
 
@@ -1628,8 +1628,8 @@ def standard(request, id=''):
                                                     nested_formset=inlineformset_factory(models.Category, models.Subcategory, form=forms.SubcategoryForm, can_delete=True, can_order=True, extra=1),
                                                     can_delete=True, can_order=True, extra=1)
       formset = CategoryFormSet(data, request.FILES, instance=standard, prefix='form')
-      print form.is_valid()
-      print formset.is_valid()
+      print(form.is_valid())
+      print(formset.is_valid())
       if form.is_valid() and formset.is_valid():
         savedStandard = form.save()
         formset.save(commit=False)
@@ -1650,8 +1650,8 @@ def standard(request, id=''):
         messages.success(request, "Standard Saved.")
         return shortcuts.redirect('ctstem:standard', id=savedStandard.id)
       else:
-        print form.errors
-        print formset.errors
+        print(form.errors)
+        print(formset.errors)
         messages.error(request, "The standard could not be saved because there were errors.  Please check the errors below.")
         context = {'form': form, 'formset':formset}
         return render(request, 'ctstem_app/Standard.html', context)
@@ -1710,7 +1710,7 @@ def searchTaxonomy(request):
       query_filter['title__icontains'] = str(data['title'])
     if data['code']:
       query_filter['code__icontains'] = str(data['code'])
-    print query_filter
+    print(query_filter)
     taxonomyList = models.Subcategory.objects.filter(**query_filter).annotate(code_isnull=models.IsNull('code')).order_by('code_isnull', Lower('code'), Lower('category__standard__short_name'), Lower('category__name'), Lower('title'))
     taxonomy_list = [{'standard': subcategory.category.standard.short_name, 'category': subcategory.category.name, 'title': subcategory.title, 'code': subcategory.code, 'id': subcategory.id} for subcategory in taxonomyList]
     return http.HttpResponse(json.dumps(taxonomy_list), content_type="application/json")
@@ -1733,7 +1733,7 @@ def searchStudents(request):
 
   elif 'POST' == request.method:
     data = request.POST.copy()
-    print data
+    print(data)
     query_filter = {}
     if data['username']:
       query_filter['user__username__icontains'] = str(data['username'])
@@ -1776,7 +1776,7 @@ def searchTeachers(request):
 
   elif 'POST' == request.method:
     data = request.POST.copy()
-    print data
+    print(data)
     query_filter = {}
     if data['username']:
       query_filter['user__username__icontains'] = str(data['username'])
@@ -1787,9 +1787,9 @@ def searchTeachers(request):
     if data['email']:
       query_filter['user__email__icontains'] = str(data['email'])
 
-    print query_filter
+    print(query_filter)
     teacherList = models.Teacher.objects.filter(**query_filter)
-    print teacherList
+    print(teacherList)
     teacher_list = [{'user_id': teacher.user.id, 'teacher_id': teacher.id, 'username': teacher.user.username, 'name': teacher.user.get_full_name(),
                      'email': teacher.user.email}
                 for teacher in teacherList]
@@ -1813,7 +1813,7 @@ def searchAuthors(request):
 
   elif 'POST' == request.method:
     data = request.POST.copy()
-    print data
+    print(data)
     query_filter = {}
     if data['username']:
       query_filter['username__icontains'] = str(data['username'])
@@ -2014,7 +2014,7 @@ def searchCurricula(request, queryset, search_criteria):
 @login_required
 def _do_action(request, id_list, model, object_id=None):
   action_params = request.POST
-  if u'' == action_params.get('action') or len(id_list) == 0:
+  if '' == action_params.get('action') or len(id_list) == 0:
     return True
   if model == 'user' or model == 'student':
     if model == 'user':
@@ -2022,24 +2022,24 @@ def _do_action(request, id_list, model, object_id=None):
     elif model == 'student':
       users = User.objects.filter(student__id__in=id_list)
 
-    if u'delete_selected' == action_params.get(u'action'):
+    if 'delete_selected' == action_params.get('action'):
       for user in users:
         transferCurriculum(request, user)
       users.delete()
       messages.success(request, "Selected user(s) deleted.")
       return True
-    if u'remove_selected' == action_params.get(u'action'):
+    if 'remove_selected' == action_params.get('action'):
       for user in users:
         removeStudent(request, object_id, user.student.id)
       messages.success(request, "Selected student(s) removed from class.")
       return True
-    elif u'activate_selected' == action_params.get(u'action'):
+    elif 'activate_selected' == action_params.get('action'):
       for user in users:
         user.is_active = True
         user.save()
       messages.success(request, "Selected user(s) activated.")
       return True
-    elif u'inactivate_selected' == action_params.get(u'action'):
+    elif 'inactivate_selected' == action_params.get('action'):
       for user in users:
         user.is_active = False
         user.save()
@@ -2065,12 +2065,12 @@ def _do_action(request, id_list, model, object_id=None):
         return False
   elif model == 'group':
     groups = models.UserGroup.objects.filter(id__in=id_list)
-    if u'activate_selected' == action_params.get(u'action'):
+    if 'activate_selected' == action_params.get('action'):
       groups.update(is_active=True)
-      print 'activation done'
+      print('activation done')
       messages.success(request, "Selected class(es) activated.")
       return True
-    elif u'inactivate_selected' == action_params.get(u'action'):
+    elif 'inactivate_selected' == action_params.get('action'):
       groups.update(is_active=False)
       #archive assignments
       archiveAssignments(request, id_list)
@@ -2132,7 +2132,7 @@ def research_category(request, id=''):
         messages.success(request, "Research Category Saved.")
         return shortcuts.redirect('ctstem:categories',)
       else:
-        print form.errors
+        print(form.errors)
         messages.error(request, "The research category could not be saved because there were errors.  Please check the errors below.")
         context = {'form': form}
         return render(request, 'ctstem_app/ResearchCategory.html', context)
@@ -2212,7 +2212,7 @@ def publication(request, id=''):
         messages.success(request, "Publication Saved.")
         return shortcuts.redirect('ctstem:publications',)
       else:
-        print form.errors
+        print(form.errors)
         messages.error(request, "The publication could not be saved because there were errors.  Please check the errors below.")
         context = {'form': form}
         return render(request, 'ctstem_app/Publication.html', context)
@@ -2375,7 +2375,7 @@ def group(request, id=''):
           messages.success(request, "Class Saved.")
           return shortcuts.redirect('ctstem:group', id=savedGroup.id)
         else:
-          print form.errors
+          print(form.errors)
           messages.error(request, "The class could not be saved because there were errors.  Please check the errors below.")
           context = {'form': form, 'role': 'group', 'uploadForm': uploadForm, 'assignmentForm': assignmentForm, 'studentAddForm': studentAddForm, 'assignments': assignments, 'keys': keys}
 
@@ -2557,7 +2557,7 @@ def groupDashboard(request, id=''):
               assignment_status['N'] +=1
             else:
               assignment_status['N'] =1
-        for key, value in assignment_status.items():
+        for key, value in list(assignment_status.items()):
           status.append({'name': status_map[key], 'y': value, 'color': status_color[key]})
         serial += 1
 
@@ -2798,7 +2798,7 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
     if hasattr(request.user, 'student') == False:
       return http.HttpResponseNotFound('<h1>You do not have the privilege to do this assignments</h1>')
 
-    print assignment_id, instance_id, step_order
+    print(assignment_id, instance_id, step_order)
     assignment = models.Assignment.objects.get(id=assignment_id)
     curriculum = assignment.curriculum
 
@@ -3063,8 +3063,8 @@ def feedback(request, assignment_id='', instance_id=''):
           else:
             messages.success(request, 'Your feedback has been saved')
         else:
-          print form.errors
-          print formset.errors
+          print(form.errors)
+          print(formset.errors)
           messages.error(request, 'Your feedback could not be saved')
 
         context = {'form': form, 'formset': formset, 'nextInstance': nextInstance, 'prevInstance': prevInstance}
@@ -3771,7 +3771,7 @@ def export_all_response(request, curriculum_id=''):
 
           studentID = instance.student.user.id
           stepResponses = models.AssignmentStepResponse.objects.all().filter(instance=instance)
-          print stepResponses
+          print(stepResponses)
           for stepResponse in stepResponses:
             questionResponses = models.QuestionResponse.objects.all().filter(step_response=stepResponse)
             for questionResponse in questionResponses:
@@ -3871,7 +3871,7 @@ def question(request, id=''):
       question = questionForm.save()
       response_data = {'success': True, 'question_id': question.id, 'question_text': question.question_text}
     else:
-      print questionForm.errors
+      print(questionForm.errors)
       context = {'questionForm': questionForm, 'title': title, 'disable_fields': disable_fields}
       html = render_to_string('ctstem_app/Question.html', context, context_instance=RequestContext(request))
       response_data = {'success': False, 'html': html, 'error': 'The question could not be saved because there were errors. Please check the errors below.'}
@@ -3891,7 +3891,7 @@ def questionResponse(request, instance_id='', response_id=''):
     # check if the user has permission to view student response
     if '' != instance_id and '' != response_id:
       instance = models.AssignmentInstance.objects.get(id=instance_id)
-      print 'instance', instance
+      print('instance', instance)
       school = instance.student.school
       group = instance.assignment.group
       privilege = 0
@@ -3908,7 +3908,7 @@ def questionResponse(request, instance_id='', response_id=''):
       if 'GET' == request.method:
         #get the question response
         question_response = models.QuestionResponse.objects.get(id=response_id, step_response__instance__id=instance_id)
-        print 'response', question_response
+        print('response', question_response)
         question = question_response.curriculum_question.question
         question_response_files = question_response.response_file.all()
         context = {'question': question, 'question_response': question_response, 'response_files': question_response_files}
@@ -4039,7 +4039,7 @@ def user_upload(request):
 
       response_data = {'success': True, 'new_students': added_students, 'messages': msg}
     else:
-      print form.errors
+      print(form.errors)
       response_data = {'success': False, 'message': 'Please select a class and either a list of student emails or a student email csv to upload.'}
 
     return http.HttpResponse(json.dumps(response_data), content_type="application/json")
@@ -4222,7 +4222,7 @@ def school(request, id=''):
         messages.success(request, "School Saved.")
         return shortcuts.redirect('ctstem:schools',)
       else:
-        print form.errors
+        print(form.errors)
         messages.error(request, "The school could not be saved because there were errors.  Please check the errors below.")
         context = {'form': form}
         return render(request, 'ctstem_app/School.html', context)
@@ -4247,7 +4247,7 @@ def deleteSchool(request, id=''):
       raise models.School.DoesNotExist
 
     if request.method == 'GET' or request.method == 'POST':
-      print school
+      print(school)
       school.delete()
       messages.success(request, '%s deleted' % school.name)
       return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
@@ -4297,7 +4297,7 @@ def subject(request, id=''):
         messages.success(request, "Subject Saved.")
         return shortcuts.redirect('ctstem:subjects',)
       else:
-        print form.errors
+        print(form.errors)
         messages.error(request, "The subject could not be saved because there were errors.  Please check the errors below.")
         context = {'form': form}
         return render(request, 'ctstem_app/Subject.html', context)
@@ -4354,7 +4354,7 @@ def teamRoles(request):
       messages.success(request, 'Team roles saved')
       return shortcuts.redirect('ctstem:teamRoles')
     else:
-      print formset.errors
+      print(formset.errors)
       context = {'formset': formset}
       return render(request, 'ctstem_app/TeamRoles.html', context)
   return http.HttpResponseNotAllowed(['GET', 'POST'])
@@ -4394,7 +4394,7 @@ def teamMember(request, id=''):
         messages.success(request, "Team Member Saved.")
         return shortcuts.redirect('ctstem:teamMembers')
       else:
-        print form.errors
+        print(form.errors)
         messages.error(request, "Team member could not be saved because there were errors.  Please check the errors below.")
         context = {'form': form}
         return render(request, 'ctstem_app/TeamMember.html', context)
@@ -4516,7 +4516,7 @@ def request_training(request):
 
       return http.HttpResponse(json.dumps(response_data), content_type="application/json")
     else:
-      print form.errors
+      print(form.errors)
       response_data['success'] = False
       context = {'form': form}
       response_data['html'] = render_to_string('ctstem_app/TrainingRequestModal.html', context, context_instance=RequestContext(request))
@@ -4558,7 +4558,7 @@ def validate(request, username='', validation_code=''):
       response_data['success'] = True
 
     else:
-      print form.errors
+      print(form.errors)
       context = {'form': form}
       response_data['success'] = False
       response_data['html'] = render_to_string('ctstem_app/ValidationModal.html', context, context_instance=RequestContext(request))
@@ -4593,7 +4593,7 @@ def resetPassword(request, id=''):
         password = User.objects.make_random_password()
         user.set_password(password)
         user.save()
-        print 'password reset'
+        print('password reset')
         response_data = {'result': 'Success', 'full_name': user.get_full_name(), 'username': user.username, 'password': password}
       return http.HttpResponse(json.dumps(response_data), content_type="application/json")
     except models.User.DoesNotExist:

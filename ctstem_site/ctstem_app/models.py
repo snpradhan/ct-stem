@@ -5,7 +5,7 @@ from ckeditor_uploader.fields import RichTextUploadingField
 from ckeditor.fields import RichTextField
 from smart_selects.db_fields import ChainedForeignKey
 from PIL import Image
-import StringIO
+import io
 import datetime
 import string
 from django.utils.crypto import get_random_string
@@ -21,82 +21,82 @@ from django.db.models import Func
 
 
 CURRICULUM_STATUS_CHOICES = (
-    (u'D', u'Private'),
-    (u'P', u'Public'),
-    (u'A', u'Archived'),
-    (u'R', u'Deleted'),
+    ('D', 'Private'),
+    ('P', 'Public'),
+    ('A', 'Archived'),
+    ('R', 'Deleted'),
 )
 
 CURRICULUM_TYPE_CHOICES = (
-    (u'U', u'Unit'),
-    (u'L', u'Lesson Plan'),
-    (u'A', u'Assessment'),
+    ('U', 'Unit'),
+    ('L', 'Lesson Plan'),
+    ('A', 'Assessment'),
 )
 
 FIELD_TYPE_CHOICES = (
-    (u'TA', u'Text Area'),
-    (u'TF', u'Text Field'),
-    (u'DD', u'Drop Down'),
-    (u'MS', u'Multi-Select'),
-    (u'MC', u'Multiple Choice'),
-    (u'MI', u'Multiple Choice w/ Images'),
-    (u'MH', u'Multiple Choice w/ Horizontal Layout'),
-    (u'FI', u'File'),
-    (u'SK', u'Sketch'),
-    (u'DT', u'Data Table'),
+    ('TA', 'Text Area'),
+    ('TF', 'Text Field'),
+    ('DD', 'Drop Down'),
+    ('MS', 'Multi-Select'),
+    ('MC', 'Multiple Choice'),
+    ('MI', 'Multiple Choice w/ Images'),
+    ('MH', 'Multiple Choice w/ Horizontal Layout'),
+    ('FI', 'File'),
+    ('SK', 'Sketch'),
+    ('DT', 'Data Table'),
 
 )
 
 USER_ROLE_CHOICES = (
-    (u'A', u'Site Administrator'),
-    (u'R', u'Researcher'),
-    (u'C', u'Content Author'),
-    (u'P', u'School Administrator'),
-    (u'T', u'Teacher'),
-    (u'S', u'Student'),
+    ('A', 'Site Administrator'),
+    ('R', 'Researcher'),
+    ('C', 'Content Author'),
+    ('P', 'School Administrator'),
+    ('T', 'Teacher'),
+    ('S', 'Student'),
 )
 
 PUBLICATION_TYPES = (
-  (u'journal', u'Journal Articles'),
-  (u'book', u'Book Chapters'),
-  (u'refConfs', u'Refereed Conference Papers'),
-  (u'presentations', u'Presentations and Posters'),
-  (u'workshops', u'Workshop Papers'),
-  (u'others', u'Other Papers'),
+  ('journal', 'Journal Articles'),
+  ('book', 'Book Chapters'),
+  ('refConfs', 'Refereed Conference Papers'),
+  ('presentations', 'Presentations and Posters'),
+  ('workshops', 'Workshop Papers'),
+  ('others', 'Other Papers'),
 )
 
 ASSIGNMENT_STATUS = (
-  (u'N', u'New'),
-  (u'P', u'In Progress'),
-  (u'S', u'Submitted'),
-  (u'F', u'Feedback Ready'),
-  (u'A', u'Archived'),
+  ('N', 'New'),
+  ('P', 'In Progress'),
+  ('S', 'Submitted'),
+  ('F', 'Feedback Ready'),
+  ('A', 'Archived'),
 )
 
 ASSIGNMENT_SORT = (
-  (u'assigned', u'Assigned Date'),
-  (u'group', u'Group'),
-  (u'due', u'Due Date'),
-  (u'status', u'Status'),
-  (u'percent', u'Percent Complete'),
-  (u'modified', u'Last Modified')
+  ('assigned', 'Assigned Date'),
+  ('group', 'Group'),
+  ('due', 'Due Date'),
+  ('status', 'Status'),
+  ('percent', 'Percent Complete'),
+  ('modified', 'Last Modified')
 )
 
 REQUESTER_ROLE = (
-  (u'', u'I am:'),
-  (u'T', u'Teacher'),
-  (u'R', u'Researcher'),
-  (u'A', u'School Administrator'),
-  (u'O', u'Other'),
+  ('', 'I am:'),
+  ('T', 'Teacher'),
+  ('R', 'Researcher'),
+  ('A', 'School Administrator'),
+  ('O', 'Other'),
 )
 CONSENT_CHOICES = (
-  (u'A', u'I Agree'),
-  (u'D', u'I Disagree'),
+  ('A', 'I Agree'),
+  ('D', 'I Disagree'),
 )
 PARENTAL_CONSENT_CHOICES = (
-  (u'U', u'Unknown'),
-  (u'A', u'Agree'),
-  (u'D', u'Disagree'),
+  ('U', 'Unknown'),
+  ('A', 'Agree'),
+  ('D', 'Disagree'),
 )
 
 class IsNull(Func):
@@ -107,7 +107,7 @@ def upload_file_to(instance, filename):
   now = datetime.datetime.now()
   dt = now.strftime("%Y-%m-%d-%H-%M-%S-%f")
   filename_base, filename_ext = os.path.splitext(filename)
-  print filename, now, instance.id
+  print(filename, now, instance.id)
   if isinstance(instance, Curriculum):
     return 'curriculum/%s_%s%s' % (slugify(instance.title[:40]), dt, filename_ext.lower(),)
   elif isinstance(instance, Publication):
@@ -181,7 +181,7 @@ class Curriculum (models.Model):
       ordering = ['-id']
 
   def __unicode__(self):
-      return u'%s' % (self.title)
+      return '%s' % (self.title)
 
   def save(self, *args, **kwargs):
     if self.icon:
@@ -251,7 +251,7 @@ class CurriculumQuestion(models.Model):
   optional = models.BooleanField(default=False)
 
   def __unicode__(self):
-      return u'%s' % (self.question.question_text)
+      return '%s' % (self.question.question_text)
 
   class Meta:
       ordering = ['order']
@@ -281,7 +281,7 @@ class ResearchCategory(models.Model):
   description = models.TextField(null=True, blank=True)
 
   def __unicode__(self):
-    return u'%s' % (self.category)
+    return '%s' % (self.category)
 
   class Meta:
     ordering = ['category']
@@ -303,7 +303,7 @@ class Question(models.Model):
   research_category = models.ManyToManyField(ResearchCategory, null=True, blank=True, related_name='questions')
 
   def __unicode__(self):
-      return u'%s' % (self.question_text)
+      return '%s' % (self.question_text)
 
   def save(self, *args, **kwargs):
     if self.sketch_background:
@@ -318,7 +318,7 @@ class Subject(models.Model):
   abbrevation = models.CharField(null=True, blank=True, max_length=10)
 
   def __unicode__(self):
-      return u'%s' % (self.name)
+      return '%s' % (self.name)
 
   class Meta:
     ordering = ['name']
@@ -334,7 +334,7 @@ class System(models.Model):
   icon = models.CharField(null=False, max_length=256)
 
   def __unicode__(self):
-      return u'%s' % (self.name)
+      return '%s' % (self.name)
 
 # Standards model
 # These would include NGSS, CT-STEM Practice, Common Core, Illinois State Science Standards etc
@@ -344,7 +344,7 @@ class Standard(models.Model):
   primary = models.BooleanField(default=False)
 
   def __unicode__(self):
-      return u'%s' % (self.short_name)
+      return '%s' % (self.short_name)
 
 # Category in a standard
 class Category(models.Model):
@@ -355,7 +355,7 @@ class Category(models.Model):
   order = models.IntegerField(null=True)
 
   def __unicode__(self):
-      return u'%s' % (self.name)
+      return '%s' % (self.name)
 
   class Meta:
       ordering = ['order']
@@ -375,7 +375,7 @@ class Subcategory(models.Model):
   link = models.URLField(null=True, max_length=500, blank=True)
 
   def __unicode__(self):
-      return u'%s' % (self.title)
+      return '%s' % (self.title)
 
   class Meta:
     ordering = ['code']
@@ -388,7 +388,7 @@ class School(models.Model):
   is_active = models.BooleanField(null=False, blank=False, default=False)
 
   def __unicode__(self):
-      return u'%s' % (self.name)
+      return '%s' % (self.name)
 
 ###############################
 # USER CLASSES
@@ -401,7 +401,7 @@ class Student(models.Model):
   parental_consent = models.CharField(null=False, max_length=1, default='U', choices=PARENTAL_CONSENT_CHOICES)
 
   def __unicode__(self):
-      return u'%s, %s' % (self.user.last_name, self.user.first_name)
+      return '%s, %s' % (self.user.last_name, self.user.first_name)
 
   def get_consent(self):
     if self.consent == 'A':
@@ -431,7 +431,7 @@ class Teacher(models.Model):
       ordering = ['user__first_name', 'user__last_name']
 
   def __unicode__(self):
-      return u'%s' % (self.user.get_full_name())
+      return '%s' % (self.user.get_full_name())
 
 # Researcher model
 # This model represents researchers
@@ -439,7 +439,7 @@ class Researcher(models.Model):
   user = models.OneToOneField(User, unique=True, null=False, related_name="researcher")
 
   def __unicode__(self):
-      return u'%s' % (self.user.get_full_name())
+      return '%s' % (self.user.get_full_name())
 
 # Administrator models
 # This model represents a author user
@@ -447,7 +447,7 @@ class Author(models.Model):
   user = models.OneToOneField(User, unique=True, null=False, related_name="author")
 
   def __unicode__(self):
-      return u'%s' % (self.user.get_full_name())
+      return '%s' % (self.user.get_full_name())
 
 # Administrator models
 # This model represents a super user
@@ -455,7 +455,7 @@ class Administrator(models.Model):
   user = models.OneToOneField(User, unique=True, null=False, related_name="administrator")
 
   def __unicode__(self):
-      return u'%s' % (self.user.get_full_name())
+      return '%s' % (self.user.get_full_name())
 
 # School Administrator model
 # This model represents school administrators and school principals
@@ -464,7 +464,7 @@ class SchoolAdministrator(models.Model):
   school = models.ForeignKey(School)
 
   def __unicode__(self):
-      return u'%s' % (self.user.get_full_name())
+      return '%s' % (self.user.get_full_name())
 #######################################################
 # Publication model
 #######################################################
@@ -493,7 +493,7 @@ class UserGroup(models.Model):
   modified_date = models.DateTimeField(auto_now=True)
 
   def __unicode__(self):
-    return u'%s' % (self.title)
+    return '%s' % (self.title)
 
   class Meta:
     ordering = ['title']
@@ -515,7 +515,7 @@ class Assignment(models.Model):
   lock_on_completion = models.BooleanField(default=False)
 
   def __unicode__(self):
-    return u'%s' % (self.curriculum.title)
+    return '%s' % (self.curriculum.title)
 
 #######################################################
 # Membership model
@@ -631,7 +631,7 @@ class TeamRole(models.Model):
   order = models.IntegerField(null=False, blank=False, unique=True)
 
   def __unicode__(self):
-    return u'%s' % (self.role)
+    return '%s' % (self.role)
 
   class Meta:
       ordering = ['order']
@@ -690,12 +690,12 @@ def resizeImage(img, minwidth, minheight):
     #check if the file actually exists
     img.read()
     img.seek(0)
-    image = Image.open(StringIO.StringIO(img.read()))
+    image = Image.open(io.StringIO(img.read()))
     image = image.resize((minwidth, minheight), Image.ANTIALIAS)
-    output = StringIO.StringIO()
+    output = io.StringIO()
     image.save(output, format='png', quality=75)
     output.seek(0)
     return InMemoryUploadedFile(output,'ImageField', "%s.png" %img.name, 'image/png', output.len, None)
-  except IOError, e:
+  except IOError as e:
     #file does not exists
     return None

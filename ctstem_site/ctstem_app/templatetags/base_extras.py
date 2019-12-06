@@ -9,7 +9,7 @@ import random
 import os
 import posixpath
 import stat
-import urllib
+import urllib.request, urllib.parse, urllib.error
 from django.contrib.staticfiles import finders
 
 register = template.Library()
@@ -32,7 +32,7 @@ def settings_value(name):
 
 @register.simple_tag
 def staticfile(path):
-    normalized_path = posixpath.normpath(urllib.unquote(path)).lstrip('/')
+    normalized_path = posixpath.normpath(urllib.parse.unquote(path)).lstrip('/')
     absolute_path = finders.find(normalized_path)
     if not absolute_path and getattr(settings, 'STATIC_ROOT', None):
         absolute_path = os.path.join(settings.STATIC_ROOT, path)

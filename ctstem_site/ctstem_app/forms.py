@@ -18,7 +18,7 @@ from tinymce.widgets import TinyMCE
 from django.db.models import Q
 from django.db.models.functions import Lower
 from PIL import Image
-import StringIO
+import io
 import os
 from dal import autocomplete
 
@@ -27,15 +27,15 @@ from dal import autocomplete
 # Login Form
 ####################################
 class LoginForm (forms.Form):
-  username_email = forms.CharField(required=True, max_length=75, label=u'Username or Email',
+  username_email = forms.CharField(required=True, max_length=75, label='Username or Email',
                               error_messages={'required': 'Username or email is required'})
-  password = forms.CharField(required=True, widget=forms.PasswordInput(render_value=False), label=u'Password',
+  password = forms.CharField(required=True, widget=forms.PasswordInput(render_value=False), label='Password',
                               error_messages={'required': 'Password is required'})
 
   def __init__(self, *args, **kwargs):
     super(LoginForm, self).__init__(*args, **kwargs)
 
-    for field_name, field in self.fields.items():
+    for field_name, field in list(self.fields.items()):
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['aria-describedby'] = field.label
       field.widget.attrs['placeholder'] = field.help_text
@@ -56,7 +56,7 @@ class LoginForm (forms.Form):
 
     if username_email is not None:
       if User.objects.filter(username=username_email.lower()).count() == 0 and User.objects.filter(email=username_email.lower()).count() == 0:
-        self.add_error('username_email', u'Username or email is incorrect.')
+        self.add_error('username_email', 'Username or email is incorrect.')
         self.fields['username_email'].widget.attrs['class'] += ' error'
       elif password is not None:
         username = None
@@ -67,21 +67,21 @@ class LoginForm (forms.Form):
 
         user = authenticate(username=username, password=password)
         if user is None:
-          self.add_error('password', u'Password is incorrect.')
+          self.add_error('password', 'Password is incorrect.')
           self.fields['password'].widget.attrs['class'] += ' error'
 
 ####################################
 # Registration Form
 ####################################
 class RegistrationForm (forms.Form):
-  email = forms.EmailField(required=True, max_length=75, label=u'Email')
-  confirm_email = forms.EmailField(required=True, max_length=75, label=u'Confirm Email')
-  username = forms.RegexField(required=True, regex=r'^\w+$', max_length=30, label=u'Username',
+  email = forms.EmailField(required=True, max_length=75, label='Email')
+  confirm_email = forms.EmailField(required=True, max_length=75, label='Confirm Email')
+  username = forms.RegexField(required=True, regex=r'^\w+$', max_length=30, label='Username',
                               error_messages={'invalid': 'Usernames may only contain letters, numbers, and underscores (_)'})
-  first_name = forms.CharField(required=True, max_length=30, label=u'First name')
-  last_name = forms.CharField(required=True, max_length=30, label=u'Last name')
-  password1 = forms.CharField(required=True, widget=forms.PasswordInput(render_value=False), label=u'Password')
-  password2 = forms.CharField(required=True, widget=forms.PasswordInput(render_value=False), label=u'Confirm Password')
+  first_name = forms.CharField(required=True, max_length=30, label='First name')
+  last_name = forms.CharField(required=True, max_length=30, label='Last name')
+  password1 = forms.CharField(required=True, widget=forms.PasswordInput(render_value=False), label='Password')
+  password2 = forms.CharField(required=True, widget=forms.PasswordInput(render_value=False), label='Confirm Password')
   account_type = forms.ChoiceField(required=True, choices = models.USER_ROLE_CHOICES)
   school = forms.ModelChoiceField(required=False,
                                   queryset=models.School.objects.all().filter(is_active=True).order_by('name'),
@@ -113,7 +113,7 @@ class RegistrationForm (forms.Form):
     else:
       self.fields['account_type'].choices = models.USER_ROLE_CHOICES[4:5]
 
-    for field_name, field in self.fields.items():
+    for field_name, field in list(self.fields.items()):
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['aria-describedby'] = field.label
       field.widget.attrs['placeholder'] = field.help_text
@@ -145,7 +145,7 @@ class RegistrationForm (forms.Form):
     if username is None:
       self.fields['username'].widget.attrs['class'] += ' error'
     elif User.objects.filter(username=username.lower()).count() > 0:
-      self.add_error('username', u'This username is already taken. Please choose another.')
+      self.add_error('username', 'This username is already taken. Please choose another.')
       self.fields['username'].widget.attrs['class'] += ' error'
 
     if password1 is None:
@@ -153,7 +153,7 @@ class RegistrationForm (forms.Form):
     if password2 is None:
       self.fields['password2'].widget.attrs['class'] += ' error'
     if password1 != password2:
-      self.add_error('password1', u'Passwords do not match.')
+      self.add_error('password1', 'Passwords do not match.')
       self.fields['password1'].widget.attrs['class'] += ' error'
       self.fields['password2'].widget.attrs['class'] += ' error'
 
@@ -164,26 +164,26 @@ class RegistrationForm (forms.Form):
     if email is None:
       self.fields['email'].widget.attrs['class'] += ' error'
     elif User.objects.filter(email=email).count() > 0:
-      self.add_error('email', u'This email is already taken. Please choose another.')
+      self.add_error('email', 'This email is already taken. Please choose another.')
       self.fields['email'].widget.attrs['class'] += ' error'
     elif 'confirm_email' in self.fields and email != confirm_email:
-      self.add_error('confirm_email', u'Emails do not match.')
+      self.add_error('confirm_email', 'Emails do not match.')
       self.fields['email'].widget.attrs['class'] += ' error'
       self.fields['confirm_email'].widget.attrs['class'] += ' error'
     #check fields for Teacher, Student and School Administrator
     if account_type in ['T', 'S', 'P'] and school is None:
       self.fields['school'].widget.attrs['class'] += ' error'
-      self.add_error('school', u'School is required.')
+      self.add_error('school', 'School is required.')
 
 
 
 class PreRegistrationForm(forms.Form):
-  email = forms.EmailField(required=True, max_length=75, label=u'Email')
+  email = forms.EmailField(required=True, max_length=75, label='Email')
 
   def __init__(self, *args, **kwargs):
     super(PreRegistrationForm, self).__init__(*args, **kwargs)
 
-    for field_name, field in self.fields.items():
+    for field_name, field in list(self.fields.items()):
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['aria-describedby'] = field.label
       field.widget.attrs['placeholder'] = field.help_text
@@ -200,15 +200,15 @@ class PreRegistrationForm(forms.Form):
       user = User.objects.get(email=email)
       student = models.Student.objects.get(user=user)
       if group.teacher.school != student.school:
-        self.errors['email'] = u'Your student account belongs to a different school and you cannot join this class.'
+        self.errors['email'] = 'Your student account belongs to a different school and you cannot join this class.'
         return False
     except User.MultipleObjectsReturned:
-      self.errors['email'] = u'More than one account exists for this email. Contact your system admin.'
+      self.errors['email'] = 'More than one account exists for this email. Contact your system admin.'
       return False
     except User.DoesNotExist:
       return True
     except models.Student.DoesNotExist:
-      self.errors['email'] = u'Email exists in the system but is not associated with a student account'
+      self.errors['email'] = 'Email exists in the system but is not associated with a student account'
       return False
 
     return True
@@ -217,14 +217,14 @@ class PreRegistrationForm(forms.Form):
 # Validation Form
 ####################################
 class ValidationForm (forms.Form):
-  username = forms.RegexField(required=True, regex=r'^\w+$', max_length=30, label=u'Username', help_text="Enter your username")
-  password = forms.CharField(required=True, widget=forms.PasswordInput(render_value=False), label=u'Password', help_text="Enter your password")
-  validation_code = forms.CharField(required=True, label=u'Validation Code', help_text="Enter the validation code")
+  username = forms.RegexField(required=True, regex=r'^\w+$', max_length=30, label='Username', help_text="Enter your username")
+  password = forms.CharField(required=True, widget=forms.PasswordInput(render_value=False), label='Password', help_text="Enter your password")
+  validation_code = forms.CharField(required=True, label='Validation Code', help_text="Enter the validation code")
 
   def __init__(self, *args, **kwargs):
     super(ValidationForm, self).__init__(*args, **kwargs)
 
-    for field_name, field in self.fields.items():
+    for field_name, field in list(self.fields.items()):
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['aria-describedby'] = field.label
       field.widget.attrs['placeholder'] = field.help_text
@@ -245,19 +245,19 @@ class ValidationForm (forms.Form):
         user = User.objects.get(username=username)
         teacher = models.Teacher.objects.get(user=user)
       except (User.DoesNotExist, models.Teacher.DoesNotExist):
-        self.add_error('username', u'Username is incorrect.')
+        self.add_error('username', 'Username is incorrect.')
         self.fields['username'].widget.attrs['class'] += ' error'
 
     if password is None:
       self.fields['password'].widget.attrs['class'] += ' error'
     elif teacher and not user.check_password(password):
-      self.add_error('password', u'Password is incorrect.')
+      self.add_error('password', 'Password is incorrect.')
       self.fields['password'].widget.attrs['class'] += ' error'
 
     if validation_code is None:
       self.fields['validation_code'].widget.attrs['class'] += ' error'
     elif teacher and teacher.validation_code != validation_code:
-      self.add_error('validation_code', u'Validation Code is incorrect.')
+      self.add_error('validation_code', 'Validation Code is incorrect.')
       self.fields['validation_code'].widget.attrs['class'] += ' error'
 
 
@@ -265,8 +265,8 @@ class ValidationForm (forms.Form):
 # UserProfile Form
 ####################################
 class UserProfileForm(ModelForm):
-  password1 = forms.CharField(widget=forms.PasswordInput, required=False, label=u'Password', help_text="Leave this field blank to retain old password")
-  password2 = forms.CharField(widget=forms.PasswordInput, required=False, label=u'Confirm Password')
+  password1 = forms.CharField(widget=forms.PasswordInput, required=False, label='Password', help_text="Leave this field blank to retain old password")
+  password2 = forms.CharField(widget=forms.PasswordInput, required=False, label='Confirm Password')
 
   class Meta:
     model = models.User
@@ -274,7 +274,7 @@ class UserProfileForm(ModelForm):
 
   def __init__(self, *args, **kwargs):
     super(UserProfileForm, self).__init__(*args, **kwargs)
-    for field_name, field in self.fields.items():
+    for field_name, field in list(self.fields.items()):
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['aria-describedby'] = field.label
       field.widget.attrs['placeholder'] = field.help_text
@@ -310,27 +310,27 @@ class UserProfileForm(ModelForm):
     email = cleaned_data.get('email')
 
     if username is None or username == '':
-      self.add_error('username', u'Username is required')
+      self.add_error('username', 'Username is required')
       valid = False
     elif User.objects.filter(username=username.lower()).exclude(id=user_id).count() > 0:
-      self.add_error('username', u'This username is already taken. Please choose another.')
+      self.add_error('username', 'This username is already taken. Please choose another.')
       valid = False
 
     if password1 != password2:
-      self.add_error('password1', u'Passwords do not match.')
+      self.add_error('password1', 'Passwords do not match.')
       valid = False
 
     if first_name is None or first_name == '':
-      self.add_error('first_name', u'First name is required')
+      self.add_error('first_name', 'First name is required')
       valid = False
     if last_name is None or last_name == '':
-      self.add_error('last_name', u'Last name is required')
+      self.add_error('last_name', 'Last name is required')
       valid = False
     if email is None or email == '':
-      self.add_error('email', u'Email is required')
+      self.add_error('email', 'Email is required')
       valid = False
     elif User.objects.filter(email=email).exclude(id=user_id).count() > 0:
-      self.add_error('email', u'This email is already taken. Please choose another.')
+      self.add_error('email', 'This email is already taken. Please choose another.')
       valid = False
 
     return valid
@@ -369,7 +369,7 @@ class StudentForm (ModelForm):
       if hasattr(user, 'student') == False:
         del self.fields['consent']
 
-    for field_name, field in self.fields.items():
+    for field_name, field in list(self.fields.items()):
       if field_name != 'consent':
         field.widget.attrs['class'] = 'form-control'
         field.widget.attrs['aria-describedby'] = field.label
@@ -421,7 +421,7 @@ class TeacherForm (ModelForm):
     else:
       self.fields['school'].queryset = models.School.objects.all().filter(is_active=True)
 
-    for field_name, field in self.fields.items():
+    for field_name, field in list(self.fields.items()):
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['aria-describedby'] = field.label
       field.widget.attrs['placeholder'] = field.help_text
@@ -435,7 +435,7 @@ class ResearcherForm (ModelForm):
     fields = []
   def __init__(self, *args, **kwargs):
     super(ResearcherForm, self).__init__(*args, **kwargs)
-    for field_name, field in self.fields.items():
+    for field_name, field in list(self.fields.items()):
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['aria-describedby'] = field.label
       field.widget.attrs['placeholder'] = field.help_text
@@ -456,7 +456,7 @@ class SchoolAdministratorForm (ModelForm):
     else:
       self.fields['school'].queryset = models.School.objects.filter(~Q(school_code='OTHER'), is_active=True).order_by('name')
 
-    for field_name, field in self.fields.items():
+    for field_name, field in list(self.fields.items()):
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['aria-describedby'] = field.label
       field.widget.attrs['placeholder'] = field.help_text
@@ -470,7 +470,7 @@ class AuthorForm (ModelForm):
     fields = []
   def __init__(self, *args, **kwargs):
     super(AuthorForm, self).__init__(*args, **kwargs)
-    for field_name, field in self.fields.items():
+    for field_name, field in list(self.fields.items()):
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['aria-describedby'] = field.label
       field.widget.attrs['placeholder'] = field.help_text
@@ -520,7 +520,7 @@ class CurriculumForm(ModelForm):
     if self.instance.id:
       self.fields['curriculum_type'].widget.attrs['disabled'] = True
 
-    for field_name, field in self.fields.items():
+    for field_name, field in list(self.fields.items()):
       if field_name == 'order' or field_name == 'feature_rank':
         field.widget.attrs['class'] = 'form-control order'
       else:
@@ -539,34 +539,34 @@ class CurriculumForm(ModelForm):
         try:
           cleaned_data.get('icon').read()
           validateImage(cleaned_data.get('icon'), 400, 289)
-        except IOError, e:
-          self.add_error('icon', u'Icon file is invalid. Please upload a new icon.')
+        except IOError as e:
+          self.add_error('icon', 'Icon file is invalid. Please upload a new icon.')
           valid = False
-        except ValidationError, e:
+        except ValidationError as e:
           self.add_error('icon', e.message)
           valid = False
 
       if cleaned_data.get('title') == '':
-        self.add_error('title', u'Title is required')
+        self.add_error('title', 'Title is required')
         valid = False
       if cleaned_data.get('time') == '':
-        self.add_error('time', u'Time is required')
+        self.add_error('time', 'Time is required')
         valid = False
       if cleaned_data.get('curriculum_type') != 'L' or not cleaned_data.get('unit'):
         if cleaned_data.get('level') == '':
-          self.add_error('level', u'Level is required')
+          self.add_error('level', 'Level is required')
           valid = False
         if cleaned_data.get('overview') == '':
-          self.add_error('overview', u'Overview is required')
+          self.add_error('overview', 'Overview is required')
           valid = False
       if not cleaned_data.get('taxonomy') and not cleaned_data.get('unit'):
-          self.add_error('taxonomy', u'Standards is required')
+          self.add_error('taxonomy', 'Standards is required')
           valid = False
 
       if cleaned_data.get('curriculum_type') == 'U'  or cleaned_data.get('curriculum_type') == 'L':
         if cleaned_data.get('curriculum_type') != 'L' or not cleaned_data.get('unit'):
           if not cleaned_data.get('subject'):
-            self.add_error('subject', u'Subject is required')
+            self.add_error('subject', 'Subject is required')
             valid = False
     return valid
 
@@ -586,7 +586,7 @@ class StepForm(ModelForm):
 
   def __init__(self, *args, **kwargs):
     super(StepForm, self).__init__(*args, **kwargs)
-    for field_name, field in self.fields.items():
+    for field_name, field in list(self.fields.items()):
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['placeholder'] = field.help_text
 
@@ -607,7 +607,7 @@ class AttachmentForm(ModelForm):
 
   def __init__(self, *args, **kwargs):
     super(AttachmentForm, self).__init__(*args, **kwargs)
-    for field_name, field in self.fields.items():
+    for field_name, field in list(self.fields.items()):
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['placeholder'] = field.help_text
 
@@ -621,8 +621,8 @@ class AttachmentForm(ModelForm):
     if cleaned_data.get('file_object') and not cleaned_data.get('DELETE'):
       try:
         cleaned_data.get('file_object').read()
-      except IOError, e:
-        self.add_error('file_object', u'Attached file is invalid. Please upload a new attachment.')
+      except IOError as e:
+        self.add_error('file_object', 'Attached file is invalid. Please upload a new attachment.')
         valid = False
 
     return valid
@@ -661,7 +661,7 @@ class QuestionForm(ModelForm):
       self.fields['answer_field_type'].widget.attrs['disabled'] = True
       self.fields['options'].widget.attrs['disabled'] = True
 
-    for field_name, field in self.fields.items():
+    for field_name, field in list(self.fields.items()):
       field.widget.attrs['class'] = 'form-control'
 
   def is_valid(self):
@@ -675,10 +675,10 @@ class QuestionForm(ModelForm):
       try:
         cleaned_data.get('sketch_background').read()
         validateImage(cleaned_data.get('sketch_background'), 900, 500)
-      except IOError, e:
-        self.add_error('sketch_background', u'Background image file is invalid. Please upload a new file.')
+      except IOError as e:
+        self.add_error('sketch_background', 'Background image file is invalid. Please upload a new file.')
         valid = False
-      except ValidationError, e:
+      except ValidationError as e:
         self.add_error('sketch_background', e.message)
         valid = False
 
@@ -700,7 +700,7 @@ class ResearchCategoryForm(ModelForm):
   def __init__(self, *args, **kwargs):
     super(ResearchCategoryForm, self).__init__(*args, **kwargs)
 
-    for field_name, field in self.fields.items():
+    for field_name, field in list(self.fields.items()):
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['placeholder'] = field.help_text
 
@@ -722,7 +722,7 @@ class SubcategoryForm(ModelForm):
   def __init__(self, *args, **kwargs):
     super(SubcategoryForm, self).__init__(*args, **kwargs)
 
-    for field_name, field in self.fields.items():
+    for field_name, field in list(self.fields.items()):
       field.widget.attrs['class'] = 'form-control'
       if field.help_text:
         field.widget.attrs['placeholder'] = field.help_text
@@ -744,7 +744,7 @@ class TaxonomySearchForm(ModelForm):
   def __init__(self, *args, **kwargs):
     super(TaxonomySearchForm, self).__init__(*args, **kwargs)
 
-    for field_name, field in self.fields.items():
+    for field_name, field in list(self.fields.items()):
       field.widget.attrs['class'] = 'form-control'
       if field.help_text:
         field.widget.attrs['placeholder'] = field.help_text
@@ -756,15 +756,15 @@ class TaxonomySearchForm(ModelForm):
 # User Search Form
 ####################################
 class UserSearchForm(forms.Form):
-  username = forms.CharField(required=False, max_length=30, label=u'Username')
-  first_name = forms.CharField(required=False, max_length=30, label=u'First name')
-  last_name = forms.CharField(required=False, max_length=30, label=u'Last name')
-  email = forms.EmailField(required=False, max_length=75, label=u'Email')
+  username = forms.CharField(required=False, max_length=30, label='Username')
+  first_name = forms.CharField(required=False, max_length=30, label='First name')
+  last_name = forms.CharField(required=False, max_length=30, label='Last name')
+  email = forms.EmailField(required=False, max_length=75, label='Email')
 
   def __init__(self, *args, **kwargs):
     super(UserSearchForm, self).__init__(*args, **kwargs)
 
-    for field_name, field in self.fields.items():
+    for field_name, field in list(self.fields.items()):
       field.widget.attrs['class'] = 'form-control'
       if field.help_text:
         field.widget.attrs['placeholder'] = field.help_text
@@ -775,16 +775,16 @@ class UserSearchForm(forms.Form):
 ####################################
 class StudentAddForm(forms.Form):
 
-  username = forms.RegexField(required=True, regex=r'^\w+$', max_length=30, label=u'Username',
+  username = forms.RegexField(required=True, regex=r'^\w+$', max_length=30, label='Username',
                               error_messages={'invalid': 'Usernames may only contain letters, numbers, and underscores (_)'})
-  first_name = forms.CharField(required=True, max_length=30, label=u'First name')
-  last_name = forms.CharField(required=True, max_length=30, label=u'Last name')
-  email = forms.EmailField(required=True, max_length=75, label=u'Email')
+  first_name = forms.CharField(required=True, max_length=30, label='First name')
+  last_name = forms.CharField(required=True, max_length=30, label='Last name')
+  email = forms.EmailField(required=True, max_length=75, label='Email')
 
   def __init__(self, *args, **kwargs):
     super(StudentAddForm, self).__init__(*args, **kwargs)
 
-    for field_name, field in self.fields.items():
+    for field_name, field in list(self.fields.items()):
       field.widget.attrs['class'] = 'form-control'
       if field.required:
         field.widget.attrs['required'] = 'required'
@@ -809,7 +809,7 @@ class AssignmentSearchForm(forms.Form):
     elif hasattr(user, 'school_administrator'):
       self.fields['group_class'].queryset = self.fields['group_class'].queryset.filter(teacher__school=user.school_administrator.school)
 
-    for field_name, field in self.fields.items():
+    for field_name, field in list(self.fields.items()):
       field.widget.attrs['class'] = 'form-control'
       if field.help_text:
         field.widget.attrs['placeholder'] = field.help_text
@@ -819,12 +819,12 @@ class AssignmentSearchForm(forms.Form):
 # Search Form
 ####################################
 class SearchForm(forms.Form):
-  search_criteria = forms.CharField(required=False, max_length=30, label=u'Search Criteria', help_text='Enter your search text')
+  search_criteria = forms.CharField(required=False, max_length=30, label='Search Criteria', help_text='Enter your search text')
 
   def __init__(self, *args, **kwargs):
     super(SearchForm, self).__init__(*args, **kwargs)
 
-    for field_name, field in self.fields.items():
+    for field_name, field in list(self.fields.items()):
       field.widget.attrs['class'] = 'form-control'
       if field.help_text:
         field.widget.attrs['placeholder'] = field.help_text
@@ -844,7 +844,7 @@ class StandardForm(ModelForm):
   def __init__(self, *args, **kwargs):
     super(StandardForm, self).__init__(*args, **kwargs)
 
-    for field_name, field in self.fields.items():
+    for field_name, field in list(self.fields.items()):
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['placeholder'] = field.help_text
 
@@ -864,7 +864,7 @@ class CategoryForm(ModelForm):
   def __init__(self, *args, **kwargs):
     super(CategoryForm, self).__init__(*args, **kwargs)
 
-    for field_name, field in self.fields.items():
+    for field_name, field in list(self.fields.items()):
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['placeholder'] = field.help_text
 
@@ -879,10 +879,10 @@ class CategoryForm(ModelForm):
       try:
         cleaned_data.get('icon').read()
         validateImage(cleaned_data.get('icon'), 400, 289)
-      except IOError, e:
-        self.add_error('icon',  u'Icon file is invalid. Please upload a new file.')
+      except IOError as e:
+        self.add_error('icon',  'Icon file is invalid. Please upload a new file.')
         valid = False
-      except ValidationError, e:
+      except ValidationError as e:
         self.add_error('icon', e.message)
         valid = False
 
@@ -899,7 +899,7 @@ class PublicationForm(ModelForm):
   def __init__(self, *args, **kwargs):
     super(PublicationForm, self).__init__(*args, **kwargs)
 
-    for field_name, field in self.fields.items():
+    for field_name, field in list(self.fields.items()):
       if field_name == 'order':
         field.widget.attrs['class'] = 'form-control order'
       else:
@@ -930,13 +930,13 @@ class UserGroupForm(ModelForm):
       self.fields['teacher'].queryset = self.fields['teacher'].queryset.filter(school=user.school_administrator.school).order_by('user__first_name', 'user__last_name')
       self.fields['members'].queryset = self.fields['members'].queryset.filter(school=user.school_administrator.school).order_by('user__first_name', 'user__last_name')
 
-    for field_name, field in self.fields.items():
+    for field_name, field in list(self.fields.items()):
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['placeholder'] = field.help_text
 
     #if group is inactive, disable all fields
     if self.instance.is_active == False:
-      for field_name, field in self.fields.items():
+      for field_name, field in list(self.fields.items()):
         field.widget.attrs['disabled'] = True
 
   def is_valid(self):
@@ -950,10 +950,10 @@ class UserGroupForm(ModelForm):
       try:
         cleaned_data.get('icon').read()
         validateImage(cleaned_data.get('icon'), 400, 289)
-      except IOError, e:
-        self.add_error('icon', u'Icon file is invalid. Please upload a new file.')
+      except IOError as e:
+        self.add_error('icon', 'Icon file is invalid. Please upload a new file.')
         valid = False
-      except ValidationError, e:
+      except ValidationError as e:
         self.add_error('icon', e.message)
         valid = False
 
@@ -1009,7 +1009,7 @@ class AssignmentForm(ModelForm):
     super(AssignmentForm, self).__init__(*args, **kwargs)
     self.fields["curriculum"].queryset = models.Curriculum.objects.filter(status='P')
 
-    for field_name, field in self.fields.items():
+    for field_name, field in list(self.fields.items()):
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['placeholder'] = field.help_text
 
@@ -1031,7 +1031,7 @@ class CurriculumAssignmentForm(ModelForm):
   def __init__(self, *args, **kwargs):
     super(CurriculumAssignmentForm, self).__init__(*args, **kwargs)
 
-    for field_name, field in self.fields.items():
+    for field_name, field in list(self.fields.items()):
       if field_name == 'due_date':
         field.widget.attrs['class'] = 'form-control datepicker'
         field.widget.attrs['readonly'] = True
@@ -1060,7 +1060,7 @@ class UploadFileForm(forms.Form):
   def __init__(self, *args, **kwargs):
     user = kwargs.pop('user')
     super(UploadFileForm, self).__init__(*args, **kwargs)
-    print 'user', user
+    print('user', user)
     if user.is_authenticated():
       if hasattr(user, 'school_administrator'):
         self.fields['group'].queryset = models.UserGroup.objects.all().filter(teacher__school=user.school_administrator.school, is_active=True)
@@ -1069,7 +1069,7 @@ class UploadFileForm(forms.Form):
     else:
       self.fields['group'].queryset = models.UserGroup.objects.none()
 
-    for field_name, field in self.fields.items():
+    for field_name, field in list(self.fields.items()):
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['aria-describedby'] = field.label
       field.widget.attrs['placeholder'] = field.help_text
@@ -1088,7 +1088,7 @@ class AssignmentInstanceForm(ModelForm):
     super(AssignmentInstanceForm, self).__init__(*args, **kwargs)
     self.fields['teammates'].queryset = assignment.group.members.order_by('user__first_name', 'user__last_name')
 
-    for field_name, field in self.fields.items():
+    for field_name, field in list(self.fields.items()):
       field.widget.attrs['class'] = 'form-control'
       if field.help_text:
         field.widget.attrs['placeholder'] = field.help_text
@@ -1103,7 +1103,7 @@ class AssignmentNotesForm(ModelForm):
 
   def __init__(self, *args, **kwargs):
     super(AssignmentNotesForm, self).__init__(*args, **kwargs)
-    for field_name, field in self.fields.items():
+    for field_name, field in list(self.fields.items()):
       field.widget.attrs['class'] = 'form-control'
       if field.help_text:
         field.widget.attrs['placeholder'] = field.help_text
@@ -1163,7 +1163,7 @@ class QuestionResponseFileForm(ModelForm):
   def __init__(self, *args, **kwargs):
     super(QuestionResponseFileForm, self).__init__(*args, **kwargs)
     self.fields['file'].widget.attrs = {'id':'selectedFile'}
-    for field_name, field in self.fields.items():
+    for field_name, field in list(self.fields.items()):
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['placeholder'] = field.help_text
 
@@ -1206,7 +1206,7 @@ class QuestionFeedbackForm(ModelForm):
   def __init__(self, *args, **kwargs):
     super(QuestionFeedbackForm, self).__init__(*args, **kwargs)
 
-    for field_name, field in self.fields.items():
+    for field_name, field in list(self.fields.items()):
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['placeholder'] = field.help_text
 
@@ -1220,7 +1220,7 @@ class InboxSortForm (forms.Form):
     super(InboxSortForm, self).__init__(*args, **kwargs)
     self.initial['sort_by'] = 'A'
 
-    for field_name, field in self.fields.items():
+    for field_name, field in list(self.fields.items()):
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['placeholder'] = field.help_text
 
@@ -1236,7 +1236,7 @@ class SchoolForm(ModelForm):
   def __init__(self, *args, **kwargs):
     super(SchoolForm, self).__init__(*args, **kwargs)
 
-    for field_name, field in self.fields.items():
+    for field_name, field in list(self.fields.items()):
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['placeholder'] = field.help_text
 
@@ -1273,7 +1273,7 @@ class SubjectForm(ModelForm):
   def __init__(self, *args, **kwargs):
     super(SubjectForm, self).__init__(*args, **kwargs)
 
-    for field_name, field in self.fields.items():
+    for field_name, field in list(self.fields.items()):
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['placeholder'] = field.help_text
 
@@ -1288,10 +1288,10 @@ class SubjectForm(ModelForm):
       try:
         cleaned_data.get('icon').read()
         validateImage(cleaned_data.get('icon'), 400, 289)
-      except IOError, e:
-        self.add_error('icon', u'Icon file is invalid. Please upload a new file.')
+      except IOError as e:
+        self.add_error('icon', 'Icon file is invalid. Please upload a new file.')
         valid = False
-      except ValidationError, e:
+      except ValidationError as e:
         self.add_error('icon', e.message)
         valid = False
 
@@ -1308,7 +1308,7 @@ class TeamRoleForm(ModelForm):
   def __init__(self, *args, **kwargs):
     super(TeamRoleForm, self).__init__(*args, **kwargs)
 
-    for field_name, field in self.fields.items():
+    for field_name, field in list(self.fields.items()):
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['placeholder'] = field.help_text
 
@@ -1327,7 +1327,7 @@ class TeamMemberForm(ModelForm):
   def __init__(self, *args, **kwargs):
     super(TeamMemberForm, self).__init__(*args, **kwargs)
 
-    for field_name, field in self.fields.items():
+    for field_name, field in list(self.fields.items()):
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['placeholder'] = field.help_text
 
@@ -1343,7 +1343,7 @@ class TrainingRequestForm(ModelForm):
   def __init__(self, *args, **kwargs):
     super(TrainingRequestForm, self).__init__(*args, **kwargs)
 
-    for field_name, field in self.fields.items():
+    for field_name, field in list(self.fields.items()):
       field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['placeholder'] = field.help_text
       field.error_messages['required'] = '{fieldname} is required'.format(fieldname=field.label)
@@ -1373,8 +1373,8 @@ class TrainingRequestForm(ModelForm):
 
 def validateImage(img, minwidth, minheight):
   img.seek(0)
-  image = Image.open(StringIO.StringIO(img.read()))
+  image = Image.open(io.StringIO(img.read()))
   width, height = image.size
-  print width, height
+  print(width, height)
   if width < minwidth or height < minheight:
     raise ValidationError(_('Uploaded image is smaller than the minimum required resolution of %d x %d' % (minwidth, minheight)), code='invalid')
