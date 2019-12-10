@@ -180,7 +180,7 @@ class Curriculum (models.Model):
   class Meta:
       ordering = ['-id']
 
-  def __unicode__(self):
+  def __str__(self):
       return '%s' % (self.title)
 
   def save(self, *args, **kwargs):
@@ -250,7 +250,7 @@ class CurriculumQuestion(models.Model):
   referenced_by = models.CharField(null=True, blank=True, max_length=256)
   optional = models.BooleanField(default=False)
 
-  def __unicode__(self):
+  def __str__(self):
       return '%s' % (self.question.question_text)
 
   class Meta:
@@ -280,7 +280,7 @@ class ResearchCategory(models.Model):
   category = models.CharField(null=False, blank=False, max_length=256)
   description = models.TextField(null=True, blank=True)
 
-  def __unicode__(self):
+  def __str__(self):
     return '%s' % (self.category)
 
   class Meta:
@@ -302,7 +302,7 @@ class Question(models.Model):
   sketch_background = models.ImageField(upload_to=upload_file_to, blank=True, null=True, help_text='Upload a background image at least 900x500 in resolution for the sketch pad')
   research_category = models.ManyToManyField(ResearchCategory, null=True, blank=True, related_name='questions')
 
-  def __unicode__(self):
+  def __str__(self):
       return '%s' % (self.question_text)
 
   def save(self, *args, **kwargs):
@@ -317,7 +317,7 @@ class Subject(models.Model):
   icon = models.ImageField(upload_to=upload_file_to, blank=True, null=True, help_text='Upload an image at least 400x289 in resolution that represents this subject')
   abbrevation = models.CharField(null=True, blank=True, max_length=10)
 
-  def __unicode__(self):
+  def __str__(self):
       return '%s' % (self.name)
 
   class Meta:
@@ -333,7 +333,7 @@ class System(models.Model):
   name = models.CharField(null=False, max_length=256)
   icon = models.CharField(null=False, max_length=256)
 
-  def __unicode__(self):
+  def __str__(self):
       return '%s' % (self.name)
 
 # Standards model
@@ -343,7 +343,7 @@ class Standard(models.Model):
   short_name = models.CharField(null=False, max_length=256)
   primary = models.BooleanField(default=False)
 
-  def __unicode__(self):
+  def __str__(self):
       return '%s' % (self.short_name)
 
 # Category in a standard
@@ -354,7 +354,7 @@ class Category(models.Model):
   description = models.TextField(null=True, blank=True)
   order = models.IntegerField(null=True)
 
-  def __unicode__(self):
+  def __str__(self):
       return '%s' % (self.name)
 
   class Meta:
@@ -374,7 +374,7 @@ class Subcategory(models.Model):
   description = models.CharField(null=True, max_length=256, blank=True)
   link = models.URLField(null=True, max_length=500, blank=True)
 
-  def __unicode__(self):
+  def __str__(self):
       return '%s' % (self.title)
 
   class Meta:
@@ -387,7 +387,7 @@ class School(models.Model):
   school_code = models.CharField(null=False, max_length=10, unique=True)
   is_active = models.BooleanField(null=False, blank=False, default=False)
 
-  def __unicode__(self):
+  def __str__(self):
       return '%s' % (self.name)
 
 ###############################
@@ -400,7 +400,7 @@ class Student(models.Model):
   consent = models.CharField(null=False, max_length=1, default='U', choices=CONSENT_CHOICES)
   parental_consent = models.CharField(null=False, max_length=1, default='U', choices=PARENTAL_CONSENT_CHOICES)
 
-  def __unicode__(self):
+  def __str__(self):
       return '%s, %s' % (self.user.last_name, self.user.first_name)
 
   def get_consent(self):
@@ -430,7 +430,7 @@ class Teacher(models.Model):
   class Meta:
       ordering = ['user__first_name', 'user__last_name']
 
-  def __unicode__(self):
+  def __str__(self):
       return '%s' % (self.user.get_full_name())
 
 # Researcher model
@@ -438,7 +438,7 @@ class Teacher(models.Model):
 class Researcher(models.Model):
   user = models.OneToOneField(User, unique=True, null=False, related_name="researcher")
 
-  def __unicode__(self):
+  def __str__(self):
       return '%s' % (self.user.get_full_name())
 
 # Administrator models
@@ -446,7 +446,7 @@ class Researcher(models.Model):
 class Author(models.Model):
   user = models.OneToOneField(User, unique=True, null=False, related_name="author")
 
-  def __unicode__(self):
+  def __str__(self):
       return '%s' % (self.user.get_full_name())
 
 # Administrator models
@@ -454,7 +454,7 @@ class Author(models.Model):
 class Administrator(models.Model):
   user = models.OneToOneField(User, unique=True, null=False, related_name="administrator")
 
-  def __unicode__(self):
+  def __str__(self):
       return '%s' % (self.user.get_full_name())
 
 # School Administrator model
@@ -463,7 +463,7 @@ class SchoolAdministrator(models.Model):
   user = models.OneToOneField(User, unique=True, null=False, related_name="school_administrator")
   school = models.ForeignKey(School)
 
-  def __unicode__(self):
+  def __str__(self):
       return '%s' % (self.user.get_full_name())
 #######################################################
 # Publication model
@@ -492,7 +492,7 @@ class UserGroup(models.Model):
   created_date = models.DateTimeField(auto_now_add=True)
   modified_date = models.DateTimeField(auto_now=True)
 
-  def __unicode__(self):
+  def __str__(self):
     return '%s' % (self.title)
 
   class Meta:
@@ -514,7 +514,7 @@ class Assignment(models.Model):
   assigned_date = models.DateTimeField(auto_now_add=True)
   lock_on_completion = models.BooleanField(default=False)
 
-  def __unicode__(self):
+  def __str__(self):
     return '%s' % (self.curriculum.title)
 
 #######################################################
@@ -630,7 +630,7 @@ class TeamRole(models.Model):
   role = models.CharField(max_length=255, blank=False)
   order = models.IntegerField(null=False, blank=False, unique=True)
 
-  def __unicode__(self):
+  def __str__(self):
     return '%s' % (self.role)
 
   class Meta:
