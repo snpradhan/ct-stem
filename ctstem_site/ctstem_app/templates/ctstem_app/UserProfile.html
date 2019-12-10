@@ -4,7 +4,7 @@
 {% block content %}
   {{block.super}}
   <div class="content">
-    {% if user.id = userform.instance.id %}
+    {% if user.id == userform.instance.id %}
       <h2>My Profile</h2>
     {% else %}
       <h2>{{role|title}} Profile</h2>
