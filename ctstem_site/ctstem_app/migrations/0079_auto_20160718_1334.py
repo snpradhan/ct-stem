@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='assignment',
             name='curriculum',
-            field=models.ForeignKey(related_name='assignments', to='ctstem_app.Curriculum'),
+            field=models.ForeignKey(related_name='assignments', to='ctstem_app.Curriculum', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='curriculum',

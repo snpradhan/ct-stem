@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
             name='Administrator',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('user', models.OneToOneField(to=settings.AUTH_USER_MODEL)),
+                ('user', models.OneToOneField(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
                 ('status', models.CharField(default=b'D', max_length=1, choices=[('D', 'Draft'), ('P', 'Published')])),
                 ('created_date', models.DateTimeField(auto_now_add=True)),
                 ('modified_date', models.DateTimeField(auto_now=True)),
-                ('author', models.ForeignKey(related_name='assessment_author', to=settings.AUTH_USER_MODEL)),
+                ('author', models.ForeignKey(related_name='assessment_author', to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': ['-id'],
@@ -49,7 +49,7 @@ class Migration(migrations.Migration):
                 ('title', models.CharField(max_length=256, null=True)),
                 ('order', models.IntegerField(null=True)),
                 ('content', models.TextField()),
-                ('assessment_id', models.ForeignKey(to='ctstem_app.Assessment')),
+                ('assessment_id', models.ForeignKey(to='ctstem_app.Assessment', on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -74,9 +74,9 @@ class Migration(migrations.Migration):
                 ('status', models.CharField(default=b'D', max_length=1, choices=[('D', 'Draft'), ('P', 'Published')])),
                 ('created_date', models.DateTimeField(auto_now_add=True)),
                 ('modified_date', models.DateTimeField(auto_now=True)),
-                ('author', models.ForeignKey(related_name='lesson_author', to=settings.AUTH_USER_MODEL)),
+                ('author', models.ForeignKey(related_name='lesson_author', to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
                 ('ct_stem_practices', models.ManyToManyField(to='ctstem_app.CTStemPractice')),
-                ('modified_by', models.ForeignKey(related_name='lesson_modifier', to=settings.AUTH_USER_MODEL)),
+                ('modified_by', models.ForeignKey(related_name='lesson_modifier', to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': ['-id'],
@@ -87,7 +87,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('order', models.IntegerField(null=True)),
-                ('lesson', models.ForeignKey(to='ctstem_app.Lesson')),
+                ('lesson', models.ForeignKey(to='ctstem_app.Lesson', on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -106,7 +106,7 @@ class Migration(migrations.Migration):
                 ('answer_field_type', models.CharField(max_length=2, choices=[('TA', 'Text Area'), ('TF', 'Text Field'), ('SB', 'Slider Bar'), ('DD', 'Drop Down'), ('MS', 'Multi-Select'), ('MC', 'Multiple Choice')])),
                 ('options', models.TextField(null=True, blank=True)),
                 ('answer', models.TextField(null=True, blank=True)),
-                ('owner', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('owner', models.ForeignKey(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -134,7 +134,7 @@ class Migration(migrations.Migration):
             name='Student',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('user', models.OneToOneField(to=settings.AUTH_USER_MODEL)),
+                ('user', models.OneToOneField(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -148,9 +148,9 @@ class Migration(migrations.Migration):
             name='Teacher',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('school', models.ForeignKey(to='ctstem_app.School')),
+                ('school', models.ForeignKey(to='ctstem_app.School', on_delete=models.SET_NULL)),
                 ('students', models.ManyToManyField(to='ctstem_app.Student')),
-                ('user', models.OneToOneField(to=settings.AUTH_USER_MODEL)),
+                ('user', models.OneToOneField(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
         ),
         migrations.AddField(
@@ -161,17 +161,17 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='section',
             name='subject',
-            field=models.ForeignKey(to='ctstem_app.Subject'),
+            field=models.ForeignKey(to='ctstem_app.Subject', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='section',
             name='teacher',
-            field=models.ForeignKey(to='ctstem_app.Teacher'),
+            field=models.ForeignKey(to='ctstem_app.Teacher', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='researcher',
             name='school',
-            field=models.ForeignKey(to='ctstem_app.School'),
+            field=models.ForeignKey(to='ctstem_app.School', on_delete=models.SET_NULL),
         ),
         migrations.AddField(
             model_name='researcher',
@@ -181,12 +181,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='researcher',
             name='user',
-            field=models.OneToOneField(to=settings.AUTH_USER_MODEL),
+            field=models.OneToOneField(to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='lessonquestion',
             name='question',
-            field=models.ForeignKey(to='ctstem_app.Question'),
+            field=models.ForeignKey(to='ctstem_app.Question', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='lesson',
@@ -211,12 +211,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='assessmentquestion',
             name='assessment_step',
-            field=models.ForeignKey(to='ctstem_app.AssessmentStep'),
+            field=models.ForeignKey(to='ctstem_app.AssessmentStep', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='assessmentquestion',
             name='question',
-            field=models.ForeignKey(to='ctstem_app.Question'),
+            field=models.ForeignKey(to='ctstem_app.Question', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='assessment',
@@ -226,7 +226,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='assessment',
             name='modified_by',
-            field=models.ForeignKey(related_name='assessment_modifier', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(related_name='assessment_modifier', to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='assessment',

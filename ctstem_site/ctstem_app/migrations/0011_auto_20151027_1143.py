@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='assessment',
             name='parent',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.SET_NULL, to='ctstem_app.Assessment', null=True),
+            field=models.ForeignKey(on_delete=models.SET_NULL, to='ctstem_app.Assessment', null=True),
         ),
         migrations.AddField(
             model_name='assessment',
@@ -31,7 +31,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='lesson',
             name='parent',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.SET_NULL, to='ctstem_app.Lesson', null=True),
+            field=models.ForeignKey(on_delete=models.SET_NULL, to='ctstem_app.Lesson', null=True),
         ),
         migrations.AddField(
             model_name='lesson',

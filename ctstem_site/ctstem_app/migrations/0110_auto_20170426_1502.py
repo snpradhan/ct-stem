@@ -15,11 +15,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='curriculum',
             name='unit',
-            field=models.ForeignKey(related_name='underlying_curriculum', on_delete=django.db.models.deletion.SET_NULL, blank=True, to='ctstem_app.Curriculum', help_text=b'Select a unit if this lesson is part of one', null=True),
+            field=models.ForeignKey(related_name='underlying_curriculum', on_delete=models.SET_NULL, blank=True, to='ctstem_app.Curriculum', help_text=b'Select a unit if this lesson is part of one', null=True),
         ),
         migrations.AlterField(
             model_name='curriculum',
             name='parent',
-            field=models.ForeignKey(related_name='children', on_delete=django.db.models.deletion.SET_NULL, blank=True, to='ctstem_app.Curriculum', null=True),
+            field=models.ForeignKey(related_name='children', on_delete=models.SET_NULL, blank=True, to='ctstem_app.Curriculum', null=True),
         ),
     ]

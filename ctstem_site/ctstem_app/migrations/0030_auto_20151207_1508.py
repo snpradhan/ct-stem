@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
             name='AssignmentStepResponse',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('assessment_step', models.ForeignKey(to='ctstem_app.AssessmentStep')),
+                ('assessment_step', models.ForeignKey(to='ctstem_app.AssessmentStep', on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -25,8 +25,8 @@ class Migration(migrations.Migration):
                 ('response', models.TextField()),
                 ('created_date', models.DateTimeField(auto_now_add=True)),
                 ('modified_date', models.DateTimeField(auto_now=True)),
-                ('assessment_question', models.ForeignKey(to='ctstem_app.AssessmentQuestion')),
-                ('step_response', models.ForeignKey(to='ctstem_app.AssignmentStepResponse')),
+                ('assessment_question', models.ForeignKey(to='ctstem_app.AssessmentQuestion', on_delete=models.CASCADE)),
+                ('step_response', models.ForeignKey(to='ctstem_app.AssignmentStepResponse', on_delete=models.CASCADE)),
             ],
         ),
         migrations.RemoveField(
@@ -51,6 +51,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='assignmentstepresponse',
             name='instance',
-            field=models.ForeignKey(to='ctstem_app.AssignmentInstance'),
+            field=models.ForeignKey(to='ctstem_app.AssignmentInstance', on_delete=models.CASCADE),
         ),
     ]

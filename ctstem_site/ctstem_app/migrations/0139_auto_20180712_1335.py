@@ -26,6 +26,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='groupinvitee',
             name='group',
-            field=models.ForeignKey(related_name='groups', to='ctstem_app.UserGroup'),
+            field=models.ForeignKey(related_name='groups', to='ctstem_app.UserGroup', on_delete=models.CASCADE),
         ),
     ]

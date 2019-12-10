@@ -33,9 +33,9 @@ class Migration(migrations.Migration):
                 ('slug', models.SlugField(unique=True, max_length=255)),
                 ('created_date', models.DateTimeField(auto_now_add=True)),
                 ('modified_date', models.DateTimeField(auto_now=True)),
-                ('author', models.ForeignKey(related_name='curriculum_author', to=settings.AUTH_USER_MODEL)),
-                ('modified_by', models.ForeignKey(related_name='curriculum_modifier', to=settings.AUTH_USER_MODEL)),
-                ('parent', models.ForeignKey(on_delete=django.db.models.deletion.SET_NULL, to='ctstem_app.Curriculum', null=True)),
+                ('author', models.ForeignKey(related_name='curriculum_author', to=settings.AUTH_USER_MODEL, on_delete=models.SET_NULL)),
+                ('modified_by', models.ForeignKey(related_name='curriculum_modifier', to=settings.AUTH_USER_MODEL, on_delete=models.SET_NULL)),
+                ('parent', models.ForeignKey(on_delete=models.SET_NULL, to='ctstem_app.Curriculum', null=True)),
                 ('subject', models.ManyToManyField(to='ctstem_app.Subject')),
                 ('taxonomy', models.ManyToManyField(to='ctstem_app.Subcategory')),
             ],
@@ -48,7 +48,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('order', models.IntegerField(null=True)),
-                ('question', models.ForeignKey(to='ctstem_app.Question')),
+                ('question', models.ForeignKey(to='ctstem_app.Question', on_delete=models.CASCADE)),
             ],
             options={
                 'ordering': ['order'],
@@ -62,7 +62,7 @@ class Migration(migrations.Migration):
                 ('order', models.IntegerField(null=True)),
                 ('content', ckeditor_uploader.fields.RichTextUploadingField()),
                 ('teacher_notes', ckeditor_uploader.fields.RichTextUploadingField(null=True, blank=True)),
-                ('curriculum', models.ForeignKey(to='ctstem_app.Curriculum')),
+                ('curriculum', models.ForeignKey(to='ctstem_app.Curriculum', on_delete=models.CASCADE)),
                 ('questions', models.ManyToManyField(to='ctstem_app.Question', through='ctstem_app.CurriculumQuestion', blank=True)),
             ],
             options={
@@ -187,30 +187,30 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='curriculumquestion',
             name='step',
-            field=models.ForeignKey(to='ctstem_app.Step', null=True),
+            field=models.ForeignKey(to='ctstem_app.Step', null=True, on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='assignment',
             name='curriculum',
-            field=models.ForeignKey(default=1, to='ctstem_app.Curriculum'),
+            field=models.ForeignKey(default=1, to='ctstem_app.Curriculum', on_delete=models.CASCADE),
             preserve_default=False,
         ),
         migrations.AddField(
             model_name='assignmentstepresponse',
             name='step',
-            field=models.ForeignKey(default=1, to='ctstem_app.Step'),
+            field=models.ForeignKey(default=1, to='ctstem_app.Step', on_delete=models.CASCADE),
             preserve_default=False,
         ),
         migrations.AddField(
             model_name='attachment',
             name='curriculum',
-            field=models.ForeignKey(default=1, to='ctstem_app.Curriculum'),
+            field=models.ForeignKey(default=1, to='ctstem_app.Curriculum', on_delete=models.CASCADE),
             preserve_default=False,
         ),
         migrations.AddField(
             model_name='questionresponse',
             name='curriculum_question',
-            field=models.ForeignKey(default=1, to='ctstem_app.CurriculumQuestion'),
+            field=models.ForeignKey(default=1, to='ctstem_app.CurriculumQuestion', on_delete=models.CASCADE),
             preserve_default=False,
         ),
     ]

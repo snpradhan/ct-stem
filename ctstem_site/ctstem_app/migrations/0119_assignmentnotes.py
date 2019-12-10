@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('note', models.TextField(null=True, blank=True)),
-                ('instance', models.OneToOneField(related_name='notes', to='ctstem_app.AssignmentInstance')),
+                ('instance', models.OneToOneField(related_name='notes', to='ctstem_app.AssignmentInstance', on_delete=models.CASCADE)),
             ],
         ),
     ]

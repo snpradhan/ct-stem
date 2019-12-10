@@ -16,8 +16,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('created', models.DateTimeField(auto_now_add=True)),
-                ('curriculum', models.ForeignKey(to='ctstem_app.Curriculum')),
-                ('teacher', models.ForeignKey(to='ctstem_app.Teacher')),
+                ('curriculum', models.ForeignKey(to='ctstem_app.Curriculum', on_delete=models.CASCADE)),
+                ('teacher', models.ForeignKey(to='ctstem_app.Teacher', on_delete=models.CASCADE)),
             ],
         ),
     ]

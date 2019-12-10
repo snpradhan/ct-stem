@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='taxonomy',
             name='standard',
-            field=models.ForeignKey(related_name='taxonomy', default=1, to='ctstem_app.Standard'),
+            field=models.ForeignKey(related_name='taxonomy', default=1, to='ctstem_app.Standard', on_delete=models.CASCADE),
             preserve_default=False,
         ),
         migrations.AlterField(

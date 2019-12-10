@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
                 ('description', models.CharField(max_length=256, null=True, blank=True)),
                 ('link', models.URLField(max_length=500, null=True, blank=True)),
                 ('category', smart_selects.db_fields.ChainedForeignKey(chained_model_field=b'standard', to='ctstem_app.Category', chained_field=b'subcategory', auto_choose=True)),
-                ('standard', models.ForeignKey(related_name='subcategory', to='ctstem_app.Standard')),
+                ('standard', models.ForeignKey(related_name='subcategory', to='ctstem_app.Standard', on_delete=models.CASCADE)),
             ],
         ),
         migrations.RemoveField(

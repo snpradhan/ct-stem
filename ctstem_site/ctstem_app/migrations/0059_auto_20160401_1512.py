@@ -22,6 +22,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='usergroup',
             name='teacher',
-            field=models.ForeignKey(related_name='groups', to='ctstem_app.Teacher'),
+            field=models.ForeignKey(related_name='groups', to='ctstem_app.Teacher', on_delete=models.SET_NULL),
         ),
     ]

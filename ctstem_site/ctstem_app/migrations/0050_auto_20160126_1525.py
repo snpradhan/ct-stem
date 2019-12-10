@@ -18,6 +18,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='subcategory',
             name='category',
-            field=models.ForeignKey(related_name='subcategory', to='ctstem_app.Category'),
+            field=models.ForeignKey(related_name='subcategory', to='ctstem_app.Category', on_delete=models.CASCADE),
         ),
     ]

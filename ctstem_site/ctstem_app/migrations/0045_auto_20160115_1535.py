@@ -32,6 +32,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='team',
             name='role',
-            field=models.ForeignKey(to='ctstem_app.TeamRole'),
+            field=models.ForeignKey(to='ctstem_app.TeamRole', on_delete=models.SET_NULL),
         ),
     ]

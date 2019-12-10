@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='school',
             name='created_by',
-            field=models.ForeignKey(related_name='school_creator', default='1', to=settings.AUTH_USER_MODEL),
+            field=models.ForeignKey(related_name='school_creator', default='1', to=settings.AUTH_USER_MODEL, on_delete=models.SET_NULL),
             preserve_default=False,
         ),
         migrations.AddField(

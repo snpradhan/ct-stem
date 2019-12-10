@@ -17,8 +17,8 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('iframe_id', models.CharField(max_length=255)),
                 ('state', models.TextField(null=True, blank=True)),
-                ('instance', models.ForeignKey(to='ctstem_app.AssignmentInstance')),
-                ('step', models.ForeignKey(to='ctstem_app.Step')),
+                ('instance', models.ForeignKey(to='ctstem_app.AssignmentInstance', on_delete=models.CASCADE)),
+                ('step', models.ForeignKey(to='ctstem_app.Step', on_delete=models.CASCADE)),
             ],
         ),
         migrations.AlterUniqueTogether(

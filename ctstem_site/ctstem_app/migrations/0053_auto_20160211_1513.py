@@ -14,11 +14,11 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='curriculumquestion',
             name='question',
-            field=models.ForeignKey(related_name='curriculum_question', to='ctstem_app.Question'),
+            field=models.ForeignKey(related_name='curriculum_question', to='ctstem_app.Question', on_delete=models.CASCADE),
         ),
         migrations.AlterField(
             model_name='step',
             name='curriculum',
-            field=models.ForeignKey(related_name='steps', to='ctstem_app.Curriculum'),
+            field=models.ForeignKey(related_name='steps', to='ctstem_app.Curriculum', on_delete=models.CASCADE),
         ),
     ]

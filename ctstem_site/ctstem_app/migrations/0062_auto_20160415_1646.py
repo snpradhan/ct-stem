@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
             name='AssignmentFeedback',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('instance', models.ForeignKey(to='ctstem_app.AssignmentInstance')),
+                ('instance', models.ForeignKey(to='ctstem_app.AssignmentInstance', on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -25,15 +25,15 @@ class Migration(migrations.Migration):
                 ('feedback', models.TextField(null=True, blank=True)),
                 ('created_date', models.DateTimeField(auto_now_add=True)),
                 ('modified_date', models.DateTimeField(auto_now=True)),
-                ('response', models.ForeignKey(to='ctstem_app.QuestionResponse')),
+                ('response', models.ForeignKey(to='ctstem_app.QuestionResponse', on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
             name='StepFeedback',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('assignment_feedback', models.ForeignKey(to='ctstem_app.AssignmentFeedback')),
-                ('step_response', models.ForeignKey(to='ctstem_app.AssignmentStepResponse')),
+                ('assignment_feedback', models.ForeignKey(to='ctstem_app.AssignmentFeedback', on_delete=models.CASCADE)),
+                ('step_response', models.ForeignKey(to='ctstem_app.AssignmentStepResponse', on_delete=models.CASCADE)),
             ],
         ),
         migrations.RemoveField(
@@ -46,6 +46,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='questionfeedback',
             name='step_feedback',
-            field=models.ForeignKey(to='ctstem_app.StepFeedback'),
+            field=models.ForeignKey(to='ctstem_app.StepFeedback', on_delete=models.CASCADE),
         ),
     ]

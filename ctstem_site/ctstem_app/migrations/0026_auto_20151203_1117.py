@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('assigned_date', models.DateTimeField(auto_now_add=True)),
                 ('due_date', models.DateTimeField(null=True)),
-                ('assessment', models.ForeignKey(to='ctstem_app.Assessment')),
+                ('assessment', models.ForeignKey(to='ctstem_app.Assessment', on_delete=models.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -36,23 +36,23 @@ class Migration(migrations.Migration):
                 ('description', models.TextField(null=True)),
                 ('assignments', models.ManyToManyField(related_name='assigned_to', null=True, through='ctstem_app.Assignment', to='ctstem_app.Assessment', blank=True)),
                 ('members', models.ManyToManyField(related_name='member_of', null=True, through='ctstem_app.Membership', to='ctstem_app.Student', blank=True)),
-                ('subject', models.ForeignKey(to='ctstem_app.Subject')),
-                ('teacher', models.ForeignKey(to='ctstem_app.Teacher')),
+                ('subject', models.ForeignKey(to='ctstem_app.Subject', on_delete=models.SET_NULL)),
+                ('teacher', models.ForeignKey(to='ctstem_app.Teacher', on_delete=models.SET_NULL)),
             ],
         ),
         migrations.AddField(
             model_name='membership',
             name='group',
-            field=models.ForeignKey(related_name='group_members', to='ctstem_app.UserGroup'),
+            field=models.ForeignKey(related_name='group_members', to='ctstem_app.UserGroup', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='membership',
             name='student',
-            field=models.ForeignKey(to='ctstem_app.Student'),
+            field=models.ForeignKey(to='ctstem_app.Student', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='assignment',
             name='group',
-            field=models.ForeignKey(related_name='group_assignments', to='ctstem_app.UserGroup'),
+            field=models.ForeignKey(related_name='group_assignments', to='ctstem_app.UserGroup', on_delete=models.CASCADE),
         ),
     ]

@@ -15,6 +15,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='question',
             name='research_category',
-            field=models.ForeignKey(related_name='questions', on_delete=django.db.models.deletion.SET_NULL, blank=True, to='ctstem_app.ResearchCategory', null=True),
+            field=models.ForeignKey(related_name='questions', on_delete=models.SET_NULL, blank=True, to='ctstem_app.ResearchCategory', null=True),
         ),
     ]

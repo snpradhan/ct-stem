@@ -174,7 +174,7 @@ class Curriculum (models.Model):
   acknowledgement = RichTextUploadingField(null=True, blank=True, help_text="Resources, models, and other material used in this curriculum; past authors/contributors")
   order = models.IntegerField(null=True, blank=True, help_text="Order within the Unit")
   credits = RichTextUploadingField(null=True, blank=True, help_text="Author contributions")
-  locked_by = models.ForeignKey(User, null=True)
+  locked_by = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
   feature_rank = models.IntegerField(null=True, blank=True, help_text="Order in the feature pool")
 
   class Meta:
@@ -231,7 +231,7 @@ class Curriculum (models.Model):
 # Curriculum Step model
 # A curriculum may have one or more step/activity
 class Step(models.Model):
-  curriculum = models.ForeignKey(Curriculum, null=False, related_name="steps")
+  curriculum = models.ForeignKey(Curriculum, null=False, related_name="steps", on_delete=models.CASCADE)
   title = models.CharField(null=True, blank=True, max_length=256, help_text="Page title")
   order = models.IntegerField(null=True)
   content = RichTextUploadingField(null=True, blank=True)
@@ -244,8 +244,8 @@ class Step(models.Model):
 
 # A relation between Curriculum and Question models
 class CurriculumQuestion(models.Model):
-  question = models.ForeignKey('Question', related_name="curriculum_question")
-  step = models.ForeignKey(Step, null=True)
+  question = models.ForeignKey('Question', related_name="curriculum_question", on_delete=models.CASCADE)
+  step = models.ForeignKey(Step, null=True, on_delete=models.CASCADE)
   order = models.IntegerField(null=True)
   referenced_by = models.CharField(null=True, blank=True, max_length=256)
   optional = models.BooleanField(default=False)
@@ -259,7 +259,7 @@ class CurriculumQuestion(models.Model):
 # Lesson Attachment model
 # A lesson may have one or more attachments
 class Attachment(models.Model):
-  curriculum = models.ForeignKey(Curriculum, null=False)
+  curriculum = models.ForeignKey(Curriculum, null=False, on_delete=models.CASCADE)
   title = models.CharField(null=False, blank=False, max_length=256)
   file_object = models.FileField(upload_to=upload_file_to, null=False)
   teacher_only = models.BooleanField(choices=((True, 'Yes'), (False, 'No')))
@@ -271,8 +271,8 @@ class Attachment(models.Model):
 
 # Bookmarked Curriculum
 class BookmarkedCurriculum(models.Model):
-  curriculum = models.ForeignKey(Curriculum, null=False, related_name='bookmarked')
-  teacher = models.ForeignKey('Teacher', null=False)
+  curriculum = models.ForeignKey(Curriculum, null=False, related_name='bookmarked', on_delete=models.CASCADE)
+  teacher = models.ForeignKey('Teacher', null=False, on_delete=models.CASCADE)
   created = models.DateTimeField(auto_now_add=True)
 
 # Research Category
@@ -348,7 +348,7 @@ class Standard(models.Model):
 
 # Category in a standard
 class Category(models.Model):
-  standard = models.ForeignKey(Standard, related_name="category")
+  standard = models.ForeignKey(Standard, related_name="category", on_delete=models.CASCADE)
   name = models.CharField(null=False, max_length=256)
   icon = models.ImageField(upload_to=upload_file_to, blank=True, null=True, help_text='Upload an image at least 400x289 in resolution that represents this category')
   description = models.TextField(null=True, blank=True)
@@ -368,7 +368,7 @@ class Category(models.Model):
 
 # Subcategory model
 class Subcategory(models.Model):
-  category = models.ForeignKey(Category, related_name="subcategory")
+  category = models.ForeignKey(Category, related_name="subcategory", on_delete=models.CASCADE)
   title = models.CharField(null=False, max_length=512)
   code = models.CharField(null=True, max_length=256, blank=True)
   description = models.CharField(null=True, max_length=256, blank=True)
@@ -395,8 +395,8 @@ class School(models.Model):
 ##############################
 # Student model
 class Student(models.Model):
-  user = models.OneToOneField(User, unique=True, null=False, related_name="student")
-  school = models.ForeignKey(School)
+  user = models.OneToOneField(User, unique=True, null=False, related_name="student", on_delete=models.CASCADE)
+  school = models.ForeignKey(School, null=True, on_delete=models.SET_NULL)
   consent = models.CharField(null=False, max_length=1, default='U', choices=CONSENT_CHOICES)
   parental_consent = models.CharField(null=False, max_length=1, default='U', choices=PARENTAL_CONSENT_CHOICES)
 
@@ -422,8 +422,8 @@ class Student(models.Model):
 # Teacher models
 # This is a user class model
 class Teacher(models.Model):
-  user = models.OneToOneField(User, unique=True, null=False, related_name="teacher")
-  school = models.ForeignKey(School, related_name="teachers")
+  user = models.OneToOneField(User, unique=True, null=False, related_name="teacher", on_delete=models.CASCADE)
+  school = models.ForeignKey(School, null=True, related_name="teachers", on_delete=models.SET_NULL)
   consent = models.CharField(null=False, max_length=1, default='U', choices=CONSENT_CHOICES)
   validation_code = models.CharField(null=False, max_length=5)
 
@@ -436,7 +436,7 @@ class Teacher(models.Model):
 # Researcher model
 # This model represents researchers
 class Researcher(models.Model):
-  user = models.OneToOneField(User, unique=True, null=False, related_name="researcher")
+  user = models.OneToOneField(User, unique=True, null=False, related_name="researcher", on_delete=models.CASCADE)
 
   def __str__(self):
       return '%s' % (self.user.get_full_name())
@@ -444,7 +444,7 @@ class Researcher(models.Model):
 # Administrator models
 # This model represents a author user
 class Author(models.Model):
-  user = models.OneToOneField(User, unique=True, null=False, related_name="author")
+  user = models.OneToOneField(User, unique=True, null=False, related_name="author", on_delete=models.CASCADE)
 
   def __str__(self):
       return '%s' % (self.user.get_full_name())
@@ -452,7 +452,7 @@ class Author(models.Model):
 # Administrator models
 # This model represents a super user
 class Administrator(models.Model):
-  user = models.OneToOneField(User, unique=True, null=False, related_name="administrator")
+  user = models.OneToOneField(User, unique=True, null=False, related_name="administrator", on_delete=models.CASCADE)
 
   def __str__(self):
       return '%s' % (self.user.get_full_name())
@@ -460,8 +460,8 @@ class Administrator(models.Model):
 # School Administrator model
 # This model represents school administrators and school principals
 class SchoolAdministrator(models.Model):
-  user = models.OneToOneField(User, unique=True, null=False, related_name="school_administrator")
-  school = models.ForeignKey(School)
+  user = models.OneToOneField(User, unique=True, null=False, related_name="school_administrator", on_delete=models.CASCADE)
+  school = models.ForeignKey(School, null=True, on_delete=models.SET_NULL)
 
   def __str__(self):
       return '%s' % (self.user.get_full_name())
@@ -480,9 +480,9 @@ class Publication(models.Model):
 #######################################################
 class UserGroup(models.Model):
   title = models.CharField(max_length=50, help_text='Class Title. Eg. Physics Section A')
-  subject = models.ForeignKey(Subject, null=True, blank=True)
+  subject = models.ForeignKey(Subject, null=True, blank=True, on_delete=models.SET_NULL)
   time = models.CharField(null=False, max_length=256)
-  teacher = models.ForeignKey(Teacher, related_name='groups')
+  teacher = models.ForeignKey(Teacher, null=True, related_name='groups', on_delete=models.SET_NULL)
   description = models.TextField(null=True, blank=True)
   members = models.ManyToManyField(Student, through='Membership', blank=True, null=True, related_name='member_of')
   shared_with = models.ManyToManyField(Teacher, null=True, blank=True, help_text='Select teachers to share this class with.' )
@@ -509,8 +509,8 @@ class UserGroup(models.Model):
 # Assignment model
 #######################################################
 class Assignment(models.Model):
-  curriculum = models.ForeignKey(Curriculum, related_name="assignments")
-  group = models.ForeignKey(UserGroup, related_name="assignments")
+  curriculum = models.ForeignKey(Curriculum, related_name="assignments", on_delete=models.CASCADE)
+  group = models.ForeignKey(UserGroup, related_name="assignments", on_delete=models.CASCADE)
   assigned_date = models.DateTimeField(auto_now_add=True)
   lock_on_completion = models.BooleanField(default=False)
 
@@ -521,8 +521,8 @@ class Assignment(models.Model):
 # Membership model
 #######################################################
 class Membership(models.Model):
-  student = models.ForeignKey(Student, related_name="student_membership")
-  group = models.ForeignKey(UserGroup, related_name="group_members")
+  student = models.ForeignKey(Student, related_name="student_membership", on_delete=models.CASCADE)
+  group = models.ForeignKey(UserGroup, related_name="group_members", on_delete=models.CASCADE)
   joined_on = models.DateTimeField(auto_now_add=True)
 
   class Meta:
@@ -531,8 +531,8 @@ class Membership(models.Model):
 # Assignment Instance Model
 #######################################################
 class AssignmentInstance(models.Model):
-  assignment = models.ForeignKey(Assignment)
-  student = models.ForeignKey(Student, related_name='instance')
+  assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE)
+  student = models.ForeignKey(Student, related_name='instance', on_delete=models.CASCADE)
   teammates = models.ManyToManyField(Student, blank=True, null=True, help_text='On Windows use Ctrl+Click to make multiple selection.  On a Mac use Cmd+Click to make multiple selection')
   status = models.CharField(max_length=255, choices=ASSIGNMENT_STATUS, default='N')
   last_step = models.IntegerField(null=False, blank=False, default=0)
@@ -547,15 +547,15 @@ class AssignmentInstance(models.Model):
 # Assignment Notes Model
 #######################################################
 class AssignmentNotes(models.Model):
-  instance = models.OneToOneField(AssignmentInstance, unique=True, null=False, related_name="notes")
+  instance = models.OneToOneField(AssignmentInstance, unique=True, null=False, related_name="notes", on_delete=models.CASCADE)
   note = RichTextField(null=True, blank=True, config_name='student_response_ckeditor')
 
 #######################################################
 # Assignment Step Response Model
 #######################################################
 class AssignmentStepResponse(models.Model):
-  instance = models.ForeignKey(AssignmentInstance)
-  step = models.ForeignKey(Step)
+  instance = models.ForeignKey(AssignmentInstance, on_delete=models.CASCADE)
+  step = models.ForeignKey(Step, on_delete=models.CASCADE)
 
   class Meta:
     unique_together = ('instance', 'step')
@@ -566,7 +566,7 @@ class AssignmentStepResponse(models.Model):
 # in a curriculum
 #######################################################
 class IframeState(models.Model):
-  instance = models.ForeignKey(AssignmentInstance)
+  instance = models.ForeignKey(AssignmentInstance, on_delete=models.CASCADE)
   iframe_id = models.CharField(null=False, max_length=255)
   iframe_url = models.URLField(null=False, max_length=1600)
   state = models.TextField(null=True, blank=True)
@@ -578,8 +578,8 @@ class IframeState(models.Model):
 # Question Response Model
 #######################################################
 class QuestionResponse(models.Model):
-  step_response = models.ForeignKey(AssignmentStepResponse)
-  curriculum_question = models.ForeignKey(CurriculumQuestion)
+  step_response = models.ForeignKey(AssignmentStepResponse, on_delete=models.CASCADE)
+  curriculum_question = models.ForeignKey(CurriculumQuestion, on_delete=models.CASCADE)
   response = RichTextField(null=True, blank=True, config_name='student_response_ckeditor')
   created_date = models.DateTimeField(auto_now_add=True)
   modified_date = models.DateTimeField(auto_now=True)
@@ -589,21 +589,21 @@ class QuestionResponse(models.Model):
 
 
 class QuestionResponseFile(models.Model):
-  question_response = models.ForeignKey(QuestionResponse, related_name='response_file', null=False)
+  question_response = models.ForeignKey(QuestionResponse, related_name='response_file', null=False, on_delete=models.CASCADE)
   file = models.FileField(upload_to=upload_file_to, null=False, blank=False, help_text='Upload a file less than 5 MB in size.')
 
 #######################################################
 # Assignment Feedback Model
 #######################################################
 class AssignmentFeedback(models.Model):
-  instance = models.ForeignKey(AssignmentInstance)
+  instance = models.ForeignKey(AssignmentInstance, on_delete=models.CASCADE)
 
 #######################################################
 # Step Feedback Model
 #######################################################
 class StepFeedback(models.Model):
-  assignment_feedback = models.ForeignKey(AssignmentFeedback)
-  step_response = models.ForeignKey(AssignmentStepResponse)
+  assignment_feedback = models.ForeignKey(AssignmentFeedback, on_delete=models.CASCADE)
+  step_response = models.ForeignKey(AssignmentStepResponse, on_delete=models.CASCADE)
 
   class Meta:
     ordering = ('step_response__step__order',)
@@ -613,8 +613,8 @@ class StepFeedback(models.Model):
 # Question Feedback Model
 #######################################################
 class QuestionFeedback(models.Model):
-  step_feedback = models.ForeignKey(StepFeedback)
-  response = models.ForeignKey(QuestionResponse)
+  step_feedback = models.ForeignKey(StepFeedback, on_delete=models.CASCADE)
+  response = models.ForeignKey(QuestionResponse, on_delete=models.CASCADE)
   feedback = models.TextField(null=True, blank=True, help_text="Enter Feedback")
   created_date = models.DateTimeField(auto_now_add=True)
   modified_date = models.DateTimeField(auto_now=True)
@@ -637,7 +637,7 @@ class TeamRole(models.Model):
       ordering = ['order']
 
 class Team(models.Model):
-  role = models.ForeignKey(TeamRole, related_name='members')
+  role = models.ForeignKey(TeamRole, null=True, related_name='members', on_delete=models.SET_NULL)
   current = models.BooleanField(default=True)
   name = models.CharField(max_length=255, blank=False)
   description = models.TextField(null=True)

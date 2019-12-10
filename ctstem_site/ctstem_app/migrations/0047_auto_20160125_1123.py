@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='team',
             name='role',
-            field=models.ForeignKey(related_name='members', to='ctstem_app.TeamRole'),
+            field=models.ForeignKey(related_name='members', to='ctstem_app.TeamRole', on_delete=models.SET_NULL),
         ),
         migrations.AlterField(
             model_name='teamrole',

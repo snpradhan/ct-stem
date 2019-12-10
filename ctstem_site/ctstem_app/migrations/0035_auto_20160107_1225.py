@@ -33,7 +33,7 @@ class Migration(migrations.Migration):
                 ('code', models.CharField(max_length=256, null=True)),
                 ('description', models.CharField(max_length=256, null=True)),
                 ('link', models.URLField(max_length=500, null=True)),
-                ('category', models.ForeignKey(related_name='taxonomy', to='ctstem_app.Category')),
+                ('category', models.ForeignKey(related_name='taxonomy', to='ctstem_app.Category', on_delete=models.CASCADE)),
             ],
         ),
         migrations.RemoveField(
@@ -47,7 +47,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='category',
             name='standard',
-            field=models.ForeignKey(related_name='category', to='ctstem_app.Standard'),
+            field=models.ForeignKey(related_name='category', to='ctstem_app.Standard', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='assessment',

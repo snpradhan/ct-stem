@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='question',
             name='research_category',
-            field=models.ForeignKey(related_name='questions', to='ctstem_app.ResearchCategory', null=True),
+            field=models.ForeignKey(related_name='questions', to='ctstem_app.ResearchCategory', null=True, on_delete=models.SET_NULL),
         ),
     ]

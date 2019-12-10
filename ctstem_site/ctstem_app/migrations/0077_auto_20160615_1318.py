@@ -19,6 +19,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='assignmentinstance',
             name='student',
-            field=models.ForeignKey(related_name='instance', to='ctstem_app.Student'),
+            field=models.ForeignKey(related_name='instance', to='ctstem_app.Student', on_delete=models.CASCADE),
         ),
     ]

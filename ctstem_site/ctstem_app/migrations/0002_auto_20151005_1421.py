@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='student',
             name='school',
-            field=models.ForeignKey(default=1, to='ctstem_app.School'),
+            field=models.ForeignKey(default=1, to='ctstem_app.School', on_delete=models.SET_NULL),
             preserve_default=False,
         ),
         migrations.AddField(

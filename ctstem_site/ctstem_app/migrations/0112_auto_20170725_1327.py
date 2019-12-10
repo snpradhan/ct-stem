@@ -25,6 +25,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='curriculum',
             name='unit',
-            field=models.ForeignKey(related_name='underlying_curriculum', blank=True, to='ctstem_app.Curriculum', help_text=b'Select a unit if this lesson is part of one', null=True),
+            field=models.ForeignKey(related_name='underlying_curriculum', blank=True, to='ctstem_app.Curriculum', help_text=b'Select a unit if this lesson is part of one', null=True, on_delete=models.CASCADE),
         ),
     ]

@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='administrator',
             name='user',
-            field=models.OneToOneField(related_name='administrator', to=settings.AUTH_USER_MODEL),
+            field=models.OneToOneField(related_name='administrator', to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE),
         ),
         migrations.AlterField(
             model_name='researcher',
@@ -29,12 +29,12 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='researcher',
             name='user',
-            field=models.OneToOneField(related_name='researcher', to=settings.AUTH_USER_MODEL),
+            field=models.OneToOneField(related_name='researcher', to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE),
         ),
         migrations.AlterField(
             model_name='student',
             name='user',
-            field=models.OneToOneField(related_name='student', to=settings.AUTH_USER_MODEL),
+            field=models.OneToOneField(related_name='student', to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE),
         ),
         migrations.AlterField(
             model_name='teacher',
@@ -44,6 +44,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='teacher',
             name='user',
-            field=models.OneToOneField(related_name='teacher', to=settings.AUTH_USER_MODEL),
+            field=models.OneToOneField(related_name='teacher', to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE),
         ),
     ]

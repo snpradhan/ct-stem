@@ -17,8 +17,8 @@ class Migration(migrations.Migration):
             name='SchoolAdministrator',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('school', models.ForeignKey(to='ctstem_app.School')),
-                ('user', models.OneToOneField(related_name='school_administrator', to=settings.AUTH_USER_MODEL)),
+                ('school', models.ForeignKey(to='ctstem_app.School', on_delete=models.SET_NULL)),
+                ('user', models.OneToOneField(related_name='school_administrator', to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)),
             ],
         ),
     ]

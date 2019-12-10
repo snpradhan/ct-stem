@@ -31,7 +31,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='lessonactivity',
             name='lesson',
-            field=models.ForeignKey(to='ctstem_app.Lesson'),
+            field=models.ForeignKey(to='ctstem_app.Lesson', on_delete=models.CASCADE),
         ),
         migrations.AddField(
             model_name='lessonactivity',
@@ -41,6 +41,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='lessonquestion',
             name='lesson_activity',
-            field=models.ForeignKey(to='ctstem_app.LessonActivity', null=True),
+            field=models.ForeignKey(to='ctstem_app.LessonActivity', null=True, on_delete=models.CASCADE),
         ),
     ]

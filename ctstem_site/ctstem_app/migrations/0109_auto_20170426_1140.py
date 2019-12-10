@@ -20,6 +20,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='curriculum',
             name='parent',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.SET_NULL, blank=True, to='ctstem_app.Curriculum', help_text=b'Select a unit if this lesson is part of one', null=True),
+            field=models.ForeignKey(on_delete=models.SET_NULL, blank=True, to='ctstem_app.Curriculum', help_text=b'Select a unit if this lesson is part of one', null=True),
         ),
     ]

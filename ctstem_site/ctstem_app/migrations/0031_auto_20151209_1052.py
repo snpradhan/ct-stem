@@ -22,6 +22,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='assessmentquestion',
             name='question',
-            field=models.ForeignKey(related_name='assessment_question', to='ctstem_app.Question'),
+            field=models.ForeignKey(related_name='assessment_question', to='ctstem_app.Question', on_delete=models.CASCADE),
         ),
     ]
