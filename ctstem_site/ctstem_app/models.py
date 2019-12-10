@@ -262,7 +262,7 @@ class Attachment(models.Model):
   curriculum = models.ForeignKey(Curriculum, null=False, on_delete=models.CASCADE)
   title = models.CharField(null=False, blank=False, max_length=256)
   file_object = models.FileField(upload_to=upload_file_to, null=False)
-  teacher_only = models.BooleanField(choices=((True, 'Yes'), (False, 'No')))
+  teacher_only = models.BooleanField(choices=((True, 'Yes'), (False, 'No')), default=False)
 
 
   class Meta:
