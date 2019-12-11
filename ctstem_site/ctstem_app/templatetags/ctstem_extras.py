@@ -307,7 +307,7 @@ def get_teacher_groups(id):
   groups = teacher.groups.all().filter(is_active=True)
   return groups
 
-@register.assignment_tag(takes_context=True)
+@register.simple_tag(takes_context=True)
 def get_underlying_curriculum(context, curriculum_id):
   request = context.get('request')
   curriculum = models.Curriculum.objects.get(id=curriculum_id)
@@ -386,7 +386,7 @@ def is_teacher_authored(curriculum):
 
   return False
 
-@register.assignment_tag(takes_context=True)
+@register.simple_tag(takes_context=True)
 def check_curriculum_permission(context, curriculum_id, action):
   request = context.get('request')
   has_permission = views.check_curriculum_permission(request, curriculum_id, action)
@@ -394,7 +394,7 @@ def check_curriculum_permission(context, curriculum_id, action):
   list(messages.get_messages(request))
   return has_permission
 
-@register.assignment_tag(takes_context=True)
+@register.simple_tag(takes_context=True)
 def get_curriculum_locked_by(context, curriculum_id):
   request = context.get('request')
   locked_by = views.get_curriculum_locked_by(request, curriculum_id)
