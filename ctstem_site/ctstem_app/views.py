@@ -13,7 +13,7 @@ from slugify import slugify
 import json
 from django_xhtml2pdf.utils import render_to_pdf_response
 from django.template.loader import render_to_string, get_template
-from django.template import RequestContext, Context
+from django.template import Context
 import io as StringIO
 import xhtml2pdf.pisa as pisa
 import os
@@ -56,7 +56,7 @@ def home(request):
   else:
     curr_type = ['U', 'L']
     curricula = models.Curriculum.objects.all().filter(status='P', unit__isnull=True, curriculum_type__in=curr_type, feature_rank__isnull=False).order_by('feature_rank')[:4]
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
       if hasattr(request.user, 'administrator'):
         school = None
         requester_role = ''
@@ -82,7 +82,7 @@ def home(request):
       elif 'login' in redirect_url:
         target ='#login'
 
-      if target and request.user.is_authenticated():
+      if target and request.user.is_authenticated:
         logout(request)
 
       context = {'curricula': curricula, 'redirect_url': redirect_url, 'target': target}
@@ -441,7 +441,7 @@ def fetch_resources(uri, rel):
     return path
 
 def render_to_pdf(template_src, context_dict, request):
-  html  = render_to_string(template_src, context_dict, context_instance=RequestContext(request))
+  html  = render_to_string(template_src, context_dict, request)
   result = StringIO.StringIO()
   pdf = pisa.pisaDocument(StringIO.StringIO(html.encode('utf-8')), dest=result, link_callback=fetch_resources, encoding='utf-8')
   if not pdf.err:
@@ -464,7 +464,7 @@ def downloadAttachments(request, id=''):
       # Files (local path) to put in the .zip
       # FIXME: Change this (get paths from DB etc)
       # check if the user has permission to delete a lesson
-      if request.user.is_anonymous() or hasattr(request.user, 'student'):
+      if request.user.is_anonymous or hasattr(request.user, 'student'):
         attachments = models.Attachment.objects.all().filter(curriculum=curriculum, teacher_only=False)
       else:
         attachments = models.Attachment.objects.all().filter(curriculum=curriculum)
@@ -875,7 +875,7 @@ def preregister(request, group_code=''):
       else:
         context = {'form': form, 'group_code': group_code}
         response_data['success'] = False
-        response_data['html'] = render_to_string('ctstem_app/PreRegistration.html', context, context_instance=RequestContext(request))
+        response_data['html'] = render_to_string('ctstem_app/PreRegistration.html', context, request)
 
       return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 
@@ -916,13 +916,13 @@ def register(request, group_code='', email=''):
     if form.is_valid():
       # checking for bot signup
       # anonymous users signing up as teachers need to go through recaptcha validation
-      if request.user.is_anonymous() and group_id is None:
+      if request.user.is_anonymous and group_id is None:
         recaptcha_response = request.POST.get('g-recaptcha-response')
         is_human = validate_recaptcha(request, recaptcha_response)
         if not is_human:
           context = {'form': form, 'school_form': school_form, 'other_school': other_school, 'recaptcha_error':  'Invalid reCAPTCHA'}
           response_data['success'] = False
-          response_data['html'] = render_to_string('ctstem_app/RegistrationModal.html', context, context_instance=RequestContext(request))
+          response_data['html'] = render_to_string('ctstem_app/RegistrationModal.html', context, request)
           return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 
       #convert username to lowercase
@@ -933,7 +933,7 @@ def register(request, group_code='', email=''):
       user.first_name = form.cleaned_data['first_name']
       user.last_name = form.cleaned_data['last_name']
       #Admin, Researcher, Author, School Admin or Teacher account created by anonymous user is set as inactive
-      if form.cleaned_data['account_type'] in  ['A', 'R', 'C', 'P', 'T'] and request.user.is_anonymous():
+      if form.cleaned_data['account_type'] in  ['A', 'R', 'C', 'P', 'T'] and request.user.is_anonymous:
           user.is_active = False
       else:
           user.is_active = True
@@ -965,7 +965,7 @@ def register(request, group_code='', email=''):
             user.delete()
             context = {'form': form, 'school_form': school_form, 'other_school': other_school }
             response_data['success'] = False
-            response_data['html'] = render_to_string('ctstem_app/RegistrationModal.html', context, context_instance=RequestContext(request))
+            response_data['html'] = render_to_string('ctstem_app/RegistrationModal.html', context, request)
             return http.HttpResponse(json.dumps(response_data), content_type="application/json")
         else:
           newUser.school = form.cleaned_data['school']
@@ -1006,7 +1006,7 @@ def register(request, group_code='', email=''):
       domain = current_site.domain
 
       #anonymous user creates an account
-      if request.user.is_anonymous():
+      if request.user.is_anonymous:
         #account type created is Admin, Researcher, Content Author, School Principal
         if form.cleaned_data['account_type'] in ['A', 'R', 'C', 'P']:
           #send an email to the registering user
@@ -1067,7 +1067,7 @@ def register(request, group_code='', email=''):
         school_form.is_valid()
         context = {'form': form, 'school_form': school_form, 'other_school': other_school }
       response_data['success'] = False
-      response_data['html'] = render_to_string('ctstem_app/RegistrationModal.html', context, context_instance=RequestContext(request))
+      response_data['html'] = render_to_string('ctstem_app/RegistrationModal.html', context, request)
 
     return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 
@@ -1086,7 +1086,7 @@ def register(request, group_code='', email=''):
       else:
         form = forms.RegistrationForm(user=request.user, group_id=group_id)
         context = {'form': form, 'group_id': group_id, 'school_id': school.id, 'group_code': group_code}
-    elif request.user.is_anonymous():
+    elif request.user.is_anonymous:
       form = forms.RegistrationForm(user=request.user)
       school_form = forms.SchoolForm(instance=school, prefix='school')
       context = {'form': form, 'school_form': school_form, 'other_school': other_school}
@@ -1162,11 +1162,11 @@ def user_login(request, user_name=''):
         messages.error(request, 'Your account has not been activated')
         context = {'form': form}
         response_data['success'] = False
-        response_data['html'] = render_to_string('ctstem_app/LoginModal.html', context, context_instance=RequestContext(request))
+        response_data['html'] = render_to_string('ctstem_app/LoginModal.html', context, request)
     else:
       context = {'form': form}
       response_data['success'] = False
-      response_data['html'] = render_to_string('ctstem_app/LoginModal.html', context, context_instance=RequestContext(request))
+      response_data['html'] = render_to_string('ctstem_app/LoginModal.html', context, request)
 
     return http.HttpResponse(json.dumps(response_data), content_type="application/json")
   elif request.method == 'GET':
@@ -1397,7 +1397,7 @@ def deleteUser(request, id=''):
 
     privilege = 1
     # check if the user has permission to delete a user
-    if request.user.is_anonymous():
+    if request.user.is_anonymous:
       privilege = 0
     elif hasattr(request.user, 'author') or hasattr(request.user, 'student') or hasattr(request.user, 'researcher'):
       privilege = 0
@@ -1766,7 +1766,7 @@ def searchStudents(request):
 @login_required
 def searchTeachers(request):
   # check if the user has permission to add a question
-  if request.user.is_anonymous() or hasattr(request.user, 'student'):
+  if request.user.is_anonymous or hasattr(request.user, 'student'):
     return http.HttpResponseNotFound('<h1>You do not have the privilege search teachers</h1>')
 
   if 'GET' == request.method:
@@ -2448,7 +2448,7 @@ def searchAssignment(request):
           curricula.append(curr)
 
     context = {'curricula': curricula, 'group_id': data['group'] }
-    html = render_to_string('ctstem_app/AssignmentSearchResult.html', context, context_instance=RequestContext(request))
+    html = render_to_string('ctstem_app/AssignmentSearchResult.html', context, request)
     return http.HttpResponse(html)
 
   return http.HttpResponseNotAllowed(['POST'])
@@ -2484,7 +2484,7 @@ def underlyingCurriculumTable(request, id=''):
       action = 'restore'
     underlying_curriculum = underlyingCurriculum(request, action, id)
     context = {'underlying_curriculum': underlying_curriculum, 'back_url': request.GET['back_url']}
-    html = render_to_string('ctstem_app/UnderlyingCurricula.html', context, context_instance=RequestContext(request))
+    html = render_to_string('ctstem_app/UnderlyingCurricula.html', context, request)
     return http.HttpResponse(html)
 
   return http.HttpResponseNotAllowed(['GET'])
@@ -3873,7 +3873,7 @@ def question(request, id=''):
     else:
       print(questionForm.errors)
       context = {'questionForm': questionForm, 'title': title, 'disable_fields': disable_fields}
-      html = render_to_string('ctstem_app/Question.html', context, context_instance=RequestContext(request))
+      html = render_to_string('ctstem_app/Question.html', context, request)
       response_data = {'success': False, 'html': html, 'error': 'The question could not be saved because there were errors. Please check the errors below.'}
 
     return http.HttpResponse(json.dumps(response_data), content_type="application/json")
@@ -3885,7 +3885,7 @@ def question(request, id=''):
 ####################################
 def questionResponse(request, instance_id='', response_id=''):
   try:
-    if request.user.is_anonymous():
+    if request.user.is_anonymous:
       messages.info(request, 'Please login to view the link')
       return shortcuts.redirect('ctstem:home')
     # check if the user has permission to view student response
@@ -4481,7 +4481,7 @@ def request_training(request):
 
   training = models.TrainingRequest()
   if request.method == 'GET':
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
       initial= {'name': request.user.get_full_name(), 'email': request.user.email}
       if hasattr(request.user, 'teacher'):
         initial['school'] = request.user.teacher.school
@@ -4498,13 +4498,13 @@ def request_training(request):
     form = forms.TrainingRequestForm(data, instance=training)
     if form.is_valid():
       #checking for bots
-      if request.user.is_anonymous():
+      if request.user.is_anonymous:
         recaptcha_response = request.POST.get('g-recaptcha-response')
         is_human = validate_recaptcha(request, recaptcha_response)
         if not is_human:
           response_data['success'] = False
           context = {'form': form, 'recaptcha_error':  'Invalid reCAPTCHA'}
-          response_data['html'] = render_to_string('ctstem_app/TrainingRequestModal.html', context, context_instance=RequestContext(request))
+          response_data['html'] = render_to_string('ctstem_app/TrainingRequestModal.html', context, request)
 
           return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 
@@ -4519,7 +4519,7 @@ def request_training(request):
       print(form.errors)
       response_data['success'] = False
       context = {'form': form}
-      response_data['html'] = render_to_string('ctstem_app/TrainingRequestModal.html', context, context_instance=RequestContext(request))
+      response_data['html'] = render_to_string('ctstem_app/TrainingRequestModal.html', context, request)
 
       return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 
@@ -4561,7 +4561,7 @@ def validate(request, username='', validation_code=''):
       print(form.errors)
       context = {'form': form}
       response_data['success'] = False
-      response_data['html'] = render_to_string('ctstem_app/ValidationModal.html', context, context_instance=RequestContext(request))
+      response_data['html'] = render_to_string('ctstem_app/ValidationModal.html', context, request)
 
     return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 
@@ -4682,7 +4682,7 @@ class SchoolAutocomplete(autocomplete.Select2QuerySetView):
     qs = models.School.objects.all().filter(is_active=True).exclude(school_code='OTHER').order_by(Lower('name'))
     if self.q:
       qs = qs.filter(name__icontains=self.q)
-    if self.request.user.is_authenticated():
+    if self.request.user.is_authenticated:
       return qs
     else:
       create_school = models.School.objects.all().filter(school_code='OTHER')

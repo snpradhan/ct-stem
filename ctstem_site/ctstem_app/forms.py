@@ -95,7 +95,7 @@ class RegistrationForm (forms.Form):
     if 'group_id' in kwargs:
       group_id = kwargs.pop('group_id')
     super(RegistrationForm, self).__init__(*args, **kwargs)
-    if user.is_authenticated():
+    if user.is_authenticated:
       self.fields.pop('confirm_email')
       if hasattr(user, 'school_administrator'):
         self.fields['account_type'].choices = models.USER_ROLE_CHOICES[4:]
@@ -351,7 +351,7 @@ class StudentForm (ModelForm):
   def __init__(self, *args, **kwargs):
     user = kwargs.pop('user')
     super(StudentForm, self).__init__(*args, **kwargs)
-    if user.is_authenticated():
+    if user.is_authenticated:
       if hasattr(user, 'school_administrator'):
         school = user.school_administrator.school
       elif hasattr(user, 'teacher'):
@@ -405,7 +405,7 @@ class TeacherForm (ModelForm):
     user = kwargs.pop('user')
     super(TeacherForm, self).__init__(*args, **kwargs)
 
-    if user.is_authenticated():
+    if user.is_authenticated:
       if hasattr(user, 'school_administrator'):
         school = user.school_administrator.school
       elif hasattr(user, 'teacher'):
@@ -450,7 +450,7 @@ class SchoolAdministratorForm (ModelForm):
   def __init__(self, *args, **kwargs):
     user = kwargs.pop('user')
     super(SchoolAdministratorForm, self).__init__(*args, **kwargs)
-    if user.is_authenticated() and hasattr(user, 'school_administrator'):
+    if user.is_authenticated and hasattr(user, 'school_administrator'):
       school = user.school_administrator.school
       self.fields['school'].queryset = models.School.objects.filter(id=school.id)
     else:
@@ -1061,7 +1061,7 @@ class UploadFileForm(forms.Form):
     user = kwargs.pop('user')
     super(UploadFileForm, self).__init__(*args, **kwargs)
     print('user', user)
-    if user.is_authenticated():
+    if user.is_authenticated:
       if hasattr(user, 'school_administrator'):
         self.fields['group'].queryset = models.UserGroup.objects.all().filter(teacher__school=user.school_administrator.school, is_active=True)
       elif hasattr(user, 'teacher'):

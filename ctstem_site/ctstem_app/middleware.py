@@ -7,7 +7,7 @@ from django.utils.deprecation import MiddlewareMixin
 class UpdateSession(MiddlewareMixin):
 
   def process_request(self, request):
-    if not request.user.is_authenticated() :
+    if not request.user.is_authenticated:
       #Can't log out if not logged in
       return
     # only update non ajax requests
