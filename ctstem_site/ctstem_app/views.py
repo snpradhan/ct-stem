@@ -1116,7 +1116,7 @@ def validate_recaptcha(request, recaptcha_response):
     'secret': settings.GOOGLE_RECAPTCHA_SECRET_KEY,
     'response': recaptcha_response
   }
-  data = urllib.parse.urlencode(values)
+  data = urllib.parse.urlencode(values).encode("utf-8")
   req = urllib.request.Request(url, data)
   response = urllib.request.urlopen(req)
   result = json.load(response)
