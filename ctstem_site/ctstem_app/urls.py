@@ -2,6 +2,8 @@ from django.conf.urls import url
 
 from . import views
 
+app_name = 'ctstem'
+
 urlpatterns = [
     url(r'^$', views.home, name='home'),
     url(r'^curricula/(?P<bucket>[\w-]+)/$', views.curricula, name='curricula'),
