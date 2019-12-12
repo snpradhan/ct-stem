@@ -27,7 +27,7 @@
                                  {% endif %}" >
             <label for="id_{{field.name}}">
               {{ field.label|title }} {% if field.field.required %} (*) {% endif %}
-              {% if field.name = 'options' %}
+              {% if field.name == 'options' %}
                 <a href="#" class="info" id="options_info" rel="popover" data-content="">
                   <i class="fa fa-info-circle" aria-hidden="true" />
                 </a>
