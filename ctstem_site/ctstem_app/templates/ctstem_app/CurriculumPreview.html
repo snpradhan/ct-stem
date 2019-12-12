@@ -163,6 +163,7 @@
     </header>
 
     <!-- MAIN CONTENT -->
+
     <main>
       {% if curr_unit.curriculum_type == 'L' or curr_unit.curriculum_type == 'U' %}
         <lesson-summary style="{%if step_order|add:0 >= 0 %} display: none; {% endif %}">
@@ -332,7 +333,7 @@
         </faq>
       {% endif %}
 
-      {% if step_order >= 0 %}
+      {% if step_order|add:0 >= 0 %}
         <activity>
           {% include 'ctstem_app/CurriculumActivityPreview.html' with step=step %}
         </activity>
