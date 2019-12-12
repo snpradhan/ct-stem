@@ -730,16 +730,11 @@ class SubcategoryForm(ModelForm):
 ####################################
 # Taxonomy Search Form
 ####################################
-class TaxonomySearchForm(ModelForm):
-  standard = forms.ModelChoiceField(queryset=models.Standard.objects.all())
-
-  class Meta:
-    model = models.Subcategory
-    exclude = ('id', 'description', 'link',)
-    widgets = {
-      'title': forms.TextInput(attrs={'placeholder': 'Standards title'}),
-      'code': forms.TextInput(attrs={'placeholder': 'Standards code'}),
-    }
+class TaxonomySearchForm(forms.Form):
+  standard = forms.ModelChoiceField(required = False, queryset=models.Standard.objects.all())
+  category = forms.ModelChoiceField(required = False, queryset=models.Category.objects.none())
+  title = forms.CharField(required = False, widget=forms.TextInput(attrs={'placeholder': 'Standards title'}))
+  code = forms.CharField(required = False, widget=forms.TextInput(attrs={'placeholder': 'Standards code'}))
 
   def __init__(self, *args, **kwargs):
     super(TaxonomySearchForm, self).__init__(*args, **kwargs)

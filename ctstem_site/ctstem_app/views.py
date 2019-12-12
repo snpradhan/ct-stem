@@ -1692,10 +1692,9 @@ def searchTaxonomy(request):
   if hasattr(request.user, 'teacher') == False and hasattr(request.user, 'author') == False and hasattr(request.user, 'researcher') == False and  hasattr(request.user, 'administrator') == False:
     return http.HttpResponseNotFound('<h1>You do not have the privilege search taxonomy</h1>')
 
-  subcategory = models.Subcategory()
   title = 'Search Standards'
   if 'GET' == request.method:
-    form = forms.TaxonomySearchForm(instance=subcategory)
+    form = forms.TaxonomySearchForm()
     context = {'form': form, 'title': title}
     return render(request, 'ctstem_app/TaxonomySearch.html', context)
 
