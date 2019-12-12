@@ -475,11 +475,11 @@ def downloadAttachments(request, id=''):
       zip_subdir = curriculum.title
       zip_filename = "%s.zip" % zip_subdir
 
-      # Open StringIO to grab in-memory ZIP contents
-      s = StringIO.StringIO()
+      # Grab ZIP file from in-memory, make response with correct MIME-type
+      response = http.HttpResponse(content_type="application/x-zip-compressed")
 
       # The zip compressor
-      zf = zipfile.ZipFile(s, "w")
+      zf = zipfile.ZipFile(response, "w")
 
       for attachment in attachments:
         # Calculate path for file in zip
@@ -496,8 +496,6 @@ def downloadAttachments(request, id=''):
       # Must close zip for all contents to be written
       zf.close()
 
-      # Grab ZIP file from in-memory, make response with correct MIME-type
-      response = http.HttpResponse(s.getvalue(), content_type="application/x-zip-compressed")
       # ..and correct content-disposition
       response['Content-Disposition'] = 'attachment; filename=%s' % zip_filename
 
