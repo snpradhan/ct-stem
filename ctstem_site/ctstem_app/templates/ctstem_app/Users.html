@@ -21,6 +21,11 @@
           <thead>
             <tr>
               <th width="1%" class="no-sort">Select All<br><input id="select-all" type="checkbox" value="0" name="select-all"/></th>
+              {% if user.administrator or user.researcher %}
+                {% if role == 'students' %}
+                  <th id="user__id"> User ID </th>
+                {% endif %}
+              {% endif %}
               <th id="user__username" class="ignorecase">Username</th>
               <th id="user__first_name" class="ignorecase"> Name </th>
               <th id="user__email" class="ignorecase"> Email </th>
@@ -71,9 +76,15 @@
                 <td>
                   <input id="user_{{userProfile.user.id}}" type="checkbox" class="action-select" value="{{userProfile.user.id}}" name="user_{{userProfile.user.id}}" />
                 </td>
+                {% if user.administrator or user.researcher %}
+                  {% if role == 'students' %}
+                    <td>{{userProfile.user.id}}</td>
+                  {% endif %}
+                {% endif %}
+
                 <td>
                   {% if user.researcher and role == 'students' %}
-                    {{userProfile.user.id}}
+                    xxxxxxxxxxxxx
                   {% else %}
                     {{userProfile.user.username}}
                   {% endif %}
