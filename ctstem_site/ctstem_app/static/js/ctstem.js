@@ -320,6 +320,14 @@ $(function (){
     });
     return false;
   });
+
+  $('body').on("click", "a.warning", function(e){
+    e.preventDefault();
+    var message = $(this).data("message");
+    $('#warning .modal-body p').html($(this).data('message'));
+    $('#warning').modal('show');
+    return false;
+  });
   //disable a field if it is inside a div with class disabled
   $('div#userProfile div.disabled select').prop('disabled', true);
 

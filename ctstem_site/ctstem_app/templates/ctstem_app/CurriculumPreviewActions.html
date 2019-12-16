@@ -30,12 +30,12 @@
       <a type="button" class="btn normal blue" aria-hidden="true" aria-label="Create New Copy" title="Create New Copy" href="{% url 'ctstem:copyCurriculum' curriculum.id %}?back_url={{ back_url }}">Remix</a>
     {% else %}
       {% if user.is_authenticated %}
-        {% with msg="You do not have the permission to remix this curriculum" %}
-        <a type="button" class="btn normal blue" aria-hidden="true" aria-label="Create New Copy" title="Create New Copy" onclick="alert('{{msg}}');">Remix</a>
+        {% with msg="You can only remix this curriculum at the unit level. Please go back to the unit overview page and remix from there." %}
+          <a type="button" class="btn normal blue warning" data-message="{{msg}}" href="#">Remix</a>
         {% endwith %}
       {% else %}
         {% with msg="Please login to remix this curriculum" %}
-        <a type="button" class="btn normal blue" aria-hidden="true" aria-label="Create New Copy" title="Create New Copy" onclick="alert('{{msg}}');">Remix</a>
+          <a type="button" class="btn normal blue warning" data-message="{{msg}}" href="#">Remix</a>
         {% endwith %}
       {% endif %}
     {% endif %}
