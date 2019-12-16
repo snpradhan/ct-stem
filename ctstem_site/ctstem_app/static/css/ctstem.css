@@ -1535,6 +1535,13 @@ div.modal-xlg {
   width: 1024px;
 }
 
+div.bootbox.modal .modal-title {
+  font-size: 2.4em;
+  text-align: left;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
 ul#id_student-consent {
   list-style: none;
 }
