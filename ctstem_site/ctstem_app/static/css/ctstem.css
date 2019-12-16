@@ -1665,7 +1665,7 @@ span.ec .glyphicon-collapse-up, span.ec_lessons .fa-caret-square-o-up{
   margin-top: 1em;
   margin-bottom: 0.5em;
 }
-.page-blurb p, .page-blurb ul, .page-blurb ol {
+.page-blurb p, .page-blurb ul:not(.slick-dots), .page-blurb ol {
   color: #777;
   line-height: 160%;
   text-align: justify;
@@ -1677,17 +1677,14 @@ img.page-blurb-image {
   width: 600px;
   margin: 1rem 12rem;
 }
-.page-blurb .pd1, .page-blurb .pd2{
-  margin-bottom: 0.5em;
+.page-blurb .slides {
   text-align: center;
 }
-.page-blurb .pd1 img {
-  max-width: 100%;
-  width: 80em;
-}
-.page-blurb .pd2 img {
-  max-width: 100%;
-  width: 39.75em;
+
+.page-blurb .slides img {
+  width: 75% !important;
+  height: auto !important;
+  display: inline !important;
 }
 .service-blurb {
   color: #777;
