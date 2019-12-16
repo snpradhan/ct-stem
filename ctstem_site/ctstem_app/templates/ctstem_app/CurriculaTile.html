@@ -50,7 +50,7 @@
             <div class="col form-group">
               <label>{{searchForm.curricula_types.label|title}}</label>
               {% for curricula_type in searchForm.curricula_types %}
-                <div>{{curricula_type.tag}} &nbsp; <label for="{{curricula_type.id_for_label}}">{{curricula_type.choice_label}}</label></div>
+                <div>{{curricula_type.tag}} &nbsp; <label for="{{curricula_type.id_for_label}}">{{curricula_type.choice_label}}s</label></div>
               {% endfor %}
             </div>
             {% endif %}
