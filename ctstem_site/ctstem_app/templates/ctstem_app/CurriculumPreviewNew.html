@@ -77,7 +77,20 @@
       <div class="section" id="overview">
         <h3 class="left">Overview</h3>
         <div>{{curriculum.overview|safe}}</div>
+        <!-- Teacher Notes -->
+        {% if curriculum.teacher_notes %}
+          <div>
+          {% if user.administrator or user.researcher or user.school_administrator or user.teacher or user.author %}
+            <a id="teacher_notes_link" href="#teacher_notes"><h5 class="left">Teacher Notes</h5></a>
+          {% else %}
+            {% with msg="Please login as a teacher to see the teacher notes" %}
+              <a onclick="alert('{{msg}}');"><h5 class="left">Teacher Notes</h5></a>
+            {% endwith %}
+          {% endif %}
+          </div>
+        {% endif %}
       </div>
+
 
       {% if curriculum.curriculum_type == 'U' %}
         {% get_underlying_curriculum curriculum.id as underlying_curriculum %}

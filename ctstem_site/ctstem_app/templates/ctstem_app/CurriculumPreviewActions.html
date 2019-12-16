@@ -81,18 +81,7 @@
       <a type="button" class="btn normal blue" aria-hidden="true" aria-label="Unlock Curriculum" title="Unlock Curriculum" href="{% url 'ctstem:unlockCurriculum' curriculum.id %}">Unlock</a>
     </div>
   {% endif %}
-  <!-- Teacher Notes -->
-  {% if curriculum.teacher_notes %}
-    <div class="col">
-    {% if user.administrator or user.researcher or user.school_administrator or user.teacher or user.author %}
-      <a id="teacher_notes_link" href="#teacher_notes"><h5>Teacher Notes</h5></a>
-    {% else %}
-      {% with msg="Please login as a teacher to see the teacher notes" %}
-        <a onclick="alert('{{msg}}');"><h5>Teacher Notes</h5></a>
-      {% endwith %}
-    {% endif %}
-    </div>
-  {% endif %}
+
 
   <!-- Export Student Data -->
   {% check_curriculum_permission curriculum.id 'export_response' as has_export_permission %}
