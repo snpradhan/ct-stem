@@ -863,7 +863,7 @@ class SearchForm(forms.Form):
 class CurriculaSearchForm(forms.Form):
   subjects = forms.ModelMultipleChoiceField(required=False, widget=forms.CheckboxSelectMultiple(), queryset=models.Subject.objects.all().order_by('name'))
   curricula_types = forms.MultipleChoiceField(required=False, widget=forms.CheckboxSelectMultiple(), choices=models.CURRICULUM_TYPE_CHOICES)
-  buckets = forms.MultipleChoiceField(required=False, widget=forms.CheckboxSelectMultiple(), choices=models.CURRICULUM_BUCKET_CHOICES)
+  buckets = forms.MultipleChoiceField(required=False, widget=forms.CheckboxSelectMultiple(), choices=models.CURRICULUM_BUCKET_CHOICES, label='My Collections')
   status = forms.MultipleChoiceField(required=False, widget=forms.CheckboxSelectMultiple(), choices=models.CURRICULUM_STATUS_CHOICES)
   keywords = forms.CharField(required=False, max_length=30, label=u'Search by Keyword')
 
