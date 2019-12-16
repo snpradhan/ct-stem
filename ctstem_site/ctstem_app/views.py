@@ -280,7 +280,15 @@ def curriculum(request, id=''):
           subform.initial = collaborator_data
 
       attachment_formset = AttachmentFormSet(instance=curriculum, prefix='attachment_form')
-      context = {'form': form, 'attachment_formset': attachment_formset, 'collaborator_formset': collaborator_formset, 'formset':formset, 'newQuestionForm': newQuestionForm, 'back_url': back_url }
+
+      storage = messages.get_messages(request)
+      modal_messages = []
+      for message in storage:
+        if message.extra_tags == 'modal_message':
+          modal_messages.append(message)
+
+      context = {'form': form, 'attachment_formset': attachment_formset, 'collaborator_formset': collaborator_formset, 'formset':formset, 'newQuestionForm': newQuestionForm, 'back_url': back_url, 'modal_messages': modal_messages }
+
       return render(request, 'ctstem_app/Curriculum.html', context)
 
     elif request.method == 'POST':
@@ -686,9 +694,9 @@ def copyCurriculum(request, id=''):
 
 
       if hasattr(request.user, 'teacher'):
-        messages.success(request, "A new curriculum '%s - v%s.' has been created and added to your My Curricula folder." % (new_curriculum.title, new_curriculum.version))
+        messages.success(request, "A new curriculum '%s - v%s.' has been created and added to your My Curricula collection.  You may edit the newly remixed curriculum after dismissing this message." % (new_curriculum.title, new_curriculum.version), extra_tags="modal_message")
       else:
-        messages.success(request, "A new curriculum '%s - v%s.' has been created and added to the Private folder.  Please archive the original curriculum" % (new_curriculum.title, new_curriculum.version))
+        messages.success(request, "A new curriculum '%s - v%s.' has been created and the status set to Private.  You may edit the newly remixed curriculum after dismissing this message." % (new_curriculum.title, new_curriculum.version), extra_tags="modal_message")
 
       back_url = None
       if 'back_url' in request.GET:

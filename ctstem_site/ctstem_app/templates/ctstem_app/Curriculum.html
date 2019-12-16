@@ -807,6 +807,16 @@
         $('form#curriculumForm').submit();
       });
 
+      {% if modal_messages %}
+        var message = '';
+        {% for message in modal_messages %}
+          message = message + '{{message}} <br>';
+        {% endfor %}
+
+        $('#notification .modal-body p').html(message);
+        $('#notification').modal('show');
+      {% endif %}
+
     });
   </script>
 

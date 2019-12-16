@@ -324,7 +324,9 @@
     {% block content %}
       <ul class="messages bg-light-gray">
         {% for message in messages %}
-        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message|safe }}</li>
+          {% if not message.extra_tags or message.extra_tags != 'modal_message' %}
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message|safe }}</li>
+          {% endif %}
         {% endfor %}
       </ul>
     {% endblock %}
