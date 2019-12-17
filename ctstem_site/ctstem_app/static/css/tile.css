@@ -1,20 +1,24 @@
 .tile {
   border: 2px solid white;
   margin: 1em;
-  border-radius: 4px;
+  border-radius: 0.5em;
   width: 35em;
   /*height: 45em;*/
   box-shadow: -0.8em 0.8em var(--ctstem-color-medium-blue);
 }
 
 .tile .icon {
-  background-color: #b5b5b5;
+  background-color: var(--ctstem-color-light-gray);
   border-bottom: 2px solid white;
+  border-top-left-radius: 0.25em;
+  border-top-right-radius: 0.25em;
   /*height: 24em;*/
 }
 .tile .icon img {
   max-width: 100%;
   max-height: 100%;
+  border-top-left-radius: inherit;
+  border-top-right-radius: inherit;
 }
 
 .tile .detail {
@@ -23,6 +27,8 @@
   text-align: left;
   padding: 1.6em;
   position: relative;
+  border-bottom-left-radius: 0.25em;
+  border-bottom-right-radius: 0.25em;
 }
 .tile .detail .type {
   text-transform: uppercase;

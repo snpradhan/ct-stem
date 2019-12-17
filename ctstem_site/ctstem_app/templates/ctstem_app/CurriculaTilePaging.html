@@ -13,6 +13,9 @@
             {% if curriculum.status == 'A' %}
               archived
             {% endif %}
+            {% if parent == 'preview' %}
+              underlying
+            {% endif %}
             ">
         {% if curriculum.unit|slugify == 'None'|slugify %}
           <a href="{% url 'ctstem:previewCurriculumNew' curriculum.id %}">

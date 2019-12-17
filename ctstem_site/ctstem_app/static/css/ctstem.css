@@ -769,22 +769,27 @@ div.row#curricula_tiles .col .tile .detail .period{
 div.row#curricula_tiles .col .tile .detail .others{
   color: inherit;
 }
-div.row#curricula_tiles .col .tile.unit .detail {
+
+div.row#curricula_tiles .col .tile .detail {
   background-color: white;
 }
-div.row#curricula_tiles .col .tile.lesson .detail {
-  background-color: var(--ctstem-color-pale-purple);
+div.row#curricula_tiles .col .tile.unit {
+  border-color: var(--ctstem-color-dark-blue);
 }
-div.row#curricula_tiles .col .tile.assessment .detail {
-  background-color: var(--ctstem-color-pale-red);
+div.row#curricula_tiles .col .tile.lesson {
+  border-color:  var(--ctstem-color-dark-blue);
 }
-div.row#curricula_tiles .col .tile.step .detail {
-  background-color: var(--ctstem-color-pale-purple);
-  height: 15em;
+div.row#curricula_tiles .col .tile.assessment {
+  border-color: var(--ctstem-color-yellow);
 }
 div.row#curricula_tiles .col .tile.archived .detail {
   background-color: var(--ctstem-color-light-gray);
 }
+div.row#curricula_tiles .col .tile.underlying .detail {
+  border-top-left-radius: 0.25em;
+  border-top-right-radius: 0.25em;
+}
+
 div.row#curricula_tiles .col .tile.archived .icon img{
   opacity: 0.5;
 }
@@ -825,7 +830,7 @@ div.content#preview div.row#preview_head .col{
 div.content#preview div.row#preview_head .col .icon{
   width: 35em;
   height: 25em;
-  background-color: #b5b5b5;
+  background-color: var(--ctstem-color-light-gray);
   background-size: cover;
   background-repeat: no-repeat;
   position: relative;
@@ -869,19 +874,9 @@ div.content#preview div.row .col.meta > div {
   line-height: 1.1em;
 }
 
-div.content#preview div.row.unit#preview_head .col.meta {
+div.content#preview div.row#preview_head .col.meta {
   background-color: white
 }
-div.content#preview div.row.lesson#preview_head .col.meta{
-  background-color: var(--ctstem-color-pale-purple);
-}
-div.content#preview div.row.assessment#preview_head .col.meta{
-  background-color: var(--ctstem-color-pale-red);
-}
-div.content#preview div.row.archived#preview_head .col.meta{
-  background-color: var(--ctstem-color-light-gray);
-}
-
 div.content#preview div.row.buttons {
   flex-wrap: wrap;
 }
