@@ -24,10 +24,28 @@
   background-color: white;
   height: 21em;
   text-align: left;
-  padding: 1.6em;
+  padding: 1em;
   position: relative;
   border-bottom-left-radius: 0.25em;
   border-bottom-right-radius: 0.25em;
+  display: flex;
+}
+.tile .detail .text {
+  width:90%;
+}
+.tile .detail .tags {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  font-size: 1.7em;
+  width: 10%;
+  justify-content: flex-end;
+}
+.tile .detail .tags > * {
+  flex-basis: 20%;
+}
+.tile .detail .tags .version {
+  font-size: 1em;
 }
 .tile .detail .type {
   text-transform: uppercase;
@@ -53,11 +71,7 @@
   font-size: 1.3em;
   font-weight: 400;
 }
-.tile .detail .version {
-  position: absolute;
-  bottom: 0.8em;
-  right: 0.8em;
-}
+
 .tile .detail .others .author {
   margin-bottom: 0.6em;
 }

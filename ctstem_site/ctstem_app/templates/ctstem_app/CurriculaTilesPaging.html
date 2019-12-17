@@ -1,6 +1,9 @@
 {% load ctstem_extras %}
 {% if curricula %}
   {% for curriculum in curricula %}
+    {% is_my_curriculum curriculum as my_curriculum %}
+    {% is_curriculum_shared_with_me curriculum as shared_curriculum %}
+    {% is_curriculum_assigned curriculum as assigned_curriculum %}
     <div class="col col-{{forloop.counter}}">
       <div class="tile
             {% if curriculum.curriculum_type == 'U' %}
@@ -31,6 +34,23 @@
               {% endif %}
             </div>
           </a>
+          <div class="tags">
+            {% if my_curriculum %}
+              <div class="my">
+                <i class="fa fa-user" title="My Curriculum"></i>
+              </div>
+            {% endif %}
+            {% if shared_curriculum %}
+              <div class="shared">
+                <i class="fa fa-users" title="This curriculum has been shared with me"></i>
+              </div>
+            {% endif %}
+            {% if assigned_curriculum %}
+              <div class="assigned">
+                <i class="fa fa-check-square-o" title="This curriculum has been assigned"></i>
+              </div>
+            {% endif %}
+          </div>
           <div class="favorite">
             {% check_curriculum_permission curriculum.id 'favorite' as has_favorite_permission %}
             {% if has_favorite_permission == True %}
@@ -44,45 +64,66 @@
         {% endif %}
         <a href="{% url 'ctstem:previewCurriculumNew' curriculum.id %}">
           <div class="detail">
-            <div class="type">
-              {{curriculum.get_curriculum_type_display}}
-              {% if curriculum.unit %}
-                {{curriculum.order}}
-              {% endif %}
-              {% if curriculum.subject.all %}
-                - {{curriculum.subject.all|join:", "}}
-              {% endif %}
-            </div>
-            <div class="period">
-              {% if curriculum.curriculum_type == 'U' %}
-                {% get_underlying_curriculum curriculum.id as underlying_curriculum %}
-                {{underlying_curriculum|length}} Lessons
-              {% else %}
-                {{curriculum.time}}
-              {% endif %}
-            </div>
-            <div class="title">{{curriculum.title}}</div>
-            <div class="others">
-              <div class="author">
-                {% if curriculum.authors.all %}
-                  {% if curriculum.authors.all|length > 1 %}
-                    {{curriculum.authors.all|length}} Authors
-                  {% else %}
-                    {% with curriculum.authors.all|first as author %}
-                      by {{author.get_full_name}}
-                    {% endwith %}
-                  {% endif %}
+            <div class="text">
+              <div class="type">
+                {{curriculum.get_curriculum_type_display}}
+                {% if curriculum.unit %}
+                  {{curriculum.order}}
+                {% endif %}
+                {% if curriculum.subject.all %}
+                  - {{curriculum.subject.all|join:", "}}
                 {% endif %}
               </div>
-              <div class="standard">
-                Standards: {{curriculum.taxonomy.all|getStandards|join:", " }}
+              <div class="period">
+                {% if curriculum.curriculum_type == 'U' %}
+                  {% get_underlying_curriculum curriculum.id as underlying_curriculum %}
+                  {{underlying_curriculum|length}} Lessons
+                {% else %}
+                  {{curriculum.time}}
+                {% endif %}
               </div>
-              <div class="used_by">
-                Used by {{curriculum.usage_by_student}} Students
+              <div class="title">{{curriculum.title}}</div>
+              <div class="others">
+                <div class="author">
+                  {% if curriculum.authors.all %}
+                    {% if curriculum.authors.all|length > 1 %}
+                      {{curriculum.authors.all|length}} Authors
+                    {% else %}
+                      {% with curriculum.authors.all|first as author %}
+                        by {{author.get_full_name}}
+                      {% endwith %}
+                    {% endif %}
+                  {% endif %}
+                </div>
+                <div class="standard">
+                  Standards: {{curriculum.taxonomy.all|getStandards|join:", " }}
+                </div>
+                <div class="used_by">
+                  Used by {{curriculum.usage_by_student}} Students
+                </div>
               </div>
             </div>
-            <div class="title version">
-              v{{curriculum.version}}
+            <div class="tags">
+              {% if my_curriculum %}
+                <div class="my">
+                  <i class="fa fa-user" title="My Curriculum"></i>
+                </div>
+              {% endif %}
+
+              {% if shared_curriculum %}
+                <div class="shared">
+                  <i class="fa fa-users" title="This curriculum has been shared with me"></i>
+                </div>
+              {% endif %}
+
+              {% if assigned_curriculum %}
+                <div class="assigned">
+                  <i class="fa fa-check-square-o" title="This curriculum has been assigned"></i>
+                </div>
+              {% endif %}
+              <div class="version title">
+                v{{curriculum.version}}
+              </div>
             </div>
           </div>
         </a>

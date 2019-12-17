@@ -442,3 +442,24 @@ def get_page_end_index(paginator, page_number):
 def get_collaborator_privilege_display(privilege_value):
   privilege_display = dict(models.CURRICULUM_PRIVILEGE_CHOICES)[privilege_value]
   return privilege_display
+
+@register.assignment_tag(takes_context=True)
+def is_my_curriculum(context, curriculum):
+  request = context.get('request')
+  authors = curriculum.authors.all()
+  if hasattr(request.user, 'teacher') and request.user in authors:
+    return True
+  return False
+
+@register.assignment_tag(takes_context=True)
+def is_curriculum_shared_with_me(context, curriculum):
+  request = context.get('request')
+  shared_with = curriculum.shared_with.all()
+  if hasattr(request.user, 'teacher') and request.user.teacher in shared_with:
+    return True
+  return False
+
+@register.assignment_tag(takes_context=True)
+def is_curriculum_assigned(context, curriculum):
+  request = context.get('request')
+  return views.is_curriculum_assigned(request, curriculum.id)
