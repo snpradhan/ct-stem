@@ -4,8 +4,7 @@
   border-radius: 0.5em;
   width: 35em;
   /*height: 45em;*/
-  box-shadow: -0.8em 0.8em var(--ctstem-color-medium-blue);
-}
+ }
 
 .tile .icon {
   background-color: var(--ctstem-color-light-gray);

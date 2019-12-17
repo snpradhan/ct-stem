@@ -219,9 +219,9 @@ def curriculatiles(request):
     curricula_list = paginate(request, curricula, sort_order, 12)
     context = {'curricula': curricula_list, 'searchForm': searchForm }
 
-    template = 'ctstem_app/CurriculaTile.html'
+    template = 'ctstem_app/CurriculaTiles.html'
     if request.is_ajax():
-      template = 'ctstem_app/CurriculaTilePaging.html'
+      template = 'ctstem_app/CurriculaTilesPaging.html'
       context['parent'] = 'curricula'
 
     #return render(request, 'ctstem_app/CurriculaTile.html', context)

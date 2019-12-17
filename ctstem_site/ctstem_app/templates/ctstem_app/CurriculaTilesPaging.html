@@ -1,7 +1,7 @@
 {% load ctstem_extras %}
 {% if curricula %}
   {% for curriculum in curricula %}
-    <div class="col">
+    <div class="col col-{{forloop.counter}}">
       <div class="tile
             {% if curriculum.curriculum_type == 'U' %}
               unit
