@@ -2214,6 +2214,9 @@ def searchCurriculaTiles(request, queryset, search_criteria):
     if 'status' in search_criteria:
       status = search_criteria['status']
       status_filter = Q(status__in=status)
+    else:
+      if not hasattr(request.user, 'administrator'):
+        status_filter = ~Q(status='R')
 
     if keyword_filter:
       base_filter = base_filter & keyword_filter
@@ -2249,7 +2252,7 @@ def searchCurriculaTiles(request, queryset, search_criteria):
         shared_curricula_filter = base_filter & shared_curricula_filter
         query_filter = query_filter | shared_curricula_filter
 
-    #no bucket selected
+    #no bucket/collection selected
     else:
       if request.user.is_anonymous() or hasattr(request.user, 'student') or hasattr(request.user, 'school_administrator'):
         query_filter = base_filter & Q(status='P')
@@ -2272,7 +2275,7 @@ def searchCurriculaTiles(request, queryset, search_criteria):
 
   raw_result = queryset.filter(query_filter)
   if search_units:
-    units = raw_result.values_list('unit', flat=True).distinct().order_by()
+    units = raw_result.values_list('unit', flat=True).distinct()
     filtered_result = queryset.filter(Q(Q(unit__isnull=True), query_filter) | Q(id__in=units)).distinct()
   else:
     filtered_result = queryset.filter(Q(unit__isnull=True), query_filter).distinct()

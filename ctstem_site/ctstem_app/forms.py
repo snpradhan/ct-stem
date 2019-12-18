@@ -871,22 +871,16 @@ class CurriculaSearchForm(forms.Form):
     user = kwargs.pop('user')
     super(CurriculaSearchForm, self).__init__(*args, **kwargs)
 
-    disabled_options = []
-    status_choices = models.CURRICULUM_STATUS_CHOICES
-
-    for value, label in models.CURRICULUM_BUCKET_CHOICES:
-      if hasattr(user, 'teacher'):
-        print 'is teacher'
-        self.fields['buckets'].choices = models.CURRICULUM_BUCKET_CHOICES[1:]
-      if not hasattr(user, 'teacher'):
-        print 'not teacher'
-        self.fields['buckets'].choices = models.CURRICULUM_BUCKET_CHOICES[:1]
-
     if user.is_anonymous() or hasattr(user, 'student') or hasattr(user, 'school_administrator'):
       self.fields.pop('status')
       self.fields.pop('buckets')
     elif hasattr(user, 'teacher'):
       self.fields.pop('status')
+      self.fields['buckets'].choices = models.CURRICULUM_BUCKET_CHOICES[1:]
+    else:
+      self.fields['buckets'].choices = models.CURRICULUM_BUCKET_CHOICES[:1]
+      if not hasattr(user, 'administrator'):
+        self.fields['status'].choices = models.CURRICULUM_STATUS_CHOICES[:3]
 
     for field_name, field in self.fields.items():
       field.widget.attrs['class'] = 'form-control'
