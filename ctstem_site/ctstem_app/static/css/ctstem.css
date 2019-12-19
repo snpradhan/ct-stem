@@ -1677,12 +1677,15 @@ img.page-blurb-image {
   width: 600px;
   margin: 1rem 12rem;
 }
-.page-blurb .slides {
-  text-align: center;
+.page-blurb .col-container {
+  justify-content: space-between;
+}
+.page-blurb .col-container > div {
+  width: 48%;
 }
 
 .page-blurb .slides img {
-  width: 75% !important;
+  width: 100%;
   height: auto !important;
   display: inline !important;
 }
