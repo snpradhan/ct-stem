@@ -1549,7 +1549,7 @@ def createStudent(request, group_id=''):
         response_data = {'result': 'Success', 'student': {'user_id': user.id, 'student_id': student.id, 'username': user.username,
                           'name': user.get_full_name(), 'email': user.email, 'status': 'Active' if user.is_active else 'Inactive',
                           'last_login': user.last_login.strftime('%B %d, %Y') if user.last_login else '', 'group': group.id,
-                          'student_consent': student.get_consent(), 'parental_consent': student.get_parental_consent(), 'member_since': user.date_joined.strftime('%B %d, %Y')}
+                          'student_consent': student.get_consent(), 'member_since': user.date_joined.strftime('%B %d, %Y')}
                         }
 
         send_account_by_admin_confirmation_email('student', user, password)
@@ -1752,9 +1752,10 @@ def searchStudents(request):
     student_list = [{'user_id': student.user.id, 'student_id': student.id, 'username': student.user.username, 'name': student.user.get_full_name(),
                      'email': student.user.email, 'status': 'Active' if student.user.is_active else 'Inactive',
                      'last_login': student.user.last_login.strftime('%B %d, %Y') if student.user.last_login else '',
-                     'group': group.id, 'student_consent': student.get_consent(), 'parental_consent': student.get_parental_consent(),
+                     'group': group.id, 'student_consent': student.get_consent(),
                      'member_since': student.user.date_joined.strftime('%B %d, %Y')}
                 for student in studentList]
+    print student_list
     return http.HttpResponse(json.dumps(student_list), content_type="application/json")
 
   return http.HttpResponseNotAllowed(['GET', 'POST'])
@@ -2044,17 +2045,6 @@ def _do_action(request, id_list, model, object_id=None):
         user.save()
       messages.success(request, "Selected user(s) inactivated.")
       return True
-    elif u'parental_consent_selected' == action_params.get(u'action'):
-      if u'subaction' in action_params:
-        consent = action_params.get(u'subaction')
-        for user in users:
-          student = user.student
-          student.parental_consent = consent
-          student.save()
-        messages.success(request, "Selected students' parental consent updated.")
-        return True
-      else:
-        return False
     elif u'school_selected' == action_params.get(u'action'):
       if u'subaction' in action_params:
         school_id = action_params.get(u'subaction')
@@ -4011,7 +4001,7 @@ def user_upload(request):
                 added_students[student.id] = {'user_id': student.user.id, 'username': student.user.username,
                                               'full_name': student.user.get_full_name(), 'email': student.user.email,
                                               'status': 'Active' if student.user.is_active else 'Inactive',
-                                              'student_consent':  student_consent, 'parental_consent': student.get_parental_consent_display(),
+                                              'student_consent':  student_consent,
                                               'member_since': student.user.date_joined.strftime('%b %d, %Y'),
                                               'last_login': student.user.last_login.strftime('%b %d, %Y') if student.user.last_login else '', 'group': group.id}
                 send_added_to_group_confirmation_email(email, group)

@@ -263,7 +263,6 @@ def teacher_actions(context):
 
 def StudentActions(context):
   actions = TeacherActions(context)
-  actions.append({'description':'Update Parental Consent','value':'parental_consent_selected'})
   return actions
 
 @register.inclusion_tag("ctstem_app/admin/actions.html", takes_context=True)

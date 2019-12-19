@@ -258,7 +258,6 @@
                         <th> Email </th>
                         <th> Status </th>
                         <th> Student Consent </th>
-                        <th> Parental Consent </th>
                         <th> Member Since</th>
                         <th> Last Login </th>
                       </tr>
@@ -298,13 +297,12 @@
                           <td>
                             {% if student.consent == 'A' %}
                               Agree
-                            {% elif consent == 'D' %}
+                            {% elif student.consent == 'D' %}
                               Disagree
                             {% else %}
                               Unknown
                             {% endif %}
                           </td>
-                          <td>{{student.get_parental_consent_display}}</td>
                           <td>{{student.user.date_joined|date}} </td>
                           <td>{{student.user.last_login|date}}</td>
                         </tr>
