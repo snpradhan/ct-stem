@@ -614,7 +614,6 @@ a.add_attachment {
   font-size: 1.1rem;
   font-weight: 300;
   width: 100%;
-  height: 3rem;
   border-top: 1px solid #333;
   border-bottom: 1px solid #333;
   line-height: 3rem;
@@ -646,9 +645,6 @@ a.add_attachment {
 .share-button:active { background-color: red; }
 
 .credits {
-  float: left;
-  height: 3rem;
-  max-width: 80%;
   overflow-y: auto;
 }
 
