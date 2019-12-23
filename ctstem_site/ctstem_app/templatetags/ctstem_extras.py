@@ -454,10 +454,7 @@ def is_my_curriculum(context, curriculum):
 @register.assignment_tag(takes_context=True)
 def is_curriculum_shared_with_me(context, curriculum):
   request = context.get('request')
-  shared_with = curriculum.shared_with.all()
-  if hasattr(request.user, 'teacher') and request.user.teacher in shared_with:
-    return True
-  return False
+  return views.is_curriculum_shared_with_me(request, curriculum.id)
 
 @register.assignment_tag(takes_context=True)
 def is_curriculum_assigned(context, curriculum):

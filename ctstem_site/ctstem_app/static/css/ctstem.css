@@ -814,18 +814,16 @@ div.row .col .bookmark.fa:hover {
   cursor: pointer;
 }
 
-div.row#curricula_tiles .col .tile > .tags {
+div.row#curricula_tiles .col .tile .featured {
   position: absolute;
-  top:5px;
-  left:5px;
-  font-size: 1.7em;
+  top: 5px;
+  left: 5px;
+  font-size: 3em;
   z-index: 99;
   text-decoration: none;
-  color: white;
+  color: var(--ctstem-color-light-red);
 }
-div.row#curricula_tiles .col .tile > .tags > div {
-  margin-bottom: 1em;
-}
+
 div.content#preview {
   width: 80%;
 }

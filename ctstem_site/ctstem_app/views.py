@@ -3686,7 +3686,7 @@ def check_curriculum_permission(request, curriculum_id, action, step_order=-1):
               for lesson in curriculum.underlying_curriculum.all():
                 is_assigned = is_curriculum_assigned(request, lesson.id)
                 if is_assigned:
-                  break;
+                  break
             else:
               is_assigned = is_curriculum_assigned(request, curriculum_id)
 
@@ -3752,7 +3752,7 @@ def check_curriculum_permission(request, curriculum_id, action, step_order=-1):
               for lesson in curriculum.underlying_curriculum.all():
                 has_permission = check_curriculum_permission(request, lesson.id, action)
                 if has_permission:
-                  break;
+                  break
 
           if not has_permission:
             messages.error(request, 'You do not have the privilege to preview this curriculum')
@@ -3777,7 +3777,7 @@ def check_curriculum_permission(request, curriculum_id, action, step_order=-1):
             for lesson in curriculum.underlying_curriculum.all():
               has_permission = check_curriculum_permission(request, lesson.id, action)
               if has_permission:
-                break;
+                break
 
         ############ EXPORT RESPONSE ############
         elif action == 'export_response':
@@ -4925,6 +4925,26 @@ def is_curriculum_assigned(request, id):
     is_assigned = True
 
   return is_assigned
+
+@login_required
+def is_curriculum_shared_with_me(request, id):
+  curriculum = models.Curriculum.objects.get(id=id)
+  is_shared = False
+  #curriculum can only be shared with teachers
+  if hasattr(request.user, 'teacher'):
+    #standalone curriculum is shared with the teacher
+    if request.user.teacher in curriculum.shared_with.all():
+      is_shared = True
+
+    #underlying curricula is shared with the teacher
+    if not is_shared and curriculum.curriculum_type == 'U':
+      underlying_curriculum = underlyingCurriculum(request, 'preview', id)
+
+      for underlying in underlying_curriculum:
+        if request.user.teacher in underlying.shared_with.all():
+          is_shared = True
+          break
+  return is_shared
 
 @login_required
 def is_curriculum_assigned_ajax(request, id):
