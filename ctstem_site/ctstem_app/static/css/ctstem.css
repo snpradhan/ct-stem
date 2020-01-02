@@ -1679,6 +1679,7 @@ img.page-blurb-image {
 }
 .page-blurb .col-container {
   justify-content: space-between;
+  padding: 2em 0;
 }
 .page-blurb .col-container > div {
   width: 48%;
