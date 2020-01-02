@@ -1752,7 +1752,6 @@ def searchStudents(request):
                      'group': group.id, 'student_consent': student.get_consent(),
                      'member_since': student.user.date_joined.strftime('%B %d, %Y')}
                 for student in studentList]
-    print student_list
     return http.HttpResponse(json.dumps(student_list), content_type="application/json")
 
   return http.HttpResponseNotAllowed(['GET', 'POST'])

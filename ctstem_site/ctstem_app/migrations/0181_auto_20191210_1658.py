@@ -13,7 +13,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('ctstem_app', '0179_auto_20191119_1557'),
+        ('ctstem_app', '0180_auto_20191220_1250'),
     ]
 
     operations = [
@@ -30,7 +30,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='attachment',
             name='teacher_only',
-            field=models.BooleanField(choices=[(True, 'Yes'), (False, 'No')], default=False),
+            field=models.BooleanField(choices=[(False, 'No'), (True, 'Yes')], default=False),
         ),
         migrations.AlterField(
             model_name='category',
