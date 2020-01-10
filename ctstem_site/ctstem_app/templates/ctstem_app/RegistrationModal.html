@@ -210,20 +210,22 @@
     });
     /**************************/
 
-    document.querySelector('select[name="school"]').onchange = function(){
-      if($(this).val() == "{{other_school.id}}"){
-        $("div#school_form").show();
-        $('input[name="school-name"]').prop('required', true);
-        $('input[name="school-city"]').prop('required', true);
-        generate_code();
-      }
-      else{
-        $("div#school_form").hide();
-        $('input[name="school-name"]').prop('required', false);
-        $('input[name="school-city"]').prop('required', false);
-      }
-    };
-    $('select#id_school').trigger('change');
+    if($('select#id_school').length){
+      document.querySelector('select[name="school"]').onchange = function(){
+        if($(this).val() == "{{other_school.id}}"){
+          $("div#school_form").show();
+          $('input[name="school-name"]').prop('required', true);
+          $('input[name="school-city"]').prop('required', true);
+          generate_code();
+        }
+        else{
+          $("div#school_form").hide();
+          $('input[name="school-name"]').prop('required', false);
+          $('input[name="school-city"]').prop('required', false);
+        }
+      };
+      $('select#id_school').trigger('change');
+    }
 
     {% if user.is_anonymous %}
       {% if group_id and school_id %}
