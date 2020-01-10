@@ -82,20 +82,20 @@
       });
     });
 
-    $('#add').prop('disabled', true);
+    $('#studentAddForm button#add').prop('disabled', true);
 
-    $('input:required').keyup(function() {
+    $('#studentAddForm input:required').keyup(function() {
       var empty = false;
-      $('input:required').each(function() {
+      $('#studentAddForm input:required').each(function() {
         if ($(this).val() === '') {
           empty = true;
         }
       });
 
       if (empty) {
-        $('#add').prop('disabled', true);
+        $('#studentAddForm button#add').prop('disabled', true);
       } else {
-        $('#add').prop('disabled', false);
+        $('#studentAddForm button#add').prop('disabled', false);
       }
     });
   });
