@@ -793,8 +793,8 @@ class AssignmentSearchForm(forms.Form):
 
   group_class = forms.ModelChoiceField(queryset=models.UserGroup.objects.all().filter(is_active=True).order_by('title'))
   curriculum_type = forms.ChoiceField(choices=(('', '---------'),)+models.CURRICULUM_TYPE_CHOICES, required=False)
-  title = forms.CharField(max_length=256)
-  subject = forms.ModelChoiceField(queryset=models.Subject.objects.all())
+  title = forms.CharField(max_length=256, required=False)
+  subject = forms.ModelChoiceField(queryset=models.Subject.objects.all(), required=False)
 
   def __init__(self, *args, **kwargs):
     user = kwargs.pop('user')
