@@ -3724,7 +3724,7 @@ def export_all_response(request, curriculum_id=''):
     if curriculum.curriculum_type != 'U':
       curricula.append(curriculum)
     else:
-      curricula = curriculum.underlying_curriculum.all().filter(Q(status='P')|Q(status='A')).order_by('order')
+      curricula = curriculum.underlying_curriculum.all().order_by('order')
 
     for curr in curricula:
       if hasattr(request.user, 'administrator') == True or hasattr(request.user, 'researcher') == True:
@@ -3767,7 +3767,6 @@ def export_all_response(request, curriculum_id=''):
 
           studentID = instance.student.user.id
           stepResponses = models.AssignmentStepResponse.objects.all().filter(instance=instance)
-          print(stepResponses)
           for stepResponse in stepResponses:
             questionResponses = models.QuestionResponse.objects.all().filter(step_response=stepResponse)
             for questionResponse in questionResponses:
