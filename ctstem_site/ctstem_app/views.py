@@ -3960,7 +3960,9 @@ def user_upload(request):
       #read the emails in the csv and append to the previous list
       if request.FILES:
         f = request.FILES['uploadFile']
-        reader = csv.reader(f.read().decode("utf-8-sig").encode("utf-8").splitlines(), delimiter=',')
+        decoded_file = f.read().decode("utf-8-sig")
+        io_string = StringIO.StringIO(decoded_file)
+        reader = csv.reader(io_string, delimiter=',')
         for row in reader:
           csv_email = str(row[0]).strip()
           if csv_email is not None and csv_email != '':
