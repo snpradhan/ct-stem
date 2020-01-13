@@ -53,7 +53,7 @@
 {% check_curriculum_permission curriculum.id 'assign' as has_assign_permission %}
 {% if has_assign_permission == True %}
   <a class="assign util-button fa fa-calendar-check-o" aria-hidden="true" data-form="{% url 'ctstem:assignCurriculum' curriculum.id%}" aria-label="Assign Curriculum" title="Assign Curriculum"></a>
-{% elif user.is_authenticated and curriculum.status != 'R' %}
+{% elif user.is_authenticated and not user.researcher and curriculum.status != 'R' %}
   {% if curriculum.curriculum_type == 'U' %}
     {% with msg="This unit cannot be assigned because all the underlying lessons are private and not locked.  If you need to assign this unit please ask the author to lock one or more lessons or make them public" %}
     <a class="fa fa-calendar-check-o disabled" aria-hidden="true" onclick="alert('{{msg}}');"></a>
