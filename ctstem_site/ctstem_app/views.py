@@ -635,17 +635,21 @@ def copyCurriculumMeta(request, id=''):
     for attachment in attachments:
       if attachment.file_object:
         try:
+          original_attachment_id = attachment.id
           source = attachment.file_object
           filecontent = ContentFile(source.file.read())
           filename = os.path.split(source.file.name)[-1]
           filename_array = filename.split('.')
-          filename = filename_array[0] + '-' + str(curriculum.id) + '.' + filename_array[1]
+          new_filename = filename_array[0] + '-' + str(curriculum.id) + '.' + filename_array[1]
           attachment.pk = None
           attachment.id = None
           attachment.curriculum = curriculum
-          attachment.file_object.save(filename, filecontent)
+          attachment.file_object.save(new_filename, filecontent)
           attachment.save()
           source.file.close()
+          original_attachment = models.Attachment.objects.get(id=original_attachment_id)
+          original_attachment.file_object.save(filename, filecontent)
+          original_attachment.save()
         except IOError as e:
           continue
 
@@ -668,6 +672,7 @@ def copyCurriculumSteps(request, original_curriculum, new_curriculum):
     step.save()
     for step_question in step_questions:
       question = step_question.question
+      original_question_id = question.id
       question.id = None
       question.pk = None
       if question.sketch_background:
@@ -676,9 +681,12 @@ def copyCurriculumSteps(request, original_curriculum, new_curriculum):
           filecontent = ContentFile(source.file.read())
           filename = os.path.split(source.file.name)[-1]
           filename_array = filename.split('.')
-          filename = filename_array[0][:10] + '_' + dt + '.' + filename_array[1]
-          question.sketch_background.save(filename, filecontent)
+          new_filename = filename_array[0][:10] + '_' + dt + '.' + filename_array[1]
+          question.sketch_background.save(new_filename, filecontent)
           source.file.close()
+          original_question = models.Question.objects.get(id=original_question_id)
+          original_question.sketch_background.save(filename, filecontent)
+          original_question.save()
         except IOError as e:
           question.sketch_background = None
       question.save()
