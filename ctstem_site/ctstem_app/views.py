@@ -564,9 +564,9 @@ def copyCurriculum(request, id=''):
         #unit copy
         #copy underlying lessons
         if hasattr(request.user, 'teacher'):
-          underlying_curriculum =  original_curriculum.underlying_curriculum.all().filter(Q(status='P') | Q(authors=request.user) | Q(shared_with=request.user.teacher)).distinct()
+          underlying_curriculum =  original_curriculum.underlying_curriculum.all().filter(Q(status='P') | Q(authors=request.user) | Q(shared_with=request.user.teacher)).exclude(status='R').distinct()
         else:
-          underlying_curriculum = original_curriculum.underlying_curriculum.all().distinct()
+          underlying_curriculum = original_curriculum.underlying_curriculum.all().exclude(status='R').distinct()
 
         for lesson in underlying_curriculum:
           new_lesson = copyCurriculumMeta(request, lesson.id)
