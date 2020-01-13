@@ -3602,7 +3602,7 @@ def export_response(request, assignment_id='', student_id=''):
     if '' != student_id:
       student = models.Student.objects.get(id=student_id)
       instances = models.AssignmentInstance.objects.all().filter(assignment=assignment, student=student)
-      response['Content-Disposition'] = 'attachment; filename="%s-%s.xls"'% (assignment, student)
+      response['Content-Disposition'] = 'attachment; filename="%s-%s.xls"'% (assignment, student.user.id)
     else:
       instances = models.AssignmentInstance.objects.all().filter(assignment=assignment)
       #for researchers filter out students who have opted out
