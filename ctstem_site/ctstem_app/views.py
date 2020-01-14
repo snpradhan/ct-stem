@@ -3171,7 +3171,7 @@ def question_response_review(request, assignment_id='', curriculum_question_id='
       elif 'POST' == request.method:
         data = request.POST.copy()
         feedback_saved = False
-        for k, v in data.iterlists():
+        for k, v in data.lists():
           if 'feedback' in k:
             feedback_id = int(k[:k.index('-')])
             question_feedback = models.QuestionFeedback.objects.get(id=feedback_id)
