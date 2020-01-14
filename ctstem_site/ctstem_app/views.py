@@ -3641,7 +3641,7 @@ def export_response(request, assignment_id='', student_id=''):
       ws.write(row_num, 1, assignment.group.teacher.user.get_full_name(), font_style)
       row_num += 1
 
-    ws.write(row_num, 0, 'Group', bold_font_style)
+    ws.write(row_num, 0, 'Class', bold_font_style)
     ws.write(row_num, 1, assignment.group.title, font_style)
     row_num += 1
     ws.write(row_num, 0, 'Assignment', bold_font_style)
@@ -3716,7 +3716,7 @@ def export_all_response(request, curriculum_id=''):
     date_time_format.num_format_str = 'mm/dd/yyyy hh:mm AM/PM'
 
 
-    columns = ['Group', 'Curriculum', 'Assigned Date', 'Student', 'Student ID', 'Step No.', 'Step Title', 'Question No.', 'Question', 'Research Category', 'Options', 'Correct Answer', 'Student Response', 'Submission DateTime']
+    columns = ['Class', 'Curriculum', 'Assigned Date', 'Student', 'Student ID', 'Step No.', 'Step Title', 'Question No.', 'Question', 'Research Category', 'Options', 'Correct Answer', 'Student Response', 'Submission DateTime']
     font_styles = [font_style, font_style, date_format, font_style, font_style, font_style, font_style, font_style, font_style, font_style, font_style, font_style, font_style, date_time_format]
 
     if hasattr(request.user, 'administrator') == True or hasattr(request.user, 'researcher') == True or hasattr(request.user, 'school_administrator') == True:
