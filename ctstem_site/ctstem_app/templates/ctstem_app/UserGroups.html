@@ -193,9 +193,11 @@
                           <a type="button" class="btn btn-purple" aria-label="Inactivate Class" title="Inactivate Class" href="{% url 'ctstem:inactivateGroup' group.id %}" onclick="return confirm('Are you sure you want to inactivate {{group.title}}?')">
                               <i class="fa fa-archive"></i>
                           </a>
-                          <a type="button" class="btn btn-danger" aria-label="Delete Class" title="Delete Class" href="{% url 'ctstem:deleteGroup' group.id %}" onclick="return confirm('Are you sure you want to delete {{group.title}}?')">
-                              <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-                          </a>
+                          {% if user.administrator %}
+                            <a type="button" class="btn btn-danger" aria-label="Delete Class" title="Delete Class" href="{% url 'ctstem:deleteGroup' group.id %}" onclick="return confirm('Are you sure you want to delete {{group.title}}?')">
+                                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                            </a>
+                          {% endif %}
                         {% endif %}
                       </div>
                     {% endif %}
