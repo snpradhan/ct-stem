@@ -821,9 +821,17 @@ div.row#curricula_tiles .col .tile .featured {
   font-size: 3em;
   z-index: 99;
   text-decoration: none;
-  color: var(--ctstem-color-light-red);
+  color: var(--ctstem-color-blue);
 }
-
+div.row#curricula_tiles .col .tile .shelf {
+  width: 0px;
+  height: 0px;
+  border-top: 6.5em solid white;
+  border-right: 6.5em solid transparent;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+}
 div.content#preview {
   width: 80%;
 }

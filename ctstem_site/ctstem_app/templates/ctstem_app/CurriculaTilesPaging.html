@@ -34,11 +34,13 @@
               {% endif %}
             </div>
           </a>
-          <div class="featured">
-            {% if curriculum.feature_rank %}
+          {% if curriculum.feature_rank %}
+            <div class="shelf">
+            </div>
+            <div class="featured">
               <i class="fas fa-award"></i>
-            {% endif %}
-          </div>
+            </div>
+           {% endif %}
           <div class="favorite">
             {% check_curriculum_permission curriculum.id 'favorite' as has_favorite_permission %}
             {% if has_favorite_permission == True %}
