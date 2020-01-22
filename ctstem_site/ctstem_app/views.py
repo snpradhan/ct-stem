@@ -4545,7 +4545,7 @@ def validate(request, username='', validation_code=''):
     if form.is_valid():
       username = form.cleaned_data['username'].lower()
       password = form.cleaned_data['password']
-      user = authenticate(username=username, password=password)
+      user = User.objects.get(username=username)
       user.is_active = True
       user.save()
 
