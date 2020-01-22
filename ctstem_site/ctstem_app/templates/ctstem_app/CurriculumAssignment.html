@@ -127,7 +127,7 @@
       }
     });
 
-    $('.assigned').each(function(){
+    $('#curriculumAssignmentForm input.assigned').each(function(){
       var class_names = $(this).closest('tr').attr('class').split(' ');
       if(class_names[0] == 'unit'){
         $(this).change(function(){
