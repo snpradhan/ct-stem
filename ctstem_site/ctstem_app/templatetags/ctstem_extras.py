@@ -460,3 +460,8 @@ def is_curriculum_shared_with_me(context, curriculum):
 def is_curriculum_assigned(context, curriculum):
   request = context.get('request')
   return views.is_curriculum_assigned(request, curriculum.id)
+
+@register.assignment_tag(takes_context=True)
+def is_curriculum_assigned_by_me(context, curriculum):
+  request = context.get('request')
+  return views.is_curriculum_assigned_by_me(request, curriculum.id)

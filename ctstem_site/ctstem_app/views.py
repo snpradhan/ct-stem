@@ -4926,7 +4926,17 @@ def is_curriculum_assigned(request, id):
 
   return is_assigned
 
-@login_required
+def is_curriculum_assigned_by_me(request, id):
+  curriculum = models.Curriculum.objects.get(id=id)
+  is_assigned = False
+
+  if hasattr(request.user, 'teacher'):
+    assignment_count = models.Assignment.objects.all().filter(Q(curriculum=curriculum) | Q(curriculum__unit=curriculum), Q(group__teacher=request.user.teacher)).count()
+    if assignment_count > 0:
+      is_assigned = True
+
+  return is_assigned
+
 def is_curriculum_shared_with_me(request, id):
   curriculum = models.Curriculum.objects.get(id=id)
   is_shared = False

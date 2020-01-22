@@ -3,7 +3,7 @@
   {% for curriculum in curricula %}
     {% is_my_curriculum curriculum as my_curriculum %}
     {% is_curriculum_shared_with_me curriculum as shared_curriculum %}
-    {% is_curriculum_assigned curriculum as assigned_curriculum %}
+    {% is_curriculum_assigned_by_me curriculum as assigned_curriculum %}
     <div class="col col-{{forloop.counter}}">
       <div class="tile
             {% if curriculum.curriculum_type == 'U' %}
