@@ -111,6 +111,7 @@ urlpatterns = [
     url(r'^categories/$', views.research_categories, name='categories'),
     url(r'^terms/$', views.terms, name='terms'),
     url(r'^help/$', views.help, name='help'),
+    url(r'^clear_cache/$', views.clear_cache, name='clear_cache'),
 
 
 ]

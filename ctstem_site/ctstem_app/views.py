@@ -43,6 +43,7 @@ from django.db.models import Max, Min
 import logging
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from dal import autocomplete
+from django.core.cache import cache
 
 logger = logging.getLogger('django')
 
@@ -4693,3 +4694,9 @@ class SchoolAutocomplete(autocomplete.Select2QuerySetView):
       create_school = models.School.objects.all().filter(school_code='OTHER')
       return list(create_school) + list(qs)
 
+@login_required
+def clear_cache(request):
+  if hasattr(request.user, 'administrator'):
+    cache.clear()
+    messages.success(request, "Cache cleared.")
+  return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))

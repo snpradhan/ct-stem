@@ -240,6 +240,7 @@
                       <li class="{% navactive request 'ctstem:categories' %}"><a href="{% url 'ctstem:categories' %}">Research Categories</a></li>
                       {% if user.administrator %}
                         <li class="{% navactive request 'ctstem:teamMembers' %}"><a href="{% url 'ctstem:teamMembers' %}">Team Members</a></li>
+                        <li><a href="{% url 'ctstem:clear_cache' %}">Clear Cache</a></li>
                       {% endif %}
                     </ul>
                   </li>
