@@ -213,4 +213,6 @@ CRONJOBS = [
     ('0 0 * * *', 'ctstem_app.cron.cleanup_teacher_accounts', '>> /srv/project/logs/cron.log'),
     # run cron at 1 am to backup database
     ('0 1 * * *', 'ctstem_app.cron.backup_db', '>> /srv/project/logs/cron.log'),
+    # run cron at 2 am to clean up deleted curricula
+    ('0 2 * * *', 'ctstem_app.cron.cleanup_deleted_curricula', '>> /srv/project/logs/cron.log'),
 ]

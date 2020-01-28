@@ -45,3 +45,11 @@ def backup_db():
   subprocess.call(cmd, shell=True)
   print('end db backup', datetime.today())
 
+def cleanup_deleted_curricula():
+  #get a list of curricula that were deleted a year ago
+  regEnd = datetime.today() - timedelta(days = 365)
+  print('finding curricula deleted before ', regEnd)
+  curricula = models.Curriculum.objects.all().filter(status = 'R', modified_date__lt=regEnd)
+  count = len(curricula)
+  curricula.delete()
+  print('%d curriculum purged' % count)
