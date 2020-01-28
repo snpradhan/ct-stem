@@ -206,7 +206,7 @@ def curriculatiles(request):
     elif request.method == 'POST':
       data = request.POST.copy()
       searchForm = forms.CurriculaSearchForm(user=request.user, data=data)
-      search_criteria = eval(json.dumps(dict(data.iterlists())))
+      search_criteria = eval(json.dumps(dict(data.lists())))
 
     curricula = searchCurriculaTiles(request, curricula, search_criteria)
 
@@ -224,8 +224,8 @@ def curriculatiles(request):
       template = 'ctstem_app/CurriculaTilesPaging.html'
       context['parent'] = 'curricula'
 
-    #return render(request, 'ctstem_app/CurriculaTile.html', context)
-    return render_to_response(template, context, context_instance=RequestContext(request))
+    return render(request, template, context)
+    #return render_to_response(template, context, context_instance=RequestContext(request))
   return http.HttpResponseNotAllowed(['GET', 'POST'])
 
 ####################################
@@ -2174,7 +2174,6 @@ def searchCurricula(request, queryset, search_criteria):
 # filter curricula queryset based on search criteria
 ####################################
 def searchCurriculaTiles(request, queryset, search_criteria):
-  print 'search_criteria', search_criteria
   query_filter = Q()
 
   base_filter = Q()
@@ -2226,7 +2225,6 @@ def searchCurriculaTiles(request, queryset, search_criteria):
       base_filter = base_filter & curricula_type_filter
     if status_filter:
       base_filter = base_filter & status_filter
-    print 'base_filter', base_filter
 
     if 'buckets' in search_criteria:
       buckets = search_criteria['buckets']

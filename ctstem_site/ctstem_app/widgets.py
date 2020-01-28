@@ -35,7 +35,6 @@ class CheckboxSelectMultipleWithDisabledOption(forms.CheckboxSelectMultiple):
 
     def __init__(self, *args, **kwargs):
         self.disabled_options = kwargs.pop('disabled_options')
-        print self.disabled_options
         super(CheckboxSelectMultipleWithDisabledOption, self).__init__(*args, **kwargs)
 
     def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
