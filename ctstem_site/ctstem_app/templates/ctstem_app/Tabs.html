@@ -35,7 +35,7 @@
     {% endif %}
   {% endif %}
   {% if tab == 'user' or tab == 'group' %}
-    {% if not group.id %}
+    {% if searchForm %}
       <div class="search">
         {{searchForm.search_criteria}}
         <input type="submit" class="btn btn-success" id="submit" value="Search"/>
