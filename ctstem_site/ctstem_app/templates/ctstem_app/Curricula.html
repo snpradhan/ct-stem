@@ -8,186 +8,188 @@
 {% block content %}
   {{block.super}}
   <div class="content">
-    <div class="col-lg-12">
-      {% if bucket == 'lesson' or bucket == 'unit' %}
-        {% if bucket == 'lesson' %}
-          <h2> Lessons </h2>
-        {% else %}
-          <h2> Units </h2>
-        {% endif %}
-        <p class="page-blurb">
-        Our computational thinking lesson plans are designed to embed authentic CT practices into high school science and mathematics classrooms while enriching disciplinary content learning.
-        </p>
-      {% elif bucket == 'assessment' %}
-        <h2> Assessments </h2>
-      {% elif bucket == 'teacher_authored' %}
-        <h2> Teacher Authored Curricula </h2>
-      {% elif bucket == 'my' %}
-        <h2> My Curricula </h2>
-      {% elif bucket == 'shared' %}
-        <h2> Shared Curricula </h2>
-      {% elif bucket == 'favorite' %}
-        <h2> Favorite Curricula </h2>
-      {% elif bucket == 'deleted' %}
-        <h2> Deleted Curricula </h2>
-      {% endif %}
-
-      <div class="btn-group">
-        {% if user.administrator or user.researcher or user.author or user.teacher %}
-          <a type="button" class="btn btn-success" href="{% url 'ctstem:newCurriculum' %}?back_url={{ request.path }}" title="Create new curriculum">Create Curriculum</a>
-        {% endif %}
-      </div>
-      <form method="post">
-        {% csrf_token %}
-        {% include "ctstem_app/CurriculaTabs.html" %}
-      </form>
-      {% if curricula %}
-        <div id="curricula_table">
-          {% include "ctstem_app/Pagination.html" with model=curricula %}
-          <table class="table table-striped paginate_sort" id="curricula">
-            <thead>
-              <tr id="filterrow">
-                <th class="no-sort"> </th>
-                <th width="50%" class="no-sort"> </th>
-                <th width="20%" class="no-sort"> </th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for curriculum in curricula %}
-                <tr>
-                  <td class="icon">
-                    {% if curriculum.icon %}
-                      <img class="big_icon" src="{{curriculum.icon.url}}"/>
-                    {% elif curriculum.curriculum_type == 'U' %}
-                      <img class="big_icon" src="/static/img/unit.png">
-                    {% elif curriculum.curriculum_type == 'L' %}
-                      <img class="big_icon" src="/static/img/lesson.png">
-                    {% elif curriculum.curriculum_type == 'A' %}
-                      <img class="big_icon" src="/static/img/assessment.png">
-                    {% endif %}
-                  </td>
-                  <td class="information">
-                    <div class="title">
-                      {{curriculum.title}} - v{{curriculum.version}}.
-                      {% if curriculum.locked_by %}
-                        {% if user.administrator or user.researcher or user.author %}
-                          <i class="fa fa-lock" aria-hidden="true" title="Locked by {{curriculum.locked_by}}"></i>
-                        {% elif user.teacher %}
-                          {% if user in curriculum.authors.all or user.teacher in curriculum.shared_with.all %}
-                            <i class="fa fa-lock" aria-hidden="true" title="Locked by {{curriculum.locked_by}}"></i>
-                          {% endif %}
-                        {% endif %}
-                      {% endif %}
-                      {% if curriculum.feature_rank %}
-                        <i class="fa fa-certificate" aria-hidden="true" title="This is a featured curriculum"></i>
-                      {% endif %}
-                    </div>
-                    {% if user.administrator or user.researcher or user.author or user.teacher %}
-                      {% if bucket == 'teacher_authored' or bucket == 'my' or bucket == 'shared' or bucket == 'favorite' or bucket == 'deleted' %}
-                        <div class="row">
-                          <div class="col-md-2 title">Curriculum Type:</div>
-                          <div class="col-md-10">{{ curriculum.get_curriculum_type_display }}</div>
-                        </div>
-                      {% endif %}
-                      <div class="row">
-                        <div class="col-md-2 title">Status:</div>
-                        <div class="col-md-10">{{ curriculum.get_status_display }}</div>
-                      </div>
-                    {% endif %}
-
-                    {% if curriculum.curriculum_type|is_in:"['U', L', 'A']" %}
-                      <div class="row">
-                        <div class="col-md-2 title">Subject(s):</div>
-                        <div class="col-md-10">
-                          {% if curriculum.subject.all %}
-                            {{curriculum.subject.all|join:", "}}
-                          {% else %}
-                            -
-                          {% endif %}
-                        </div>
-                      </div>
-                      <div class="row">
-                        <div class="col-md-2 title">Standards:</div>
-                        <div class="col-md-10">
-                          <ul class="standard">
-                            {% for standard, categories in curriculum.taxonomy.all|taxonomyHelper %}
-                              <li>{{standard}}
-                                <span class="ec">
-                                  <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                                  <span class="glyphicon glyphicon-collapse-up" aria-hidden="true" style="display:none;"></span>
-                                </span>
-                              </li>
-                              <ul class="category" style="display:none;">
-                                {% for category, taxonomies in categories.items %}
-                                  <li>{{category}}
-                                    <span class="ec">
-                                      <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                                      <span class="glyphicon glyphicon-collapse-up" aria-hidden="true" style="display:none;"></span>
-                                    </span>
-                                  </li>
-                                  <ul class="taxonomy" style="display:none;">
-                                  {% for taxonomy in taxonomies %}
-                                    <li>{{taxonomy}} </li>
-                                  {% endfor %}
-                                  </ul>
-                                {% endfor %}
-                              </ul>
-                            {% endfor %}
-                          </ul>
-                        </div>
-                      </div>
-                    {% endif %}
-                    <div class="row">
-                      <div class="col-md-2 title">Author(s):</div>
-                      <div class="col-md-10">
-                        {% for author in curriculum.authors.all %}
-                          {{author.get_full_name}}{% if forloop.last == False %}, {% endif %}
-                        {% endfor %}
-                      </div>
-                    </div>
-                    {% if curriculum.curriculum_type == 'U'%}
-                      <div class="row">
-                        <div class="col-md-2 title">Underlying Curricula:</div>
-                        <div class="col-md-10">
-                          <span class="ec unit_lesson" data-unit-id="{{curriculum.id}}" data-back-url="{{request.path}}">
-                            <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                            <span class="glyphicon glyphicon-collapse-up" aria-hidden="true" style="display:none;"></span>
-                          </span>
-                          <div id="underlying_curricula" style="display:none;">
-                            <table></table>
-                          </div>
-                        </div>
-                      </div>
-                    {% endif %}
-                    <div class="row">
-                      <div class="col-md-2 title">Used By:</div>
-                      <div class="col-md-10">
-                        {{curriculum.usage_by_student}} Students,
-                        {{curriculum.usage_by_teacher}} Teachers,
-                        {{curriculum.usage_by_class}} Classes &
-                        {{curriculum.usage_by_school}} Schools
-                      </div>
-                    </div>
-                    <div class="row">
-                      <div class="col-md-2 title">{% if curriculum.status == 'R' %} Deleted On: {% else %} Last Updated: {% endif %}</div>
-                      <div class="col-md-10">
-                        {{curriculum.modified_date|date}}
-                      </div>
-                    </div>
-                  </td>
-                  <td class="action">
-                    {% include "ctstem_app/CurriculaActions.html" with curriculum=curriculum %}
-                  </td>
-                </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-          {% include "ctstem_app/Pagination.html" with model=curricula %}
-        </div>
+    {% if bucket == 'lesson' or bucket == 'unit' %}
+      {% if bucket == 'lesson' %}
+        <h2> Lessons </h2>
       {% else %}
-        <p>No curricula exists for the selected category.</p>
+        <h2> Units </h2>
+      {% endif %}
+      <div class="page-blurb">
+        <p>
+          Our computational thinking lesson plans are designed to embed authentic CT practices into high school science and mathematics classrooms while enriching disciplinary content learning.
+        </p>
+      </div>
+    {% elif bucket == 'assessment' %}
+      <h2> Assessments </h2>
+    {% elif bucket == 'teacher_authored' %}
+      <h2> Teacher Authored Curricula </h2>
+    {% elif bucket == 'my' %}
+      <h2> My Curricula </h2>
+    {% elif bucket == 'shared' %}
+      <h2> Shared Curricula </h2>
+    {% elif bucket == 'favorite' %}
+      <h2> Favorite Curricula </h2>
+    {% elif bucket == 'deleted' %}
+      <h2> Deleted Curricula </h2>
+    {% endif %}
+
+    <div class="btn-group">
+      {% if user.administrator or user.researcher or user.author or user.teacher %}
+        <a type="button" class="btn btn-success" href="{% url 'ctstem:newCurriculum' %}?back_url={{ request.path }}" title="Create new curriculum">Create Curriculum</a>
       {% endif %}
     </div>
+    <form method="post">
+      {% csrf_token %}
+      {% include "ctstem_app/CurriculaTabs.html" %}
+    </form>
+    {% if curricula %}
+      <div id="curricula_table">
+        {% include "ctstem_app/Pagination.html" with model=curricula %}
+        <table class="table table-striped paginate_sort" id="curricula">
+          <thead>
+            <tr id="filterrow">
+              <th class="no-sort"> </th>
+              <th width="50%" class="no-sort"> </th>
+              <th width="20%" class="no-sort"> </th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for curriculum in curricula %}
+              <tr>
+                <td class="icon">
+                  {% if curriculum.icon %}
+                    <img class="big_icon" src="{{curriculum.icon.url}}"/>
+                  {% elif curriculum.curriculum_type == 'U' %}
+                    <img class="big_icon" src="/static/img/unit.png">
+                  {% elif curriculum.curriculum_type == 'L' %}
+                    <img class="big_icon" src="/static/img/lesson.png">
+                  {% elif curriculum.curriculum_type == 'A' %}
+                    <img class="big_icon" src="/static/img/assessment.png">
+                  {% endif %}
+                </td>
+                <td class="information">
+                  <div class="title">
+                    {{curriculum.title}} - v{{curriculum.version}}.
+                    {% if curriculum.locked_by %}
+                      {% if user.administrator or user.researcher or user.author %}
+                        <i class="fa fa-lock" aria-hidden="true" title="Locked by {{curriculum.locked_by}}"></i>
+                      {% elif user.teacher %}
+                        {% if user in curriculum.authors.all or user.teacher in curriculum.shared_with.all %}
+                          <i class="fa fa-lock" aria-hidden="true" title="Locked by {{curriculum.locked_by}}"></i>
+                        {% endif %}
+                      {% endif %}
+                    {% endif %}
+                    {% if curriculum.feature_rank %}
+                      <i class="fa fa-certificate" aria-hidden="true" title="This is a featured curriculum"></i>
+                    {% endif %}
+                  </div>
+                  {% if user.administrator or user.researcher or user.author or user.teacher %}
+                    {% if bucket == 'teacher_authored' or bucket == 'my' or bucket == 'shared' or bucket == 'favorite' or bucket == 'deleted' %}
+                      <div class="row">
+                        <div class="col-md-2 title">Curriculum Type:</div>
+                        <div class="col-md-10">{{ curriculum.get_curriculum_type_display }}</div>
+                      </div>
+                    {% endif %}
+                    <div class="row">
+                      <div class="col-md-2 title">Status:</div>
+                      <div class="col-md-10">{{ curriculum.get_status_display }}</div>
+                    </div>
+                  {% endif %}
+
+                  {% if curriculum.curriculum_type|is_in:"['U', L', 'A']" %}
+                    <div class="row">
+                      <div class="col-md-2 title">Subject(s):</div>
+                      <div class="col-md-10">
+                        {% if curriculum.subject.all %}
+                          {{curriculum.subject.all|join:", "}}
+                        {% else %}
+                          -
+                        {% endif %}
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-2 title">Standards:</div>
+                      <div class="col-md-10">
+                        <ul class="standard">
+                          {% for standard, categories in curriculum.taxonomy.all|taxonomyHelper %}
+                            <li>{{standard}}
+                              <span class="ec">
+                                <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
+                                <span class="glyphicon glyphicon-collapse-up" aria-hidden="true" style="display:none;"></span>
+                              </span>
+                            </li>
+                            <ul class="category" style="display:none;">
+                              {% for category, taxonomies in categories.items %}
+                                <li>{{category}}
+                                  <span class="ec">
+                                    <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
+                                    <span class="glyphicon glyphicon-collapse-up" aria-hidden="true" style="display:none;"></span>
+                                  </span>
+                                </li>
+                                <ul class="taxonomy" style="display:none;">
+                                {% for taxonomy in taxonomies %}
+                                  <li>{{taxonomy}} </li>
+                                {% endfor %}
+                                </ul>
+                              {% endfor %}
+                            </ul>
+                          {% endfor %}
+                        </ul>
+                      </div>
+                    </div>
+                  {% endif %}
+                  <div class="row">
+                    <div class="col-md-2 title">Author(s):</div>
+                    <div class="col-md-10">
+                      {% for author in curriculum.authors.all %}
+                        {{author.get_full_name}}{% if forloop.last == False %}, {% endif %}
+                      {% endfor %}
+                    </div>
+                  </div>
+                  {% if curriculum.curriculum_type == 'U'%}
+                    <div class="row">
+                      <div class="col-md-2 title">Underlying Curricula:</div>
+                      <div class="col-md-10">
+                        <span class="ec unit_lesson" data-unit-id="{{curriculum.id}}" data-back-url="{{request.path}}">
+                          <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
+                          <span class="glyphicon glyphicon-collapse-up" aria-hidden="true" style="display:none;"></span>
+                        </span>
+                        <div id="underlying_curricula" style="display:none;">
+                          <table></table>
+                        </div>
+                      </div>
+                    </div>
+                  {% endif %}
+                  <div class="row">
+                    <div class="col-md-2 title">Used By:</div>
+                    <div class="col-md-10">
+                      {{curriculum.usage_by_student}} Students,
+                      {{curriculum.usage_by_teacher}} Teachers,
+                      {{curriculum.usage_by_class}} Classes &
+                      {{curriculum.usage_by_school}} Schools
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-2 title">{% if curriculum.status == 'R' %} Deleted On: {% else %} Last Updated: {% endif %}</div>
+                    <div class="col-md-10">
+                      {{curriculum.modified_date|date}}
+                    </div>
+                  </div>
+                </td>
+                <td class="action">
+                  {% include "ctstem_app/CurriculaActions.html" with curriculum=curriculum %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% include "ctstem_app/Pagination.html" with model=curricula %}
+      </div>
+    {% else %}
+      <div class="page-blurb">
+        <p>No curricula exists for the selected category.</p>
+      </div>
+    {% endif %}
   </div>
   <div class="modal fade" id="assignmentModal" role="dialog"></div>
 

@@ -1655,17 +1655,14 @@ span.ec .glyphicon-collapse-up, span.ec_lessons .fa-caret-square-o-up{
   text-align: center;
 }
 .page-blurb ol > li {
-  font-size: 1.2em;
-  font-weight: 700;
   margin: 1em 0;
-}
-.page-blurb ol > ul > li {
-  font-size: 1em;
   font-weight: 700;
+}
+.page-blurb ul > li {
   margin-top: 1em;
   margin-bottom: 0.5em;
 }
-.page-blurb p, .page-blurb ul:not(.slick-dots), .page-blurb ol {
+.page-blurb p, .page-blurb ul:not(.slick-dots) li, .page-blurb  ol li {
   color: #777;
   line-height: 160%;
   text-align: justify;
