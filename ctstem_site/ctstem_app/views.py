@@ -1781,7 +1781,6 @@ def searchTeachers(request):
 
   elif 'POST' == request.method:
     data = request.POST.copy()
-    print(data)
     query_filter = {}
     if data['username']:
       query_filter['user__username__icontains'] = str(data['username'])
@@ -1792,9 +1791,7 @@ def searchTeachers(request):
     if data['email']:
       query_filter['user__email__icontains'] = str(data['email'])
 
-    print(query_filter)
     teacherList = models.Teacher.objects.filter(**query_filter)
-    print(teacherList)
     teacher_list = [{'user_id': teacher.user.id, 'teacher_id': teacher.id, 'username': teacher.user.username, 'name': teacher.user.get_full_name(),
                      'email': teacher.user.email}
                 for teacher in teacherList]
@@ -4188,6 +4185,7 @@ def send_training_request_email(training):
            <div>We will communicate the date, place and other details about the event shortly. </div><br> \
            <div><b>CT-STEM Admin </b></div>' % (training.name, training.email, training.school, training.subject)
   send_mail('CT-STEM - Training Request', body, settings.DEFAULT_FROM_EMAIL, [training.email, settings.DEFAULT_FROM_EMAIL], html_message=body)
+
 
 ####################################
 # Schools

@@ -12,7 +12,7 @@ from django.utils.crypto import get_random_string
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db.models import signals
 from django.dispatch import receiver
-from django.db.models.signals import pre_save, post_save
+from django.db.models.signals import pre_save, post_save, m2m_changed
 from django.db.models.functions import Upper
 from django.conf import settings
 from django.core.mail import send_mail
@@ -684,6 +684,24 @@ def check_curriculum_status_change(sender, instance, **kwargs):
       # if changing the status of underlying curriculum to Public, also make Unit Public
       elif obj.unit and obj.unit.status != 'P' and instance.status == 'P':
         Curriculum.objects.filter(id=obj.unit.id).update(status='P')
+
+#signal to check if curriculum shared with has changed
+def check_curriculum_shared_with_change(sender, **kwargs):
+  action = kwargs.pop('action', None)
+  pk_set = kwargs.pop('pk_set', None)
+  instance = kwargs.pop('instance', None)
+  if action == 'pre_add':
+    for teacher_id in pk_set:
+      teacher = Teacher.objects.get(id=teacher_id)
+      current_site = Site.objects.get_current()
+      domain = current_site.domain
+      body =  '<div>A curriculum titled <b> %s </b> has been shared with you. </div><br> \
+               <div>You may click https://%s/curriculum/preview/%s/ to preview this curriculum. </div><br><br> \
+               <div><b>CT-STEM Admin</b></div>' % (instance.title, domain, instance.id)
+
+      send_mail('CT-STEM - Curriculum Shared', body, settings.DEFAULT_FROM_EMAIL, [teacher.user.email], html_message=body)
+
+m2m_changed.connect(check_curriculum_shared_with_change, sender=Curriculum.shared_with.through)
 
 def resizeImage(img, minwidth, minheight):
   try:

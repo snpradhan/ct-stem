@@ -59,45 +59,43 @@
 
 
 <script type="text/javascript">
-$(function (){
-
+  $(function (){
+    var new_shared_with = [];
     $("#teacherForm").submit(function(e) {
-
-    e.preventDefault();
-    $("#teacherResults table tbody").empty();
-
-
-    /*var url = "{% url 'ctstem:newQuestion' %}";*/
-    $.ajax({
-      type: $(this).attr('method'),
-      url: this.action,
-      data: $(this).serialize(),
-      context: this,
-      success: function(data){
-        if('error' in data){
-          $('#teacherMsg .errorlist li').addClass('error').html(data['error']);
-        }
-        else {
-          var teacher = "";
-          var teacher_row = "";
-          $.each(data, function(key, value){
-            teacher += "<tr><td>"+value['username']+"</td><td>"+value['name']+"</td><<td>"+value['email']+"</td><td><button type='button' class='btn small blue select_teacher' id='"+value['teacher_id']+"'>Share</a></td></tr>";
-          });
-
-          if(teacher.length == 0){
-            $('#teacherMsg .errorlist li').addClass('error').html('No matching teachers found');
-            $("#teacherResults").hide();
+      e.preventDefault();
+      $("#teacherResults table tbody").empty();
+      $.ajax({
+        type: $(this).attr('method'),
+        url: this.action,
+        data: $(this).serialize(),
+        context: this,
+        success: function(data){
+          if('error' in data){
+            $('#teacherMsg .errorlist li').addClass('error').html(data['error']);
           }
-          else{
-            $('#teacherMsg .errorlist li').html('');
-            $("#teacherResults table tbody").append(teacher);
-            $("#teacherResults").show();
-            $("#teacherResults button.select_teacher").click(function(){
-              if($('select[id^="id"][id$="shared_with"] option[value="'+$(this).attr('id')+'"]').prop('selected') == false){
-               //select the teacher id in the hidden select field
+          else {
+            var teacher = "";
+            var teacher_row = "";
+            $.each(data, function(key, value){
+              if($('select[id^="id"][id$="shared_with"] option[value="'+value['teacher_id']+'"]').prop('selected') == false){
+                teacher += "<tr><td>"+value['username']+"</td><td class='teacher_name'>"+value['name']+"</td><<td>"+value['email']+"</td><td><button type='button' class='btn small blue select_teacher' id='"+value['teacher_id']+"'>Share</a></td></tr>";
+              }
+            });
+
+            if(teacher.length == 0){
+              $('#teacherMsg .errorlist li').addClass('error').html('No matching teachers found');
+              $("#teacherResults").hide();
+            }
+            else{
+              $('#teacherMsg .errorlist li').html('');
+              $("#teacherResults table tbody").append(teacher);
+              $("#teacherResults").show();
+              $("#teacherResults button.select_teacher").click(function(){
+                //select the teacher id in the hidden select field
                 $('select[id^="id"][id$="shared_with"] option[value="'+$(this).attr('id')+'"]').prop('selected', true);
                 //add the selected teacher to the shared with table
                 teacher_row = $(this).closest('tr');
+                teacher_name = $(teacher_row).find('td.teacher_name')[0].innerText;
                 teacher = "<tr id='"+$(this).attr('id')+"'>";
                 $(teacher_row).find('td:not(:last)').each(function(){
                   teacher += "<td>"+$(this).html()+"</td>";
@@ -115,22 +113,32 @@ $(function (){
                   $('table#teachers tbody tr#'+teacher_id).remove();
                   rowAddorRemove($('table#teachers'));
                 });
-              }
-
-              $(this).attr('disabled', 'disabled');
-            });
+                //add the teacher to a list
+                new_shared_with.push(teacher_name);
+                $(this).attr('disabled', 'disabled');
+              });
+            }
+            //$("#teacherForm")[0].reset();
+            //$("#teacherModal").modal('toggle');
           }
-          //$("#teacherForm")[0].reset();
-          //$("#teacherModal").modal('toggle');
-        }
-        return false;
-      },
-      error: function(xhr, ajaxOptions, thrownError){
-        alert(thrownError);
-      },
+          return false;
+        },
+        error: function(xhr, ajaxOptions, thrownError){
+          alert(thrownError);
+        },
+      });
+    });
+
+    $('button.close').on('click', function(){
+      if(new_shared_with.length){
+        var text = "<p>This curriculum has been shared with the following users:</p> <br> <ul><li><p>";
+        text = text + new_shared_with.join('</p></li><li><p>');
+        text = text + '</p></li></ul>';
+        new_shared_with = [];
+        $('#notification .modal-body').html(text);
+        $('#notification').modal('toggle');
+      }
     });
   });
-
-});
 
 </script>

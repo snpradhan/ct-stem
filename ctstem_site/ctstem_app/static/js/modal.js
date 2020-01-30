@@ -1,7 +1,9 @@
 $(function (){
 
   $('.modal').on('hidden.bs.modal', function(){
-    $(this).find('form')[0].reset();
+    if($(this).find('form').length > 0) {
+      $(this).find('form')[0].reset();
+    }
     $(this).find('.msg .errorlist .error').html('');
     $(this).find('.results').hide();
     $(this).find('.results tbody').html('');
