@@ -509,7 +509,7 @@ class CurriculumForm(ModelForm):
     self.fields['authors'].choices = [(user.pk, user.get_full_name()) for user in models.User.objects.all().filter(Q(administrator__isnull=False) | Q(researcher__isnull=False) | Q(author__isnull=False) |  Q(teacher__isnull=False)).order_by(Lower('first_name'), Lower('last_name'))]
     self.fields['unit'].queryset = models.Curriculum.objects.filter(curriculum_type='U').order_by(Lower('title'), 'version')
     self.fields['unit'].label_from_instance = lambda obj: "%s - v%d." % (obj.title, obj.version)
-    if hasattr(usr, 'teacher'):
+    if hasattr(usr, 'teacher') or hasattr(usr, 'researcher'):
       self.fields['unit'].queryset = models.Curriculum.objects.filter(curriculum_type='U', authors=usr).order_by(Lower('title'), 'version')
       self.fields.pop('status')
       self.fields.pop('feature_rank')

@@ -125,7 +125,7 @@ def curricula(request, bucket='unit', status='public'):
                           'modified_month': 'EXTRACT(MONTH FROM modified_date)',
                           'modified_day': 'EXTRACT(DAY FROM modified_date)'})
   if bucket in ['unit', 'lesson', 'assessment']:
-    if hasattr(request.user, 'administrator') or hasattr(request.user, 'researcher') or hasattr(request.user, 'author'):
+    if hasattr(request.user, 'administrator') or hasattr(request.user, 'author'):
       if status == 'archived':
         stat = ['A']
       elif status == 'private':
@@ -136,54 +136,53 @@ def curricula(request, bucket='unit', status='public'):
       stat = ['P']
     curricula = curricula.filter(unit__isnull=True, curriculum_type__in = curriculum_type, status__in = stat)
 
-  elif bucket == 'teacher_authored':
-    if hasattr(request.user, 'administrator') or hasattr(request.user, 'researcher') or hasattr(request.user, 'author'):
-      stat = ['D', 'P', 'A']
-      curricula = curricula.filter(unit__isnull=True, curriculum_type__in = curriculum_type, status__in = stat, authors__teacher__isnull=False).distinct()
-  elif bucket == 'deleted':
-    if hasattr(request.user, 'administrator'):
-      stat = ['R']
-      curricula = curricula.filter(unit__isnull=True, curriculum_type__in = curriculum_type, status__in = stat).distinct()
-
-  elif bucket == 'my' and hasattr(request.user, 'teacher'):
+  elif bucket == 'teacher_authored' and (hasattr(request.user, 'administrator') or hasattr(request.user, 'author')):
+    stat = ['D', 'P', 'A']
+    curricula = curricula.filter(unit__isnull=True, curriculum_type__in = curriculum_type, status__in = stat, authors__teacher__isnull=False).distinct()
+  elif bucket == 'deleted' and hasattr(request.user, 'administrator'):
+    stat = ['R']
+    curricula = curricula.filter(unit__isnull=True, curriculum_type__in = curriculum_type, status__in = stat).distinct()
+  elif bucket == 'my' and (hasattr(request.user, 'teacher') or hasattr(request.user, 'researcher')):
     stat = ['D', 'P', 'A']
     curricula = curricula.filter(unit__isnull=True, curriculum_type__in = curriculum_type, status__in = stat, authors=request.user)
-
   elif bucket == 'favorite' and hasattr(request.user, 'teacher'):
     stat = ['P']
     curricula = curricula.filter(Q(unit__isnull=True), Q(curriculum_type__in=curriculum_type), Q(bookmarked__teacher=request.user.teacher), Q(status__in=stat) | Q(shared_with=request.user.teacher)).distinct()
-
   elif bucket == 'shared' and hasattr(request.user, 'teacher'):
     stat = ['D', 'P']
     shared_lessons = curricula.filter(unit__isnull=False, curriculum_type__in = 'L', status__in = stat, shared_with=request.user.teacher).distinct()
     shared_lessons_units = shared_lessons.values_list('unit', flat=True)
     curricula = curricula.filter(Q(unit__isnull=True), Q(curriculum_type__in = curriculum_type), Q(status__in = stat), Q(shared_with=request.user.teacher) | Q(id__in=shared_lessons_units)).distinct()
   else:
+    curricula = None
     messages.error(request, "There are no curricula for the requested category.")
 
-  #search
-  search_criteria = None
-  if request.method == 'POST':
-    data = request.POST.copy()
-    if 'search_criteria' in data:
-      search_criteria = data['search_criteria']
-    searchForm = forms.SearchForm(data)
+  if curricula:
+    #search
+    search_criteria = None
+    if request.method == 'POST':
+      data = request.POST.copy()
+      if 'search_criteria' in data:
+        search_criteria = data['search_criteria']
+      searchForm = forms.SearchForm(data)
+    else:
+      searchForm = forms.SearchForm()
+
+    if search_criteria:
+      curricula = searchCurricula(request, curricula, search_criteria)
+
+    sort_order = [{'order_by': 'feature_rank', 'direction': 'asc', 'ignorecase': 'false'},
+                  {'order_by': 'modified_year', 'direction': 'desc', 'ignorecase': 'false'},
+                  {'order_by': 'modified_month', 'direction': 'desc', 'ignorecase': 'false'},
+                  {'order_by': 'modified_day', 'direction': 'desc', 'ignorecase': 'false'},
+                  {'order_by': 'title', 'direction': 'asc', 'ignorecase': 'true'}]
+    curricula_list = paginate(request, curricula, sort_order, 25)
   else:
+    curricula_list = None
     searchForm = forms.SearchForm()
-
-  if search_criteria:
-    curricula = searchCurricula(request, curricula, search_criteria)
-
-  sort_order = [{'order_by': 'feature_rank', 'direction': 'asc', 'ignorecase': 'false'},
-                {'order_by': 'modified_year', 'direction': 'desc', 'ignorecase': 'false'},
-                {'order_by': 'modified_month', 'direction': 'desc', 'ignorecase': 'false'},
-                {'order_by': 'modified_day', 'direction': 'desc', 'ignorecase': 'false'},
-                {'order_by': 'title', 'direction': 'asc', 'ignorecase': 'true'}]
-  curricula_list = paginate(request, curricula, sort_order, 25)
   #if curricula:
   #  curricula = curricula.order_by('-modified_date', Lower('title'))
   context = {'curricula': curricula_list, 'bucket': bucket, 'status': status, 'searchForm': searchForm}
-
   return render(request, 'ctstem_app/Curricula.html', context)
 
 
@@ -3348,11 +3347,11 @@ def check_curriculum_permission(request, curriculum_id, action, step_order=-1):
       else:
         ############ COPY ############
         if action == 'copy':
-          # admin, researcher and author can copy any curriculum
-          if is_admin or is_researcher or is_author:
+          # admin, author can copy any curriculum
+          if is_admin or is_author:
             has_permission = True
-          # teacher can only copy units, stand alone lessons, assessments that are public or something that they own
-          elif is_teacher:
+          # teacher and researcher can only copy units, stand alone lessons, assessments that are public or something that they own
+          elif is_teacher or is_researcher:
             if request.user in curriculum.authors.all():
               has_permission = True
             elif curriculum.unit and request.user in curriculum.unit.authors.all():
@@ -3384,11 +3383,11 @@ def check_curriculum_permission(request, curriculum_id, action, step_order=-1):
                 has_permission = False
                 messages.error(request, 'You do not have the privilege to %s this curriculum because it is locked by %s' % (action, locked_by))
             else:
-              # admin, researcher and author can edit any unlocked curriculum
-              if is_admin or is_researcher or is_author:
+              # admin and author can edit any unlocked curriculum
+              if is_admin or is_author:
                 has_permission = True
-              # teacher can only edit their own curriculum that is unlocked
-              elif is_teacher:
+              # teacher and researcher can only edit their own curriculum that is unlocked
+              elif is_teacher or is_researcher:
                 if request.user in curriculum.authors.all():
                   has_permission = True
                 elif curriculum.unit and request.user in curriculum.unit.authors.all():
@@ -3404,8 +3403,8 @@ def check_curriculum_permission(request, curriculum_id, action, step_order=-1):
             if is_assigned:
               if action == 'modify':
                 #admins can edit any curriculum that are assigned
-                #teachers can edit their curriculum that are assigned
-                if is_admin or is_teacher:
+                # researchers and teachers can edit their curriculum that are assigned
+                if is_admin or is_researcher or is_teacher:
                   has_permission = True
                   messages.warning(request, 'This curriculum has already been assigned, please be careful with the modification')
                 else:
@@ -3423,12 +3422,16 @@ def check_curriculum_permission(request, curriculum_id, action, step_order=-1):
           if locked_by:
             has_permission = False
             messages.error(request, "This curriculum is already locked")
-          elif is_admin or is_researcher or is_author:
+          elif is_admin or is_author:
             has_permission = True
-          elif is_teacher and request.user in curriculum.authors.all():
-            has_permission = True
-          elif is_teacher and curriculum.unit and request.user in curriculum.unit.authors.all():
+          elif is_teacher or is_researcher:
+            if is_teacher and request.user in curriculum.authors.all():
               has_permission = True
+            elif is_teacher and curriculum.unit and request.user in curriculum.unit.authors.all():
+              has_permission = True
+            else:
+              has_permission = False
+              messages.error(request, 'You do not have the privilege to lock this curriculum')
           else:
             has_permission = False
             messages.error(request, 'You do not have the privilege to lock this curriculum')
@@ -3476,17 +3479,19 @@ def check_curriculum_permission(request, curriculum_id, action, step_order=-1):
             if curriculum.status == 'P':
               if is_admin or is_school_admin or is_teacher:
                 has_permission = True
-            #if a non-unit curriculum is private and locked, allow admins and teachers who authored the curriculum and with
+            #if a non-unit curriculum is private and locked, allow all admins, researchers who authored the curriculum and teachers who authored the curriculum and with
             #whom the curriculum is shared with assign
             elif curriculum.status == 'D' and get_curriculum_locked_by(request, curriculum.id):
               if is_admin:
                 has_permission = True
               elif is_teacher:
-                if request.user in curriculum.authors.all() or request.user.teacher in curriculum.shared_with.all():
-                  has_permission = True
-                elif curriculum.unit and request.user.teacher in curriculum.unit.shared_with.all():
+                if request.user in curriculum.authors.all():
                   has_permission = True
                 elif curriculum.unit and request.user in curriculum.unit.authors.all():
+                  has_permission = True
+                elif request.user.teacher in curriculum.shared_with.all():
+                  has_permission = True
+                elif curriculum.unit and request.user.teacher in curriculum.unit.shared_with.all():
                   has_permission = True
           else:
             #allow a unit to be assigned only if at least one of the underlying lessons can be assigned by the user
@@ -3503,7 +3508,7 @@ def check_curriculum_permission(request, curriculum_id, action, step_order=-1):
               has_permission = True
           #only teachers can export student data of private curriculum that they own
           elif curriculum.status == 'D':
-            if is_teacher:
+            if is_researcher or is_teacher:
               if request.user in curriculum.authors.all():
                 has_permission = True
               elif curriculum.unit and request.user in curriculum.unit.authors.all():

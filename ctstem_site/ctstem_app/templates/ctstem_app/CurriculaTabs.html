@@ -10,8 +10,11 @@
     <li {% if bucket == 'unit' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'unit' 'public' %}">Units</a></li>
     <li {% if bucket == 'lesson' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'lesson' 'public' %}">Lessons</a></li>
     <li {% if bucket == 'assessment' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'assessment' 'public' %}">Assessment</a></li>
-    {% if user.administrator or user.researcher or user.author %}
+    {% if user.administrator or user.author %}
       <li {% if bucket == 'teacher_authored' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'teacher_authored' %}">Teacher Authored Curricula</a></li>
+    {% endif %}
+    {% if user.researcher %}
+      <li {% if bucket == 'my' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'my' %}">My Curricula</a></li>
     {% endif %}
     {% if user.administrator %}
       <li {% if bucket == 'deleted' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'deleted' %}">Deleted Curricula</a></li>
@@ -25,7 +28,7 @@
   </div>
 </ul>
 
-{% if user.administrator or user.researcher or user.author %}
+{% if user.administrator or user.author %}
   {% if bucket == 'unit' %}
      <ul class="nav nav-tabs">
       <li {% if status == 'private' %} class="active"{% endif %}><a href="{% url 'ctstem:curricula' 'unit' 'private'%}">Private</a></li>
