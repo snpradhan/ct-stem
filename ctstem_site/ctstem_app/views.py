@@ -203,7 +203,6 @@ def curriculum(request, id=''):
       has_permission = check_curriculum_permission(request, id, 'create')
       if has_permission:
         curriculum = models.Curriculum()
-        curriculum.author = request.user
       else:
          return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
@@ -213,11 +212,13 @@ def curriculum(request, id=''):
       back_url = request.GET['back_url']
 
     if request.method == 'GET':
-      initial = {}
+      initial_author_data = []
       if '' == id:
-        initial['authors'] = [request.user.id]
-      form = forms.CurriculumForm(user=request.user, instance=curriculum, prefix='curriculum', initial=initial)
+        initial_author_data = [{'author': request.user, 'ORDER': 1}]
+      form = forms.CurriculumForm(user=request.user, instance=curriculum, prefix='curriculum')
       #AssessmentStepFormSet = inlineformset_factory(models.Assessment, models.AssessmentStep, form=forms.AssessmentStepForm,can_delete=True, can_order=True, extra=1)
+
+      AuthorFormSet = inlineformset_factory(models.Curriculum, models.CurriculumAuthor, form=forms.CurriculumAuthorForm, can_delete=True, can_order=True, extra=len(initial_author_data)+1)
 
       StepFormSet = nestedformset_factory(models.Curriculum, models.Step, form=forms.StepForm,
                                                     nested_formset=inlineformset_factory(models.Step, models.CurriculumQuestion, form=forms.CurriculumQuestionForm, can_delete=True, can_order=True, extra=1),
@@ -225,8 +226,13 @@ def curriculum(request, id=''):
       AttachmentFormSet = inlineformset_factory(models.Curriculum, models.Attachment, form=forms.AttachmentForm, can_delete=True, extra=1)
 
       formset = StepFormSet(instance=curriculum, prefix='form')
+      author_formset = AuthorFormSet(instance=curriculum, prefix='author_form')
+      if initial_author_data:
+        for subform, author_data in zip(author_formset.forms, initial_author_data):
+          subform.initial = author_data
+
       attachment_formset = AttachmentFormSet(instance=curriculum, prefix='attachment_form')
-      context = {'form': form, 'attachment_formset': attachment_formset, 'formset':formset, 'newQuestionForm': newQuestionForm, 'back_url': back_url }
+      context = {'form': form, 'attachment_formset': attachment_formset, 'author_formset': author_formset, 'formset':formset, 'newQuestionForm': newQuestionForm, 'back_url': back_url }
       return render(request, 'ctstem_app/Curriculum.html', context)
 
     elif request.method == 'POST':
@@ -237,20 +243,30 @@ def curriculum(request, id=''):
       form = forms.CurriculumForm(user=request.user, data=data, files=request.FILES, instance=curriculum, prefix="curriculum")
       #AssessmentStepFormSet = inlineformset_factory(models.Assessment, models.AssessmentStep, form=forms.AssessmentStepForm,
                                                     #can_delete=True, can_order=True, extra=0)
+      AuthorFormSet = inlineformset_factory(models.Curriculum, models.CurriculumAuthor, form=forms.CurriculumAuthorForm, can_delete=True, can_order=True, extra=1)
+
       StepFormSet = nestedformset_factory(models.Curriculum, models.Step, form=forms.StepForm,
                                                     nested_formset=inlineformset_factory(models.Step, models.CurriculumQuestion, form=forms.CurriculumQuestionForm, can_delete=True, can_order=True, extra=1),
                                                     can_delete=True, can_order=True, extra=1)
       AttachmentFormSet = inlineformset_factory(models.Curriculum, models.Attachment, form=forms.AttachmentForm, can_delete=True, extra=1)
 
       formset = StepFormSet(data, instance=curriculum, prefix='form')
+      author_formset = AuthorFormSet(data, instance=curriculum, prefix='author_form')
       attachment_formset = AttachmentFormSet(data, request.FILES, instance=curriculum, prefix='attachment_form')
 
-      if form.is_valid() and formset.is_valid() and attachment_formset.is_valid():
+      if form.is_valid() and formset.is_valid() and author_formset.is_valid() and attachment_formset.is_valid():
         savedCurriculum = form.save()
 
         #make sure curriculum order is present and unique in a unit
         if savedCurriculum.curriculum_type != 'U' and savedCurriculum.unit:
           reorder_underlying_curricula(request, savedCurriculum.unit.id)
+
+        author_formset.save(commit=False)
+        for authorform in author_formset.ordered_forms:
+          authorform.instance.order = authorform.cleaned_data['ORDER']
+          authorform.instance.save()
+        for obj in author_formset.deleted_objects:
+          obj.delete()
 
         attachment_formset.save()
         formset.save(commit=False)
@@ -287,6 +303,7 @@ def curriculum(request, id=''):
         print(form.errors)
         print(formset.errors)
         print(attachment_formset.errors)
+        print(author_formset.errors)
         if request.is_ajax():
           response_data = {'status': 0, 'message': 'The preview could not be generated because some mandatory fields are missing.  Please manually save the curriculum to see specific errors.'}
           return http.HttpResponse(json.dumps(response_data), content_type = 'application/json')
@@ -296,7 +313,7 @@ def curriculum(request, id=''):
             messages.error(request, "The preview could not be generated because some mandatory fields are missing.")
           else:
             messages.error(request, "The curriculum could not be saved because there were errors.  Please check the errors below.")
-          context = {'form': form, 'attachment_formset': attachment_formset, 'formset':formset, 'newQuestionForm': newQuestionForm, 'back_url': back_url}
+          context = {'form': form, 'attachment_formset': attachment_formset, 'author_formset': author_formset, 'formset':formset, 'newQuestionForm': newQuestionForm, 'back_url': back_url}
           return render(request, 'ctstem_app/Curriculum.html', context)
 
     return http.HttpResponseNotAllowed(['GET', 'POST'])
@@ -594,6 +611,7 @@ def copyCurriculumMeta(request, id=''):
     steps = models.Step.objects.all().filter(curriculum=curriculum)
     attachments = models.Attachment.objects.all().filter(curriculum=curriculum)
     title = curriculum.title
+    authors = models.CurriculumAuthor.objects.all().filter(curriculum=curriculum)
     #curriculum.title = str(datetime.datetime.now())
     curriculum.pk = None
     curriculum.id = None
@@ -601,10 +619,7 @@ def copyCurriculumMeta(request, id=''):
     curriculum.save()
 
     original_curriculum = models.Curriculum.objects.get(id=id)
-    # curriculum.title = title
-    curriculum.authors = original_curriculum.authors.all()
-    if request.user not in curriculum.authors.all():
-      curriculum.authors.add(request.user)
+
     curriculum.created_date = datetime.datetime.now()
     curriculum.modified_date = datetime.datetime.now()
     curriculum.parent = original_curriculum
@@ -652,6 +667,16 @@ def copyCurriculumMeta(request, id=''):
           original_attachment.save()
         except IOError as e:
           continue
+
+    #copy authors to new curriculum
+    for author in authors:
+      author.pk = None
+      author.id = None
+      author.curriculum = curriculum
+      author.save()
+
+    if request.user not in curriculum.authors.all():
+      author = models.CurriculumAuthor.objects.create(curriculum=curriculum, author=request.user, order=len(authors)+1)
 
     return curriculum
   else:

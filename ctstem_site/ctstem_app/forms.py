@@ -481,7 +481,7 @@ class CurriculumForm(ModelForm):
 
   class Meta:
     model = models.Curriculum
-    fields = ['curriculum_type', 'unit', 'authors', 'order', 'feature_rank', 'title', 'icon', 'time', 'level', 'overview', 'student_overview', 'acknowledgement', 'credits', 'status', 'subject', 'compatible_system', 'taxonomy', 'teacher_notes', 'shared_with']
+    fields = ['curriculum_type', 'unit', 'order', 'feature_rank', 'title', 'icon', 'time', 'level', 'overview', 'student_overview', 'acknowledgement', 'credits', 'status', 'subject', 'compatible_system', 'taxonomy', 'teacher_notes', 'shared_with']
 
     widgets = {
       'title': forms.TextInput(attrs={'placeholder': 'Lesson Title'}),
@@ -492,7 +492,6 @@ class CurriculumForm(ModelForm):
       'content': forms.Textarea(attrs={'rows':0, 'cols':60}),
       'teacher_notes': forms.Textarea(attrs={'rows':0, 'cols':60}),
       'taxonomy': forms.SelectMultiple(attrs={'size':5}),
-      'authors': forms.SelectMultiple(attrs={'size':5}),
       'subject': forms.SelectMultiple(attrs={'size':4}),
       'compatible_system': forms.SelectMultiple(attrs={'size':6}),
       'shared_with': forms.SelectMultiple(attrs={'size':10}),
@@ -506,7 +505,6 @@ class CurriculumForm(ModelForm):
     forms.ModelForm.__init__(self, *args, **kwargs)
     self.fields['taxonomy'].label = "Standards"
     self.fields['order'].label = "Curriculum Order"
-    self.fields['authors'].choices = [(user.pk, user.get_full_name()) for user in models.User.objects.all().filter(Q(administrator__isnull=False) | Q(researcher__isnull=False) | Q(author__isnull=False) |  Q(teacher__isnull=False)).order_by(Lower('first_name'), Lower('last_name'))]
     self.fields['unit'].queryset = models.Curriculum.objects.filter(curriculum_type='U').order_by(Lower('title'), 'version')
     self.fields['unit'].label_from_instance = lambda obj: "%s - v%d." % (obj.title, obj.version)
     if hasattr(usr, 'teacher') or hasattr(usr, 'researcher'):
@@ -626,6 +624,15 @@ class AttachmentForm(ModelForm):
         valid = False
 
     return valid
+
+####################################
+# Curriculum Author Form
+####################################
+class CurriculumAuthorForm(ModelForm):
+
+  class Meta:
+    model = models.CurriculumAuthor
+    exclude = ('order',)
 
 ####################################
 # Curriculum Question Form

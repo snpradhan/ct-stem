@@ -165,7 +165,7 @@ class Curriculum (models.Model):
   parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL, related_name="children")
   version = models.IntegerField(default=1)
   taxonomy = models.ManyToManyField('Subcategory', blank=True)
-  authors = models.ManyToManyField(User, blank=False, related_name="curriculum_authors", help_text='Select authors for this curriculum')
+  authors = models.ManyToManyField(to=User, through='CurriculumAuthor')
   created_date = models.DateTimeField(auto_now_add=True)
   modified_date = models.DateTimeField(auto_now=True)
   icon = models.ImageField(upload_to=upload_file_to, blank=True, null=True, help_text='Upload an image at least 400x289 in resolution that represents this curriculum')
@@ -174,7 +174,7 @@ class Curriculum (models.Model):
   acknowledgement = RichTextUploadingField(null=True, blank=True, help_text="Resources, models, and other material used in this curriculum; past authors/contributors")
   order = models.IntegerField(null=True, blank=True, help_text="Order within the Unit")
   credits = RichTextUploadingField(null=True, blank=True, help_text="Author contributions")
-  locked_by = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
+  locked_by = models.ForeignKey(User, null=True, on_delete=models.SET_NULL, related_name='user_locked_curriculum')
   feature_rank = models.IntegerField(null=True, blank=True, help_text="Order in the feature pool")
 
   class Meta:
@@ -227,6 +227,16 @@ class Curriculum (models.Model):
     else:
       student_count = Student.objects.all().filter(member_of__assignments__curriculum__id__in=ancestors).distinct().count()
     return student_count
+
+# CurriculumAuthor through model
+class CurriculumAuthor(models.Model):
+  curriculum = models.ForeignKey(Curriculum, null=False, on_delete=models.CASCADE)
+  author = models.ForeignKey(User, null=False, on_delete=models.CASCADE)
+  order = models.IntegerField(null=True, blank=True, help_text="Curriculum Author Order")
+
+  class Meta:
+      ordering = ['order']
+      unique_together = ('curriculum', 'author')
 
 # Curriculum Step model
 # A curriculum may have one or more step/activity

@@ -75,9 +75,10 @@ $(function (){
         }
         else {
           var author = "";
-          var author_row = "";
           $.each(data, function(key, value){
-            author += "<tr><td>"+value['username']+"</td><td>"+value['name']+"</td><<td>"+value['email']+"</td><td><button type='button' class='btn btn-info select_author' id='"+value['user_id']+"'>Add</a></td></tr>";
+            if($('table.table#authors tr#user_'+value['user_id']).length == 0){
+              author += "<tr><td class='username'>"+value['username']+"</td><td class='full_name'>"+value['name']+"</td><<td class='email'>"+value['email']+"</td><td><button type='button' class='btn btn-info select_author' id='"+value['user_id']+"'>Add</a></td></tr>";
+            }
           });
 
           if(author.length == 0){
@@ -89,30 +90,24 @@ $(function (){
             $("#authorResults table tbody").append(author);
             $("#authorResults").show();
             $("#authorResults button.select_author").click(function(){
-              if($('select[id^="id"][id$="authors"] option[value="'+$(this).attr('id')+'"]').prop('selected') == false){
-               //select the teacher id in the hidden select field
-                $('select[id^="id"][id$="authors"] option[value="'+$(this).attr('id')+'"]').prop('selected', true);
-                console.log($('select[id^="id"][id$="authors"] option[value="'+$(this).attr('id')+'"]').prop('selected'));
-                //add the selected teacher to the shared with table
-                author_row = $(this).closest('tr');
-                author = "<tr id='"+$(this).attr('id')+"'>";
-                $(author_row).find('td:not(:last)').each(function(){
-                  author += "<td>"+$(this).html()+"</td>";
-                });
-                author += "<td> <button type='button' class='btn btn-warning unshare' aria-label='Unshare resource with this teacher' title='Unshare resource with this teacher'> \
-                            <span class='glyphicon glyphicon-trash' aria-hidden='true'></span>\
-                          </button></td>";
-                $('table#authors tbody').append(author);
-                rowAddorRemove($('table#authors'));
+              var author_table = $('table.table#authors');
+              var author_result_row = $(this).closest('tr');
+              var username = $(author_result_row).find('td.username').html();
+              var full_name = $(author_result_row).find('td.full_name').html();
+              var email = $(author_result_row).find('td.email').html();
+              cloneMore($(author_table).find('tbody tr:last'), 'author_form');
+              var author_row = $(author_table).find("tbody tr:nth-last-child(2)");
 
-                //bind remove function
-                $("button.remove").click(function(e){
-                  var author_id = $(this).closest('tr').attr('id');
-                  $('select[id^="id"][id$="authors"] option[value="'+author_id+'"]').prop('selected', false);
-                  $('table#authors tbody tr#'+author_id).remove();
-                  rowAddorRemove($('table#authors'));
-                });
-              }
+              $(author_row).find("td.username input[type=hidden]").val($(this).attr('id'));
+              $(author_row).find("td.username div").html(username);
+              $(author_row).find("td.full_name").html(full_name);
+              $(author_row).find("td.email").html(email);
+              $(author_row).attr("id", "user_"+$(this).attr('id'));
+              var author_order = $(author_table).find("tbody > tr:visible").length + 1;
+              $(author_row).find("td.order input[id$='ORDER']").val(author_order);
+              $(author_row).show();
+
+              rowAddorRemove($('table#authors'));
 
               $(this).attr('disabled', 'disabled');
             });

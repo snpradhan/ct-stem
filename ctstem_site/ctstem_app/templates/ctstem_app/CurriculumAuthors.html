@@ -1,37 +1,74 @@
 {% load ctstem_extras %}
-<button class="btn btn-info search_users" data-target="#userSearch" data-form="{% url 'ctstem:searchAuthors' %}">
-  <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-</button>
-<div class="controls table_container">
-  <div style="display:none;">
-    {{field}}
-  </div>
-  <table class="table table-striped table-bordered table-condensed inner_table" id="authors">
-    <thead>
-      <tr>
-        <th> Username </th>
-        <th> Name </th>
-        <th> Email </th>
-        <th> Remove </th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for x in field.value %}
-        {% with author=x|getUserInfo %}
-        <tr id="{{author.id}}">
-          <td>{{author.username}}</td>
-          <td>{{author.get_full_name}}</td>
-          <td>{{author.email}}</td>
-          <td>
-            {% if user != author %}
-              <button type="button" class="btn btn-warning remove" aria-label="Remove this author" title="Remove this author" href="#">
-                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-              </button>
-            {% endif %}
-          </td>
+<div class="form-group author_table">
+  <label for="id_author_table">Author(s) (<span class="required">*</span>)</label>
+  <button class="btn btn-info search_users" data-target="#userSearch" data-form="{% url 'ctstem:searchAuthors' %}">
+    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+  </button>
+  <div class="controls table_container">
+    {{author_formset.management_form}}
+    <table class="table table-striped table-bordered table-condensed inner_table" id="authors">
+      <thead>
+        <tr>
+          <th> Order </th>
+          <th> Username </th>
+          <th> Name </th>
+          <th> Email </th>
+          <th> Remove? </th>
         </tr>
-        {% endwith %}
-      {% endfor %}
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+        {% for authorForm in author_formset %}
+          <tr style="{% if forloop.last %} display:none; {% endif %}" id="user_{{authorForm.author.value}}">
+            <td class="order">
+              {{authorForm.id}}
+              {{authorForm.ORDER}}
+            </td>
+            {% if authorForm.author.value %}
+              {% with author=authorForm.author.value|getUserInfo %}
+              <td class="username">
+                {{authorForm.author.as_hidden}}
+                <div>{{author.username}}</div>
+              </td>
+              <td class="full_name">{{author.get_full_name}}</td>
+              <td class="email">{{author.email}}</td>
+              <td class="delete">
+                {% if user != author %}
+                  <button type="button" class="btn btn-danger remove_author" name="remove_author" aria-label="Remove this author" title="Remove this author" href="#">
+                    <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                  </button>
+                  {{authorForm.DELETE.as_hidden}}
+                {% endif %}
+              </td>
+              {% endwith %}
+            {% else %}
+              <td class="username">
+                {{authorForm.author.as_hidden}}
+                <div></div>
+              </td>
+              <td class="full_name"></td>
+              <td class="email"></td>
+              <td class="delete">
+                <button type="button" class="btn btn-danger remove_author" name="remove_author" aria-label="Remove this author" title="Remove this author" href="#">
+                  <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                </button>
+                {{authorForm.DELETE.as_hidden}}
+              </td>
+            {% endif %}
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 </div>
+
+<script type="text/javascript">
+  $(function (){
+    $('button.remove_author').click(function(){
+      var author = $(this);
+      $(author).next('input').val('on');
+      $(author).closest('tr').hide();
+      rowAddorRemove( $(author).closest('table.inner_table'));
+    });
+  });
+
+</script>

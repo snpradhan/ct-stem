@@ -93,8 +93,6 @@
                       <div class="error">{{ field.errors }}</div>
                     {% elif field.name == 'shared_with' %}
                       {% include "ctstem_app/SharedTeachers.html" with resource='curriculum'%}
-                    {% elif field.name == 'authors' %}
-                      {% include "ctstem_app/CurriculumAuthors.html"%}
                     {% else %}
                       <div>
                         {{field}}
@@ -110,6 +108,7 @@
                 </div>
 
               {% endfor %}
+              {% include "ctstem_app/CurriculumAuthors.html"%}
               <div class="form-group attachment_table">
                 {{attachment_formset.management_form}}
                 <label for="id_attachment_table">Attachment(s)</label>
@@ -494,16 +493,12 @@
         //reset field visibility
         reset_curriculum_metadata();
 
-        //for all curriculum types, display author, title, status and icon
+        //for all curriculum types, display author table, title, status, icon, time, teacher overview, student direction, acknowledgement, attachment table
         if($(this).val() == 'U' || $(this).val() == 'L' || $(this).val() == 'A') {
-          $('#id_curriculum-author').closest('.form-group').show();
           $('#id_curriculum-authors').closest('.form-group').show();
           $('#id_curriculum-title').closest('.form-group').show();
           $('#id_curriculum-status').closest('.form-group').show();
           $('#id_curriculum-icon').closest('.form-group').show();
-        }
-        //for unit, lesson and assessment, display time, teacher overview, student direction, acknowledgement and attachment table
-        if($(this).val() == 'U' || $(this).val() == 'L' || $(this).val() == 'A') {
           $('#id_curriculum-time').closest('.form-group').show();
           $('#id_curriculum-time').closest('.form-group').find('label:first').html('Time (<span class="required">*</span>)');
           $('#id_curriculum-overview').closest('.form-group').show();
@@ -513,6 +508,7 @@
           $('div.form-group.attachment_table').show();
           $('#id_curriculum-acknowledgement').closest('.form-group').show();
           $('#id_curriculum-credits').closest('.form-group').show();
+          $('div.form-group.author_table').show();
         }
 
         //for unit, stand alone lesson and assessment display level and taxonomy
