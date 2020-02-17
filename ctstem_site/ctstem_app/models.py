@@ -706,7 +706,7 @@ def check_curriculum_shared_with_change(sender, **kwargs):
       current_site = Site.objects.get_current()
       domain = current_site.domain
       body =  '<div>A curriculum titled <b> %s </b> has been shared with you. </div><br> \
-               <div>You may click https://%s/curriculum/preview/%s/ to preview this curriculum. </div><br><br> \
+               <div>You may click https://%s/curriculum/preview/%s/ to preview this curriculum or find it in your <b>Shared Curricula</b> tab. </div><br><br> \
                <div><b>CT-STEM Admin</b></div>' % (instance.title, domain, instance.id)
 
       send_mail('CT-STEM - Curriculum Shared', body, settings.DEFAULT_FROM_EMAIL, [teacher.user.email], html_message=body)
