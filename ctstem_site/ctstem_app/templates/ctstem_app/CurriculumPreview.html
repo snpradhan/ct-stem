@@ -358,22 +358,7 @@
     </main>
 
     <!-- FOOTER -->
-    <footer>
-      <p>
-        <!-- TODO: Come up with terms of use page! -->
-        <a data-toggle="modal" data-target="#terms" class="terms" href="#">
-        <span class="fa fa-creative-commons fa-2x" style="position: relative; top: 5px; margin-right: 2px;"></span> 2016.
-        Some Rights Reserved</a>.
-      </p>
-      <p>
-        This material was developed by the <a href="{% url 'ctstem:home' %}"> CT-STEM Project</a> at Northwestern University. <br>
-        To inquire about using our material in your school or as part of research, please contact
-        <a href="mailto:ctstem@northwestern.edu">ctstem@northwestern.edu</a>.
-      </p>
-      <p>
-        This work was made possible through generous support from the National Science Foundation (grants CNS-1138461 and CNS 1441041) and the Spencer Foundation (Award #201600069). Any opinions, findings, or recommendations expressed in this material are those of the author(s) and do not necessarily reflect the views of the funding organizations.
-      </p>
-    </footer>
+    {% include 'ctstem_app/CurriculumFooter.html' %}
   </div>
 
   <div>

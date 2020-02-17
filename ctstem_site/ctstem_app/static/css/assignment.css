@@ -1,3 +1,6 @@
+@import 'media.css';
+@import 'footer.css';
+
 :root {
   --ctstem-font-family: "proxima-nova", sans-serif;
   --ctstem-color-yellow: #FFD028;
@@ -29,7 +32,7 @@ header {
   left: 0;
   display: block;
   border-bottom: 1px solid white;
-  background-color: rgb(70, 160, 215);
+  background-color: var(--ctstem-color-blue);
   color: rgba(255, 255, 255, 0.9);
   width: 100%;
   min-width: 700px;
@@ -40,6 +43,11 @@ header {
   font-size: 1.1rem;
   z-index: 5;  /* Make sure it's above the side bar */
   font-family: 'Roboto Condensed', sans-serif;
+}
+
+footer * {
+  font-size: 15px !important;
+  font-family: sans-serif;
 }
 
 /* PAGE NAVIGATION */
@@ -57,7 +65,7 @@ header span {
 }
 
 header nav.activated {
-  background-color: rgb(70, 160, 215);
+  background-color: var(--ctstem-color-blue);
 }
 
 header nav.activated button {
@@ -86,7 +94,7 @@ header nav#side-nav {
   right: -350px;  /* this will slide in from the right */
   width: 350px;
   height: 100%;
-  background-color: rgb(70, 160, 215);
+  background-color: var(--ctstem-color-blue);
   z-index: 0;  /* keep this below the top menu */
   padding-top: 1rem;
   line-height: 200%;
@@ -466,30 +474,6 @@ pre.code {
   width: 70%;
   margin-left: 3rem;
   border: 1px solid #888;
-}
-
-
-/* FOOTER */
-footer {
-  display: block;
-  width: 100%;
-  height: auto;
-  background-color: #666;
-  margin: 8rem 0 0 0;
-  padding: 2rem 80px 2rem 10%;
-}
-
-footer p {
-  font-size: 14px;
-  font-weight: 200;
-  letter-spacing: 0.5px;
-  line-height: 150%;
-  color: rgba(255, 255, 255, 0.6);
-  font-family: Helvetica, sans-serif;
-}
-
-footer a {
-  color: white;
 }
 
 
