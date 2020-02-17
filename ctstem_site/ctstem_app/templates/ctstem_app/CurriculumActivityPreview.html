@@ -95,6 +95,7 @@
                         <input type="text" placeholder="Enter your response" class="form-control" name="{{forloop.counter}}" id="{{forloop.counter}}"/>
                       {% elif field_type == 'DD' %}
                         <select class="form-control assignment_input" name="{{forloop.counter}}" id="{{forloop.counter}}">
+                          <option value="">--------</option>
                           {% for option in question.options|splitlines%}
                           <option value="{{option}}">{{option}}</option>
                           {% endfor %}

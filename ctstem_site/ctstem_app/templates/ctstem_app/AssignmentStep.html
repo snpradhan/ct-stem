@@ -269,6 +269,7 @@
                             <input type="text" placeholder="Enter your response" class="form-control assignment_input" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{questionForm.response.value}}" />
                           {% elif field_type == 'DD' %}
                             <select class="form-control assignment_input" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}">
+                              <option value="">--------</option>
                               {% for option in questionObj.options|splitlines%}
                                 {% if option|slugify == questionForm.response.value|slugify %}
                                   <option value="{{option}}" selected>{{option}}</option>
