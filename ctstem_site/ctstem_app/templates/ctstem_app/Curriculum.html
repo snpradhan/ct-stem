@@ -157,7 +157,7 @@
               <div class="form-group">
                 <label for="id_{{form.student_overview.name}}">{{ form.student_overview.label|title }} {% if form.student_overview.field.required %}(<span class="required">*</span>) {% endif %}</label>
                 <div>
-                  {{form.student_overviewvel}}
+                  {{form.student_overview}}
                 </div>
                 <div class="help warning">{{form.student_overview.help_text|safe}}</div>
                 <div class="error">{{ form.student_overview.errors }}</div>

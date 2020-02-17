@@ -532,40 +532,42 @@ class CurriculumForm(ModelForm):
 
     cleaned_data = super(CurriculumForm, self).clean()
 
-    if cleaned_data.get('curriculum_type') == 'U'  or cleaned_data.get('curriculum_type') == 'L' or cleaned_data.get('curriculum_type') == 'A':
-      if cleaned_data.get('icon'):
-        try:
-          cleaned_data.get('icon').read()
-          validateImage(cleaned_data.get('icon'), 400, 289)
-        except IOError as e:
-          self.add_error('icon', 'Icon file is invalid. Please upload a new icon.')
-          valid = False
-        except ValidationError as e:
-          self.add_error('icon', e.message)
-          valid = False
+    if cleaned_data.get('icon'):
+      try:
+        cleaned_data.get('icon').read()
+        validateImage(cleaned_data.get('icon'), 400, 289)
+      except IOError as e:
+        self.add_error('icon', 'Icon file is invalid. Please upload a new icon.')
+        valid = False
+      except ValidationError as e:
+        self.add_error('icon', e.message)
+        valid = False
 
-      if cleaned_data.get('title') == '':
-        self.add_error('title', 'Title is required')
+    if cleaned_data.get('title') == '' or cleaned_data.get('title') is None:
+      self.add_error('title', 'Title is required')
+      valid = False
+    if cleaned_data.get('time') == '' or cleaned_data.get('time') is None:
+      self.add_error('time', 'Time is required')
+      valid = False
+    if not cleaned_data.get('unit'):
+      if cleaned_data.get('level') == '' or cleaned_data.get('level') is None:
+        self.add_error('level', 'Level is required')
         valid = False
-      if cleaned_data.get('time') == '':
-        self.add_error('time', 'Time is required')
+      if cleaned_data.get('overview') == '' or cleaned_data.get('overview') is None:
+        self.add_error('overview', 'Overview is required')
         valid = False
-      if cleaned_data.get('curriculum_type') != 'L' or not cleaned_data.get('unit'):
-        if cleaned_data.get('level') == '':
-          self.add_error('level', 'Level is required')
-          valid = False
-        if cleaned_data.get('overview') == '':
-          self.add_error('overview', 'Overview is required')
-          valid = False
-      if not cleaned_data.get('taxonomy') and not cleaned_data.get('unit'):
+      if cleaned_data.get('student_overview') == '' or cleaned_data.get('student_overview') is None:
+        self.add_error('student_overview', 'Student Directions & Learning Objectives is required')
+        valid = False
+      if not cleaned_data.get('taxonomy'):
           self.add_error('taxonomy', 'Standards is required')
           valid = False
 
-      if cleaned_data.get('curriculum_type') == 'U'  or cleaned_data.get('curriculum_type') == 'L':
-        if cleaned_data.get('curriculum_type') != 'L' or not cleaned_data.get('unit'):
-          if not cleaned_data.get('subject'):
-            self.add_error('subject', 'Subject is required')
-            valid = False
+    if cleaned_data.get('curriculum_type') == 'U'  or cleaned_data.get('curriculum_type') == 'L':
+      if not cleaned_data.get('unit'):
+        if not cleaned_data.get('subject'):
+          self.add_error('subject', 'Subject is required')
+          valid = False
     return valid
 
 ####################################
