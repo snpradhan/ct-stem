@@ -28,87 +28,224 @@
                 </span>
               </span>
             </h4>
-            <div class="curriculum_content collapsible_content">
-              {{form.management_form}}
-              {% for field in form %}
-                <div class="form-group">
-                <label for="id_{{field.name}}">{{ field.label|title }} {% if field.field.required %}(<span class="required">*</span>) {% endif %}</label>
-                  {% if field.name == 'taxonomy' %}
-                    <div style="display:none;">
-                      {{field}}
-                    </div>
-                    <button class="btn btn-info search_taxonomy" name="search_taxonomy" data-form="{% url 'ctstem:searchTaxonomy' %}">
-                      <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-                    </button>
-                    <span class="expand_collapse_other">
-                      <button type="button" class="btn btn-warning" name="collapse_standards" aria-label="Collapse Standards" title="Collapse Standards">
-                        <span class="glyphicon glyphicon-collapse-up" aria-hidden="true"></span>
-                      </button>
-                      <button type="button" class="btn btn-success" style="display:none;" name="expand_standards" aria-label="Expand Standards" title="Expand Standards">
-                        <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                      </button>
-                    </span>
-                    <div id="taxonomy_div">
-                      <table class="table table-bordered table-striped table-condensed inner_table" id="taxonomy">
-                        <thead>
-                          <tr>
-                            <th>Standard</th>
-                            <th>Category</th>
-                            <th>Code</th>
-                            <th>Title</th>
-                            <th>Remove?</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {% for x in field.value %}
-                            {% with taxonomy=x|getTaxonomy %}
-                            <tr id="{{taxonomy.id}}">
-                              <td class="donotwrap">{{taxonomy.category.standard.short_name}}</td>
-                              <td>{{taxonomy.category.name}}</td>
-                              <td class="donotwrap">{{taxonomy.code}}</td>
-                              <td>{{taxonomy.title}}</td>
-                              <td>
-                                <button type="button" class="btn btn-danger remove_taxonomy" title="Remove Taxonomy">
-                                  <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-                                </button>
-                              </td>
-                            </tr>
-                            {% endwith %}
-                          {% endfor %}
-                        </tbody>
-                      </table>
-                    </div>
-                    {% elif field.name == 'teacher_notes'%}
-                      <span class="expand_collapse_other">
-                        <button type="button" class="btn btn-warning" style="display:none;" name="collapse_notes" aria-label="Collapse Notes" title="Collapse Notes">
-                          <span class="glyphicon glyphicon-collapse-up" aria-hidden="true"></span>
-                        </button>
-                        <button type="button" class="btn btn-success"  name="expand_notes" aria-label="Expand Notes" title="Expand Notes">
-                          <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                        </button>
-                      </span>
-                      <div style="display:none; margin-top: 1em;">
-                        {{field}}
-                      </div>
-                      <div class="error">{{ field.errors }}</div>
-                    {% elif field.name == 'shared_with' %}
-                      {% include "ctstem_app/SharedTeachers.html" with resource='curriculum'%}
-                    {% else %}
-                      <div>
-                        {{field}}
-                        {% if field.name == 'curriculum_type' and form.instance.id %}
-                          {{field.as_hidden}}
-                        {% endif %}
-                      </div>
-                    {% endif %}
-                    {% if field.name == 'student_overview' or field.name == 'overview' or field.name == 'credits' or field.name == 'acknowledgement' or field.name == 'icon' or field.name == 'subject' or field.name == 'compatible_system' or field.name == 'unit' or field.name == 'shared_with' or field.name == 'order' or field.name == 'authors' or field.name == 'feature_rank' %}
-                    <div class="help warning">{{field.help_text|safe}}</div>
-                  {% endif %}
-                  <div class="error">{{ field.errors }}</div>
-                </div>
 
-              {% endfor %}
+            <div class="curriculum_content collapsible_content">
+
+              {{form.management_form}}
+              <!-- CURRICULUM TYPE -->
+              <div class="form-group">
+                <label for="id_{{form.curriculum_type.name}}">{{ form.curriculum_type.label|title }} {% if form.curriculum_type.field.required %}(<span class="required">*</span>) {% endif %}</label>
+                <div>
+                  {{form.curriculum_type}}
+                  {% if form.instance.id %}
+                    {{form.curriculum_type.as_hidden}}
+                  {% endif %}
+                </div>
+                <div class="help warning">{{form.curriculum_type.help_text|safe}}</div>
+                <div class="error">{{ form.curriculum_type.errors }}</div>
+              </div>
+
+              <!-- UNIT -->
+              <div class="form-group">
+                <label for="id_{{form.unit.name}}">{{ form.unit.label|title }} {% if form.unit.field.required %}(<span class="required">*</span>) {% endif %}</label>
+                <div>
+                  {{form.unit}}
+                </div>
+                <div class="help warning">{{form.unit.help_text|safe}}</div>
+                <div class="error">{{ form.unit.errors }}</div>
+              </div>
+
+              <!-- CURRICULUM TITLE -->
+              <div class="form-group">
+                <label for="id_{{form.title.name}}">{{ form.title.label|title }} {% if form.title.field.required %}(<span class="required">*</span>) {% endif %}</label>
+                <div>
+                  {{form.title}}
+                </div>
+                <div class="help warning">{{form.title.help_text|safe}}</div>
+                <div class="error">{{ form.title.errors }}</div>
+              </div>
+
+              <!-- SUBJECT -->
+              <div class="form-group">
+                <label for="id_{{form.subject.name}}">{{ form.subject.label|title }} {% if form.subject.field.required %}(<span class="required">*</span>) {% endif %}</label>
+                <div>
+                  {{form.subject}}
+                </div>
+                <div class="help warning">{{form.subject.help_text|safe}}</div>
+                <div class="error">{{ form.subject.errors }}</div>
+              </div>
+
+              <!-- FEATURE RANK AND STATUS -->
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="id_{{form.feature_rank.name}}">{{ form.feature_rank.label|title }} {% if form.feature_rank.field.required %}(<span class="required">*</span>) {% endif %}</label>
+                    <div>
+                      {{form.feature_rank}}
+                    </div>
+                    <div class="help warning">{{form.feature_rank.help_text|safe}}</div>
+                    <div class="error">{{ form.feature_rank.errors }}</div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label for="id_{{form.status.name}}">{{ form.status.label|title }} {% if form.status.field.required %}(<span class="required">*</span>) {% endif %}</label>
+                    <div>
+                      {{form.status}}
+                    </div>
+                    <div class="help warning">{{form.status.help_text|safe}}</div>
+                    <div class="error">{{ form.status.errors }}</div>
+                  </div>
+                </div>
+              </div>
+
               {% include "ctstem_app/CurriculumAuthors.html"%}
+
+              {% include "ctstem_app/SharedTeachers.html" with resource='curriculum'%}
+
+              <!-- ORDER -->
+              <div class="form-group">
+                <label for="id_{{form.order.name}}">{{ form.order.label|title }} {% if form.order.field.required %}(<span class="required">*</span>) {% endif %}</label>
+                <div>
+                  {{form.order}}
+                </div>
+                <div class="help warning">{{form.order.help_text|safe}}</div>
+                <div class="error">{{ form.order.errors }}</div>
+              </div>
+
+              <!-- ICON -->
+              <div class="form-group">
+                <label for="id_{{form.icon.name}}">{{ form.icon.label|title }} {% if form.icon.field.required %}(<span class="required">*</span>) {% endif %}</label>
+                <div>
+                  {{form.icon}}
+                </div>
+                <div class="help warning">{{form.icon.help_text|safe}}</div>
+                <div class="error">{{ form.icon.errors }}</div>
+              </div>
+
+              <!-- TIME -->
+              <div class="form-group">
+                <label for="id_{{form.time.name}}">{{ form.time.label|title }} {% if form.time.field.required %}(<span class="required">*</span>) {% endif %}</label>
+                <div>
+                  {{form.time}}
+                </div>
+                <div class="help warning">{{form.time.help_text|safe}}</div>
+                <div class="error">{{ form.time.errors }}</div>
+              </div>
+
+              <!-- LEVEL -->
+              <div class="form-group">
+                <label for="id_{{form.level.name}}">{{ form.level.label|title }} {% if form.level.field.required %}(<span class="required">*</span>) {% endif %}</label>
+                <div>
+                  {{form.level}}
+                </div>
+                <div class="help warning">{{form.level.help_text|safe}}</div>
+                <div class="error">{{ form.level.errors }}</div>
+              </div>
+
+              <!-- OVERVIEW -->
+              <div class="form-group">
+                <label for="id_{{form.overview.name}}">{{ form.overview.label|title }} {% if form.overview.field.required %}(<span class="required">*</span>) {% endif %}</label>
+                <div>
+                  {{form.overview}}
+                </div>
+                <div class="help warning">{{form.overview.help_text|safe}}</div>
+                <div class="error">{{ form.overview.errors }}</div>
+              </div>
+
+              <!-- STUDENT OVERVIEW -->
+              <div class="form-group">
+                <label for="id_{{form.student_overview.name}}">{{ form.student_overview.label|title }} {% if form.student_overview.field.required %}(<span class="required">*</span>) {% endif %}</label>
+                <div>
+                  {{form.student_overviewvel}}
+                </div>
+                <div class="help warning">{{form.student_overview.help_text|safe}}</div>
+                <div class="error">{{ form.student_overview.errors }}</div>
+              </div>
+
+              <!-- ACKNOWLEDGEMENT -->
+              <div class="form-group">
+                <label for="id_{{form.acknowledgement.name}}">{{ form.acknowledgement.label|title }} {% if form.acknowledgement.field.required %}(<span class="required">*</span>) {% endif %}</label>
+                <div>
+                  {{form.acknowledgement}}
+                </div>
+                <div class="help warning">{{form.acknowledgement.help_text|safe}}</div>
+                <div class="error">{{ form.acknowledgement.errors }}</div>
+              </div>
+
+              <!-- CREDITS -->
+              <div class="form-group">
+                <label for="id_{{form.credits.name}}">{{ form.credits.label|title }} {% if form.credits.field.required %}(<span class="required">*</span>) {% endif %}</label>
+                <div>
+                  {{form.credits}}
+                </div>
+                <div class="help warning">{{form.credits.help_text|safe}}</div>
+                <div class="error">{{ form.credits.errors }}</div>
+              </div>
+
+              <!-- COMPATIBLE SYSTEMS -->
+              <div class="form-group">
+                <label for="id_{{form.compatible_system.name}}">{{ form.compatible_system.label|title }} {% if form.compatible_system.field.required %}(<span class="required">*</span>) {% endif %}</label>
+                <div>
+                  {{form.compatible_system}}
+                </div>
+                <div class="help warning">{{form.compatible_system.help_text|safe}}</div>
+                <div class="error">{{ form.compatible_system.errors }}</div>
+
+              </div>
+
+              <!-- TAXONOMY -->
+              <div class="form-group">
+                <label for="id_{{form.taxonomy.name}}">{{ form.taxonomy.label|title }} {% if form.taxonomy.field.required %}(<span class="required">*</span>) {% endif %}</label>
+                <div style="display:none;">
+                  {{form.taxonomy}}
+                </div>
+                <button class="btn btn-info search_taxonomy" name="search_taxonomy" data-form="{% url 'ctstem:searchTaxonomy' %}">
+                  <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                </button>
+                <span class="expand_collapse_other">
+                  <button type="button" class="btn btn-warning" name="collapse_standards" aria-label="Collapse Standards" title="Collapse Standards">
+                    <span class="glyphicon glyphicon-collapse-up" aria-hidden="true"></span>
+                  </button>
+                  <button type="button" class="btn btn-success" style="display:none;" name="expand_standards" aria-label="Expand Standards" title="Expand Standards">
+                    <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
+                  </button>
+                </span>
+                <div id="taxonomy_div">
+                  <table class="table table-bordered table-striped table-condensed inner_table" id="taxonomy">
+                    <thead>
+                      <tr>
+                        <th>Standard</th>
+                        <th>Category</th>
+                        <th>Code</th>
+                        <th>Title</th>
+                        <th>Remove?</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for x in form.taxonomy.value %}
+                        {% with taxonomy=x|getTaxonomy %}
+                        <tr id="{{taxonomy.id}}">
+                          <td class="donotwrap">{{taxonomy.category.standard.short_name}}</td>
+                          <td>{{taxonomy.category.name}}</td>
+                          <td class="donotwrap">{{taxonomy.code}}</td>
+                          <td>{{taxonomy.title}}</td>
+                          <td>
+                            <button type="button" class="btn btn-danger remove_taxonomy" title="Remove Taxonomy">
+                              <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                            </button>
+                          </td>
+                        </tr>
+                        {% endwith %}
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+                <div class="help warning">{{form.taxonomy.help_text|safe}}</div>
+                <div class="error">{{ form.taxonomy.errors }}</div>
+              </div>
+
+              <!-- ATTACHMENTS -->
               <div class="form-group attachment_table">
                 {{attachment_formset.management_form}}
                 <label for="id_attachment_table">Attachment(s)</label>
@@ -161,8 +298,29 @@
                     {% endfor %}
                   </tbody>
                 </table>
+
               </div>
+
+              <!-- TEACHER NOTES -->
+              <div class="form-group">
+                <label for="id_{{form.teacher_notes.name}}">{{ form.teacher_notes.label|title }} {% if form.teacher_notes.field.required %}(<span class="required">*</span>) {% endif %}</label>
+                <span class="expand_collapse_other">
+                  <button type="button" class="btn btn-warning" style="display:none;" name="collapse_notes" aria-label="Collapse Notes" title="Collapse Notes">
+                    <span class="glyphicon glyphicon-collapse-up" aria-hidden="true"></span>
+                  </button>
+                  <button type="button" class="btn btn-success"  name="expand_notes" aria-label="Expand Notes" title="Expand Notes">
+                    <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
+                  </button>
+                </span>
+                <div style="display:none; margin-top: 1em;">
+                  {{form.teacher_notes}}
+                </div>
+                <div class="help warning">{{form.teacher_notes.help_text|safe}}</div>
+                <div class="error">{{ form.teacher_notes.errors }}</div>
+              </div>
+
             </div>
+
           </div>
 
           {{formset.management_form}}
