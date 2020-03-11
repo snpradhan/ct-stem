@@ -101,12 +101,14 @@
                   <i class="fas fa-user-friends" title="This curriculum has been shared with me"></i>
                 </div>
               {% endif %}
-
-              {% if assigned_curriculum %}
-                <div class="assigned">
-                  <i class="fas fa-check-square" title="This curriculum has been assigned"></i>
-                </div>
+              {% if user.administrator or my_curriculum or shared_curriculum %}
+                {% if curriculum.locked_by %}
+                  <div class="locked">
+                    <i class="fas fa-lock" title="Locked by {{curriculum.locked_by}}"></i>
+                  </div>
+                {% endif %}
               {% endif %}
+
               <div class="version title">
                 v{{curriculum.version}}
               </div>

@@ -52,15 +52,15 @@
 <!-- Assign -->
 {% check_curriculum_permission curriculum.id 'assign' as has_assign_permission %}
 {% if has_assign_permission == True %}
-  <a class="assign util-button fa fa-calendar-check-o" aria-hidden="true" data-form="{% url 'ctstem:assignCurriculum' curriculum.id%}" aria-label="Assign Curriculum" title="Assign Curriculum"></a>
+  <a class="assign util-button fas fa-tasks" aria-hidden="true" data-form="{% url 'ctstem:assignCurriculum' curriculum.id%}" aria-label="Assign Curriculum" title="Assign Curriculum"></a>
 {% elif user.is_authenticated and not user.researcher and not user.author and curriculum.status != 'R' %}
   {% if curriculum.curriculum_type == 'U' %}
     {% with msg="This unit cannot be assigned because all the underlying lessons are private and not locked.  If you need to assign this unit please ask the author to lock one or more lessons or make them public" %}
-    <a class="fa fa-calendar-check-o disabled" aria-hidden="true" data-title="{{msg}}"></a>
+    <a class="fas fa-tasks disabled" aria-hidden="true" data-title="{{msg}}"></a>
     {% endwith %}
   {% else %}
     {% with msg="This curriculum cannot be assigned because it is private and not locked.  If you need to assign this curriculum please ask the author to lock the curriculum or make it public" %}
-    <a class="fa fa-calendar-check-o disabled" aria-hidden="true" data-title="{{msg}}"></a>
+    <a class="fas fa-tasks disabled" aria-hidden="true" data-title="{{msg}}"></a>
     {% endwith %}
   {% endif %}
 {% endif %}
