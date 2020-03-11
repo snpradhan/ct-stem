@@ -2199,9 +2199,12 @@ def searchCurriculaTiles(request, queryset, search_criteria):
       keyword_filter = keyword_filter | Q(taxonomy__title__icontains=keywords)
       keyword_filter = keyword_filter | Q(taxonomy__category__name__icontains=keywords)
       keyword_filter = keyword_filter | Q(taxonomy__category__standard__name__icontains=keywords)
+      keyword_filter = keyword_filter | Q(level__icontains=keywords)
+      keyword_filter = keyword_filter | Q(subject__name__icontains=keywords)
 
     if 'subjects' in search_criteria:
-      subjects = map(int, search_criteria['subjects'])
+      #subjects = map(int, search_criteria['subjects'])
+      subjects = [int(i) for i in search_criteria['subjects']]
       subject_filter = Q(subject__id__in=subjects)
 
     if 'curricula_types' in search_criteria:
