@@ -929,9 +929,12 @@ div.content#preview div#compatibility div.row .col.compatible-item.incompatible 
 div.content#preview div#standards div.row .col {
   flex: 1;
 }
-div.content#preview div#standards div.row .col ul {
+div.content#preview div#standards div.row .col > ul {
   font-size: 1.5em;
   line-height: 1.5em;
+}
+div.content#preview div#standards div.row .col > ul * {
+  font-size: 1em;
 }
 div.content#preview ul.page_links  {
   list-style-type: none;
