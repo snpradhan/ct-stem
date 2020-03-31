@@ -747,6 +747,7 @@ div.row#curricula_tiles .col .tile {
   display: inline-block;
   position: relative;
   box-shadow: unset;
+  overflow: hidden;
 }
 
 div.row#curricula_tiles .col .tile:hover {
@@ -831,7 +832,6 @@ div.row#curricula_tiles .col .tile .shelf {
   position: absolute;
   top: 0px;
   left: 0px;
-  border-top-left-radius: 0.25em;
 }
 div.content#preview {
   width: 80%;
