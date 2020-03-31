@@ -940,7 +940,7 @@ div.content#preview ul.page_links  {
   list-style-type: none;
 }
 
-div.content#preview a > h5 {
+div.content#preview a > h5, div.content#preview a > h6 {
   color: inherit !important;
   text-decoration: underline;
 }
@@ -1615,6 +1615,9 @@ h1, h2, h3, h4, h5, h6 {
 
 h1.left, h2.left, h3.left, h4.left, h5.left, h6.left {
   text-align: left;
+}
+h1.inline, h2.inline, h3.inline, h4.inline, h5.inline, h6.inline {
+  display: inline-block;
 }
 
 h1 {
