@@ -435,8 +435,13 @@ def previewCurriculumNew(request, id=''):
       return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
     if request.method == 'GET':
-
       systems = models.System.objects.all()
+
+      if request.user.is_anonymous or hasattr(request.user, 'student'):
+        attachments = models.Attachment.objects.all().filter(curriculum=curriculum, teacher_only=False)
+      else:
+        attachments = models.Attachment.objects.all().filter(curriculum=curriculum)
+
       if curriculum.unit and curriculum.unit.icon:
         icon = curriculum.unit.icon.url
       elif curriculum.icon:
@@ -449,7 +454,7 @@ def previewCurriculumNew(request, id=''):
         icon = '/static/img/assessment.png'
 
 
-      context = {'curriculum': curriculum, 'systems': systems, 'icon': icon}
+      context = {'curriculum': curriculum, 'systems': systems, 'icon': icon, 'attachments': attachments}
 
       return render(request, 'ctstem_app/CurriculumPreviewNew.html', context)
 

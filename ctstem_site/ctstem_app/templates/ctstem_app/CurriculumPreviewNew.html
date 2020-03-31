@@ -202,6 +202,14 @@
         </div>
       {% endif %}
     {% endif %}
+    {% if attachments %}
+      {% if user.administrator or user.researcher or user.school_administrator or user.teacher or user.author %}
+        <div class="section" id="attachments">
+          <h3 class="left">Attachment(s) <span class="fa fa-paperclip"></span></h3>
+          <a href="{% url 'ctstem:downloadAttachments' curriculum.id%}"><h5 class="left">Download</h5></a>
+        </div>
+      {% endif %}
+    {% endif %}
 
     {% include "ctstem_app/CurriculumPreviewActions.html" with curriculum=curriculum %}
   </div>
