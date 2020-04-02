@@ -101,7 +101,7 @@
                   <div> Submitted </div>
                   <div>
                     <a type="button" class="btn btn-success" href="{% url 'ctstem:feedback' assignment.id  assignment_details.instance.id %}" title="Give Feedback"> <img src="/static/img/feedback.png" class="icon" /> </a>
-                    <a type="button" class="btn btn-info" href="{% url 'ctstem:export_student_response' assignment.id  student.id %}" title="Export Student Response"> <span class="glyphicon glyphicon-export" aria-hidden="true"></span> </a>
+                    <a type="button" class="btn btn-info" href="{% url 'ctstem:export_student_response' assignment.id  student.id %}" title="Download Student Response"> <i class="fas fa-file-download"></i> </a>
                     {% if assignment_details.instance.assignment.curriculum.curriculum_type == 'L' %}
                       <a type="button" class="btn btn-warning" href="{% url 'ctstem:unlockAssignment' assignment.id  assignment_details.instance.id %}" title="Unlock Assignment" onclick="return confirm('Are you sure you want to unlock this assignment? Unlocking the assignment will allow the student to edit his/her responses and resubmit.');"> <span class="fa fa-unlock" aria-hidden="true"></span> </a>
                     {% endif %}
@@ -110,13 +110,13 @@
                   <div> Feedback Provided </div>
                   <div>
                     <a type="button" class="btn btn-default" href="{% url 'ctstem:feedback' assignment.id  assignment_details.instance.id %}" title="View Response/Feedback"> <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> </a>
-                    <a type="button" class="btn btn-info" href="{% url 'ctstem:export_student_response' assignment.id  student.id %}" title="Export Student Response"> <span class="glyphicon glyphicon-export" aria-hidden="true"></span> </a>
+                    <a type="button" class="btn btn-info" href="{% url 'ctstem:export_student_response' assignment.id  student.id %}" title="Download Student Response"> <i class="fas fa-file-download"></i> </a>
                   </div>
                 {% elif assignment_details.instance.status == 'A' %}
                   <div> Archived </div>
                   <div>
                     <a type="button" class="btn btn-default" href="{% url 'ctstem:feedback' assignment.id  assignment_details.instance.id %}" title="View Response/Feedback"> <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> </a>
-                    <a type="button" class="btn btn-info" href="{% url 'ctstem:export_student_response' assignment.id  student.id %}" title="Export Student Response"> <span class="glyphicon glyphicon-export" aria-hidden="true"></span> </a>
+                    <a type="button" class="btn btn-info" href="{% url 'ctstem:export_student_response' assignment.id  student.id %}" title="Download Student Response"> <i class="fas fa-file-download"></i> </a>
                   </div>
                 {% else %}
                   <div> New </div>

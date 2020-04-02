@@ -37,8 +37,8 @@
                       <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
                     </a>
                     {% if curriculum|has_response:request.user %}
-                      <a type="button" class="btn btn-info" href="{% url 'ctstem:export_all_response' curriculum.id %}" aria-label="Export Student Response" title="Export Student Response">
-                         <span class="glyphicon glyphicon-export" aria-hidden="true"></span>
+                      <a type="button" class="btn btn-info" href="{% url 'ctstem:export_all_response' curriculum.id %}" aria-label="Download Student Response" title="Download Student Response">
+                        <i class="fas fa-file-download"></i>
                       </a>
                     {% endif %}
                   </div>
@@ -86,8 +86,8 @@
                       <img src="/static/img/dashboard.png" class="icon" />
                     </a>
 
-                    <a type="button" class="btn btn-info" href="{% url 'ctstem:export_group_response' assignment.assignment.id %}" aria-label="Export Student Response" title="Export Student Response">
-                       <span class="glyphicon glyphicon-export" aria-hidden="true"></span>
+                    <a type="button" class="btn btn-info" href="{% url 'ctstem:export_group_response' assignment.assignment.id %}" aria-label="Download Student Response" title="Download Student Response">
+                        <i class="fas fa-file-download"></i>
                     </a>
                   </td>
                 </tr>
