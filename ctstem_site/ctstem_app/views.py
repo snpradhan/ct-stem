@@ -348,10 +348,7 @@ def curriculum(request, id=''):
           #check which submit button was clicked and redirect accordingly
           messages.success(request, "Curriculum Saved.")
           if preview == '1':
-            if savedCurriculum.unit is None:
-              return shortcuts.redirect('ctstem:previewCurriculum', id=savedCurriculum.id)
-            else:
-              return shortcuts.redirect('ctstem:previewCurriculum', id=savedCurriculum.id, step_order=0)
+            return shortcuts.redirect('ctstem:previewCurriculum', id=savedCurriculum.id)
           elif back == '1':
             return shortcuts.redirect(back_url)
           else:
@@ -380,12 +377,12 @@ def curriculum(request, id=''):
     return http.HttpResponseNotFound('<h1>Requested curriculum not found</h1>')
 
 ####################################
-# PREVIEW A Curriculum
+# PREVIEW A Curriculum Activity page
 ####################################
-def previewCurriculum(request, id='', step_order=-1):
+def previewCurriculumActivity(request, id='', step_order=0):
   try:
     # check curriculum permission
-    has_permission = check_curriculum_permission(request, id, 'preview', step_order)
+    has_permission = check_curriculum_permission(request, id, 'preview')
     if has_permission:
       curriculum = models.Curriculum.objects.get(id=id)
     else:
@@ -415,7 +412,7 @@ def previewCurriculum(request, id='', step_order=-1):
 
       context['steps'] = steps
 
-      return render(request, 'ctstem_app/CurriculumPreview.html', context)
+      return render(request, 'ctstem_app/CurriculumActivityPreview.html', context)
 
     return http.HttpResponseNotAllowed(['GET'])
 
@@ -423,12 +420,12 @@ def previewCurriculum(request, id='', step_order=-1):
     return http.HttpResponseNotFound('<h1>Requested curriculum not found</h1>')
 
 ####################################
-# PREVIEW A Curriculum NEW
+# PREVIEW A Curriculum
 ####################################
-def previewCurriculumNew(request, id=''):
+def previewCurriculum(request, id=''):
   try:
     # check curriculum permission
-    has_permission = check_curriculum_permission(request, id, 'preview', -1)
+    has_permission = check_curriculum_permission(request, id, 'preview')
     if has_permission:
       curriculum = models.Curriculum.objects.get(id=id)
     else:
@@ -456,7 +453,7 @@ def previewCurriculumNew(request, id=''):
 
       context = {'curriculum': curriculum, 'systems': systems, 'icon': icon, 'attachments': attachments}
 
-      return render(request, 'ctstem_app/CurriculumPreviewNew.html', context)
+      return render(request, 'ctstem_app/CurriculumPreview.html', context)
 
     return http.HttpResponseNotAllowed(['GET'])
 
@@ -3596,7 +3593,7 @@ def addAssignment(request, curriculum_id='', group_id=''):
 # to perform the specified action on the
 # curriculum
 ####################################
-def check_curriculum_permission(request, curriculum_id, action, step_order=-1):
+def check_curriculum_permission(request, curriculum_id, action):
   try:
     has_permission = False
     is_admin = is_researcher = is_author = is_school_admin = is_teacher = False

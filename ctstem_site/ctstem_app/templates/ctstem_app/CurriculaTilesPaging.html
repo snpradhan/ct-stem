@@ -21,7 +21,7 @@
             {% endif %}
             ">
         {% if curriculum.unit|slugify == 'None'|slugify %}
-          <a href="{% url 'ctstem:previewCurriculumNew' curriculum.id %}">
+          <a href="{% url 'ctstem:previewCurriculum' curriculum.id %}">
             <div class="icon">
               {% if curriculum.icon %}
                 <img src="{{curriculum.icon.url}}"/>
@@ -52,7 +52,7 @@
             {% endif %}
           </div>
         {% endif %}
-        <a href="{% url 'ctstem:previewCurriculumNew' curriculum.id %}">
+        <a href="{% url 'ctstem:previewCurriculum' curriculum.id %}">
           <div class="detail">
 
             <div class="type">

@@ -1,567 +1,241 @@
 {% extends "ctstem_app/base.html" %}
 {% load ctstem_extras %}
 {% load base_extras %}
-
-{% block title %} {{curriculum.title}} Preview{%endblock %}
-
-{% block bootstrap_css %}
-  <link rel="stylesheet" href="{% staticfile 'css/bootstrap-modal.css' %}">
+{% block media %}
+  {{ block.super }}
+  {{ form.media }}
 {% endblock %}
-{% block datatable %}{% endblock %}
-{% block django_admin %}{% endblock %}
-{% block misc %}
- <script src="https://canvasjs.com//assets/script/canvasjs.min.js"></script>
- <script src="{% staticfile 'js/highlight.pack.js' %}"></script>
- <script type="text/javascript" src="{% staticfile 'ckeditor/ckeditor-init.js' %}"></script>
- <script type="text/javascript" src="{% staticfile 'ckeditor/ckeditor/ckeditor.js' %}"></script>
- <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>
-{% endblock %}
-{% block agency %}{% endblock %}
-{% block ctstem %}
-  <script type="text/javascript" src="{% staticfile 'js/session.js' %}"></script>
-  <script type="text/javascript" src="{% staticfile 'js/clone_more.js' %}"></script>
-  <script type="text/javascript" src="{% staticfile 'js/assignment.js' %}"></script>
-  <script type="text/javascript" src="{% staticfile 'js/modal.js' %}"></script>
-{% endblock %}
-
-{% block custom_media %}
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css?family=Maitree:400,700|Roboto+Condensed:300,400,700italic" rel="stylesheet">
-  <!--script src="http://ajax.googleapis.com/ajax/libs/jquery/3.0.0/jquery.min.js"></script-->
-  <link rel="stylesheet" href="{% staticfile 'css/table.css' %}">
-  <link rel="stylesheet" href="{% staticfile 'css/messages.css' %}">
-  <link rel="stylesheet" href="{% staticfile 'css/assignment.css' %}">
-  <script type="text/javascript" src="{% staticfile 'js/jquery.form.min.js' %}"></script>
-  <link rel="stylesheet" href="{% staticfile 'css/sketch.css' %}">
-  <script type="text/javascript" src="{% staticfile 'js/sketch.js' %}"></script>
-  <script type="text/javascript" src="{% staticfile 'js/sketch_custom.js' %}"></script>
-  <script type="text/javascript" src="{% staticfile 'js/assignment.js' %}"></script>
-{% endblock %}
-
-{% block header %}{% endblock %}
 
 {% block content %}
-{% with curr_unit=curriculum.unit|default:curriculum %}
-{% get_underlying_curriculum curr_unit.id as underlying_curriculum %}
-<!--if curriculum is a unit or a lesson inside a unit then curr_unit is the unit otherwise it is the curriculum  -->
-  <div>
-    {% if curr_unit.curriculum_type == 'L' or curr_unit.curriculum_type == 'U' %}
-      <!-- Facebook share js -->
-      <div id="fb-root"></div>
-      <script>(function(d, s, id) {
-        var js, fjs = d.getElementsByTagName(s)[0];
-        if (d.getElementById(id)) return;
-        js = d.createElement(s); js.id = id;
-        js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.7";
-        fjs.parentNode.insertBefore(js, fjs);
-      }(document, 'script', 'facebook-jssdk'));</script>
-      <!-- Google Plus share js -->
-      <script type="text/javascript">
-        (function() {
-          var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
-          po.src = 'https://apis.google.com/js/platform.js';
-          var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
-        })();
-      </script>
-    {% endif %}
-    <!-- TOP HEADER BAR -->
-    <header>
-      <div><a class="navbar-brand" href="{% url 'ctstem:home' %}"><img src="/static/img/logo/svg/light/wide.svg"></a></div>
-      <div class="title">Preview: {{curr_unit.title|title}}</div>
-      <div id="page_numbers">
-        <nav id="numbers">
-          <span id="activity-nav">
-          {% if step_order|add:0 >= 0 %}
-            Page &nbsp;
-            {% if step_order|add:0  == 0 %}
-              <a class="page-link selected" href="#">{{0}}</a>
+  {{block.super}}
+  {% is_my_curriculum curriculum as my_curriculum %}
+  {% is_curriculum_shared_with_me curriculum as shared_curriculum %}
+  <div class="content" id="preview">
+
+    <div id="preview_head" class="row section
+            {% if curriculum.curriculum_type == 'U' %}
+              unit
+            {% elif curriculum.curriculum_type == 'L' %}
+              lesson
             {% else %}
-              <a class="page-link" href="{% url 'ctstem:previewCurriculum' curriculum.id 0 %}">{{0}}</a>
+              assessment
             {% endif %}
-            {% for i in total_steps|iterate %}
-              {% if i|add:0 == step_order|add:0 %}
-                <a class="page-link selected" href="{% url 'ctstem:previewCurriculum' curriculum.id i %}">{{i}}</a>
-              {% else %}
-                <a class="page-link" href="{% url 'ctstem:previewCurriculum' curriculum.id i %}">{{i}}</a>
-              {% endif %}
-            {% endfor %}
-          {% endif %}
-          </span>
-          {% if curr_unit.curriculum_type == 'L' or curr_unit.curriculum_type == 'U' %}
-            &nbsp;
-            <button id="menu-button"><span class="fa fa-navicon"></span></button>
-          {% endif %}
-        </nav>
-        {% if curr_unit.curriculum_type == 'L' or curr_unit.curriculum_type == 'U' %}
-          <!-- SIDE MENU -->
-          <nav id="side-nav">
-            <ul>
-              <li><a href="{% url 'ctstem:previewCurriculum'  curr_unit.id %}" class="lesson">
-                View
-                {% if curr_unit.curriculum_type == 'U' %}
-                  Unit
-                {% else %}
-                  Lesson
-                {% endif %}
-                Summary</a>
-              </li>
-
-              {% if curr_unit.curriculum_type == 'L'%}
-                <li>
-                  <a href="{% url 'ctstem:previewCurriculum'  curriculum.id 0 %}" class="activity">Preview Student Activity</a>
-                </li>
-              {% else %}
-                <li>
-                  <a href="#" class="list_underlying_curriculum">Preview Underlying Curricula</a>
-                  <i class="fa fa-caret-square-o-down underlying_curriculum" aria-hidden="true"></i>
-                  <i class="fa fa-caret-square-o-up underlying_curriculum" aria-hidden="true" style="display:none;"></i>
-                  <ul class="underlying_curriculum">
-                    {% for curr in underlying_curriculum %}
-                      <li><a href="{% url 'ctstem:previewCurriculum'  curr.id 0 %}" class="activity">{{curr.order}}. {{curr.title}}</a></li>
-                    {% endfor %}
-                   </ul>
-                </li>
-              {% endif %}
-
-              <!-- TODO: LINK TO ATTACHMENT -->
-              {% if user.administrator or user.school_administrator or user.researcher or user.author or user.teacher %}
-                {% if attachments %}
-                  <li><a href="{% url 'ctstem:downloadAttachments' curr_unit.id%}">Download Attachment(s) <span class="fa fa-paperclip"></span></a></li>
-                {% endif %}
-              {% endif %}
-              <li class="divider"></li>
-              {% check_curriculum_permission curr_unit.id 'assign' as has_assign_permission %}
-              {% if has_assign_permission == True %}
-                {% if user.administrator or user.school_administrator %}
-                    <li><a class="assign" href="#" data-form="{% url 'ctstem:assignCurriculum' curr_unit.id%}">Assign to Classes</a></li>
-                {% elif user.teacher %}
-                    <li><a class="assign" href="#" data-form="{% url 'ctstem:assignCurriculum' curr_unit.id%}">Assign to My Classes</a></li>
-                {% endif %}
-              {% endif %}
-
-              {% check_curriculum_permission curr_unit.id 'favorite' as has_favorite_permission %}
-              {% if has_favorite_permission == True %}
-                {% if curr_unit|is_bookmarked:user.teacher %}
-                  <li><a id="favorites-link" class="favorites">Remove from Favorites</a></li>
-                {% else %}
-                  <li><a id="favorites-link" class="favorites">Add to Favorites</a></li>
-                {% endif %}
-              {% endif %}
-
-
-              <li><a class="print" href="{% url 'ctstem:previewCurriculum' curr_unit.id %}">Print This Curriculum <span class="fa fa-print "></span></a></li>
-              <li class="divider"></li>
-              <li><a href="#" class="faq"">View CT FAQ</a></li>
-              {% if user.is_anonymous %}
-                <li><a data-toggle="modal" data-target="#login" class="login modal-open" data-href="{% url 'ctstem:login' %}" href="#">Login/Register</a></li>
-              {% else %}
-                <li><a href="{% url 'ctstem:logout' %}">Logout</a></li>
-              {% endif %}
-              <!-- END IF -->
-            </ul>
-          </nav>
-        {% endif %}
-      </div>
-    </header>
-
-    <!-- MAIN CONTENT -->
-
-    <main>
-      {% if curr_unit.curriculum_type == 'L' or curr_unit.curriculum_type == 'U' %}
-        <lesson-summary style="{%if step_order|add:0 >= 0 %} display: none; {% endif %}">
-          <div class="page">
-            <h1>{{curr_unit.title|title}}</h1>
-            <div class="byline">
-              <!-- TODO: Need author URL field in database -->
-              <!-- TODO: Byline might also say "Curriculum adapted from XYZ" -->
-              <!--Original curriculum by
-              {% for author in curriculum.authors.all %}
-                <a href="#">{{author.get_full_name}}</a>
-                {% if forloop.last == False %}
-                  ,
-                {% endif %}
-              {% endfor %}
-              -->
-              <div class="credits">
-                {% if curr_unit.credits %}
-                  {{curr_unit.credits|safe}}
-                {% endif %}
-              </div>
-            </div>
-
-            <!-- LESSON META DATA -->
-            <p style="margin-bottom: 0.5rem;">
-              <b>Subject:</b> {{curr_unit.subject.all|join:','}}<br>
-              <b>Time:</b> {{curr_unit.time}}<br>
-              <b>Level:</b> {{curr_unit.level|safe}}<br>
-            </p>
-
-            <!-- UTILITY BUTTONS -->
-            <div class="utility">
-              {% check_curriculum_permission curr_unit.id 'favorite' as has_favorite_permission %}
-              {% if has_favorite_permission == True %}
-                {% if curr_unit|is_bookmarked:user.teacher %}
-                  <a class="util-button fa fa-star favorites" id="favorites-icon" title="Remove from Favorites"></a>
-                {% else %}
-                  <a class="util-button fa fa-star-o favorites" id="favorites-icon" title="Add to My Favorites"></a>
-                {% endif %}
-              {% endif %}
-
-              <a class="util-button fa fa-print" href="javascript:window.print();" title="Print"></a>
-
-              {% check_curriculum_permission curr_unit.id 'assign' as has_assign_permission %}
-              {% if has_assign_permission == True %}
-                {% if user.administrator or user.school_administrator %}
-                  <a class="assign util-button fa fa-calendar-check-o" aria-hidden="true" data-form="{% url 'ctstem:assignCurriculum' curr_unit.id%}" aria-label="Assign to Classes" title="Assign to Classes"></a>
-                {% elif user.teacher %}
-                  <a class="assign util-button fa fa-calendar-check-o" aria-hidden="true" data-form="{% url 'ctstem:assignCurriculum' curr_unit.id%}" aria-label="Assign to Classes" title="Assign to My Classes"></a>
-                {% endif %}
-              {% endif %}
-            </div>
-
-            <!-- MAIN IMAGE -->
-            <!-- TODO: We might need to collect multiple resolution images for the main image and thumbnails -->
-            <figure>
-              {% if curr_unit.icon %}
-                <img src="{{curr_unit.icon.url}}" class="preview"/>
-              {% endif %}
-              <figcaption></figcaption>
-            </figure>
-
-            <!-- TODO: Think about how to implement popup glossary -->
-
-            <div class="overview">
-              {% if curr_unit.curriculum_type == 'U' %}
-                <h2>Unit Overview</h2>
-              {% else %}
-                <h2>Lesson Overview</h2>
-              {% endif %}
-              {{curr_unit.overview|safe}}
-
-              {% if curr_unit.curriculum_type == 'U' %}
-                <div class="underlying_lessons_overview">
-                  {% if underlying_curriculum %}
-                    <h2>Lessons</h2>
-                    <ul>
-                    {% for lesson in underlying_curriculum %}
-                      <li>
-                        <div class="lesson_overview">
-                          <div>{{lesson.title}}</div>
-                          <ul>
-                            {% if lesson.overview %}
-                            <li>
-                              <a class="lesson_overview_link">Overview</a>
-                              <div class="lesson_overview_content">{{lesson.overview|safe}}</div>
-                            </li>
-                            <li>
-                              <a target="_blank" href="{% url 'ctstem:previewCurriculum' lesson.id 0 %}">Preview as Student</a>
-                            </li>
-                            {% endif %}
-                          </ul>
-                        </div>
-                      </li>
-                    {% endfor %}
-                  </ul>
-                  {% endif %}
-                </div>
-              {% endif %}
-            </div>
-
-            <!-- TODO: Should this be in the database?? -->
-            <div class="compatibility">
-              <h2>Compatible With</h2>
-              {% for system in systems %}
-                <div class="compatible-item {% if system not in curr_unit.compatible_system.all %} incompatible {% endif %}">
-                  <span class="fa fa-{{system.icon}}"></span><br>
-                  {{system.name}}
-                </div>
-              {% endfor %}
-            </div>
-
-            <!-- WHAT'S NEXT - This is the same for every lesson so it doesn't need to be dynamic -->
-            <div class="next">
-              <h2>What's Next?</h2>
-              <ul>
-                {% if curr_unit.curriculum_type != 'U' %}
-                  <li><a href="{% url 'ctstem:previewCurriculum'  curr_unit.id 0 %}" class="activity">Preview student activity</a></li>
-                {% endif %}
-
-                {% check_curriculum_permission curr_unit.id 'assign' as has_assign_permission %}
-                {% if has_assign_permission == True %}
-                  <li><a href="#" class="assign" data-form="{% url 'ctstem:assignCurriculum' curr_unit.id %}">Assign this to {% if user.teacher %}my{% endif %} classes</a></li>
-                {% endif %}
-              </ul>
-            </div>
-
-
-            <!-- STANDARDS BOX -->
-            <!-- TODO: Figure out how to make the links work. Not sure what they should like to?? -->
-            <h2>Standards</h2>
-            <div class="standards">
-              {% for standard, categories in curr_unit.taxonomy.all|taxonomyHelper %}
-                <b>{{standard}}</b>
-                <ul>
-                  {% for category, taxonomies in categories.items %}
-                    <li>{{category}}</li>
-                    <ul>
-                      {% for taxonomy in taxonomies %}
-                        <li>{% if taxonomy.code %}<a href="#">[{{taxonomy.code}}]</a>{% endif %} {{taxonomy}}</li>
-                      {% endfor %}
-                    </ul>
-                  {% endfor %}
-                </ul>
-                {% if not forloop.last %}
-                  <hr>
-                {% endif %}
-              {% endfor %}
-            </div>
-
-            <!-- ACKNOWLEDGEMENT -->
-            {% if curr_unit.acknowledgement %}
-              <h2>Acknowledgement</h2>
-              <div class="acknowledgement" id="acknowledgement">
-                {{curr_unit.acknowledgement|safe}}
-              </div>
+            {% if curriculum.status == 'A' %}
+              archived
             {% endif %}
-
-
-          </div>
-        </lesson-summary>
-
-        <faq>
-          <div class="page">
-            <iframe width="1200" height="1200" src="https://docs.google.com/document/d/e/2PACX-1vR2Ixodfx7jupVLhvukg3JrZLnEtbUA7_CU3ltA6iJ4vuvOa5SlAPU0EvBZY1jinN2J1jaiMBN8q50Q/pub?embedded=true"></iframe>
-          </div>
-        </faq>
-      {% endif %}
-
-      {% if step_order|add:0 >= 0 %}
-        <activity>
-          {% include 'ctstem_app/CurriculumActivityPreview.html' with step=step %}
-        </activity>
-      {% endif %}
-
-      <div class="page print">
-      {% if user.administrator or user.researcher or user.school_administrator or user.author or user.teacher %}
-        {% if step_order|add:0 < 0 %}
-          {% if curr_unit.curriculum_type != 'U' %}
-
-            <h2> {{curr_unit.title|title}} Activities </h2>
-            {% for st in curr_unit.steps.all %}
-              <activity>
-                {% include 'ctstem_app/CurriculumActivityPreview.html' with step=st %}
-              </activity>
-            {% endfor %}
-          {% endif %}
+            ">
+      <div class="col">
+        <div class="icon" style="background-image: url('{{icon}}');">
+          {% if curriculum.unit|slugify == 'None'|slugify %}
+            {% check_curriculum_permission curriculum.id 'favorite' as has_favorite_permission %}
+            {% if has_favorite_permission == True %}
+              <a class="bookmark util-button fa fa-star" href="{% url 'ctstem:removeBookmark' curriculum.id %}" style="{% if curriculum|is_bookmarked:user.teacher %} display: inline-block; {% else %} display: none; {% endif %}" title="Remove from Favorites"></a>
+              <a class="bookmark util-button fa fa-star-o" href="{% url 'ctstem:bookmarkCurriculum' curriculum.id %}" style="{% if curriculum|is_bookmarked:user.teacher %} display: none; {% else %} display: inline-block; {% endif %}" title="Add to Favorites"></a>
+            {% else %}
+              <a class="bookmark util-button fa fa-star-o" data-title="You need to be logged in as a teacher to favorite this curriculum"></a>
+            {% endif %}
         {% endif %}
-      {% endif %}
+        </div>
       </div>
 
-    </main>
-
-    <!-- FOOTER -->
-    {% include 'ctstem_app/CurriculumFooter.html' %}
-  </div>
-
-  <div>
-    <div class="modal fade" id="assignmentModal" role="dialog"></div>
-
-    <div class="modal fade" id="imageModal" role="dialog">
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
-          </div>
-          <img src="" class="popup_image"/>
+      <div class="col meta">
+        <h3 class="left">
+          {% if curriculum.unit %}
+            {{curriculum.order}}.
+          {% endif %}
+          {{curriculum.title}}
+          {% if curriculum.locked_by %}
+            {% if user.administrator %}
+              <i class="fa fa-lock" aria-hidden="true" title="Locked by {{curriculum.locked_by}}"></i>
+            {% elif user.teacher %}
+              {% if my_curriculum or shared_curriculum %}
+                <i class="fa fa-lock" aria-hidden="true" title="Locked by {{curriculum.locked_by}}"></i>
+              {% endif %}
+            {% endif %}
+          {% endif %}
+        </h3>
+        <div>
+          Author(s):
+          {% for curriculum_author in curriculum.curriculumauthor_set.all|dictsort:"order" %}
+            {{curriculum_author.author.get_full_name}}{% if forloop.last == False %}, {% endif %}
+          {% endfor %}
+        </div>
+        <div>
+          Subject:
+          {% if curriculum.subject.all %}
+            {{curriculum.subject.all|join:", "}}
+          {% endif %}
+        </div>
+        <div>
+          Time: {{curriculum.time}}
+        </div>
+        <div>
+          Level: {{curriculum.level}}
+        </div>
+        <div>
+          Version: v{{curriculum.version}}
         </div>
       </div>
     </div>
-  </div>
 
+    {% include "ctstem_app/CurriculumPreviewActions.html" with curriculum=curriculum %}
+
+    <div class="preview">
+      <div class="section" id="overview">
+        <h3 class="left">Overview</h3>
+        <div>{{curriculum.overview|safe}}</div>
+        <!-- Teacher Notes -->
+        {% if curriculum.teacher_notes %}
+          <div>
+          {% if user.administrator or user.researcher or user.school_administrator or user.teacher or user.author %}
+            <a id="teacher_notes_link" href="#teacher_notes"><h5 class="left">Jump to Teacher Notes</h5></a>
+          {% else %}
+            {% with msg="Please login as a teacher to see the teacher notes" %}
+              <a onclick="alert('{{msg}}');" href="#"><h5 class="left">Jump to Teacher Notes</h5></a>
+            {% endwith %}
+          {% endif %}
+          </div>
+        {% endif %}
+      </div>
+
+      {% if curriculum.curriculum_type == 'U' %}
+        {% get_underlying_curriculum curriculum.id as underlying_curriculum %}
+        <div class="section">
+          {% if underlying_curriculum %}
+            <h3 class="left">Underlying Lessons</h3>
+            <div class="row underlying_curricula" id="curricula_tiles">
+              {% include "ctstem_app/CurriculaTilesPaging.html" with curricula=underlying_curriculum parent='preview' %}
+            </div>
+          {% endif %}
+        </div>
+      {% else %}
+      <!-- get underlying pages -->
+        <div class="section">
+          <h3 class="left">Underlying Pages</h3>
+          <ul class="page_links">
+            <li>
+              <h5 class="left inline">0. Student Directions - </h5>
+              <a href="{% url 'ctstem:previewCurriculumActivity' curriculum.id 0 %}" target="_blank" title="Preview">
+                <h6 class="left inline"> Preview as Student <i class="fas fa-external-link-alt"></i></h6>
+              </a>
+            </li>
+
+            {% for step in curriculum.steps.all %}
+              <li>
+                <h5 class="left inline">{{step.order}}. {{step.title}} - </h5>
+                <a href="{% url 'ctstem:previewCurriculumActivity' curriculum.id step.order %}" target="_blank" title="Preview">
+                  <h6 class="left inline"> Preview as Student <i class="fas fa-external-link-alt"></i></h6>
+                </a>
+
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+
+      {% if curriculum.unit %}
+        <div class="row buttons">
+          <div class="col">
+            <a type="button" class="btn normal darkblue" aria-hidden="true" href="{% url 'ctstem:previewCurriculum' curriculum.unit.id %}" aria-label="Back to Unit" title="Back to Unit">Back to Unit</a>
+          </div>
+          <div class="col">
+            {% with previous_curriculum=curriculum.id|get_previous_curriculum %}
+              {% if previous_curriculum %}
+                <a type="button" class="btn normal darkblue" aria-hidden="true" href="{% url 'ctstem:previewCurriculum' previous_curriculum.id %}" aria-label="Previous Lesson" title="Previous Lesson">Previous Lesson</a>
+              {% endif %}
+            {% endwith %}
+          </div>
+          <div class="col">
+            {% with next_curriculum=curriculum.id|get_next_curriculum %}
+              {% if next_curriculum %}
+                <a type="button" class="btn normal darkblue" aria-hidden="true" href="{% url 'ctstem:previewCurriculum' next_curriculum.id %}" aria-label="Next Lesson" title="Next Lesson">Next Lesson</a>
+              {% endif %}
+            {% endwith %}
+          </div>
+        </div>
+      {% endif %}
+      <div class="section" id="standards">
+        <h3 class="left">Standards</h3>
+        <div class="row">
+          {% for standard, categories in curriculum.taxonomy.all|taxonomyHelper %}
+            <div class="col">
+              <h5 class="left">{{standard}}</h5>
+              <ul>
+                {% for category, taxonomies in categories.items %}
+                  <li>{{category}} <span class="fa fa-plus-circle"></span><span class="fa fa-minus-circle" style="display:none;"></span></li>
+                  <ul style="display:none;">
+                    {% for taxonomy in taxonomies %}
+                      <li>{% if taxonomy.code %}<a href="#">[{{taxonomy.code}}]</a>{% endif %} {{taxonomy}}</li>
+                    {% endfor %}
+                  </ul>
+                {% endfor %}
+              </ul>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="section" id="compatibility">
+        <h3 class="left">Compatibility</h3>
+        <div class="row">
+          {% for system in systems %}
+            <div class="col compatible-item {% if system not in curriculum.compatible_system.all %} incompatible {% endif %}">
+              <span class="fa fa-{{system.icon}}"></span><br>
+              {{system.name}}
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      {% if curriculum.credits %}
+        <div class="section" id="credits">
+          <h3 class="left">Credits</h3>
+          <div>{{curriculum.credits|safe}}</div>
+        </div>
+      {% endif %}
+
+      <!-- ACKNOWLEDGEMENT -->
+      {% if curriculum.acknowledgement %}
+        <div class="section" id="acknowledgement">
+          <h3 class="left">Acknowledgement</h3>
+          <div>{{curriculum.acknowledgement|safe}}</div>
+        </div>
+      {% endif %}
+    </div>
+    {% if curriculum.teacher_notes %}
+      {% if user.administrator or user.researcher or user.school_administrator or user.teacher or user.author %}
+        <div class="section" id="teacher_notes">
+          <h3 class="left">Teacher Notes</h3>
+          <div>{{curriculum.teacher_notes|safe}}</div>
+        </div>
+      {% endif %}
+    {% endif %}
+    {% if attachments %}
+      {% if user.administrator or user.researcher or user.school_administrator or user.teacher or user.author %}
+        <div class="section" id="attachments">
+          <h3 class="left">Attachment(s) <span class="fa fa-paperclip"></span></h3>
+          <a href="{% url 'ctstem:downloadAttachments' curriculum.id%}"><h5 class="left">Download</h5></a>
+        </div>
+      {% endif %}
+    {% endif %}
+
+    {% include "ctstem_app/CurriculumPreviewActions.html" with curriculum=curriculum %}
+  </div>
   <script type="text/javascript">
     $(function(){
-      loadDataTable(true);
-
-      $('body').on('click', 'button.fa-facebook', function(){
-        window.open('https://www.facebook.com/sharer/sharer.php?u='+window.location.href+'&title={{curr_unit.title}}', 'Facebook', 'width=640,height=300');
+      $('#standards span.fa').click(function(){
+        var li = $(this).closest('li');
+        var next = $(li).next();
+        $(li).find('span.fa').toggle();
+        $(next).toggle();
       });
 
-      $('body').on('click', 'button.fa-google-plus', function(){
-        window.open('https://plus.google.com/share?url='+window.location.href+'&title={{curr_unit.title}}', 'Google+', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600');
+      $('#teacher_notes_link').click(function(){
+        $('html, body').animate({
+          scrollTop: $($(this).attr('href')).offset().top - 100,
+        }, 1000,'swing');
       });
 
-      $('body').on('click', 'button.fa-twitter', function(){
-        window.open('https://twitter.com/share?url='+window.location.href+'&text={{curr_unit.title}}', 'Twitter', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600');
-      });
-
-      $('body').on('click', 'button.fa-pinterest-p', function(){
-        window.open('http://pinterest.com/pin/create/button/?url='+encodeURI(window.location.href)+'&media={% if curr_unit.icon %}{{curr_unit.icon.url}}{% endif %}&description={{curr_unit.title}}', 'Pinterest', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600');
-      });
-      $('body').on('click', 'button.fa-envelope', function(){
-        window.location = 'mailto:?subject={{curr_unit.title}}&body='+window.location.href;
-      });
-
-
-      $('body').on('click', 'a.lesson', function(){
-        $('lesson-summary').show();
-        $('activity').hide();
-        $('faq').hide();
-        $('nav span#activity-nav').hide();
-      });
-
-      $('body').on('click', 'a.activity', function(){
-        $('main').hide();
-        $('activity').show();
-        $('faq').hide();
-      });
-      $('body').on('click', 'a.faq', function(){
-        $('lesson-summary').hide();
-        $('activity').hide();
-        $('faq').show();
-        $('nav span#activity-nav').hide();
-      });
-      $('body').on('click', 'a.list_underlying_curriculum', function(){
-        $('.underlying_curriculum').toggle();
-      });
-
-      /*$('body').on('click', 'nav#side-nav ul li a', function(){
-        $('nav#side-nav ul li a').removeClass('active');
-        $(this).addClass('active');
-      });*/
-      $('a.activity').each(function(){
-        var url = $(this).attr('href');
-        var path = window.location.pathname;
-        if(path == url) {
-          $(this).addClass('active');
-        }
-      })
-      //--------------------------------------------------------------------------
-      // right menu box animation
-      //--------------------------------------------------------------------------
-      $('#menu-button').mousedown(function() {
-        $('#side-nav').toggleClass('activated');
-        //$('header nav').toggleClass('activated');
-        //$('#side-nav').css('right', '0px');
-      });
-
-      //--------------------------------------------------------------------------
-      // Toggle favorites
-      // TODO -- needs to update the database in addition to updating the DOM
-      //--------------------------------------------------------------------------
-      $('.favorites').click(function(){
-        var url ='';
-        if ($('#favorites-icon').hasClass('fa-star')) {
-          $('#favorites-icon').removeClass('fa-star');
-          $('#favorites-icon').addClass('fa-star-o');
-          $('#favorites-link').html('Add to Favorites');
-          url = '/curriculum/removeBookmark/{{curr_unit.id}}';
-        } else {
-          $('#favorites-icon').removeClass('fa-star-o');
-          $('#favorites-icon').addClass('fa-star');
-          $('#favorites-link').html('Remove from Favorites');
-          url = '/curriculum/bookmark/{{curr_unit.id}}';
-        }
-
-        $.ajax({
-          type: "GET",
-          url: url,
-          success: function(data){
-            return false;
-          },
-          error: function(xhr, ajaxOptions, thrownError){
-            alert("Something went wrong.  Try again later!");
-          },
-        });
-        return false;
-      });
-
-      $('body').on("click", "a.assign", function(e){
-        e.preventDefault();
-        {% if user.is_anonymous or user.author  or user.researcher %}
-          alert('Please login as a teacher to assign this curriculum');
-        {% elif user.administrator and curr_unit.status == 'D'  %}
-          alert("Please make this curriculum public to assign");
-        {% elif user.teacher and user in curr_unit.authors.all and curr_unit.status == 'D' and not curr_unit.locked_by  %}
-          alert("Please lock this curriculum to assign");
-        {% else %}
-          var url = $(this).data('form');
-          $("#assignmentModal").load(url, function() {
-            $(this).modal('show');
-          });
-        {% endif %}
-        return false;
-      });
-
-      $("body").on("click", 'a.print', function(e){
-        e.preventDefault();
-        var url = $(this).attr('href');
-        var W = window.open(url, "Print", "height=10, width=10");
-        setTimeout(function () {
-          W.window.print();
-        }, 3000);
-        W.window.onfocus = function() {
-          setTimeout(function() {
-              W.window.close();
-            }, 3000);
-        }
-      });
-      //hide disabled Other text field
-      $('input[type="radio"]').on('change', function(){
-        if($(this).is(':checked')){
-          if($(this).hasClass('other')){
-            $(this).siblings('input[type="text"]').prop('disabled', false);
-          }
-          else{
-            $(this).siblings('input[type="text"]').prop('disabled', true);
-            $(this).siblings('input[type="text"]').val('');
-          }
-        }
-      });
-
-      $('select.assignment_input').on('change', function(){
-        var selected = $(this).find('option:selected');
-        if($(selected).hasClass('other')){
-          $(this).siblings('input[type="text"]').prop('disabled', false);
-        }
-        else{
-          $(this).siblings('input[type="text"]').prop('disabled', true);
-          $(this).siblings('input[type="text"]').val('');
-        }
-      });
-
-      $('a.image_option').click(function(){
-        var url = $(this).data("href");
-        $('#imageModal').find('img.popup_image').attr('src', url);
-        $('#imageModal').modal('show');
-        return false;
-      });
-
-      $('textarea.assignment_textarea').each(function(){
-        var id = $(this).attr('id');
-        CKEDITOR.replace(id, {
-            'removePlugins': 'stylesheetparser',
-            'toolbar': [['Bold', 'Italic', 'Underline', 'Strike', 'Subscript','Superscript','-','SpellChecker', 'Scayt']],
-            'height': '100',
-            'extraPlugins': 'scayt',
-            'scayt_autoStartup': true,
-            'scayt_sLang': 'en_US',
-            'disableNativeSpellChecker': false,
-        });
-      });
-
-      $('body').on("click", "a.lesson_overview_link", function(e) {
-        $(this).next().toggle();
-      });
-
-      page_numbers_position();
-
-      $(window).resize(function(){
-        page_numbers_position();
-      });
+      bind_bookmark();
     });
   </script>
-{% endwith %}
-{% endblock %}
-
-{% block footer %}
 {% endblock %}

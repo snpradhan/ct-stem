@@ -1,233 +1,401 @@
+{% extends "ctstem_app/base.html" %}
 {% load ctstem_extras %}
-<div class="page">
-  {% if step_order|add:0 == 0 %}
-    <h2>Computational Thinking in Science and Math</h2>
-    <h1>{{curriculum.title}}</h1>
-    <hr>
-    <p class="item">
-      {% if curriculum.curriculum_type == 'A' %}
-        {% if curriculum.student_overview %}
-          {{curriculum.student_overview|safe}}
-        {% endif %}
-        Thank you for taking this assessment!
-        Please do the best that you can, and don't worry if you don't know all of the answers.
-      {% elif curriculum.curriculum_type == 'L' %}
-        {% if curriculum.student_overview %}
-          {{curriculum.student_overview|safe}}
-        {% elif curriculum.unit and curriculum.unit.student_overview %}
-          {{curriculum.unit.student_overview|safe}}
-        {% endif %}
-      {% endif %}
-    {% if attachments %}
-      <div>
-        You will need additional resources to complete this assignment.  Please download them from this link <a href="{% url 'ctstem:downloadAttachments' curriculum.id%}" target="_blank">Download Attachment(s) <span class="fa fa-paperclip"></span></a>
-      </div>
+{% load base_extras %}
+
+{% block title %} {{curriculum.title}} Preview{%endblock %}
+
+{% block bootstrap_css %}
+  <link rel="stylesheet" href="{% staticfile 'css/bootstrap-modal.css' %}">
+{% endblock %}
+{% block datatable %}{% endblock %}
+{% block django_admin %}{% endblock %}
+{% block misc %}
+ <script src="https://canvasjs.com//assets/script/canvasjs.min.js"></script>
+ <script src="{% staticfile 'js/highlight.pack.js' %}"></script>
+ <script type="text/javascript" src="{% staticfile 'ckeditor/ckeditor-init.js' %}"></script>
+ <script type="text/javascript" src="{% staticfile 'ckeditor/ckeditor/ckeditor.js' %}"></script>
+ <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>
+{% endblock %}
+{% block agency %}{% endblock %}
+{% block ctstem %}
+  <script type="text/javascript" src="{% staticfile 'js/session.js' %}"></script>
+  <script type="text/javascript" src="{% staticfile 'js/clone_more.js' %}"></script>
+  <script type="text/javascript" src="{% staticfile 'js/assignment.js' %}"></script>
+  <script type="text/javascript" src="{% staticfile 'js/modal.js' %}"></script>
+{% endblock %}
+
+{% block custom_media %}
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Maitree:400,700|Roboto+Condensed:300,400,700italic" rel="stylesheet">
+  <!--script src="http://ajax.googleapis.com/ajax/libs/jquery/3.0.0/jquery.min.js"></script-->
+  <link rel="stylesheet" href="{% staticfile 'css/table.css' %}">
+  <link rel="stylesheet" href="{% staticfile 'css/messages.css' %}">
+  <link rel="stylesheet" href="{% staticfile 'css/assignment.css' %}">
+  <script type="text/javascript" src="{% staticfile 'js/jquery.form.min.js' %}"></script>
+  <link rel="stylesheet" href="{% staticfile 'css/sketch.css' %}">
+  <script type="text/javascript" src="{% staticfile 'js/sketch.js' %}"></script>
+  <script type="text/javascript" src="{% staticfile 'js/sketch_custom.js' %}"></script>
+  <script type="text/javascript" src="{% staticfile 'js/assignment.js' %}"></script>
+{% endblock %}
+
+{% block header %}{% endblock %}
+
+{% block content %}
+{% with curr_unit=curriculum.unit|default:curriculum %}
+<!--if curriculum is a unit or a lesson inside a unit then curr_unit is the unit otherwise it is the curriculum  -->
+  <div>
+    {% if curr_unit.curriculum_type == 'L' or curr_unit.curriculum_type == 'U' %}
+      <!-- Facebook share js -->
+      <div id="fb-root"></div>
+      <script>(function(d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) return;
+        js = d.createElement(s); js.id = id;
+        js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.7";
+        fjs.parentNode.insertBefore(js, fjs);
+      }(document, 'script', 'facebook-jssdk'));</script>
+      <!-- Google Plus share js -->
+      <script type="text/javascript">
+        (function() {
+          var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
+          po.src = 'https://apis.google.com/js/platform.js';
+          var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+        })();
+      </script>
     {% endif %}
-    </p>
-    <div class="save-buttons" style="text-align: center; margin-bottom: 150px; margin-top: 80px;">
-      <a href="{% url 'ctstem:previewCurriculum'  curriculum.id 1 %}">
-        <button class="continue" {% if total_steps == 0 %} disabled {% endif %}>
-          Start!
-        </button>
-      </a>
-    </div>
-  {% else %}
-    <h2>{{step.title}}</h2>
-    <hr>
-    <form method="post" enctype="multipart/form-data" id="assignmentForm">
-      <input type="hidden" name="step_order" value="{{step.order}}"/>
-      {% if instanceform %}
-        <div class="teammates">
-          {{instanceform.management_form}}
-          <label>If you are working in a team, select your teammates from the list below:</label>
-          {{instanceform.teammates}}
-          <div class="warning">{{instanceform.teammates.help_text}}</div>
-        </div>
-      {% endif %}
-      <div class="step_context">
-        {% if step.content %}
-          {{step.content|safe}}
-          <hr>
-        {% endif %}
-      </div>
-      <div class="referenced_question_container">
-      {% if step|get_referenced_questions %}
-        {% with referenced_questions=step|get_referenced_questions %}
-          <h3> Referenced Questions </h3>
-          <div class="help">These questions were answered in the previous steps.  They are provided here for your reference.</div>
-          {% for curr_question in referenced_questions %}
-            <div class="referenced_question_response">
-              <div class="question">
-                <label>Question {{curr_question.step.order}}.{{curr_question.order}}</label>
-                <div class="text">
-                  {{curr_question.question.question_text|inline_style|safe}}
-                </div>
-              </div>
-            </div>
-            {% if forloop.last == False %}
-              <hr class="light">
+    <!-- TOP HEADER BAR -->
+    <header>
+      <a class="navbar-brand" href="{% url 'ctstem:home' %}"><img src="/static/img/logo/svg/light/wide.svg"></a>
+      <span>{{curr_unit.title|title}} - Preview </span>
+      <nav>
+        <span id="activity-nav">
+        {% if step_order|add:0 >= 0 %}
+          Page &nbsp;
+          {% if step_order|add:0  == 0 %}
+            <a class="page-link selected" href="#">{{0}}</a>
+          {% else %}
+            <a class="page-link" href="{% url 'ctstem:previewCurriculumActivity' curriculum.id 0 %}">{{0}}</a>
+          {% endif %}
+          {% for i in total_steps|iterate %}
+            {% if i|add:0 == step_order|add:0 %}
+              <a class="page-link selected" href="{% url 'ctstem:previewCurriculumActivity' curriculum.id i %}">{{i}}</a>
+            {% else %}
+              <a class="page-link" href="{% url 'ctstem:previewCurriculumActivity' curriculum.id i %}">{{i}}</a>
             {% endif %}
           {% endfor %}
-        {% endwith %}
-      {% endif %}
-      </div>
-      <div class="question_container">
-        {% if step.curriculumquestion_set.all|length > 0 %}
-          <h3>Questions</h3>
-          <div class="help">Please answer the questions below.</div>
-          <div class="question_table">
-            {% for curriculumquestion in step.curriculumquestion_set.all %}
-              {% with question=curriculumquestion.question %}
-              {% with field_type=question.answer_field_type %}
-              {% if field_type != 'MH' %}
-                <div class="question_response_feedback {% if forloop.counter|divisibleby:2 %} even {% else %} odd {% endif %}">
-                  <div class="question">
-                    <label>Question {{step.order}}.{{forloop.counter}}</label>
-                    <div class="text">
-                      {{question|safe}}
-                    </div>
-                  </div>
-                  <div class="response">
-                    <div class="text">
-                      {% if field_type == 'TA' %}
-                        <textarea placeholder="Enter your response" class="form-control assignment_textarea" name="{{forloop.counter}}" id="{{forloop.counter}}" ></textarea>
-                      {% elif field_type == 'TF' %}
-                        <input type="text" placeholder="Enter your response" class="form-control" name="{{forloop.counter}}" id="{{forloop.counter}}"/>
-                      {% elif field_type == 'DD' %}
-                        <select class="form-control assignment_input" name="{{forloop.counter}}" id="{{forloop.counter}}">
-                          <option value="">--------</option>
-                          {% for option in question.options|splitlines%}
-                          <option value="{{option}}">{{option}}</option>
-                          {% endfor %}
-                          {% if question.display_other_option %}
-                            <option value="{{option}}" class="other">Other</option>
-                            <input type="text" placeholder="Enter your response" class="form-control assignment_input other" disabled/>
-                          {% endif %}
-                        </select>
-                      {% elif field_type == 'MC' %}
-                        {% for option in question.options|splitlines%}
-                          <input type="radio" name="{{question.id}}_mc" id="{{question.id}}_mc" value="{{option}}" />  {{option}}<br>
-                        {% endfor %}
-                        {% if question.display_other_option %}
-                          <input type="radio" name="{{question.id}}_mc" id="{{question.id}}_mc" value="{{option}}" class="other" />  Other<br>
-                          <input type="text" placeholder="Enter your response" class="form-control assignment_input" name="{{question.id}}_mc" id="{{question.id}}_mc" disabled/>
-                        {% endif %}
-                      {% elif field_type == 'MI' %}
-                        <div class="help warning">You may click the images below to view a larger version</div>
-                        {% for option in question.options|splitlines%}
-                          <input type="radio" name="{{question.id}}_mi" id="{{question.id}}_mi" value="{{option}}"/>
-                          <span>{{forloop.counter0|get_ascii_char}}.</span>
-                          <a data-toggle="modal" data-target="#imageModal" data-href="{{option}}" class="image_option"><img src="{{option}}" class="image_option"/></a><br><br>
-                        {% endfor %}
-                      {% elif field_type == 'MS' %}
-                        {% for option in question.options|splitlines%}
-                          <input type="checkbox" name="{{question.id}}_cb" id="{{question.id}}_cb" value="{{option}}"/>  {{option}}<br>
-                        {% endfor %}
-                      {% elif field_type == 'FI' %}
-                        <div>
-                          <table class="table table-striped table-condensed table-bordered inner_table collapsible_content">
-                            <caption>Upload files that are less than 5MB in size.</caption>
-                            <thead>
-                              <tr>
-                                <th>File</th>
-                                <th>Delete</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              <tr>
-                                <td class="attached_file">
-                                  <input type="file"/>
-                                </td>
-                                <td class="attachment_edit">
-                                  <button type="button" class="delete_attachment" name="delete_attachment" aria-label="Delete Attachment" title="Delete Attachment">
-                                    <i class="fa fa-trash" aria-hidden="true"></i>
-                                  </button>
-                                </td>
-                              </tr>
+        {% endif %}
+        </span>
+      </nav>
+    </header>
 
-                            </tbody>
-                          </table>
-                          <button type="button" class="add_attachment" id="form-response_file" title="Add New Attachment">
-                            Upload more
-                          </button>
-                        </div>
-                      {% elif field_type == 'SK' %}
-                        <div class="note"> Note: Draw your sketch in the sketchpad below </div>
-                        <div id="{{question.id}}_sketch_tools" class="sketch_tools"></div>
-                        <canvas id="{{question.id}}_sketch" width="900" height="500" class="assignment_sketch" style="{% if question.sketch_background %} background: url({{question.sketch_background.url}}) no-repeat;{% endif %}"></canvas>
-                      {% elif field_type == 'DT' %}
-                        <div class="assignment_input dt_input" id="dt_input_{{forloop.counter}}">
-                          <input type="hidden" name="dt_response_{{forloop.counter}}" id="dt_response_{{forloop.counter}}" value=''/>
-                          <input type="hidden" name="column_headers" id="dt_col_headers_{{forloop.counter}}" value="{{question.options}}"/>
-                          <table class="table table-condensed table-bordered inner_table" id="dt_table_{{forloop.counter}}">
-                            <thead>
-                            </thead>
-                            <tbody>
-                            </tbody>
-                          </table>
-                        </div>
-                      {% endif %}
-                    </div>
-                  </div>
-                </div>
-                {% if forloop.last == False %}
-                  <hr class="light">
+    <!-- MAIN CONTENT -->
+    <main>
+      <activity>
+        <div class="page">
+          {% if step_order|add:0 == 0 %}
+            <h2>Computational Thinking in Science and Math</h2>
+            <h1>{{curriculum.title}}</h1>
+            <hr>
+            <p class="item">
+              {% if curriculum.curriculum_type == 'A' %}
+                {% if curriculum.student_overview %}
+                  {{curriculum.student_overview|safe}}
                 {% endif %}
-              {% else %}
-                <table class="likert">
-                  <tbody>
-                    <tr class="likert-item">
-                      <td class="likert-number">
-                        {{forloop.counter}}.
-                      </td>
-                      <td class="likert-prompt">
-                        {{question.question_text|inline_style|safe}}
-                      </td>
-                      {% for option in question.options|splitlines%}
-                      <td class="likert-option">
-                        <input type="radio" name="{{question.id}}_s" id="{{question.id}}_s" value="{{option}}" title="{{option}}"/>
-                      </td>
-                      {% endfor %}
-                    </tr>
-                  </tbody>
-                </table>
+                Thank you for taking this assessment!
+                Please do the best that you can, and don't worry if you don't know all of the answers.
+              {% elif curriculum.curriculum_type == 'L' %}
+                {% if curriculum.student_overview %}
+                  {{curriculum.student_overview|safe}}
+                {% elif curriculum.unit and curriculum.unit.student_overview %}
+                  {{curriculum.unit.student_overview|safe}}
+                {% endif %}
               {% endif %}
-              {% endwith %}
-              {% endwith %}
-            {% endfor %}
-          </div>
-          <hr>
-        {% endif %}
-      </div>
-      {% if curriculum.curriculum_type != 'A' %}
-        <div>
-          <h3>Notes</h3>
-          <div class="help">These notes will appear on every page in this lesson so feel free to put anything here you'd like to keep track of.</div>
-          <textarea class="form-control assignment_textarea" name="notes" id="id_notes" ></textarea>
-          <hr>
-        </div>
-      {% endif %}
-      <div class="save-buttons">
-        {% if step_order|add:0 > 0 %}
-          <a href="{% url 'ctstem:previewCurriculum'  curriculum.id step_order|add:'-1' %}">
-            <button type="button" class="light back">Back</button>
-          </a>
-        {% endif %}
+            {% if attachments %}
+              <div>
+                You will need additional resources to complete this assignment.  Please download them from this link <a href="{% url 'ctstem:downloadAttachments' curriculum.id%}" target="_blank">Download Attachment(s) <span class="fa fa-paperclip"></span></a>
+              </div>
+            {% endif %}
+            </p>
+            <div class="save-buttons" style="text-align: center; margin-bottom: 150px; margin-top: 80px;">
+              <a href="{% url 'ctstem:previewCurriculumActivity'  curriculum.id 1 %}">
+                <button class="continue" {% if total_steps == 0 %} disabled {% endif %}>
+                  Start!
+                </button>
+              </a>
+            </div>
+          {% else %}
+            <h2>{{step.title}}</h2>
+            <hr>
+            <form method="post" enctype="multipart/form-data" id="assignmentForm">
+              <input type="hidden" name="step_order" value="{{step.order}}"/>
+              {% if instanceform %}
+                <div class="teammates">
+                  {{instanceform.management_form}}
+                  <label>If you are working in a team, select your teammates from the list below:</label>
+                  {{instanceform.teammates}}
+                  <div class="warning">{{instanceform.teammates.help_text}}</div>
+                </div>
+              {% endif %}
+              <div class="step_context">
+                {% if step.content %}
+                  {{step.content|safe}}
+                  <hr>
+                {% endif %}
+              </div>
+              <div class="referenced_question_container">
+              {% if step|get_referenced_questions %}
+                {% with referenced_questions=step|get_referenced_questions %}
+                  <h3> Referenced Questions </h3>
+                  <div class="help">These questions were answered in the previous steps.  They are provided here for your reference.</div>
+                  {% for curr_question in referenced_questions %}
+                    <div class="referenced_question_response">
+                      <div class="question">
+                        <label>Question {{curr_question.step.order}}.{{curr_question.order}}</label>
+                        <div class="text">
+                          {{curr_question.question.question_text|inline_style|safe}}
+                        </div>
+                      </div>
+                    </div>
+                    {% if forloop.last == False %}
+                      <hr class="light">
+                    {% endif %}
+                  {% endfor %}
+                {% endwith %}
+              {% endif %}
+              </div>
+              <div class="question_container">
+                {% if step.curriculumquestion_set.all|length > 0 %}
+                  <h3>Questions</h3>
+                  <div class="help">Please answer the questions below.</div>
+                  <div class="question_table">
+                    {% for curriculumquestion in step.curriculumquestion_set.all %}
+                      {% with question=curriculumquestion.question %}
+                      {% with field_type=question.answer_field_type %}
+                      {% if field_type != 'MH' %}
+                        <div class="question_response_feedback {% if forloop.counter|divisibleby:2 %} even {% else %} odd {% endif %}">
+                          <div class="question">
+                            <label>Question {{step.order}}.{{forloop.counter}}</label>
+                            <div class="text">
+                              {{question|safe}}
+                            </div>
+                          </div>
+                          <div class="response">
+                            <div class="text">
+                              {% if field_type == 'TA' %}
+                                <textarea placeholder="Enter your response" class="form-control assignment_textarea" name="{{forloop.counter}}" id="{{forloop.counter}}" ></textarea>
+                              {% elif field_type == 'TF' %}
+                                <input type="text" placeholder="Enter your response" class="form-control" name="{{forloop.counter}}" id="{{forloop.counter}}"/>
+                              {% elif field_type == 'DD' %}
+                                <select class="form-control assignment_input" name="{{forloop.counter}}" id="{{forloop.counter}}">
+                                  <option value="">--------</option>
+                                  {% for option in question.options|splitlines%}
+                                  <option value="{{option}}">{{option}}</option>
+                                  {% endfor %}
+                                  {% if question.display_other_option %}
+                                    <option value="{{option}}" class="other">Other</option>
+                                    <input type="text" placeholder="Enter your response" class="form-control assignment_input other" disabled/>
+                                  {% endif %}
+                                </select>
+                              {% elif field_type == 'MC' %}
+                                {% for option in question.options|splitlines%}
+                                  <input type="radio" name="{{question.id}}_mc" id="{{question.id}}_mc" value="{{option}}" />  {{option}}<br>
+                                {% endfor %}
+                                {% if question.display_other_option %}
+                                  <input type="radio" name="{{question.id}}_mc" id="{{question.id}}_mc" value="{{option}}" class="other" />  Other<br>
+                                  <input type="text" placeholder="Enter your response" class="form-control assignment_input" name="{{question.id}}_mc" id="{{question.id}}_mc" disabled/>
+                                {% endif %}
+                              {% elif field_type == 'MI' %}
+                                <div class="help warning">You may click the images below to view a larger version</div>
+                                {% for option in question.options|splitlines%}
+                                  <input type="radio" name="{{question.id}}_mi" id="{{question.id}}_mi" value="{{option}}"/>
+                                  <span>{{forloop.counter0|get_ascii_char}}.</span>
+                                  <a data-toggle="modal" data-target="#imageModal" data-href="{{option}}" class="image_option"><img src="{{option}}" class="image_option"/></a><br><br>
+                                {% endfor %}
+                              {% elif field_type == 'MS' %}
+                                {% for option in question.options|splitlines%}
+                                  <input type="checkbox" name="{{question.id}}_cb" id="{{question.id}}_cb" value="{{option}}"/>  {{option}}<br>
+                                {% endfor %}
+                              {% elif field_type == 'FI' %}
+                                <div>
+                                  <table class="table table-striped table-condensed table-bordered inner_table collapsible_content">
+                                    <caption>Upload files that are less than 5MB in size.</caption>
+                                    <thead>
+                                      <tr>
+                                        <th>File</th>
+                                        <th>Delete</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      <tr>
+                                        <td class="attached_file">
+                                          <input type="file"/>
+                                        </td>
+                                        <td class="attachment_edit">
+                                          <button type="button" class="delete_attachment" name="delete_attachment" aria-label="Delete Attachment" title="Delete Attachment">
+                                            <i class="fa fa-trash" aria-hidden="true"></i>
+                                          </button>
+                                        </td>
+                                      </tr>
 
-        {% if step_order|add:0 != total_steps %}
-          <a href="{% url 'ctstem:previewCurriculum'  curriculum.id step_order|add:'1' %}">
-            <button type="button" class="bright submit" title="Next Step" >
-              Forward
-            </button>
-          </a>
-        {% else %}
-          <a href="{% url 'ctstem:previewCurriculumNew'  curriculum.id %}">
-            <button type="button" class="bright save"  title="Submit Assignment">
-              Exit
-            </button>
-          </a>
-        {% endif %}
+                                    </tbody>
+                                  </table>
+                                  <button type="button" class="add_attachment" id="form-response_file" title="Add New Attachment">
+                                    Upload more
+                                  </button>
+                                </div>
+                              {% elif field_type == 'SK' %}
+                                <div class="note"> Note: Draw your sketch in the sketchpad below </div>
+                                <div id="{{question.id}}_sketch_tools" class="sketch_tools"></div>
+                                <canvas id="{{question.id}}_sketch" width="900" height="500" class="assignment_sketch" style="{% if question.sketch_background %} background: url({{question.sketch_background.url}}) no-repeat;{% endif %}"></canvas>
+                              {% elif field_type == 'DT' %}
+                                <div class="assignment_input dt_input" id="dt_input_{{forloop.counter}}">
+                                  <input type="hidden" name="dt_response_{{forloop.counter}}" id="dt_response_{{forloop.counter}}" value=''/>
+                                  <input type="hidden" name="column_headers" id="dt_col_headers_{{forloop.counter}}" value="{{question.options}}"/>
+                                  <table class="table table-condensed table-bordered inner_table" id="dt_table_{{forloop.counter}}">
+                                    <thead>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                  </table>
+                                </div>
+                              {% endif %}
+                            </div>
+                          </div>
+                        </div>
+                        {% if forloop.last == False %}
+                          <hr class="light">
+                        {% endif %}
+                      {% else %}
+                        <table class="likert">
+                          <tbody>
+                            <tr class="likert-item">
+                              <td class="likert-number">
+                                {{forloop.counter}}.
+                              </td>
+                              <td class="likert-prompt">
+                                {{question.question_text|inline_style|safe}}
+                              </td>
+                              {% for option in question.options|splitlines%}
+                              <td class="likert-option">
+                                <input type="radio" name="{{question.id}}_s" id="{{question.id}}_s" value="{{option}}" title="{{option}}"/>
+                              </td>
+                              {% endfor %}
+                            </tr>
+                          </tbody>
+                        </table>
+                      {% endif %}
+                      {% endwith %}
+                      {% endwith %}
+                    {% endfor %}
+                  </div>
+                  <hr>
+                {% endif %}
+              </div>
+              {% if curriculum.curriculum_type != 'A' %}
+                <div>
+                  <h3>Notes</h3>
+                  <div class="help">These notes will appear on every page in this lesson so feel free to put anything here you'd like to keep track of.</div>
+                  <textarea class="form-control assignment_textarea" name="notes" id="id_notes" ></textarea>
+                  <hr>
+                </div>
+              {% endif %}
+              <div class="save-buttons">
+                {% if step_order|add:0 > 0 %}
+                  <a href="{% url 'ctstem:previewCurriculumActivity'  curriculum.id step_order|add:'-1' %}">
+                    <button type="button" class="light back">Back</button>
+                  </a>
+                {% endif %}
+
+                {% if step_order|add:0 != total_steps %}
+                  <a href="{% url 'ctstem:previewCurriculumActivity'  curriculum.id step_order|add:'1' %}">
+                    <button type="button" class="bright submit" title="Next Step" >
+                      Forward
+                    </button>
+                  </a>
+                {% else %}
+                  <a href="{% url 'ctstem:previewCurriculum'  curriculum.id %}">
+                    <button type="button" class="bright save"  title="Submit Assignment">
+                      Exit
+                    </button>
+                  </a>
+                {% endif %}
+              </div>
+            </form>
+          {% endif %}
+        </div>
+      </activity>
+    </main>
+
+    <!-- FOOTER -->
+    {% include 'ctstem_app/CurriculumFooter.html' %}
+  </div>
+
+  <div>
+    <div class="modal fade" id="imageModal" role="dialog">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+          </div>
+          <img src="" class="popup_image"/>
+        </div>
       </div>
-    </form>
-  {% endif %}
-</div>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    $(function(){
+      loadDataTable(true);
+
+      //hide disabled Other text field
+      $('input[type="radio"]').on('change', function(){
+        if($(this).is(':checked')){
+          if($(this).hasClass('other')){
+            $(this).siblings('input[type="text"]').prop('disabled', false);
+          }
+          else{
+            $(this).siblings('input[type="text"]').prop('disabled', true);
+            $(this).siblings('input[type="text"]').val('');
+          }
+        }
+      });
+
+      $('select.assignment_input').on('change', function(){
+        var selected = $(this).find('option:selected');
+        if($(selected).hasClass('other')){
+          $(this).siblings('input[type="text"]').prop('disabled', false);
+        }
+        else{
+          $(this).siblings('input[type="text"]').prop('disabled', true);
+          $(this).siblings('input[type="text"]').val('');
+        }
+      });
+
+      $('a.image_option').click(function(){
+        var url = $(this).data("href");
+        $('#imageModal').find('img.popup_image').attr('src', url);
+        $('#imageModal').modal('show');
+        return false;
+      });
+
+      $('textarea.assignment_textarea').each(function(){
+        var id = $(this).attr('id');
+        CKEDITOR.replace(id, {
+            'removePlugins': 'stylesheetparser',
+            'toolbar': [['Bold', 'Italic', 'Underline', 'Strike', 'Subscript','Superscript','-','SpellChecker', 'Scayt']],
+            'height': '100',
+            'extraPlugins': 'scayt',
+            'scayt_autoStartup': true,
+            'scayt_sLang': 'en_US',
+            'disableNativeSpellChecker': false,
+        });
+      });
+
+    });
+  </script>
+{% endwith %}
+{% endblock %}
+
+{% block footer %}
+{% endblock %}
+

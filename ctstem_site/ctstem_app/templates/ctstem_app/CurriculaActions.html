@@ -2,15 +2,7 @@
 <!-- Preview -->
 {% check_curriculum_permission curriculum.id 'preview' as has_preview_permission %}
 {% if has_preview_permission == True %}
-  <!-- unit and stand alone curricula -->
-  {% if curriculum.unit|slugify == 'None'|slugify %}
-    <a class="util-button fa fa-eye" aria-hidden="true" title="Preview Curriculum" href="{% url 'ctstem:previewCurriculum' curriculum.id %}" target="_blank">
-    <a class="util-button fa fa-print" aria-hidden="true" title="Print" href="{% url 'ctstem:previewCurriculum' curriculum.id %}"></a>
-  {% else %}
-    <!-- underlying curricula -->
-    <a class="util-button fa fa-eye" aria-hidden="true" title="Preview Curriculum" href="{% url 'ctstem:previewCurriculum' curriculum.id 0 %}" target="_blank">
-    </a>
-  {% endif %}
+  <a class="util-button fa fa-eye" aria-hidden="true" title="Preview Curriculum" href="{% url 'ctstem:previewCurriculum' curriculum.id %}" target="_blank">
 {% endif %}
 
 <!-- Edit -->
