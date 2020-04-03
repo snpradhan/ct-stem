@@ -115,15 +115,22 @@
         <div class="section">
           <h3 class="left">Underlying Pages</h3>
           <ul class="page_links">
-          {% for step in curriculum.steps.all %}
             <li>
-              <h5 class="left inline">{{step.order}}. {{step.title}} - </h5>
-              <a href="{% url 'ctstem:previewCurriculum' curriculum.id step.order %}" target="_blank" title="Preview">
+              <h5 class="left inline">0. Student Directions - </h5>
+              <a href="{% url 'ctstem:previewCurriculum' curriculum.id 0 %}" target="_blank" title="Preview">
                 <h6 class="left inline"> Preview as Student <i class="fas fa-external-link-alt"></i></h6>
               </a>
-
             </li>
-          {% endfor %}
+
+            {% for step in curriculum.steps.all %}
+              <li>
+                <h5 class="left inline">{{step.order}}. {{step.title}} - </h5>
+                <a href="{% url 'ctstem:previewCurriculum' curriculum.id step.order %}" target="_blank" title="Preview">
+                  <h6 class="left inline"> Preview as Student <i class="fas fa-external-link-alt"></i></h6>
+                </a>
+
+              </li>
+            {% endfor %}
           </ul>
         </div>
       {% endif %}
