@@ -113,7 +113,7 @@ CKEDITOR_CONFIGS = {
         'mathJaxLib': '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_HTMLorMML',
         'codeSnippet_theme': 'monokai_sublime',
         'extraPlugins': ','.join(
-            ['mathjax', 'codesnippet', 'scayt', 'uploadimage', 'autogrow', 'pasteFromGoogleDoc']
+            ['mathjax', 'codesnippet', 'scayt', 'autogrow', 'uploadwidget', 'iframe_upload']
         ),
         'autoGrow_onStartup': True,
         'scayt_autoStartup': True,
@@ -136,7 +136,7 @@ CKEDITOR_CONFIGS = {
         'allowedContent': True,
         'mathJaxLib': '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_HTMLorMML',
         'extraPlugins': ','.join(
-            ['mathjax', 'scayt', 'uploadimage']
+            ['mathjax', 'scayt', 'uploadwidget', 'iframe_upload']
         ),
         'scayt_autoStartup': True,
         'scayt_sLang': 'en_US',

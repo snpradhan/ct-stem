@@ -6,7 +6,7 @@
 'use strict';
 
 ( function() {
-	CKEDITOR.plugins.add( 'uploadfile', {
+	CKEDITOR.plugins.add( 'iframe_upload', {
 		requires: 'uploadwidget,link',
 		init: function( editor ) {
 			// Do not execute this paste listener if it will not be possible to upload file.
