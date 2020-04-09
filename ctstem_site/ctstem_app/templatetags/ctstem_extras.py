@@ -23,6 +23,12 @@ def selected_question(question_id):
   except models.Question.DoesNotExist:
     return ''
 
+@register.simple_tag(takes_context=True)
+def replace_iframe_tag(context, text):
+  request = context.get('request')
+  revised_text = views.replace_iframe_tag(request, text)
+  return revised_text
+
 @register.filter
 def get_question(curriculum_question_id):
   try:

@@ -44,6 +44,7 @@ import logging
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from dal import autocomplete
 from django.core.cache import cache
+import re
 
 logger = logging.getLogger('django')
 
@@ -3900,7 +3901,7 @@ def question(request, id=''):
     response_data = {}
     if questionForm.is_valid():
       question = questionForm.save()
-      response_data = {'success': True, 'question_id': question.id, 'question_text': question.question_text}
+      response_data = {'success': True, 'question_id': question.id, 'question_text': replace_iframe_tag(request, question.question_text)}
     else:
       print(questionForm.errors)
       context = {'questionForm': questionForm, 'title': title, 'disable_fields': disable_fields}
@@ -4728,3 +4729,8 @@ def clear_cache(request):
     cache.clear()
     messages.success(request, "Cache cleared.")
   return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+
+def replace_iframe_tag(request, text):
+  iframe_re = re.compile(r'<iframe.*</iframe>')
+  return iframe_re.sub('<div class="iframe_replacement"><i class="far fa-file-code" title="iframe placeholder"></i></div>', text)

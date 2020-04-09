@@ -425,7 +425,10 @@
                           <td class="question_text">
                             {% if questionForm.question.value and questionForm.question.value != 'None' %}
                               {{questionForm.question.as_hidden}}
-                              <div> {{questionForm.question.value|selected_question|safe }} </div>
+                              <div>
+                                {% replace_iframe_tag questionForm.question.value|selected_question as revised_test %}
+                                {{ revised_test|safe }}
+                              </div>
                             {% else %}
                               {{questionForm.question.as_hidden}}
                               <div></div>

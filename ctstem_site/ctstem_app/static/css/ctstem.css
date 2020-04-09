@@ -415,6 +415,10 @@ div.question_table div.question_text, div.question_table div.answer_field, div.q
   margin-bottom: 1em;
 }
 
+div.question_table div.iframe_replacement i {
+  font-size: 5em;
+}
+
 div.table.stepPreview h3.activity_title {
   text-decoration: underline;
 }
