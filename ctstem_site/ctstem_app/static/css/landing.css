@@ -321,6 +321,7 @@
   border-radius: 3px;
   height: auto;
   max-width: 100%;
+  width: unset;
 }
 
 #home .block#four .tile.yellow {
