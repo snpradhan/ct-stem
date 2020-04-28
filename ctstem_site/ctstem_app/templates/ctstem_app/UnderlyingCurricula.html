@@ -23,10 +23,10 @@
         {{curr.title}} - v{{curr.version}}.
         {% get_curriculum_locked_by curr.id as locked_by %}
         {% if locked_by %}
-          {% if user.administrator or user.researcher or user.author %}
+          {% if user.administrator or user.author %}
             <i class="fa fa-lock" aria-hidden="true" title="Locked by {{locked_by}}"></i>
-          {% elif user.teacher %}
-            {% if user in curr.authors.all or user.teacher in curr.shared_with.all or user.teacher in curriculum.shared_with.all %}
+          {% elif user.teacher or user.researcher %}
+            {% if user in curr.collaborators.all or user in curriculum.collaborators.all %}
               <i class="fa fa-lock" aria-hidden="true" title="Locked by {{locked_by}}"></i>
             {% endif %}
           {% endif %}

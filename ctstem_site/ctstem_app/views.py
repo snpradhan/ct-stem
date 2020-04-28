@@ -139,21 +139,21 @@ def curricula(request, bucket='unit', status='public'):
 
   elif bucket == 'teacher_authored' and (hasattr(request.user, 'administrator') or hasattr(request.user, 'author')):
     stat = ['D', 'P', 'A']
-    curricula = curricula.filter(unit__isnull=True, curriculum_type__in = curriculum_type, status__in = stat, authors__teacher__isnull=False).distinct()
+    curricula = curricula.filter(unit__isnull=True, curriculum_type__in = curriculum_type, status__in = stat, curriculumcollaborator__user__teacher__isnull=False, curriculumcollaborator__privilege='E').distinct()
   elif bucket == 'deleted' and hasattr(request.user, 'administrator'):
     stat = ['R']
     curricula = curricula.filter(unit__isnull=True, curriculum_type__in = curriculum_type, status__in = stat).distinct()
   elif bucket == 'my' and (hasattr(request.user, 'teacher') or hasattr(request.user, 'researcher')):
     stat = ['D', 'P', 'A']
-    curricula = curricula.filter(unit__isnull=True, curriculum_type__in = curriculum_type, status__in = stat, authors=request.user)
+    curricula = curricula.filter(unit__isnull=True, curriculum_type__in = curriculum_type, status__in = stat, curriculumcollaborator__user=request.user, curriculumcollaborator__privilege='E')
   elif bucket == 'favorite' and hasattr(request.user, 'teacher'):
     stat = ['P']
-    curricula = curricula.filter(Q(unit__isnull=True), Q(curriculum_type__in=curriculum_type), Q(bookmarked__teacher=request.user.teacher), Q(status__in=stat) | Q(shared_with=request.user.teacher)).distinct()
-  elif bucket == 'shared' and hasattr(request.user, 'teacher'):
+    curricula = curricula.filter(Q(unit__isnull=True), Q(curriculum_type__in=curriculum_type), Q(bookmarked__teacher=request.user.teacher), Q(status__in=stat) | (Q(curriculumcollaborator__user=request.user) & Q(curriculumcollaborator__privilege='V'))).distinct()
+  elif bucket == 'shared' and (hasattr(request.user, 'teacher') or hasattr(request.user, 'researcher')):
     stat = ['D', 'P']
-    shared_lessons = curricula.filter(unit__isnull=False, curriculum_type__in = 'L', status__in = stat, shared_with=request.user.teacher).distinct()
+    shared_lessons = curricula.filter(unit__isnull=False, curriculum_type__in = 'L', status__in = stat, curriculumcollaborator__user=request.user, curriculumcollaborator__privilege='V').distinct()
     shared_lessons_units = shared_lessons.values_list('unit', flat=True)
-    curricula = curricula.filter(Q(unit__isnull=True), Q(curriculum_type__in = curriculum_type), Q(status__in = stat), Q(shared_with=request.user.teacher) | Q(id__in=shared_lessons_units)).distinct()
+    curricula = curricula.filter(Q(unit__isnull=True), Q(curriculum_type__in = curriculum_type), Q(status__in = stat), (Q(curriculumcollaborator__user=request.user) & Q(curriculumcollaborator__privilege='V')) | Q(id__in=shared_lessons_units)).distinct()
   else:
     curricula = None
     messages.error(request, "There are no curricula for the requested category.")
@@ -214,12 +214,13 @@ def curriculum(request, id=''):
 
     if request.method == 'GET':
       initial_author_data = []
+      initial_collaborator_data = []
       if '' == id:
         initial_author_data = [{'author': request.user, 'ORDER': 1}]
+        initial_collaborator_data = [{'user': request.user, 'ORDER': 1, 'privilege': 'E'}]
       form = forms.CurriculumForm(user=request.user, instance=curriculum, prefix='curriculum')
       #AssessmentStepFormSet = inlineformset_factory(models.Assessment, models.AssessmentStep, form=forms.AssessmentStepForm,can_delete=True, can_order=True, extra=1)
-
-      AuthorFormSet = inlineformset_factory(models.Curriculum, models.CurriculumAuthor, form=forms.CurriculumAuthorForm, can_delete=True, can_order=True, extra=len(initial_author_data)+1)
+      CollaboratorFormSet = inlineformset_factory(models.Curriculum, models.CurriculumCollaborator, form=forms.CurriculumCollaboratorForm, can_delete=True, can_order=True, extra=len(initial_collaborator_data)+1)
 
       StepFormSet = nestedformset_factory(models.Curriculum, models.Step, form=forms.StepForm,
                                                     nested_formset=inlineformset_factory(models.Step, models.CurriculumQuestion, form=forms.CurriculumQuestionForm, can_delete=True, can_order=True, extra=1),
@@ -227,13 +228,14 @@ def curriculum(request, id=''):
       AttachmentFormSet = inlineformset_factory(models.Curriculum, models.Attachment, form=forms.AttachmentForm, can_delete=True, extra=1)
 
       formset = StepFormSet(instance=curriculum, prefix='form')
-      author_formset = AuthorFormSet(instance=curriculum, prefix='author_form')
-      if initial_author_data:
-        for subform, author_data in zip(author_formset.forms, initial_author_data):
-          subform.initial = author_data
+      collaborator_formset = CollaboratorFormSet(instance=curriculum, prefix='collaborator_form')
+
+      if initial_collaborator_data:
+        for subform, collaborator_data in zip(collaborator_formset.forms, initial_collaborator_data):
+          subform.initial = collaborator_data
 
       attachment_formset = AttachmentFormSet(instance=curriculum, prefix='attachment_form')
-      context = {'form': form, 'attachment_formset': attachment_formset, 'author_formset': author_formset, 'formset':formset, 'newQuestionForm': newQuestionForm, 'back_url': back_url }
+      context = {'form': form, 'attachment_formset': attachment_formset, 'collaborator_formset': collaborator_formset, 'formset':formset, 'newQuestionForm': newQuestionForm, 'back_url': back_url }
       return render(request, 'ctstem_app/Curriculum.html', context)
 
     elif request.method == 'POST':
@@ -243,30 +245,29 @@ def curriculum(request, id=''):
 
       form = forms.CurriculumForm(user=request.user, data=data, files=request.FILES, instance=curriculum, prefix="curriculum")
       #AssessmentStepFormSet = inlineformset_factory(models.Assessment, models.AssessmentStep, form=forms.AssessmentStepForm,
-                                                    #can_delete=True, can_order=True, extra=0)
-      AuthorFormSet = inlineformset_factory(models.Curriculum, models.CurriculumAuthor, form=forms.CurriculumAuthorForm, can_delete=True, can_order=True, extra=1)
-
+      CollaboratorFormSet = inlineformset_factory(models.Curriculum, models.CurriculumCollaborator, form=forms.CurriculumCollaboratorForm, can_delete=True, can_order=True, extra=1)
       StepFormSet = nestedformset_factory(models.Curriculum, models.Step, form=forms.StepForm,
                                                     nested_formset=inlineformset_factory(models.Step, models.CurriculumQuestion, form=forms.CurriculumQuestionForm, can_delete=True, can_order=True, extra=1),
                                                     can_delete=True, can_order=True, extra=1)
       AttachmentFormSet = inlineformset_factory(models.Curriculum, models.Attachment, form=forms.AttachmentForm, can_delete=True, extra=1)
 
       formset = StepFormSet(data, instance=curriculum, prefix='form')
-      author_formset = AuthorFormSet(data, instance=curriculum, prefix='author_form')
+      collaborator_formset = CollaboratorFormSet(data, instance=curriculum, prefix='collaborator_form')
+
       attachment_formset = AttachmentFormSet(data, request.FILES, instance=curriculum, prefix='attachment_form')
 
-      if form.is_valid() and formset.is_valid() and author_formset.is_valid() and attachment_formset.is_valid():
+      if form.is_valid() and formset.is_valid() and collaborator_formset.is_valid() and attachment_formset.is_valid():
         savedCurriculum = form.save()
 
         #make sure curriculum order is present and unique in a unit
         if savedCurriculum.curriculum_type != 'U' and savedCurriculum.unit:
           reorder_underlying_curricula(request, savedCurriculum.unit.id)
 
-        author_formset.save(commit=False)
-        for authorform in author_formset.ordered_forms:
-          authorform.instance.order = authorform.cleaned_data['ORDER']
-          authorform.instance.save()
-        for obj in author_formset.deleted_objects:
+        collaborator_formset.save(commit=False)
+        for collaboratorform in collaborator_formset.ordered_forms:
+          collaboratorform.instance.order = collaboratorform.cleaned_data['ORDER']
+          collaboratorform.instance.save()
+        for obj in collaborator_formset.deleted_objects:
           obj.delete()
 
         attachment_formset.save()
@@ -304,7 +305,7 @@ def curriculum(request, id=''):
         print(form.errors)
         print(formset.errors)
         print(attachment_formset.errors)
-        print(author_formset.errors)
+        print(collaborator_formset.errors)
         if request.is_ajax():
           response_data = {'status': 0, 'message': 'The preview could not be generated because some mandatory fields are missing.  Please manually save the curriculum to see specific errors.'}
           return http.HttpResponse(json.dumps(response_data), content_type = 'application/json')
@@ -314,7 +315,7 @@ def curriculum(request, id=''):
             messages.error(request, "The preview could not be generated because some mandatory fields are missing.")
           else:
             messages.error(request, "The curriculum could not be saved because there were errors.  Please check the errors below.")
-          context = {'form': form, 'attachment_formset': attachment_formset, 'author_formset': author_formset, 'formset':formset, 'newQuestionForm': newQuestionForm, 'back_url': back_url}
+          context = {'form': form, 'attachment_formset': attachment_formset, 'collaborator_formset': collaborator_formset, 'formset':formset, 'newQuestionForm': newQuestionForm, 'back_url': back_url}
           return render(request, 'ctstem_app/Curriculum.html', context)
 
     return http.HttpResponseNotAllowed(['GET', 'POST'])
@@ -582,7 +583,7 @@ def copyCurriculum(request, id=''):
         #unit copy
         #copy underlying lessons
         if hasattr(request.user, 'teacher'):
-          underlying_curriculum =  original_curriculum.underlying_curriculum.all().filter(Q(status='P') | Q(authors=request.user) | Q(shared_with=request.user.teacher)).exclude(status='R').distinct()
+          underlying_curriculum =  original_curriculum.underlying_curriculum.all().filter(Q(status='P') | Q(collaborators=request.user)).exclude(status='R').distinct()
         else:
           underlying_curriculum = original_curriculum.underlying_curriculum.all().exclude(status='R').distinct()
 
@@ -612,7 +613,7 @@ def copyCurriculumMeta(request, id=''):
     steps = models.Step.objects.all().filter(curriculum=curriculum)
     attachments = models.Attachment.objects.all().filter(curriculum=curriculum)
     title = curriculum.title
-    authors = models.CurriculumAuthor.objects.all().filter(curriculum=curriculum)
+    collaborators = models.CurriculumCollaborator.objects.all().filter(curriculum=curriculum)
     #curriculum.title = str(datetime.datetime.now())
     curriculum.pk = None
     curriculum.id = None
@@ -669,15 +670,22 @@ def copyCurriculumMeta(request, id=''):
         except IOError as e:
           continue
 
-    #copy authors to new curriculum
-    for author in authors:
-      author.pk = None
-      author.id = None
-      author.curriculum = curriculum
-      author.save()
+    #copy collaborators to new curriculum
+    for collaborator in collaborators:
+      collaborator.pk = None
+      collaborator.id = None
+      collaborator.curriculum = curriculum
+      collaborator.save()
 
-    if request.user not in curriculum.authors.all():
-      author = models.CurriculumAuthor.objects.create(curriculum=curriculum, author=request.user, order=len(authors)+1)
+    author_count = models.CurriculumCollaborator.objects.all().filter(curriculum=curriculum, privilege='E').count()
+    if request.user not in curriculum.collaborators.all():
+      author = models.CurriculumCollaborator.objects.create(curriculum=curriculum, user=request.user, privilege='E', order=author_count+1)
+    else:
+      author = models.CurriculumCollaborator.objects.get(curriculum=curriculum, user=request.user)
+      if author.privilege != 'E':
+        author.privilege = 'E'
+        author.order = author_count + 1
+        author.save()
 
     return curriculum
   else:
@@ -1467,7 +1475,7 @@ def deleteUser(request, id=''):
 # authored by this user to an admin
 ####################################
 def transferCurriculum(request, user):
-  curricula = models.Curriculum.objects.all().filter(authors__in=[user])
+  curricula = models.Curriculum.objects.all().filter(curriculumcollaborator__user=user, curriculumcollaborator__privilege='E')
   flag = True
   if len(curricula) > 0:
     #get an admin to transfer the curriculum ownership to
@@ -1475,9 +1483,8 @@ def transferCurriculum(request, user):
     if admin:
       for curriculum in curricula:
         # if the curriculum has only one author, set the author to an admin
-        if curriculum.authors.count() == 1:
-          curriculum.authors.add(admin.user)
-          curriculum.save()
+        if models.CurriculumCollaborator.objects.all().filter(curriculum=curriculum, privilege='E').count() == 1:
+          models.CurriculumCollaborator.objects.create(curriculum=curriculum, user=admin.user, order=1, privilege='E')
       messages.success(request, 'Curriculum owned by %s has been trasferred to %s' % (user.username, admin.user.username))
     else:
       messages.success(request, 'No admins exists to transfer ownership of curriculum authored by %s. So the user cannot be deleted.' % user.username)
@@ -1790,6 +1797,7 @@ def searchStudents(request):
 
   return http.HttpResponseNotAllowed(['GET', 'POST'])
 
+
 ####################################
 # Search Teachers
 ####################################
@@ -1825,18 +1833,18 @@ def searchTeachers(request):
   return http.HttpResponseNotAllowed(['GET', 'POST'])
 
 ####################################
-# Search Curriculum Authors
+# Search Curriculum Collaborators
 ####################################
 @login_required
-def searchAuthors(request):
-  # check if the user has permission search Authors
-  if hasattr(request.user, 'teacher') == False and hasattr(request.user, 'school_administrator') == False and hasattr(request.user, 'author') == False and hasattr(request.user, 'administrator') == False:
-    return http.HttpResponseNotFound('<h1>You do not have the privilege search authors</h1>')
+def searchCollaborators(request):
+  # check if the user has permission search Collaborators
+  if request.user.is_anonymous or hasattr(request.user, 'student') == True:
+    return http.HttpResponseNotFound('<h1>You do not have the privilege search collaborators</h1>')
 
   if 'GET' == request.method:
-    authorSearchForm = forms.UserSearchForm()
-    context = {'authorSearchForm': authorSearchForm}
-    return render(request, 'ctstem_app/CurriculumAuthorSearch.html', context)
+    collaboratorSearchForm = forms.UserSearchForm()
+    context = {'collaboratorSearchForm': collaboratorSearchForm}
+    return render(request, 'ctstem_app/CurriculumCollaboratorSearch.html', context)
 
   elif 'POST' == request.method:
     data = request.POST.copy()
@@ -1851,19 +1859,18 @@ def searchAuthors(request):
     if data['email']:
       query_filter['email__icontains'] = str(data['email'])
 
-    if hasattr(request.user, 'teacher') or hasattr(request.user, 'school_administrator'):
-      authorList = User.objects.filter(teacher__isnull=False).exclude(id=request.user.id)
+    if hasattr(request.user, 'teacher') or hasattr(request.user, 'school_administrator') or hasattr(request.user, 'researcher'):
+      collaboratorList = User.objects.filter(Q(teacher__isnull=False) | Q(researcher__isnull=False)).exclude(id=request.user.id)
     else:
-      authorList = User.objects.filter(Q(administrator__isnull=False) | Q(researcher__isnull=False) | Q(author__isnull=False) |  Q(teacher__isnull=False))
+      collaboratorList = User.objects.filter(Q(administrator__isnull=False) | Q(researcher__isnull=False) | Q(author__isnull=False) |  Q(teacher__isnull=False))
 
-    authorList = authorList.filter(**query_filter).order_by('first_name', 'last_name')
-    author_list = [{'user_id': user.id, 'username': user.username, 'name': user.get_full_name(),
+    collaboratorList = collaboratorList.filter(**query_filter).order_by('first_name', 'last_name')
+    collaborator_list = [{'user_id': user.id, 'username': user.username, 'name': user.get_full_name(),
                      'email': user.email}
-                for user in authorList]
-    return http.HttpResponse(json.dumps(author_list), content_type="application/json")
+                for user in collaboratorList]
+    return http.HttpResponse(json.dumps(collaborator_list), content_type="application/json")
 
   return http.HttpResponseNotAllowed(['GET', 'POST'])
-
 ####################################
 # USER LIST
 ####################################
@@ -2027,8 +2034,8 @@ def searchCurricula(request, queryset, search_criteria):
   query_filter = Q(title__icontains=search_criteria)
   query_filter.add(Q(subject__name__icontains=search_criteria), Q.OR)
   query_filter.add(Q(time__icontains=search_criteria), Q.OR)
-  query_filter.add(Q(authors__first_name__icontains=search_criteria), Q.OR)
-  query_filter.add(Q(authors__last_name__icontains=search_criteria), Q.OR)
+  query_filter.add(Q(curriculumcollaborator__user__first_name__icontains=search_criteria), Q.OR)
+  query_filter.add(Q(curriculumcollaborator__user__last_name__icontains=search_criteria), Q.OR)
   query_filter.add(Q(taxonomy__title__icontains=search_criteria), Q.OR)
   query_filter.add(Q(taxonomy__category__name__icontains=search_criteria), Q.OR)
   query_filter.add(Q(taxonomy__category__standard__name__icontains=search_criteria), Q.OR)
@@ -3367,6 +3374,17 @@ def check_curriculum_permission(request, curriculum_id, action, step_order=-1):
         messages.error(request, 'You do not have the privilege to create a new curriculum')
     else:
       curriculum = models.Curriculum.objects.get(id=curriculum_id)
+      #collaborator privileges
+      has_edit_privilege = has_view_privilege = False
+      if is_admin or is_researcher or is_author or is_school_admin or is_teacher:
+        has_edit_privilege = models.CurriculumCollaborator.objects.all().filter(curriculum=curriculum, user=request.user, privilege='E').count()
+        has_view_privilege = models.CurriculumCollaborator.objects.all().filter(curriculum=curriculum, user=request.user, privilege='V').count()
+        if curriculum.unit:
+          if not has_edit_privilege:
+            has_edit_privilege = models.CurriculumCollaborator.objects.all().filter(curriculum=curriculum.unit, user=request.user, privilege='E').count()
+          if not has_view_privilege:
+            has_view_privilege = models.CurriculumCollaborator.objects.all().filter(curriculum=curriculum.unit, user=request.user, privilege='V').count()
+
       if curriculum.status == 'R':
         if is_admin and action == 'restore':
           has_permission = True
@@ -3378,9 +3396,7 @@ def check_curriculum_permission(request, curriculum_id, action, step_order=-1):
             has_permission = True
           # teacher and researcher can only copy units, stand alone lessons, assessments that are public or something that they own
           elif is_teacher or is_researcher:
-            if request.user in curriculum.authors.all():
-              has_permission = True
-            elif curriculum.unit and request.user in curriculum.unit.authors.all():
+            if has_edit_privilege:
               has_permission = True
             elif curriculum.status == 'P' and curriculum.unit is None:
               has_permission = True
@@ -3414,9 +3430,7 @@ def check_curriculum_permission(request, curriculum_id, action, step_order=-1):
                 has_permission = True
               # teacher and researcher can only edit their own curriculum that is unlocked
               elif is_teacher or is_researcher:
-                if request.user in curriculum.authors.all():
-                  has_permission = True
-                elif curriculum.unit and request.user in curriculum.unit.authors.all():
+                if has_edit_privilege:
                   has_permission = True
                 else:
                   has_permission = False
@@ -3451,9 +3465,7 @@ def check_curriculum_permission(request, curriculum_id, action, step_order=-1):
           elif is_admin or is_author:
             has_permission = True
           elif is_teacher or is_researcher:
-            if is_teacher and request.user in curriculum.authors.all():
-              has_permission = True
-            elif is_teacher and curriculum.unit and request.user in curriculum.unit.authors.all():
+            if has_edit_privilege:
               has_permission = True
             else:
               has_permission = False
@@ -3479,18 +3491,12 @@ def check_curriculum_permission(request, curriculum_id, action, step_order=-1):
           #allow everyone to preview public curricula
           if curriculum.status == 'P':
             has_permission = True
-          # admin, researcher and author can preview any curricula
-          elif is_admin or is_researcher or is_author:
+          # admin, author can preview any curricula
+          elif is_admin or is_author:
             has_permission = True
           # teacher can only preview curriculum that are public, shared with them or that they own
-          elif is_teacher:
-            if request.user in curriculum.authors.all():
-              has_permission = True
-            elif curriculum.unit and request.user in curriculum.unit.authors.all():
-              has_permission = True
-            elif request.user.teacher in curriculum.shared_with.all():
-              has_permission = True
-            elif curriculum.unit and request.user.teacher in curriculum.unit.shared_with.all():
+          elif is_teacher or is_researcher:
+            if has_edit_privilege or has_view_privilege:
               has_permission = True
             elif curriculum.curriculum_type == 'U':
               for lesson in curriculum.underlying_curriculum.all():
@@ -3511,13 +3517,7 @@ def check_curriculum_permission(request, curriculum_id, action, step_order=-1):
               if is_admin:
                 has_permission = True
               elif is_teacher:
-                if request.user in curriculum.authors.all():
-                  has_permission = True
-                elif curriculum.unit and request.user in curriculum.unit.authors.all():
-                  has_permission = True
-                elif request.user.teacher in curriculum.shared_with.all():
-                  has_permission = True
-                elif curriculum.unit and request.user.teacher in curriculum.unit.shared_with.all():
+                if has_edit_privilege or has_view_privilege:
                   has_permission = True
           else:
             #allow a unit to be assigned only if at least one of the underlying lessons can be assigned by the user
@@ -3532,12 +3532,10 @@ def check_curriculum_permission(request, curriculum_id, action, step_order=-1):
           if curriculum.status == 'P' or curriculum.status == 'A':
             if is_admin or is_researcher or is_school_admin or is_teacher:
               has_permission = True
-          #only teachers can export student data of private curriculum that they own
+          #only teachers and researchers can export student data of private curriculum that they own
           elif curriculum.status == 'D':
             if is_researcher or is_teacher:
-              if request.user in curriculum.authors.all():
-                has_permission = True
-              elif curriculum.unit and request.user in curriculum.unit.authors.all():
+              if has_edit_privilege:
                 has_permission = True
 
           if not has_permission:
@@ -3546,7 +3544,7 @@ def check_curriculum_permission(request, curriculum_id, action, step_order=-1):
         ############ FAVORITE ############
         elif action == 'favorite':
           # a teacher who is not the author can mark a curriculum as favorite
-          if is_teacher and request.user not in curriculum.authors.all() and curriculum.unit is None:
+          if is_teacher and not has_edit_privilege and curriculum.unit is None:
             has_permission = True
 
           if not has_permission:

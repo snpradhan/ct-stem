@@ -73,11 +73,7 @@
             {% if user.teacher and user.teacher.id != form.teacher.value and user.teacher.id in form.shared_with.value %}
               {{form.shared_with.as_hidden}}
             {% else %}
-              <div class="form-group">
-                <label for="id_group-coteachers">{{ form.shared_with.label }} {% if form.shared_with.field.required %}(<span class="required">*</span>){% endif %} </label>
-                {% include "ctstem_app/SharedTeachers.html" with resource='group' field=form.shared_with %}
-                <div class="help warning">{{form.shared_with.help_text|safe}}</div>
-              </div>
+              {% include "ctstem_app/SharedTeachers.html"%}
             {% endif %}
             <div class="form-group">
               <label for="id_group-description">{{ form.description.label }} {% if form.description.field.required %}(<span class="required">*</span>){% endif %} </label>

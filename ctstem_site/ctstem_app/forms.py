@@ -481,7 +481,7 @@ class CurriculumForm(ModelForm):
 
   class Meta:
     model = models.Curriculum
-    fields = ['curriculum_type', 'unit', 'order', 'feature_rank', 'title', 'icon', 'time', 'level', 'overview', 'student_overview', 'acknowledgement', 'credits', 'status', 'subject', 'compatible_system', 'taxonomy', 'teacher_notes', 'shared_with']
+    fields = ['curriculum_type', 'unit', 'order', 'feature_rank', 'title', 'icon', 'time', 'level', 'overview', 'student_overview', 'acknowledgement', 'credits', 'status', 'subject', 'compatible_system', 'taxonomy', 'teacher_notes']
 
     widgets = {
       'title': forms.TextInput(attrs={'placeholder': 'Lesson Title'}),
@@ -494,7 +494,6 @@ class CurriculumForm(ModelForm):
       'taxonomy': forms.SelectMultiple(attrs={'size':5}),
       'subject': forms.SelectMultiple(attrs={'size':4}),
       'compatible_system': forms.SelectMultiple(attrs={'size':6}),
-      'shared_with': forms.SelectMultiple(attrs={'size':10}),
       'acknowledgement': forms.Textarea(attrs={'rows':0, 'cols':60}),
       'credits': forms.Textarea(attrs={'rows':0, 'cols':60}),
     }
@@ -508,7 +507,7 @@ class CurriculumForm(ModelForm):
     self.fields['unit'].queryset = models.Curriculum.objects.filter(curriculum_type='U').order_by(Lower('title'), 'version')
     self.fields['unit'].label_from_instance = lambda obj: "%s - v%d." % (obj.title, obj.version)
     if hasattr(usr, 'teacher') or hasattr(usr, 'researcher'):
-      self.fields['unit'].queryset = models.Curriculum.objects.filter(curriculum_type='U', authors=usr).order_by(Lower('title'), 'version')
+      self.fields['unit'].queryset = models.Curriculum.objects.filter(curriculum_type='U', curriculumcollaborator__user=usr, curriculumcollaborator__privilege='E').order_by(Lower('title'), 'version')
       self.fields.pop('status')
       self.fields.pop('feature_rank')
     else:
@@ -628,13 +627,19 @@ class AttachmentForm(ModelForm):
     return valid
 
 ####################################
-# Curriculum Author Form
+# Curriculum Collaborator Form
 ####################################
-class CurriculumAuthorForm(ModelForm):
+class CurriculumCollaboratorForm(ModelForm):
 
   class Meta:
-    model = models.CurriculumAuthor
+    model = models.CurriculumCollaborator
     exclude = ('order',)
+
+  def __init__(self, *args, **kwargs):
+    super(CurriculumCollaboratorForm, self).__init__(*args, **kwargs)
+    for field_name, field in list(self.fields.items()):
+      field.widget.attrs['class'] = 'form-control'
+      field.widget.attrs['placeholder'] = field.help_text
 
 ####################################
 # Curriculum Question Form

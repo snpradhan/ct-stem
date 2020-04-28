@@ -1,0 +1,126 @@
+<div class="modal-dialog modal-lg">
+  <div class="modal-content">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal">&times;</button>
+      <h3 class="modal-title">Search Collaborators</h3>
+    </div>
+    <div id="collaboratorMsg" class="msg">
+    </div>
+    <form class="form" id="collaboratorForm" method="post" action="{% url 'ctstem:searchCollaborators' %}">
+      {% csrf_token %}
+      <div class="modal-body">
+        <div class="form-inline">
+          <div class="form-group">
+            <label for="id_username">Username</label>
+            <div>{{collaboratorSearchForm.username}}</div>
+          </div>
+          <div class="form-group">
+            <label for="id_first_name">First Name</label>
+            <div>{{collaboratorSearchForm.first_name}}</div>
+          </div>
+          <div class="form-group">
+            <label for="id_last_name">Last Name</label>
+            <div>{{collaboratorSearchForm.last_name}}</div>
+          </div>
+          <div class="form-group">
+            <label for="id_email">Email</label>
+            <div>{{collaboratorSearchForm.email}}</div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div class="form-group button-row">
+          <button type="submit" id="search" class="btn btn-success">
+            Search
+          </button>
+        </div>
+      </div>
+    </form>
+    <div id="collaboratorResults" style="display:none;" class="results">
+      <table class="table table-bordered table-striped table-condensed inner_table">
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Share?</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+<script type="text/javascript">
+$(function (){
+
+    $("#collaboratorForm").submit(function(e) {
+
+    e.preventDefault();
+    $("#collaboratorResults table tbody").empty();
+
+
+    /*var url = "{% url 'ctstem:newQuestion' %}";*/
+    $.ajax({
+      type: $(this).attr('method'),
+      url: this.action,
+      data: $(this).serialize(),
+      context: this,
+      success: function(data){
+        if('error' in data){
+          $('#collaboratorMsg').html(data['error']);
+        }
+        else {
+          var collaborator = "";
+          $.each(data, function(key, value){
+            if($('table.table#collaborators tr#user_'+value['user_id']).length == 0){
+              collaborator += "<tr><td class='username'>"+value['username']+"</td><td class='full_name'>"+value['name']+"</td><td class='email'>"+value['email']+"</td><td><button type='button' class='btn btn-info select_collaborator' id='"+value['user_id']+"'>Add</a></td></tr>";
+            }
+          });
+
+          if(collaborator.length == 0){
+            $('#collaboratorMsg').html('No matching collaborators found');
+            $("#collaboratorResults").hide();
+          }
+          else{
+            $('#collaboratorMsg').html('');
+            $("#collaboratorResults table tbody").append(collaborator);
+            $("#collaboratorResults").show();
+            $("#collaboratorResults button.select_collaborator").click(function(){
+              var collaborator_table = $('table.table#collaborators');
+              var collaborator_result_row = $(this).closest('tr');
+              var username = $(collaborator_result_row).find('td.username').html();
+              var full_name = $(collaborator_result_row).find('td.full_name').html();
+              var email = $(collaborator_result_row).find('td.email').html();
+              cloneMore($(collaborator_table).find('tbody tr:last'), 'collaborator_form');
+              var collaborator_row = $(collaborator_table).find("tbody tr:nth-last-child(2)");
+
+              $(collaborator_row).find("td.username input[type=hidden]").val($(this).attr('id'));
+              $(collaborator_row).find("td.username div").html(username);
+              $(collaborator_row).find("td.full_name").html(full_name);
+              $(collaborator_row).find("td.email").html(email);
+              $(collaborator_row).attr("id", "user_"+$(this).attr('id'));
+              $(collaborator_row).find("td.order input[id$='ORDER']").prop('disabled', 'disabled').hide();
+              $(collaborator_row).find("td.edit_view select").val('V');
+              $(collaborator_row).show();
+
+              rowAddorRemove($('table#collaborators'));
+
+              $(this).attr('disabled', 'disabled');
+            });
+          }
+        }
+        return false;
+      },
+      error: function(xhr, ajaxOptions, thrownError){
+        alert(thrownError);
+      },
+    });
+  });
+
+});
+
+</script>

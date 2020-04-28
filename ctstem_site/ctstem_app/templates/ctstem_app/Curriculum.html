@@ -99,9 +99,7 @@
                 </div>
               </div>
 
-              {% include "ctstem_app/CurriculumAuthors.html"%}
-
-              {% include "ctstem_app/SharedTeachers.html" with resource='curriculum'%}
+              {% include "ctstem_app/CurriculumCollaborators.html"%}
 
               <!-- ORDER -->
               <div class="form-group">
@@ -656,7 +654,6 @@
 
         //for all curriculum types, display author table, title, status, icon, time, teacher overview, student direction, acknowledgement, attachment table
         if($(this).val() == 'U' || $(this).val() == 'L' || $(this).val() == 'A') {
-          $('#id_curriculum-authors').closest('.form-group').show();
           $('#id_curriculum-title').closest('.form-group').show();
           $('#id_curriculum-status').closest('.form-group').show();
           $('#id_curriculum-icon').closest('.form-group').show();
@@ -669,7 +666,7 @@
           $('div.form-group.attachment_table').show();
           $('#id_curriculum-acknowledgement').closest('.form-group').show();
           $('#id_curriculum-credits').closest('.form-group').show();
-          $('div.form-group.author_table').show();
+          $('div.form-group.collaborator_table').show();
         }
 
         //for unit, stand alone lesson and assessment display level and taxonomy
@@ -701,11 +698,6 @@
         else{
           //reset the unit field
           $('#id_curriculum-unit').prop('selectedIndex', 0);
-        }
-
-        //for unit and lesson, display shared with table
-        if($(this).val() == 'U' || $(this).val() == 'L') {
-          $('select#id_curriculum-shared_with').closest('.form-group').show();
         }
 
         //for lesson, assessment show the steps and Add Step button

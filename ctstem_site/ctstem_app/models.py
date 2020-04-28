@@ -33,6 +33,11 @@ CURRICULUM_TYPE_CHOICES = (
     ('A', 'Assessment'),
 )
 
+CURRICULUM_PRIVILEGE_CHOICES = (
+    ('V', 'View'),
+    ('E', 'Edit'),
+)
+
 FIELD_TYPE_CHOICES = (
     ('TA', 'Text Area'),
     ('TF', 'Text Field'),
@@ -165,11 +170,10 @@ class Curriculum (models.Model):
   parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL, related_name="children")
   version = models.IntegerField(default=1)
   taxonomy = models.ManyToManyField('Subcategory', blank=True)
-  authors = models.ManyToManyField(to=User, through='CurriculumAuthor')
+  collaborators = models.ManyToManyField(to=User, through='CurriculumCollaborator', related_name='collaborated_curricula')
   created_date = models.DateTimeField(auto_now_add=True)
   modified_date = models.DateTimeField(auto_now=True)
   icon = models.ImageField(upload_to=upload_file_to, blank=True, null=True, help_text='Upload an image at least 400x289 in resolution that represents this curriculum')
-  shared_with = models.ManyToManyField('Teacher', blank=True, help_text='Select teachers to share this curriculum with before it is public' )
   unit = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, related_name="underlying_curriculum", help_text="Select a unit if this curriculum is part of one")
   acknowledgement = RichTextUploadingField(null=True, blank=True, help_text="Resources, models, and other material used in this curriculum; past authors/contributors")
   order = models.IntegerField(null=True, blank=True, help_text="Order within the Unit")
@@ -228,15 +232,16 @@ class Curriculum (models.Model):
       student_count = Student.objects.all().filter(member_of__assignments__curriculum__id__in=ancestors).distinct().count()
     return student_count
 
-# CurriculumAuthor through model
-class CurriculumAuthor(models.Model):
+# CurriculumCollaborator through model
+class CurriculumCollaborator(models.Model):
   curriculum = models.ForeignKey(Curriculum, null=False, on_delete=models.CASCADE)
-  author = models.ForeignKey(User, null=False, on_delete=models.CASCADE)
-  order = models.IntegerField(null=True, blank=True, help_text="Curriculum Author Order")
+  user = models.ForeignKey(User, null=False, on_delete=models.CASCADE)
+  order = models.IntegerField(null=True, blank=True, help_text="Curriculum Order for Authors")
+  privilege = models.CharField(max_length=1, choices=CURRICULUM_PRIVILEGE_CHOICES)
 
   class Meta:
       ordering = ['order']
-      unique_together = ('curriculum', 'author')
+      unique_together = ('curriculum', 'user')
 
 # Curriculum Step model
 # A curriculum may have one or more step/activity
@@ -696,22 +701,28 @@ def check_curriculum_status_change(sender, instance, **kwargs):
         Curriculum.objects.filter(id=obj.unit.id).update(status='P')
 
 #signal to check if curriculum shared with has changed
-def check_curriculum_shared_with_change(sender, **kwargs):
-  action = kwargs.pop('action', None)
+@receiver(pre_save, sender=CurriculumCollaborator)
+def check_curriculum_collaborators_change(sender, instance, **kwargs):
+
+  '''action = kwargs.pop('action', None)
   pk_set = kwargs.pop('pk_set', None)
   instance = kwargs.pop('instance', None)
-  if action == 'pre_add':
-    for teacher_id in pk_set:
-      teacher = Teacher.objects.get(id=teacher_id)
-      current_site = Site.objects.get_current()
-      domain = current_site.domain
+  '''
+  try:
+    obj = sender.objects.get(pk=instance.pk)
+  except sender.DoesNotExist:
+    # Object is new, so field hasn't technically changed, but you may want to do something else here.
+    current_site = Site.objects.get_current()
+    domain = current_site.domain
+    if instance.privilege == 'V':
       body =  '<div>A curriculum titled <b> %s </b> has been shared with you. </div><br> \
                <div>You may click https://%s/curriculum/preview/%s/ to preview this curriculum or find it in your <b>Shared Curricula</b> tab. </div><br><br> \
-               <div><b>CT-STEM Admin</b></div>' % (instance.title, domain, instance.id)
+               <div><b>CT-STEM Admin</b></div>' % (instance.curriculum.title, domain, instance.curriculum.id)
+      subject = 'CT-STEM - Curriculum Shared'
 
-      send_mail('CT-STEM - Curriculum Shared', body, settings.DEFAULT_FROM_EMAIL, [teacher.user.email], html_message=body)
+      send_mail(subject, body, settings.DEFAULT_FROM_EMAIL, [instance.user.email], html_message=body)
 
-m2m_changed.connect(check_curriculum_shared_with_change, sender=Curriculum.shared_with.through)
+#m2m_changed.connect(check_curriculum_collaborators_change, sender=Curriculum.collaborators.through)
 
 def resizeImage(img, minwidth, minheight):
   try:

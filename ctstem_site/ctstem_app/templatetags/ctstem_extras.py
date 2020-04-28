@@ -9,6 +9,10 @@ from collections import OrderedDict
 register = template.Library()
 
 @register.filter
+def get_authors(queryset):
+  return queryset.filter(privilege='E')
+
+@register.filter
 def selected_labels(form, field):
     return [label for value, label in form.fields[field].choices if value in form[field].value()]
 
@@ -385,9 +389,9 @@ def class_last_login(group):
 
 @register.filter
 def is_teacher_authored(curriculum):
-  authors = curriculum.authors.all()
+  authors = models.CurriculumCollaborator.objects.all().filter(curriculum=curriculum, privilege='E')
   for author in authors:
-    if hasattr(author, 'teacher'):
+    if hasattr(author.user, 'teacher'):
       return True
 
   return False

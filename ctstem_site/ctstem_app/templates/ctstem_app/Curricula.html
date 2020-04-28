@@ -74,7 +74,7 @@
                       {% if user.administrator or user.researcher or user.author %}
                         <i class="fa fa-lock" aria-hidden="true" title="Locked by {{curriculum.locked_by}}"></i>
                       {% elif user.teacher %}
-                        {% if user in curriculum.authors.all or user.teacher in curriculum.shared_with.all %}
+                        {% if user in curriculum.collaborators.all %}
                           <i class="fa fa-lock" aria-hidden="true" title="Locked by {{curriculum.locked_by}}"></i>
                         {% endif %}
                       {% endif %}
@@ -141,8 +141,8 @@
                   <div class="row">
                     <div class="col-md-2 title">Author(s):</div>
                     <div class="col-md-10">
-                      {% for curriculum_author in curriculum.curriculumauthor_set.all|dictsort:"order" %}
-                        {{curriculum_author.author.get_full_name}}{% if forloop.last == False %}, {% endif %}
+                      {% for curriculum_author in curriculum.curriculumcollaborator_set.all|get_authors|dictsort:"order" %}
+                        {{curriculum_author.user.get_full_name}}{% if forloop.last == False %}, {% endif %}
                       {% endfor %}
                     </div>
                   </div>
