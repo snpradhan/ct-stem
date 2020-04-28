@@ -532,6 +532,9 @@ class Assignment(models.Model):
   def __str__(self):
     return '%s' % (self.curriculum.title)
 
+  class Meta:
+    unique_together = ('curriculum', 'group')
+
 #######################################################
 # Membership model
 #######################################################

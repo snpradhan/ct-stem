@@ -3339,7 +3339,11 @@ def addAssignment(request, curriculum_id='', group_id=''):
       curricula = models.Curriculum.objects.all().filter(id=curriculum_id)
 
     for curr in curricula:
-      assignment, created = models.Assignment.objects.get_or_create(group=group, curriculum=curr, lock_on_completion=lock_on_completion)
+      assignment, created = models.Assignment.objects.get_or_create(group=group, curriculum=curr)
+      if created and lock_on_completion:
+        assignment.lock_on_completion = lock_on_completion
+        assignment.save()
+
     response_data['success'] = True
   return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 
