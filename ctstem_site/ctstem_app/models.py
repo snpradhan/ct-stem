@@ -717,13 +717,19 @@ def check_curriculum_collaborators_change(sender, instance, **kwargs):
     # Object is new, so field hasn't technically changed, but you may want to do something else here.
     current_site = Site.objects.get_current()
     domain = current_site.domain
+    body = subject = ''
     if instance.privilege == 'V':
       body =  '<div>A curriculum titled <b> %s </b> has been shared with you. </div><br> \
                <div>You may click https://%s/curriculum/preview/%s/ to preview this curriculum or find it in your <b>Shared Curricula</b> tab. </div><br><br> \
                <div><b>CT-STEM Admin</b></div>' % (instance.curriculum.title, domain, instance.curriculum.id)
       subject = 'CT-STEM - Curriculum Shared'
+    else:
+      body =  '<div>You have been given edit privilege on a curriculum titled <b> %s</b>. </div><br> \
+               <div>You may click https://%s/curriculum/%s/ to edit this curriculum or find it in your <b>My Curricula</b> tab. </div><br><br> \
+               <div><b>CT-STEM Admin</b></div>' % (instance.curriculum.title, domain, instance.curriculum.id)
+      subject = 'CT-STEM - Curriculum Authoring Privilege'
 
-      send_mail(subject, body, settings.DEFAULT_FROM_EMAIL, [instance.user.email], html_message=body)
+    send_mail(subject, body, settings.DEFAULT_FROM_EMAIL, [instance.user.email], html_message=body)
 
 #m2m_changed.connect(check_curriculum_collaborators_change, sender=Curriculum.collaborators.through)
 
