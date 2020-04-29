@@ -105,6 +105,7 @@ $(function (){
               $(collaborator_row).attr("id", "user_"+$(this).attr('id'));
               $(collaborator_row).find("td.order input[id$='ORDER']").prop('disabled', 'disabled').hide();
               $(collaborator_row).find("td.edit_view select").val('V');
+              $(collaborator_row).find("td.edit_view select").find('option[value=""]').remove();
               $(collaborator_row).show();
 
               rowAddorRemove($('table#collaborators'));

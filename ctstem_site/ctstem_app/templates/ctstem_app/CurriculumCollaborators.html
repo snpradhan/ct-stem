@@ -77,6 +77,9 @@
       if($(this).val() == 'V'){
         $(this).closest('tr').find('input[id^="id_collaborator_form"][id$="ORDER"]').val('').prop('disabled', 'disabled').hide();
       }
+      if($(this).is(":visible")){
+        $(this).find('option[value=""]').remove();
+      }
     });
 
     $('select[id^="id_collaborator_form"][id$=privilege]').change(function(){
