@@ -213,10 +213,8 @@ def curriculum(request, id=''):
       back_url = request.GET['back_url']
 
     if request.method == 'GET':
-      initial_author_data = []
       initial_collaborator_data = []
       if '' == id:
-        initial_author_data = [{'author': request.user, 'ORDER': 1}]
         initial_collaborator_data = [{'user': request.user, 'ORDER': 1, 'privilege': 'E'}]
       form = forms.CurriculumForm(user=request.user, instance=curriculum, prefix='curriculum')
       #AssessmentStepFormSet = inlineformset_factory(models.Assessment, models.AssessmentStep, form=forms.AssessmentStepForm,can_delete=True, can_order=True, extra=1)
@@ -263,12 +261,14 @@ def curriculum(request, id=''):
         if savedCurriculum.curriculum_type != 'U' and savedCurriculum.unit:
           reorder_underlying_curricula(request, savedCurriculum.unit.id)
 
-        collaborator_formset.save(commit=False)
-        for collaboratorform in collaborator_formset.ordered_forms:
-          collaboratorform.instance.order = collaboratorform.cleaned_data['ORDER']
-          collaboratorform.instance.save()
-        for obj in collaborator_formset.deleted_objects:
-          obj.delete()
+        #only save collaborators for unit and stand alone lessons/assessments
+        if not savedCurriculum.unit:
+          collaborator_formset.save(commit=False)
+          for collaboratorform in collaborator_formset.ordered_forms:
+            collaboratorform.instance.order = collaboratorform.cleaned_data['ORDER']
+            collaboratorform.instance.save()
+          for obj in collaborator_formset.deleted_objects:
+            obj.delete()
 
         attachment_formset.save()
         formset.save(commit=False)
@@ -582,8 +582,8 @@ def copyCurriculum(request, id=''):
       else:
         #unit copy
         #copy underlying lessons
-        if hasattr(request.user, 'teacher'):
-          underlying_curriculum =  original_curriculum.underlying_curriculum.all().filter(Q(status='P') | Q(collaborators=request.user)).exclude(status='R').distinct()
+        if hasattr(request.user, 'teacher') or hasattr(request.user, 'researcher'):
+          underlying_curriculum =  original_curriculum.underlying_curriculum.all().filter(Q(status='P') | Q(unit__collaborators=request.user)).exclude(status='R').distinct()
         else:
           underlying_curriculum = original_curriculum.underlying_curriculum.all().exclude(status='R').distinct()
 
@@ -670,22 +670,20 @@ def copyCurriculumMeta(request, id=''):
         except IOError as e:
           continue
 
-    #copy collaborators to new curriculum
-    for collaborator in collaborators:
-      collaborator.pk = None
-      collaborator.id = None
-      collaborator.curriculum = curriculum
-      collaborator.save()
+    #copy collaborators to new curriculum only for unit and stand alone lessons
+    if not original_curriculum.unit:
+      for collaborator in collaborators:
+        collaborator.pk = None
+        collaborator.id = None
+        collaborator.curriculum = curriculum
+        collaborator.privilege = 'V'
+        collaborator.order = None
+        collaborator.save()
 
-    author_count = models.CurriculumCollaborator.objects.all().filter(curriculum=curriculum, privilege='E').count()
-    if request.user not in curriculum.collaborators.all():
-      author = models.CurriculumCollaborator.objects.create(curriculum=curriculum, user=request.user, privilege='E', order=author_count+1)
-    else:
-      author = models.CurriculumCollaborator.objects.get(curriculum=curriculum, user=request.user)
-      if author.privilege != 'E':
-        author.privilege = 'E'
-        author.order = author_count + 1
-        author.save()
+      author, created = models.CurriculumCollaborator.objects.get_or_create(curriculum=curriculum, user=request.user)
+      author.privilege = 'E'
+      author.order = 1
+      author.save()
 
     return curriculum
   else:
@@ -3381,13 +3379,13 @@ def check_curriculum_permission(request, curriculum_id, action, step_order=-1):
       #collaborator privileges
       has_edit_privilege = has_view_privilege = False
       if is_admin or is_researcher or is_author or is_school_admin or is_teacher:
-        has_edit_privilege = models.CurriculumCollaborator.objects.all().filter(curriculum=curriculum, user=request.user, privilege='E').count()
-        has_view_privilege = models.CurriculumCollaborator.objects.all().filter(curriculum=curriculum, user=request.user, privilege='V').count()
         if curriculum.unit:
-          if not has_edit_privilege:
-            has_edit_privilege = models.CurriculumCollaborator.objects.all().filter(curriculum=curriculum.unit, user=request.user, privilege='E').count()
-          if not has_view_privilege:
-            has_view_privilege = models.CurriculumCollaborator.objects.all().filter(curriculum=curriculum.unit, user=request.user, privilege='V').count()
+          curr = curriculum.unit
+        else:
+          curr = curriculum
+
+        has_edit_privilege = models.CurriculumCollaborator.objects.all().filter(curriculum=curr, user=request.user, privilege='E').count()
+        has_view_privilege = models.CurriculumCollaborator.objects.all().filter(curriculum=curr, user=request.user, privilege='V').count()
 
       if curriculum.status == 'R':
         if is_admin and action == 'restore':

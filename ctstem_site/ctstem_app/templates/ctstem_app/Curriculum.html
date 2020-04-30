@@ -666,15 +666,15 @@
           $('div.form-group.attachment_table').show();
           $('#id_curriculum-acknowledgement').closest('.form-group').show();
           $('#id_curriculum-credits').closest('.form-group').show();
-          $('div.form-group.collaborator_table').show();
         }
 
         //for unit, stand alone lesson and assessment display level and taxonomy
-        if($(this).val() == 'U' || ($(this).val() == 'L' &&  $('select#id_curriculum-unit').val() == '' )|| $(this).val() == 'A') {
+        if($(this).val() == 'U' || (($(this).val() == 'L' || $(this).val() == 'A') &&  $('select#id_curriculum-unit').val() == '' )) {
           $('#id_curriculum-level').closest('.form-group').show();
           $('#id_curriculum-level').closest('.form-group').find('label:first').html('Level (<span class="required">*</span>)');
           $('#id_curriculum-taxonomy').closest('.form-group').show();
           $('#id_curriculum-taxonomy').closest('.form-group').find('label:first').html('Standards (<span class="required">*</span>)');
+          $('div.collaborator_table').show();
         }
 
         //for unit and stand alone lesson display subject, teacher notes and compatible systems and feature rank
