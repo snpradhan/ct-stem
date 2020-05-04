@@ -32,7 +32,14 @@
               </td>
               <td class="full_name">{{collaborator.get_full_name}}</td>
               <td class="email">{{collaborator.email}}</td>
-              <td class="edit_view">{{collaboratorForm.privilege}}</td>
+              <td class="edit_view">
+                {% if user != collaborator %}
+                  {{collaboratorForm.privilege}}
+                {% else %}
+                  <div>{{collaboratorForm.privilege.value|get_collaborator_privilege_display}}</div>
+                  {{collaboratorForm.privilege.as_hidden}}
+                {% endif %}
+              </td>
               <td class="delete">
                 {% if user != collaborator %}
                   <button type="button" class="btn btn-danger remove_collaborator" name="remove_collaborator" aria-label="Remove this collaborator" title="Remove this collaborator" href="#">
@@ -91,7 +98,7 @@
       else{
         $(order_input).val('').prop('disabled', false).show();
         var order = 0;
-        $('select[id^="id_collaborator_form"][id$=privilege]').each(function(){
+        $(':input[id^="id_collaborator_form"][id$=privilege]').each(function(){
           if($(this).val() == 'E'){
             order++;
           }

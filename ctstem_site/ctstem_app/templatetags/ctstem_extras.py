@@ -417,3 +417,8 @@ def get_page_start_index(paginator, page_number):
 @register.filter
 def get_page_end_index(paginator, page_number):
   return paginator.page(page_number).end_index()
+
+@register.filter
+def get_collaborator_privilege_display(privilege_value):
+  privilege_display = dict(models.CURRICULUM_PRIVILEGE_CHOICES)[privilege_value]
+  return privilege_display
