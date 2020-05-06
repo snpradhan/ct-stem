@@ -13,11 +13,12 @@ class Migration(migrations.Migration):
 
     operations = [
       migrations.RunSQL('INSERT INTO ctstem_app_curriculumcollaborator(curriculum_id, user_id, privilege, "order") \
-                         SELECT DISTINCT c.unit_id, cc1.user_id, cc1.privilege, cc1."order" \
+                         SELECT c.unit_id, cc1.user_id, min(cc1.privilege), min(cc1."order") \
                          FROM ctstem_app_curriculumcollaborator cc1 JOIN ctstem_app_curriculum c ON cc1.curriculum_id = c.id \
                          WHERE c.unit_id IS NOT NULL AND not exists (SELECT 1 \
                                                                      FROM ctstem_app_curriculumcollaborator cc2 \
-                                                                     WHERE cc2.curriculum_id = c.unit_id AND cc2.user_id = cc1.user_id); \
+                                                                     WHERE cc2.curriculum_id = c.unit_id AND cc2.user_id = cc1.user_id) \
+                         GROUP BY c.unit_id, cc1.user_id; \
                         '),
       migrations.RunSQL('UPDATE ctstem_app_curriculumcollaborator \
                          SET privilege = \'E\' \
