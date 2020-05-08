@@ -2193,11 +2193,10 @@ def searchCurriculaTiles(request, queryset, search_criteria):
     if 'keywords' in search_criteria and search_criteria['keywords'][0] != '':
 
       keywords = search_criteria['keywords'][0]
-
       #keyword search for units and standalone curricula
       keyword_filter = Q(title__icontains=keywords) | Q(time__icontains=keywords)
-      keyword_filter = keyword_filter | Q(authors__first_name__icontains=keywords)
-      keyword_filter = keyword_filter | Q(authors__last_name__icontains=keywords)
+      keyword_filter = keyword_filter | (Q(curriculumcollaborator__user__first_name__icontains=keywords) & Q(curriculumcollaborator__privilege='E'))
+      keyword_filter = keyword_filter | (Q(curriculumcollaborator__user__last_name__icontains=keywords) & Q(curriculumcollaborator__privilege='E'))
       keyword_filter = keyword_filter | Q(taxonomy__title__icontains=keywords)
       keyword_filter = keyword_filter | Q(taxonomy__category__name__icontains=keywords)
       keyword_filter = keyword_filter | Q(taxonomy__category__standard__name__icontains=keywords)
@@ -2235,13 +2234,13 @@ def searchCurriculaTiles(request, queryset, search_criteria):
       buckets = search_criteria['buckets']
       if 'teacher_authored' in buckets:
         #teacher authored units and standalone curricula
-        teacher_authored_filter = Q(authors__teacher__isnull=False)
+        teacher_authored_filter = Q(curriculumcollaborator__user__teacher__isnull=False)
         teacher_authored_filter = base_filter & teacher_authored_filter
         query_filter = query_filter | teacher_authored_filter
 
       if 'my_curricula' in buckets:
         #my unit and standalone curricula
-        my_curricula_filter = Q(authors=request.user)
+        my_curricula_filter = (Q(curriculumcollaborator__user=request.user) & Q(curriculumcollaborator__privilege='E'))
         my_curricula_filter = base_filter & my_curricula_filter
         query_filter = query_filter | my_curricula_filter
 
@@ -2251,7 +2250,7 @@ def searchCurriculaTiles(request, queryset, search_criteria):
         query_filter = query_filter | favorite_curricula_filter
       if 'shared_curricula' in buckets:
         #shared unit and standalone curricula
-        shared_curricula_filter = Q(shared_with=request.user.teacher)
+        shared_curricula_filter = (Q(curriculumcollaborator__user=request.user) & Q(curriculumcollaborator__privilege='V'))
         shared_curricula_filter = base_filter & shared_curricula_filter
         query_filter = query_filter | shared_curricula_filter
 
@@ -2259,10 +2258,10 @@ def searchCurriculaTiles(request, queryset, search_criteria):
     else:
       if request.user.is_anonymous() or hasattr(request.user, 'student') or hasattr(request.user, 'school_administrator'):
         query_filter = base_filter & Q(status='P')
-      elif hasattr(request.user, 'teacher'):
-        query_filter = Q(status='P') | Q(authors=request.user)
-        query_filter = query_filter | Q(bookmarked__teacher=request.user.teacher)
-        query_filter = query_filter | Q(shared_with=request.user.teacher)
+      elif hasattr(request.user, 'teacher') or hasattr(request.user, 'researcher'):
+        query_filter = Q(status='P') | Q(curriculumcollaborator__user=request.user)
+        if hasattr(request.user, 'teacher'):
+          query_filter = query_filter | Q(bookmarked__teacher=request.user.teacher)
         query_filter = base_filter & query_filter
       else:
         query_filter = base_filter
@@ -2271,10 +2270,11 @@ def searchCurriculaTiles(request, queryset, search_criteria):
   else:
     if request.user.is_anonymous() or hasattr(request.user, 'student') or hasattr(request.user, 'school_administrator'):
       query_filter = Q(status='P')
-    elif hasattr(request.user, 'teacher'):
-      query_filter = Q(status='P') | Q(authors=request.user)
-      query_filter = query_filter | Q(bookmarked__teacher=request.user.teacher)
-      query_filter = query_filter | Q(shared_with=request.user.teacher)
+    elif hasattr(request.user, 'teacher') or hasattr(request.user, 'researcher'):
+      query_filter = Q(status='P') | Q(curriculumcollaborator__user=request.user)
+      if hasattr(request.user, 'teacher'):
+        query_filter = query_filter | Q(bookmarked__teacher=request.user.teacher)
+
 
   raw_result = queryset.filter(query_filter)
   if search_units:
@@ -4943,20 +4943,14 @@ def is_curriculum_assigned_by_me(request, id):
 def is_curriculum_shared_with_me(request, id):
   curriculum = models.Curriculum.objects.get(id=id)
   is_shared = False
-  #curriculum can only be shared with teachers
-  if hasattr(request.user, 'teacher'):
-    #standalone curriculum is shared with the teacher
-    if request.user.teacher in curriculum.shared_with.all():
-      is_shared = True
+  if request.user.is_authenticated:
+    view_privilege = models.CurriculumCollaborator.objects.all().filter(curriculum=curriculum, user=request.user, privilege='V').count()
 
-    #underlying curricula is shared with the teacher
-    if not is_shared and curriculum.curriculum_type == 'U':
-      underlying_curriculum = underlyingCurriculum(request, 'preview', id)
+    if view_privilege == 1:
+      #curriculum can only be shared with teachers and researchers
+      if hasattr(request.user, 'teacher') or hasattr(request.user, 'researcher'):
+        is_shared = True
 
-      for underlying in underlying_curriculum:
-        if request.user.teacher in underlying.shared_with.all():
-          is_shared = True
-          break
   return is_shared
 
 @login_required

@@ -56,9 +56,11 @@
         </h3>
         <div>
           Author(s):
-          {% for curriculum_author in curriculum.curriculumauthor_set.all|dictsort:"order" %}
-            {{curriculum_author.author.get_full_name}}{% if forloop.last == False %}, {% endif %}
-          {% endfor %}
+          {% with curr_unit=curriculum.unit|default:curriculum %}
+            {% for curriculum_author in curr_unit.curriculumcollaborator_set.all|get_authors|dictsort:"order" %}
+              {{curriculum_author.user.get_full_name}}{% if forloop.last == False %}, {% endif %}
+            {% endfor %}
+          {% endwith %}
         </div>
         <div>
           Subject:

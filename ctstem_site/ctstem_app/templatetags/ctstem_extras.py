@@ -446,10 +446,15 @@ def get_collaborator_privilege_display(privilege_value):
 @register.assignment_tag(takes_context=True)
 def is_my_curriculum(context, curriculum):
   request = context.get('request')
-  authors = curriculum.authors.all()
-  if hasattr(request.user, 'teacher') and request.user in authors:
-    return True
-  return False
+  is_author = False
+  if request.user.is_authenticated:
+    author_count = models.CurriculumCollaborator.objects.all().filter(curriculum=curriculum, user=request.user, privilege='E').count()
+
+    if author_count == 1:
+      if hasattr(request.user, 'teacher') or hasattr(request.user, 'researcher'):
+        is_author = True
+
+  return is_author
 
 @register.assignment_tag(takes_context=True)
 def is_curriculum_shared_with_me(context, curriculum):
