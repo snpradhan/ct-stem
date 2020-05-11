@@ -147,10 +147,10 @@ def curricula(request, bucket='unit', status='public'):
     stat = ['D', 'P', 'A']
     curricula = curricula.filter(unit__isnull=True, curriculum_type__in = curriculum_type, status__in = stat, curriculumcollaborator__user=request.user, curriculumcollaborator__privilege='E')
   elif bucket == 'favorite' and hasattr(request.user, 'teacher'):
-    stat = ['P']
+    stat = ['D', 'P', 'A']
     curricula = curricula.filter(Q(unit__isnull=True), Q(curriculum_type__in=curriculum_type), Q(bookmarked__teacher=request.user.teacher), Q(status__in=stat) | (Q(curriculumcollaborator__user=request.user) & Q(curriculumcollaborator__privilege='V'))).distinct()
   elif bucket == 'shared' and (hasattr(request.user, 'teacher') or hasattr(request.user, 'researcher')):
-    stat = ['D', 'P']
+    stat = ['D', 'P', 'A']
     shared_lessons = curricula.filter(unit__isnull=False, curriculum_type__in = 'L', status__in = stat, curriculumcollaborator__user=request.user, curriculumcollaborator__privilege='V').distinct()
     shared_lessons_units = shared_lessons.values_list('unit', flat=True)
     curricula = curricula.filter(Q(unit__isnull=True), Q(curriculum_type__in = curriculum_type), Q(status__in = stat), (Q(curriculumcollaborator__user=request.user) & Q(curriculumcollaborator__privilege='V')) | Q(id__in=shared_lessons_units)).distinct()
@@ -2245,9 +2245,10 @@ def searchCurriculaTiles(request, queryset, search_criteria):
         query_filter = query_filter | my_curricula_filter
 
       if 'favorite_curricula' in buckets:
-        favorite_curricula_filter = Q(bookmarked__teacher=request.user.teacher)
+        favorite_curricula_filter = (Q(bookmarked__teacher=request.user.teacher))
         favorite_curricula_filter = base_filter & favorite_curricula_filter
         query_filter = query_filter | favorite_curricula_filter
+
       if 'shared_curricula' in buckets:
         #shared unit and standalone curricula
         shared_curricula_filter = (Q(curriculumcollaborator__user=request.user) & Q(curriculumcollaborator__privilege='V'))
@@ -2256,25 +2257,28 @@ def searchCurriculaTiles(request, queryset, search_criteria):
 
     #no bucket/collection selected
     else:
-      if request.user.is_anonymous() or hasattr(request.user, 'student') or hasattr(request.user, 'school_administrator'):
+      if request.user.is_anonymous or hasattr(request.user, 'student') or hasattr(request.user, 'school_administrator'):
         query_filter = base_filter & Q(status='P')
-      elif hasattr(request.user, 'teacher') or hasattr(request.user, 'researcher'):
-        query_filter = Q(status='P') | Q(curriculumcollaborator__user=request.user)
-        if hasattr(request.user, 'teacher'):
-          query_filter = query_filter | Q(bookmarked__teacher=request.user.teacher)
+      elif hasattr(request.user, 'teacher'):
+        query_filter = Q(curriculumcollaborator__user=request.user) | Q(bookmarked__teacher=request.user.teacher)
+        query_filter = query_filter | Q(status='P')
+        query_filter = base_filter & query_filter
+      elif hasattr(request.user, 'researcher'):
+        query_filter = Q(curriculumcollaborator__user=request.user) | Q(status='P')
         query_filter = base_filter & query_filter
       else:
         query_filter = base_filter
 
   #no filter provided
   else:
-    if request.user.is_anonymous() or hasattr(request.user, 'student') or hasattr(request.user, 'school_administrator'):
-      query_filter = Q(status='P')
-    elif hasattr(request.user, 'teacher') or hasattr(request.user, 'researcher'):
-      query_filter = Q(status='P') | Q(curriculumcollaborator__user=request.user)
-      if hasattr(request.user, 'teacher'):
-        query_filter = query_filter | Q(bookmarked__teacher=request.user.teacher)
+    if request.user.is_anonymous or hasattr(request.user, 'student') or hasattr(request.user, 'school_administrator'):
+        query_filter = Q(status='P')
+    elif hasattr(request.user, 'teacher'):
+      query_filter = Q(curriculumcollaborator__user=request.user) | Q(bookmarked__teacher=request.user.teacher)
+      query_filter = query_filter | Q(status='P')
 
+    elif hasattr(request.user, 'researcher'):
+      query_filter = Q(curriculumcollaborator__user=request.user) | Q(status='P')
 
   raw_result = queryset.filter(query_filter)
   if search_units:

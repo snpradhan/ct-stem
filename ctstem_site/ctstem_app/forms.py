@@ -875,8 +875,11 @@ class CurriculaSearchForm(forms.Form):
       self.fields.pop('status')
       self.fields.pop('buckets')
     elif hasattr(user, 'teacher'):
-      self.fields.pop('status')
+      self.fields['status'].choices = models.CURRICULUM_STATUS_CHOICES[:2]
       self.fields['buckets'].choices = models.CURRICULUM_BUCKET_CHOICES[1:]
+    elif hasattr(user, 'researcher'):
+      self.fields['status'].choices = models.CURRICULUM_STATUS_CHOICES[:2]
+      self.fields['buckets'].choices = models.CURRICULUM_BUCKET_CHOICES[1:3]
     else:
       self.fields['buckets'].choices = models.CURRICULUM_BUCKET_CHOICES[:1]
       if not hasattr(user, 'administrator'):
