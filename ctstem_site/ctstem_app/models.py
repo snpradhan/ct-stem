@@ -733,6 +733,37 @@ def check_curriculum_collaborators_change(sender, instance, **kwargs):
 
 #m2m_changed.connect(check_curriculum_collaborators_change, sender=Curriculum.collaborators.through)
 
+#signal to check if curriculum unit has changed
+@receiver(pre_save, sender=Curriculum)
+def check_curriculum_unit_change(sender, instance, **kwargs):
+  try:
+    obj = sender.objects.get(pk=instance.pk)
+  except sender.DoesNotExist:
+    pass # Object is new, so field hasn't technically changed, but you may want to do something else here.
+  else:
+    if obj.unit is None and instance.unit is not None: # stand alone unit added to a unit
+      lesson_collaborators = CurriculumCollaborator.objects.all().filter(curriculum=obj).order_by('order')
+      unit_author_count = CurriculumCollaborator.objects.all().filter(curriculum=instance.unit, privilege='E').count()
+
+      for lesson_collaborator in lesson_collaborators:
+        collaborator, created = CurriculumCollaborator.objects.get_or_create(curriculum=instance.unit, user=lesson_collaborator.user)
+
+        if created:
+          if lesson_collaborator.privilege == 'E':
+            collaborator.privilege = 'E'
+            unit_author_count = unit_author_count + 1
+            collaborator.order = unit_author_count
+          else:
+            collaborator.privilege = 'V'
+        elif lesson_collaborator.privilege == 'E' and collaborator.privilege != 'E':
+          collaborator.privilege = 'E'
+          unit_author_count = unit_author_count + 1
+          collaborator.order = unit_author_count
+
+        collaborator.save()
+      lesson_collaborators.delete()
+
+
 def resizeImage(img, minwidth, minheight):
   try:
     #check if the file actually exists
