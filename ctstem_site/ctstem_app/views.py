@@ -1869,6 +1869,26 @@ def searchCollaborators(request):
     return http.HttpResponse(json.dumps(collaborator_list), content_type="application/json")
 
   return http.HttpResponseNotAllowed(['GET', 'POST'])
+
+####################################
+# Get Curriculum Collaborators
+####################################
+@login_required
+def getCollaborators(request, id=''):
+  # check if the user has permission search Collaborators
+  if request.user.is_anonymous or hasattr(request.user, 'student') == True:
+    return http.HttpResponseNotFound('<h1>You do not have the privilege search collaborators</h1>')
+
+  if 'GET' == request.method:
+    collaborators = models.CurriculumCollaborator.objects.all().filter(curriculum__id=id)
+    collaborator_list = [{'user_id': collaborator.user.id, 'username': collaborator.user.username, 'name': collaborator.user.get_full_name(),
+                     'email': collaborator.user.email, 'order': collaborator.order, 'privilege_code': collaborator.privilege, 'privilege_display': collaborator.get_privilege_display()}
+                for collaborator in collaborators]
+
+    return http.HttpResponse(json.dumps(collaborator_list), content_type="application/json")
+
+  return http.HttpResponseNotAllowed(['GET'])
+
 ####################################
 # USER LIST
 ####################################

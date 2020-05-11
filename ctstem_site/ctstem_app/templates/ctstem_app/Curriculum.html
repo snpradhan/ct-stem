@@ -725,7 +725,61 @@
         }
         else{
           $('#id_curriculum-order').closest('.form-group').hide();
+          //when unit is unselected, copy unit collaborators to the lesson
+          if('{{form.instance.id}}' != 'None' && '{{form.instance.unit}}' != 'None'){
+            $.ajax({
+              type: "GET",
+              url: '/collaborators/{{form.instance.unit.id}}/',
+              dataType: 'json',
+              success: function(data){
+                console.log(data);
+                var collaborator_table = $('table.table#collaborators');
+                $.each(data, function(index, value) {
+                  var user_id = value['user_id'];
+                  var username = value['username'];
+                  var full_name = value['name'];
+                  var email = value['email'];
+                  var privilege_code = value['privilege_code'];
+                  var privilege_display = value['privilege_display']
+                  var order = value['order'];
+                  if($('table.table#collaborators tr#user_'+user_id).length == 0) {
+                    cloneMore($(collaborator_table).find('tbody tr:last'), 'collaborator_form');
+                    var collaborator_row = $(collaborator_table).find("tbody tr:nth-last-child(2)");
+                    $(collaborator_row).find("td.username input[type=hidden]").val(user_id);
+                    $(collaborator_row).find("td.username div").html(username);
+                    $(collaborator_row).find("td.full_name").html(full_name);
+                    $(collaborator_row).find("td.email").html(email);
+                    $(collaborator_row).attr("id", "user_"+user_id);
+                    if(order != null){
+                      $(collaborator_row).find("td.order input[id$='ORDER']").val(order).prop('disabled', false).show();
+                    }
+                    else{
+                      $(collaborator_row).find("td.order input[id$='ORDER']").prop('disabled', 'disabled').hide();
+                    }
+                    var privilege_select = $(collaborator_row).find("td.edit_view select");
+                    $(privilege_select).val(privilege_code);
+                    $(privilege_select).find('option[value=""]').remove();
+                    if('{{user.id}}' == user_id) {
+                      $('<div>'+privilege_display+'</div>').insertAfter($(privilege_select));
+                      $(privilege_select).hide();
+                      $(collaborator_row).find("td.delete").hide();
+                    }
+
+                    $(collaborator_row).show();
+                  }
+                });
+                rowAddorRemove($('table#collaborators'));
+              },
+              error: function(xhr, ajaxOptions, thrownError){
+                $("ul.messages li").remove();
+                $("ul.messages").html('<li class="error">Unit collaborators could not be copied.</li>');
+                $('ul.messages').show();
+                $('ul.messages').delay(30000).fadeOut('slow');
+              },
+            });
+          }
         }
+
       }));
       $('select#id_curriculum-unit').trigger('change');
 

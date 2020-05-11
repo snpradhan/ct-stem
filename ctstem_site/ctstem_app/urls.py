@@ -66,6 +66,7 @@ urlpatterns = [
     url(r'^students/search/$', views.searchStudents, name='searchStudents'),
     url(r'^teachers/search/$', views.searchTeachers, name='searchTeachers'),
     url(r'^collaborators/search/$', views.searchCollaborators, name='searchCollaborators'),
+    url(r'^collaborators/(?P<id>[\d]+)/$', views.getCollaborators, name='getCollaborators'),
     url(r'^question/new/$', views.question, name='newQuestion'),
     url(r'^question/(?P<id>[\d]+)/$', views.question, name='question'),
     url(r'^response/(?P<instance_id>[\d]+)/(?P<response_id>[\d]+)/$', views.questionResponse, name='questionResponse'),
