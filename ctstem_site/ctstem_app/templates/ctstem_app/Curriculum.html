@@ -739,33 +739,13 @@
                   var username = value['username'];
                   var full_name = value['name'];
                   var email = value['email'];
-                  var privilege_code = value['privilege_code'];
-                  var privilege_display = value['privilege_display']
                   var order = value['order'];
-                  if($('table.table#collaborators tr#user_'+user_id).length == 0) {
-                    cloneMore($(collaborator_table).find('tbody tr:last'), 'collaborator_form');
-                    var collaborator_row = $(collaborator_table).find("tbody tr:nth-last-child(2)");
-                    $(collaborator_row).find("td.username input[type=hidden]").val(user_id);
-                    $(collaborator_row).find("td.username div").html(username);
-                    $(collaborator_row).find("td.full_name").html(full_name);
-                    $(collaborator_row).find("td.email").html(email);
-                    $(collaborator_row).attr("id", "user_"+user_id);
-                    if(order != null){
-                      $(collaborator_row).find("td.order input[id$='ORDER']").val(order).prop('disabled', false).show();
-                    }
-                    else{
-                      $(collaborator_row).find("td.order input[id$='ORDER']").prop('disabled', 'disabled').hide();
-                    }
-                    var privilege_select = $(collaborator_row).find("td.edit_view select");
-                    $(privilege_select).val(privilege_code);
-                    $(privilege_select).find('option[value=""]').remove();
-                    if('{{user.id}}' == user_id) {
-                      $('<div>'+privilege_display+'</div>').insertAfter($(privilege_select));
-                      $(privilege_select).hide();
-                      $(collaborator_row).find("td.delete").hide();
-                    }
+                  var privilege_code = value['privilege_code'];
+                  var privilege_display = value['privilege_display'];
+                  var current_user_id = '{{user.id}}';
 
-                    $(collaborator_row).show();
+                  if($('table.table#collaborators tr#user_'+user_id).length == 0) {
+                    add_to_collaborator_table(collaborator_table, current_user_id, user_id, username, full_name, email, order, privilege_code, privilege_display);
                   }
                 });
                 rowAddorRemove($('table#collaborators'));

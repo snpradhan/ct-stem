@@ -79,6 +79,9 @@ $(function (){
             if($('table.table#collaborators tr#user_'+value['user_id']).length == 0){
               collaborator += "<tr><td class='username'>"+value['username']+"</td><td class='full_name'>"+value['name']+"</td><td class='email'>"+value['email']+"</td><td><button type='button' class='btn btn-info select_collaborator' id='"+value['user_id']+"'>Add</a></td></tr>";
             }
+            else if($('table.table#collaborators tr#user_'+value['user_id']).is(':hidden')){
+              collaborator += "<tr><td class='username'>"+value['username']+"</td><td class='full_name'>"+value['name']+"</td><td class='email'>"+value['email']+"</td><td><button type='button' class='btn btn-info select_collaborator exists' id='"+value['user_id']+"'>Add</a></td></tr>";
+            }
           });
 
           if(collaborator.length == 0){
@@ -91,25 +94,26 @@ $(function (){
             $("#collaboratorResults").show();
             $("#collaboratorResults button.select_collaborator").click(function(){
               var collaborator_table = $('table.table#collaborators');
-              var collaborator_result_row = $(this).closest('tr');
-              var username = $(collaborator_result_row).find('td.username').html();
-              var full_name = $(collaborator_result_row).find('td.full_name').html();
-              var email = $(collaborator_result_row).find('td.email').html();
-              cloneMore($(collaborator_table).find('tbody tr:last'), 'collaborator_form');
-              var collaborator_row = $(collaborator_table).find("tbody tr:nth-last-child(2)");
+              var user_id = $(this).attr('id');
+              var current_user_id = '{{user.id}}';
 
-              $(collaborator_row).find("td.username input[type=hidden]").val($(this).attr('id'));
-              $(collaborator_row).find("td.username div").html(username);
-              $(collaborator_row).find("td.full_name").html(full_name);
-              $(collaborator_row).find("td.email").html(email);
-              $(collaborator_row).attr("id", "user_"+$(this).attr('id'));
-              $(collaborator_row).find("td.order input[id$='ORDER']").prop('disabled', 'disabled').hide();
-              $(collaborator_row).find("td.edit_view select").val('V');
-              $(collaborator_row).find("td.edit_view select").find('option[value=""]').remove();
-              $(collaborator_row).show();
+              if($(this).hasClass('exists')) {
+                var hidden_collaborator = $(collaborator_table).find('tr#user_'+user_id);
+                $(hidden_collaborator).find('td.delete input[type="hidden"]').val('');
+                $(hidden_collaborator).show();
+              }
+              else{
 
+                var collaborator_result_row = $(this).closest('tr');
+                var username = $(collaborator_result_row).find('td.username').html();
+                var full_name = $(collaborator_result_row).find('td.full_name').html();
+                var email = $(collaborator_result_row).find('td.email').html();
+                var order = null;
+                var privilege_code = 'V';
+                var privilege_display = null;
+                add_to_collaborator_table(collaborator_table, current_user_id, user_id, username, full_name, email, order, privilege_code, privilege_display);
+              }
               rowAddorRemove($('table#collaborators'));
-
               $(this).attr('disabled', 'disabled');
             });
           }

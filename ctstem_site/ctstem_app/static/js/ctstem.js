@@ -635,3 +635,33 @@ function is_curriculum_assigned_ajax(id) {
   return is_assigned;
 
 }
+
+//Add the collaborator details in the parameter to the collaborator table in the curriculum edit page
+function add_to_collaborator_table(collaborator_table, current_user_id, user_id, username, full_name, email, order, privilege_code, privilege_display){
+
+  cloneMore($(collaborator_table).find('tbody tr:last'), 'collaborator_form');
+  var collaborator_row = $(collaborator_table).find("tbody tr:nth-last-child(2)");
+  var privilege_select = $(collaborator_row).find("td.edit_view select");
+  $(collaborator_row).find("td.username input[type=hidden]").val(user_id);
+  $(collaborator_row).find("td.username div").html(username);
+  $(collaborator_row).find("td.full_name").html(full_name);
+  $(collaborator_row).find("td.email").html(email);
+  $(collaborator_row).attr("id", "user_"+user_id);
+  if(order != null){
+    $(collaborator_row).find("td.order input[id$='ORDER']").val(order).prop('disabled', false).show();
+  }
+  else{
+    $(collaborator_row).find("td.order input[id$='ORDER']").prop('disabled', 'disabled').hide();
+  }
+
+  $(privilege_select).val(privilege_code);
+  $(privilege_select).find('option[value=""]').remove();
+
+  if(current_user_id == user_id) {
+    $('<div>'+privilege_display+'</div>').insertAfter($(privilege_select));
+    $(privilege_select).hide();
+    $(collaborator_row).find("td.delete").hide();
+  }
+
+  $(collaborator_row).show();
+}
