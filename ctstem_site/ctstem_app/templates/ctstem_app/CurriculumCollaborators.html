@@ -19,7 +19,7 @@
       </thead>
       <tbody>
         {% for collaboratorForm in collaborator_formset %}
-          <tr style="{% if forloop.last %} display:none; {% endif %}" id="user_{{collaboratorForm.user.value}}">
+          <tr style="{% if forloop.last or collaboratorForm.DELETE.value %} display:none; {% endif %}" id="user_{{collaboratorForm.user.value}}">
             <td class="order">
               {{collaboratorForm.id}}
               {{collaboratorForm.ORDER}}
@@ -68,6 +68,7 @@
         {% endfor %}
       </tbody>
     </table>
+    <div class="error">{{ collaborator_formset.non_form_errors }}</div>
   </div>
 </div>
 

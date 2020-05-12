@@ -626,6 +626,24 @@ class AttachmentForm(ModelForm):
 
     return valid
 
+class CollaboratorInlineFormSet(BaseInlineFormSet):
+
+  def clean(self):
+    super(CollaboratorInlineFormSet, self).clean()
+
+    if not self.instance.unit:
+      author_count = 0
+      for form in self.forms:
+        if not form.is_valid():
+          continue
+        if form.cleaned_data and not form.cleaned_data.get('DELETE'):
+          if form.cleaned_data['privilege'] == 'E':
+            author_count += 1
+
+      if author_count == 0:
+        error = ValidationError("At least one collaborator with edit privilege is required.", "error")
+        self._non_form_errors.append(error)
+
 ####################################
 # Curriculum Collaborator Form
 ####################################

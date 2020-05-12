@@ -218,7 +218,7 @@ def curriculum(request, id=''):
         initial_collaborator_data = [{'user': request.user, 'ORDER': 1, 'privilege': 'E'}]
       form = forms.CurriculumForm(user=request.user, instance=curriculum, prefix='curriculum')
       #AssessmentStepFormSet = inlineformset_factory(models.Assessment, models.AssessmentStep, form=forms.AssessmentStepForm,can_delete=True, can_order=True, extra=1)
-      CollaboratorFormSet = inlineformset_factory(models.Curriculum, models.CurriculumCollaborator, form=forms.CurriculumCollaboratorForm, can_delete=True, can_order=True, extra=len(initial_collaborator_data)+1)
+      CollaboratorFormSet = inlineformset_factory(models.Curriculum, models.CurriculumCollaborator, form=forms.CurriculumCollaboratorForm, formset=forms.CollaboratorInlineFormSet, can_delete=True, can_order=True, extra=len(initial_collaborator_data)+1)
 
       StepFormSet = nestedformset_factory(models.Curriculum, models.Step, form=forms.StepForm,
                                                     nested_formset=inlineformset_factory(models.Step, models.CurriculumQuestion, form=forms.CurriculumQuestionForm, can_delete=True, can_order=True, extra=1),
@@ -243,7 +243,7 @@ def curriculum(request, id=''):
 
       form = forms.CurriculumForm(user=request.user, data=data, files=request.FILES, instance=curriculum, prefix="curriculum")
       #AssessmentStepFormSet = inlineformset_factory(models.Assessment, models.AssessmentStep, form=forms.AssessmentStepForm,
-      CollaboratorFormSet = inlineformset_factory(models.Curriculum, models.CurriculumCollaborator, form=forms.CurriculumCollaboratorForm, can_delete=True, can_order=True, extra=1)
+      CollaboratorFormSet = inlineformset_factory(models.Curriculum, models.CurriculumCollaborator, form=forms.CurriculumCollaboratorForm, formset=forms.CollaboratorInlineFormSet, can_delete=True, can_order=True, extra=1)
       StepFormSet = nestedformset_factory(models.Curriculum, models.Step, form=forms.StepForm,
                                                     nested_formset=inlineformset_factory(models.Step, models.CurriculumQuestion, form=forms.CurriculumQuestionForm, can_delete=True, can_order=True, extra=1),
                                                     can_delete=True, can_order=True, extra=1)
@@ -306,6 +306,7 @@ def curriculum(request, id=''):
         print(formset.errors)
         print(attachment_formset.errors)
         print(collaborator_formset.errors)
+        print(collaborator_formset._non_form_errors)
         if request.is_ajax():
           response_data = {'status': 0, 'message': 'The preview could not be generated because some mandatory fields are missing.  Please manually save the curriculum to see specific errors.'}
           return http.HttpResponse(json.dumps(response_data), content_type = 'application/json')
