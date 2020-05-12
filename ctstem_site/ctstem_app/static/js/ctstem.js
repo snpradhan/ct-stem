@@ -419,25 +419,13 @@ $(function (){
       rowAddorRemove($(this));
     }
   });
-
+  //fixed buttons
   if($('div.button-group-fixed').length > 0) {
-    var fix_button_top = $('div.button-group-fixed').offset().top;
+    stick_div_to_top($('div.button-group-fixed'), true);
+  }
 
-    $(window).scroll(function() {
-      var currentScroll = $(window).scrollTop() + 100;
-      if (currentScroll >= fix_button_top) {
-        // apply position: fixed if you
-        $('div.button-group-fixed').css({
-          position: 'fixed',
-          top: '6em',
-          right: '6.75em',
-        });
-      } else {
-        $('div.button-group-fixed').css({
-          position: 'static'
-        });
-      }
-    });
+  if($('div.unit-navigation').length > 0) {
+    stick_div_to_top($('div.unit-navigation'), false);
   }
 
   $('a.emoji-modal').click(function(){
@@ -698,6 +686,36 @@ function bind_bookmark(){
     else{
       var msg = $(this).data('title');
       alert(msg);
+    }
+  });
+}
+
+//stick a div to top of the screen on scroll
+function stick_div_to_top(element, right_align) {
+  var element_pos = $(element).offset().top;
+
+  $(window).scroll(function() {
+    var currentScroll = $(window).scrollTop() + 100;
+    if (currentScroll >= element_pos) {
+      // apply position: fixed if you
+      if (right_align) {
+        $(element).css({
+          position: 'fixed',
+          top: '6em',
+          right: '6.75em'
+        });
+      }
+      else {
+        $(element).css({
+          position: 'fixed',
+          top: '6em',
+        });
+      }
+
+    } else {
+      $(element).css({
+        position: 'static'
+      });
     }
   });
 }

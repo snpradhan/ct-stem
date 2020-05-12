@@ -357,9 +357,35 @@ div#div_conditions {
   display: none;
 }
 
+div.curriculum_container {
+  display: flex;
+  justify-content: space-between;
+}
+div.curriculum_container div.left-navigation {
+  width: 8%;
+}
+div.curriculum_container div.left-navigation label.current_curriculum {
+  color: var(--ctstem-color-yellow);
+  text-decoration: underline;
+}
+div.curriculum_container div.left-navigation label a {
+  color: var(--ctstem-color-blue);
+}
+div.curriculum_container div.left-navigation label a:hover{
+  cursor: pointer;
+  color: var(--ctstem-color-yellow);
+  text-decoration: underline;
+}
+div.curriculum_container div.curriculum_components {
+  width: 85%;
+}
+div.curriculum_container div.button-container {
+  width: 7%;
+}
+
 div.table#curriculum, div.table.step,
 div.table#curriculumQuestions, div.table.activity, div.table#group, div.table#standard {
-  width: 85%;
+  width: 90%;
   padding: 3em 4em;
   margin-top: 3em;
   margin-bottom: 3em;
@@ -1194,7 +1220,11 @@ div.button-group-fixed {
   text-align: right;
   position: static;
 }
-
+div.unit-navigation {
+  margin-top: 4em;
+  text-align: left;
+  position: static;
+}
 .form-inline > * {
    margin: 1em;
 }

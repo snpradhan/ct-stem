@@ -10,8 +10,35 @@
     <form method="post" enctype="multipart/form-data" id='curriculumForm'>
       {% csrf_token %}
       {{form.media}}
-      <div class="row">
-        <div class="col-md-11">
+      <div class="curriculum_container">
+        <div class="left-navigation">
+          <div class="form-group unit-navigation">
+            {% if form.instance %}
+              {% if form.instance.unit or form.instance.curriculum_type == 'U' %}
+                {% with unit_id=form.instance.unit.id|default:form.instance.id unit_title=form.instance.unit.title|default:form.instance.title %}
+                  {% if form.instance.id != unit_id %}
+                    <label><a href="{% url 'ctstem:curriculum' unit_id %}">Unit</a></label>
+                  {% else %}
+                    <label class="current_curriculum"><strong>Unit</strong></label>
+                  {% endif %}
+                  {% get_underlying_curriculum unit_id as underlying_curriculum %}
+                  <ul>
+                  {% for lesson in underlying_curriculum %}
+                    <li>
+                      {% if form.instance.id != lesson.id %}
+                        <label><a href="{% url 'ctstem:curriculum' lesson.id %}">Lesson {{lesson.order}}</a></label>
+                      {% else %}
+                       <label class="current_curriculum"><strong>Lesson {{forloop.counter}}</strong></label>
+                      {% endif %}
+                    </li>
+                  {% endfor %}
+                  </ul>
+                {% endwith %}
+              {% endif %}
+            {% endif %}
+          </div>
+        </div>
+        <div class="curriculum_components">
           <div class="table" id="curriculum">
             <h4>
               <span>&nbsp;</span>
@@ -451,28 +478,28 @@
               </div>
             </div>
           {% endfor %}
+        </div> <!-- end of curriculum form div-->
+
+        <div class="button-container">
+          <div class="form-group button-group-fixed">
+            <input type="hidden" name="back" id="back" value="0"/>
+            {% if back_url %}
+              <input type="submit" class="btn" id="backBtn" value="Back"/>
+            {% endif %}
+             <br><br>
+            {% if form.instance.id %}
+              <input type="submit" class="btn btn-warning" id="previewBtn" value="Preview"/>
+            {% else %}
+              <input type="submit" class="btn btn-warning" id="previewBtn" value="Preview" title="Save this curriculum for the Preview button to be enabled" disabled/>
+            {% endif %}
+            <input type="hidden" name="preview" id="preview" value="0"/>
+            <br><br>
+            <input type="submit" class="btn btn-success" id="submit" value="Save"/>
+            <br><br>
+            <input type="button" class="btn btn-info" id="addStep" value="Add Page" style="display:none;"/>
+          </div>
         </div>
-
-        <div class="form-group button-group-fixed col-md-1">
-          <input type="hidden" name="back" id="back" value="0"/>
-          {% if back_url %}
-            <input type="submit" class="btn" id="backBtn" value="Back"/>
-          {% endif %}
-           <br><br>
-          {% if form.instance.id %}
-            <input type="submit" class="btn btn-warning" id="previewBtn" value="Preview"/>
-          {% else %}
-            <input type="submit" class="btn btn-warning" id="previewBtn" value="Preview" title="Save this curriculum for the Preview button to be enabled" disabled/>
-          {% endif %}
-          <input type="hidden" name="preview" id="preview" value="0"/>
-          <br><br>
-          <input type="submit" class="btn btn-success" id="submit" value="Save"/>
-          <br><br>
-          <input type="button" class="btn btn-info" id="addStep" value="Add Page" style="display:none;"/>
-
-
-        </div>
-    </div>
+      </div>
     </form>
     <div class="modal fade" id="questionModal" role="dialog" data-keyboard="false" data-backdrop="static"></div>
     <div class="modal fade" id="taxonomyModal" role="dialog"></div>
@@ -805,6 +832,29 @@
       $('input#backBtn').click(function(e){
         $('input#back').val("1");
         $('form#curriculumForm').submit();
+      });
+
+      $('div.unit-navigation a').click(function(e){
+        var link = $(this);
+        e.preventDefault();
+        bootbox.confirm({ title: 'Confirm',
+                          message: "<p>If you haven't saved the current curriculum, click <strong>Cancel</strong> and then <strong>Save</strong> the curriculum before proceeding. Otherwise, click <strong>Proceed</strong> to proceed to the next lesson.</p>",
+                          buttons: {
+                            confirm: {
+                                label: 'Proceed',
+                                className: 'btn-normal-yellow'
+                            },
+                            cancel: {
+                                label: 'Cancel',
+                                className: 'btn-normal-red'
+                            }
+                          },
+                          callback: function(result){
+                            if (result == true) {
+                              window.location = $(link).attr("href");
+                            }
+                          },
+                        });
       });
 
       {% if modal_messages %}
