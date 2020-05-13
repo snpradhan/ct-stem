@@ -693,29 +693,78 @@ function bind_bookmark(){
 //stick a div to top of the screen on scroll
 function stick_div_to_top(element, right_align) {
   var element_pos = $(element).offset().top;
+  var footer = $('footer');
+  var footer_height = $(footer).height() + 100;
 
   $(window).scroll(function() {
     var currentScroll = $(window).scrollTop() + 100;
-    if (currentScroll >= element_pos) {
+    var is_colliding_with_footer = is_colliding($(element), $(footer));
+    if (currentScroll >= element_pos && !is_colliding_with_footer) {
       // apply position: fixed if you
       if (right_align) {
-        $(element).css({
-          position: 'fixed',
-          top: '6em',
-          right: '6.75em'
-        });
+        $(element).removeClass('fixed-top-left');
+        $(element).removeClass('fixed-bottom-right');
+        $(element).removeClass('fixed-bottom-left');
+        $(element).addClass('fixed-top-right');
       }
       else {
-        $(element).css({
-          position: 'fixed',
-          top: '6em',
-        });
+        $(element).removeClass('fixed-bottom-right');
+        $(element).removeClass('fixed-bottom-left');
+        $(element).removeClass('fixed-top-right');
+        $(element).addClass('fixed-top-left');
       }
-
-    } else {
-      $(element).css({
-        position: 'static'
-      });
+    }
+    else if(is_colliding_with_footer) {
+      if (right_align) {
+        $(element).removeClass('fixed-bottom-left');
+        $(element).removeClass('fixed-top-right');
+        $(element).removeClass('fixed-top-left');
+        $(element).addClass('fixed-bottom-right');
+      }
+      else {
+        $(element).removeClass('fixed-top-right');
+        $(element).removeClass('fixed-top-left');
+        $(element).removeClass('fixed-bottom-right');
+        $(element).addClass('fixed-bottom-left');
+      }
+    }
+    else {
+      $(element).removeClass('fixed-top-left');
+      $(element).removeClass('fixed-bottom-right');
+      $(element).removeClass('fixed-bottom-left');
+      $(element).removeClass('fixed-top-right');
     }
   });
 }
+
+/**
+ * Detects if two elements are colliding
+ *
+ * Credit goes to BC on Stack Overflow, cleaned up a little bit
+ *
+ * @link http://stackoverflow.com/questions/5419134/how-to-detect-if-two-divs-touch-with-jquery
+ * @param $div1
+ * @param $div2
+ * @returns {boolean}
+ */
+var is_colliding = function( $div1, $div2 ) {
+  // Div 1 data
+  var d1_offset             = $div1.offset();
+  var d1_height             = $div1.outerHeight( true );
+  var d1_width              = $div1.outerWidth( true );
+  var d1_distance_from_top  = d1_offset.top + d1_height;
+  var d1_distance_from_left = d1_offset.left + d1_width;
+
+  // Div 2 data
+  var d2_offset             = $div2.offset();
+  var d2_height             = $div2.outerHeight( true );
+  var d2_width              = $div2.outerWidth( true );
+  var d2_distance_from_top  = d2_offset.top + d2_height;
+  var d2_distance_from_left = d2_offset.left + d2_width;
+
+  var not_colliding = ( d1_distance_from_top < d2_offset.top || d1_offset.top > d2_distance_from_top || d1_distance_from_left < d2_offset.left || d1_offset.left > d2_distance_from_left );
+
+  // Return whether it IS colliding
+  return ! not_colliding;
+};
+

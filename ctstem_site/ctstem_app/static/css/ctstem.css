@@ -1225,6 +1225,29 @@ div.unit-navigation {
   text-align: left;
   position: static;
 }
+
+.fixed-top-right {
+  position: fixed !important;
+  top: 6em !important;
+  bottom: unset;
+  right: 6.75em !important;
+}
+.fixed-top-left {
+  position: fixed !important;
+  top: 6em !important;
+  bottom: unset;
+}
+.fixed-bottom-right {
+  position: fixed !important;
+  top: unset;
+  bottom: 65em !important;
+  right: 6.75em !important;
+}
+.fixed-bottom-left {
+  position: fixed !important;
+  top: unset;
+  bottom: 65em !important;
+}
 .form-inline > * {
    margin: 1em;
 }
