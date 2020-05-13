@@ -30,7 +30,7 @@
       </div>
       <div class="modal-footer">
         <div class="form-group button-row">
-          <button type="submit" id="search" class="btn btn-success">
+          <button type="submit" id="search" class="btn normal yellow">
             Search
           </button>
         </div>
@@ -77,10 +77,10 @@ $(function (){
           var collaborator = "";
           $.each(data, function(key, value){
             if($('table.table#collaborators tr#user_'+value['user_id']).length == 0){
-              collaborator += "<tr><td class='username'>"+value['username']+"</td><td class='full_name'>"+value['name']+"</td><td class='email'>"+value['email']+"</td><td><button type='button' class='btn btn-info select_collaborator' id='"+value['user_id']+"'>Add</a></td></tr>";
+              collaborator += "<tr><td class='username'>"+value['username']+"</td><td class='full_name'>"+value['name']+"</td><td class='email'>"+value['email']+"</td><td><button type='button' class='btn small blue select_collaborator' id='"+value['user_id']+"'>Add</a></td></tr>";
             }
             else if($('table.table#collaborators tr#user_'+value['user_id']).is(':hidden')){
-              collaborator += "<tr><td class='username'>"+value['username']+"</td><td class='full_name'>"+value['name']+"</td><td class='email'>"+value['email']+"</td><td><button type='button' class='btn btn-info select_collaborator exists' id='"+value['user_id']+"'>Add</a></td></tr>";
+              collaborator += "<tr><td class='username'>"+value['username']+"</td><td class='full_name'>"+value['name']+"</td><td class='email'>"+value['email']+"</td><td><button type='button' class='btn small blue select_collaborator exists' id='"+value['user_id']+"'>Add</a></td></tr>";
             }
           });
 

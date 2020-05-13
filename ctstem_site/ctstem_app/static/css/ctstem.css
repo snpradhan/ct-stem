@@ -377,10 +377,10 @@ div.curriculum_container div.left-navigation label a:hover{
   text-decoration: underline;
 }
 div.curriculum_container div.curriculum_components {
-  width: 85%;
+  width: 82%;
 }
 div.curriculum_container div.button-container {
-  width: 7%;
+  width: 10%;
 }
 
 div.table#curriculum, div.table.step,
@@ -1334,7 +1334,10 @@ div.content #curricula_tile  .row.button a {
   font-size: 1.4em !important;
   padding: 0.8em 1.6em !important;
 }
-
+.btn.inbetween, button[class*="inbetween"] {
+  font-size: 1.2em !important;
+  padding: 0.7em 1.2em !important;
+}
 .btn.small, button[class*="small"] {
   font-size: 1em !important;
   padding: 0.6em 1em !important;

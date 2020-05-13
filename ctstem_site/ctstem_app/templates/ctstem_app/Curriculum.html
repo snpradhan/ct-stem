@@ -46,10 +46,10 @@
               <span>&nbsp;</span>
               <span class="controls">
                 <span class="expand_collapse">
-                  <button type="button" class="btn btn-warning" name="collapse_curriculum" aria-label="Collapse Curriculum" title="Collapse Curriculum">
+                  <button type="button" class="btn orange" name="collapse_curriculum" aria-label="Collapse Curriculum" title="Collapse Curriculum">
                     <span class="glyphicon glyphicon-collapse-up" aria-hidden="true"></span>
                   </button>
-                  <button type="button" class="btn btn-success" style="display:none;" name="expand_curriculum" aria-label="Expand Curriculum" title="Expand Curriculum">
+                  <button type="button" class="btn green" style="display:none;" name="expand_curriculum" aria-label="Expand Curriculum" title="Expand Curriculum">
                     <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
                   </button>
                 </span>
@@ -225,14 +225,14 @@
                 <div style="display:none;">
                   {{form.taxonomy}}
                 </div>
-                <button class="btn btn-info search_taxonomy" name="search_taxonomy" data-form="{% url 'ctstem:searchTaxonomy' %}">
+                <button class="btn blue search_taxonomy" name="search_taxonomy" data-form="{% url 'ctstem:searchTaxonomy' %}">
                   <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
                 </button>
                 <span class="expand_collapse_other">
-                  <button type="button" class="btn btn-warning" name="collapse_standards" aria-label="Collapse Standards" title="Collapse Standards">
+                  <button type="button" class="btn orange" name="collapse_standards" aria-label="Collapse Standards" title="Collapse Standards">
                     <span class="glyphicon glyphicon-collapse-up" aria-hidden="true"></span>
                   </button>
-                  <button type="button" class="btn btn-success" style="display:none;" name="expand_standards" aria-label="Expand Standards" title="Expand Standards">
+                  <button type="button" class="btn green" style="display:none;" name="expand_standards" aria-label="Expand Standards" title="Expand Standards">
                     <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
                   </button>
                 </span>
@@ -256,7 +256,7 @@
                           <td class="donotwrap">{{taxonomy.code}}</td>
                           <td>{{taxonomy.title}}</td>
                           <td>
-                            <button type="button" class="btn btn-danger remove_taxonomy" title="Remove Taxonomy">
+                            <button type="button" class="btn red remove_taxonomy" title="Remove Taxonomy">
                               <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
                             </button>
                           </td>
@@ -274,14 +274,14 @@
               <div class="form-group attachment_table">
                 {{attachment_formset.management_form}}
                 <label for="id_attachment_table">Attachment(s)</label>
-                <a type="button" class="btn btn-info" id="add_attachment" title="Add New Attachment">
+                <a type="button" class="btn blue" id="add_attachment" title="Add New Attachment">
                   <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
                 </a>
                 <span class="expand_collapse_other">
-                  <button type="button" class="btn btn-warning" name="collapse_attachment" aria-label="Collapse Attachments" title="Collapse Attachments">
+                  <button type="button" class="btn orange" name="collapse_attachment" aria-label="Collapse Attachments" title="Collapse Attachments">
                     <span class="glyphicon glyphicon-collapse-up" aria-hidden="true"></span>
                   </button>
-                  <button type="button" class="btn btn-success" style="display:none;" name="expand_attachment" aria-label="Expand Attachments" title="Expand Attachments">
+                  <button type="button" class="btn green" style="display:none;" name="expand_attachment" aria-label="Expand Attachments" title="Expand Attachments">
                     <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
                   </button>
                 </span>
@@ -314,7 +314,7 @@
                           <div class="error">{{ attachmentForm.teacher_only.errors }}</div>
                         </td>
                         <td class="attachment_edit">
-                          <button type="button" class="btn btn-danger delete_attachment" name="delete_attachment" aria-label="Delete Attachment" title="Delete Attachment">
+                          <button type="button" class="btn red delete_attachment" name="delete_attachment" aria-label="Delete Attachment" title="Delete Attachment">
                             <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
                           </button>
                           {{attachmentForm.DELETE.as_hidden}}
@@ -330,10 +330,10 @@
               <div class="form-group">
                 <label for="id_{{form.teacher_notes.name}}">{{ form.teacher_notes.label|title }} {% if form.teacher_notes.field.required %}(<span class="required">*</span>) {% endif %}</label>
                 <span class="expand_collapse_other">
-                  <button type="button" class="btn btn-warning" style="display:none;" name="collapse_notes" aria-label="Collapse Notes" title="Collapse Notes">
+                  <button type="button" class="btn orange" style="display:none;" name="collapse_notes" aria-label="Collapse Notes" title="Collapse Notes">
                     <span class="glyphicon glyphicon-collapse-up" aria-hidden="true"></span>
                   </button>
-                  <button type="button" class="btn btn-success"  name="expand_notes" aria-label="Expand Notes" title="Expand Notes">
+                  <button type="button" class="btn green"  name="expand_notes" aria-label="Expand Notes" title="Expand Notes">
                     <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
                   </button>
                 </span>
@@ -358,16 +358,16 @@
                 <span>&nbsp;</span>
                 <span class="controls">
                   <span>
-                    <button type="button" class="btn btn-danger delete_step" name="delete_step" aria-label="Delete Page" title="Delete Page">
+                    <button type="button" class="btn red delete_step" name="delete_step" aria-label="Delete Page" title="Delete Page">
                       <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
                     </button>
                     {{step.DELETE.as_hidden}}
                   </span>
                   <span class="expand_collapse">
-                    <button type="button" class="btn btn-warning" name="collapse_step" aria-label="Collapse Page" title="Collapse Page">
+                    <button type="button" class="btn orange" name="collapse_step" aria-label="Collapse Page" title="Collapse Page">
                       <span class="glyphicon glyphicon-collapse-up" aria-hidden="true"></span>
                     </button>
-                    <button type="button" class="btn btn-success" style="display:none;" name="expand_step" aria-label="Expand Page" title="Expand Page">
+                    <button type="button" class="btn green" style="display:none;" name="expand_step" aria-label="Expand Page" title="Expand Page">
                       <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
                     </button>
                   </span>
@@ -397,10 +397,10 @@
                 <div class="form-group teacher_notes">
                   <label for="id_{{step.teacher_notes.name}}">{{ step.teacher_notes.label|title }} {% if step.teacher_notes.field.required %}(<span class="required">*</span>) {% endif %}</label>
                   <span class="expand_collapse_other">
-                    <button type="button" class="btn btn-warning" style="display:none;" name="collapse_notes" aria-label="Collapse Notes" title="Collapse Notes">
+                    <button type="button" class="btn orange" style="display:none;" name="collapse_notes" aria-label="Collapse Notes" title="Collapse Notes">
                       <span class="glyphicon glyphicon-collapse-up" aria-hidden="true"></span>
                     </button>
-                    <button type="button" class="btn btn-success"  name="expand_notes" aria-label="Expand Notes" title="Expand Notes">
+                    <button type="button" class="btn green"  name="expand_notes" aria-label="Expand Notes" title="Expand Notes">
                       <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
                     </button>
                   </span>
@@ -414,14 +414,14 @@
                   {{step.nested.management_form}}
                   {{step.nested.id}}
                   <label for="id_question_table">Question(s)</label>
-                  <button class="btn btn-info edit_question" name="add_question" data-form="{% url 'ctstem:newQuestion' %}" aria-label="Add New Question" title="Add New Question">
+                  <button class="btn blue edit_question" name="add_question" data-form="{% url 'ctstem:newQuestion' %}" aria-label="Add New Question" title="Add New Question">
                     <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
                   </button>
                   <span class="expand_collapse_other">
-                    <button type="button" class="btn btn-warning" name="collapse_notes" aria-label="Collapse Questions" title="Collapse Questions">
+                    <button type="button" class="btn orange" name="collapse_notes" aria-label="Collapse Questions" title="Collapse Questions">
                       <span class="glyphicon glyphicon-collapse-up" aria-hidden="true"></span>
                     </button>
-                    <button type="button" class="btn btn-success"  style="display:none;" name="expand_notes" aria-label="Expand Questions" title="Expand Questions">
+                    <button type="button" class="btn green"  style="display:none;" name="expand_notes" aria-label="Expand Questions" title="Expand Questions">
                       <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
                     </button>
                   </span>
@@ -462,11 +462,11 @@
                           <td class="referenced_by">{{questionForm.referenced_by}}</td>
                           <td class="optional">{{questionForm.optional}}</td>
                           <td class="question_edit">
-                            <button type="button" class="btn btn-danger delete_question" name="delete_question" aria-label="Delete Question" title="Delete Question">
+                            <button type="button" class="btn red delete_question" name="delete_question" aria-label="Delete Question" title="Delete Question">
                               <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
                             </button>
                             {{questionForm.DELETE.as_hidden}}
-                            <button type="button" class="btn btn-success edit_question" name="edit_question" aria-label="Edit Question" title="Edit Question" data-form="{% url 'ctstem:question' questionForm.question.value|default:0 %}" >
+                            <button type="button" class="btn green edit_question" name="edit_question" aria-label="Edit Question" title="Edit Question" data-form="{% url 'ctstem:question' questionForm.question.value|default:0 %}" >
                               <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
                             </button>
                           </td>
@@ -484,25 +484,27 @@
           <div class="form-group button-group-fixed">
             <input type="hidden" name="back" id="back" value="0"/>
             {% if back_url %}
-              <input type="submit" class="btn" id="backBtn" value="Back"/>
+              <input type="submit" class="btn inbetween gray" id="backBtn" value="Back"/>
+              <br><br>
             {% endif %}
-             <br><br>
+
             {% if form.instance.id %}
               {% check_curriculum_permission form.instance.id 'delete' as has_delete_permission %}
               {% if has_delete_permission == True %}
-                <a type="button" class="btn btn-danger delete_curriculum" aria-hidden="true" aria-label="Delete Curriculum" title="Delete Curriculum" href="{% url 'ctstem:deleteCurriculum' form.instance.id %}">Delete
+                <a type="button" class="btn inbetween red delete_curriculum" aria-hidden="true" aria-label="Delete Curriculum" title="Delete Curriculum" href="{% url 'ctstem:deleteCurriculum' form.instance.id %}">Delete
                 </a>
                 <br><br>
               {% endif %}
-              <input type="submit" class="btn btn-warning" id="previewBtn" value="Preview"/>
+              <input type="submit" class="btn inbetween orange" id="previewBtn" value="Preview"/>
             {% else %}
-              <input type="submit" class="btn btn-warning" id="previewBtn" value="Preview" title="Save this curriculum for the Preview button to be enabled" disabled/>
+              <input type="submit" class="btn inbetween orange" id="previewBtn" value="Preview" title="Save this curriculum for the Preview button to be enabled" disabled/>
             {% endif %}
+            <br><br>
             <input type="hidden" name="preview" id="preview" value="0"/>
+            <input type="submit" class="btn inbetween green" id="submit" value="Save"/>
             <br><br>
-            <input type="submit" class="btn btn-success" id="submit" value="Save"/>
+            <input type="button" class="btn inbetween blue" id="addStep" value="Add Page" style="display:none;"/>
             <br><br>
-            <input type="button" class="btn btn-info" id="addStep" value="Add Page" style="display:none;"/>
           </div>
         </div>
       </div>

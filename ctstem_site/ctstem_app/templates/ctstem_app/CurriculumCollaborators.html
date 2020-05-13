@@ -1,7 +1,7 @@
 {% load ctstem_extras %}
 <div class="form-group collaborator_table">
   <label for="id_collaborator_table">Collaborator(s) (<span class="required">*</span>)</label>
-  <button class="btn btn-info search_users" data-target="#userSearch" data-form="{% url 'ctstem:searchCollaborators' %}">
+  <button class="btn inbetween blue search_users" data-target="#userSearch" data-form="{% url 'ctstem:searchCollaborators' %}">
     <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
   </button>
   <div class="controls table_container">
@@ -42,7 +42,7 @@
               </td>
               <td class="delete">
                 {% if user != collaborator %}
-                  <button type="button" class="btn btn-danger remove_collaborator" name="remove_collaborator" aria-label="Remove this collaborator" title="Remove this collaborator" href="#">
+                  <button type="button" class="btn small red remove_collaborator" name="remove_collaborator" aria-label="Remove this collaborator" title="Remove this collaborator" href="#">
                     <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
                   </button>
                   {{collaboratorForm.DELETE.as_hidden}}
@@ -58,7 +58,7 @@
               <td class="email"></td>
               <td class="edit_view">{{collaboratorForm.privilege}}</td>
               <td class="delete">
-                <button type="button" class="btn btn-danger remove_collaborator" name="remove_collaborator" aria-label="Remove this collaborator" title="Remove this collaborator" href="#">
+                <button type="button" class="btn small red remove_collaborator" name="remove_collaborator" aria-label="Remove this collaborator" title="Remove this collaborator" href="#">
                   <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
                 </button>
                 {{collaboratorForm.DELETE.as_hidden}}
