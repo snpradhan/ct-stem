@@ -21,7 +21,7 @@
 <!-- Delete -->
 {% check_curriculum_permission curriculum.id 'delete' as has_delete_permission %}
 {% if has_delete_permission == True %}
-  <a class="util-button fa fa-trash" aria-hidden="true" aria-label="Delete Curriculum" title="Delete Curriculum" href="{% url 'ctstem:deleteCurriculum' curriculum.id %}" onclick="return confirm('Are you sure you want to delete {{curriculum.title}}?')">
+  <a class="util-button fa fa-trash delete_curriculum" aria-hidden="true" aria-label="Delete Curriculum" title="Delete Curriculum" href="{% url 'ctstem:deleteCurriculum' curriculum.id %}">
     </a>
 {% endif %}
 <!-- Copy -->

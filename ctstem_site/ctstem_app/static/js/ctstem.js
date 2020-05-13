@@ -448,6 +448,30 @@ $(function (){
     alert(msg);
   });
 
+  //confirm curriculum delete
+  $('a.delete_curriculum').click(function(e){
+    e.preventDefault();
+    var link = $(this);
+    bootbox.confirm({ title: 'Confirm',
+                      message: "<p>Are you sure you want to delete this curriculum? If you delete the curriculum and later need to restore, you will need to contact the admin.</p>",
+                      buttons: {
+                        confirm: {
+                            label: 'Yes',
+                            className: 'btn-normal-yellow'
+                        },
+                        cancel: {
+                            label: 'No',
+                            className: 'btn-normal-red'
+                        }
+                      },
+                      callback: function(result){
+                        if (result == true) {
+                          window.location = $(link).attr("href");
+                        }
+                      },
+                  });
+  });
+
 });
 
 function rowAddorRemove(tbl){
