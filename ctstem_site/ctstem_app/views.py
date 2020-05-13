@@ -379,7 +379,7 @@ def lockCurriculum(request, id=''):
           if curr.locked_by:
             curr.locked_by = None
             curr.save()
-      messages.success(request, "The curriculum %s has been locked.  Only you or a site admin can modify and/or unlock this curriculum " % curriculum.title)
+      messages.success(request, "The curriculum %s has been locked.  Only you or a site admin can edit this curriculum while locked.  Other collaborators will need to unlock before editing." % curriculum.title)
 
     return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
@@ -3500,7 +3500,7 @@ def check_curriculum_permission(request, curriculum_id, action, step_order=-1):
         ############ UNLOCK ############
         elif action == 'unlock':
           if curriculum.locked_by:
-            if is_admin or curriculum.locked_by == request.user:
+            if is_admin or has_edit_privilege:
               has_permission = True
             else:
               has_permission = False
