@@ -641,6 +641,8 @@ def deleteCurriculum(request, id=''):
 
     if request.method == 'GET' or request.method == 'POST':
       curriculum = models.Curriculum.objects.get(id=id)
+      unit = curriculum.unit
+      referer = request.META.get('HTTP_REFERER')
 
       curriculum.status = 'R'
       curriculum.save()
@@ -649,7 +651,29 @@ def deleteCurriculum(request, id=''):
         reorder_underlying_curricula(request, curriculum.unit.id)
 
       messages.success(request, "Curriculum '%s - v%s.' has been deleted" % (curriculum.title, curriculum.version))
-      return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+      redirect_url = ''
+      #this request came from curriculum preview page
+      if 'preview' in referer:
+        #if underlying curriculum, redirect to unit overview page
+        if unit:
+          redirect_url = '/curriculum/preview/%s' % unit.id
+        #if standalone curriculum, redirect to curricula tile page
+        else:
+          redirect_url = '/curriculatiles/'
+      #this request came from curriculum edit page
+      elif 'curriculum' in referer:
+        #if underlying curriculum, redirect to unit edit page
+        if unit:
+          redirect_url = '/curriculum/%s' % unit.id
+        #if standalone curriculum, redirect to curricula tile page
+        else:
+          redirect_url = '/curriculatiles/'
+      #this request came from curricula table page, redirect to the same page
+      elif 'curricula' in referer:
+        redirect_url = referer
+
+      return http.HttpResponseRedirect(redirect_url)
 
     return http.HttpResponseNotAllowed(['GET', 'POST'])
 

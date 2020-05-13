@@ -279,6 +279,7 @@ $(function (){
           data: data,
           success: function(data){
             $(lesson_table).html(data);
+            bind_curriculum_delete_confirmation();
             return false;
           },
           error: function(xhr, ajaxOptions, thrownError){
@@ -448,6 +449,10 @@ $(function (){
     alert(msg);
   });
 
+  bind_curriculum_delete_confirmation();
+});
+
+function bind_curriculum_delete_confirmation() {
   //confirm curriculum delete
   $('a.delete_curriculum').click(function(e){
     e.preventDefault();
@@ -471,9 +476,7 @@ $(function (){
                       },
                   });
   });
-
-});
-
+}
 function rowAddorRemove(tbl){
   if($(tbl).find('tbody > tr:visible').length == 0){
     $(tbl).find('thead').css('display', 'none');

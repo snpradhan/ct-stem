@@ -488,6 +488,12 @@
             {% endif %}
              <br><br>
             {% if form.instance.id %}
+              {% check_curriculum_permission form.instance.id 'delete' as has_delete_permission %}
+              {% if has_delete_permission == True %}
+                <a type="button" class="btn btn-danger delete_curriculum" aria-hidden="true" aria-label="Delete Curriculum" title="Delete Curriculum" href="{% url 'ctstem:deleteCurriculum' form.instance.id %}">Delete
+                </a>
+                <br><br>
+              {% endif %}
               <input type="submit" class="btn btn-warning" id="previewBtn" value="Preview"/>
             {% else %}
               <input type="submit" class="btn btn-warning" id="previewBtn" value="Preview" title="Save this curriculum for the Preview button to be enabled" disabled/>
