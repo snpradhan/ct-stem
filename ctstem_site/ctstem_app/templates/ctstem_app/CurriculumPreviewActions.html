@@ -27,7 +27,7 @@
   <div class="col">
     {% check_curriculum_permission curriculum.id 'copy' as has_copy_permission %}
     {% if has_copy_permission == True %}
-      <a type="button" class="btn normal blue" aria-hidden="true" aria-label="Create New Copy" title="Create New Copy" href="{% url 'ctstem:copyCurriculum' curriculum.id %}?back_url={{ back_url }}">Remix</a>
+      <a type="button" class="btn normal blue" aria-hidden="true" aria-label="Create New Copy" title="Create New Copy" href="{% url 'ctstem:copyCurriculum' curriculum.id %}">Remix</a>
     {% else %}
       {% if user.is_authenticated %}
         {% with msg="You can only remix this curriculum at the unit level. Please go back to the unit overview page and remix from there." %}

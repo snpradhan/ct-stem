@@ -351,8 +351,10 @@ def curriculum(request, id=''):
             return shortcuts.redirect('ctstem:previewCurriculum', id=savedCurriculum.id)
           elif back == '1':
             return shortcuts.redirect(back_url)
-          else:
+          elif back_url:
             return shortcuts.redirect('/curriculum/%s?back_url=%s' % (savedCurriculum.id, back_url))
+          else:
+            return shortcuts.redirect('/curriculum/%s' % savedCurriculum.id)
       else:
         print(form.errors)
         print(formset.errors)
@@ -728,7 +730,10 @@ def copyCurriculum(request, id=''):
       if 'back_url' in request.GET:
         back_url = request.GET['back_url']
 
-      return shortcuts.redirect('/curriculum/%s?back_url=%s' % (new_curriculum.id, back_url))
+      if back_url:
+        return shortcuts.redirect('/curriculum/%s?back_url=%s' % (new_curriculum.id, back_url))
+      else:
+        return shortcuts.redirect('/curriculum/%s' % new_curriculum.id)
 
     return http.HttpResponseNotAllowed(['GET', 'POST'])
 
