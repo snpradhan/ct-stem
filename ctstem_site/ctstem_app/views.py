@@ -198,7 +198,13 @@ def curriculum(request, id=''):
       if has_permission:
         curriculum = models.Curriculum.objects.get(id=id)
       else:
-         return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+        if request.META.get('HTTP_REFERER'):
+          if 'login' in request.META.get('HTTP_REFERER'):
+            return shortcuts.redirect('ctstem:home')
+          else:
+            return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+        else:
+          return shortcuts.redirect('ctstem:home')
     #curriculum does not exist
     else:
       has_permission = check_curriculum_permission(request, id, 'create')
@@ -334,7 +340,13 @@ def previewCurriculum(request, id='', step_order=-1):
     if has_permission:
       curriculum = models.Curriculum.objects.get(id=id)
     else:
-      return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+      if request.META.get('HTTP_REFERER'):
+        if 'login' in request.META.get('HTTP_REFERER'):
+          return shortcuts.redirect('ctstem:home')
+        else:
+          return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+      else:
+        return shortcuts.redirect('ctstem:home')
 
     if request.method == 'GET':
       steps = models.Step.objects.all().filter(curriculum=curriculum)
@@ -1171,6 +1183,7 @@ def validate_recaptcha(request, recaptcha_response):
 def user_login(request, user_name=''):
   username = password = ''
   print(request.method)
+  redirect_url = request.GET.get('next', '')
   if request.method == 'POST':
     data = request.POST.copy()
     form = forms.LoginForm(data)
@@ -1187,7 +1200,12 @@ def user_login(request, user_name=''):
 
       if user.is_active:
         login(request, user)
-        if hasattr(user, 'teacher'):
+        if redirect_url:
+          messages.success(request, "Now you are logged in")
+          response_data['success'] = True
+          response_data['redirect_url'] = redirect_url
+
+        elif hasattr(user, 'teacher'):
           messages.success(request, "Welcome to the CT-STEM website. If you need help with using the site, you can go to the <a href='/help'>Help and FAQ</a> page.", extra_tags='safe');
           response_data['success'] = True
           response_data['redirect_url'] = '/groups/active/'
@@ -1199,11 +1217,11 @@ def user_login(request, user_name=''):
 
       else:
         messages.error(request, 'Your account has not been activated')
-        context = {'form': form}
+        context = {'form': form, 'redirect_url': redirect_url}
         response_data['success'] = False
         response_data['html'] = render_to_string('ctstem_app/LoginModal.html', context, request)
     else:
-      context = {'form': form}
+      context = {'form': form, 'redirect_url': redirect_url}
       response_data['success'] = False
       response_data['html'] = render_to_string('ctstem_app/LoginModal.html', context, request)
 
@@ -1213,7 +1231,7 @@ def user_login(request, user_name=''):
       form = forms.LoginForm(initial={'username_email': user_name})
     else:
       form = forms.LoginForm()
-    context = {'form': form}
+    context = {'form': form, 'redirect_url': redirect_url}
     return render(request, 'ctstem_app/LoginModal.html', context)
 
   return http.HttpResponseNotAllowed(['GET', 'POST'])
@@ -3526,6 +3544,9 @@ def check_curriculum_permission(request, curriculum_id, action, step_order=-1):
                 has_permission = check_curriculum_permission(request, lesson.id, action)
                 if has_permission:
                   break;
+
+          if not has_permission:
+            messages.error(request, 'You do not have the privilege to preview this curriculum')
 
         ############ ASSIGN ############
         elif action == 'assign':

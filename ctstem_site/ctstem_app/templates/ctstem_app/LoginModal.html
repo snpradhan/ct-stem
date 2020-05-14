@@ -12,7 +12,7 @@
         {% endfor %}
       </ul>
     </div>
-    <form class="form" id="formLogin" method="post" action="{% url 'ctstem:login' %}">
+    <form class="form" id="formLogin" method="post" action="{% url 'ctstem:login' %}{% if redirect_url %}?next={{redirect_url}}{% endif %}">
       {% csrf_token %}
       {{form.management_form}}
       <div class="modal-body">
