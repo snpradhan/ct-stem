@@ -38,15 +38,15 @@
             <div class="shelf">
             </div>
             <div class="featured">
-              <i class="fas fa-award"></i>
+              <i class="fas fa-award" title="Featured Curriculum"></i>
             </div>
            {% endif %}
           <div class="favorite">
             {% check_curriculum_permission curriculum.id 'favorite' as has_favorite_permission %}
             {% if has_favorite_permission == True %}
-              <a class="bookmark util-button fa fa-star" href="{% url 'ctstem:removeBookmark' curriculum.id %}" style="{% if curriculum|is_bookmarked:user.teacher %} display: inline-block; {% else %} display: none; {% endif %}" title="Remove from Favorites"></a>
+              <a class="bookmark util-button fa fa-star" href="{% url 'ctstem:removeBookmark' curriculum.id %}" style="{% if curriculum|is_bookmarked:user.teacher %} display: inline-block; {% else %} display: none; {% endif %}" title="Favorite Curriculum"></a>
 
-              <a class="bookmark util-button fa fa-star-o" href="{% url 'ctstem:bookmarkCurriculum' curriculum.id %}" style="{% if curriculum|is_bookmarked:user.teacher %} display: none; {% else %} display: inline-block; {% endif %}" title="Add to Favorites"></a>
+              <a class="bookmark util-button fa fa-star-o" href="{% url 'ctstem:bookmarkCurriculum' curriculum.id %}" style="{% if curriculum|is_bookmarked:user.teacher %} display: none; {% else %} display: inline-block; {% endif %}" title="Mark as Favorite"></a>
             {% else %}
               <a class="bookmark util-button fa fa-star-o" data-title="You need to be logged in as a teacher to favorite this curriculum"></a>
             {% endif %}
@@ -98,13 +98,13 @@
 
               {% if shared_curriculum %}
                 <div class="shared">
-                  <i class="fas fa-user-friends" title="This curriculum has been shared with me"></i>
+                  <i class="fas fa-user-friends" title="Shared Curriculum"></i>
                 </div>
               {% endif %}
               {% if user.administrator or my_curriculum or shared_curriculum %}
                 {% if curriculum.locked_by %}
                   <div class="locked">
-                    <i class="fas fa-lock" title="Locked by {{curriculum.locked_by}}"></i>
+                    <i class="fas fa-lock" title="Locked Curriculum"></i>
                   </div>
                 {% endif %}
               {% endif %}
