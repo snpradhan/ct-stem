@@ -66,100 +66,102 @@
     {% endif %}
     <!-- TOP HEADER BAR -->
     <header>
-      <a class="navbar-brand" href="{% url 'ctstem:home' %}"><img src="/static/img/logo/svg/light/wide.svg"></a>
-      <span>{{curr_unit.title|title}} - Preview </span>
-      <nav>
-        <span id="activity-nav">
-        {% if step_order|add:0 >= 0 %}
-          Page &nbsp;
-          {% if step_order|add:0  == 0 %}
-            <a class="page-link selected" href="#">{{0}}</a>
-          {% else %}
-            <a class="page-link" href="{% url 'ctstem:previewCurriculum' curriculum.id 0 %}">{{0}}</a>
+      <div><a class="navbar-brand" href="{% url 'ctstem:home' %}"><img src="/static/img/logo/svg/light/wide.svg"></a></div>
+      <div class="title">Preview: {{curr_unit.title|title}}</div>
+      <div id="page_numbers">
+        <nav id="numbers">
+          <span id="activity-nav">
+          {% if step_order|add:0 >= 0 %}
+            Page &nbsp;
+            {% if step_order|add:0  == 0 %}
+              <a class="page-link selected" href="#">{{0}}</a>
+            {% else %}
+              <a class="page-link" href="{% url 'ctstem:previewCurriculum' curriculum.id 0 %}">{{0}}</a>
+            {% endif %}
+            {% for i in total_steps|iterate %}
+              {% if i|add:0 == step_order|add:0 %}
+                <a class="page-link selected" href="{% url 'ctstem:previewCurriculum' curriculum.id i %}">{{i}}</a>
+              {% else %}
+                <a class="page-link" href="{% url 'ctstem:previewCurriculum' curriculum.id i %}">{{i}}</a>
+              {% endif %}
+            {% endfor %}
           {% endif %}
-          {% for i in total_steps|iterate %}
-            {% if i|add:0 == step_order|add:0 %}
-              <a class="page-link selected" href="{% url 'ctstem:previewCurriculum' curriculum.id i %}">{{i}}</a>
-            {% else %}
-              <a class="page-link" href="{% url 'ctstem:previewCurriculum' curriculum.id i %}">{{i}}</a>
-            {% endif %}
-          {% endfor %}
-        {% endif %}
-        </span>
-        {% if curr_unit.curriculum_type == 'L' or curr_unit.curriculum_type == 'U' %}
-          &nbsp;
-          <button id="menu-button"><span class="fa fa-navicon"></span></button>
-        {% endif %}
-      </nav>
-      {% if curr_unit.curriculum_type == 'L' or curr_unit.curriculum_type == 'U' %}
-        <!-- SIDE MENU -->
-        <nav id="side-nav">
-          <ul>
-            <li><a href="{% url 'ctstem:previewCurriculum'  curr_unit.id %}" class="lesson">
-              View
-              {% if curr_unit.curriculum_type == 'U' %}
-                Unit
-              {% else %}
-                Lesson
-              {% endif %}
-              Summary</a>
-            </li>
-
-            {% if curr_unit.curriculum_type == 'L'%}
-              <li>
-                <a href="{% url 'ctstem:previewCurriculum'  curriculum.id 0 %}" class="activity">Preview Student Activity</a>
-              </li>
-            {% else %}
-              <li>
-                <a href="#" class="list_underlying_curriculum">Preview Underlying Curricula</a>
-                <i class="fa fa-caret-square-o-down underlying_curriculum" aria-hidden="true"></i>
-                <i class="fa fa-caret-square-o-up underlying_curriculum" aria-hidden="true" style="display:none;"></i>
-                <ul class="underlying_curriculum">
-                  {% for curr in underlying_curriculum %}
-                    <li><a href="{% url 'ctstem:previewCurriculum'  curr.id 0 %}" class="activity">{{curr.order}}. {{curr.title}}</a></li>
-                  {% endfor %}
-                 </ul>
-              </li>
-            {% endif %}
-
-            <!-- TODO: LINK TO ATTACHMENT -->
-            {% if user.administrator or user.school_administrator or user.researcher or user.author or user.teacher %}
-              {% if attachments %}
-                <li><a href="{% url 'ctstem:downloadAttachments' curr_unit.id%}">Download Attachment(s) <span class="fa fa-paperclip"></span></a></li>
-              {% endif %}
-            {% endif %}
-            <li class="divider"></li>
-            {% check_curriculum_permission curr_unit.id 'assign' as has_assign_permission %}
-            {% if has_assign_permission == True %}
-              {% if user.administrator or user.school_administrator %}
-                  <li><a class="assign" href="#" data-form="{% url 'ctstem:assignCurriculum' curr_unit.id%}">Assign to Classes</a></li>
-              {% elif user.teacher %}
-                  <li><a class="assign" href="#" data-form="{% url 'ctstem:assignCurriculum' curr_unit.id%}">Assign to My Classes</a></li>
-              {% endif %}
-            {% endif %}
-
-            {% check_curriculum_permission curr_unit.id 'favorite' as has_favorite_permission %}
-            {% if has_favorite_permission == True %}
-              {% if curr_unit|is_bookmarked:user.teacher %}
-                <li><a id="favorites-link" class="favorites">Remove from Favorites</a></li>
-              {% else %}
-                <li><a id="favorites-link" class="favorites">Add to Favorites</a></li>
-              {% endif %}
-            {% endif %}
-
-
-            <li><a class="print" href="{% url 'ctstem:previewCurriculum' curr_unit.id %}">Print This Curriculum <span class="fa fa-print "></span></a></li>
-            <li class="divider"></li>
-            <li><a href="#" class="faq"">View CT FAQ</a></li>
-            {% if user.is_anonymous %}
-              <li><a data-toggle="modal" data-target="#login" class="login modal-open" data-href="{% url 'ctstem:login' %}" href="#">Login/Register</a></li>
-            {% else %}
-              <li><a href="{% url 'ctstem:logout' %}">Logout</a></li>
-            {% endif %}
-            <!-- END IF -->
-          </ul>
+          </span>
+          {% if curr_unit.curriculum_type == 'L' or curr_unit.curriculum_type == 'U' %}
+            &nbsp;
+            <button id="menu-button"><span class="fa fa-navicon"></span></button>
+          {% endif %}
         </nav>
-      {% endif %}
+        {% if curr_unit.curriculum_type == 'L' or curr_unit.curriculum_type == 'U' %}
+          <!-- SIDE MENU -->
+          <nav id="side-nav">
+            <ul>
+              <li><a href="{% url 'ctstem:previewCurriculum'  curr_unit.id %}" class="lesson">
+                View
+                {% if curr_unit.curriculum_type == 'U' %}
+                  Unit
+                {% else %}
+                  Lesson
+                {% endif %}
+                Summary</a>
+              </li>
+
+              {% if curr_unit.curriculum_type == 'L'%}
+                <li>
+                  <a href="{% url 'ctstem:previewCurriculum'  curriculum.id 0 %}" class="activity">Preview Student Activity</a>
+                </li>
+              {% else %}
+                <li>
+                  <a href="#" class="list_underlying_curriculum">Preview Underlying Curricula</a>
+                  <i class="fa fa-caret-square-o-down underlying_curriculum" aria-hidden="true"></i>
+                  <i class="fa fa-caret-square-o-up underlying_curriculum" aria-hidden="true" style="display:none;"></i>
+                  <ul class="underlying_curriculum">
+                    {% for curr in underlying_curriculum %}
+                      <li><a href="{% url 'ctstem:previewCurriculum'  curr.id 0 %}" class="activity">{{curr.order}}. {{curr.title}}</a></li>
+                    {% endfor %}
+                   </ul>
+                </li>
+              {% endif %}
+
+              <!-- TODO: LINK TO ATTACHMENT -->
+              {% if user.administrator or user.school_administrator or user.researcher or user.author or user.teacher %}
+                {% if attachments %}
+                  <li><a href="{% url 'ctstem:downloadAttachments' curr_unit.id%}">Download Attachment(s) <span class="fa fa-paperclip"></span></a></li>
+                {% endif %}
+              {% endif %}
+              <li class="divider"></li>
+              {% check_curriculum_permission curr_unit.id 'assign' as has_assign_permission %}
+              {% if has_assign_permission == True %}
+                {% if user.administrator or user.school_administrator %}
+                    <li><a class="assign" href="#" data-form="{% url 'ctstem:assignCurriculum' curr_unit.id%}">Assign to Classes</a></li>
+                {% elif user.teacher %}
+                    <li><a class="assign" href="#" data-form="{% url 'ctstem:assignCurriculum' curr_unit.id%}">Assign to My Classes</a></li>
+                {% endif %}
+              {% endif %}
+
+              {% check_curriculum_permission curr_unit.id 'favorite' as has_favorite_permission %}
+              {% if has_favorite_permission == True %}
+                {% if curr_unit|is_bookmarked:user.teacher %}
+                  <li><a id="favorites-link" class="favorites">Remove from Favorites</a></li>
+                {% else %}
+                  <li><a id="favorites-link" class="favorites">Add to Favorites</a></li>
+                {% endif %}
+              {% endif %}
+
+
+              <li><a class="print" href="{% url 'ctstem:previewCurriculum' curr_unit.id %}">Print This Curriculum <span class="fa fa-print "></span></a></li>
+              <li class="divider"></li>
+              <li><a href="#" class="faq"">View CT FAQ</a></li>
+              {% if user.is_anonymous %}
+                <li><a data-toggle="modal" data-target="#login" class="login modal-open" data-href="{% url 'ctstem:login' %}" href="#">Login/Register</a></li>
+              {% else %}
+                <li><a href="{% url 'ctstem:logout' %}">Logout</a></li>
+              {% endif %}
+              <!-- END IF -->
+            </ul>
+          </nav>
+        {% endif %}
+      </div>
     </header>
 
     <!-- MAIN CONTENT -->
@@ -551,6 +553,11 @@
         $(this).next().toggle();
       });
 
+      page_numbers_position();
+
+      $(window).resize(function(){
+        page_numbers_position();
+      });
     });
   </script>
 {% endwith %}

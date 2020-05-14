@@ -30,21 +30,21 @@ header {
   position: fixed;
   top: 0;
   left: 0;
-  display: block;
+  display: flex;
   border-bottom: 1px solid white;
   background-color: var(--ctstem-color-blue);
   color: rgba(255, 255, 255, 0.9);
   width: 100%;
-  min-width: 700px;
-  height: 60px;
+  min-width: 400px;
   line-height: 55px;
   padding: 0 25px 0 50px;
   vertical-align: middle;
   font-size: 1.1rem;
   z-index: 5;  /* Make sure it's above the side bar */
   font-family: 'Roboto Condensed', sans-serif;
+  justify-content: flex-start;
+  flex-wrap: wrap;
 }
-
 footer * {
   font-size: 15px !important;
   font-family: sans-serif;
@@ -52,15 +52,26 @@ footer * {
 
 /* PAGE NAVIGATION */
 header nav {
-  display: inline-block;
   vertical-align: middle;
   font-family: 'Roboto Condensed', sans-serif;
-  position: absolute;
-  top: 0;
-  right: 30px;
+  /*position: absolute;*/
 }
 
-header span {
+header > div#page_numbers {
+  flex: 3 1 auto;
+}
+header > div#page_numbers nav#numbers {
+  text-align: right;
+}
+
+header > div.title {
+  max-width: 80%;
+  height: 60px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+header div, header span {
   font-family: 'Roboto Condensed', sans-serif;
 }
 
@@ -171,7 +182,7 @@ main {
   display: block;
   /*max-width: 1200px;*/
   width: 100%;
-  min-width: 600px;
+  min-width: 400px;
 }
 
 .page {
@@ -491,8 +502,9 @@ figcaption {
 }
 
 ul.messages {
-  font-size: 1em;
+  font-size: 1.5em;
   top: 45px;
+  padding: 0;
 }
 
 div.help {

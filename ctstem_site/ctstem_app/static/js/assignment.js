@@ -206,3 +206,20 @@ function setDataTable(){
     dtmSaveTable(tableId);
   });
 }
+
+/*
+ * Adjust side nav and main content top position based on blue nav bar height
+ */
+function page_numbers_position(){
+
+  var top_pos = $('header div#page_numbers').offset();
+  var height = $('header div#page_numbers').height();
+  var nav_bar_pos = top_pos['top'] + height;
+  var messages_pos = nav_bar_pos + 5;
+  var main_content_pos = nav_bar_pos + 50;
+
+  $('ul.messages').css('top', messages_pos+'px');
+  $('header nav#side-nav').css('top', nav_bar_pos+'px');
+  $('.page').css('margin-top', main_content_pos+'px');
+
+}
