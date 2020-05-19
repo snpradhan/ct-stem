@@ -326,6 +326,7 @@ def get_underlying_curriculum(context, curriculum_id):
   else:
     action = 'restore'
   underlying_curriculum = views.underlyingCurriculum(request, action, curriculum_id)
+  list(messages.get_messages(request))
   return underlying_curriculum
 
 # get the next lesson in the sequence for an underlying lesson
