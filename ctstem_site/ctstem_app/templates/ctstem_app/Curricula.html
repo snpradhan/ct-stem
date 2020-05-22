@@ -8,31 +8,32 @@
 {% block content %}
   {{block.super}}
   <div class="content">
-    {% if bucket == 'lesson' or bucket == 'unit' %}
-      {% if bucket == 'lesson' %}
-        <h2> Lessons </h2>
-      {% else %}
-        <h2> Units </h2>
-      {% endif %}
-      <div class="page-blurb">
-        <p>
-          Our computational thinking lesson plans are designed to embed authentic CT practices into high school science and mathematics classrooms while enriching disciplinary content learning.
-        </p>
-      </div>
-    {% elif bucket == 'assessment' %}
-      <h2> Assessments </h2>
-    {% elif bucket == 'teacher_authored' %}
-      <h2> Teacher Authored Curricula </h2>
-    {% elif bucket == 'my' %}
-      <h2> My Curricula </h2>
-    {% elif bucket == 'shared' %}
-      <h2> Shared Curricula </h2>
-    {% elif bucket == 'favorite' %}
-      <h2> Favorite Curricula </h2>
-    {% elif bucket == 'deleted' %}
-      <h2> Deleted Curricula </h2>
-    {% endif %}
+    <div class="page-blurb">
+      {% include "ctstem_app/CurriculaSwitch.html" with on='true' %}
 
+      {% if bucket == 'lesson' or bucket == 'unit' %}
+        {% if bucket == 'lesson' %}
+          <h2> Lessons </h2>
+        {% else %}
+          <h2> Units </h2>
+        {% endif %}
+        <p>
+          Our curricular units are developed and tested with high school teachers to bring authentic CT practices with disciplinary content to your classroom. Find or create curriculum below.
+        </p>
+      {% elif bucket == 'assessment' %}
+        <h2> Assessments </h2>
+      {% elif bucket == 'teacher_authored' %}
+        <h2> Teacher Authored Curricula </h2>
+      {% elif bucket == 'my' %}
+        <h2> My Curricula </h2>
+      {% elif bucket == 'shared' %}
+        <h2> Shared Curricula </h2>
+      {% elif bucket == 'favorite' %}
+        <h2> Favorite Curricula </h2>
+      {% elif bucket == 'deleted' %}
+        <h2> Deleted Curricula </h2>
+      {% endif %}
+    </div>
     <div class="btn-group">
       {% if user.administrator or user.researcher or user.author or user.teacher %}
         <a type="button" class="btn btn-success" href="{% url 'ctstem:newCurriculum' %}?back_url={{ request.path }}" title="Create new curriculum">Create Curriculum</a>

@@ -1,0 +1,11 @@
+{% if user.is_authenticated %}
+<label class="switch" id="curricula_view">
+  {% if on == 'true' %}
+    <input class="switch-input" type="checkbox" checked />
+  {% else %}
+    <input class="switch-input" type="checkbox" />
+  {% endif %}
+  <span class="switch-label" data-on="Table View" data-off="Tile View"></span>
+  <span class="switch-handle"></span>
+</label>
+{% endif %}

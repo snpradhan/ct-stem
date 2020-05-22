@@ -719,6 +719,12 @@ div.content#curricula .page-blurb > * {
   color: inherit !important;
   text-align: center !important;
 }
+
+label.switch#curricula_view {
+  position: absolute;
+  right: 5%;
+}
+
 div.content#curricula div.row {
   flex-flow: wrap;
   display: flex;
@@ -1774,7 +1780,7 @@ a.selector-chooseall, a.selector-clearall {
   height: inherit;
   font-size: 10px;
   text-transform: uppercase;
-  background: #337ab7;
+  background: var(--ctstem-color-dark-blue);
   border-radius: inherit;
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.12), inset 0 0 2px rgba(0, 0, 0, 0.15);
 }
@@ -1802,7 +1808,7 @@ a.selector-chooseall, a.selector-clearall {
   opacity: 0;
 }
 .switch-input:checked ~ .switch-label {
-  background: #5cb85c;
+  background: var(--ctstem-color-dark-green);;
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.15), inset 0 0 3px rgba(0, 0, 0, 0.2);
 }
 .switch-input:checked ~ .switch-label:before {
