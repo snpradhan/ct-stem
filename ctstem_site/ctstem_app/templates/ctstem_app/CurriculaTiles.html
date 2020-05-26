@@ -134,13 +134,6 @@
             }, 3000);
         }
       });
-      $('.portfolio-item').each(function(){
-        var id = $(this).attr('id');
-        var index = parseInt(id, 10);
-        if(index > 8){
-          $(this).hide();
-        }
-      });
 
       $('#curricula_filters_toggle label').click(function(){
         $('#curricula_filters_toggle label').toggle();

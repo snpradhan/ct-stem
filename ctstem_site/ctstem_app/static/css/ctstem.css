@@ -690,7 +690,7 @@ label.switch#curricula_view {
   right: 5%;
 }
 
-div.content#curricula div.row, div.content#classes div.row {
+div.content#curricula div.row, div.content#classes div.row, div.content div.row#standard_tiles{
   flex-flow: wrap;
   display: flex;
   margin-left: auto;
@@ -728,27 +728,38 @@ div.content#curricula div.row#curricula_filters .search {
   text-align: right;
   margin-top: 2em;
 }
-div.row#curricula_tiles, div.row#class_tiles {
+div.row#curricula_tiles, div.row#class_tiles, div.row#standard_tiles {
   justify-content: center;
   align-items: center;
 }
 
-div.row#curricula_tiles a:hover, div.row#class_tiles a:hover {
+div.row#curricula_tiles a:hover, div.row#class_tiles a:hover, div.row#standard_tiles a:hover {
   text-decoration: none;
 }
-div.row#curricula_tiles .col, div.row#class_tiles .col {
+div.row#curricula_tiles .col {
   flex: 1 1 30%;
   text-align: center;
   margin: 2em auto;
 }
-div.row#curricula_tiles .col .tile, div.row#class_tiles .col .tile {
+
+div.row#class_tiles .col, div.row#standard_tiles .col {
+  flex: 1 1 25%;
+  text-align: center;
+  margin: 2em auto;
+}
+
+div.row#curricula_tiles .col .tile, div.row#class_tiles .col .tile, div.row#standard_tiles .col .tile {
   display: inline-block;
   position: relative;
   box-shadow: unset;
   overflow: hidden;
 }
+div.row#class_tiles .col .tile, div.row#standard_tiles .col .tile {
+  border: 2px solid black;
+  width: 30em;
+}
 
-div.row#curricula_tiles .col .tile:hover, div.row#class_tiles .col .tile:hover {
+div.row#curricula_tiles .col .tile:hover, div.row#class_tiles .col .tile:hover, div.row#standard_tiles .col .tile:hover {
   z-index: 2;
   -webkit-transition: all 200ms ease-in;
   -webkit-transform: scale(1.05);
@@ -759,13 +770,17 @@ div.row#curricula_tiles .col .tile:hover, div.row#class_tiles .col .tile:hover {
   transition: all 200ms ease-in;
   transform: scale(1.05);
 }
-div.row#curricula_tiles .col .tile .detail, div.row#class_tiles .col .tile .detail{
+div.row#curricula_tiles .col .tile .detail, div.row#class_tiles .col .tile .detail, div.row#standard_tiles .col .tile .detail {
   color: black;
   background-color: white;
 }
 
 div.row#class_tiles .col .tile .detail {
   height: 12em;
+}
+div.row#standard_tiles .col .tile .detail {
+  height: 7em;
+  text-align: center;
 }
 
 div.row#class_tiles .col .tile .detail .button_row {

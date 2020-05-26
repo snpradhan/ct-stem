@@ -89,7 +89,7 @@
             {% if group_status == 'active' %}
             <div class="col">
               <div class="tile">
-                <a href="{% url 'ctstem:newGroup' %}" class="portfolio-link">
+                <a href="{% url 'ctstem:newGroup' %}">
                   <div class="icon">
                     <img src="/static/img/new_class.png" class="img-responsive group_icon_stock" alt="">
                   </div>
@@ -262,9 +262,6 @@
         $("div.modal#invite .modal-body .link").html($(this).data('invite-link'));
       });
 
-      $('div.portfolio-select').on('click', function(){
-        $(this).find('input[type="hidden"][id^="group"]')
-      });
     });
 
   </script>

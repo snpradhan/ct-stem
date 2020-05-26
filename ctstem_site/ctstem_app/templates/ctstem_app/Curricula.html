@@ -210,13 +210,6 @@
             }, 3000);
         }
       });
-      $('.portfolio-item').each(function(){
-        var id = $(this).attr('id');
-        var index = parseInt(id, 10);
-        if(index > 8){
-          $(this).hide();
-        }
-      });
 
       $('.content').on("click", "a.bookmark", function(e){
         e.preventDefault();
