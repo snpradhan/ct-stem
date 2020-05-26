@@ -100,8 +100,8 @@
                 $(teacher_row).find('td:not(:last)').each(function(){
                   teacher += "<td>"+$(this).html()+"</td>";
                 });
-                teacher += "<td> <button type='button' class='btn btn-warning unshare' aria-label='Unshare resource with this teacher' title='Unshare resource with this teacher'> \
-                            <span class='glyphicon glyphicon-trash' aria-hidden='true'></span>\
+                teacher += "<td> <button type='button' class='btn red unshare' aria-label='Unshare resource with this teacher' title='Unshare resource with this teacher'> \
+                            <i class='fa fa-trash' aria-hidden='true'></i>\
                           </button></td>";
                 $('table#teachers tbody').append(teacher);
                 rowAddorRemove($('table#teachers'));

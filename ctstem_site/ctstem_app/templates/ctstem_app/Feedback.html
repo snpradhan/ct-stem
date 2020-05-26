@@ -151,19 +151,19 @@
         <div class="form-group button-group-fixed col-md-2">
           <input type="hidden" name="save_and_close" id="save_and_close" value="false" />
           {% if form.instance.instance.status == 'P' %}
-            <input type="submit" class="btn btn-info" id="save" value="Save"/>
+            <input type="submit" class="btn inbetween blue" id="save" value="Save"/>
           {% elif form.instance.instance.status == 'S' %}
-            <input type="submit" class="btn btn-info" id="save" value="Save"/>
+            <input type="submit" class="btn inbetween blue" id="save" value="Save"/>
             <br><br>
-            <input type="button" class="btn btn-success" id="close" value="Save and Close"/>
+            <input type="button" class="btn inbetween green" id="close" value="Save and Close"/>
             <br><br>
           {% endif %}
           {% if prevInstance %}
-            <a type="button" class="btn btn-warning" id="prev" href="{% url 'ctstem:feedback' form.instance.instance.assignment.id prevInstance.id %}"> Previous Student </a>
+            <a type="button" class="btn inbetween orange" id="prev" href="{% url 'ctstem:feedback' form.instance.instance.assignment.id prevInstance.id %}"> Previous Student </a>
             <br><br>
           {% endif %}
           {% if nextInstance %}
-            <a type="button" class="btn btn-warning" id="prev" href="{% url 'ctstem:feedback' form.instance.instance.assignment.id nextInstance.id %}"> Next Student </a>
+            <a type="button" class="btn inbetween orange" id="prev" href="{% url 'ctstem:feedback' form.instance.instance.assignment.id nextInstance.id %}"> Next Student </a>
           {% endif %}
         </div>
       </div>

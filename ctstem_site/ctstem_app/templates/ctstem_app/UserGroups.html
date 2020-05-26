@@ -36,7 +36,7 @@
                   <a href="{% url 'ctstem:group' group.id %}" class="portfolio-link">
                     <div class="portfolio-hover">
                       <div class="portfolio-hover-content">
-                        <span class="glyphicon glyphicon-pencil gi-3x" aria-hidden="true"></span>
+                        <i class="fas fa-pencil-alt"></i>
                       </div>
                     </div>
                     <div class="portfolio-icon">
@@ -45,7 +45,8 @@
                     {% elif group.subject and group.subject.icon %}
                       <img src="{{group.subject.icon.url}}" class="img-responsive" alt="">
                     {% else %}
-                      <img src="/static/img/class.png" class="img-responsive group_icon_stock" alt="">
+                      <!--img src="/static/img/class.png" class="img-responsive group_icon_stock" alt=""-->
+                      <i class="fas fa-users"></i>
                     {% endif %}
                     </div>
                   </a>
@@ -62,41 +63,35 @@
                     <div class="button_row">
                       {% if group.is_active %}
                         <div>
-                          <a type="button" class="btn btn-yellow invite-modal" href="#" data-toggle="modal" data-target="#invite" data-invite-link="https://{{domain}}/?next=/preregister/group/{{group.group_code}}/" data-title="{{group.title}}" title="Student Invitation Link">
+                          <a type="button" class="btn inbetween yellow invite-modal" href="#" data-toggle="modal" data-target="#invite" data-invite-link="https://{{domain}}/?next=/preregister/group/{{group.group_code}}/" data-title="{{group.title}}" title="Student Invitation Link">
                             <i class="fa fa-link"></i>
                           </a>
                         </div>
 
                         <div>
-                          <a type="button" class="btn btn-success upload-modal" href="#" data-toggle="modal" data-target="#upload" data-id="{{group.id}}" data-title="{{group.title}}" title="Add Students">
+                          <a type="button" class="btn inbetween green upload-modal" href="#" data-toggle="modal" data-target="#upload" data-id="{{group.id}}" data-title="{{group.title}}" title="Add Students">
                             <i class="fa fa-user-plus"></i>
                           </a>
                         </div>
                         <div>
-                          <a type="button" class="btn btn-warning" aria-label="Class Dashboard" title="Class Dashboard" href="{% url 'ctstem:groupDashboard' group.id %}">
-                            <img src="/static/img/dashboard.png" class="icon" />
+                          <a type="button" class="btn inbetween orange" aria-label="Class Dashboard" title="Class Dashboard" href="{% url 'ctstem:groupDashboard' group.id %}">
+                            <i class="fas fa-tachometer-alt"></i>
                           </a>
                         </div>
                          <div>
-                          <a type="button" class="btn btn-info assignment-modal" href="#" data-toggle="modal" data-target="#assignment" data-id="{{group.id}}" title="Search and Add Assignments" data-title="{{group.title}}">
+                          <a type="button" class="btn inbetween blue assignment-modal" href="#" data-toggle="modal" data-target="#assignment" data-id="{{group.id}}" title="Search and Add Assignments" data-title="{{group.title}}">
                             <i class="fa fa-tasks"></i>
                           </a>
                         </div>
-
-                        <!--div>
-                          <a type="button" class="btn btn-purple" aria-label="Inactivate Class" title="Inactivate Class" href="{% url 'ctstem:inactivateGroup' group.id %}" onclick="return confirm('Are you sure you want to inactivate {{group.title}}?')">
-                              <i class="fa fa-archive"></i>
-                          </a>
-                        </div-->
                       {% else %}
                         <div>
-                          <a type="button" class="btn btn-info" aria-label="Edit Class" title="Edit Class" href="{% url 'ctstem:group' group.id %}">
-                            <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
+                          <a type="button" class="btn inbetween blue" aria-label="Edit Class" title="Edit Class" href="{% url 'ctstem:group' group.id %}">
+                            <i class="far fa-eye" aria-hidden="true"></i>
                           </a>
                         </div>
                         <div>
-                          <a type="button" class="btn btn-warning" aria-label="Class Dashboard" title="Class Dashboard" href="{% url 'ctstem:groupDashboard' group.id %}">
-                            <img src="/static/img/dashboard.png" class="icon" />
+                          <a type="button" class="btn inbetween orange" aria-label="Class Dashboard" title="Class Dashboard" href="{% url 'ctstem:groupDashboard' group.id %}">
+                            <i class="fas fa-tachometer-alt"></i>
                           </a>
                         </div>
                       {% endif %}
@@ -111,7 +106,7 @@
                 <a href="{% url 'ctstem:newGroup' %}" class="portfolio-link">
                    <div class="portfolio-hover">
                     <div class="portfolio-hover-content">
-                      <span class="glyphicon glyphicon-plus gi-3x" aria-hidden="true"></span>
+                      <i class="fas fa-plus"></i>
                     </div>
                   </div>
                   <div class="portfolio-icon">
@@ -134,18 +129,18 @@
               <tr>
                 <th width="1%" class="no-sort">Select All <br> <input id="select-all" type="checkbox" value="0" name="select-all"/></th>
                 <th width="20%" id="title" class="ignorecase"> Class Name </th>
-                <th width="10%" id="subject__name" class="ignorecase"> Subject </th>
+                <th width="7%" id="subject__name" class="ignorecase"> Subject </th>
                 <th width="10%" id="time" class="ignorecase"> Time </th>
                 <th width="5%" id="is_active"> Status </th>
                 {% if not user.teacher %}
                   <th width="15%" id="teacher__user__first_name" class="ignorecase"> Teacher </th>
                 {% endif %}
-                <th width="15%">Co-teachers</th>
+                <th width="10%">Co-teachers</th>
                 {% if not user.teacher and not user.school_administrator %}
                   <th width="15%" id="teacher__school__name" class="ignorecase"> School </th>
                 {% endif %}
                 <th> Students </th>
-                <th> Assignments </th>
+                <th width="8%"> Assignments </th>
                 <th width="8%"> Created <br> Modified <br> Last Login</th>
               </tr>
               <!--tr id="filterrow">
@@ -176,26 +171,26 @@
                     {{group.title}}
                     {% if not user.researcher %}
                       <div class="controls">
-                        <a type="button" class="btn btn-info" aria-label="Edit Class" title="Edit Class" href="{% url 'ctstem:group' group.id %}">
+                        <a type="button" class="btn small blue" aria-label="Edit Class" title="Edit Class" href="{% url 'ctstem:group' group.id %}">
                             {% if group.is_active %}
-                              <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+                              <i class="fas fa-pencil-alt" aria-hidden="true"></i>
                             {% else %}
-                              <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
+                              <i class="far fa-eye" aria-hidden="true"></i>
                             {% endif %}
                         </a>
                         {% if group.is_active %}
-                          <a type="button" class="btn btn-yellow invite-modal" href="#" data-toggle="modal" data-target="#invite" data-invite-link="https://{{domain}}/?next=/preregister/group/{{group.group_code}}/" data-title="{{group.title}}" title="Student Invitation Link">
+                          <a type="button" class="btn small yellow invite-modal" href="#" data-toggle="modal" data-target="#invite" data-invite-link="https://{{domain}}/?next=/preregister/group/{{group.group_code}}/" data-title="{{group.title}}" title="Student Invitation Link">
                             <i class="fa fa-link"></i>
                           </a>
-                          <a type="button" class="btn btn-success upload-modal" href="#" data-toggle="modal" data-target="#upload" data-id="{{group.id}}" data-title="{{group.title}}" title="Upload Students">
+                          <a type="button" class="btn small green upload-modal" href="#" data-toggle="modal" data-target="#upload" data-id="{{group.id}}" data-title="{{group.title}}" title="Upload Students">
                             <i class="fa fa-user-plus"></i>
                           </a>
-                          <a type="button" class="btn btn-purple" aria-label="Inactivate Class" title="Inactivate Class" href="{% url 'ctstem:inactivateGroup' group.id %}" onclick="return confirm('Are you sure you want to inactivate {{group.title}}?')">
+                          <a type="button" class="btn small purple" aria-label="Inactivate Class" title="Inactivate Class" href="{% url 'ctstem:inactivateGroup' group.id %}" onclick="return confirm('Are you sure you want to inactivate {{group.title}}?')">
                               <i class="fa fa-archive"></i>
                           </a>
                           {% if user.administrator %}
-                            <a type="button" class="btn btn-danger" aria-label="Delete Class" title="Delete Class" href="{% url 'ctstem:deleteGroup' group.id %}" onclick="return confirm('Are you sure you want to delete {{group.title}}?')">
-                                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                            <a type="button" class="btn small red" aria-label="Delete Class" title="Delete Class" href="{% url 'ctstem:deleteGroup' group.id %}" onclick="return confirm('Are you sure you want to delete {{group.title}}?')">
+                                <i class="fa fa-trash" aria-hidden="true"></i>
                             </a>
                           {% endif %}
                         {% endif %}
@@ -230,8 +225,8 @@
                       {% if group.assignments.count > 0 %}
                         {{group.assignments.count}} Assignments
                         <div>
-                          <a type="button" class="btn btn-warning" href="{% url 'ctstem:groupDashboard' group.id %}" aria-label="View Class Dashboard" title="View Class Dashboard">
-                            <img src="/static/img/dashboard.png" class="icon" />
+                          <a type="button" class="btn small orange" href="{% url 'ctstem:groupDashboard' group.id %}" aria-label="View Class Dashboard" title="View Class Dashboard">
+                            <i class="fas fa-tachometer-alt"></i>
                           </a>
                       {% else %}
                         No Assignment
@@ -240,7 +235,7 @@
                       {% endif %}
 
                       {% if not user.researcher %}
-                        <a type="button" class="btn btn-info assignment-modal" href="#" data-toggle="modal" data-target="#assignment" data-id="{{group.id}}" data-title="{{group.title}}" data-subject="{{group.subject.id}}" title="Search and Add Assignments">
+                        <a type="button" class="btn small blue assignment-modal" href="#" data-toggle="modal" data-target="#assignment" data-id="{{group.id}}" data-title="{{group.title}}" data-subject="{{group.subject.id}}" title="Search and Add Assignments">
                           <i class="fa fa-tasks"></i>
                         </a>
                       {% endif %}

@@ -1,45 +1,10 @@
+@import 'color.css';
 @import 'media.css';
 @import 'footer.css';
+@import 'button.css';
 
 /* Page Element Styles */
-:root {
-  --ctstem-font-family: "proxima-nova", sans-serif;
-  --ctstem-color-dark-yellow: #B2911C;
-  --ctstem-color-yellow: #FFD028;
-  --ctstem-color-light-yellow: #FFDF6F;
-  --ctstem-color-pale-yellow: #FFF8DF;
 
-  --ctstem-color-dark-blue: #343D51;
-  --ctstem-color-blue: #00ADFF;
-  --ctstem-color-medium-blue: #3A74E8;
-  --ctstem-color-light-blue: #54C8FF;
-  --ctstem-color-pale-blue: #E5F7FF;
-
-  --ctstem-color-dark-gray: #242B39;
-  --ctstem-color-gray: #343D51;
-  --ctstem-color-light-gray: #808593;
-  --ctstem-color-pale-gray: #D8DAE2;
-
-  --ctstem-color-dark-red: #A93254;
-  --ctstem-color-red: #F24878;
-  --ctstem-color-light-red: #F684A4;
-  --ctstem-color-pale-red: #FDE4EB;
-
-  --ctstem-color-dark-green: #079342;
-  --ctstem-color-green: #0ad35e;
-  --ctstem-color-light-green: #5be193;
-  --ctstem-color-pale-green: #daf8e7;
-
-  --ctstem-color-dark-orange: #af5417;
-  --ctstem-color-orange: #fa7921;
-  --ctstem-color-light-orange: #fca56a;
-  --ctstem-color-pale-orange: #feedbe;
-
-  --ctstem-color-dark-purple: #38388c;
-  --ctstem-color-purple: #5050c9;
-  --ctstem-color-light-purple: #8a8adb;
-  --ctstem-color-pale-purple: #e5e5f7;
-}
 html {
   height: 100%;
 }
@@ -1131,6 +1096,14 @@ section.portfolio .portfolio-item .portfolio-link .portfolio-hover {
   border-top-right-radius: 2em;
 }
 
+section.portfolio .portfolio-item .portfolio-link .portfolio-hover .portfolio-hover-content i{
+  font-size: 4em;
+}
+
+section.portfolio .portfolio-item .portfolio-link .portfolio-icon i {
+  font-size: 20em;
+  color: black;
+}
 div.content#classes section.portfolio .portfolio-item .portfolio-caption .button_row {
   display: flex;
   justify-content: space-around;
@@ -1324,113 +1297,7 @@ div.content #curricula_tile  .row.button a {
   margin-right: 1em;
 }
 
-.btn, button[class*="btn"]  {
-  font-family: var(--ctstem-font-family) !important;
-  text-transform: uppercase !important;
-  font-weight: 600 !important;
 
-}
-
-.btn.big, button[class*="big"] {
-  font-size: 1.6em !important;
-  padding: 1em 1.6em !important;
-}
-
-.btn.normal, button[class*="normal"] {
-  font-size: 1.4em !important;
-  padding: 0.8em 1.6em !important;
-}
-.btn.inbetween, button[class*="inbetween"] {
-  font-size: 1.2em !important;
-  padding: 0.7em 1.2em !important;
-}
-.btn.small, button[class*="small"] {
-  font-size: 1em !important;
-  padding: 0.6em 1em !important;
-}
-.btn.blue, button[class*="blue"] {
-  background-color: var(--ctstem-color-blue) !important;
-  color: white !important;
-}
-.btn.blue:hover, button[class*="blue"]:hover  {
-  border: 1px solid var(--ctstem-color-blue) !important;
-  background-color: #ffffff !important;
-  color: var(--ctstem-color-blue) !important;
-}
-.btn.darkblue, button[class*="darkblue"]  {
-  background-color: var(--ctstem-color-dark-blue) !important;
-  color: white !important;
-}
-.btn.darkblue:hover, button[class*="darkblue"]:hover {
-  border: 1px solid var(--ctstem-color-dark-blue) !important;
-  background-color: #ffffff !important;
-  color: var(--ctstem-color-dark-blue) !important;
-}
-.btn.yellow, button[class*="yellow"] {
-  background-color: var(--ctstem-color-yellow) !important;
-  color: black !important;
-}
-.btn.yellow:hover, button[class*="yellow"]:hover {
-  border: 1px solid var(--ctstem-color-yellow) !important;
-  background-color: #ffffff !important;
-  color: var(--ctstem-color-yellow) !important;
-}
-.btn.white, button[class*="white"] {
-  border: 1px solid var(--ctstem-color-light-gray) !important;
-  background-color: #ffffff !important;
-  color: black !important;
-}
-.btn.white:hover, button[class*="white"]:hover {
-  background-color: var(--ctstem-color-light-gray) !important;
-  color: #ffffff !important;
-}
-
-.btn.gray, button[class*="gray"] {
-  border: 1px solid var(--ctstem-color-light-gray) !important;
-  background-color: var(--ctstem-color-light-gray) !important;
-  color: black !important;
-}
-.btn.gray:hover, button[class*="gray"]:hover {
-  background-color: #ffffff !important;
-}
-.btn.red, button[class*="red"] {
-  background-color: var(--ctstem-color-red) !important;
-  color: white !important;
-}
-.btn.red:hover, button[class*="red"]:hover {
-  border: 1px solid var(--ctstem-color-red) !important;
-  background-color: #ffffff !important;
-  color: var(--ctstem-color-red) !important;
-}
-
-.btn.orange,  button[class*="orange"] {
-  background-color: var(--ctstem-color-orange) !important;
-  color: white !important;
-}
-.btn.orange:hover, button[class*="orange"]:hover {
-  border: 1px solid var(--ctstem-color-orange) !important;
-  background-color: #ffffff !important;
-  color: var(--ctstem-color-orange) !important;
-}
-
-.btn.green,  button[class*="green"] {
-  background-color: var(--ctstem-color-green) !important;
-  color: white !important;
-}
-.btn.green:hover, button[class*="green"]:hover {
-  border: 1px solid var(--ctstem-color-green) !important;
-  background-color: #ffffff !important;
-  color: var(--ctstem-color-green) !important;
-}
-.btn.purple,  button[class*="purple"] {
-  background-color: var(--ctstem-color-purple) !important;
-  color: white !important;
-}
-.btn.purple:hover, button[class*="purple"]:hover {
-  border: 1px solid var(--ctstem-color-purple) !important;
-  background-color: #ffffff !important;
-  color: var(--ctstem-color-purple) !important;
-}
 
 /********************/
 

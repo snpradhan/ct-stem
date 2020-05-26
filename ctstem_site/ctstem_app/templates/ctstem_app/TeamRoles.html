@@ -9,7 +9,7 @@
     <h2>Team Roles</h2>
     {% if user.administrator or user.researcher%}
       <div class="btn-group">
-        <a type="button" class="btn btn-info" href="{% url 'ctstem:newMember' %}" title="Create new team member">Create Team Member</a>
+        <a type="button" class="btn blue normal" href="{% url 'ctstem:newMember' %}" title="Create new team member">Create Team Member</a>
       </div>
       <ul class="nav nav-tabs">
         <li class="{% navactive request 'ctstem:teamMembers' %}"><a href="{% url 'ctstem:teamMembers' %}">Team Members</a></li>
@@ -41,8 +41,8 @@
                 <div class="error">{{ form.ORDER.errors }}</div>
               </td>
               <td>
-                <button type="button" class="btn btn-danger delete_role" name="delete_role" aria-label="Delete Role" title="Delete Role">
-                  <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                <button type="button" class="btn red small delete_role" name="delete_role" aria-label="Delete Role" title="Delete Role">
+                  <i class="fa fa-trash" aria-hidden="true"></i>
                 </button>
                 {{form.DELETE.as_hidden}}
                 <div class="error">{{ form.DELETE.errors }}</div>
@@ -52,8 +52,8 @@
         </tbody>
         </table>
         <div class="form-group button-group">
-          <input type="button" class="btn btn-info" id="add" value="Add Role"/>
-          <input type="submit" class="btn btn-success" id="submit" value="Save Roles"/>
+          <input type="button" class="btn blue inbetween" id="add" value="Add Role"/>
+          <input type="submit" class="btn green inbetween" id="submit" value="Save Roles"/>
         </div>
       </div>
     </form>

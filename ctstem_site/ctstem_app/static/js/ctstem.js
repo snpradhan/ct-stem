@@ -186,11 +186,11 @@ $(function (){
                     <td><input id="student_'+student+'" type="checkbox" class="action-select" value="'+student+'" name="student_'+student+'">\
                     <td>'+data['new_students'][student]['username']+'\
                       <div class="controls">\
-                        <a type="button" class="btn btn-success edit" aria-label="Edit User" title="Edit User" href="/user/'+user_id+'">\
-                          <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>\
+                        <a type="button" class="btn green small edit" aria-label="Edit User" title="Edit User" href="/user/'+user_id+'">\
+                          <i class="fas fa-pencil-alt"></i>\
                         </a>\
-                        <a type="button" class="btn btn-warning removeUser" aria-label="Remove Student" title="Remove Student" href="/student/remove/'+group+'/'+student+'" data-id="'+student+'">\
-                          <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>\
+                        <a type="button" class="btn orange small removeUser" aria-label="Remove Student" title="Remove Student" href="/student/remove/'+group+'/'+student+'" data-id="'+student+'">\
+                          <i class="fa fa-trash"></i>\
                         </a>\
                       </div>\
                     </td>\
@@ -560,14 +560,14 @@ function add_student_to_data_table(value, csrf){
     <td width="3%"><input id="student_'+value['student_id']+'" type="checkbox" class="action-select" value="'+value['student_id']+'" name="student_'+value['student_id']+'" /></td>\
     <td>'+value['username']+'\
       <div class="controls">\
-        <a type="button" class="btn btn-success edit" aria-label="Edit User" title="Edit User" href="/user/'+value['user_id']+'">\
-          <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>\
+        <a type="button" class="btn green small edit" aria-label="Edit User" title="Edit User" href="/user/'+value['user_id']+'">\
+          <i class="fas fa-pencil-alt"></i>\
         </a>\
-        <a type="button" class="btn btn-warning removeUser" aria-label="Remove Student" title="Remove Student" href="/student/remove/'+value['group']+'/'+value['student_id']+'" data-id="'+value['student_id']+'">\
-          <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>\
+        <a type="button" class="btn red small removeUser" aria-label="Remove Student" title="Remove Student" href="/student/remove/'+value['group']+'/'+value['student_id']+'" data-id="'+value['student_id']+'">\
+          <i class="fa fa-trash"></i>\
         </a>\
-        <button type="button" class="btn btn-info reset" aria-label="Reset User Password" title="Reset User Password" onclick="return reset_password(&apos;'+value['username']+'&apos;,&apos;'+csrf+'&apos;)">\
-          <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>\
+        <button type="button" class="btn gray small reset" aria-label="Reset User Password" title="Reset User Password" onclick="return reset_password(&apos;'+value['username']+'&apos;,&apos;'+csrf+'&apos;)">\
+          <i class="fas fa-sync-alt"></i>\
         </button>\
       </div>\
     </td>\

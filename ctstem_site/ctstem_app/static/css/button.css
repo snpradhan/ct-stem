@@ -1,0 +1,116 @@
+.btn, button[class*="btn"]  {
+  font-family: var(--ctstem-font-family) !important;
+  text-transform: uppercase !important;
+  font-weight: 600 !important;
+}
+
+.btn.big, button[class*="big"] {
+  font-size: 1.6em !important;
+  padding: 1em 1.6em !important;
+}
+
+.btn.normal, button[class*="normal"] {
+  font-size: 1.4em !important;
+  padding: 0.8em 1.6em !important;
+}
+.btn.inbetween, button[class*="inbetween"] {
+  font-size: 1.2em !important;
+  padding: 0.7em 1.2em !important;
+}
+.btn.small, button[class*="small"] {
+  font-size: 1em !important;
+  padding: 0.6em 1em !important;
+}
+.btn.lightblue, button[class*="lightblue"] {
+  background-color: var(--ctstem-color-light-blue) !important;
+  color: white !important;
+}
+.btn.lightblue:hover, button[class*="lightblue"]:hover  {
+  border: 1px solid var(--ctstem-color-light-blue) !important;
+  background-color: #ffffff !important;
+  color: var(--ctstem-color-light-blue) !important;
+}
+.btn.blue, button[class*="blue"] {
+  background-color: var(--ctstem-color-blue) !important;
+  color: white !important;
+}
+.btn.blue:hover, button[class*="blue"]:hover  {
+  border: 1px solid var(--ctstem-color-blue) !important;
+  background-color: #ffffff !important;
+  color: var(--ctstem-color-blue) !important;
+}
+.btn.darkblue, button[class*="darkblue"]  {
+  background-color: var(--ctstem-color-dark-blue) !important;
+  color: white !important;
+}
+.btn.darkblue:hover, button[class*="darkblue"]:hover {
+  border: 1px solid var(--ctstem-color-dark-blue) !important;
+  background-color: #ffffff !important;
+  color: var(--ctstem-color-dark-blue) !important;
+}
+.btn.yellow, button[class*="yellow"] {
+  background-color: var(--ctstem-color-yellow) !important;
+  color: black !important;
+}
+.btn.yellow:hover, button[class*="yellow"]:hover {
+  border: 1px solid var(--ctstem-color-yellow) !important;
+  background-color: #ffffff !important;
+  color: var(--ctstem-color-yellow) !important;
+}
+.btn.white, button[class*="white"] {
+  border: 1px solid var(--ctstem-color-light-gray) !important;
+  background-color: #ffffff !important;
+  color: black !important;
+}
+.btn.white:hover, button[class*="white"]:hover {
+  background-color: var(--ctstem-color-light-gray) !important;
+  color: #ffffff !important;
+}
+
+.btn.gray, button[class*="gray"] {
+  border: 1px solid var(--ctstem-color-light-gray) !important;
+  background-color: var(--ctstem-color-light-gray) !important;
+  color: white !important;
+}
+.btn.gray:hover, button[class*="gray"]:hover {
+  background-color: #ffffff !important;
+  color: var(--ctstem-color-light-gray) !important;
+}
+.btn.red, button[class*="red"] {
+  background-color: var(--ctstem-color-red) !important;
+  color: white !important;
+}
+.btn.red:hover, button[class*="red"]:hover {
+  border: 1px solid var(--ctstem-color-red) !important;
+  background-color: #ffffff !important;
+  color: var(--ctstem-color-red) !important;
+}
+
+.btn.orange,  button[class*="orange"] {
+  background-color: var(--ctstem-color-orange) !important;
+  color: white !important;
+}
+.btn.orange:hover, button[class*="orange"]:hover {
+  border: 1px solid var(--ctstem-color-orange) !important;
+  background-color: #ffffff !important;
+  color: var(--ctstem-color-orange) !important;
+}
+
+.btn.green,  button[class*="green"] {
+  background-color: var(--ctstem-color-green) !important;
+  color: white !important;
+}
+.btn.green:hover, button[class*="green"]:hover {
+  border: 1px solid var(--ctstem-color-green) !important;
+  background-color: #ffffff !important;
+  color: var(--ctstem-color-green) !important;
+}
+.btn.purple,  button[class*="purple"] {
+  background-color: var(--ctstem-color-purple) !important;
+  color: white !important;
+}
+.btn.purple:hover, button[class*="purple"]:hover {
+  border: 1px solid var(--ctstem-color-purple) !important;
+  background-color: #ffffff !important;
+  color: var(--ctstem-color-purple) !important;
+}

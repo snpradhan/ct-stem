@@ -226,7 +226,7 @@
                   {{form.taxonomy}}
                 </div>
                 <button class="btn blue search_taxonomy" name="search_taxonomy" data-form="{% url 'ctstem:searchTaxonomy' %}">
-                  <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                  <i class="fas fa-plus" aria-hidden="true"></i>
                 </button>
                 <span class="expand_collapse_other">
                   <button type="button" class="btn orange" name="collapse_standards" aria-label="Collapse Standards" title="Collapse Standards">
@@ -257,7 +257,7 @@
                           <td>{{taxonomy.title}}</td>
                           <td>
                             <button type="button" class="btn red remove_taxonomy" title="Remove Taxonomy">
-                              <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                              <i class="fa fa-trash" aria-hidden="true"></i>
                             </button>
                           </td>
                         </tr>
@@ -275,7 +275,7 @@
                 {{attachment_formset.management_form}}
                 <label for="id_attachment_table">Attachment(s)</label>
                 <a type="button" class="btn blue" id="add_attachment" title="Add New Attachment">
-                  <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                  <i class="fas fa-plus" aria-hidden="true"></i>
                 </a>
                 <span class="expand_collapse_other">
                   <button type="button" class="btn orange" name="collapse_attachment" aria-label="Collapse Attachments" title="Collapse Attachments">
@@ -315,7 +315,7 @@
                         </td>
                         <td class="attachment_edit">
                           <button type="button" class="btn red delete_attachment" name="delete_attachment" aria-label="Delete Attachment" title="Delete Attachment">
-                            <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                            <i class="fa fa-trash" aria-hidden="true"></i>
                           </button>
                           {{attachmentForm.DELETE.as_hidden}}
                         </td>
@@ -359,7 +359,7 @@
                 <span class="controls">
                   <span>
                     <button type="button" class="btn red delete_step" name="delete_step" aria-label="Delete Page" title="Delete Page">
-                      <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                      <i class="fa fa-trash" aria-hidden="true"></i>
                     </button>
                     {{step.DELETE.as_hidden}}
                   </span>
@@ -415,7 +415,7 @@
                   {{step.nested.id}}
                   <label for="id_question_table">Question(s)</label>
                   <button class="btn blue edit_question" name="add_question" data-form="{% url 'ctstem:newQuestion' %}" aria-label="Add New Question" title="Add New Question">
-                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                    <i class="fas fa-plus" aria-hidden="true"></i>
                   </button>
                   <span class="expand_collapse_other">
                     <button type="button" class="btn orange" name="collapse_notes" aria-label="Collapse Questions" title="Collapse Questions">
@@ -463,11 +463,11 @@
                           <td class="optional">{{questionForm.optional}}</td>
                           <td class="question_edit">
                             <button type="button" class="btn red delete_question" name="delete_question" aria-label="Delete Question" title="Delete Question">
-                              <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                              <i class="fa fa-trash" aria-hidden="true"></i>
                             </button>
                             {{questionForm.DELETE.as_hidden}}
                             <button type="button" class="btn green edit_question" name="edit_question" aria-label="Edit Question" title="Edit Question" data-form="{% url 'ctstem:question' questionForm.question.value|default:0 %}" >
-                              <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+                              <i class="fas fa-pencil-alt" aria-hidden="true"></i>
                             </button>
                           </td>
                         </tr>

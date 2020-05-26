@@ -1,0 +1,38 @@
+:root {
+  --ctstem-font-family: "proxima-nova", sans-serif;
+  --ctstem-color-dark-yellow: #B2911C;
+  --ctstem-color-yellow: #FFD028;
+  --ctstem-color-light-yellow: #FFDF6F;
+  --ctstem-color-pale-yellow: #FFF8DF;
+
+  --ctstem-color-dark-blue: #343D51;
+  --ctstem-color-blue: #00ADFF;
+  --ctstem-color-medium-blue: #3A74E8;
+  --ctstem-color-light-blue: #54C8FF;
+  --ctstem-color-pale-blue: #E5F7FF;
+
+  --ctstem-color-dark-gray: #242B39;
+  --ctstem-color-gray: #343D51;
+  --ctstem-color-light-gray: #808593;
+  --ctstem-color-pale-gray: #D8DAE2;
+
+  --ctstem-color-dark-red: #A93254;
+  --ctstem-color-red: #F24878;
+  --ctstem-color-light-red: #F684A4;
+  --ctstem-color-pale-red: #FDE4EB;
+
+  --ctstem-color-dark-green: #079342;
+  --ctstem-color-green: #0ad35e;
+  --ctstem-color-light-green: #5be193;
+  --ctstem-color-pale-green: #daf8e7;
+
+  --ctstem-color-dark-orange: #af5417;
+  --ctstem-color-orange: #fa7921;
+  --ctstem-color-light-orange: #fca56a;
+  --ctstem-color-pale-orange: #feedbe;
+
+  --ctstem-color-dark-purple: #38388c;
+  --ctstem-color-purple: #5050c9;
+  --ctstem-color-light-purple: #8a8adb;
+  --ctstem-color-pale-purple: #e5e5f7;
+}

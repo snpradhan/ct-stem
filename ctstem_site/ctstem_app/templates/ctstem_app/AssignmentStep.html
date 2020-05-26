@@ -98,7 +98,7 @@
         </p>
         <div class="save-buttons" style="text-align: center; margin-bottom: 150px; margin-top: 80px;">
           <a href="{% url 'ctstem:resumeAssignment'  instance.assignment.id instance.id 1 %}">
-            <button class="continue" {% if total_steps == 0 %} disabled {% endif %}>
+            <button class="btn blue small continue" {% if total_steps == 0 %} disabled {% endif %}>
               {% if instance.status == 'N' %}
                 Start!
               {% else %}
@@ -378,7 +378,7 @@
                                       </td>
 
                                       <td class="attachment_edit">
-                                        <button type="button" class="delete_attachment" name="delete_attachment" aria-label="Delete Attachment" title="Delete Attachment">
+                                        <button type="button" class="btn red delete_attachment" name="delete_attachment" aria-label="Delete Attachment" title="Delete Attachment">
                                           <i class="fa fa-trash" aria-hidden="true"></i>
                                         </button>
                                         {{fileform.DELETE.as_hidden}}
@@ -387,7 +387,7 @@
                                   {% endfor %}
                                 </tbody>
                               </table>
-                              <button type="button" class="add_attachment" id="form-{{forloop.counter0}}-response_file" title="Add New Attachment">
+                              <button type="button" class="btn blue add_attachment" id="form-{{forloop.counter0}}-response_file" title="Add New Attachment">
                                   Upload more
                               </button>
                             </div>
@@ -498,33 +498,33 @@
         <div class="save-buttons">
           {% if form and form.instance.step.order > 0 %}
             <a class="back" href="javascript:waitForSave('{% url 'ctstem:resumeAssignment'  form.instance.instance.assignment.id form.instance.instance.id form.instance.step.order|add:'-1' %}')" onclick="return saveStep('{{form.instance.instance.status}}');">
-              <button type="button" class="light back" id="bk">Back</button>
+              <button type="button" class="btn gray back" id="bk">Back</button>
             </a>
           {% endif %}
 
           {% if form and form.instance.step.order != total_steps %}
             {% if instance.status == 'S' or instance.status == 'F' or instance.status == 'A' %}
               <a href="{% url 'ctstem:resumeAssignment' form.instance.instance.assignment.id form.instance.instance.id form.instance.step.order|add:'1' %}">
-                <button type="button" class="bright next">Next</button>
+                <button type="button" class="btn blue next">Next</button>
               </a>
             {% else %}
-              <button type="button" class="light save" id="sv" title="Save" >
+              <button type="button" class="btn lightblue save" id="sv" title="Save" >
                 Save
               </button>
-              <button type="button" class="bright submit" id="sc" title="Next Step" >
+              <button type="button" class="btn blue submit" id="sc" title="Next Step" >
                 Save &amp; Continue
               </button>
             {% endif %}
           {% else %}
             {% if instance.status == 'S' or instance.status == 'F' or instance.status == 'A' %}
               <a title="Next Step" href="{% url 'ctstem:home' %}">
-                <button type="button" class="bright">Exit</button>
+                <button type="button" class="btn blue">Exit</button>
               </a>
             {% else %}
-              <button class="light save" id="sv" title="Save" >
+              <button class="btn lightblue save" id="sv" title="Save" >
                 Save
               </button>
-              <button class="bright confirm_submit" id="sc" title="Save and Submit">
+              <button class="btn blue confirm_submit" id="sc" title="Save and Submit">
                 Save &amp; Submit
               </button>
             {% endif %}
@@ -560,8 +560,8 @@
           </div>
           <div class="modal-footer">
             <div class="form-group button-row">
-              <button type="button" class="btn btn-danger" id="modal_exit" data-dismiss="modal">Cancel</button>
-              <button type="button" class="btn btn-success" id="modal_submit" data-dismiss="modal">Submit</button>
+              <button type="button" class="btn red inbetween" id="modal_exit" data-dismiss="modal">Cancel</button>
+              <button type="button" class="btn green inbetween" id="modal_submit" data-dismiss="modal">Submit</button>
             </div>
           </div>
         </div>

@@ -120,7 +120,7 @@
             </p>
             <div class="save-buttons" style="text-align: center; margin-bottom: 150px; margin-top: 80px;">
               <a href="{% url 'ctstem:previewCurriculumActivity'  curriculum.id 1 %}">
-                <button class="continue" {% if total_steps == 0 %} disabled {% endif %}>
+                <button class="btn blue small continue" {% if total_steps == 0 %} disabled {% endif %}>
                   Start!
                 </button>
               </a>
@@ -304,19 +304,19 @@
               <div class="save-buttons">
                 {% if step_order|add:0 > 0 %}
                   <a href="{% url 'ctstem:previewCurriculumActivity'  curriculum.id step_order|add:'-1' %}">
-                    <button type="button" class="light back">Back</button>
+                    <button type="button" class="btn gray back">Back</button>
                   </a>
                 {% endif %}
 
                 {% if step_order|add:0 != total_steps %}
                   <a href="{% url 'ctstem:previewCurriculumActivity'  curriculum.id step_order|add:'1' %}">
-                    <button type="button" class="bright submit" title="Next Step" >
+                    <button type="button" class="btn blue submit" title="Next Step" >
                       Forward
                     </button>
                   </a>
                 {% else %}
                   <a href="{% url 'ctstem:previewCurriculum'  curriculum.id %}">
-                    <button type="button" class="bright save"  title="Submit Assignment">
+                    <button type="button" class="btn blue save"  title="Submit Assignment">
                       Exit
                     </button>
                   </a>

@@ -190,14 +190,14 @@
         </div>
         <div class="form-group button-group-fixed col-md-2">
           {% if prevQuestion %}
-            <a type="button" class="btn btn-warning" id="prev" href="{% url 'ctstem:question_response_review' assignment.id prevQuestion.id %}"> Previous Question </a>
+            <a type="button" class="btn orange inbetween" id="prev" href="{% url 'ctstem:question_response_review' assignment.id prevQuestion.id %}"> Previous Question </a>
             <br><br>
           {% endif %}
           {% if nextQuestion %}
-            <a type="button" class="btn btn-warning" id="prev" href="{% url 'ctstem:question_response_review' assignment.id nextQuestion.id %}"> Next Question </a>
+            <a type="button" class="btn orange inbetween" id="prev" href="{% url 'ctstem:question_response_review' assignment.id nextQuestion.id %}"> Next Question </a>
           {% endif %}
           {% if allow_save %}
-            <input type="submit" class="btn btn-info" id="save" value="Save"/>
+            <input type="submit" class="btn blue inbetween" id="save" value="Save"/>
           {% endif %}
         </div>
       </div>

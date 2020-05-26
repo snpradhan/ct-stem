@@ -89,14 +89,14 @@
                   {% endif %}
                   {% if not user.researcher %}
                     <div class="controls">
-                      <a type="button" class="btn btn-success edit" aria-label="Edit User" title="Edit User" href="{% url 'ctstem:userProfile' userProfile.user.id %}">
-                        <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+                      <a type="button" class="btn small green edit" aria-label="Edit User" title="Edit User" href="{% url 'ctstem:userProfile' userProfile.user.id %}">
+                        <i class="fas fa-pencil-alt" aria-hidden="true"></i>
                       </a>
-                      <a type="button" class="btn btn-danger delete" aria-label="Delete User" title="Delete User" href="{% url 'ctstem:deleteUser' userProfile.user.id %}" onclick="return confirm('Are you sure you want to delete user {{userProfile.user.username}}?')">
-                        <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                      <a type="button" class="btn small red delete" aria-label="Delete User" title="Delete User" href="{% url 'ctstem:deleteUser' userProfile.user.id %}" onclick="return confirm('Are you sure you want to delete user {{userProfile.user.username}}?')">
+                        <i class="fa fa-trash" aria-hidden="true"></i>
                       </a>
-                      <button type="button" class="btn btn-info reset_email" aria-label="Send password reset email" title="Send password reset email" onclick="this.disabled=true; return send_password_reset_email('{{userProfile.user.username}}','{{csrf_token}}')">
-                        <span class="glyphicon glyphicon-send" aria-hidden="true"></span>
+                      <button type="button" class="btn small blue reset_email" aria-label="Send password reset email" title="Send password reset email" onclick="this.disabled=true; return send_password_reset_email('{{userProfile.user.username}}','{{csrf_token}}')">
+                        <i class="fas fa-paper-plane"></i>
                       </button>
                     </div>
                   {% endif %}

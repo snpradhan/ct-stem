@@ -49,7 +49,7 @@
               {% endif %}
                 <div class="portfolio-hover">
                   <div class="portfolio-hover-content">
-                     <span class="glyphicon glyphicon-folder-open gi-3x" aria-hidden="true"></span>
+                     <i class="far fa-folder-open"></i>
                   </div>
                 </div>
                 {% if assignment_details.assignment.curriculum.icon and assignment_details.assignment.curriculum.icon.url %}
@@ -119,32 +119,32 @@
                 <div class="row">
                   {% if assignment_details.instance %}
                     {% if assignment_details.instance.status == 'N' %}
-                      <a type="button" class="btn btn-success btn-md" aria-label="Start Assignment" title="Start Assignment" href="{% url 'ctstem:resumeAssignment' assignment_details.assignment.id assignment_details.instance.id assignment_details.instance.last_step %}">
+                      <a type="button" class="btn green inbetween" aria-label="Start Assignment" title="Start Assignment" href="{% url 'ctstem:resumeAssignment' assignment_details.assignment.id assignment_details.instance.id assignment_details.instance.last_step %}">
                         Start <span class="glyphicon glyphicon-play" aria-hidden="true"></span>
                       </a>
                     {% elif assignment_details.instance.status == 'P' %}
-                      <a type="button" class="btn btn-warning btn-md" aria-label="Resume Assignment" title="Resume Assignment" href="{% url 'ctstem:resumeAssignment' assignment_details.assignment.id assignment_details.instance.id assignment_details.instance.last_step|add:'1' %}">
+                      <a type="button" class="btn orange inbetween" aria-label="Resume Assignment" title="Resume Assignment" href="{% url 'ctstem:resumeAssignment' assignment_details.assignment.id assignment_details.instance.id assignment_details.instance.last_step|add:'1' %}">
                         Resume <span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span>
                       </a>
                     {% else %}
                       {% if not assignment_details.assignment.lock_on_completion %}
-                        <a type="button" class="btn btn-info btn-md" aria-label="Resume Assignment" title="Resume Assignment" href="{% url 'ctstem:resumeAssignment' assignment_details.assignment.id assignment_details.instance.id 0 %}">
+                        <a type="button" class="btn blue inbetween" aria-label="Resume Assignment" title="Resume Assignment" href="{% url 'ctstem:resumeAssignment' assignment_details.assignment.id assignment_details.instance.id 0 %}">
                           {% if assignment_details.instance.status == 'F' or assignment_details.instance.status == 'A'%}
                             Review Feedback
                           {% else %}
                             View
                           {% endif %}
-                          <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
+                          <i class="far fa-eye" aria-hidden="true"></i>
                         </a>
                       {% endif %}
                     {% endif %}
                     {% if assignment_details.instance.status == 'F' %}
-                      <a type="button" class="btn btn-warning btn-md" aria-label="Archive Assignment" title="Archive Assignment" href="{% url 'ctstem:archiveAssignment' assignment_details.instance.id %}">
+                      <a type="button" class="btn orange inbetween" aria-label="Archive Assignment" title="Archive Assignment" href="{% url 'ctstem:archiveAssignment' assignment_details.instance.id %}">
                         Archive <span class="glyphicon glyphicon-folder-close" aria-hidden="true"></span>
                       </a>
                     {% endif %}
                   {% else %}
-                    <a type="button" class="btn btn-success btn-md" aria-label="Start Assignment" title="Start Assignment" href="{% url 'ctstem:startAssignment' assignment_details.assignment.id %}">
+                    <a type="button" class="btn green inbetween" aria-label="Start Assignment" title="Start Assignment" href="{% url 'ctstem:startAssignment' assignment_details.assignment.id %}">
                         Start <span class="glyphicon glyphicon-play" aria-hidden="true"></span>
                     </a>
                   {% endif %}

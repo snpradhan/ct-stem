@@ -12,7 +12,7 @@
     <h2> Schools </h2>
     {% if user.administrator or user.researcher%}
       <div class="btn-group">
-        <a type="button" class="btn btn-info" href="{% url 'ctstem:newSchool' %}" title="Create new school">Create School</a>
+        <a type="button" class="btn blue normal" href="{% url 'ctstem:newSchool' %}" title="Create new school">Create School</a>
       </div>
     {% endif %}
     {% if schools %}
@@ -36,11 +36,11 @@
             <tr>
               <td class="title">{{school.name}}
                 <div class="controls">
-                  <a type="button" class="btn btn-success" aria-label="Edit School" title="Edit School" href="{% url 'ctstem:school' school.id %}">
-                      <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+                  <a type="button" class="btn green" aria-label="Edit School" title="Edit School" href="{% url 'ctstem:school' school.id %}">
+                      <i class="fas fa-pencil-alt" aria-hidden="true"></i>
                   </a>
-                  <a type="button" class="btn btn-danger delete" aria-label="Delete School" title="Delete School" href="{% url 'ctstem:deleteSchool' school.id %}" onclick="return confirm('Are you sure you want to delete {{school.name}}?')">
-                    <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                  <a type="button" class="btn red delete" aria-label="Delete School" title="Delete School" href="{% url 'ctstem:deleteSchool' school.id %}" onclick="return confirm('Are you sure you want to delete {{school.name}}?')">
+                    <i class="fa fa-trash" aria-hidden="true"></i>
                   </a>
                 </div>
               </td>

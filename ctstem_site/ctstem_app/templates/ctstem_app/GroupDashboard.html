@@ -33,11 +33,11 @@
                   <label>Unit:</label>
                   <div>{{curriculum.title}}</div>
                   <div class="controls">
-                    <a type="button" class="btn btn-warning" title="Preview Assignment" href="{% url 'ctstem:previewCurriculum' curriculum.id %}" target="_blank">
-                      <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
+                    <a type="button" class="btn small orange" title="Preview Assignment" href="{% url 'ctstem:previewCurriculum' curriculum.id %}" target="_blank">
+                      <i class="far fa-eye" aria-hidden="true"></i>
                     </a>
                     {% if curriculum|has_response:request.user %}
-                      <a type="button" class="btn btn-info" href="{% url 'ctstem:export_all_response' curriculum.id %}" aria-label="Download Student Response" title="Download Student Response">
+                      <a type="button" class="btn small blue" href="{% url 'ctstem:export_all_response' curriculum.id %}" aria-label="Download Student Response" title="Download Student Response">
                         <i class="fas fa-file-download"></i>
                       </a>
                     {% endif %}
@@ -70,8 +70,8 @@
                     <div>{{curriculum.title}}</div>
 
                     <div class="controls">
-                      <a type="button" class="btn btn-warning" title="Preview Assignment" href="{% url 'ctstem:previewCurriculum' curriculum.id %}" target="_blank">
-                        <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
+                      <a type="button" class="btn small orange" title="Preview Assignment" href="{% url 'ctstem:previewCurriculum' curriculum.id %}" target="_blank">
+                        <i class="far fa-eye" aria-hidden="true"></i>
                       </a>
                     </div>
                   </td>
@@ -82,11 +82,11 @@
                     <div id="chart_{{assignment.serial}}" class="chart" name="{{assignment.status}}"></div>
                   </td>
                   <td>
-                    <a type="button" class="btn btn-warning" href="{% url 'ctstem:assignmentDashboard' assignment.assignment.id %}" aria-label="View Assignment Dashboard" title="View Assignment Dashboard">
-                      <img src="/static/img/dashboard.png" class="icon" />
+                    <a type="button" class="btn small orange" href="{% url 'ctstem:assignmentDashboard' assignment.assignment.id %}" aria-label="View Assignment Dashboard" title="View Assignment Dashboard">
+                      <i class="fas fa-tachometer-alt"></i>
                     </a>
 
-                    <a type="button" class="btn btn-info" href="{% url 'ctstem:export_group_response' assignment.assignment.id %}" aria-label="Download Student Response" title="Download Student Response">
+                    <a type="button" class="btn small blue" href="{% url 'ctstem:export_group_response' assignment.assignment.id %}" aria-label="Download Student Response" title="Download Student Response">
                         <i class="fas fa-file-download"></i>
                     </a>
                   </td>

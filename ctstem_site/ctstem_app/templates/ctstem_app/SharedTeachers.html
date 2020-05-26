@@ -1,8 +1,8 @@
 {% load ctstem_extras %}
 <div class="form-group shared_with_table">
   <label for="id_{{form.shared_with.name}}">{{ form.shared_with.label|title }} {% if form.shared_with.field.required %}(<span class="required">*</span>) {% endif %}</label>
-  <button class="btn btn-info search_users" data-target="#userSearch" data-form="{% url 'ctstem:searchTeachers' %}">
-    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+  <button class="btn inbetween blue search_users" data-target="#userSearch" data-form="{% url 'ctstem:searchTeachers' %}">
+    <i class="fas fa-plus"></i>
   </button>
   <div class="controls table_container">
     <div style="display:none;">
@@ -25,8 +25,8 @@
             <td>{{teacher.user.get_full_name}}</td>
             <td>{{teacher.user.email}}</td>
             <td>
-              <button type="button" class="btn btn-warning remove" aria-label="Unshare resource with this teacher" title="Unshare resource with this teacher" href="#">
-                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+              <button type="button" class="btn small red remove" aria-label="Unshare resource with this teacher" title="Unshare resource with this teacher" href="#">
+                <i class="fa fa-trash" aria-hidden="true"></i>
               </button>
             </td>
           </tr>
