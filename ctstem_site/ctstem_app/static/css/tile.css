@@ -6,9 +6,12 @@
   /*height: 45em;*/
  }
 
+#class_tiles .tile {
+  border: 2px solid black;
+}
+
 .tile .icon {
   background-color: var(--ctstem-color-light-gray);
-  border-bottom: 2px solid white;
   border-top-left-radius: 0.25em;
   border-top-right-radius: 0.25em;
   /*height: 24em;*/

@@ -27,33 +27,26 @@
       {% include "ctstem_app/Tabs.html" with tab='group'%}
 
       {% if user.teacher %}
-        <section class="portfolio">
-          <div class="row">
+        <div class="row_container">
+          <div class="row" id="class_tiles">
             {% for group in groups %}
-              <div class="col-lg-3 col-md-4 col-sm-6 portfolio-item ">
-                <div class="tile">
-
-                  <a href="{% url 'ctstem:group' group.id %}" class="portfolio-link">
-                    <div class="portfolio-hover">
-                      <div class="portfolio-hover-content">
-                        <i class="fas fa-pencil-alt"></i>
-                      </div>
-                    </div>
-                    <div class="portfolio-icon">
-                    {% if group.icon %}
-                      <img src="{{group.icon.url}}" class="img-responsive" alt="">
-                    {% elif group.subject and group.subject.icon %}
-                      <img src="{{group.subject.icon.url}}" class="img-responsive" alt="">
-                    {% else %}
-                      <!--img src="/static/img/class.png" class="img-responsive group_icon_stock" alt=""-->
-                      <i class="fas fa-users"></i>
-                    {% endif %}
+              <div class="col col-{{forloop.counter}}">
+                <div class="tile {{group_status}}">
+                  <a href="{% url 'ctstem:group' group.id %}">
+                    <div class="icon">
+                      {% if group.icon %}
+                        <img src="{{group.icon.url}}" class="img-responsive" alt="">
+                      {% elif group.subject and group.subject.icon %}
+                        <img src="{{group.subject.icon.url}}" class="img-responsive" alt="">
+                      {% else %}
+                        <img src="/static/img/class.png" class="img-responsive group_icon_stock" alt="">
+                      {% endif %}
                     </div>
                   </a>
 
-                  <div class="portfolio-caption">
+                  <div class="detail">
                     <input id="group_{{group.id}}" type="checkbox" class="action-select" value="{{group.id}}" name="group_{{group.id}}"/>
-                    <div class="class_title">
+                    <div class="title">
                       {{group.title}}
                       {% if user.teacher != group.teacher and user.teacher in group.shared_with.all %}
                         <i class="fa fa-share-alt" title="Shared by {{group.teacher}}"></i>
@@ -62,38 +55,31 @@
 
                     <div class="button_row">
                       {% if group.is_active %}
-                        <div>
-                          <a type="button" class="btn inbetween yellow invite-modal" href="#" data-toggle="modal" data-target="#invite" data-invite-link="https://{{domain}}/?next=/preregister/group/{{group.group_code}}/" data-title="{{group.title}}" title="Student Invitation Link">
-                            <i class="fa fa-link"></i>
-                          </a>
-                        </div>
+                        <a type="button" class="btn inbetween blue" aria-label="Edit Class" title="Edit Class" href="{% url 'ctstem:group' group.id %}">
+                          <i class="fas fa-pencil-alt" aria-hidden="true"></i>
+                        </a>
 
-                        <div>
-                          <a type="button" class="btn inbetween green upload-modal" href="#" data-toggle="modal" data-target="#upload" data-id="{{group.id}}" data-title="{{group.title}}" title="Add Students">
+                        <a type="button" class="btn inbetween yellow invite-modal" href="#" data-toggle="modal" data-target="#invite" data-invite-link="https://{{domain}}/?next=/preregister/group/{{group.group_code}}/" data-title="{{group.title}}" title="Student Invitation Link">
+                            <i class="fa fa-link"></i>
+                        </a>
+
+                        <a type="button" class="btn inbetween green upload-modal" href="#" data-toggle="modal" data-target="#upload" data-id="{{group.id}}" data-title="{{group.title}}" title="Add Students">
                             <i class="fa fa-user-plus"></i>
-                          </a>
-                        </div>
-                        <div>
-                          <a type="button" class="btn inbetween orange" aria-label="Class Dashboard" title="Class Dashboard" href="{% url 'ctstem:groupDashboard' group.id %}">
+                        </a>
+
+                        <a type="button" class="btn inbetween orange" aria-label="Class Dashboard" title="Class Dashboard" href="{% url 'ctstem:groupDashboard' group.id %}">
                             <i class="fas fa-tachometer-alt"></i>
-                          </a>
-                        </div>
-                         <div>
-                          <a type="button" class="btn inbetween blue assignment-modal" href="#" data-toggle="modal" data-target="#assignment" data-id="{{group.id}}" title="Search and Add Assignments" data-title="{{group.title}}">
+                        </a>
+                        <a type="button" class="btn inbetween blue assignment-modal" href="#" data-toggle="modal" data-target="#assignment" data-id="{{group.id}}" title="Search and Add Assignments" data-title="{{group.title}}">
                             <i class="fa fa-tasks"></i>
-                          </a>
-                        </div>
+                        </a>
                       {% else %}
-                        <div>
-                          <a type="button" class="btn inbetween blue" aria-label="Edit Class" title="Edit Class" href="{% url 'ctstem:group' group.id %}">
+                        <a type="button" class="btn inbetween blue" aria-label="Edit Class" title="Edit Class" href="{% url 'ctstem:group' group.id %}">
                             <i class="far fa-eye" aria-hidden="true"></i>
-                          </a>
-                        </div>
-                        <div>
-                          <a type="button" class="btn inbetween orange" aria-label="Class Dashboard" title="Class Dashboard" href="{% url 'ctstem:groupDashboard' group.id %}">
+                        </a>
+                        <a type="button" class="btn inbetween orange" aria-label="Class Dashboard" title="Class Dashboard" href="{% url 'ctstem:groupDashboard' group.id %}">
                             <i class="fas fa-tachometer-alt"></i>
-                          </a>
-                        </div>
+                        </a>
                       {% endif %}
                     </div>
                   </div>
@@ -101,27 +87,21 @@
               </div>
             {% endfor %}
             {% if group_status == 'active' %}
-            <div class="col-lg-3 col-md-4 col-sm-6 portfolio-item ">
+            <div class="col">
               <div class="tile">
                 <a href="{% url 'ctstem:newGroup' %}" class="portfolio-link">
-                   <div class="portfolio-hover">
-                    <div class="portfolio-hover-content">
-                      <i class="fas fa-plus"></i>
-                    </div>
-                  </div>
-                  <div class="portfolio-icon">
+                  <div class="icon">
                     <img src="/static/img/new_class.png" class="img-responsive group_icon_stock" alt="">
                   </div>
                 </a>
-                <div class="portfolio-caption">
+                <div class="detail">
                    <div class="class_title"><h3>ADD NEW CLASS</h3></div>
                 </div>
               </div>
             </div>
             {% endif %}
           </div>
-        </section>
-
+        </div>
       {% else %}
         {% if groups %}
           <table class="table table-striped table-bordered table-condensed inner_table paginate_sort" id="groups">

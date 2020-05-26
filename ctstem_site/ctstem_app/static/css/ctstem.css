@@ -690,7 +690,7 @@ label.switch#curricula_view {
   right: 5%;
 }
 
-div.content#curricula div.row {
+div.content#curricula div.row, div.content#classes div.row {
   flex-flow: wrap;
   display: flex;
   margin-left: auto;
@@ -728,26 +728,27 @@ div.content#curricula div.row#curricula_filters .search {
   text-align: right;
   margin-top: 2em;
 }
-div.row#curricula_tiles {
+div.row#curricula_tiles, div.row#class_tiles {
   justify-content: center;
   align-items: center;
 }
-div.row#curricula_tiles a:hover {
+
+div.row#curricula_tiles a:hover, div.row#class_tiles a:hover {
   text-decoration: none;
 }
-div.row#curricula_tiles .col {
+div.row#curricula_tiles .col, div.row#class_tiles .col {
   flex: 1 1 30%;
   text-align: center;
   margin: 2em auto;
 }
-div.row#curricula_tiles .col .tile {
+div.row#curricula_tiles .col .tile, div.row#class_tiles .col .tile {
   display: inline-block;
   position: relative;
   box-shadow: unset;
   overflow: hidden;
 }
 
-div.row#curricula_tiles .col .tile:hover {
+div.row#curricula_tiles .col .tile:hover, div.row#class_tiles .col .tile:hover {
   z-index: 2;
   -webkit-transition: all 200ms ease-in;
   -webkit-transform: scale(1.05);
@@ -758,8 +759,24 @@ div.row#curricula_tiles .col .tile:hover {
   transition: all 200ms ease-in;
   transform: scale(1.05);
 }
-div.row#curricula_tiles .col .tile .detail{
+div.row#curricula_tiles .col .tile .detail, div.row#class_tiles .col .tile .detail{
   color: black;
+  background-color: white;
+}
+
+div.row#class_tiles .col .tile .detail {
+  height: 12em;
+}
+
+div.row#class_tiles .col .tile .detail .button_row {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 3em;
+}
+
+div.row#class_tiles .col .tile .detail input[type=checkbox] {
+  float: right;
+  zoom: 1.1;
 }
 div.row#curricula_tiles .col .tile .detail .period{
   color: inherit;
@@ -768,9 +785,6 @@ div.row#curricula_tiles .col .tile .detail .others{
   color: inherit;
 }
 
-div.row#curricula_tiles .col .tile .detail {
-  background-color: white;
-}
 div.row#curricula_tiles .col .tile.unit {
   border-color: var(--ctstem-color-dark-blue);
 }
@@ -788,7 +802,7 @@ div.row#curricula_tiles .col .tile.underlying .detail {
   border-top-right-radius: 0.25em;
 }
 
-div.row#curricula_tiles .col .tile.archived .icon img{
+div.row#curricula_tiles .col .tile.archived .icon img, div.row#class_tiles .col .tile.inactive .icon img{
   opacity: 0.5;
 }
 div.row#curricula_tiles .col .tile.archived .detail > * {
@@ -1096,14 +1110,6 @@ section.portfolio .portfolio-item .portfolio-link .portfolio-hover {
   border-top-right-radius: 2em;
 }
 
-section.portfolio .portfolio-item .portfolio-link .portfolio-hover .portfolio-hover-content i{
-  font-size: 4em;
-}
-
-section.portfolio .portfolio-item .portfolio-link .portfolio-icon i {
-  font-size: 20em;
-  color: black;
-}
 div.content#classes section.portfolio .portfolio-item .portfolio-caption .button_row {
   display: flex;
   justify-content: space-around;
@@ -1117,7 +1123,7 @@ div.content section.portfolio.bg-light-gray .portfolio-item .portfolio-caption {
   background-color: #fff;
 }
 
-div.content#assignments, div.content.teacher#classes {
+div.content#assignments {
   width: 80%;
 }
 
@@ -1129,7 +1135,7 @@ div.content#assignments div.inbox_filter {
   float: right;
   margin-right: 2em;
 }
-div.content#assignments .assignment_title, div.content#classes .class_title {
+div.content#assignments .assignment_title {
   margin-bottom: 1em;
   margin-top: 0.5em;
   font-weight: bold;
@@ -1139,23 +1145,18 @@ div.content#assignments .assignment_title, div.content#classes .class_title {
   line-height: 1.3em;
 }
 
-div.content#classes .class_title {
-  height: 1.5em;
-  overflow-x: unset;
-}
-
-div.content#assignments  .dates, div.content#classes .details {
+div.content#assignments  .dates{
   margin-bottom: 1em;
   font-size: 1.3em;
 }
-div.content#assignments  .dates .row, div.content#classes .details .row {
+div.content#assignments  .dates .row{
   margin-bottom: 0.5em;
 }
-div.content#assignments  .dates .row .title, div.content#classes .details .row .title {
+div.content#assignments  .dates .row .title{
   font-weight: bold;
   text-align: right;
 }
-div.content#assignments  .dates .row .value, div.content#classes .details .row .value {
+div.content#assignments  .dates .row .value {
   text-align: left;
 }
 div.content#assignments .chart_container {
