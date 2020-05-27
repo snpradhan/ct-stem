@@ -13,7 +13,7 @@
       <div class="curriculum_container">
         <div class="left-navigation">
           <div class="form-group unit-navigation">
-            {% if form.instance %}
+            {% if form.instance and form.instance.id %}
               {% if form.instance.unit or form.instance.curriculum_type == 'U' %}
                 {% with unit_id=form.instance.unit.id|default:form.instance.id unit_title=form.instance.unit.title|default:form.instance.title %}
                   {% if form.instance.id != unit_id %}
