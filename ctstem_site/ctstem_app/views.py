@@ -722,9 +722,9 @@ def copyCurriculum(request, id=''):
 
 
       if hasattr(request.user, 'teacher'):
-        messages.success(request, "A new curriculum '%s - v%s.' has been created and added to your My Curricula collection.  You may edit the newly remixed curriculum after dismissing this message." % (new_curriculum.title, new_curriculum.version), extra_tags="modal_message")
+        messages.success(request, "A new curriculum '%s - v%s.' has been created and added to your My Curricula collection.  You may edit the newly copied curriculum after dismissing this message." % (new_curriculum.title, new_curriculum.version), extra_tags="modal_message")
       else:
-        messages.success(request, "A new curriculum '%s - v%s.' has been created and the status set to Private.  You may edit the newly remixed curriculum after dismissing this message." % (new_curriculum.title, new_curriculum.version), extra_tags="modal_message")
+        messages.success(request, "A new curriculum '%s - v%s.' has been created and the status set to Private.  You may edit the newly copied curriculum after dismissing this message." % (new_curriculum.title, new_curriculum.version), extra_tags="modal_message")
 
       back_url = None
       if 'back_url' in request.GET:
