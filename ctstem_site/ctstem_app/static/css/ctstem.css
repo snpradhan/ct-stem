@@ -322,7 +322,7 @@ div#div_conditions {
   display: none;
 }
 
-div.curriculum_container {
+div.curriculum_container, div.group_container {
   display: flex;
   justify-content: space-between;
 }
@@ -344,7 +344,10 @@ div.curriculum_container div.left-navigation label a:hover{
 div.curriculum_container div.curriculum_components {
   width: 82%;
 }
-div.curriculum_container div.button-container {
+div.group_container div.group_components {
+  width: 90%;
+}
+div.curriculum_container div.button-container, div.group_container div.button-container {
   width: 10%;
 }
 
@@ -905,20 +908,32 @@ div.row#assignment_tiles .col .tile .detail .button_row {
 
 /******* class tiles *******/
 div.row#class_tiles .col .tile .detail {
-  height: 12em;
+  height: 14em;
 }
-div.row#class_tiles .col .tile .detail .button_row {
+div.row#class_tiles .col .tile .detail .stat_and_button {
   display: flex;
   justify-content: space-around;
-  margin-top: 3em;
+  margin-top: 2em;
+  align-items: stretch;
+}
+div.row#class_tiles .col .tile .detail .stat_and_button .stat {
+  font-size: 0.85em;
+  flex: 0 0 50%
+}
+div.row#class_tiles .col .tile .detail .stat_and_button .button_row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  flex: 0 0 50%;
+}
+div.row#class_tiles .col .tile .detail .stat_and_button .button_row > * {
+  margin-bottom: 1em;
 }
 
 div.row#class_tiles .col .tile .detail input[type=checkbox] {
   float: right;
   zoom: 1.1;
 }
-
-
 /******* class tiles end *******/
 
 /******* standards tiles *******/

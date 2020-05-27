@@ -23,8 +23,8 @@
     {% include "ctstem_app/Tabs.html" with tab='group' group=form.instance role='group'%}
     <form method="post" id="userGroupForm" enctype="multipart/form-data">
       {% csrf_token %}
-      <div class="row">
-        <div class="col-md-11">
+      <div class="group_container">
+        <div class="group_components">
           <div class="table" id="group">
             {{form.management_form}}
             <div class="form-group">
@@ -317,10 +317,12 @@
             {% endif %}
           </div>
         </div>
-        <div class="form-group button-group-fixed col-md-1">
-          {% if form.instance.is_active %}
-            <input type="submit" class="btn inbetween green" id="submit" value="Save Class"/>
-          {% endif %}
+        <div class="button-container">
+          <div class="form-group button-group-fixed">
+            {% if form.instance.is_active %}
+              <input type="submit" class="btn inbetween green" id="submit" value="Save Class"/>
+            {% endif %}
+          </div>
         </div>
       </div>
     </form>
