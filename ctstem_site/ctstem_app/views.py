@@ -1000,7 +1000,10 @@ def assignCurriculum(request, id=''):
               new_assignment = models.Assignment(curriculum=curr, group=group, lock_on_completion=lock_on_completion)
               new_assignment.save()
 
-      response_data = {'message': 'The curriculum "%s" has been assigned' % curriculum.title}
+      if hasattr(request.user, 'teacher'):
+        response_data = {'message': 'The curriculum "%s" has been assigned.  Go to <a href="/groups/active/">Teacher Dashboard</a> to view details.' % curriculum.title}
+      else:
+        response_data = {'message': 'The curriculum "%s" has been assigned' % curriculum.title}
       return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 
     return http.HttpResponseNotAllowed(['GET', 'POST'])

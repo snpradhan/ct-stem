@@ -107,7 +107,7 @@ $(function (){
         url: '/assignment/add/'+curr_id+'/'+group_class_id+'/',
         data: data,
         success: function(data){
-          $('#assignmentMsg .errorlist li').removeClass('error').addClass('success').html("Curriculum "+curriculum_name+" has been assigned");
+          $('#assignmentMsg .errorlist li').removeClass('error').addClass('success').html("Curriculum "+curriculum_name+" has been assigned.");
           //save the id of the clicked button row in a hidden input so the row can be expanded on reload
           if(keep_open_id){
             $('input#assign_id').val(keep_open_id);
