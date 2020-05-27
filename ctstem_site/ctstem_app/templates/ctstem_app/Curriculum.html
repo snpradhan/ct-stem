@@ -846,14 +846,14 @@
         var link = $(this);
         e.preventDefault();
         bootbox.confirm({ title: 'Confirm',
-                          message: "<p>If you haven't saved the current curriculum, click <strong>Cancel</strong> and then <strong>Save</strong> the curriculum before proceeding. Otherwise, click <strong>Proceed</strong> to proceed to the next lesson.</p>",
+                          message: "<p>If you haven't saved the current curriculum, click <strong>Close</strong> to dismiss this popup and then <strong>Save</strong> the curriculum before proceeding. Otherwise, click <strong>Proceed</strong> to proceed to the next lesson.</p>",
                           buttons: {
                             confirm: {
                                 label: 'Proceed',
                                 className: 'btn-normal-yellow'
                             },
                             cancel: {
-                                label: 'Cancel',
+                                label: 'Close',
                                 className: 'btn-normal-red'
                             }
                           },
