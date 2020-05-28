@@ -691,6 +691,7 @@ div.content#curricula .page-blurb > * {
 label.switch#curricula_view {
   position: absolute;
   right: 5%;
+  text-align: right;
 }
 
 /*** TILES COMMON ****/

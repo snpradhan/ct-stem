@@ -174,11 +174,17 @@
                           {% if user.is_authenticated %}
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">Curricula <b class="caret"></b></a>
                             <ul class="dropdown-menu">
-                              <li>
-                                <a href="{% url 'ctstem:curricula' 'unit' %}">Curricula Table</a>
+                              <li class="{% navactive request 'ctstem:curriculatiles' %}">
+                                <a href="{% url 'ctstem:curriculatiles' %}">Tile View</a>
                               </li>
-                              <li>
-                                <a href="{% url 'ctstem:curriculatiles' %}">Curricula Tiles</a>
+                              <li class="{% navactive request 'ctstem:curricula' 'lesson' %}
+                                         {% navactive request 'ctstem:curricula' 'unit' %}
+                                         {% navactive request 'ctstem:curricula' 'assessment' %}
+                                         {% navactive request 'ctstem:curricula' 'teacher_authored' %}
+                                         {% navactive request 'ctstem:curricula' 'my' %}
+                                         {% navactive request 'ctstem:curricula' 'shared' %}
+                                         {% navactive request 'ctstem:curricula' 'favorite' %}">
+                                <a href="{% url 'ctstem:curricula' 'unit' %}">Table View</a>
                               </li>
                             </ul>
                           {% else %}

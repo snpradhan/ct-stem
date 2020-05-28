@@ -451,16 +451,6 @@ $(function (){
 
   bind_curriculum_delete_confirmation();
 
-  //toggle between curricula tile and table view
-  $('#curricula_view .switch-input').change(function() {
-    if($(this).is(':checked')){
-      window.location = '/curricula/unit/';
-    }
-    else {
-      window.location = '/curriculatiles/';
-    }
-  });
-
 });
 
 function bind_curriculum_delete_confirmation() {

@@ -1,11 +1,9 @@
 {% if user.is_authenticated %}
 <label class="switch" id="curricula_view">
   {% if on == 'true' %}
-    <input class="switch-input" type="checkbox" checked />
+    <a type="button" class="btn yellow small" href="{% url 'ctstem:curriculatiles' %}">Switch to Tile View</a>
   {% else %}
-    <input class="switch-input" type="checkbox" />
+    <a type="button" class="btn yellow small" href="{% url 'ctstem:curricula' 'unit' 'public' %}">Switch to Table View</a>
   {% endif %}
-  <span class="switch-label" data-on="Table View" data-off="Tile View"></span>
-  <span class="switch-handle"></span>
 </label>
 {% endif %}

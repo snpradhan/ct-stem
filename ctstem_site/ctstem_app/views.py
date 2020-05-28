@@ -109,6 +109,7 @@ def team(request):
 ####################################
 # Curricula TABLE VIEW
 ####################################
+@login_required
 def curricula(request, bucket='unit', status='public'):
 
   curriculum_type = []
