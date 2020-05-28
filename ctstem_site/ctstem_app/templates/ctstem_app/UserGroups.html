@@ -53,34 +53,32 @@
                       {% endif %}
                     </div>
                     <div class="stat_and_button">
-                      <div class="stat">
-                        <div class="title">{{group.members.count}} Students</div><br>
-                        <div class="title">{{group.assignments.count}} Assignments</div>
+                      <div class="student_stat_button">
+                        <div class="title">{{group.members.count}} Student(s)</div>
+                        <div class="buttons">
+                          {% if group.is_active %}
+                            <a type="button" class="btn inbetween yellow invite-modal" href="#" data-toggle="modal" data-target="#invite" data-invite-link="https://{{domain}}/?next=/preregister/group/{{group.group_code}}/" data-title="{{group.title}}" title="Student Invitation Link">
+                                <i class="fa fa-link"></i>
+                            </a>
+
+                            <a type="button" class="btn inbetween green upload-modal" href="#" data-toggle="modal" data-target="#upload" data-id="{{group.id}}" data-title="{{group.title}}" title="Add Students">
+                                <i class="fa fa-user-plus"></i>
+                            </a>
+                          {% endif %}
+                        </div>
                       </div>
-                      <div class="button_row">
-                        {% if group.is_active %}
-                          <a type="button" class="btn inbetween yellow invite-modal" href="#" data-toggle="modal" data-target="#invite" data-invite-link="https://{{domain}}/?next=/preregister/group/{{group.group_code}}/" data-title="{{group.title}}" title="Student Invitation Link">
-                              <i class="fa fa-link"></i>
-                          </a>
-
-                          <a type="button" class="btn inbetween green upload-modal" href="#" data-toggle="modal" data-target="#upload" data-id="{{group.id}}" data-title="{{group.title}}" title="Add Students">
-                              <i class="fa fa-user-plus"></i>
-                          </a>
-
+                      <div class="assignment_stat_button">
+                        <div class="title">{{group.assignments.count}} Assignment(s)</div>
+                        <div class="buttons">
                           <a type="button" class="btn inbetween orange" aria-label="Class Dashboard" title="Class Dashboard" href="{% url 'ctstem:groupDashboard' group.id %}">
-                              <i class="fas fa-tachometer-alt"></i>
+                                <i class="fas fa-tachometer-alt"></i>
                           </a>
-                          <a type="button" class="btn inbetween blue assignment-modal" href="#" data-toggle="modal" data-target="#assignment" data-id="{{group.id}}" title="Search and Add Assignments" data-title="{{group.title}}">
-                              <i class="fa fa-tasks"></i>
-                          </a>
-                        {% else %}
-                          <a type="button" class="btn inbetween blue" aria-label="Edit Class" title="Edit Class" href="{% url 'ctstem:group' group.id %}">
-                              <i class="far fa-eye" aria-hidden="true"></i>
-                          </a>
-                          <a type="button" class="btn inbetween orange" aria-label="Class Dashboard" title="Class Dashboard" href="{% url 'ctstem:groupDashboard' group.id %}">
-                              <i class="fas fa-tachometer-alt"></i>
-                          </a>
-                        {% endif %}
+                          {% if group.is_active %}
+                            <a type="button" class="btn inbetween blue assignment-modal" href="#" data-toggle="modal" data-target="#assignment" data-id="{{group.id}}" title="Search and Add Assignments" data-title="{{group.title}}">
+                                <i class="fa fa-tasks"></i>
+                            </a>
+                          {% endif %}
+                        </div>
                       </div>
                     </div>
                   </div>
