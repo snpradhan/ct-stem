@@ -107,20 +107,20 @@
             <thead>
               <tr>
                 <th width="1%" class="no-sort">Select All <br> <input id="select-all" type="checkbox" value="0" name="select-all"/></th>
-                <th width="20%" id="title" class="ignorecase"> Class Name </th>
+                <th width="18%" id="title" class="ignorecase"> Class Name </th>
                 <th width="7%" id="subject__name" class="ignorecase"> Subject </th>
                 <th width="10%" id="time" class="ignorecase"> Time </th>
                 <th width="5%" id="is_active"> Status </th>
                 {% if not user.teacher %}
-                  <th width="15%" id="teacher__user__first_name" class="ignorecase"> Teacher </th>
+                  <th width="10%" id="teacher__user__first_name" class="ignorecase"> Teacher </th>
                 {% endif %}
                 <th width="10%">Co-teachers</th>
                 {% if not user.teacher and not user.school_administrator %}
                   <th width="15%" id="teacher__school__name" class="ignorecase"> School </th>
                 {% endif %}
-                <th> Students </th>
+                <th width="8%"> Students </th>
                 <th width="8%"> Assignments </th>
-                <th width="8%"> Created <br> Modified <br> Last Login</th>
+                <th width="12%"> Created <br> Modified <br> Last Login</th>
               </tr>
               <!--tr id="filterrow">
                 <th class="no-sort"></th>
@@ -158,18 +158,12 @@
                             {% endif %}
                         </a>
                         {% if group.is_active %}
-                          <a type="button" class="btn small yellow invite-modal" href="#" data-toggle="modal" data-target="#invite" data-invite-link="https://{{domain}}/?next=/preregister/group/{{group.group_code}}/" data-title="{{group.title}}" title="Student Invitation Link">
-                            <i class="fa fa-link"></i>
-                          </a>
-                          <a type="button" class="btn small green upload-modal" href="#" data-toggle="modal" data-target="#upload" data-id="{{group.id}}" data-title="{{group.title}}" title="Upload Students">
-                            <i class="fa fa-user-plus"></i>
-                          </a>
                           <a type="button" class="btn small purple" aria-label="Inactivate Class" title="Inactivate Class" href="{% url 'ctstem:inactivateGroup' group.id %}" onclick="return confirm('Are you sure you want to inactivate {{group.title}}?')">
                               <i class="fa fa-archive"></i>
                           </a>
                           {% if user.administrator %}
                             <a type="button" class="btn small red" aria-label="Delete Class" title="Delete Class" href="{% url 'ctstem:deleteGroup' group.id %}" onclick="return confirm('Are you sure you want to delete {{group.title}}?')">
-                                <i class="fa fa-trash" aria-hidden="true"></i>
+                              <i class="fa fa-trash" aria-hidden="true"></i>
                             </a>
                           {% endif %}
                         {% endif %}
@@ -191,18 +185,26 @@
                     <td> {{group.teacher.school}} </td>
                   {% endif %}
                   <td>
-                     <div>
-                      {% if group.members.count > 0 %}
-                        {{group.members.count}} Members
-                      {% else %}
-                        No Member
+                    {% if group.members.count > 0 %}
+                      {{group.members.count}} Student(s)
+                    {% else %}
+                      No Students
+                    {% endif %}
+                    <div>
+                      {% if group.is_active %}
+                        <a type="button" class="btn small yellow invite-modal" href="#" data-toggle="modal" data-target="#invite" data-invite-link="https://{{domain}}/?next=/preregister/group/{{group.group_code}}/" data-title="{{group.title}}" title="Student Invitation Link">
+                          <i class="fa fa-link"></i>
+                        </a>
+                        <a type="button" class="btn small green upload-modal" href="#" data-toggle="modal" data-target="#upload" data-id="{{group.id}}" data-title="{{group.title}}" title="Upload Students">
+                          <i class="fa fa-user-plus"></i>
+                        </a>
                       {% endif %}
                     </div>
                   </td>
                   <td>
                     <div>
                       {% if group.assignments.count > 0 %}
-                        {{group.assignments.count}} Assignments
+                        {{group.assignments.count}} Assignment(s)
                         <div>
                           <a type="button" class="btn small orange" href="{% url 'ctstem:groupDashboard' group.id %}" aria-label="View Class Dashboard" title="View Class Dashboard">
                             <i class="fas fa-tachometer-alt"></i>
