@@ -918,13 +918,13 @@ div.row#class_tiles .col .tile .detail .stat_and_button {
 }
 div.row#class_tiles .col .tile .detail .stat_and_button .stat {
   font-size: 0.85em;
-  flex: 0 0 50%
+  flex: 0 0 60%
 }
 div.row#class_tiles .col .tile .detail .stat_and_button .button_row {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-around;
-  flex: 0 0 50%;
+  flex: 0 0 40%;
 }
 div.row#class_tiles .col .tile .detail .stat_and_button .button_row > * {
   margin-bottom: 1em;
