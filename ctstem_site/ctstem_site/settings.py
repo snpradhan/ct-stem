@@ -206,6 +206,8 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 # Auto logout delay in minutes
 AUTO_LOGOUT_DELAY = 30
 
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 10000
+
 #Cron jobs
 CRONJOBS = [
     # run cron at midnight to clean up inactive teacher accounts
