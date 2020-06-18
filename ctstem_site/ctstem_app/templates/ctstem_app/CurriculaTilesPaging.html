@@ -15,6 +15,8 @@
             {% endif %}
             {% if curriculum.status == 'A' %}
               archived
+            {% elif curriculum.status == 'R' %}
+              removed
             {% endif %}
             {% if parent == 'preview' %}
               underlying
@@ -34,6 +36,11 @@
               {% endif %}
             </div>
           </a>
+          {% if curriculum.status == 'R' %}
+            <div class="trash">
+              <i class="fas fa-trash-alt"></i>
+            </div>
+          {% endif %}
           {% if curriculum.feature_rank %}
             <div class="shelf">
             </div>

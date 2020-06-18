@@ -20,6 +20,15 @@
   cursor: pointer;
 }
 
+.tile .trash {
+  margin: auto;
+  position: absolute;
+  top: 15%; left: 0; bottom: 0; right: 0;
+  font-size: 11em;
+  color: var(--ctstem-color-red);
+  z-index: 999;
+}
+
 .tile .detail {
   background-color: white;
   height: 21em;

@@ -772,6 +772,7 @@ div.row#assignment_tiles .col .tile .detail {
 
 
 div.row#curricula_tiles .col .tile.archived .icon img,
+div.row#curricula_tiles .col .tile.removed .icon img
 div.row#class_tiles .col .tile.inactive .icon img{
   opacity: 0.5;
 }
@@ -828,14 +829,16 @@ div.row#curricula_tiles .col .tile.lesson {
 div.row#curricula_tiles .col .tile.assessment {
   border-color: var(--ctstem-color-yellow);
 }
-div.row#curricula_tiles .col .tile.archived .detail {
+div.row#curricula_tiles .col .tile.archived .detail,
+div.row#curricula_tiles .col .tile.removed .detail {
   background-color: var(--ctstem-color-light-gray);
 }
 div.row#curricula_tiles .col .tile.underlying .detail {
   border-top-left-radius: 0.25em;
   border-top-right-radius: 0.25em;
 }
-div.row#curricula_tiles .col .tile.archived .detail > * {
+div.row#curricula_tiles .col .tile.archived .detail > *,
+div.row#curricula_tiles .col .tile.removed .detail > * {
   opacity: 0.5;
 }
 div.row#curricula_tiles .col .tile .bookmark, div.row#preview_head .col .bookmark {
