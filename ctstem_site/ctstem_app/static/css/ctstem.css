@@ -351,7 +351,7 @@ div.curriculum_container div.button-container, div.group_container div.button-co
   width: 10%;
 }
 
-div.table#curriculum, div.table.step,
+div.table#curriculum, div.table#directions_attachments, div.table.step,
 div.table#curriculumQuestions, div.table.activity, div.table#group, div.table#standard {
   width: 90%;
   padding: 3em 4em;
@@ -408,8 +408,11 @@ div.table.step div.row.question {
   margin-bottom: 1em;
 }
 
-div.table#curriculum span.controls, div.table.activity span.controls, div.table#assessment span.controls, div.table.step span.controls {
+div.table#curriculum span.controls, div.table#directions_attachments span.controls, div.table.activity span.controls, div.table#assessment span.controls, div.table.step span.controls {
   float: right;
+}
+div.curriculum_content {
+  margin-top: 2em;
 }
 div.curriculum_content div#taxonomy_div {
   overflow-y: auto;

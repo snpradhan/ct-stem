@@ -178,16 +178,6 @@
                 <div class="error">{{ form.overview.errors }}</div>
               </div>
 
-              <!-- STUDENT OVERVIEW -->
-              <div class="form-group">
-                <label for="id_{{form.student_overview.name}}">{{ form.student_overview.label|title }} {% if form.student_overview.field.required %}(<span class="required">*</span>) {% endif %}</label>
-                <div>
-                  {{form.student_overview}}
-                </div>
-                <div class="help warning">{{form.student_overview.help_text|safe}}</div>
-                <div class="error">{{ form.student_overview.errors }}</div>
-              </div>
-
               <!-- ACKNOWLEDGEMENT -->
               <div class="form-group">
                 <label for="id_{{form.acknowledgement.name}}">{{ form.acknowledgement.label|title }} {% if form.acknowledgement.field.required %}(<span class="required">*</span>) {% endif %}</label>
@@ -216,7 +206,6 @@
                 </div>
                 <div class="help warning">{{form.compatible_system.help_text|safe}}</div>
                 <div class="error">{{ form.compatible_system.errors }}</div>
-
               </div>
 
               <!-- TAXONOMY -->
@@ -268,6 +257,56 @@
                 </div>
                 <div class="help warning">{{form.taxonomy.help_text|safe}}</div>
                 <div class="error">{{ form.taxonomy.errors }}</div>
+              </div>
+
+              <!-- TEACHER NOTES -->
+              <div class="form-group">
+                <label for="id_{{form.teacher_notes.name}}">{{ form.teacher_notes.label|title }} {% if form.teacher_notes.field.required %}(<span class="required">*</span>) {% endif %}</label>
+                <span class="expand_collapse_other">
+                  <button type="button" class="btn orange" style="display:none;" name="collapse_notes" aria-label="Collapse Notes" title="Collapse Notes">
+                    <span class="glyphicon glyphicon-collapse-up" aria-hidden="true"></span>
+                  </button>
+                  <button type="button" class="btn green"  name="expand_notes" aria-label="Expand Notes" title="Expand Notes">
+                    <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
+                  </button>
+                </span>
+                <div style="display:none; margin-top: 1em;">
+                  {{form.teacher_notes}}
+                </div>
+                <div class="help warning">{{form.teacher_notes.help_text|safe}}</div>
+                <div class="error">{{ form.teacher_notes.errors }}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Student directions and attachments -->
+          <!-- Page 0 of Student view -->
+          <div class="table" id="directions_attachments">
+            <h4>
+              <span>&nbsp;</span>
+              <span class="step_title" style="font-weight: bold; text-decoration: underline;">Student Directions and Attachments</span>
+              <span>(Page 0)</span>
+              <span>&nbsp;</span>
+              <span class="controls">
+                <span class="expand_collapse">
+                  <button type="button" class="btn orange" name="collapse_step" aria-label="Collapse Page" title="Collapse Page">
+                    <span class="glyphicon glyphicon-collapse-up" aria-hidden="true"></span>
+                  </button>
+                  <button type="button" class="btn green" style="display:none;" name="expand_step" aria-label="Expand Page" title="Expand Page">
+                    <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
+                  </button>
+                </span>
+              </span>
+            </h4>
+            <div class="curriculum_content collapsible_content">
+              <!-- STUDENT OVERVIEW -->
+              <div class="form-group">
+                <label for="id_{{form.student_overview.name}}">{{ form.student_overview.label|title }} {% if form.student_overview.field.required %}(<span class="required">*</span>) {% endif %}</label>
+                <div>
+                  {{form.student_overview}}
+                </div>
+                <div class="help warning">{{form.student_overview.help_text|safe}}</div>
+                <div class="error">{{ form.student_overview.errors }}</div>
               </div>
 
               <!-- ATTACHMENTS -->
@@ -323,29 +362,8 @@
                     {% endfor %}
                   </tbody>
                 </table>
-
               </div>
-
-              <!-- TEACHER NOTES -->
-              <div class="form-group">
-                <label for="id_{{form.teacher_notes.name}}">{{ form.teacher_notes.label|title }} {% if form.teacher_notes.field.required %}(<span class="required">*</span>) {% endif %}</label>
-                <span class="expand_collapse_other">
-                  <button type="button" class="btn orange" style="display:none;" name="collapse_notes" aria-label="Collapse Notes" title="Collapse Notes">
-                    <span class="glyphicon glyphicon-collapse-up" aria-hidden="true"></span>
-                  </button>
-                  <button type="button" class="btn green"  name="expand_notes" aria-label="Expand Notes" title="Expand Notes">
-                    <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                  </button>
-                </span>
-                <div style="display:none; margin-top: 1em;">
-                  {{form.teacher_notes}}
-                </div>
-                <div class="help warning">{{form.teacher_notes.help_text|safe}}</div>
-                <div class="error">{{ form.teacher_notes.errors }}</div>
-              </div>
-
             </div>
-
           </div>
 
           {{formset.management_form}}
@@ -696,11 +714,13 @@
           $('#id_curriculum-time').closest('.form-group').find('label:first').html('Time (<span class="required">*</span>)');
           $('#id_curriculum-overview').closest('.form-group').show();
           $('#id_curriculum-overview').closest('.form-group').find('label:first').html('Overview (<span class="required">*</span>)');
+          $('div.table#directions_attachments').show();
           $('#id_curriculum-student_overview').closest('.form-group').show();
           $('#id_curriculum-student_overview').closest('.form-group').find('label:first').html('Student Directions & Learning Objectives (<span class="required">*</span>)');
           $('div.form-group.attachment_table').show();
           $('#id_curriculum-acknowledgement').closest('.form-group').show();
           $('#id_curriculum-credits').closest('.form-group').show();
+
         }
 
         //for unit, stand alone lesson and assessment display level and taxonomy
@@ -801,6 +821,7 @@
       function reset_curriculum_metadata(){
         //hide all curriculum metadata fields if curriculum type is not selected
         $('div.curriculum_content div.form-group').hide();
+        $('div.table#directions_attachments').hide();
         //only show the curriculum type field
         $('#id_curriculum-curriculum_type').closest('.form-group').show();
       }
