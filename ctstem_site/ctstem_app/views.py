@@ -3678,9 +3678,11 @@ def check_curriculum_permission(request, curriculum_id, action):
             has_permission = True
           # teacher and researcher can only copy units, stand alone lessons, assessments that are public or something that they own
           elif is_teacher or is_researcher:
-            if has_edit_privilege:
+            if curriculum.status == 'P' and curriculum.unit is None:
               has_permission = True
-            elif curriculum.status == 'P' and curriculum.unit is None:
+            elif has_view_privilege and curriculum.unit is None:
+              has_permission = True
+            elif has_edit_privilege:
               has_permission = True
             else:
               has_permission = False
