@@ -3836,8 +3836,8 @@ def check_curriculum_permission(request, curriculum_id, action):
 
         ############ FAVORITE ############
         elif action == 'favorite':
-          # a teacher who is not the author can mark a curriculum as favorite
-          if is_teacher and not has_edit_privilege and curriculum.unit is None:
+          # a teacher can mark a curriculum as favorite
+          if is_teacher and curriculum.unit is None:
             has_permission = True
 
           if not has_permission:
