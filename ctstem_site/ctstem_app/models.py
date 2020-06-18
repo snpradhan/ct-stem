@@ -29,7 +29,7 @@ CURRICULUM_STATUS_CHOICES = (
 
 CURRICULUM_TYPE_CHOICES = (
     ('U', 'Unit'),
-    ('L', 'Lesson Plan'),
+    ('L', 'Lesson'),
     ('A', 'Assessment'),
 )
 CURRICULUM_BUCKET_CHOICES = (
