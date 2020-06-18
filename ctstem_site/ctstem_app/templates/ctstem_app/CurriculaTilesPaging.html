@@ -48,81 +48,84 @@
               <i class="fas fa-award" title="Featured Curriculum"></i>
             </div>
            {% endif %}
-          <div class="favorite">
-            {% check_curriculum_permission curriculum.id 'favorite' as has_favorite_permission %}
-            {% if has_favorite_permission == True %}
-              <a class="bookmark util-button fa fa-star" href="{% url 'ctstem:removeBookmark' curriculum.id %}" style="{% if curriculum|is_bookmarked:user.teacher %} display: inline-block; {% else %} display: none; {% endif %}" title="Favorite Curriculum"></a>
 
-              <a class="bookmark util-button fa fa-star-o" href="{% url 'ctstem:bookmarkCurriculum' curriculum.id %}" style="{% if curriculum|is_bookmarked:user.teacher %} display: none; {% else %} display: inline-block; {% endif %}" title="Mark as Favorite"></a>
-            {% else %}
-              <a class="bookmark util-button fa fa-star-o" data-title="You need to be logged in as a teacher to favorite this curriculum"></a>
-            {% endif %}
-          </div>
         {% endif %}
-        <a href="{% url 'ctstem:previewCurriculum' curriculum.id %}">
-          <div class="detail">
+        <div class="details_container">
+          {% if parent != 'preview' %}
+            <div class="favorite">
+              {% check_curriculum_permission curriculum.id 'favorite' as has_favorite_permission %}
+              {% if has_favorite_permission == True %}
+                <a class="bookmark util-button fa fa-star" href="{% url 'ctstem:removeBookmark' curriculum.id %}" style="{% if curriculum|is_bookmarked:user.teacher %} display: inline-block; {% else %} display: none; {% endif %}" title="Favorite Curriculum"></a>
 
-            <div class="type">
-              {{curriculum.get_curriculum_type_display}}
-              {% if curriculum.unit %}
-                {{curriculum.order}}
-              {% endif %}
-              {% if curriculum.subject.all %}
-                - {{curriculum.subject.all|join:", "}}
-              {% endif %}
-            </div>
-            <div class="period">
-              {% if curriculum.curriculum_type == 'U' %}
-                {% get_underlying_curriculum curriculum.id as underlying_curriculum %}
-                {{underlying_curriculum|length}} Lessons
+                <a class="bookmark util-button fa fa-star-o" href="{% url 'ctstem:bookmarkCurriculum' curriculum.id %}" style="{% if curriculum|is_bookmarked:user.teacher %} display: none; {% else %} display: inline-block; {% endif %}" title="Mark as Favorite"></a>
               {% else %}
-                {{curriculum.time}}
+                <a class="bookmark util-button fa fa-star-o" data-title="You need to be logged in as a teacher to favorite this curriculum"></a>
               {% endif %}
             </div>
-            <div class="title">{{curriculum.title}}</div>
-            <div class="others">
-              <div class="author">
-                {% if curriculum.curriculumcollaborator_set.all %}
-                  {% if curriculum.curriculumcollaborator_set.all|get_authors|length > 1 %}
-                    {{curriculum.curriculumcollaborator_set.all|get_authors|length}} Authors
-                  {% else %}
-                    {% with curriculum.curriculumcollaborator_set.all|get_authors|first as author %}
-                      by {{author.user.get_full_name}}
-                    {% endwith %}
-                  {% endif %}
+          {% endif %}
+          <a href="{% url 'ctstem:previewCurriculum' curriculum.id %}">
+            <div class="detail">
+              <div class="type">
+                {{curriculum.get_curriculum_type_display}}
+                {% if curriculum.unit %}
+                  {{curriculum.order}}
+                {% endif %}
+                {% if curriculum.subject.all %}
+                  - {{curriculum.subject.all|join:", "}}
                 {% endif %}
               </div>
-              <div class="used_by">
-                Used by {{curriculum.usage_by_student}} Students
+              <div class="period">
+                {% if curriculum.curriculum_type == 'U' %}
+                  {% get_underlying_curriculum curriculum.id as underlying_curriculum %}
+                  {{underlying_curriculum|length}} Lessons
+                {% else %}
+                  {{curriculum.time}}
+                {% endif %}
               </div>
-            </div>
-            <div class="tags">
-              {% if my_curriculum %}
-                <div class="my">
-                  <i class="fas fa-user" title="My Curriculum"></i>
+              <div class="title">{{curriculum.title}}</div>
+              <div class="others">
+                <div class="author">
+                  {% if curriculum.curriculumcollaborator_set.all %}
+                    {% if curriculum.curriculumcollaborator_set.all|get_authors|length > 1 %}
+                      {{curriculum.curriculumcollaborator_set.all|get_authors|length}} Authors
+                    {% else %}
+                      {% with curriculum.curriculumcollaborator_set.all|get_authors|first as author %}
+                        by {{author.user.get_full_name}}
+                      {% endwith %}
+                    {% endif %}
+                  {% endif %}
                 </div>
-              {% endif %}
-
-              {% if shared_curriculum %}
-                <div class="shared">
-                  <i class="fas fa-user-friends" title="Shared Curriculum"></i>
+                <div class="used_by">
+                  Used by {{curriculum.usage_by_student}} Students
                 </div>
-              {% endif %}
-              {% if user.administrator or my_curriculum or shared_curriculum %}
-                {% if curriculum.locked_by %}
-                  <div class="locked">
-                    <i class="fas fa-lock" title="Locked Curriculum"></i>
+              </div>
+              <div class="tags">
+                {% if my_curriculum %}
+                  <div class="my">
+                    <i class="fas fa-user" title="My Curriculum"></i>
                   </div>
                 {% endif %}
-              {% endif %}
 
-              <div class="version title">
-                v{{curriculum.version}}
+                {% if shared_curriculum %}
+                  <div class="shared">
+                    <i class="fas fa-user-friends" title="Shared Curriculum"></i>
+                  </div>
+                {% endif %}
+                {% if user.administrator or my_curriculum or shared_curriculum %}
+                  {% if curriculum.locked_by %}
+                    <div class="locked">
+                      <i class="fas fa-lock" title="Locked Curriculum"></i>
+                    </div>
+                  {% endif %}
+                {% endif %}
+
+                <div class="version title">
+                  v{{curriculum.version}}
+                </div>
               </div>
             </div>
-
-          </div>
-        </a>
+          </a>
+        </div>
       </div>
     </div>
   {% endfor %}

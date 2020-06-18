@@ -26,15 +26,6 @@
             ">
       <div class="col">
         <div class="icon" style="background-image: url('{{icon}}');">
-          {% if curriculum.unit|slugify == 'None'|slugify %}
-            {% check_curriculum_permission curriculum.id 'favorite' as has_favorite_permission %}
-            {% if has_favorite_permission == True %}
-              <a class="bookmark util-button fa fa-star" href="{% url 'ctstem:removeBookmark' curriculum.id %}" style="{% if curriculum|is_bookmarked:user.teacher %} display: inline-block; {% else %} display: none; {% endif %}" title="Remove from Favorites"></a>
-              <a class="bookmark util-button fa fa-star-o" href="{% url 'ctstem:bookmarkCurriculum' curriculum.id %}" style="{% if curriculum|is_bookmarked:user.teacher %} display: none; {% else %} display: inline-block; {% endif %}" title="Add to Favorites"></a>
-            {% else %}
-              <a class="bookmark util-button fa fa-star-o" data-title="You need to be logged in as a teacher to favorite this curriculum"></a>
-            {% endif %}
-        {% endif %}
         </div>
       </div>
 
@@ -53,9 +44,20 @@
               {% endif %}
             {% endif %}
           {% endif %}
+          {% if curriculum.unit|slugify == 'None'|slugify %}
+            {% check_curriculum_permission curriculum.id 'favorite' as has_favorite_permission %}
+            &nbsp;&nbsp;
+            {% if has_favorite_permission == True %}
+              <a class="bookmark util-button fa fa-star" href="{% url 'ctstem:removeBookmark' curriculum.id %}" style="{% if curriculum|is_bookmarked:user.teacher %} display: inline-block; {% else %} display: none; {% endif %}" title="Remove from Favorites"></a>
+              <a class="bookmark util-button fa fa-star-o" href="{% url 'ctstem:bookmarkCurriculum' curriculum.id %}" style="{% if curriculum|is_bookmarked:user.teacher %} display: none; {% else %} display: inline-block; {% endif %}" title="Add to Favorites"></a>
+            {% else %}
+              <a class="bookmark util-button fa fa-star-o" data-title="You need to be logged in as a teacher to favorite this curriculum"></a>
+            {% endif %}
+          {% endif %}
         </h3>
+
         <div>
-          Author(s):
+          <label>Author(s): </label>
           {% with curr_unit=curriculum.unit|default:curriculum %}
             {% for curriculum_author in curr_unit.curriculumcollaborator_set.all|get_authors|dictsort:"order" %}
               {{curriculum_author.user.get_full_name}}{% if forloop.last == False %}, {% endif %}
@@ -63,19 +65,22 @@
           {% endwith %}
         </div>
         <div>
-          Subject:
+          <label>Subject:  </label>
           {% if curriculum.subject.all %}
             {{curriculum.subject.all|join:", "}}
           {% endif %}
         </div>
         <div>
-          Time: {{curriculum.time}}
+          <label>Time:  </label>
+          {{curriculum.time}}
         </div>
         <div>
-          Level: {{curriculum.level}}
+          <label>Level:  </label>
+          {{curriculum.level}}
         </div>
         <div>
-          Version: v{{curriculum.version}}
+          <label>Version:  </label>
+          v{{curriculum.version}}
         </div>
       </div>
     </div>

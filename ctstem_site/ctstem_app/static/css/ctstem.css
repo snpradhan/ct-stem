@@ -743,6 +743,9 @@ div.row#assignment_tiles .col .tile {
   box-shadow: unset;
   overflow: hidden;
 }
+div.row#curricula_tiles .col .tile .details_container {
+  position: relative;
+}
 div.row#class_tiles .col .tile,
 div.row#standard_tiles .col .tile{
   border-color: black;
@@ -841,7 +844,7 @@ div.row#curricula_tiles .col .tile.archived .detail > *,
 div.row#curricula_tiles .col .tile.removed .detail > * {
   opacity: 0.5;
 }
-div.row#curricula_tiles .col .tile .bookmark, div.row#preview_head .col .bookmark {
+div.row#curricula_tiles .col .tile .bookmark {
   position: absolute;
   top:5px;
   right:5px;
@@ -851,6 +854,7 @@ div.row#curricula_tiles .col .tile .bookmark, div.row#preview_head .col .bookmar
 }
 div.row .col .bookmark.fa {
   color: var(--ctstem-color-yellow);
+  text-decoration: none;
 }
 div.row .col .bookmark.fa:hover {
   cursor: pointer;
@@ -1007,11 +1011,12 @@ div.content#preview div.row .col.meta {
 }
 div.content#preview div.row .col.meta > * {
   margin-bottom: 0.7em;
+  display: table;
 }
 
 div.content#preview div.row .col.meta > div {
   font-size: 1.8em;
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1.1em;
 }
 

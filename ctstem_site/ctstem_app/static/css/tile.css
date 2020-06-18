@@ -59,12 +59,14 @@
   margin-bottom: 0.6em;
   font-size: 1.4em;
   font-weight: 600;
+  width: 80%;
 }
 .tile .detail .period {
   color: #7d7d7d;
   margin-bottom: 1.6em;
   font-size: 1.3em;
   font-weight: 400;
+  width: 80%;
 }
 .tile .detail .title {
   font-size: 1.7em;
