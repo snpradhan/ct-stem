@@ -341,7 +341,7 @@ $(function (){
     $('div#spinner').show();
   });
 
-  $('form#curriculumForm input#submit').on('click', function() {
+  $('form#curriculumForm').on('submit', function() {
     $('div#spinner').show();
   });
 

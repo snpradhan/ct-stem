@@ -327,7 +327,7 @@ div.curriculum_container, div.group_container {
   justify-content: space-between;
 }
 div.curriculum_container div.left-navigation {
-  width: 8%;
+  width: 12%;
 }
 div.curriculum_container div.left-navigation label.current_curriculum {
   color: var(--ctstem-color-yellow);
@@ -342,7 +342,7 @@ div.curriculum_container div.left-navigation label a:hover{
   text-decoration: underline;
 }
 div.curriculum_container div.curriculum_components {
-  width: 82%;
+  width: 78%;
 }
 div.group_container div.group_components {
   width: 90%;
@@ -357,6 +357,9 @@ div.table#curriculumQuestions, div.table.activity, div.table#group, div.table#st
   padding: 3em 4em;
   margin-top: 3em;
   margin-bottom: 3em;
+}
+div.table#curriculum, div.table#directions_attachments {
+  width: 100%;
 }
 
 div.table.step, div.table.activity, div.table.ngss, div.table.taxonomy, div.table#curriculumQuestions {

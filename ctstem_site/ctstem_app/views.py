@@ -253,11 +253,16 @@ def curriculatiles(request):
 ####################################
 def curriculum(request, id=''):
   try:
+    unit_id = None
     # curriculum exists
     if '' != id:
       has_permission = check_curriculum_permission(request, id, 'modify')
       if has_permission:
         curriculum = models.Curriculum.objects.get(id=id)
+        if curriculum.curriculum_type == 'U':
+          unit_id = curriculum.id
+        elif curriculum.unit:
+          unit_id = curriculum.unit.id
       else:
         if request.META.get('HTTP_REFERER'):
           if 'login' in request.META.get('HTTP_REFERER'):
@@ -270,7 +275,12 @@ def curriculum(request, id=''):
     else:
       has_permission = check_curriculum_permission(request, id, 'create')
       if has_permission:
-        curriculum = models.Curriculum()
+        if 'unit_id' in request.GET:
+          unit_id = request.GET['unit_id']
+          unit = models.Curriculum.objects.get(id=unit_id)
+          curriculum = models.Curriculum(curriculum_type='L', unit=unit)
+        else:
+          curriculum = models.Curriculum()
       else:
          return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
@@ -307,7 +317,7 @@ def curriculum(request, id=''):
         if message.extra_tags == 'modal_message':
           modal_messages.append(message)
 
-      context = {'form': form, 'attachment_formset': attachment_formset, 'collaborator_formset': collaborator_formset, 'formset':formset, 'newQuestionForm': newQuestionForm, 'back_url': back_url, 'modal_messages': modal_messages }
+      context = {'form': form, 'attachment_formset': attachment_formset, 'collaborator_formset': collaborator_formset, 'formset':formset, 'newQuestionForm': newQuestionForm, 'back_url': back_url, 'modal_messages': modal_messages, 'unit_id': unit_id }
 
       return render(request, 'ctstem_app/Curriculum.html', context)
 
@@ -390,7 +400,7 @@ def curriculum(request, id=''):
             messages.error(request, "The preview could not be generated because some mandatory fields are missing.")
           else:
             messages.error(request, "The curriculum could not be saved because there were errors.  Please check the errors below.")
-          context = {'form': form, 'attachment_formset': attachment_formset, 'collaborator_formset': collaborator_formset, 'formset':formset, 'newQuestionForm': newQuestionForm, 'back_url': back_url}
+          context = {'form': form, 'attachment_formset': attachment_formset, 'collaborator_formset': collaborator_formset, 'formset':formset, 'newQuestionForm': newQuestionForm, 'back_url': back_url, 'unit_id': unit_id }
           return render(request, 'ctstem_app/Curriculum.html', context)
 
     return http.HttpResponseNotAllowed(['GET', 'POST'])

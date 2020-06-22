@@ -13,28 +13,32 @@
       <div class="curriculum_container">
         <div class="left-navigation">
           <div class="form-group unit-navigation">
-            {% if form.instance and form.instance.id %}
-              {% if form.instance.unit or form.instance.curriculum_type == 'U' %}
-                {% with unit_id=form.instance.unit.id|default:form.instance.id unit_title=form.instance.unit.title|default:form.instance.title %}
-                  {% if form.instance.id != unit_id %}
-                    <label><a href="{% url 'ctstem:curriculum' unit_id %}">Unit</a></label>
-                  {% else %}
-                    <label class="current_curriculum"><strong>Unit</strong></label>
-                  {% endif %}
-                  {% get_underlying_curriculum unit_id as underlying_curriculum %}
-                  <ul>
-                  {% for lesson in underlying_curriculum %}
-                    <li>
-                      {% if form.instance.id != lesson.id %}
-                        <label><a href="{% url 'ctstem:curriculum' lesson.id %}">Lesson {{lesson.order}}</a></label>
-                      {% else %}
-                       <label class="current_curriculum"><strong>Lesson {{forloop.counter}}</strong></label>
-                      {% endif %}
-                    </li>
-                  {% endfor %}
-                  </ul>
-                {% endwith %}
+            {% if unit_id %}
+              {% if form.instance.id != unit_id %}
+                <label><a href="{% url 'ctstem:curriculum' unit_id %}">Unit</a></label>
+              {% else %}
+                <label class="current_curriculum"><strong>Unit</strong></label>
               {% endif %}
+              {% get_underlying_curriculum unit_id as underlying_curriculum %}
+              <ul>
+                {% for lesson in underlying_curriculum %}
+                  <li>
+                    {% if form.instance.id != lesson.id %}
+                      <label><a href="{% url 'ctstem:curriculum' lesson.id %}">Lesson {{lesson.order}}</a></label>
+                    {% else %}
+                     <label class="current_curriculum"><strong>Lesson {{forloop.counter}}</strong></label>
+                    {% endif %}
+                  </li>
+                {% endfor %}
+                {% if form.instance.id is None %}
+                  <li>
+                  <label class="current_curriculum"><strong>Lesson {{underlying_curriculum|length|add:1}}</strong></label>
+                </li>
+                {% endif %}
+                <li>
+                  <label><strong><a href="{% url 'ctstem:newCurriculum' %}?unit_id={{unit_id}}">Add Lesson</a></strong></label>
+                </li>
+              </ul>
             {% endif %}
           </div>
         </div>
@@ -713,18 +717,18 @@
           $('#id_curriculum-time').closest('.form-group').show();
           $('#id_curriculum-time').closest('.form-group').find('label:first').html('Time (<span class="required">*</span>)');
           $('#id_curriculum-overview').closest('.form-group').show();
-          $('#id_curriculum-overview').closest('.form-group').find('label:first').html('Overview (<span class="required">*</span>)');
           $('div.table#directions_attachments').show();
           $('#id_curriculum-student_overview').closest('.form-group').show();
-          $('#id_curriculum-student_overview').closest('.form-group').find('label:first').html('Student Directions & Learning Objectives (<span class="required">*</span>)');
           $('div.form-group.attachment_table').show();
           $('#id_curriculum-acknowledgement').closest('.form-group').show();
           $('#id_curriculum-credits').closest('.form-group').show();
-
         }
 
         //for unit, stand alone lesson and assessment display level and taxonomy
         if($(this).val() == 'U' || (($(this).val() == 'L' || $(this).val() == 'A') &&  $('select#id_curriculum-unit').val() == '' )) {
+          $('#id_curriculum-overview').closest('.form-group').find('label:first').html('Overview (<span class="required">*</span>)');
+          $('#id_curriculum-student_overview').closest('.form-group').find('label:first').html('Student Directions & Learning Objectives (<span class="required">*</span>)');
+
           $('#id_curriculum-level').closest('.form-group').show();
           $('#id_curriculum-level').closest('.form-group').find('label:first').html('Level (<span class="required">*</span>)');
           $('#id_curriculum-taxonomy').closest('.form-group').show();
