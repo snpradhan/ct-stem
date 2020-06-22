@@ -15,18 +15,34 @@
           <div class="form-group unit-navigation">
             {% if unit_id %}
               {% if form.instance.id != unit_id %}
-                <label><a href="{% url 'ctstem:curriculum' unit_id %}">Unit</a></label>
+                <label>
+                  <a href="{% url 'ctstem:curriculum' unit_id %}">Unit</a>
+                  &nbsp;&nbsp;
+                  <a class="fa fa-files-o" href="{% url 'ctstem:copyCurriculum' unit_id %}" title="Copy Unit"></a>
+                </label>
               {% else %}
-                <label class="current_curriculum"><strong>Unit</strong></label>
+                <label class="current_curriculum">
+                  <strong>Unit</strong>
+                  &nbsp;&nbsp;
+                  <a class="fa fa-files-o" href="{% url 'ctstem:copyCurriculum' unit_id %}" title="Copy Unit"></a>
+                </label>
               {% endif %}
               {% get_underlying_curriculum unit_id as underlying_curriculum %}
               <ul>
                 {% for lesson in underlying_curriculum %}
                   <li>
                     {% if form.instance.id != lesson.id %}
-                      <label><a href="{% url 'ctstem:curriculum' lesson.id %}">Lesson {{lesson.order}}</a></label>
+                      <label>
+                        <a href="{% url 'ctstem:curriculum' lesson.id %}">Lesson {{lesson.order}}</a>
+                        &nbsp;&nbsp;
+                        <a class="fa fa-files-o" href="{% url 'ctstem:copyCurriculum' lesson.id %}" title="Copy Lesson"></a>
+                      </label>
                     {% else %}
-                     <label class="current_curriculum"><strong>Lesson {{forloop.counter}}</strong></label>
+                     <label class="current_curriculum">
+                      <strong>Lesson {{forloop.counter}}</strong>
+                      &nbsp;&nbsp;
+                      <a class="fa fa-files-o" href="{% url 'ctstem:copyCurriculum' lesson.id %}" title="Copy Lesson"></a>
+                    </label>
                     {% endif %}
                   </li>
                 {% endfor %}

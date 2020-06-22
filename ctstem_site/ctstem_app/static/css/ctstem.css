@@ -329,7 +329,10 @@ div.curriculum_container, div.group_container {
 div.curriculum_container div.left-navigation {
   width: 12%;
 }
-div.curriculum_container div.left-navigation label.current_curriculum {
+div.curriculum_container div.left-navigation ul {
+  padding-left: 2em;
+}
+div.curriculum_container div.left-navigation label.current_curriculum strong{
   color: var(--ctstem-color-yellow);
   text-decoration: underline;
 }
