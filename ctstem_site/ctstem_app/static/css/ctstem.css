@@ -786,6 +786,9 @@ div.row#class_tiles .col .tile.inactive .icon img{
 /******* TILES COMMON END *****/
 
 /**** curricula tiles ****/
+div.content#curricula div.row#curricula_filters {
+  justify-content: space-between;
+}
 div.content#curricula div.row#curricula_filters,
 div.content#curricula div#curricula_filters_toggle {
   color: white;
@@ -793,10 +796,6 @@ div.content#curricula div#curricula_filters_toggle {
 }
 div.content#curricula div#curricula_filters_toggle {
   text-align: right;
-}
-div.content#curricula div.row#curricula_filters .col {
-  flex: 1 1 auto;
-  width: auto !important;
 }
 
 div.content#curricula div.row#curricula_filters input {

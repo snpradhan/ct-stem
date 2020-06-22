@@ -71,12 +71,21 @@
               {% endfor %}
             </div>
             {% endif %}
-            {% if searchForm.keywords %}
-            <div class="col form-group">
-              <label>{{searchForm.keywords.label|title}}</label>
-              <div>{{searchForm.keywords}}</div>
-            </div>
+
+            {% if searchForm.keywords or searchForm.sort_by %}
+              <div class="col form-group">
+                {% if searchForm.keywords %}
+                  <label>{{searchForm.keywords.label|title}}</label>
+                  <div>{{searchForm.keywords}}</div>
+               {% endif %}
+                <br>
+                {% if searchForm.sort_by %}
+                  <label>{{searchForm.sort_by.label|title}}</label>
+                  {{searchForm.sort_by}}
+                {% endif %}
+              </div>
             {% endif %}
+
             <div class="col form-group">
               <div class="search">
                 <!--input type="submit" class="btn normal darkblue" id="submit" value="Search"/-->

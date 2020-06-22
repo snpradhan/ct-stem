@@ -110,6 +110,12 @@ PARENTAL_CONSENT_CHOICES = (
   ('D', 'Disagree'),
 )
 
+CURRICULA_SORT_CHOICES = (
+  ('D', 'Date Updated'),
+  ('A', 'Alphabetical'),
+  ('P', 'Most Popular'),
+)
+
 class IsNull(Func):
   template = "%(expressions)s IS NULL or %(expressions)s = ''"
 

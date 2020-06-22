@@ -865,7 +865,8 @@ class CurriculaSearchForm(forms.Form):
   curricula_types = forms.MultipleChoiceField(required=False, widget=forms.CheckboxSelectMultiple(), choices=models.CURRICULUM_TYPE_CHOICES)
   buckets = forms.MultipleChoiceField(required=False, widget=forms.CheckboxSelectMultiple(), choices=models.CURRICULUM_BUCKET_CHOICES, label='My Collections')
   status = forms.MultipleChoiceField(required=False, widget=forms.CheckboxSelectMultiple(), choices=models.CURRICULUM_STATUS_CHOICES)
-  keywords = forms.CharField(required=False, max_length=30, label=u'Search by Keyword')
+  keywords = forms.CharField(required=False, max_length=60, label=u'Search by Keyword')
+  sort_by = forms.ChoiceField(required=False, choices=(('', '---------'),)+models.CURRICULA_SORT_CHOICES)
 
   def __init__(self, *args, **kwargs):
     user = kwargs.pop('user')

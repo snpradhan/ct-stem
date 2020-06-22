@@ -196,7 +196,8 @@ def curriculatiles(request):
     curricula = models.Curriculum.objects.extra(select={'modified_year': 'EXTRACT(YEAR FROM modified_date)',
                           'modified_month': 'EXTRACT(MONTH FROM modified_date)',
                           'modified_day': 'EXTRACT(DAY FROM modified_date)',
-                          'is_active': "status <> 'A'"})
+                          'is_active': "status <> 'R' and status <> 'A'",
+                          'bookmark_count': 'SELECT COUNT(*) FROM ctstem_app_bookmarkedcurriculum WHERE ctstem_app_bookmarkedcurriculum.curriculum_id = ctstem_app_curriculum.id'})
 
     search_criteria = None
     if request.method == 'GET':
@@ -211,12 +212,30 @@ def curriculatiles(request):
 
     curricula = searchCurriculaTiles(request, curricula, search_criteria)
 
-    sort_order = [{'order_by': 'is_active', 'direction': 'desc', 'ignorecase': 'false'},
-                {'order_by': 'feature_rank', 'direction': 'asc', 'ignorecase': 'false'},
-                {'order_by': 'modified_year', 'direction': 'desc', 'ignorecase': 'false'},
-                {'order_by': 'modified_month', 'direction': 'desc', 'ignorecase': 'false'},
-                {'order_by': 'modified_day', 'direction': 'desc', 'ignorecase': 'false'},
-                {'order_by': 'title', 'direction': 'asc', 'ignorecase': 'true'}]
+    sort_order = None
+    if search_criteria and 'sort_by' in search_criteria and search_criteria['sort_by'][0] != '':
+      #sort by modified date
+      if search_criteria['sort_by'][0] == 'D':
+        sort_order = [{'order_by': 'is_active', 'direction': 'desc', 'ignorecase': 'false'},
+                      {'order_by': 'modified_year', 'direction': 'desc', 'ignorecase': 'false'},
+                      {'order_by': 'modified_month', 'direction': 'desc', 'ignorecase': 'false'},
+                      {'order_by': 'modified_day', 'direction': 'desc', 'ignorecase': 'false'}]
+      #sort by title alphabetically
+      elif search_criteria['sort_by'][0] == 'A':
+        sort_order = [{'order_by': 'is_active', 'direction': 'desc', 'ignorecase': 'false'},
+                      {'order_by': 'title', 'direction': 'asc', 'ignorecase': 'true'}]
+      #sort by popularity
+      elif search_criteria['sort_by'][0] == 'P':
+        sort_order = [{'order_by': 'is_active', 'direction': 'desc', 'ignorecase': 'false'},
+                      {'order_by': 'bookmark_count', 'direction': 'desc', 'ignorecase': 'false'}]
+    else:
+      sort_order = [{'order_by': 'is_active', 'direction': 'desc', 'ignorecase': 'false'},
+                    {'order_by': 'feature_rank', 'direction': 'asc', 'ignorecase': 'false'},
+                    {'order_by': 'modified_year', 'direction': 'desc', 'ignorecase': 'false'},
+                    {'order_by': 'modified_month', 'direction': 'desc', 'ignorecase': 'false'},
+                    {'order_by': 'modified_day', 'direction': 'desc', 'ignorecase': 'false'},
+                    {'order_by': 'title', 'direction': 'asc', 'ignorecase': 'true'}]
+
     curricula_list = paginate(request, curricula, sort_order, 12)
     context = {'curricula': curricula_list, 'searchForm': searchForm }
 
