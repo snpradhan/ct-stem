@@ -7,17 +7,15 @@
 
 <!-- Edit -->
 {% check_curriculum_permission curriculum.id 'modify' as has_modify_permission %}
-{% with back_url=back_url|default:request.path %}
 {% if has_modify_permission == True %}
   {% if curriculum.status == 'A' %}
-    <a class="util-button fa fa-pencil" aria-hidden="true" aria-label="Edit Curriculum" title="Edit Curriculum" href="{% url 'ctstem:curriculum' curriculum.id %}?back_url={{ back_url }}"
+    <a class="util-button fa fa-pencil" aria-hidden="true" aria-label="Edit Curriculum" title="Edit Curriculum" href="{% url 'ctstem:curriculum' curriculum.id %}"
     onclick="return confirm('This curriculum has been archived.  Are you sure you want to edit this curriculum?');">
     </a>
   {% else %}
-    <a class="util-button fa fa-pencil" aria-hidden="true" aria-label="Edit Curriculum" title="Edit Curriculum" href="{% url 'ctstem:curriculum' curriculum.id %}?back_url={{ back_url }}"></a>
+    <a class="util-button fa fa-pencil" aria-hidden="true" aria-label="Edit Curriculum" title="Edit Curriculum" href="{% url 'ctstem:curriculum' curriculum.id %}"></a>
   {% endif %}
 {% endif %}
-{% endwith %}
 <!-- Delete -->
 {% check_curriculum_permission curriculum.id 'delete' as has_delete_permission %}
 {% if has_delete_permission == True %}

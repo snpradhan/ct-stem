@@ -36,7 +36,7 @@
     </div>
     <div class="btn-group">
       {% if user.administrator or user.researcher or user.author or user.teacher %}
-        <a type="button" class="btn normal green" href="{% url 'ctstem:newCurriculum' %}?back_url={{ request.path }}" title="Create new curriculum">Create Curriculum</a>
+        <a type="button" class="btn normal green" href="{% url 'ctstem:newCurriculum' %}" title="Create new curriculum">Create Curriculum</a>
       {% endif %}
     </div>
     <form method="post">
@@ -151,7 +151,7 @@
                     <div class="row">
                       <div class="col-md-2 title">Underlying Curricula:</div>
                       <div class="col-md-10">
-                        <span class="ec unit_lesson" data-unit-id="{{curriculum.id}}" data-back-url="{{request.path}}">
+                        <span class="ec unit_lesson" data-unit-id="{{curriculum.id}}">
                           <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
                           <span class="glyphicon glyphicon-collapse-up" aria-hidden="true" style="display:none;"></span>
                         </span>

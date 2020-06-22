@@ -520,12 +520,6 @@
 
         <div class="button-container">
           <div class="form-group button-group-fixed">
-            <input type="hidden" name="back" id="back" value="0"/>
-            {% if back_url %}
-              <input type="submit" class="btn inbetween gray" id="backBtn" value="Back"/>
-              <br><br>
-            {% endif %}
-
             {% if form.instance.id %}
               {% check_curriculum_permission form.instance.id 'delete' as has_delete_permission %}
               {% if has_delete_permission == True %}
@@ -876,11 +870,6 @@
            },
         });
         */
-      });
-      //on click of Back button, save the curriculum and redirect to previous page
-      $('input#backBtn').click(function(e){
-        $('input#back').val("1");
-        $('form#curriculumForm').submit();
       });
 
       $('div.unit-navigation a').click(function(e){

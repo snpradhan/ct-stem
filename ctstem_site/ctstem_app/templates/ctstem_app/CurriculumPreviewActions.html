@@ -3,7 +3,6 @@
   <!--div class="col">
     <a type="button" class="btn normal blue" href="#">Print</a>
   </div-->
-  {% with back_url=back_url|default:request.path %}
   <div class="col">
     {% check_curriculum_permission curriculum.id 'assign' as has_assign_permission %}
     {% if has_assign_permission == True %}
@@ -46,12 +45,12 @@
   {% if has_modify_permission == True %}
     <div class="col">
       {% if curriculum.status == 'A' %}
-        <a type="button" class="btn normal blue" aria-hidden="true" aria-label="Edit Curriculum" title="Edit Curriculum" href="{% url 'ctstem:curriculum' curriculum.id %}?back_url={{ back_url }}"
+        <a type="button" class="btn normal blue" aria-hidden="true" aria-label="Edit Curriculum" title="Edit Curriculum" href="{% url 'ctstem:curriculum' curriculum.id %}"
         onclick="return confirm('This curriculum has been archived.  Are you sure you want to edit this curriculum?');">
           Edit
         </a>
       {% else %}
-        <a type="button" class="btn normal blue" aria-hidden="true" aria-label="Edit Curriculum" title="Edit Curriculum" href="{% url 'ctstem:curriculum' curriculum.id %}?back_url={{ back_url }}">Edit</a>
+        <a type="button" class="btn normal blue" aria-hidden="true" aria-label="Edit Curriculum" title="Edit Curriculum" href="{% url 'ctstem:curriculum' curriculum.id %}">Edit</a>
       {% endif %}
     </div>
   {% endif %}
@@ -94,5 +93,4 @@
       </div>
     {% endif %}
   {% endif %}
-   {% endwith %}
 </div>

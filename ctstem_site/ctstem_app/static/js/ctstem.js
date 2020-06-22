@@ -271,12 +271,9 @@ $(function (){
       //only make the ajax call if the table is not yet populated
       if($(lesson_table).html().length == 0){
         var unit_id = $(this).data('unit-id');
-        data = {'back_url': $(this).data('back-url')};
-        var data = $.param(data);
         $.ajax({
           type: 'GET',
           url: '/curriculum/underlying/'+unit_id+'/',
-          data: data,
           success: function(data){
             $(lesson_table).html(data);
             bind_curriculum_delete_confirmation();

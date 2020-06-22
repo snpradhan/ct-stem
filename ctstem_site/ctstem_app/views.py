@@ -285,9 +285,6 @@ def curriculum(request, id=''):
          return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
     newQuestionForm = forms.QuestionForm()
-    back_url = None
-    if 'back_url' in request.GET:
-      back_url = request.GET['back_url']
 
     if request.method == 'GET':
       initial_collaborator_data = []
@@ -317,14 +314,13 @@ def curriculum(request, id=''):
         if message.extra_tags == 'modal_message':
           modal_messages.append(message)
 
-      context = {'form': form, 'attachment_formset': attachment_formset, 'collaborator_formset': collaborator_formset, 'formset':formset, 'newQuestionForm': newQuestionForm, 'back_url': back_url, 'modal_messages': modal_messages, 'unit_id': unit_id }
+      context = {'form': form, 'attachment_formset': attachment_formset, 'collaborator_formset': collaborator_formset, 'formset':formset, 'newQuestionForm': newQuestionForm, 'modal_messages': modal_messages, 'unit_id': unit_id }
 
       return render(request, 'ctstem_app/Curriculum.html', context)
 
     elif request.method == 'POST':
       data = request.POST.copy()
       preview = data['preview']
-      back = data['back']
 
       form = forms.CurriculumForm(user=request.user, data=data, files=request.FILES, instance=curriculum, prefix="curriculum")
       #AssessmentStepFormSet = inlineformset_factory(models.Assessment, models.AssessmentStep, form=forms.AssessmentStepForm,
@@ -379,10 +375,6 @@ def curriculum(request, id=''):
           messages.success(request, "Curriculum Saved.")
           if preview == '1':
             return shortcuts.redirect('ctstem:previewCurriculum', id=savedCurriculum.id)
-          elif back == '1':
-            return shortcuts.redirect(back_url)
-          elif back_url:
-            return shortcuts.redirect('/curriculum/%s?back_url=%s' % (savedCurriculum.id, back_url))
           else:
             return shortcuts.redirect('/curriculum/%s' % savedCurriculum.id)
       else:
@@ -400,7 +392,7 @@ def curriculum(request, id=''):
             messages.error(request, "The preview could not be generated because some mandatory fields are missing.")
           else:
             messages.error(request, "The curriculum could not be saved because there were errors.  Please check the errors below.")
-          context = {'form': form, 'attachment_formset': attachment_formset, 'collaborator_formset': collaborator_formset, 'formset':formset, 'newQuestionForm': newQuestionForm, 'back_url': back_url, 'unit_id': unit_id }
+          context = {'form': form, 'attachment_formset': attachment_formset, 'collaborator_formset': collaborator_formset, 'formset':formset, 'newQuestionForm': newQuestionForm, 'unit_id': unit_id }
           return render(request, 'ctstem_app/Curriculum.html', context)
 
     return http.HttpResponseNotAllowed(['GET', 'POST'])
@@ -756,14 +748,7 @@ def copyCurriculum(request, id=''):
       else:
         messages.success(request, "A new curriculum '%s - v%s.' has been created and the status set to Private.  You may edit the newly copied curriculum after dismissing this message." % (new_curriculum.title, new_curriculum.version), extra_tags="modal_message")
 
-      back_url = None
-      if 'back_url' in request.GET:
-        back_url = request.GET['back_url']
-
-      if back_url:
-        return shortcuts.redirect('/curriculum/%s?back_url=%s' % (new_curriculum.id, back_url))
-      else:
-        return shortcuts.redirect('/curriculum/%s' % new_curriculum.id)
+      return shortcuts.redirect('/curriculum/%s' % new_curriculum.id)
 
     return http.HttpResponseNotAllowed(['GET', 'POST'])
 
@@ -2824,7 +2809,7 @@ def underlyingCurriculumTable(request, id=''):
     else:
       action = 'restore'
     underlying_curriculum = underlyingCurriculum(request, action, id)
-    context = {'underlying_curriculum': underlying_curriculum, 'back_url': request.GET['back_url']}
+    context = {'underlying_curriculum': underlying_curriculum}
     html = render_to_string('ctstem_app/UnderlyingCurricula.html', context, request)
     return http.HttpResponse(html)
 

@@ -18,7 +18,7 @@
         <div class="btn-group center">
           {% if user.is_authenticated %}
             {% if user.administrator or user.researcher or user.author or user.teacher %}
-              <a type="button" class="btn normal darkblue" href="{% url 'ctstem:newCurriculum' %}?back_url={{ request.path }}" title="Create new curriculum">Create Curriculum</a>
+              <a type="button" class="btn normal darkblue" href="{% url 'ctstem:newCurriculum' %}" title="Create new curriculum">Create Curriculum</a>
             {% else %}
               {% with msg="Please login as a teacher to create a curriculum" %}
                 <a type="button" class="btn normal darkblue" onclick="alert('{{msg}}');" title="Create new curriculum">Create Curriculum</a>
