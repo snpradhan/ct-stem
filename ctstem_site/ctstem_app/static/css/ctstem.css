@@ -361,7 +361,7 @@ div.table#curriculumQuestions, div.table.activity, div.table#group, div.table#st
   margin-top: 3em;
   margin-bottom: 3em;
 }
-div.table#curriculum, div.table#directions_attachments {
+div.table#curriculum, div.table#directions_attachments, div.table.step {
   width: 100%;
 }
 

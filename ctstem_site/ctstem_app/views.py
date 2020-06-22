@@ -420,7 +420,7 @@ def previewCurriculumActivity(request, id='', step_order=0):
 
     if request.method == 'GET':
       steps = models.Step.objects.all().filter(curriculum=curriculum)
-      attachments = models.Attachment.objects.all().filter(curriculum=curriculum)
+      attachments = models.Attachment.objects.all().filter(Q(curriculum=curriculum) | Q(curriculum=curriculum.unit), teacher_only=False)
       systems = models.System.objects.all()
       total_steps = len(steps)
 
@@ -458,10 +458,10 @@ def previewCurriculum(request, id=''):
     if request.method == 'GET':
       systems = models.System.objects.all()
 
-      if request.user.is_anonymous or hasattr(request.user, 'student'):
-        attachments = models.Attachment.objects.all().filter(curriculum=curriculum, teacher_only=False)
-      else:
-        attachments = models.Attachment.objects.all().filter(curriculum=curriculum)
+      teacher_attachments = None
+      student_attachments = models.Attachment.objects.all().filter(Q(curriculum=curriculum) | Q(curriculum=curriculum.unit), teacher_only=False)
+      if request.user.is_authenticated or not hasattr(request.user, 'student'):
+        teacher_attachments = models.Attachment.objects.all().filter(Q(curriculum=curriculum) | Q(curriculum=curriculum.unit), teacher_only=True)
 
       if curriculum.unit and curriculum.unit.icon:
         icon = curriculum.unit.icon.url
@@ -474,8 +474,7 @@ def previewCurriculum(request, id=''):
       else:
         icon = '/static/img/assessment.png'
 
-
-      context = {'curriculum': curriculum, 'systems': systems, 'icon': icon, 'attachments': attachments}
+      context = {'curriculum': curriculum, 'systems': systems, 'icon': icon, 'student_attachments': student_attachments, 'teacher_attachments': teacher_attachments}
 
       return render(request, 'ctstem_app/CurriculumPreview.html', context)
 
@@ -595,7 +594,7 @@ def render_to_pdf(template_src, context_dict, request):
 ####################################
 # Download Lesson attachments
 ####################################
-def downloadAttachments(request, id=''):
+def downloadAttachments(request, id='', flag='S'):
   try:
     # check if the lesson exists
     if '' != id:
@@ -606,11 +605,34 @@ def downloadAttachments(request, id=''):
     if request.method == 'GET' or request.method == 'POST':
       # Files (local path) to put in the .zip
       # FIXME: Change this (get paths from DB etc)
-      # check if the user has permission to delete a lesson
-      if request.user.is_anonymous or hasattr(request.user, 'student'):
-        attachments = models.Attachment.objects.all().filter(curriculum=curriculum, teacher_only=False)
+      attachments = teacher_only = None
+      download_allowed = False
+      if request.user.is_authenticated:
+        if hasattr(request.user, 'student'):
+          if flag == 'S':
+            teacher_only = False
+            download_allowed = True
+        else:
+          if flag == 'S':
+            teacher_only = False
+            download_allowed = True
+          elif flag == 'T':
+            teacher_only = True
+            download_allowed = True
+          else:
+           download_allowed = True
       else:
-        attachments = models.Attachment.objects.all().filter(curriculum=curriculum)
+        if flag == 'S':
+          teacher_only = False
+          download_allowed = True
+
+      if download_allowed:
+        if teacher_only is None:
+          attachments = models.Attachment.objects.all().filter(Q(curriculum=curriculum) | Q(curriculum=curriculum.unit))
+        else:
+          attachments = models.Attachment.objects.all().filter(Q(curriculum=curriculum) | Q(curriculum=curriculum.unit), teacher_only=teacher_only)
+      else:
+        models.Attachment.DoesNotExist
 
       # Folder name in ZIP archive which contains the above files
       # E.g [thearchive.zip]/somefiles/file2.txt
@@ -3148,7 +3170,7 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
       steps = models.Step.objects.all().filter(curriculum=curriculum)
       total_steps = steps.count()
       if int(step_order) == 0:
-        attachments = models.Attachment.objects.all().filter(curriculum=curriculum, teacher_only=False)
+        attachments = models.Attachment.objects.all().filter(Q(curriculum=curriculum) | Q(curriculum=curriculum.unit), teacher_only=False)
         context = {'curriculum': curriculum, 'instance': instance, 'total_steps': total_steps, 'step_order': step_order, 'attachments': attachments}
         return render(request, 'ctstem_app/AssignmentStep.html', context)
       else:
