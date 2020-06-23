@@ -25,31 +25,20 @@
 <!-- Copy -->
 {% check_curriculum_permission curriculum.id 'copy' as has_copy_permission %}
 {% if has_copy_permission == True %}
-  <a class="util-button fa fa-files-o" aria-hidden="true" aria-label="Create New Copy" title="Create New Copy" href="{% url 'ctstem:copyCurriculum' curriculum.id %}"></a>
-{% endif %}
-
-<!-- Lock -->
-{% check_curriculum_permission curriculum.id 'lock' as has_lock_permission %}
-{% if has_lock_permission == True %}
-  <a class="util-button fa fa-lock" aria-hidden="true" aria-label="Lock Curriculum" title="Lock Curriculum" href="{% url 'ctstem:lockCurriculum' curriculum.id %}"></a>
-{% endif %}
-<!-- Lock -->
-{% check_curriculum_permission curriculum.id 'unlock' as has_unlock_permission %}
-{% if has_unlock_permission == True %}
-  <a class="util-button fa fa-unlock" aria-hidden="true" aria-label="Unlock Curriculum" title="Unlock Curriculum" href="{% url 'ctstem:unlockCurriculum' curriculum.id %}"></a>
+  <a class="util-button fa fa-files-o copy_curriculum" aria-hidden="true" aria-label="Create New Copy" title="Create New Copy" href="{% url 'ctstem:copyCurriculum' curriculum.id %}"></a>
 {% endif %}
 
 <!-- Assign -->
 {% check_curriculum_permission curriculum.id 'assign' as has_assign_permission %}
 {% if has_assign_permission == True %}
   <a class="assign util-button fas fa-tasks" aria-hidden="true" data-form="{% url 'ctstem:assignCurriculum' curriculum.id%}" aria-label="Assign Curriculum" title="Assign Curriculum"></a>
-{% elif user.is_authenticated and not user.researcher and not user.author and curriculum.status != 'R' %}
+{% elif user.is_authenticated and not user.researcher and not user.author %}
   {% if curriculum.curriculum_type == 'U' %}
-    {% with msg="This unit cannot be assigned because all the underlying lessons are private and not locked.  If you need to assign this unit please ask the author to lock one or more lessons or make them public" %}
+    {% with msg="This unit cannot be assigned because none of the underlying lessons are public.  If you need to assign this unit please ask the author to make them public" %}
     <a class="fas fa-tasks disabled" aria-hidden="true" data-title="{{msg}}"></a>
     {% endwith %}
   {% else %}
-    {% with msg="This curriculum cannot be assigned because it is private and not locked.  If you need to assign this curriculum please ask the author to lock the curriculum or make it public" %}
+    {% with msg="This curriculum cannot be assigned because it not public.  If you need to assign this curriculum please ask the author to make it public" %}
     <a class="fas fa-tasks disabled" aria-hidden="true" data-title="{{msg}}"></a>
     {% endwith %}
   {% endif %}

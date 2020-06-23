@@ -35,15 +35,6 @@
             {{curriculum.order}}.
           {% endif %}
           {{curriculum.title}}
-          {% if curriculum.locked_by %}
-            {% if user.administrator %}
-              <i class="fa fa-lock" aria-hidden="true" title="Locked by {{curriculum.locked_by}}"></i>
-            {% elif user.teacher %}
-              {% if my_curriculum or shared_curriculum %}
-                <i class="fa fa-lock" aria-hidden="true" title="Locked by {{curriculum.locked_by}}"></i>
-              {% endif %}
-            {% endif %}
-          {% endif %}
           {% if curriculum.unit|slugify == 'None'|slugify %}
             {% check_curriculum_permission curriculum.id 'favorite' as has_favorite_permission %}
             &nbsp;&nbsp;

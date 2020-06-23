@@ -7,18 +7,18 @@
     {% check_curriculum_permission curriculum.id 'assign' as has_assign_permission %}
     {% if has_assign_permission == True %}
       <a type="button" class="assign btn normal blue" aria-hidden="true" data-form="{% url 'ctstem:assignCurriculum' curriculum.id %}" aria-label="Assign Curriculum" title="Assign Curriculum">Assign</a>
-    {% elif user.is_authenticated %}
+    {% elif user.is_authenticated and not user.researcher and not user.author %}
       {% if curriculum.curriculum_type == 'U' %}
-        {% with msg="This unit cannot be assigned because all the underlying lessons are private and not locked.  If you need to assign this unit please ask the author to lock one or more lessons or make them public" %}
+        {% with msg="This unit cannot be assigned because all the underlying lessons are private.  If you need to assign this unit please ask the author to make them public" %}
         <a type="button" class="assign btn normal blue" aria-hidden="true" onclick="alert('{{msg}}');">Assign</a>
         {% endwith %}
       {% else %}
-        {% with msg="This curriculum cannot be assigned because it is private and not locked.  If you need to assign this curriculum please ask the author to lock the curriculum or make it public" %}
+        {% with msg="This curriculum cannot be assigned because it is private.  If you need to assign this curriculum please ask the author to make it public" %}
         <a type="button" class="assign btn normal blue" aria-hidden="true" onclick="alert('{{msg}}');">Assign</a>
         {% endwith %}
       {% endif %}
     {% else %}
-      {% with msg="Please login to assign this curriculum" %}
+      {% with msg="Please login as a teacher to assign this curriculum" %}
       <a type="button" class="assign btn normal blue" aria-hidden="true" onclick="alert('{{msg}}');">Assign</a>
       {% endwith %}
     {% endif %}
@@ -26,7 +26,7 @@
   <div class="col">
     {% check_curriculum_permission curriculum.id 'copy' as has_copy_permission %}
     {% if has_copy_permission == True %}
-      <a type="button" class="btn normal blue" aria-hidden="true" aria-label="Create New Copy" title="Create New Copy" href="{% url 'ctstem:copyCurriculum' curriculum.id %}">Make a Copy</a>
+      <a type="button" class="btn normal blue copy_curriculum" aria-hidden="true" aria-label="Create New Copy" title="Create New Copy" href="{% url 'ctstem:copyCurriculum' curriculum.id %}">Make a Copy</a>
     {% else %}
       {% if user.is_authenticated %}
         {% with msg="You can only copy this curriculum at the unit level. Please go back to the unit overview page and copy from there." %}
@@ -64,23 +64,6 @@
       </a>
      </div>
   {% endif %}
-
-  <!-- Lock -->
-  {% check_curriculum_permission curriculum.id 'lock' as has_lock_permission %}
-  {% if has_lock_permission == True %}
-    <div class="col">
-      <a type="button" class="btn normal blue" aria-hidden="true" aria-label="Lock Curriculum" title="Lock Curriculum" href="{% url 'ctstem:lockCurriculum' curriculum.id %}">Lock</a>
-    </div>
-  {% endif %}
-
-  <!-- Unlock -->
-  {% check_curriculum_permission curriculum.id 'unlock' as has_unlock_permission %}
-  {% if has_unlock_permission == True %}
-    <div class="col">
-      <a type="button" class="btn normal blue" aria-hidden="true" aria-label="Unlock Curriculum" title="Unlock Curriculum" href="{% url 'ctstem:unlockCurriculum' curriculum.id %}">Unlock</a>
-    </div>
-  {% endif %}
-
 
   <!-- Export Student Data -->
   {% check_curriculum_permission curriculum.id 'export_response' as has_export_permission %}

@@ -190,7 +190,6 @@ class Curriculum (models.Model):
   acknowledgement = RichTextUploadingField(null=True, blank=True, help_text="Resources, models, and other material used in this curriculum; past authors/contributors")
   order = models.IntegerField(null=True, blank=True, help_text="Order within the Unit")
   credits = RichTextUploadingField(null=True, blank=True, help_text="Author contributions")
-  locked_by = models.ForeignKey(User, null=True, on_delete=models.SET_NULL, related_name='user_locked_curriculum')
   feature_rank = models.IntegerField(null=True, blank=True, help_text="Order in the feature pool")
 
   class Meta:

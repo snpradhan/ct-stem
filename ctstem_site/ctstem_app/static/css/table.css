@@ -169,10 +169,12 @@ table td.action a {
   margin: 0.5rem 1rem 0 0;
   background-color: transparent;
   color: black;
+
 }
 table td.action a:hover {
   color: rgb(70, 160, 215);
   text-decoration: none;
+  cursor: pointer;
 }
 table td.action a.fa-trash:hover { color: red; }
 

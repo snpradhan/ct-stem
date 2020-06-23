@@ -334,7 +334,7 @@ $(function (){
     $('div#spinner').show();
   });
 
-  $('.content').on("click", 'a.util-button.fa-files-o', function(e) {
+  $('.content').on("click", 'a.copy_curriculum', function(e) {
     $('div#spinner').show();
   });
 

@@ -876,7 +876,7 @@
         var link = $(this);
         e.preventDefault();
         bootbox.confirm({ title: 'Confirm',
-                          message: "<p>If you haven't saved the current curriculum, click <strong>Close</strong> to dismiss this popup and then <strong>Save</strong> the curriculum before proceeding. Otherwise, click <strong>Proceed</strong> to proceed to the next lesson.</p>",
+                          message: "<p>If you haven't saved the current curriculum, click <strong>Close</strong> to dismiss this popup and then <strong>Save</strong> the curriculum before proceeding. Otherwise, click <strong>Proceed</strong> to proceed.</p>",
                           buttons: {
                             confirm: {
                                 label: 'Proceed',
@@ -889,6 +889,9 @@
                           },
                           callback: function(result){
                             if (result == true) {
+                              if($(link).hasClass('fa-files-o')) {
+                                $('div#spinner').show();
+                              }
                               window.location = $(link).attr("href");
                             }
                           },
