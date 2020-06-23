@@ -16,13 +16,33 @@
 {% block content %}
   {{block.super}}
   <div class="content {% if user.teacher %} teacher {% endif %}" id="classes">
-    {% if user.teacher %}
-      <h2> My Classes </h2>
-    {% else %}
+    {% if not user.teacher %}
       <h2> Classes </h2>
     {% endif %}
      <form method="post">
       {% csrf_token %}
+      {% if user.teacher %}
+       <div class="row_container">
+        <div class="row" id="class_header">
+          <div class="col-3">
+            <div>
+              <p>Welcome, <strong>{{user.get_full_name}}.</strong></p>
+            </div>
+            <div>
+              <p>You have <strong>{{active_group_count}}</strong> class(es), <strong>{{active_group_students}}</strong> student(s) and <strong>{{active_group_assignments}}</strong> assignment(s).
+              </p>
+            </div>
+          </div>
+          <div class="col-1">
+            <h5 class="left">Quick links:</h5>
+            <a class="btn blue inbetween" href="{% url 'ctstem:help' %}">Help and FAQ </a>
+            <a class="btn yellow inbetween" href="{% url 'ctstem:curriculatiles' %}?bucket=my_curricula">My Curricula</a>
+            <a class="btn yellow inbetween" href="{% url 'ctstem:curriculatiles' %}?bucket=favorite_curricula">Favorite Curricula</a>
+          </div>
+        </div>
+        <hr class="dark thick">
+      </div>
+      {% endif %}
       {% include "ctstem_app/UserControls.html" with tab='group' %}
       {% include "ctstem_app/Tabs.html" with tab='group'%}
 

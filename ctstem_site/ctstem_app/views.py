@@ -201,9 +201,10 @@ def curriculatiles(request):
 
     search_criteria = None
     if request.method == 'GET':
-      searchForm = forms.CurriculaSearchForm(user=request.user)
-      #data = request.POST.copy()
-      #print 'data', data
+      initial = None
+      if 'bucket' in request.GET:
+        initial = {'buckets': [request.GET['bucket']]}
+      searchForm = forms.CurriculaSearchForm(user=request.user, initial=initial)
 
     elif request.method == 'POST':
       data = request.POST.copy()
@@ -2574,6 +2575,9 @@ def groups(request, status='active'):
       searchForm = forms.SearchForm()
 
     is_active = True
+    active_group_count = 0
+    active_group_students = 0
+    active_group_assignments = 0
     if status == 'inactive':
       is_active = False
     if hasattr(request.user, 'administrator') or hasattr(request.user, 'researcher'):
@@ -2581,13 +2585,18 @@ def groups(request, status='active'):
     elif hasattr(request.user, 'school_administrator'):
       groups = models.UserGroup.objects.all().filter(is_active=is_active, teacher__school=request.user.school_administrator.school)
     elif hasattr(request.user, 'teacher'):
+      total_groups = models.UserGroup.objects.all().filter(Q(teacher=request.user.teacher) | Q(shared_with=request.user.teacher)).distinct()
+      active_groups = total_groups.filter(is_active=True)
+      active_group_count = active_groups.count()
       if is_active == True:
-        group_count = models.UserGroup.objects.all().filter(teacher=request.user.teacher).count()
-        if group_count == 0:
+        if total_groups.count() == 0:
           new_group = models.UserGroup(title='My Class 1', teacher=request.user.teacher, is_active=True)
           new_group.save()
-
+          active_group_count = 1
+      active_group_students = models.Membership.objects.all().filter(group__in=active_groups).values('student').distinct().count()
+      active_group_assignments = models.Assignment.objects.all().filter(group__in=active_groups).distinct().count()
       groups = models.UserGroup.objects.all().filter(Q(is_active=is_active), Q(teacher=request.user.teacher) | Q(shared_with=request.user.teacher)).distinct()
+
     else:
       return http.HttpResponseNotFound('<h1>You do not have the privilege to view classes</h1>')
 
@@ -2604,7 +2613,12 @@ def groups(request, status='active'):
     domain = current_site.domain
     uploadForm = forms.UploadFileForm(user=request.user)
     assignmentForm = forms.AssignmentSearchForm(user=request.user)
-    context = {'groups': group_list, 'role':'groups', 'uploadForm': uploadForm, 'group_status': status, 'domain': domain, 'assignmentForm': assignmentForm, 'searchForm': searchForm, 'order_by': order_by, 'direction': direction}
+    context = {'groups': group_list, 'role':'groups', 'uploadForm': uploadForm,
+               'group_status': status, 'domain': domain, 'assignmentForm': assignmentForm,
+               'searchForm': searchForm, 'order_by': order_by, 'direction': direction,
+               'active_group_count': active_group_count,
+               'active_group_students': active_group_students,
+               'active_group_assignments': active_group_assignments}
     return render(request, 'ctstem_app/UserGroups.html', context)
 
   return http.HttpResponseNotAllowed(['GET', 'POST'])
