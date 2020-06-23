@@ -3683,8 +3683,11 @@ def check_curriculum_permission(request, curriculum_id, action):
         elif action == 'modify' or action == 'delete':
           #check if the curriculum is archived
           if curriculum.status == 'A':
-            if is_admin:
+            if is_admin or is_author:
               has_permission = True
+            elif is_teacher or is_researcher:
+              if has_edit_privilege:
+                has_permission = True
             else:
               has_permission = False
               messages.error(request, 'You do not have the privilege to %s this curriculum because it is archived' % (action))

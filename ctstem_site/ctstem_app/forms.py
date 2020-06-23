@@ -508,8 +508,11 @@ class CurriculumForm(ModelForm):
     self.fields['unit'].label_from_instance = lambda obj: "%s - v%d." % (obj.title, obj.version)
     if hasattr(usr, 'teacher') or hasattr(usr, 'researcher'):
       self.fields['unit'].queryset = models.Curriculum.objects.filter(curriculum_type='U', curriculumcollaborator__user=usr, curriculumcollaborator__privilege='E').order_by(Lower('title'), 'version')
-      self.fields.pop('status')
       self.fields.pop('feature_rank')
+      if self.instance.id and self.instance.status == 'P':
+        self.fields['status'].choices = models.CURRICULUM_STATUS_CHOICES[:3]
+      else:
+        self.fields['status'].choices = models.CURRICULUM_STATUS_CHOICES[:1] + models.CURRICULUM_STATUS_CHOICES[2:3]
     else:
       self.fields['status'].choices = models.CURRICULUM_STATUS_CHOICES[:3]
 
@@ -876,10 +879,10 @@ class CurriculaSearchForm(forms.Form):
       self.fields.pop('status')
       self.fields.pop('buckets')
     elif hasattr(user, 'teacher'):
-      self.fields['status'].choices = models.CURRICULUM_STATUS_CHOICES[:2]
+      self.fields['status'].choices = models.CURRICULUM_STATUS_CHOICES[:3]
       self.fields['buckets'].choices = models.CURRICULUM_BUCKET_CHOICES[1:]
     elif hasattr(user, 'researcher'):
-      self.fields['status'].choices = models.CURRICULUM_STATUS_CHOICES[:2]
+      self.fields['status'].choices = models.CURRICULUM_STATUS_CHOICES[:3]
       self.fields['buckets'].choices = models.CURRICULUM_BUCKET_CHOICES[1:3]
     else:
       self.fields['buckets'].choices = models.CURRICULUM_BUCKET_CHOICES[:1]

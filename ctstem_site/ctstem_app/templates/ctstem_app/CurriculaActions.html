@@ -32,7 +32,7 @@
 {% check_curriculum_permission curriculum.id 'assign' as has_assign_permission %}
 {% if has_assign_permission == True %}
   <a class="assign util-button fas fa-tasks" aria-hidden="true" data-form="{% url 'ctstem:assignCurriculum' curriculum.id%}" aria-label="Assign Curriculum" title="Assign Curriculum"></a>
-{% elif user.is_authenticated and not user.researcher and not user.author %}
+{% elif user.is_authenticated and not user.researcher and not user.author and curriculum.status != 'R' %}
   {% if curriculum.curriculum_type == 'U' %}
     {% with msg="This unit cannot be assigned because none of the underlying lessons are public.  If you need to assign this unit please ask the author to make them public" %}
     <a class="fas fa-tasks disabled" aria-hidden="true" data-title="{{msg}}"></a>

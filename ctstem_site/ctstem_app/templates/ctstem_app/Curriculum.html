@@ -124,26 +124,30 @@
 
               <!-- FEATURE RANK AND STATUS -->
               <div class="row">
-                <div class="col-md-6">
-                  <div class="form-group">
-                    <label for="id_{{form.feature_rank.name}}">{{ form.feature_rank.label|title }} {% if form.feature_rank.field.required %}(<span class="required">*</span>) {% endif %}</label>
-                    <div>
-                      {{form.feature_rank}}
+                {% if form.feature_rank %}
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="id_{{form.feature_rank.name}}">{{ form.feature_rank.label|title }} {% if form.feature_rank.field.required %}(<span class="required">*</span>) {% endif %}</label>
+                      <div>
+                        {{form.feature_rank}}
+                      </div>
+                      <div class="help warning">{{form.feature_rank.help_text|safe}}</div>
+                      <div class="error">{{ form.feature_rank.errors }}</div>
                     </div>
-                    <div class="help warning">{{form.feature_rank.help_text|safe}}</div>
-                    <div class="error">{{ form.feature_rank.errors }}</div>
                   </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="form-group">
-                    <label for="id_{{form.status.name}}">{{ form.status.label|title }} {% if form.status.field.required %}(<span class="required">*</span>) {% endif %}</label>
-                    <div>
-                      {{form.status}}
+                {% endif %}
+                {% if form.status %}
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="id_{{form.status.name}}">{{ form.status.label|title }} {% if form.status.field.required %}(<span class="required">*</span>) {% endif %}</label>
+                      <div>
+                        {{form.status}}
+                      </div>
+                      <div class="help warning">{{form.status.help_text|safe}}</div>
+                      <div class="error">{{ form.status.errors }}</div>
                     </div>
-                    <div class="help warning">{{form.status.help_text|safe}}</div>
-                    <div class="error">{{ form.status.errors }}</div>
                   </div>
-                </div>
+                {% endif %}
               </div>
 
               {% include "ctstem_app/CurriculumCollaborators.html"%}

@@ -9,11 +9,11 @@
       <a type="button" class="assign btn normal blue" aria-hidden="true" data-form="{% url 'ctstem:assignCurriculum' curriculum.id %}" aria-label="Assign Curriculum" title="Assign Curriculum">Assign</a>
     {% elif user.is_authenticated and not user.researcher and not user.author %}
       {% if curriculum.curriculum_type == 'U' %}
-        {% with msg="This unit cannot be assigned because all the underlying lessons are private.  If you need to assign this unit please ask the author to make them public" %}
+        {% with msg="This unit cannot be assigned because none the underlying lessons are public.  If you need to assign this unit please ask the author to make them public" %}
         <a type="button" class="assign btn normal blue" aria-hidden="true" onclick="alert('{{msg}}');">Assign</a>
         {% endwith %}
       {% else %}
-        {% with msg="This curriculum cannot be assigned because it is private.  If you need to assign this curriculum please ask the author to make it public" %}
+        {% with msg="This curriculum cannot be assigned because it is not public.  If you need to assign this curriculum please ask the author to make it public" %}
         <a type="button" class="assign btn normal blue" aria-hidden="true" onclick="alert('{{msg}}');">Assign</a>
         {% endwith %}
       {% endif %}
