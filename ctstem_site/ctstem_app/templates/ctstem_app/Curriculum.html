@@ -723,7 +723,7 @@
         //reset field visibility
         reset_curriculum_metadata();
 
-        //for all curriculum types, display author table, title, status, icon, time, teacher overview, student direction, acknowledgement, attachment table
+        //for all curriculum types, display author table, title, status, icon, time, teacher overview, acknowledgement
         if($(this).val() == 'U' || $(this).val() == 'L' || $(this).val() == 'A') {
           $('#id_curriculum-title').closest('.form-group').show();
           $('#id_curriculum-status').closest('.form-group').show();
@@ -731,9 +731,6 @@
           $('#id_curriculum-time').closest('.form-group').show();
           $('#id_curriculum-time').closest('.form-group').find('label:first').html('Time (<span class="required">*</span>)');
           $('#id_curriculum-overview').closest('.form-group').show();
-          $('div.table#directions_attachments').show();
-          $('#id_curriculum-student_overview').closest('.form-group').show();
-          $('div.form-group.attachment_table').show();
           $('#id_curriculum-acknowledgement').closest('.form-group').show();
           $('#id_curriculum-credits').closest('.form-group').show();
         }
@@ -741,8 +738,6 @@
         //for unit, stand alone lesson and assessment display level and taxonomy
         if($(this).val() == 'U' || (($(this).val() == 'L' || $(this).val() == 'A') &&  $('select#id_curriculum-unit').val() == '' )) {
           $('#id_curriculum-overview').closest('.form-group').find('label:first').html('Overview (<span class="required">*</span>)');
-          $('#id_curriculum-student_overview').closest('.form-group').find('label:first').html('Student Directions & Learning Objectives (<span class="required">*</span>)');
-
           $('#id_curriculum-level').closest('.form-group').show();
           $('#id_curriculum-level').closest('.form-group').find('label:first').html('Level (<span class="required">*</span>)');
           $('#id_curriculum-taxonomy').closest('.form-group').show();
@@ -764,9 +759,14 @@
           $('#id_curriculum-subject').closest('.form-group').show();
         }
 
-        //for lesson and assessment, display unit
+        //for lesson and assessment, display unit, student directions and attachments
         if($(this).val() == 'L' || $(this).val() == 'A') {
           $('#id_curriculum-unit').closest('.form-group').show();
+          $('div.table#directions_attachments').show();
+          $('#id_curriculum-student_overview').closest('.form-group').show();
+          $('#id_curriculum-student_overview').closest('.form-group').find('label:first').html('Student Directions & Learning Objectives (<span class="required">*</span>)');
+          $('div.form-group.attachment_table').show();
+
         }
         else{
           //reset the unit field

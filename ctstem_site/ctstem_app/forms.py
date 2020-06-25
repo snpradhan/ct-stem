@@ -558,12 +558,14 @@ class CurriculumForm(ModelForm):
       if cleaned_data.get('overview') == '' or cleaned_data.get('overview') is None:
         self.add_error('overview', 'Overview is required')
         valid = False
-      if cleaned_data.get('student_overview') == '' or cleaned_data.get('student_overview') is None:
-        self.add_error('student_overview', 'Student Directions & Learning Objectives is required')
-        valid = False
       if not cleaned_data.get('taxonomy'):
           self.add_error('taxonomy', 'Standards is required')
           valid = False
+
+    if cleaned_data.get('curriculum_type') != 'U':
+      if cleaned_data.get('student_overview') == '' or cleaned_data.get('student_overview') is None:
+        self.add_error('student_overview', 'Student Directions & Learning Objectives is required')
+        valid = False
 
     if cleaned_data.get('curriculum_type') == 'U'  or cleaned_data.get('curriculum_type') == 'L':
       if not cleaned_data.get('unit'):
