@@ -63,6 +63,7 @@
             <h4>
               <span>&nbsp;</span>
               <span class="curriculum_title" style="font-weight: bold; text-decoration: underline;">{{form.title.value|default_if_none:" "}}</span>
+              <span style="font-weight: bold;">(Overview)</span>
               <span>&nbsp;</span>
               <span class="controls">
                 <span class="expand_collapse">
@@ -396,7 +397,7 @@
               <h4>
                 <span>&nbsp;</span>
                 <span class="step_title" style="font-weight: bold; text-decoration: underline;">{{step.title.value|default_if_none:"  "}}</span>
-                <span>{% if step.ORDER.value %}(Page {{step.ORDER.value}}) {% endif %}</span>
+                <span class="page_number">{% if step.ORDER.value %}(Page {{step.ORDER.value}}) {% endif %}</span>
                 <span>&nbsp;</span>
                 <span class="controls">
                   <span>
@@ -586,6 +587,7 @@
         //set the step order
         var step_order = $('div.table.step:visible').length;
         $(new_step_div).find('div.order input[id$="ORDER"]').val(step_order);
+        $(new_step_div).find('span.page_number').html('(Page '+step_order+')');
         $(new_step_div).find('textarea').each(function(){
           if($(this).attr('name') !== undefined && $(this).attr('data-config') !== undefined){
             var config = {
