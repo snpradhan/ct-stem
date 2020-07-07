@@ -143,7 +143,10 @@ def curricula(request, bucket='unit', status='public'):
     curricula = curricula.filter(unit__isnull=True, curriculum_type__in = curriculum_type, status__in = stat, curriculumcollaborator__user__teacher__isnull=False, curriculumcollaborator__privilege='E').distinct()
   elif bucket == 'deleted' and hasattr(request.user, 'administrator'):
     stat = ['R']
-    curricula = curricula.filter(unit__isnull=True, curriculum_type__in = curriculum_type, status__in = stat).distinct()
+    deleted_lessons = curricula.filter(unit__isnull=False, curriculum_type__in = ['L', 'A'], status__in = stat).distinct()
+    deleted_lessons_units = deleted_lessons.values_list('unit', flat=True)
+    curricula = curricula.filter(Q(unit__isnull=True), Q(curriculum_type__in = curriculum_type), Q(status__in = stat) | Q(id__in=deleted_lessons_units)).distinct()
+
   elif bucket == 'my' and (hasattr(request.user, 'teacher') or hasattr(request.user, 'researcher')):
     stat = ['D', 'P', 'A']
     curricula = curricula.filter(unit__isnull=True, curriculum_type__in = curriculum_type, status__in = stat, curriculumcollaborator__user=request.user, curriculumcollaborator__privilege='E')
@@ -2795,10 +2798,7 @@ def underlyingCurriculum(request, action, id=''):
 def underlyingCurriculumTable(request, id=''):
   if 'GET' == request.method:
     curriculum = models.Curriculum.objects.get(id=id)
-    if curriculum.status != 'R':
-      action = 'preview'
-    else:
-      action = 'restore'
+    action = 'preview'
     underlying_curriculum = underlyingCurriculum(request, action, id)
     context = {'underlying_curriculum': underlying_curriculum}
     html = render_to_string('ctstem_app/UnderlyingCurricula.html', context, request)
@@ -3673,8 +3673,9 @@ def check_curriculum_permission(request, curriculum_id, action):
         has_view_privilege = models.CurriculumCollaborator.objects.all().filter(curriculum=curr, user=request.user, privilege='V').count()
 
       if curriculum.status == 'R':
-        if is_admin and action == 'restore':
-          has_permission = True
+        if is_admin:
+          if action == 'restore' or action =='preview':
+            has_permission = True
       else:
         ############ COPY ############
         if action == 'copy':

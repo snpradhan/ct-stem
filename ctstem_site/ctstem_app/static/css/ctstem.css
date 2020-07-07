@@ -724,6 +724,10 @@ div.row#assignment_tiles {
   align-items: center;
 }
 
+div.content#classes div.row#class_header {
+  justify-content: space-between;
+}
+
 div.row#curricula_tiles a:hover,
 div.row#class_tiles a:hover,
 div.row#standard_tiles a:hover,
@@ -742,7 +746,7 @@ div.row#class_header .col-3 {
   flex: 0 0 85%;
 }
 div.row#class_header .col-1 {
-  flex: 0 0 15%;
+  flex: 0 0 14%;
   display: flex;
   flex-direction: column;
   justify-content: stretch;

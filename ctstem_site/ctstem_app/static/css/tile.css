@@ -20,13 +20,18 @@
   cursor: pointer;
 }
 
-.tile .trash {
+.tile .trash, .tile .archive {
   margin: auto;
   position: absolute;
-  top: 15%; left: 0; bottom: 0; right: 0;
-  font-size: 11em;
-  color: var(--ctstem-color-red);
+  top: 30%; left: 0; right: 0;
+  font-size: 5em;
   z-index: 999;
+}
+.tile .trash {
+  color: var(--ctstem-color-red);
+}
+.tile .archive {
+  color: var(--ctstem-color-purple);
 }
 
 .tile .detail {

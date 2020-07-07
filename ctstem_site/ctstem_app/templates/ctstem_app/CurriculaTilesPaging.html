@@ -36,11 +36,6 @@
               {% endif %}
             </div>
           </a>
-          {% if curriculum.status == 'R' %}
-            <div class="trash">
-              <i class="fas fa-trash-alt"></i>
-            </div>
-          {% endif %}
           {% if curriculum.feature_rank %}
             <div class="shelf">
             </div>
@@ -48,8 +43,18 @@
               <i class="fas fa-award" title="Featured Curriculum"></i>
             </div>
            {% endif %}
-
         {% endif %}
+
+        {% if curriculum.status == 'R' %}
+          <div>
+            <i class="fas fa-trash-alt trash" title="Deleted"></i>
+          </div>
+        {% elif curriculum.status == 'A' %}
+          <div>
+            <i class="fas fa-archive archive" title="Archived"></i>
+          </div>
+        {% endif %}
+
         <div class="details_container">
           {% if parent != 'preview' %}
             <div class="favorite">

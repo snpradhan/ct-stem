@@ -76,4 +76,14 @@
       </div>
     {% endif %}
   {% endif %}
+  <!-- Export Student Data -->
+  {% check_curriculum_permission curriculum.id 'restore' as has_restore_permission %}
+  {% if has_restore_permission == True %}
+    <div class="col">
+      <a type="button" class="btn normal blue" aria-hidden="true" aria-label="Restore Curriculum" title="Restore Curriculum" href="{% url 'ctstem:restoreCurriculum' curriculum.id %}">
+        Restore
+      </a>
+    </div>
+  {% endif %}
+
 </div>
