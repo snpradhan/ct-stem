@@ -28,7 +28,7 @@
         </thead>
         <tbody>
           <tr>
-            <td><a href="{% url 'ctstem:groupDashboard' group.id %}">{{group}}</a></td>
+            <td><a href="{% url 'ctstem:groupDashboard' group.id 'active' %}">{{group}}</a></td>
             <td><a href="{% url 'ctstem:assignmentDashboard' assignment.id %}">{{assignment.curriculum.title}}</a></td>
           </tr>
         </tbody>

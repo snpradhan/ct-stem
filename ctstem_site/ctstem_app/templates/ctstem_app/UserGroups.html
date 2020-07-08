@@ -90,7 +90,7 @@
                       <div class="assignment_stat_button">
                         <div class="title">{{group.assignments.count}} Assignment(s)</div>
                         <div class="buttons">
-                          <a type="button" class="btn inbetween orange" aria-label="Class Dashboard" title="Class Dashboard" href="{% url 'ctstem:groupDashboard' group.id %}">
+                          <a type="button" class="btn inbetween orange" aria-label="Class Dashboard" title="Class Dashboard" href="{% url 'ctstem:groupDashboard' group.id 'active' %}">
                                 <i class="fas fa-tachometer-alt"></i>
                           </a>
                           {% if group.is_active %}
@@ -226,7 +226,7 @@
                       {% if group.assignments.count > 0 %}
                         {{group.assignments.count}} Assignment(s)
                         <div>
-                          <a type="button" class="btn small orange" href="{% url 'ctstem:groupDashboard' group.id %}" aria-label="View Class Dashboard" title="View Class Dashboard">
+                          <a type="button" class="btn small orange" href="{% url 'ctstem:groupDashboard' group.id 'active' %}" aria-label="View Class Dashboard" title="View Class Dashboard">
                             <i class="fas fa-tachometer-alt"></i>
                           </a>
                       {% else %}
@@ -235,7 +235,7 @@
 
                       {% endif %}
 
-                      {% if not user.researcher %}
+                      {% if group.is_active and not user.researcher %}
                         <a type="button" class="btn small blue assignment-modal" href="#" data-toggle="modal" data-target="#assignment" data-id="{{group.id}}" data-title="{{group.title}}" data-subject="{{group.subject.id}}" title="Search and Add Assignments">
                           <i class="fa fa-tasks"></i>
                         </a>

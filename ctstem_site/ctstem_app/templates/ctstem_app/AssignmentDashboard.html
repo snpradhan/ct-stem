@@ -24,7 +24,7 @@
       </thead>
       <tbody>
         <tr>
-          <td><a href="{% url 'ctstem:groupDashboard' assignment.group.id %}">{{assignment.group}}</a></td>
+          <td><a href="{% url 'ctstem:groupDashboard' assignment.group.id 'active' %}">{{assignment.group}}</a></td>
           <td>{{assignment.curriculum.title}}</td>
           <td>{{assignment.assigned_date|date}}</td>
           <td>

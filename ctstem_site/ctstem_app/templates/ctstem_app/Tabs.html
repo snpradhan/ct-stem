@@ -25,7 +25,7 @@
         {% if not user.researcher %}
           <li {% if role == 'group' %} class="active"{% endif %}><a href="{% url 'ctstem:group' group.id %}">Class Details</a></li>
         {% endif %}
-        <li {% if role == 'group_dashboard' %} class="active"{% endif %}><a href="{% url 'ctstem:groupDashboard' group.id %}">Class Dashboard</a></li>
+        <li {% if role == 'group_dashboard' %} class="active"{% endif %}><a href="{% url 'ctstem:groupDashboard' group.id 'active' %}">Class Dashboard</a></li>
       {% endif %}
     {% endif %}
   {% endif %}
@@ -54,3 +54,15 @@
     {% endif %}
   {% endif %}
 {% endif %}
+
+{% if tab == 'group' or tab == 'assignment' %}
+    {% if user.administrator or user.researcher or user.school_administrator or user.teacher %}
+      {% if group.id %}
+        <ul class="nav nav-tabs bottom">
+          {{status}}
+          <li {% if curriculum_status == 'active' %} class="active"{% endif %}><a href="{% url 'ctstem:groupDashboard' group.id 'active' %}">Active Assignments</a></li>
+          <li {% if curriculum_status == 'archived' %} class="active"{% endif %}><a href="{% url 'ctstem:groupDashboard' group.id 'archived' %}">Archived Assignments</a></li>
+        </ul>
+      {% endif %}
+    {% endif %}
+  {% endif %}

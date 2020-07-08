@@ -2380,7 +2380,7 @@ def _do_action(request, id_list, model, object_id=None):
     elif 'inactivate_selected' == action_params.get('action'):
       groups.update(is_active=False)
       #archive assignments
-      archiveAssignments(request, id_list)
+      archiveAssignmentsByClass(request, id_list)
       messages.success(request, "Selected class(es) inactivated.")
       return True
   else:
@@ -2685,7 +2685,7 @@ def group(request, id=''):
           savedGroup = form.save()
           #if group is being inactivated, archive the associated assignments
           if 'group-is_active' not in data:
-            archiveAssignments(request, [id])
+            archiveAssignmentsByClass(request, [id])
 
           id_list = []
           for key in data:
@@ -2838,7 +2838,7 @@ def deleteGroup(request, id=''):
 # Group Dashboard
 ####################################
 @login_required
-def groupDashboard(request, id=''):
+def groupDashboard(request, id='', curriculum_status='active'):
   try:
     if request.method == 'GET':
       group = models.UserGroup.objects.get(id=id)
@@ -2860,39 +2860,40 @@ def groupDashboard(request, id=''):
       for assignment in models.Assignment.objects.all().filter(group=group).order_by('curriculum__unit__title', 'curriculum__order'):
         instances = models.AssignmentInstance.objects.all().filter(assignment=assignment)
         curriculum = models.Curriculum.objects.get(id=assignment.curriculum.id)
-        assignment_status = {}
-        status = []
-        for student in students:
-          try:
-            instance = instances.get(student=student)
-            if instance.status in assignment_status:
-              assignment_status[instance.status] +=1
-            else:
-              assignment_status[instance.status] =1
-          except models.AssignmentInstance.DoesNotExist:
-            if 'N' in assignment_status:
-              assignment_status['N'] +=1
-            else:
-              assignment_status['N'] =1
-        for key, value in list(assignment_status.items()):
-          status.append({'name': status_map[key], 'y': value, 'color': status_color[key]})
-        serial += 1
+        if (curriculum_status == 'active' and curriculum.status in ['D', 'P']) or (curriculum_status == 'archived' and curriculum.status == 'A'):
+          assignment_status = {}
+          status = []
+          for student in students:
+            try:
+              instance = instances.get(student=student)
+              if instance.status in assignment_status:
+                assignment_status[instance.status] +=1
+              else:
+                assignment_status[instance.status] =1
+            except models.AssignmentInstance.DoesNotExist:
+              if 'N' in assignment_status:
+                assignment_status['N'] +=1
+              else:
+                assignment_status['N'] =1
+          for key, value in list(assignment_status.items()):
+            status.append({'name': status_map[key], 'y': value, 'color': status_color[key]})
+          serial += 1
 
-        if curriculum.unit is not None:
-         key = curriculum.unit
-        else:
-          key = curriculum
+          if curriculum.unit is not None:
+           key = curriculum.unit
+          else:
+            key = curriculum
 
-        if key not in keys:
-          keys.append(key)
+          if key not in keys:
+            keys.append(key)
 
-        if key in assignments:
-          assignments[key][curriculum.order] = {'assignment': assignment, 'status': status, 'serial': serial}
-        else:
-          assignments[key] = {curriculum.order : {'assignment': assignment, 'status': status, 'serial': serial}}
+          if key in assignments:
+            assignments[key][curriculum.order] = {'assignment': assignment, 'status': status, 'serial': serial}
+          else:
+            assignments[key] = {curriculum.order : {'assignment': assignment, 'status': status, 'serial': serial}}
 
       keys.sort(key=lambda x:x.title)
-      context = {'group': group, 'assignments': assignments, 'keys': keys}
+      context = {'group': group, 'assignments': assignments, 'keys': keys, 'curriculum_status': curriculum_status}
       return render(request, 'ctstem_app/GroupDashboard.html', context)
 
     return http.HttpResponseNotAllowed(['GET'])
@@ -3085,7 +3086,7 @@ def inactivateGroup(request, id=''):
         group.is_active = False
         group.save()
         messages.success(request, '"%s" inactivated' % group.title)
-        archiveAssignments(request, [id])
+        archiveAssignmentsByClass(request, [id])
         return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
       else:
         http.HttpResponseNotFound('<h1>You do not have the privilege to inactivate this class</h1>')
@@ -3098,13 +3099,22 @@ def inactivateGroup(request, id=''):
 # When group is inactivated by an Admin or a Teacher,
 # archive the associated assignments
 ####################################
-def archiveAssignments(request, group_ids):
+def archiveAssignmentsByClass(request, group_ids):
   groups = models.UserGroup.objects.filter(id__in=group_ids)
   #get all assignments for the groups
   instances = models.AssignmentInstance.objects.all().filter(assignment__group__in=groups)
   instances.update(status= 'A')
   messages.success(request, 'All associated assignments have been archived')
 
+####################################
+# When a curriculum is Archived,
+# archive all the associated assignments
+####################################
+def archiveAssignmentsByCurriculum(request, curriculum_id):
+  #get all assignments for the curriculu,
+  instances = models.AssignmentInstance.objects.all().filter(assignment__curriculum__id=curriculum_id)
+  instances.update(status= 'A')
+  messages.success(request, 'All associated assignments have been archived')
 
 ####################################
 # STUDENT ATTEMPTING ASSIGNMENTS

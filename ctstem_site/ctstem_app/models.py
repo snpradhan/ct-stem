@@ -720,6 +720,9 @@ def check_curriculum_status_change(sender, instance, **kwargs):
       # if restoring an underlying curriculum in a deleted unit, also update the Unit status to Archived
       elif obj.unit and obj.unit.status == 'R' and instance.status == 'A':
         Curriculum.objects.filter(id=obj.unit.id).update(status='A')
+      # if a curriculum is archived, also archive the associated assignments
+      elif obj.status != 'R' and instance.status == 'A':
+        AssignmentInstance.objects.filter(assignment__curriculum__id=instance.id).update(status= 'A')
 
 #signal to check if curriculum shared with has changed
 @receiver(pre_save, sender=CurriculumCollaborator)

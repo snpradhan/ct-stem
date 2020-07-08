@@ -12,7 +12,7 @@
   {{block.super}}
   <div class="content" id="dashboard">
     <h2> {{group}} - Dashboard </h2>
-      {% include "ctstem_app/Tabs.html" with tab='group' group=group role='group_dashboard' %}
+      {% include "ctstem_app/Tabs.html" with tab='group' group=group role='group_dashboard' curriculum_status=curriculum_status %}
 
       {% if assignments %}
       <table class="table table-bordered table-condensed dt" id="groups">
