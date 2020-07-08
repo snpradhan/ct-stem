@@ -93,7 +93,12 @@
           {% endif %}
 
           {% if attachments %}
-            <div>You will need additional resources to complete this assignment.  Please download them from this link <a href="{% url 'ctstem:downloadAttachments' curriculum.id 'S' %}" target="_blank">Download Attachment(s) <span class="fa fa-paperclip"></span></a></div>
+            <div>You will need the following resources to complete this assignment.  Please download them all from this link <a href="{% url 'ctstem:downloadAttachments' curriculum.id 'S' %}" target="_blank">Download All <i class="fas fa-file-download"></i></a> or individually from the links below.</div>
+            <ul>
+              {% for attachment in attachments %}
+                <li>{{attachment.title}} - <a href="{{attachment.file_object.url}}"  download="{{attachment.title.split|join:'_'}}.{{attachment.extension}}" target="_blank"> Download <i class="fas fa-file-download"></i></a></li>
+              {% endfor %}
+            </ul>
           {% endif %}
         </p>
         <div class="save-buttons" style="text-align: center; margin-bottom: 150px; margin-top: 80px;">

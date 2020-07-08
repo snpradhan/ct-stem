@@ -92,8 +92,13 @@
         {% if teacher_attachments %}
           {% if user.administrator or user.researcher or user.school_administrator or user.teacher or user.author %}
             <div class="section" id="attachments">
-              <h3 class="left">Attached Teacher Resources <span class="fa fa-paperclip"></span></h3>
-              <a href="{% url 'ctstem:downloadAttachments' curriculum.id 'T' %}"><h5 class="left">Download</h5></a>
+              <h3 class="left inline">Attached Teacher Resources  <i class="fa fa-paperclip"></i> - </h3>
+              <h6 class="left inline"><a href="{% url 'ctstem:downloadAttachments' curriculum.id 'R' %}"> Download All <i class="fas fa-file-download"></i> </a></h6>
+              <ul>
+              {% for attachment in teacher_attachments %}
+                <li><h5 class="left inline">{{attachment.title}} -  </h5> <h6 class="left inline"><a href="{{attachment.file_object.url}}" download="{{attachment.title.split|join:'_'}}.{{attachment.extension}}" target="_blank"> Download <i class="fas fa-file-download"></i></a></h6></li>
+              {% endfor %}
+              </ul>
             </div>
           {% endif %}
         {% endif %}
@@ -228,8 +233,13 @@
     {% if student_attachments %}
       {% if user.administrator or user.researcher or user.school_administrator or user.teacher or user.author %}
         <div class="section" id="attachments">
-          <h3 class="left">Attached Student Resources <span class="fa fa-paperclip"></span></h3>
-          <a href="{% url 'ctstem:downloadAttachments' curriculum.id 'S' %}"><h5 class="left">Download</h5></a>
+          <h3 class="left inline">Attached Student Resources  <i class="fa fa-paperclip"></i> - </h3>
+          <h6 class="left inline"><a href="{% url 'ctstem:downloadAttachments' curriculum.id 'S' %}"> Download All <i class="fas fa-file-download"></i> </a></h6>
+          <ul>
+          {% for attachment in student_attachments %}
+            <li><h5 class="left inline">{{attachment.title}} -  </h5> <h6 class="left inline"><a href="{{attachment.file_object.url}}"  download="{{attachment.title.split|join:'_'}}.{{attachment.extension}}" target="_blank"> Download <i class="fas fa-file-download"></i></a></h6></li>
+          {% endfor %}
+          </ul>
         </div>
       {% endif %}
     {% endif %}

@@ -18,6 +18,7 @@ from django.conf import settings
 from django.core.mail import send_mail
 from django.contrib.sites.models import Site
 from django.db.models import Func
+import os
 
 
 CURRICULUM_STATUS_CHOICES = (
@@ -289,10 +290,12 @@ class Attachment(models.Model):
   file_object = models.FileField(upload_to=upload_file_to, null=False)
   teacher_only = models.BooleanField(choices=((False, 'No'), (True, 'Yes')), default=False)
 
-
   class Meta:
       ordering = ['title']
 
+  def extension(self):
+    name, extension = os.path.splitext(self.file_object.name)
+    return extension
 
 # Bookmarked Curriculum
 class BookmarkedCurriculum(models.Model):
