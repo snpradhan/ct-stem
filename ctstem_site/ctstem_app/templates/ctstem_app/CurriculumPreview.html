@@ -59,6 +59,8 @@
           <label>Subject:  </label>
           {% if curriculum.subject.all %}
             {{curriculum.subject.all|join:", "}}
+          {% elif curriculum.unit.subject.all %}
+            {{curriculum.unit.subject.all|join:", "}}
           {% endif %}
         </div>
         <div>
@@ -67,7 +69,11 @@
         </div>
         <div>
           <label>Level:  </label>
-          {{curriculum.level}}
+          {% if curriculum.unit %}
+            {{curriculum.unit.level}}
+          {% else %}
+            {{curriculum.level}}
+          {% endif %}
         </div>
         <div>
           <label>Version:  </label>
@@ -165,7 +171,8 @@
       <div class="section" id="standards">
         <h3 class="left">Standards</h3>
         <div class="row">
-          {% for standard, categories in curriculum.taxonomy.all|taxonomyHelper %}
+          {% with curr_unit=curriculum.unit|default:curriculum %}
+          {% for standard, categories in curr_unit.taxonomy.all|taxonomyHelper %}
             <div class="col">
               <h5 class="left">{{standard}}</h5>
               <ul>
@@ -180,6 +187,7 @@
               </ul>
             </div>
           {% endfor %}
+          {% endwith %}
         </div>
       </div>
       <div class="section" id="compatibility">
