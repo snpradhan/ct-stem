@@ -261,7 +261,6 @@ class Step(models.Model):
   title = models.CharField(null=True, blank=True, max_length=256, help_text="Page title")
   order = models.IntegerField(null=True)
   content = RichTextUploadingField(null=True, blank=True)
-  teacher_notes = RichTextUploadingField(null=True, blank=True)
   questions = models.ManyToManyField('Question', through='CurriculumQuestion', blank=True)
 
   class Meta:

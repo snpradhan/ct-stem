@@ -585,7 +585,6 @@ class StepForm(ModelForm):
     widgets = {
       'title': forms.TextInput(attrs={'placeholder': 'Step Title'}),
       'content': forms.Textarea(attrs={'rows':0, 'cols':60}),
-      'teacher_notes': forms.Textarea(attrs={'rows':0, 'cols':60}),
     }
 
   def __init__(self, *args, **kwargs):

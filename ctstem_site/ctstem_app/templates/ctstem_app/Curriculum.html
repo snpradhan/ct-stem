@@ -295,7 +295,7 @@
                     <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
                   </button>
                 </span>
-                <div style="display:none; margin-top: 1em;">
+                <div>
                   {{form.teacher_notes}}
                 </div>
                 <div class="help warning">{{form.teacher_notes.help_text|safe}}</div>
@@ -437,22 +437,6 @@
                   </div>
                   <div class="error">{{ step.content.errors }}</div>
                 </div>
-                <div class="form-group teacher_notes">
-                  <label for="id_{{step.teacher_notes.name}}">{{ step.teacher_notes.label|title }} {% if step.teacher_notes.field.required %}(<span class="required">*</span>) {% endif %}</label>
-                  <span class="expand_collapse_other">
-                    <button type="button" class="btn orange" style="display:none;" name="collapse_notes" aria-label="Collapse Notes" title="Collapse Notes">
-                      <span class="glyphicon glyphicon-collapse-up" aria-hidden="true"></span>
-                    </button>
-                    <button type="button" class="btn green"  name="expand_notes" aria-label="Expand Notes" title="Expand Notes">
-                      <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    </button>
-                  </span>
-                  <div style="display:none; margin-top: 1em;">
-                    {{step.teacher_notes}}
-                  </div>
-                  <div class="error">{{ step.teacher_notes.errors }}</div>
-                </div>
-
                 <div class="form-group question_table">
                   {{step.nested.management_form}}
                   {{step.nested.id}}
@@ -734,7 +718,7 @@
         //reset field visibility
         reset_curriculum_metadata();
 
-        //for all curriculum types, display author table, title, status, icon, time, teacher overview, acknowledgement
+        //for all curriculum types, display author table, title, status, icon, time, teacher overview, acknowledgement, credits, subject and teacher notes
         if($(this).val() == 'U' || $(this).val() == 'L' || $(this).val() == 'A') {
           $('#id_curriculum-title').closest('.form-group').show();
           $('#id_curriculum-status').closest('.form-group').show();
@@ -744,9 +728,11 @@
           $('#id_curriculum-overview').closest('.form-group').show();
           $('#id_curriculum-acknowledgement').closest('.form-group').show();
           $('#id_curriculum-credits').closest('.form-group').show();
+          $('#id_curriculum-subject').closest('.form-group').show();
+          $('#id_curriculum-teacher_notes').closest('.form-group').show();
         }
 
-        //for unit, stand alone lesson and assessment display level and taxonomy
+        //for unit, stand alone lesson/assessment mark overview required, display level, taxonomy and collaborators
         if($(this).val() == 'U' || (($(this).val() == 'L' || $(this).val() == 'A') &&  $('select#id_curriculum-unit').val() == '' )) {
           $('#id_curriculum-overview').closest('.form-group').find('label:first').html('Overview (<span class="required">*</span>)');
           $('#id_curriculum-level').closest('.form-group').show();
@@ -756,18 +742,12 @@
           $('div.collaborator_table').show();
         }
 
-        //for unit and stand alone lesson display subject, teacher notes and compatible systems and feature rank
+        //for unit and stand alone lesson mark subject required and display compatible systems and feature rank
         if($(this).val() == 'U' || ($(this).val() == 'L' &&  $('select#id_curriculum-unit').val() == '' )) {
           $('#id_curriculum-subject').closest('.form-group').show();
           $('#id_curriculum-subject').closest('.form-group').find('label:first').html('Subject (<span class="required">*</span>)');
-          $('#id_curriculum-teacher_notes').closest('.form-group').show();
           $('#id_curriculum-compatible_system').closest('.form-group').show();
           $('#id_curriculum-feature_rank').closest('.form-group').show();
-        }
-
-        //for assessments show subject
-        else if ($(this).val() == 'A') {
-          $('#id_curriculum-subject').closest('.form-group').show();
         }
 
         //for lesson and assessment, display unit, student directions and attachments
@@ -789,7 +769,6 @@
           $('div.table.step div.form-group.order').show();
           $('div.table.step div.form-group.step_title').show();
           $('div.table.step div.form-group.step_content').show();
-          $('div.table.step div.form-group.teacher_notes').show();
           $('div.table.step div.form-group.question_table').show();
           $('#addStep').show();
           $('.addStep').show();
