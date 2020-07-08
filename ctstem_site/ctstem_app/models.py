@@ -709,7 +709,12 @@ def check_curriculum_status_change(sender, instance, **kwargs):
     if not obj.status == instance.status: # status has changed
       # if changing the status of a unit, also update the status of underlying curricula
       if obj.curriculum_type == 'U':
-        Curriculum.objects.filter(unit=obj).update(status=instance.status)
+        # if restoring a deleted Unit, also restore all underlying curricula
+        if obj.status == 'R' and instance.status == 'A':
+          Curriculum.objects.filter(unit=obj).update(status=instance.status)
+        #otherwise only update the status of active (undeleted) underlying curricula
+        else:
+          Curriculum.objects.filter(unit=obj).exclude(status='R').update(status=instance.status)
       # if changing the status of an underlying curriculum to Public, also make Unit Public
       elif obj.unit and obj.unit.status != 'P' and instance.status == 'P':
         Curriculum.objects.filter(id=obj.unit.id).update(status='P')
