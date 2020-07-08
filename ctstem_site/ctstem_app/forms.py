@@ -601,11 +601,10 @@ class AttachmentForm(ModelForm):
 
   class Meta:
     model = models.Attachment
-    fields = ['title', 'file_object', 'teacher_only']
+    fields = ['title', 'file_object']
     widgets = {
       'title': forms.TextInput(attrs={'placeholder': 'Activity Title'}),
       'file_object': widgets.NotClearableFileInput,
-      'teacher_only': forms.Select(),
     }
 
   def __init__(self, *args, **kwargs):

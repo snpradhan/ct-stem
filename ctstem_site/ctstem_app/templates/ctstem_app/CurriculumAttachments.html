@@ -1,0 +1,49 @@
+{% load ctstem_extras %}
+<div class="form-group {{role}}_attachment_table">
+  {{formset.management_form}}
+  <label for="id_attachment_table">{{role|title}} Attachment(s)</label>
+  <a type="button" class="btn blue add_attachment" id="add_{{role}}_attachment" title="Add New {{role|title}} Attachment">
+    <i class="fas fa-plus" aria-hidden="true"></i>
+  </a>
+  <span class="expand_collapse_other">
+    <button type="button" class="btn orange" name="collapse_attachment" aria-label="Collapse Attachments" title="Collapse Attachments">
+      <span class="glyphicon glyphicon-collapse-up" aria-hidden="true"></span>
+    </button>
+    <button type="button" class="btn green" style="display:none;" name="expand_attachment" aria-label="Expand Attachments" title="Expand Attachments">
+      <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
+    </button>
+  </span>
+  <table class="table table-striped table-condensed table-bordered attachment inner_table collapsible_content">
+    <thead>
+      <tr>
+        <th style="width:40%;">Title</th>
+        <th>File</th>
+        <th>Delete</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for attachmentForm in formset %}
+        <tr style="{% if forloop.last %} display:none; {% endif %}">
+          <td class="attachment_title">
+            {{attachmentForm.id}}
+            <div>
+              {{attachmentForm.title}}
+            </div>
+            <div class="error">{{ attachmentForm.title.errors }}</div>
+          </td>
+          <td class="attached_file">
+            <div>{{attachmentForm.file_object}}</div>
+            <div class="help warning">{{attachmentForm.file_object.help_text|safe}}</div>
+            <div class="error">{{ attachmentForm.file_object.errors }}</div>
+          </td>
+          <td class="attachment_edit">
+            <button type="button" class="btn red delete_attachment" name="delete_attachment" aria-label="Delete Attachment" title="Delete Attachment">
+              <i class="fa fa-trash" aria-hidden="true"></i>
+            </button>
+            {{attachmentForm.DELETE.as_hidden}}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

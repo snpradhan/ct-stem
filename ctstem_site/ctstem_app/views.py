@@ -301,7 +301,7 @@ def curriculum(request, id=''):
       StepFormSet = nestedformset_factory(models.Curriculum, models.Step, form=forms.StepForm,
                                                     nested_formset=inlineformset_factory(models.Step, models.CurriculumQuestion, form=forms.CurriculumQuestionForm, can_delete=True, can_order=True, extra=1),
                                                     can_delete=True, can_order=True, extra=1)
-      AttachmentFormSet = inlineformset_factory(models.Curriculum, models.Attachment, form=forms.AttachmentForm, can_delete=True, extra=1)
+      AttachmentFormSet = inlineformset_factory(models.Curriculum, models.Attachment, form=forms.AttachmentForm, can_delete=True, can_order=True, extra=1)
 
       formset = StepFormSet(instance=curriculum, prefix='form')
       collaborator_formset = CollaboratorFormSet(instance=curriculum, prefix='collaborator_form')
@@ -310,7 +310,8 @@ def curriculum(request, id=''):
         for subform, collaborator_data in zip(collaborator_formset.forms, initial_collaborator_data):
           subform.initial = collaborator_data
 
-      attachment_formset = AttachmentFormSet(instance=curriculum, prefix='attachment_form')
+      teacher_attachment_formset = AttachmentFormSet(instance=curriculum, prefix='teacher_attachment_form', queryset=models.Attachment.objects.filter(teacher_only=True))
+      student_attachment_formset = AttachmentFormSet(instance=curriculum, prefix='student_attachment_form', queryset=models.Attachment.objects.filter(teacher_only=False))
 
       storage = messages.get_messages(request)
       modal_messages = []
@@ -318,7 +319,7 @@ def curriculum(request, id=''):
         if message.extra_tags == 'modal_message':
           modal_messages.append(message)
 
-      context = {'form': form, 'attachment_formset': attachment_formset, 'collaborator_formset': collaborator_formset, 'formset':formset, 'newQuestionForm': newQuestionForm, 'modal_messages': modal_messages, 'unit_id': unit_id }
+      context = {'form': form, 'teacher_attachment_formset': teacher_attachment_formset, 'student_attachment_formset': student_attachment_formset, 'collaborator_formset': collaborator_formset, 'formset':formset, 'newQuestionForm': newQuestionForm, 'modal_messages': modal_messages, 'unit_id': unit_id }
 
       return render(request, 'ctstem_app/Curriculum.html', context)
 
@@ -332,14 +333,16 @@ def curriculum(request, id=''):
       StepFormSet = nestedformset_factory(models.Curriculum, models.Step, form=forms.StepForm,
                                                     nested_formset=inlineformset_factory(models.Step, models.CurriculumQuestion, form=forms.CurriculumQuestionForm, can_delete=True, can_order=True, extra=1),
                                                     can_delete=True, can_order=True, extra=1)
-      AttachmentFormSet = inlineformset_factory(models.Curriculum, models.Attachment, form=forms.AttachmentForm, can_delete=True, extra=1)
+
+      AttachmentFormSet = inlineformset_factory(models.Curriculum, models.Attachment, form=forms.AttachmentForm, can_delete=True, can_order=True, extra=1)
 
       formset = StepFormSet(data, instance=curriculum, prefix='form')
       collaborator_formset = CollaboratorFormSet(data, instance=curriculum, prefix='collaborator_form')
 
-      attachment_formset = AttachmentFormSet(data, request.FILES, instance=curriculum, prefix='attachment_form')
+      teacher_attachment_formset = AttachmentFormSet(data, request.FILES, instance=curriculum, prefix='teacher_attachment_form', queryset=models.Attachment.objects.filter(teacher_only=True))
+      student_attachment_formset = AttachmentFormSet(data, request.FILES, instance=curriculum, prefix='student_attachment_form', queryset=models.Attachment.objects.filter(teacher_only=False))
 
-      if form.is_valid() and formset.is_valid() and collaborator_formset.is_valid() and attachment_formset.is_valid():
+      if form.is_valid() and formset.is_valid() and collaborator_formset.is_valid() and teacher_attachment_formset.is_valid() and student_attachment_formset.is_valid():
         savedCurriculum = form.save()
 
         #make sure curriculum order is present and unique in a unit
@@ -355,7 +358,21 @@ def curriculum(request, id=''):
           for obj in collaborator_formset.deleted_objects:
             obj.delete()
 
-        attachment_formset.save()
+
+        teacher_attachment_formset.save(commit=False)
+        for attachment_form in teacher_attachment_formset.ordered_forms:
+          attachment_form.instance.teacher_only = True
+          attachment_form.instance.save()
+        for obj in teacher_attachment_formset.deleted_objects:
+          obj.delete()
+
+        student_attachment_formset.save(commit=False)
+        for attachment_form in student_attachment_formset.ordered_forms:
+          attachment_form.instance.teacher_only = False
+          attachment_form.instance.save()
+        for obj in student_attachment_formset.deleted_objects:
+          obj.delete()
+
         formset.save(commit=False)
         for stepform in formset.ordered_forms:
           stepform.instance.order = stepform.cleaned_data['ORDER']
@@ -382,11 +399,12 @@ def curriculum(request, id=''):
           else:
             return shortcuts.redirect('/curriculum/%s' % savedCurriculum.id)
       else:
-        print(form.errors)
-        print(formset.errors)
-        print(attachment_formset.errors)
-        print(collaborator_formset.errors)
-        print(collaborator_formset._non_form_errors)
+        print('form.errors', form.errors)
+        print('formset.errors', formset.errors)
+        print('teacher_attachment_formset.errors', teacher_attachment_formset.errors)
+        print('student_attachment_formset.errors', student_attachment_formset.errors)
+        print('collaborator_formset.errors', collaborator_formset.errors)
+        print('collaborator_formset._non_form_errors', collaborator_formset._non_form_errors)
         if request.is_ajax():
           response_data = {'status': 0, 'message': 'The preview could not be generated because some mandatory fields are missing.  Please manually save the curriculum to see specific errors.'}
           return http.HttpResponse(json.dumps(response_data), content_type = 'application/json')
@@ -396,7 +414,7 @@ def curriculum(request, id=''):
             messages.error(request, "The preview could not be generated because some mandatory fields are missing.")
           else:
             messages.error(request, "The curriculum could not be saved because there were errors.  Please check the errors below.")
-          context = {'form': form, 'attachment_formset': attachment_formset, 'collaborator_formset': collaborator_formset, 'formset':formset, 'newQuestionForm': newQuestionForm, 'unit_id': unit_id }
+          context = {'form': form, 'teacher_attachment_formset': teacher_attachment_formset, 'student_attachment_formset': student_attachment_formset, 'collaborator_formset': collaborator_formset, 'formset':formset, 'newQuestionForm': newQuestionForm, 'unit_id': unit_id }
           return render(request, 'ctstem_app/Curriculum.html', context)
 
     return http.HttpResponseNotAllowed(['GET', 'POST'])
