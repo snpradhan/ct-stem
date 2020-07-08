@@ -354,18 +354,26 @@ div.curriculum_container div.button-container, div.group_container div.button-co
   width: 10%;
 }
 
-div.table#curriculum, div.table#directions_attachments, div.table.step,
+div.table#curriculum, div.table#directions_attachments, div.table.step, div.table.addStep,
 div.table#curriculumQuestions, div.table.activity, div.table#group, div.table#standard {
   width: 90%;
   padding: 3em 4em;
   margin-top: 3em;
   margin-bottom: 3em;
 }
-div.table#curriculum, div.table#directions_attachments, div.table.step {
+div.table#curriculum, div.table#directions_attachments, div.table.step, div.table.addStep {
   width: 100%;
 }
+div.table.addStep:hover {
+  cursor: pointer;
+  background-color: var(--ctstem-color-light-gray) !important;
+  color: #ffffff !important;
+}
 
-div.table.step, div.table.activity, div.table.ngss, div.table.taxonomy, div.table#curriculumQuestions {
+div.table.addStep > * {
+  color: inherit;
+}
+div.table.step, div.table.addStep, div.table.activity, div.table.ngss, div.table.taxonomy, div.table#curriculumQuestions {
   margin-top: 1em;
 }
 div.table#curriculumPreview, div.table.stepPreview, div.table#assignment{
@@ -412,6 +420,9 @@ div.question_table div.feedback div.feedback
 
 div.table.step div.row.question {
   margin-bottom: 1em;
+}
+div.table.step.highlight {
+  border: solid var(--ctstem-color-yellow) 5px;
 }
 
 div.table#curriculum span.controls, div.table#directions_attachments span.controls, div.table.activity span.controls, div.table#assessment span.controls, div.table.step span.controls {

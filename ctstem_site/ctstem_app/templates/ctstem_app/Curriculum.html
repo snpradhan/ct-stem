@@ -521,6 +521,7 @@
               </div>
             </div>
           {% endfor %}
+          <div class="table addStep"><h4><i class="fas fa-plus" aria-hidden="true"></i> ADD PAGE</h4></div>
         </div> <!-- end of curriculum form div-->
 
         <div class="button-container">
@@ -580,9 +581,9 @@
         $('div.curriculum_content div#taxonomy_div table#taxonomy tbody tr#'+taxonomy_id).remove();
       });
 
-      $('#addStep').click(function() {
-        cloneMore('div.table:last', 'form');
-        var new_step_div = $('div.table:last').prev();
+      $('#addStep, div.table.addStep').click(function() {
+        cloneMore('div.table.step:last', 'form');
+        var new_step_div = $('div.table.step:last').prev();
         $(new_step_div).toggle();
         //set the step order
         var step_order = $('div.table.step:visible').length;
@@ -609,6 +610,14 @@
             CKEDITOR.replace($(this).attr('name'), config);
           }
         });
+        $(new_step_div).animate({'borderWidth': '3px', 'borderColor': '#FFD028'}, 'slow');
+        $('html, body').animate({scrollTop:$(new_step_div).offset().top}, 1000);
+        setTimeout(function() {
+            $(new_step_div).animate({'borderWidth': '1px', 'borderColor': '#ccc'}, 'slow');
+          },
+          4000
+        );
+
       });
 
       $('input#id_curriculum-title').on('input', function(){
@@ -783,10 +792,12 @@
           $('div.table.step div.form-group.teacher_notes').show();
           $('div.table.step div.form-group.question_table').show();
           $('#addStep').show();
+          $('.addStep').show();
         }
         else {
           $('div.step').hide();
           $('#addStep').hide();
+          $('.addStep').hide();
         }
 
       }));
