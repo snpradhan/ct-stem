@@ -485,6 +485,14 @@ def previewCurriculum(request, id=''):
       if request.user.is_authenticated or not hasattr(request.user, 'student'):
         teacher_attachments = models.Attachment.objects.all().filter(Q(curriculum=curriculum) | Q(curriculum=curriculum.unit), teacher_only=True)
 
+      teacher_resource_message = None
+      if curriculum.teacher_notes and teacher_attachments:
+        teacher_resource_message = 'Teacher Notes and Attached Resources'
+      elif curriculum.teacher_notes:
+        teacher_resource_message = 'Teacher Notes'
+      elif teacher_attachments:
+        teacher_resource_message = 'Attached Teacher Resources'
+
       if curriculum.unit and curriculum.unit.icon:
         icon = curriculum.unit.icon.url
       elif curriculum.icon:
@@ -496,7 +504,8 @@ def previewCurriculum(request, id=''):
       else:
         icon = '/static/img/assessment.png'
 
-      context = {'curriculum': curriculum, 'pages': pages, 'systems': systems, 'icon': icon, 'student_attachments': student_attachments, 'teacher_attachments': teacher_attachments}
+
+      context = {'curriculum': curriculum, 'pages': pages, 'systems': systems, 'icon': icon, 'student_attachments': student_attachments, 'teacher_attachments': teacher_attachments, 'teacher_resource_message': teacher_resource_message}
 
       return render(request, 'ctstem_app/CurriculumPreview.html', context)
 

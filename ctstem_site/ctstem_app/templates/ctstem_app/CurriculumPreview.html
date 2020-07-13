@@ -99,32 +99,19 @@
         <h3 class="left">Overview</h3>
         <div>{{curriculum.overview|safe}}</div>
 
-        {% if teacher_attachments %}
-          {% if user.administrator or user.researcher or user.school_administrator or user.teacher or user.author %}
-            <div class="section" id="attachments">
-              <h3 class="left inline">Attached Teacher Resources  <i class="fa fa-paperclip"></i> - </h3>
-              <h6 class="left inline"><a href="{% url 'ctstem:downloadAttachments' curriculum.id 'R' %}"> Download All <i class="fas fa-file-download"></i> </a></h6>
-              <ul>
-              {% for attachment in teacher_attachments %}
-                <li><h5 class="left inline">{{attachment.title}} -  </h5> <h6 class="left inline"><a href="{{attachment.file_object.url}}" download="{{attachment.title.split|join:'_'}}.{{attachment.extension}}" target="_blank"> Download <i class="fas fa-file-download"></i></a></h6></li>
-              {% endfor %}
-              </ul>
-            </div>
-          {% endif %}
-        {% endif %}
-
-        <!-- Teacher Notes -->
-        {% if curriculum.teacher_notes %}
+        <!-- Teacher Notes and Attachments link -->
+        {% if teacher_resource_message %}
           <div>
           {% if user.administrator or user.researcher or user.school_administrator or user.teacher or user.author %}
-            <a id="teacher_notes_link" href="#teacher_notes"><h5 class="left">Jump to Teacher Notes</h5></a>
+            <a id="teacher_notes_link" href="#teacher_notes_and_attachments"><h5 class="left">Jump to {{teacher_resource_message}}</h5></a>
           {% else %}
-            {% with msg="Please login as a teacher to see the teacher notes" %}
-              <a onclick="alert('{{msg}}');" href="#"><h5 class="left">Jump to Teacher Notes</h5></a>
+            {% with msg="Please login as a teacher to see the "|add:teacher_resource_message %}
+              <a onclick="alert('{{msg}}');" href="#"><h5 class="left">Jump to {{teacher_resource_message}}</h5></a>
             {% endwith %}
           {% endif %}
           </div>
         {% endif %}
+
       </div>
 
       {% if curriculum.curriculum_type == 'U' %}
@@ -232,14 +219,33 @@
         </div>
       {% endif %}
     </div>
-    {% if curriculum.teacher_notes %}
-      {% if user.administrator or user.researcher or user.school_administrator or user.teacher or user.author %}
-        <div class="section" id="teacher_notes">
-          <h3 class="left">Teacher Notes</h3>
-          <div>{{curriculum.teacher_notes|safe}}</div>
-        </div>
-      {% endif %}
+    <!-- TEACHER NOTES AND ATTACHMENTS -->
+    {% if curriculum.teacher_notes or teacher_attachments %}
+      <div id="teacher_notes_and_attachments">
+        {% if curriculum.teacher_notes %}
+          {% if user.administrator or user.researcher or user.school_administrator or user.teacher or user.author %}
+            <div class="section" id="teacher_notes">
+              <h3 class="left">Teacher Notes</h3>
+              <div>{{curriculum.teacher_notes|safe}}</div>
+            </div>
+          {% endif %}
+        {% endif %}
+        {% if teacher_attachments %}
+          {% if user.administrator or user.researcher or user.school_administrator or user.teacher or user.author %}
+            <div class="section" id="attachments">
+              <h3 class="left inline">Attached Teacher Resources  <i class="fa fa-paperclip"></i> - </h3>
+              <h6 class="left inline"><a href="{% url 'ctstem:downloadAttachments' curriculum.id 'R' %}"> Download All <i class="fas fa-file-download"></i> </a></h6>
+              <ul>
+              {% for attachment in teacher_attachments %}
+                <li><h5 class="left inline">{{attachment.title}} -  </h5> <h6 class="left inline"><a href="{{attachment.file_object.url}}" download="{{attachment.title.split|join:'_'}}.{{attachment.extension}}" target="_blank"> Download <i class="fas fa-file-download"></i></a></h6></li>
+              {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+        {% endif %}
+      </div>
     {% endif %}
+    <!-- STUDENT ATTACHMENTS -->
     {% if student_attachments %}
       {% if user.administrator or user.researcher or user.school_administrator or user.teacher or user.author %}
         <div class="section" id="attachments">

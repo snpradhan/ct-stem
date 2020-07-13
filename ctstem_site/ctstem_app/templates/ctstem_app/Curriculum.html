@@ -203,7 +203,7 @@
                 <div class="error">{{ form.overview.errors }}</div>
               </div>
 
-              {% include "ctstem_app/CurriculumAttachments.html" with role='teacher' formset=teacher_attachment_formset %}
+
 
               <!-- ACKNOWLEDGEMENT -->
               <div class="form-group">
@@ -297,12 +297,15 @@
                     <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
                   </button>
                 </span>
-                <div>
+                <div style="display:none;">
                   {{form.teacher_notes}}
                 </div>
                 <div class="help warning">{{form.teacher_notes.help_text|safe}}</div>
                 <div class="error">{{ form.teacher_notes.errors }}</div>
               </div>
+
+              {% include "ctstem_app/CurriculumAttachments.html" with role='teacher' formset=teacher_attachment_formset %}
+
             </div>
           </div>
 
