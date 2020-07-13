@@ -23,7 +23,7 @@
 .tile .trash, .tile .archive {
   margin: auto;
   position: absolute;
-  top: 30%; left: 0; right: 0;
+  top: 35%; left: 0; right: 0;
   font-size: 5em;
   z-index: 999;
 }

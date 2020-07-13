@@ -775,7 +775,8 @@ div.row#standard_tiles .col {
 div.row#curricula_tiles .col .tile,
 div.row#class_tiles .col .tile,
 div.row#standard_tiles .col .tile,
-div.row#assignment_tiles .col .tile {
+div.row#assignment_tiles .col .tile,
+div.row#preview_head .col .tile {
   display: inline-block;
   position: relative;
   box-shadow: unset;
@@ -813,8 +814,10 @@ div.row#assignment_tiles .col .tile .detail {
 
 
 div.row#curricula_tiles .col .tile.archived .icon img,
-div.row#curricula_tiles .col .tile.removed .icon img
-div.row#class_tiles .col .tile.inactive .icon img{
+div.row#curricula_tiles .col .tile.removed .icon img,
+div.row#class_tiles .col .tile.inactive .icon img,
+div.row#preview_head .col .tile.archived .icon img,
+div.row#preview_head .col .tile.removed .icon img {
   opacity: 0.5;
 }
 
@@ -1016,6 +1019,7 @@ div.content#preview div.row#preview_head .col .icon{
   background-size: cover;
   background-repeat: no-repeat;
   position: relative;
+  text-align: center;
 
 }
 div.content#preview .icon img{

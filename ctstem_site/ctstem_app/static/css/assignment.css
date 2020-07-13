@@ -25,7 +25,7 @@ header {
   width: 100%;
   min-width: 400px;
   line-height: 55px;
-  padding: 0 25px 0 50px;
+  padding: 0 15px 0 50px;
   vertical-align: middle;
   font-size: 1.1rem;
   z-index: 5;  /* Make sure it's above the side bar */
@@ -79,7 +79,6 @@ header nav button {
   width: 60px;
   vertical-align: middle;
 }
-
 header h1 {
   font-size: 1.5rem;
   display: inline-block;
@@ -91,17 +90,20 @@ header nav#side-nav {
   position: fixed;
   top: 50px;
   right: -350px;  /* this will slide in from the right */
-  width: 350px;
+  width: 250px;
   height: 100%;
   background-color: var(--ctstem-color-blue);
   z-index: 0;  /* keep this below the top menu */
   padding-top: 1rem;
-  line-height: 200%;
+  line-height: 100%;
   transition: right 0.5s ease-in-out; /* animate the slide */
 }
 
 header nav#side-nav.activated { right: 0px; }
-header nav#side-nav ul { list-style: none; }
+header nav#side-nav ul {
+  list-style: none;
+  padding-left: 1em;
+}
 header nav#side-nav ul li { padding: 0 0 0.5rem 0; }
 
 header nav#side-nav ul.underlying_curriculum {

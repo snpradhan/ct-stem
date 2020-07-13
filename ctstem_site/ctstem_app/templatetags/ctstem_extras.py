@@ -318,13 +318,9 @@ def get_teacher_groups(id):
   return groups
 
 @register.simple_tag(takes_context=True)
-def get_underlying_curriculum(context, curriculum_id):
+def get_underlying_curriculum(context, curriculum_id, action='preview'):
   request = context.get('request')
   curriculum = models.Curriculum.objects.get(id=curriculum_id)
-  if curriculum.status != 'R':
-    action = 'preview'
-  else:
-    action = 'restore'
   underlying_curriculum = views.underlyingCurriculum(request, action, curriculum_id)
   list(messages.get_messages(request))
   return underlying_curriculum

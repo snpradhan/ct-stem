@@ -27,7 +27,7 @@
                   <a class="fa fa-files-o" href="{% url 'ctstem:copyCurriculum' unit_id %}" title="Copy Unit"></a>
                 </label>
               {% endif %}
-              {% get_underlying_curriculum unit_id as underlying_curriculum %}
+              {% get_underlying_curriculum unit_id 'modify' as underlying_curriculum %}
               <ul>
                 {% for lesson in underlying_curriculum %}
                   <li>

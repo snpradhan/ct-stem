@@ -81,7 +81,7 @@
               </div>
               <div class="period">
                 {% if curriculum.curriculum_type == 'U' %}
-                  {% get_underlying_curriculum curriculum.id as underlying_curriculum %}
+                  {% get_underlying_curriculum curriculum.id 'preview' as underlying_curriculum %}
                   {{underlying_curriculum|length}} Lessons
                 {% else %}
                   {{curriculum.time}}

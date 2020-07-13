@@ -84,8 +84,52 @@
                 <a class="page-link" href="{% url 'ctstem:previewCurriculumActivity' curriculum.id i %}">{{i}}</a>
               {% endif %}
             {% endfor %}
+            &nbsp;
+            <button id="menu-button"><span class="fa fa-navicon"></span></button>
           {% endif %}
           </span>
+        </nav>
+        <nav id="side-nav">
+          <ul>
+            <li>
+              <label>
+                <a href="{% url 'ctstem:previewCurriculum' curr_unit.id %}">
+                  Preview
+                  {% if curr_unit.curriculum_type == 'U' %}
+                    Unit
+                  {% elif curr_unit.curriculum_type == 'L' %}
+                    Lesson
+                  {% elif curr_unit.curriculum_type == 'A' %}
+                    Assessment
+                  {% endif %}
+                  {% if curr_unit.status == 'R' %}
+                    <i class="fas fa-trash-alt" title="Deleted" aria-hidden="true"></i>
+                  {% elif curr_unit.status == 'A' %}
+                    <i class="fas fa-archive" title="Archived" aria-hidden="true"></i>
+                  {% endif %}
+                </a>
+              </label>
+            </li>
+            {% get_underlying_curriculum curr_unit.id 'preview' as underlying_curriculum %}
+            {% if underlying_curriculum %}
+              <ul>
+                {% for lesson in underlying_curriculum %}
+                  <li>
+                    <label class="{% if curr_unit.id != lesson.id %} current_curriculum {% endif %}">
+                      <a href="{% url 'ctstem:previewCurriculum' lesson.id %}">
+                        Preview Lesson {{lesson.order}}
+                        {% if lesson.status == 'R' %}
+                          <i class="fas fa-trash-alt" title="Deleted" aria-hidden="true"></i>
+                        {% elif lesson.status == 'A' %}
+                          <i class="fas fa-archive" title="Archived" aria-hidden="true"></i>
+                        {% endif %}
+                      </a>
+                    </label>
+                  </li>
+                {% endfor %}
+              </ul>
+              {% endif %}
+          </ul>
         </nav>
       </div>
     </header>
@@ -401,6 +445,11 @@
 
       $(window).on('resize', function(){
         page_numbers_position();
+      });
+      $('#menu-button').mousedown(function() {
+        $('#side-nav').toggleClass('activated');
+        //$('header nav').toggleClass('activated');
+        //$('#side-nav').css('right', '0px');
       });
 
     });

@@ -479,7 +479,7 @@ def previewCurriculum(request, id=''):
 
     if request.method == 'GET':
       systems = models.System.objects.all()
-
+      pages = models.Step.objects.all().filter(curriculum=curriculum)
       teacher_attachments = None
       student_attachments = models.Attachment.objects.all().filter(Q(curriculum=curriculum) | Q(curriculum=curriculum.unit), teacher_only=False)
       if request.user.is_authenticated or not hasattr(request.user, 'student'):
@@ -496,7 +496,7 @@ def previewCurriculum(request, id=''):
       else:
         icon = '/static/img/assessment.png'
 
-      context = {'curriculum': curriculum, 'systems': systems, 'icon': icon, 'student_attachments': student_attachments, 'teacher_attachments': teacher_attachments}
+      context = {'curriculum': curriculum, 'pages': pages, 'systems': systems, 'icon': icon, 'student_attachments': student_attachments, 'teacher_attachments': teacher_attachments}
 
       return render(request, 'ctstem_app/CurriculumPreview.html', context)
 

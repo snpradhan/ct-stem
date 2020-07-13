@@ -20,12 +20,22 @@
             {% else %}
               assessment
             {% endif %}
-            {% if curriculum.status == 'A' %}
-              archived
-            {% endif %}
             ">
       <div class="col">
-        <div class="icon" style="background-image: url('{{icon}}');">
+        <div class="tile
+                  {% if curriculum.status == 'A' %}
+                    archived
+                  {% elif curriculum.status == 'R' %}
+                    removed
+                  {% endif %}">
+          <div class="icon">
+            <img src="{{icon}}"/>
+            {% if curriculum.status == 'R' %}
+              <i class="fas fa-trash-alt trash" title="Deleted"></i>
+            {% elif curriculum.status == 'A' %}
+              <i class="fas fa-archive archive" title="Archived"></i>
+            {% endif %}
+          </div>
         </div>
       </div>
 
@@ -139,7 +149,7 @@
               </a>
             </li>
 
-            {% for step in curriculum.steps.all %}
+            {% for step in pages %}
               <li>
                 <h5 class="left inline">{{step.order}}. {{step.title}} - </h5>
                 <a href="{% url 'ctstem:previewCurriculumActivity' curriculum.id step.order %}" target="_blank" title="Preview">
