@@ -123,45 +123,40 @@
                 <div class="error">{{ form.subject.errors }}</div>
               </div>
 
-              <!-- FEATURE RANK AND STATUS -->
+              <!-- FEATURE RANK/CURRICULUM ORDER AND STATUS -->
               <div class="row">
+                <!-- FEATURE RANK -->
                 {% if form.feature_rank %}
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label for="id_{{form.feature_rank.name}}">{{ form.feature_rank.label|title }} {% if form.feature_rank.field.required %}(<span class="required">*</span>) {% endif %}</label>
-                      <div class="curriculum_input">
-                        {{form.feature_rank}}
-                      </div>
-                      <div class="help warning">{{form.feature_rank.help_text|safe}}</div>
-                      <div class="error">{{ form.feature_rank.errors }}</div>
+                  <div class="col-md-6 form-group">
+                    <label for="id_{{form.feature_rank.name}}">{{ form.feature_rank.label|title }} {% if form.feature_rank.field.required %}(<span class="required">*</span>) {% endif %}</label>
+                    <div class="curriculum_input">
+                      {{form.feature_rank}}
                     </div>
+                    <div class="help warning">{{form.feature_rank.help_text|safe}}</div>
+                    <div class="error">{{ form.feature_rank.errors }}</div>
                   </div>
                 {% endif %}
-                {% if form.status %}
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label for="id_{{form.status.name}}">{{ form.status.label|title }} {% if form.status.field.required %}(<span class="required">*</span>) {% endif %}</label>
-                      <div class="curriculum_input">
-                        {{form.status}}
-                      </div>
-                      <div class="help warning">{{form.status.help_text|safe}}</div>
-                      <div class="error">{{ form.status.errors }}</div>
-                    </div>
+                 <!-- ORDER -->
+                <div class="col-md-6 form-group">
+                  <label for="id_{{form.order.name}}">{{ form.order.label|title }} {% if form.order.field.required %}(<span class="required">*</span>) {% endif %}</label>
+                  <div class="curriculum_input">
+                    {{form.order}}
                   </div>
-                {% endif %}
+                  <div class="help warning">{{form.order.help_text|safe}}</div>
+                  <div class="error">{{ form.order.errors }}</div>
+                </div>
+                <!-- STATUS -->
+                <div class="col-md-6 form-group">
+                  <label for="id_{{form.status.name}}">{{ form.status.label|title }} {% if form.status.field.required %}(<span class="required">*</span>) {% endif %}</label>
+                  <div class="curriculum_input">
+                    {{form.status}}
+                  </div>
+                  <div class="help warning">{{form.status.help_text|safe}}</div>
+                  <div class="error">{{ form.status.errors }}</div>
+                </div>
               </div>
 
               {% include "ctstem_app/CurriculumCollaborators.html"%}
-
-              <!-- ORDER -->
-              <div class="form-group">
-                <label for="id_{{form.order.name}}">{{ form.order.label|title }} {% if form.order.field.required %}(<span class="required">*</span>) {% endif %}</label>
-                <div class="curriculum_input">
-                  {{form.order}}
-                </div>
-                <div class="help warning">{{form.order.help_text|safe}}</div>
-                <div class="error">{{ form.order.errors }}</div>
-              </div>
 
               <!-- ICON -->
               <div class="form-group">
@@ -202,8 +197,6 @@
                 <div class="help warning">{{form.overview.help_text|safe}}</div>
                 <div class="error">{{ form.overview.errors }}</div>
               </div>
-
-
 
               <!-- ACKNOWLEDGEMENT -->
               <div class="form-group">
