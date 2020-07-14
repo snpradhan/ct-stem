@@ -112,10 +112,10 @@
             </li>
             {% get_underlying_curriculum curr_unit.id 'preview' as underlying_curriculum %}
             {% if underlying_curriculum %}
-              <ul>
+              <ul class="underlying_curriculum">
                 {% for lesson in underlying_curriculum %}
-                  <li>
-                    <label class="{% if curr_unit.id != lesson.id %} current_curriculum {% endif %}">
+                  <li class="{% if curriculum.id == lesson.id %} current_curriculum {% endif %}">
+                    <label>
                       <a href="{% url 'ctstem:previewCurriculum' lesson.id %}">
                         Preview Lesson {{lesson.order}}
                         {% if lesson.status == 'R' %}

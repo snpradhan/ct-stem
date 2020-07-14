@@ -100,11 +100,13 @@ header nav#side-nav {
 }
 
 header nav#side-nav.activated { right: 0px; }
+
 header nav#side-nav ul {
   list-style: none;
   padding-left: 1em;
 }
-header nav#side-nav ul li { padding: 0 0 0.5rem 0; }
+
+/*header nav#side-nav ul li { padding: 0 0 0.5rem 0; }*/
 
 header nav#side-nav ul.underlying_curriculum {
   padding-left: 1.5em;
@@ -113,12 +115,10 @@ header nav#side-nav ul.underlying_curriculum li {
   padding: 0.25em 0;
   line-height: 1.25em;
 }
-header nav#side-nav ul.underlying_curriculum li a {
-  font-size: 0.9em;
-  padding: 0em;
-}
-header nav#side-nav ul li a.active {
+
+header nav#side-nav ul.underlying_curriculum li.current_curriculum a {
   text-decoration: underline;
+  color: var(--ctstem-color-yellow);
 }
 header nav#side-nav li a {
   padding: 0.5rem;
