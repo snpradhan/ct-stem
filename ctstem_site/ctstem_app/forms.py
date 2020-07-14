@@ -572,6 +572,21 @@ class CurriculumForm(ModelForm):
         if not cleaned_data.get('subject'):
           self.add_error('subject', 'Subject is required')
           valid = False
+
+    if cleaned_data.get('status') == 'A':
+      inprogress_assignments = None
+      if cleaned_data.get('curriculum_type') == 'U':
+        unit = self.instance
+        lessons = unit.underlying_curriculum.all()
+        inprogress_assignments = models.AssignmentInstance.objects.all().filter(assignment__curriculum__in=lessons, status='P')
+      else:
+        lesson = self.instance
+        inprogress_assignments = models.AssignmentInstance.objects.all().filter(assignment__curriculum=lesson, status='P')
+
+      if inprogress_assignments:
+        self.add_error('status', 'Status cannot be set to Archived because there are In-Progress assignments')
+        valid = False
+
     return valid
 
 ####################################
@@ -684,6 +699,11 @@ class QuestionForm(ModelForm):
       'options': forms.Textarea(attrs={'rows':5, 'cols':60}),
       'answer': forms.Textarea(attrs={'rows':5, 'cols':60, 'placeholder': 'Answer if applicable'}),
     }
+    error_messages ={
+      'question_text': {
+        'required': 'Question Text is required'
+      }
+    }
 
   def __init__(self, *args, **kwargs):
     disable_fields = False
@@ -701,8 +721,6 @@ class QuestionForm(ModelForm):
 
   def is_valid(self):
     valid = super(QuestionForm, self).is_valid()
-    if not valid:
-      return valid
 
     cleaned_data = super(QuestionForm, self).clean()
 
@@ -716,7 +734,9 @@ class QuestionForm(ModelForm):
       except ValidationError as e:
         self.add_error('sketch_background', e.message)
         valid = False
-
+    if cleaned_data.get('answer_field_type') in ['DD', 'MC', 'MS', 'MI', 'MH', 'DT'] and cleaned_data.get('options') == '':
+      self.add_error('options', 'Options is required for %s'% dict(self.fields['answer_field_type'].choices)[cleaned_data.get('answer_field_type')])
+      valid = False
     return valid
 
 ####################################

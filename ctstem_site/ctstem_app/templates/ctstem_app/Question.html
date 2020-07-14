@@ -26,7 +26,7 @@
                                     other
                                  {% endif %}" >
             <label for="id_{{field.name}}">
-              {{ field.label|title }} {% if field.field.required %} (*) {% endif %}
+              {{ field.label|title }} <span class="required_or_optional">{% if field.field.required %} (<span class="required">*</span>) {% endif %}</span>
               {% if field.name == 'options' %}
                 <a href="#" class="info" id="options_info" rel="popover" data-content="">
                   <i class="fa fa-info-circle" aria-hidden="true" />
@@ -37,7 +37,7 @@
                 </a>
               {% endif %}
             </label>
-            <div>
+            <div class="question_input">
               {{field}}
               {% if field.name == 'question_text' %}
                 <input type="hidden" id="question_html" name="question_html" />
@@ -133,13 +133,21 @@ $(function (){
       $('div.form-group.sketch').show();
       $('div.form-group.other').hide();
     }
-    else if($(this).val() == 'DD' || $(this).val() == 'MC'){
-      $('div.form-group.sketch').hide();
-      $('div.form-group.other').show();
-    }
     else {
       $('div.form-group.sketch').hide();
-      $('div.form-group.other').hide();
+      if($(this).val() == 'DD' || $(this).val() == 'MC' || $(this).val() == 'MS' || $(this).val() == 'MI' || $(this).val() == 'MH' || $(this).val() == 'DT'){
+         $('#id_options').closest('.form-group').find('label .required_or_optional').html('(<span class="required">*</span>)');
+      }
+      else {
+        $('#id_options').closest('.form-group').find('label .required_or_optional').html('');
+      }
+
+      if($(this).val() == 'DD' || $(this).val() == 'MC'){
+        $('div.form-group.other').show();
+      }
+      else {
+        $('div.form-group.other').hide();
+      }
     }
 
   });
@@ -218,6 +226,16 @@ $(function (){
       },
     });
   });
+
+
+  //for each error message highlight the field causing the error
+  $('div.error').each(function(){
+    var error_length = $.trim($(this).text()).length;
+    if(error_length > 0) {
+      $(this).closest('.form-group').find('label, .question_input .form-control:input, .question_input .django-ckeditor-widget').addClass('input_error');
+    }
+  });
+
 });
 
 </script>

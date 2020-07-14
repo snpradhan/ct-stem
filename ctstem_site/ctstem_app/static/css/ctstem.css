@@ -1379,6 +1379,16 @@ hr.thick {
   margin-bottom: 0.5em;
 }
 
+.curriculum_input .form-control.input_error,
+.curriculum_input .django-ckeditor-widget.input_error,
+.question_input .form-control.input_error,
+.question_input .django-ckeditor-widget.input_error {
+  border: 2px solid var(--ctstem-color-red) !important;
+}
+label.input_error {
+  color: var(--ctstem-color-red) !important;
+}
+
 /***********   FORM GROUP END   ************/
 
 /******** Button ***********/

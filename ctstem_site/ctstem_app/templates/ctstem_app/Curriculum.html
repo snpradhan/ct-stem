@@ -83,7 +83,7 @@
               <!-- CURRICULUM TYPE -->
               <div class="form-group">
                 <label for="id_{{form.curriculum_type.name}}">{{ form.curriculum_type.label|title }} {% if form.curriculum_type.field.required %}(<span class="required">*</span>) {% endif %}</label>
-                <div>
+                <div class="curriculum_input">
                   {{form.curriculum_type}}
                   {% if form.instance.id %}
                     {{form.curriculum_type.as_hidden}}
@@ -96,7 +96,7 @@
               <!-- UNIT -->
               <div class="form-group">
                 <label for="id_{{form.unit.name}}">{{ form.unit.label|title }} {% if form.unit.field.required %}(<span class="required">*</span>) {% endif %}</label>
-                <div>
+                <div class="curriculum_input">
                   {{form.unit}}
                 </div>
                 <div class="help warning">{{form.unit.help_text|safe}}</div>
@@ -106,7 +106,7 @@
               <!-- CURRICULUM TITLE -->
               <div class="form-group">
                 <label for="id_{{form.title.name}}">{{ form.title.label|title }} {% if form.title.field.required %}(<span class="required">*</span>) {% endif %}</label>
-                <div>
+                <div class="curriculum_input">
                   {{form.title}}
                 </div>
                 <div class="help warning">{{form.title.help_text|safe}}</div>
@@ -116,7 +116,7 @@
               <!-- SUBJECT -->
               <div class="form-group">
                 <label for="id_{{form.subject.name}}">{{ form.subject.label|title }} {% if form.subject.field.required %}(<span class="required">*</span>) {% endif %}</label>
-                <div>
+                <div class="curriculum_input">
                   {{form.subject}}
                 </div>
                 <div class="help warning">{{form.subject.help_text|safe}}</div>
@@ -129,7 +129,7 @@
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="id_{{form.feature_rank.name}}">{{ form.feature_rank.label|title }} {% if form.feature_rank.field.required %}(<span class="required">*</span>) {% endif %}</label>
-                      <div>
+                      <div class="curriculum_input">
                         {{form.feature_rank}}
                       </div>
                       <div class="help warning">{{form.feature_rank.help_text|safe}}</div>
@@ -141,7 +141,7 @@
                   <div class="col-md-6">
                     <div class="form-group">
                       <label for="id_{{form.status.name}}">{{ form.status.label|title }} {% if form.status.field.required %}(<span class="required">*</span>) {% endif %}</label>
-                      <div>
+                      <div class="curriculum_input">
                         {{form.status}}
                       </div>
                       <div class="help warning">{{form.status.help_text|safe}}</div>
@@ -156,7 +156,7 @@
               <!-- ORDER -->
               <div class="form-group">
                 <label for="id_{{form.order.name}}">{{ form.order.label|title }} {% if form.order.field.required %}(<span class="required">*</span>) {% endif %}</label>
-                <div>
+                <div class="curriculum_input">
                   {{form.order}}
                 </div>
                 <div class="help warning">{{form.order.help_text|safe}}</div>
@@ -166,7 +166,7 @@
               <!-- ICON -->
               <div class="form-group">
                 <label for="id_{{form.icon.name}}">{{ form.icon.label|title }} {% if form.icon.field.required %}(<span class="required">*</span>) {% endif %}</label>
-                <div>
+                <div class="curriculum_input">
                   {{form.icon}}
                 </div>
                 <div class="help warning">{{form.icon.help_text|safe}}</div>
@@ -176,7 +176,7 @@
               <!-- TIME -->
               <div class="form-group">
                 <label for="id_{{form.time.name}}">{{ form.time.label|title }} {% if form.time.field.required %}(<span class="required">*</span>) {% endif %}</label>
-                <div>
+                <div class="curriculum_input">
                   {{form.time}}
                 </div>
                 <div class="help warning">{{form.time.help_text|safe}}</div>
@@ -186,7 +186,7 @@
               <!-- LEVEL -->
               <div class="form-group">
                 <label for="id_{{form.level.name}}">{{ form.level.label|title }} {% if form.level.field.required %}(<span class="required">*</span>) {% endif %}</label>
-                <div>
+                <div class="curriculum_input">
                   {{form.level}}
                 </div>
                 <div class="help warning">{{form.level.help_text|safe}}</div>
@@ -196,7 +196,7 @@
               <!-- OVERVIEW -->
               <div class="form-group">
                 <label for="id_{{form.overview.name}}">{{ form.overview.label|title }} {% if form.overview.field.required %}(<span class="required">*</span>) {% endif %}</label>
-                <div>
+                <div class="curriculum_input">
                   {{form.overview}}
                 </div>
                 <div class="help warning">{{form.overview.help_text|safe}}</div>
@@ -208,7 +208,7 @@
               <!-- ACKNOWLEDGEMENT -->
               <div class="form-group">
                 <label for="id_{{form.acknowledgement.name}}">{{ form.acknowledgement.label|title }} {% if form.acknowledgement.field.required %}(<span class="required">*</span>) {% endif %}</label>
-                <div>
+                <div class="curriculum_input">
                   {{form.acknowledgement}}
                 </div>
                 <div class="help warning">{{form.acknowledgement.help_text|safe}}</div>
@@ -218,7 +218,7 @@
               <!-- CREDITS -->
               <div class="form-group">
                 <label for="id_{{form.credits.name}}">{{ form.credits.label|title }} {% if form.credits.field.required %}(<span class="required">*</span>) {% endif %}</label>
-                <div>
+                <div class="curriculum_input">
                   {{form.credits}}
                 </div>
                 <div class="help warning">{{form.credits.help_text|safe}}</div>
@@ -228,7 +228,7 @@
               <!-- COMPATIBLE SYSTEMS -->
               <div class="form-group">
                 <label for="id_{{form.compatible_system.name}}">{{ form.compatible_system.label|title }} {% if form.compatible_system.field.required %}(<span class="required">*</span>) {% endif %}</label>
-                <div>
+                <div class="curriculum_input">
                   {{form.compatible_system}}
                 </div>
                 <div class="help warning">{{form.compatible_system.help_text|safe}}</div>
@@ -252,7 +252,7 @@
                     <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
                   </button>
                 </span>
-                <div id="taxonomy_div">
+                <div id="taxonomy_div" class="curriculum_input">
                   <table class="table table-bordered table-striped table-condensed inner_table" id="taxonomy">
                     <thead>
                       <tr>
@@ -297,7 +297,7 @@
                     <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
                   </button>
                 </span>
-                <div style="display:none;">
+                <div style="display:none;" class="curriculum_input">
                   {{form.teacher_notes}}
                 </div>
                 <div class="help warning">{{form.teacher_notes.help_text|safe}}</div>
@@ -332,7 +332,7 @@
               <!-- STUDENT OVERVIEW -->
               <div class="form-group">
                 <label for="id_{{form.student_overview.name}}">{{ form.student_overview.label|title }} {% if form.student_overview.field.required %}(<span class="required">*</span>) {% endif %}</label>
-                <div>
+                <div class="curriculum_input">
                   {{form.student_overview}}
                 </div>
                 <div class="help warning">{{form.student_overview.help_text|safe}}</div>
@@ -516,6 +516,7 @@
         var taxonomy_id = $(this).closest('tr').attr('id');
         $('#id_curriculum-taxonomy option[value="'+taxonomy_id+'"]').prop('selected', false);
         $('div.curriculum_content div#taxonomy_div table#taxonomy tbody tr#'+taxonomy_id).remove();
+        rowAddorRemove($('table#taxonomy.inner_table'));
       });
 
       $('#addStep, div.table.addStep').click(function() {
@@ -864,6 +865,14 @@
         $('#notification .modal-body p').html(message);
         $('#notification').modal('show');
       {% endif %}
+
+      //for each error message highlight the field causing the error
+      $('div.error').each(function(){
+        var error_length = $.trim($(this).text()).length;
+        if(error_length > 0) {
+          $(this).closest('.form-group').find('label, .curriculum_input .form-control:input, .curriculum_input .django-ckeditor-widget').addClass('input_error');
+        }
+      });
 
     });
   </script>
