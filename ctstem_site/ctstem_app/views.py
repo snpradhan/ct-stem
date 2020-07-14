@@ -860,32 +860,42 @@ def copyCurriculumSteps(request, original_curriculum, new_curriculum):
     step.curriculum = new_curriculum
     step.save()
     for step_question in step_questions:
-      question = step_question.question
-      original_question_id = question.id
-      question.id = None
-      question.pk = None
-      if question.sketch_background:
-        try:
-          source = question.sketch_background
-          filecontent = ContentFile(source.file.read())
-          filename = os.path.split(source.file.name)[-1]
-          filename_array = filename.split('.')
-          new_filename = filename_array[0][:10] + '_' + dt + '.' + filename_array[1]
-          question.sketch_background.save(new_filename, filecontent)
-          source.file.close()
-          original_question = models.Question.objects.get(id=original_question_id)
-          original_question.sketch_background.save(filename, filecontent)
-          original_question.save()
-        except IOError as e:
-          question.sketch_background = None
-      question.save()
-
+      question = copyQuestion(request, step_question.question.id)
       step_question.id = None
       step_question.pk = None
       step_question.question = question
       step_question.step = step
       step_question.save()
   return
+
+@login_required
+def copyQuestion(request, id=''):
+  if '' != id:
+    question = models.Question.objects.get(id=id)
+    original_question_id = question.id
+    question.id = None
+    question.pk = None
+    if question.sketch_background:
+      try:
+        source = question.sketch_background
+        filecontent = ContentFile(source.file.read())
+        filename = os.path.split(source.file.name)[-1]
+        filename_array = filename.split('.')
+        new_filename = filename_array[0][:10] + '_' + dt + '.' + filename_array[1]
+        question.sketch_background.save(new_filename, filecontent)
+        source.file.close()
+        original_question = models.Question.objects.get(id=original_question_id)
+        original_question.sketch_background.save(filename, filecontent)
+        original_question.save()
+      except IOError as e:
+        question.sketch_background = None
+    question.save()
+    if request.is_ajax():
+      response_data = {'success': True, 'question_id': question.id, 'question_text': replace_iframe_tag(request, question.question_text)}
+      return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+    else:
+      return question
+
 
 @login_required
 def archiveCurriculum(request, id=''):
@@ -1891,7 +1901,7 @@ def deleteStandard(request, id=''):
 ####################################
 @login_required
 def searchTaxonomy(request):
-  # check if the user has permission to add a question
+  # check if the user has permission to search taxonomy
   if hasattr(request.user, 'teacher') == False and hasattr(request.user, 'author') == False and hasattr(request.user, 'researcher') == False and  hasattr(request.user, 'administrator') == False:
     return http.HttpResponseNotFound('<h1>You do not have the privilege search taxonomy</h1>')
 
@@ -1916,6 +1926,44 @@ def searchTaxonomy(request):
     taxonomyList = models.Subcategory.objects.filter(**query_filter).annotate(code_isnull=models.IsNull('code')).order_by('code_isnull', Lower('code'), Lower('category__standard__short_name'), Lower('category__name'), Lower('title'))
     taxonomy_list = [{'standard': subcategory.category.standard.short_name, 'category': subcategory.category.name, 'title': subcategory.title, 'code': subcategory.code, 'id': subcategory.id} for subcategory in taxonomyList]
     return http.HttpResponse(json.dumps(taxonomy_list), content_type="application/json")
+
+  return http.HttpResponseNotAllowed(['GET', 'POST'])
+
+####################################
+# Search Question
+####################################
+@login_required
+def searchQuestion(request):
+  # check if the user has permission to search taxonomy
+  if hasattr(request.user, 'teacher') == False and hasattr(request.user, 'author') == False and hasattr(request.user, 'researcher') == False and  hasattr(request.user, 'administrator') == False:
+    return http.HttpResponseNotFound('<h1>You do not have the privilege search questions</h1>')
+
+  if 'GET' == request.method:
+    form = forms.QuestionSearchForm()
+    context = {'form': form}
+    return render(request, 'ctstem_app/QuestionSearch.html', context)
+
+  elif 'POST' == request.method:
+    data = request.POST.copy()
+    query_filter = {}
+    if data['research_category']:
+      query_filter['research_category'] = int(data['research_category'])
+    if data['answer_field_type']:
+      query_filter['answer_field_type'] = data['answer_field_type']
+    if data['question_text']:
+      query_filter['question_text__icontains'] = str(data['question_text'])
+
+    if hasattr(request.user, 'teacher') or hasattr(request.user, 'researcher'):
+      query_filter['curriculum_question__step__curriculum__unit__curriculumcollaborator__user__id'] = request.user.id
+    elif data['unit_id']:
+      query_filter['curriculum_question__step__curriculum__unit__id'] = int( data['unit_id'])
+    elif data['curriculum_id']:
+      query_filter['curriculum_question__step__curriculum__id'] = int( data['curriculum_id'])
+
+    print(query_filter)
+    questionList = models.Question.objects.filter(**query_filter).order_by('question_text')
+    question_list = [{'research_category': [research_category.category for research_category in question.research_category.all()], 'answer_field_type': question.get_answer_field_type_display(), 'question_text': replace_iframe_tag(request, question.question_text), 'id': question.id} for question in questionList]
+    return http.HttpResponse(json.dumps(question_list), content_type="application/json")
 
   return http.HttpResponseNotAllowed(['GET', 'POST'])
 

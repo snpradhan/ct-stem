@@ -387,6 +387,9 @@
                   {{step.nested.management_form}}
                   {{step.nested.id}}
                   <label for="id_question_table">Question(s)</label>
+                  <button class="btn blue search_question" name="search_question" data-form="{% url 'ctstem:searchQuestion' %}">
+                    <i class="fas fa-search" aria-hidden="true"></i>
+                  </button>
                   <button class="btn blue edit_question" name="add_question" data-form="{% url 'ctstem:newQuestion' %}" aria-label="Add New Question" title="Add New Question">
                     <i class="fas fa-plus" aria-hidden="true"></i>
                   </button>
@@ -501,6 +504,21 @@
         var url = $(this).data("form");
         $("#taxonomyModal").load(url, function() {
           $(this).modal('show');
+        });
+        return false;
+      });
+      $("button.search_question").click(function(e){
+        e.preventDefault();
+        var url = $(this).data("form");
+        var step_div = $(this).closest('.step');
+        var step_id = $(step_div).children(':hidden').first().attr('id');
+        var curriculum_id = "{{form.instance.id}}";
+        var unit_id = $('select#id_curriculum-unit').val();
+        $("#questionModal").load(url, function() {
+          $(this).modal('show');
+          $("#questionModal input[id='id_step']").val(step_id);
+          $("#questionModal input[id='id_curriculum']").val(curriculum_id);
+          $("#questionModal input[id='id_unit']").val(unit_id);
         });
         return false;
       });

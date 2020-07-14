@@ -1498,6 +1498,7 @@ div.modal #recaptcha {
 }
 div.modal-content {
   max-height: 90%;
+  height: auto;
   overflow-y: scroll;
   padding: 0 1em;
   border-radius: 3px;

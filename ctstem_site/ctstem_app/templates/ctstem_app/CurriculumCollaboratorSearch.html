@@ -5,6 +5,9 @@
       <h3 class="modal-title">Search Collaborators</h3>
     </div>
     <div id="collaboratorMsg" class="msg">
+      <ul class="errorlist">
+        <li></li>
+      </ul>
     </div>
     <form class="form" id="collaboratorForm" method="post" action="{% url 'ctstem:searchCollaborators' %}">
       {% csrf_token %}
@@ -71,7 +74,7 @@ $(function (){
       context: this,
       success: function(data){
         if('error' in data){
-          $('#collaboratorMsg').html(data['error']);
+          $('#collaboratorMsg ul.errorlist li').addClass('error').html(data['error']);
         }
         else {
           var collaborator = "";
@@ -85,7 +88,7 @@ $(function (){
           });
 
           if(collaborator.length == 0){
-            $('#collaboratorMsg').html('No matching collaborators found');
+            $('#collaboratorMsg ul.errorlist li').addClass('error').html('No matching collaborators found');
             $("#collaboratorResults").hide();
           }
           else{

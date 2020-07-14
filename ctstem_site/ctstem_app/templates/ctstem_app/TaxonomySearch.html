@@ -8,6 +8,9 @@
       <h3 class="left">{{title}}</h3>
     </div>
     <div id="taxonomyMsg" class="msg">
+      <ul class="errorlist">
+        <li></li>
+      </ul>
     </div>
     <form class="form" id="taxonomyForm" method="post" action="{% url 'ctstem:searchTaxonomy' %}">
       {% csrf_token %}
@@ -106,15 +109,15 @@ $(function (){
       context: this,
       success: function(data){
         if('error' in data){
-          $('#taxonomyMsg').html(data['error']);
+          $('#taxonomyMsg ul.errorlist li').addClass('error').html(data['error']);
         }
         else {
           var taxonomy = "";
           $.each(data, function(key, value){
-            taxonomy += "<tr><td class='donotwrap'>"+value['standard']+"</td><<td>"+value['category']+"</td><<td class='donotwrap'>"+value['code']+"</td><td>"+value['title']+"</td><td><button type='button' class='btn small blue select_taxonomy' id='"+value['id']+"''>Select</a></td></tr>";
+            taxonomy += "<tr><td class='donotwrap'>"+value['standard']+"</td><td>"+value['category']+"</td><td class='donotwrap'>"+value['code']+"</td><td>"+value['title']+"</td><td><button type='button' class='btn small blue select_taxonomy' id='"+value['id']+"''>Select</a></td></tr>";
           });
           if(taxonomy.length == 0){
-            $('#taxonomyMsg').html('No matching standards found');
+            $('#taxonomyMsg ul.errorlist li').addClass('error').html('No matching standards found');
             $("#taxonomyResults").hide();
           }
           else{

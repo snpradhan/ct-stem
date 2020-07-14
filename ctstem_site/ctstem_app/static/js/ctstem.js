@@ -687,6 +687,18 @@ function add_to_collaborator_table(collaborator_table, current_user_id, user_id,
   $(collaborator_row).show();
 }
 
+//Add new question to question table in curriculum form
+function add_to_question_table(question_table, question_id, question_text) {
+  cloneSomeMore($(question_table).find('tr:last'), 'form', 'curriculumquestion_set');
+  $(question_table).find("tr:nth-last-child(2)").attr('id', 'question_row_'+question_id);
+  $(question_table).find("tr:nth-last-child(2) td.question_text input[type=hidden]").val(question_id);
+  $(question_table).find("tr:nth-last-child(2) td.question_text div").html(question_text);
+  $(question_table).find("tr:nth-last-child(2) button.edit_question").attr("data-form", '/question/'+question_id+'/');
+  $(question_table).find("tr:nth-last-child(2)").show();
+  var question_order = $(question_table).find("tbody > tr:visible").length;
+  $(question_table).find("tr:nth-last-child(2) td.order input[id$='ORDER']").val(question_order);
+}
+
 function bind_bookmark(){
   $('a.bookmark').off("click");
   $('a.bookmark').on("click", function(e){

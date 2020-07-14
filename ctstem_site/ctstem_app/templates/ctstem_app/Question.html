@@ -201,14 +201,7 @@ $(function (){
             $(question_table).find("tr#question_row_"+question_id+" td.question_text div").html(data['question_text']);
           }
           else {
-            cloneSomeMore($(question_table).find('tr:last'), 'form', 'curriculumquestion_set');
-            $(question_table).find("tr:nth-last-child(2)").attr('id', 'question_row_'+data['question_id']);
-            $(question_table).find("tr:nth-last-child(2) td.question_text input[type=hidden]").val(data['question_id']);
-            $(question_table).find("tr:nth-last-child(2) td.question_text div").html(data['question_text']);
-            $(question_table).find("tr:nth-last-child(2) button.edit_question").attr("data-form", '/question/'+data['question_id']+'/');
-            $(question_table).find("tr:nth-last-child(2)").show();
-            var question_order = $(question_table).find("tbody > tr:visible").length;
-            $(question_table).find("tr:nth-last-child(2) td.order input[id$='ORDER']").val(question_order);
+            add_to_question_table($(question_table), data['question_id'], data['question_text']);
           }
           $("#questionForm")[0].reset();
           $("#questionModal").modal('toggle');

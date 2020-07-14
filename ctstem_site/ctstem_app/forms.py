@@ -740,6 +740,24 @@ class QuestionForm(ModelForm):
     return valid
 
 ####################################
+# Question Search Form
+####################################
+class QuestionSearchForm(forms.Form):
+  research_category = forms.ModelChoiceField(required = False, queryset=models.ResearchCategory.objects.all())
+  answer_field_type = forms.ChoiceField(required = False, choices=(('','------------'),) + models.FIELD_TYPE_CHOICES)
+  question_text = forms.CharField(required = False, widget=forms.TextInput(attrs={'placeholder': 'Question text'}))
+
+  def __init__(self, *args, **kwargs):
+    super(QuestionSearchForm, self).__init__(*args, **kwargs)
+
+    for field_name, field in list(self.fields.items()):
+      field.widget.attrs['class'] = 'form-control'
+      if field.help_text:
+        field.widget.attrs['placeholder'] = field.help_text
+
+
+
+####################################
 #  Research Category Form
 ####################################
 class ResearchCategoryForm(ModelForm):
