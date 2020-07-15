@@ -47,13 +47,6 @@
       <div id="curricula_table">
         {% include "ctstem_app/Pagination.html" with model=curricula %}
         <table class="table table-striped paginate_sort" id="curricula">
-          <thead>
-            <tr id="filterrow">
-              <th class="no-sort"> </th>
-              <th width="50%" class="no-sort"> </th>
-              <th width="20%" class="no-sort"> </th>
-            </tr>
-          </thead>
           <tbody>
             {% for curriculum in curricula %}
               <tr>
@@ -68,7 +61,7 @@
                     <img class="big_icon" src="/static/img/assessment.png">
                   {% endif %}
                 </td>
-                <td class="information">
+                <td class="information" width="50%">
                   <div class="title">
                     {{curriculum.title}} - v{{curriculum.version}}.
                     {% if curriculum.feature_rank %}
@@ -168,7 +161,7 @@
                     </div>
                   </div>
                 </td>
-                <td class="action">
+                <td class="action" width="20%">
                   {% include "ctstem_app/CurriculaActions.html" with curriculum=curriculum %}
                 </td>
               </tr>

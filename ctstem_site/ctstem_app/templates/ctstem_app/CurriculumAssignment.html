@@ -11,90 +11,92 @@
     <form class="form" id="curriculumAssignmentForm" method="post" action="{% url 'ctstem:assignCurriculum' curriculum.id%}">
       {% csrf_token %}
       <div class="modal-body">
-        <table class="table table-condensed table-bordered inner_table">
-         <thead>
-            <tr>
-              <th width="20%">Class</th>
-              {% if user.administrator or user.researcher %}
-                <th width="15%">School</th>
-              {% endif %}
-              {% if user.administrator or user.researcher or user.school_administrator %}
-                <th width="10%">Teacher</th>
-              {% endif %}
-              {% if curriculum.curriculum_type|slugify == 'U'|slugify %}
-                <th width="30%">Curriculum</th>
-              {% endif %}
-              <th width="5%" class="date">Select to Assign</th>
-
-            </tr>
-          </thead>
-          <tbody>
-            {% for group in groups %}
-              <tr class="unit group_{{group.id}} {% if forloop.counter|divisibleby:2 %} even {% else %} odd {% endif %}" >
-                <td rowspan="{% if curriculum.curriculum_type|slugify == 'U'|slugify %} {{curriculum_list|length|add:1}} {% endif %}">
-                  {{group}}
-                  {% if user.teacher and user.teacher != group.teacher and user.teacher in group.shared_with.all %}
-                    <i class="fa fa-share-alt" title="Shared by {{group.teacher}}"></i>
-                  {% endif %}
-
-                </td>
+        <div class="results">
+          <table class="table table-condensed table-bordered inner_table">
+           <thead>
+              <tr>
+                <th width="20%">Class</th>
                 {% if user.administrator or user.researcher %}
-                  <td rowspan="{% if curriculum.curriculum_type|slugify == 'U'|slugify %} {{curriculum_list|length|add:1}} {% endif %}">{{group.teacher.school}}</td>
+                  <th width="15%">School</th>
                 {% endif %}
                 {% if user.administrator or user.researcher or user.school_administrator %}
-                  <td rowspan="{% if curriculum.curriculum_type|slugify == 'U'|slugify %} {{curriculum_list|length|add:1}} {% endif %}">{{group.teacher}}</td>
+                  <th width="10%">Teacher</th>
                 {% endif %}
                 {% if curriculum.curriculum_type|slugify == 'U'|slugify %}
-                  <td>
-                    {{curriculum.title}}
-                    &nbsp;&nbsp;
-                    <span class="ec_lessons" id="group_{{group.id}}">
-                      <span><a href="#">(Expand Underlying Lessons)</a></span>
-                      <span style="display:none;"><a href="#">(Collapse Underlying Lessons)</a></span>
-                    </span>
-                  </td>
+                  <th width="30%">Curriculum</th>
                 {% endif %}
-                <td style="text-align:center;">
-                  <!--In work assignment, cannot be unassigned  -->
-                  {% if instances|get_item:group.id|get_item:curriculum.id > 0 %}
-                    <input type="checkbox" id="display_assigned_{{group.id}}_{{curriculum.id}}" name="display_assigned_{{group.id}}_{{curriculum.id}}" disabled
-                    checked/>
-                    <input type="hidden" id="assigned_{{group.id}}_{{curriculum.id}}" name="assigned_{{group.id}}_{{curriculum.id}}" value="1" />
-                  {% else %}
-                    <input type="checkbox" class="assigned" id="assigned_{{group.id}}_{{curriculum.id}}" name="assigned_{{group.id}}_{{curriculum.id}}"
-                   {% if assignment_count|get_item:group.id|get_item:curriculum.id > 0 %} checked="checked" {% endif %} />
-                  {% endif %}
-                  <input type="hidden" id="instance_{{group.id}}_{{curriculum.id}}" class="instance_count" value="{{instances|get_item:group.id|get_item:curriculum.id}}"/>
-
-                </td>
+                <th width="5%" class="date">Select to Assign</th>
 
               </tr>
-              {% if curriculum.curriculum_type|slugify == 'U'|slugify %}
-                {% for curr in curriculum_list %}
-                  <tr class="lesson group_{{group.id}} {% if forloop.parentloop.counter|divisibleby:2 %} even {% else %} odd {% endif %}">
-                    {% if curriculum.curriculum_type|slugify == 'U'|slugify %}
-                      <td style="display:none;">&nbsp;&nbsp;&nbsp;&nbsp;{{curr.order}}. {{curr.title}}</td>
+            </thead>
+            <tbody>
+              {% for group in groups %}
+                <tr class="unit group_{{group.id}} {% if forloop.counter|divisibleby:2 %} even {% else %} odd {% endif %}" >
+                  <td rowspan="{% if curriculum.curriculum_type|slugify == 'U'|slugify %} {{curriculum_list|length|add:1}} {% endif %}">
+                    {{group}}
+                    {% if user.teacher and user.teacher != group.teacher and user.teacher in group.shared_with.all %}
+                      <i class="fa fa-share-alt" title="Shared by {{group.teacher}}"></i>
                     {% endif %}
-                    <td style="display:none; text-align:center;">
-                      <!--In work assignment, cannot be unassigned  -->
-                      {% if instances|get_item:group.id|get_item:curr.id > 0 %}
-                        <input type="checkbox" id="display_assigned_{{group.id}}_{{curr.id}}" name="display_assigned_{{group.id}}_{{curr.id}}" disabled
-                        checked/>
-                        <input type="hidden" id="assigned_{{group.id}}_{{curr.id}}" name="assigned_{{group.id}}_{{curr.id}}" value="1" />
-                      {% else %}
-                        <input type="checkbox" class="assigned" id="assigned_{{group.id}}_{{curr.id}}" name="assigned_{{group.id}}_{{curr.id}}"
-                        {% if assignment_count|get_item:group.id|get_item:curr.id > 0 %} checked="checked" {% endif %} />
-                      {% endif %}
-                      <input type="hidden" id="instance_{{group.id}}_{{curr.id}}" class="instance_count" value="{{instances|get_item:group.id|get_item:curr.id}}"/>
 
+                  </td>
+                  {% if user.administrator or user.researcher %}
+                    <td rowspan="{% if curriculum.curriculum_type|slugify == 'U'|slugify %} {{curriculum_list|length|add:1}} {% endif %}">{{group.teacher.school}}</td>
+                  {% endif %}
+                  {% if user.administrator or user.researcher or user.school_administrator %}
+                    <td rowspan="{% if curriculum.curriculum_type|slugify == 'U'|slugify %} {{curriculum_list|length|add:1}} {% endif %}">{{group.teacher}}</td>
+                  {% endif %}
+                  {% if curriculum.curriculum_type|slugify == 'U'|slugify %}
+                    <td>
+                      {{curriculum.title}}
+                      &nbsp;&nbsp;
+                      <span class="ec_lessons" id="group_{{group.id}}">
+                        <span><a href="#">(Expand Underlying Lessons)</a></span>
+                        <span style="display:none;"><a href="#">(Collapse Underlying Lessons)</a></span>
+                      </span>
                     </td>
+                  {% endif %}
+                  <td style="text-align:center;">
+                    <!--In work assignment, cannot be unassigned  -->
+                    {% if instances|get_item:group.id|get_item:curriculum.id > 0 %}
+                      <input type="checkbox" id="display_assigned_{{group.id}}_{{curriculum.id}}" name="display_assigned_{{group.id}}_{{curriculum.id}}" disabled
+                      checked/>
+                      <input type="hidden" id="assigned_{{group.id}}_{{curriculum.id}}" name="assigned_{{group.id}}_{{curriculum.id}}" value="1" />
+                    {% else %}
+                      <input type="checkbox" class="assigned" id="assigned_{{group.id}}_{{curriculum.id}}" name="assigned_{{group.id}}_{{curriculum.id}}"
+                     {% if assignment_count|get_item:group.id|get_item:curriculum.id > 0 %} checked="checked" {% endif %} />
+                    {% endif %}
+                    <input type="hidden" id="instance_{{group.id}}_{{curriculum.id}}" class="instance_count" value="{{instances|get_item:group.id|get_item:curriculum.id}}"/>
 
-                  </tr>
-                {% endfor %}
-              {% endif %}
-            {% endfor %}
-          </tbody>
-        </table>
+                  </td>
+
+                </tr>
+                {% if curriculum.curriculum_type|slugify == 'U'|slugify %}
+                  {% for curr in curriculum_list %}
+                    <tr class="lesson group_{{group.id}} {% if forloop.parentloop.counter|divisibleby:2 %} even {% else %} odd {% endif %}">
+                      {% if curriculum.curriculum_type|slugify == 'U'|slugify %}
+                        <td style="display:none;">&nbsp;&nbsp;&nbsp;&nbsp;{{curr.order}}. {{curr.title}}</td>
+                      {% endif %}
+                      <td style="display:none; text-align:center;">
+                        <!--In work assignment, cannot be unassigned  -->
+                        {% if instances|get_item:group.id|get_item:curr.id > 0 %}
+                          <input type="checkbox" id="display_assigned_{{group.id}}_{{curr.id}}" name="display_assigned_{{group.id}}_{{curr.id}}" disabled
+                          checked/>
+                          <input type="hidden" id="assigned_{{group.id}}_{{curr.id}}" name="assigned_{{group.id}}_{{curr.id}}" value="1" />
+                        {% else %}
+                          <input type="checkbox" class="assigned" id="assigned_{{group.id}}_{{curr.id}}" name="assigned_{{group.id}}_{{curr.id}}"
+                          {% if assignment_count|get_item:group.id|get_item:curr.id > 0 %} checked="checked" {% endif %} />
+                        {% endif %}
+                        <input type="hidden" id="instance_{{group.id}}_{{curr.id}}" class="instance_count" value="{{instances|get_item:group.id|get_item:curr.id}}"/>
+
+                      </td>
+
+                    </tr>
+                  {% endfor %}
+                {% endif %}
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
       </div>
       <div class="modal-footer">
         <div class="form-group">

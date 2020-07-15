@@ -81,11 +81,21 @@ $(function (){
         url: this.action,
         data: data,
         context: this,
-        success: function(data){
-          $("#assignmentResults").html(data);
-          $("#assignmentResults").show();
-          if($('input#assign_id').val()){
-            $('tr.unit#'+$('input#assign_id').val()).find('.ec_lessons').click();
+        success: function(data, status, xhr){
+          var ct = xhr.getResponseHeader("content-type") || "";
+          if (ct.indexOf('html') > -1) {
+            $("#assignmentResults").html(data);
+            $("#assignmentResults").show();
+            if($('input#assign_id').val()){
+              $('tr.unit#'+$('input#assign_id').val()).find('.ec_lessons').click();
+            }
+          }
+          if (ct.indexOf('json') > -1) {
+            if('success' in data && data['success'] == false){
+              $('#assignmentMsg ul.errorlist li').removeClass('success').addClass('error').html('No matching curricula found');
+              $("#assignmentResults").empty();
+              $("#assignmentResults").hide();
+            }
           }
           return false;
         },

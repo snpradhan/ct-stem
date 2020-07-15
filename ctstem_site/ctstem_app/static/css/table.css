@@ -3,9 +3,9 @@
  ***************************************/
  table.table {
   margin: auto;
-  border-radius: 10px;
-  border-collapse:collapse;
+  border-collapse: separate;
   border: inherit !important;
+  position: relative;
 }
 table.table thead {
   /*font-family: 'Montserrat, sans-serif';*/ /*'QuaTrocento Regular';*/
@@ -23,22 +23,6 @@ table.table tbody {
   font-size: 1.4em;
 }
 
-table.table thead tr:first-child th:first-child {
-    border-top-left-radius: 10px;
-    -moz-border-top-left-radius:: 10px;
-}
-table.table thead tr:first-child th:last-child {
-  border-top-right-radius: 10px;
-  -moz-border-top-right-radius: 10px;
-}
-table.table tbody tr:last-child td:first-child {
-  border-bottom-left-radius: 10px;
-  -moz-border-bottom-left-radius: 10px;
-}
-table.table tbody tr:last-child td:last-child {
-  border-bottom-right-radius: 10px;
-  -moz-border-bottom-right-radius: 10px;
-}
 table.table td {
   vertical-align: middle !important;
 }
@@ -81,6 +65,16 @@ table.table.unit_lesson {
 }
 table.table thead tr:not(#filterrow) th{
   text-align: center;
+}
+table.table thead {
+  background-color: #666666;
+  color: #e5e5e5;
+  position: sticky;
+  top: 92px;
+  z-index: 999;
+}
+table.table.inner_table thead  {
+  top: 0;
 }
 table.table[id^='subcategory_'] thead {
   background-color: #5a3163;

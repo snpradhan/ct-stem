@@ -123,6 +123,7 @@ a {
   margin-bottom: 10px;
   box-shadow: none;
   color: black;
+  z-index: 9999;
 }
 .navbar-default .container {
   width: 95% !important;
@@ -1187,7 +1188,7 @@ div.content {
   margin-bottom: 40px;
   margin-top: 120px;
   min-height: 90%;
-  overflow-y: auto;
+
 }
 
 div.content section {
@@ -1463,6 +1464,7 @@ div.content #curricula_tile  .row.button a {
   margin-left: auto;
   margin-right: auto;
   max-width: 90%;
+  margin-top: 10em;
 }
 div.modal div.modal-dialog hr{
   border-top: 2px solid var(--ctstem-color-light-gray);
@@ -1498,8 +1500,7 @@ div.modal #recaptcha {
 }
 div.modal-content {
   max-height: 90%;
-  height: auto;
-  overflow-y: scroll;
+  overflow-y: auto;
   padding: 0 1em;
   border-radius: 3px;
   box-shadow: -0.8em 0.8em var(--ctstem-color-dark-gray);
@@ -1518,7 +1519,10 @@ div.modal-content div.results{
   height: auto;
   max-height: 50em;
   overflow-y: auto;
+  position: relative;
+  margin-bottom: 1em;
 }
+
 div.modal-content div.results div.assignment_status, div.assignment_table div.assignment_status{
   font-weight: bold;
 }

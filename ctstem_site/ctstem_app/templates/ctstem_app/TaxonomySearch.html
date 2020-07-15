@@ -121,7 +121,7 @@ $(function (){
             $("#taxonomyResults").hide();
           }
           else{
-            $('#taxonomyMsg').html('');
+            $('#taxonomyMsg ul.errorlist li').removeClass('error').html('');
             $("#taxonomyResults table tbody").html(taxonomy);
             $("#taxonomyResults").show();
             $("#taxonomyResults button.select_taxonomy").click(function(){

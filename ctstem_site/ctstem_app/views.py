@@ -890,12 +890,12 @@ def copyQuestion(request, id=''):
       except IOError as e:
         question.sketch_background = None
     question.save()
+
     if request.is_ajax():
       response_data = {'success': True, 'question_id': question.id, 'question_text': replace_iframe_tag(request, question.question_text)}
       return http.HttpResponse(json.dumps(response_data), content_type="application/json")
     else:
       return question
-
 
 @login_required
 def archiveCurriculum(request, id=''):
@@ -1961,7 +1961,7 @@ def searchQuestion(request):
       query_filter['curriculum_question__step__curriculum__id'] = int( data['curriculum_id'])
 
     print(query_filter)
-    questionList = models.Question.objects.filter(**query_filter).order_by('question_text')
+    questionList = models.Question.objects.filter(**query_filter).order_by(Lower('question_text'))
     question_list = [{'research_category': [research_category.category for research_category in question.research_category.all()], 'answer_field_type': question.get_answer_field_type_display(), 'question_text': replace_iframe_tag(request, question.question_text), 'id': question.id} for question in questionList]
     return http.HttpResponse(json.dumps(question_list), content_type="application/json")
 
@@ -2842,9 +2842,13 @@ def searchAssignment(request):
 
           curricula.append(curr)
 
-    context = {'curricula': curricula, 'group_id': data['group'] }
-    html = render_to_string('ctstem_app/AssignmentSearchResult.html', context, request)
-    return http.HttpResponse(html)
+    if curricula:
+      context = {'curricula': curricula, 'group_id': data['group'] }
+      html = render_to_string('ctstem_app/AssignmentSearchResult.html', context, request)
+      return http.HttpResponse(html)
+    else:
+      response_data = {'success': False}
+      return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 
   return http.HttpResponseNotAllowed(['POST'])
 

@@ -92,7 +92,7 @@ $(function (){
             $("#collaboratorResults").hide();
           }
           else{
-            $('#collaboratorMsg').html('');
+            $('#collaboratorMsg ul.errorlist li').removeClass('error').html('');
             $("#collaboratorResults table tbody").append(collaborator);
             $("#collaboratorResults").show();
             $("#collaboratorResults button.select_collaborator").click(function(){
