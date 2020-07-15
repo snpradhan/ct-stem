@@ -47,8 +47,6 @@
       <table class="table table-bordered table-striped table-condensed inner_table">
         <thead>
           <tr>
-            <th width="20%">Research Category</th>
-            <th width="10%">Answer Field Type</th>
             <th>Question Text</th>
             <th>Select?</th>
           </tr>
@@ -76,7 +74,7 @@ $(function (){
     data['unit_id'] = $("#id_unit").val();
     data['csrfmiddlewaretoken'] = $('#questionSearchForm').find('input:hidden').eq(0).val();
     var data = $.param(data);
-    /*var url = "{% url 'ctstem:newQuestion' %}";*/
+    //ajax call to search question
     $.ajax({
       type: $(this).attr('method'),
       url: this.action,
@@ -84,41 +82,48 @@ $(function (){
       context: this,
       success: function(data){
         if('error' in data){
-          $('#questionMsg ul.errorlist li').html(data['error']);
+          $('#questionMsg ul.errorlist li').addClass('error').html(data['error']);
         }
         else {
           var questions = "";
           $.each(data, function(key, value){
             var research_category = value['research_category'];
             research_category = research_category.join("<br />");
-            questions += "<tr><td>"+research_category+"</td><td>"+value['answer_field_type']+"</td><td>"+value['question_text']+"</td><td><button type='button' class='btn small blue select_question' id='"+value['id']+"''>Add</a></td></tr>";
+            questions += "<tr><td>"+value['question_text']+"</td><td><button type='button' class='btn small blue select_question' id='"+value['id']+"''>Add</a></td></tr>";
           });
           if(questions.length == 0){
             $('#questionMsg ul.errorlist li').addClass('error').html('No matching questions found');
             $("#questionResults").hide();
           }
           else{
-            $('#questionMsg').html('');
+            $('#questionMsg ul.errorlist li').removeClass('error').html('');
             $("#questionResults table tbody").html(questions);
             $("#questionResults").show();
             $("#questionResults button.select_question").click(function(){
               var formset_div = $("input[id="+id_step+"]").parent();
               var question_table = $(formset_div).find("table.table.question");
-              console.log($(this).attr('id'));
-              console.log($(this).parent().prev().html());
-              add_to_question_table($(question_table), $(this).attr('id'), $(this).parent().prev().html());
-
-              rowAddorRemove($(question_table));
-              $(this).attr('disabled', 'disabled');
+              //ajax call to copy selected question and add to curriculum
+              $.ajax({
+                type: 'GET',
+                url: "/question/copy/"+$(this).attr('id'),
+                success: function(data) {
+                  if('success' in data && data['success'] == true) {
+                    add_to_question_table($(question_table), data['question_id'], data['question_text']);
+                    rowAddorRemove($(question_table));
+                    $(this).attr('disabled', 'disabled');
+                  }
+                },
+                error: function(xhr, ajaxOptions, thrownError){
+                  $('#questionMsg ul.errorlist li').addClass('error').html(thrownError);
+                },
+              });
             });
           }
-          //$("#taxonomyForm")[0].reset();
-          //$("#taxonomyModal").modal('toggle');
         }
         return false;
       },
       error: function(xhr, ajaxOptions, thrownError){
-        alert(thrownError);
+        $('#questionMsg ul.errorlist li').addClass('error').html(thrownError);
       },
     });
   });
