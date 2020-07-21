@@ -584,7 +584,8 @@ class CurriculumForm(ModelForm):
         inprogress_assignments = models.AssignmentInstance.objects.all().filter(assignment__curriculum=lesson, status='P')
 
       if inprogress_assignments:
-        self.add_error('status', 'Status cannot be set to Archived because there are In-Progress assignments')
+        self.add_error('status', 'You cannot archive this curriculum at this time because there may be students currently working on it. \
+                                  Archiving will affect all students and teachers who have assigned this curriculum. Please try again later.')
         valid = False
 
     return valid
