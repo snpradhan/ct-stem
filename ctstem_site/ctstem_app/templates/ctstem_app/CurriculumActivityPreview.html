@@ -116,7 +116,7 @@
                 {% for lesson in underlying_curriculum %}
                   <li class="{% if curriculum.id == lesson.id %} current_curriculum {% endif %}">
                     <label>
-                      <a href="{% url 'ctstem:previewCurriculum' lesson.id %}">
+                      <a href="{% url 'ctstem:previewCurriculumActivity' lesson.id 0 %}">
                         Preview Lesson {{lesson.order}}
                         {% if lesson.status == 'R' %}
                           <i class="fas fa-trash-alt" title="Deleted" aria-hidden="true"></i>
