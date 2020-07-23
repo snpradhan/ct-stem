@@ -76,6 +76,10 @@ table.table thead {
 table.table.inner_table thead  {
   top: 0;
 }
+table.table.inner_table img {
+  max-width: 50% !important;
+  height: auto !important;
+}
 table.table[id^='subcategory_'] thead {
   background-color: #5a3163;
   color: #f2f2f2;

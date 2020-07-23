@@ -1,11 +1,11 @@
 {% block media %}
   {{ form.media }}
 {% endblock %}
-<div class="modal-dialog modal-xlg">
+<div class="modal-dialog modal-xxlg">
   <div class="modal-content">
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal">&times;</button>
-      <h3 class="left">Search Questions</h3>
+      <h3 class="left">Search Questions in the Unit/Lesson</h3>
     </div>
     <div id="questionMsg" class="msg">
       <ul class="errorlist">
@@ -20,17 +20,19 @@
       <div class="modal-body">
         <div class="form-inline">
           <div class="form-group">
-            <label for="id_research_category">Research Category</label>
-            <div>{{form.research_category}}</div>
+            <label for="id_page_number">Page #</label>
+            <div>{{form.page_number}}</div>
+          </div>
+          <div class="form-group">
+            <label for="id_question_number">Question #</label>
+            <div>{{form.question_number}}</div>
           </div>
           <div class="form-group">
             <label for="id_answer_field_type">Answer Field Type</label>
             <div>{{form.answer_field_type}}</div>
           </div>
-        </div>
-        <div class="form-inline">
           <div class="form-group">
-            <label for="id_question_text">Question Text</label>
+            <label for="id_question_text">Question Text Contains</label>
             <div>{{form.question_text}}</div>
           </div>
         </div>
@@ -47,8 +49,11 @@
       <table class="table table-bordered table-striped table-condensed inner_table">
         <thead>
           <tr>
-            <th>Question Text</th>
-            <th>Select?</th>
+            <th width="5%">Lesson #</th>
+            <th width="5%">Page #</th>
+            <th width="5%">Question #</th>
+            <th width="80%">Question Text</th>
+            <th width="5%">Select?</th>
           </tr>
         </thead>
         <tbody>
@@ -67,7 +72,8 @@ $(function (){
     var id_step = $("#questionSearchForm input[id='id_step']").val();
     $("#questionResults table tbody").empty();
     data = {}
-    data['research_category'] = $("#id_research_category").val();
+    data['page_number'] = $("#id_page_number").val();
+    data['question_number'] = $("#id_question_number").val();
     data['answer_field_type'] = $("#id_answer_field_type").val();
     data['question_text'] = $("#id_question_text").val();
     data['curriculum_id'] = $("#id_curriculum").val();
@@ -87,9 +93,13 @@ $(function (){
         else {
           var questions = "";
           $.each(data, function(key, value){
-            var research_category = value['research_category'];
-            research_category = research_category.join("<br />");
-            questions += "<tr><td>"+value['question_text']+"</td><td><button type='button' class='btn small blue select_question' id='"+value['id']+"''>Add</a></td></tr>";
+            questions += "<tr>\
+                            <td>"+value['lesson_number']+"</td> \
+                            <td>"+value['page_number']+"</td> \
+                            <td>"+value['question_number']+"</td> \
+                            <td>"+value['question_text']+"</td> \
+                            <td><button type='button' class='btn small blue select_question' id='"+value['id']+"''>Add</a></td> \
+                          </tr>";
           });
           if(questions.length == 0){
             $('#questionMsg ul.errorlist li').addClass('error').html('No matching questions found');

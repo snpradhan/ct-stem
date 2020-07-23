@@ -744,18 +744,22 @@ class QuestionForm(ModelForm):
 # Question Search Form
 ####################################
 class QuestionSearchForm(forms.Form):
-  research_category = forms.ModelChoiceField(required = False, queryset=models.ResearchCategory.objects.all())
+  page_number = forms.IntegerField(required=False)
+  question_number = forms.IntegerField(required=False)
   answer_field_type = forms.ChoiceField(required = False, choices=(('','------------'),) + models.FIELD_TYPE_CHOICES)
-  question_text = forms.CharField(required = False, widget=forms.TextInput(attrs={'placeholder': 'Question text'}))
+  question_text = forms.CharField(required = False, widget=forms.Textarea(attrs={'rows': 2, 'cols': 60, 'placeholder': 'Question text'}))
 
   def __init__(self, *args, **kwargs):
     super(QuestionSearchForm, self).__init__(*args, **kwargs)
 
     for field_name, field in list(self.fields.items()):
-      field.widget.attrs['class'] = 'form-control'
+      if field_name == 'page_number' or field_name == 'question_number':
+        field.widget.attrs['class'] = 'form-control order'
+      else:
+        field.widget.attrs['class'] = 'form-control'
+
       if field.help_text:
         field.widget.attrs['placeholder'] = field.help_text
-
 
 
 ####################################

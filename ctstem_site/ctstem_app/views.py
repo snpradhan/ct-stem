@@ -1946,8 +1946,10 @@ def searchQuestion(request):
   elif 'POST' == request.method:
     data = request.POST.copy()
     query_filter = {}
-    if data['research_category']:
-      query_filter['research_category'] = int(data['research_category'])
+    if data['page_number']:
+      query_filter['curriculum_question__step__order'] = int(data['page_number'])
+    if data['question_number']:
+      query_filter['curriculum_question__order'] = int(data['question_number'])
     if data['answer_field_type']:
       query_filter['answer_field_type'] = data['answer_field_type']
     if data['question_text']:
@@ -1960,9 +1962,16 @@ def searchQuestion(request):
     elif data['curriculum_id']:
       query_filter['curriculum_question__step__curriculum__id'] = int( data['curriculum_id'])
 
-    print(query_filter)
-    questionList = models.Question.objects.filter(**query_filter).order_by(Lower('question_text'))
-    question_list = [{'research_category': [research_category.category for research_category in question.research_category.all()], 'answer_field_type': question.get_answer_field_type_display(), 'question_text': replace_iframe_tag(request, question.question_text), 'id': question.id} for question in questionList]
+    #print(query_filter)
+    questionList = models.Question.objects.filter(**query_filter).order_by('curriculum_question__step__curriculum__order',
+                                                                           'curriculum_question__step__order',
+                                                                           'curriculum_question__order')
+    question_list = [{'lesson_number': question.curriculum_question.all()[0].step.curriculum.order or 'N/A',
+                      'page_number': question.curriculum_question.all()[0].step.order,
+                      'question_number': question.curriculum_question.all()[0].order ,
+                      'question_text': replace_iframe_tag(request, question.question_text),
+                      'id': question.id}
+                        for question in questionList]
     return http.HttpResponse(json.dumps(question_list), content_type="application/json")
 
   return http.HttpResponseNotAllowed(['GET', 'POST'])
