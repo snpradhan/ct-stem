@@ -1946,6 +1946,8 @@ def searchQuestion(request):
   elif 'POST' == request.method:
     data = request.POST.copy()
     query_filter = {}
+    if data['research_category']:
+      query_filter['research_category'] = int(data['research_category'])
     if data['page_number']:
       query_filter['curriculum_question__step__order'] = int(data['page_number'])
     if data['question_number']:

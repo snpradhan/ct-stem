@@ -32,6 +32,10 @@
             <div>{{form.answer_field_type}}</div>
           </div>
           <div class="form-group">
+            <label for="id_research_category">Research Category</label>
+            <div>{{form.research_category}}</div>
+          </div>
+          <div class="form-group">
             <label for="id_question_text">Question Text Contains</label>
             <div>{{form.question_text}}</div>
           </div>
@@ -75,6 +79,7 @@ $(function (){
     data['page_number'] = $("#id_page_number").val();
     data['question_number'] = $("#id_question_number").val();
     data['answer_field_type'] = $("#id_answer_field_type").val();
+    data['research_category'] = $("#id_research_category").val();
     data['question_text'] = $("#id_question_text").val();
     data['curriculum_id'] = $("#id_curriculum").val();
     data['unit_id'] = $("#id_unit").val();

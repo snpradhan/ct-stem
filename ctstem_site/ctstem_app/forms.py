@@ -747,6 +747,7 @@ class QuestionSearchForm(forms.Form):
   page_number = forms.IntegerField(required=False)
   question_number = forms.IntegerField(required=False)
   answer_field_type = forms.ChoiceField(required = False, choices=(('','------------'),) + models.FIELD_TYPE_CHOICES)
+  research_category = forms.ModelChoiceField(required = False, queryset=models.ResearchCategory.objects.all())
   question_text = forms.CharField(required = False, widget=forms.Textarea(attrs={'rows': 2, 'cols': 60, 'placeholder': 'Question text'}))
 
   def __init__(self, *args, **kwargs):
