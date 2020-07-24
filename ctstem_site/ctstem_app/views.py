@@ -848,9 +848,6 @@ def copyCurriculumMeta(request, id=''):
 
 @login_required
 def copyCurriculumSteps(request, original_curriculum, new_curriculum):
-  import os
-  now = datetime.datetime.now()
-  dt = now.strftime("%Y-%m-%d-%H-%M-%S-%f")
 
   steps = models.Step.objects.all().filter(curriculum=original_curriculum)
   for step in steps:
@@ -871,6 +868,10 @@ def copyCurriculumSteps(request, original_curriculum, new_curriculum):
 @login_required
 def copyQuestion(request, id=''):
   if '' != id:
+    import os
+    now = datetime.datetime.now()
+    dt = now.strftime("%Y-%m-%d-%H-%M-%S-%f")
+
     question = models.Question.objects.get(id=id)
     original_question_id = question.id
     question.id = None
