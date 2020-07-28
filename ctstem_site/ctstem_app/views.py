@@ -493,10 +493,11 @@ def previewCurriculum(request, id=''):
       elif teacher_attachments:
         teacher_resource_message = 'Attached Teacher Resources'
 
-      if curriculum.unit and curriculum.unit.icon:
-        icon = curriculum.unit.icon.url
-      elif curriculum.icon:
+
+      if curriculum.icon:
         icon = curriculum.icon.url
+      elif curriculum.unit and curriculum.unit.icon:
+        icon = curriculum.unit.icon.url
       elif curriculum.curriculum_type == 'U':
         icon = '/static/img/unit.png'
       elif curriculum.curriculum_type == 'L':
