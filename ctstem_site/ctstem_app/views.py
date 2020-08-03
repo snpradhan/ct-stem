@@ -780,7 +780,7 @@ def copyCurriculumMeta(request, id=''):
     curriculum.save()
 
     original_curriculum = models.Curriculum.objects.get(id=id)
-
+    curriculum.title = 'Copy of ' + title
     curriculum.created_date = datetime.datetime.now()
     curriculum.modified_date = datetime.datetime.now()
     curriculum.parent = original_curriculum
