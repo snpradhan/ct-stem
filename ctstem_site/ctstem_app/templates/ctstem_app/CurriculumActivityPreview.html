@@ -75,13 +75,29 @@
             {% if step_order|add:0  == 0 %}
               <a class="page-link selected" href="#">{{0}}</a>
             {% else %}
-              <a class="page-link" href="{% url 'ctstem:previewCurriculumActivity' curriculum.id 0 %}">{{0}}</a>
+              <a class="page-link" href="{% if pem_code %}
+                                            {% url 'ctstem:previewCurriculumActivity' curriculum.id 0 pem_code %}
+                                           {% else %}
+                                            {% url 'ctstem:previewCurriculumActivity' curriculum.id 0 %}
+                                           {% endif %}">
+                                         {{0}}
+                                       </a>
             {% endif %}
             {% for i in total_steps|iterate %}
               {% if i|add:0 == step_order|add:0 %}
-                <a class="page-link selected" href="{% url 'ctstem:previewCurriculumActivity' curriculum.id i %}">{{i}}</a>
+                <a class="page-link selected" href="{% if pem_code %}
+                                                        {% url 'ctstem:previewCurriculumActivity' curriculum.id i pem_code %}
+                                                      {% else %}
+                                                        {% url 'ctstem:previewCurriculumActivity' curriculum.id i %}
+                                                      {% endif %}">
+                                                    {{i}}</a>
               {% else %}
-                <a class="page-link" href="{% url 'ctstem:previewCurriculumActivity' curriculum.id i %}">{{i}}</a>
+                <a class="page-link" href="{% if pem_code %}
+                                              {% url 'ctstem:previewCurriculumActivity' curriculum.id i pem_code %}
+                                             {% else %}
+                                              {% url 'ctstem:previewCurriculumActivity' curriculum.id i %}
+                                             {% endif %}">
+                                           {{i}}</a>
               {% endif %}
             {% endfor %}
             &nbsp;
@@ -93,7 +109,11 @@
           <ul>
             <li>
               <label>
-                <a href="{% url 'ctstem:previewCurriculum' curr_unit.id %}">
+                <a href="{% if pem_code %}
+                          {% url 'ctstem:previewCurriculum' curr_unit.id pem_code %}
+                         {% else %}
+                          {% url 'ctstem:previewCurriculum' curr_unit.id %}
+                         {% endif %}">
                   Preview
                   {% if curr_unit.curriculum_type == 'U' %}
                     Unit
@@ -110,13 +130,22 @@
                 </a>
               </label>
             </li>
-            {% get_underlying_curriculum curr_unit.id 'preview' as underlying_curriculum %}
+            {% if pem_code %}
+              {% get_underlying_curriculum curr_unit.id 'preview' pem_code as underlying_curriculum %}
+            {% else %}
+              {% get_underlying_curriculum curr_unit.id 'preview' as underlying_curriculum %}
+            {% endif %}
+
             {% if underlying_curriculum %}
               <ul class="underlying_curriculum">
                 {% for lesson in underlying_curriculum %}
                   <li class="{% if curriculum.id == lesson.id %} current_curriculum {% endif %}">
                     <label>
-                      <a href="{% url 'ctstem:previewCurriculumActivity' lesson.id 0 %}">
+                      <a href="{% if pem_code %}
+                                {% url 'ctstem:previewCurriculumActivity' lesson.id 0 pem_code %}
+                               {% else %}
+                                {% url 'ctstem:previewCurriculumActivity' lesson.id 0 %}
+                               {% endif %}">
                         Preview Lesson {{lesson.order}}
                         {% if lesson.status == 'R' %}
                           <i class="fas fa-trash-alt" title="Deleted" aria-hidden="true"></i>
@@ -167,7 +196,11 @@
             {% endif %}
             </p>
             <div class="save-buttons" style="text-align: center; margin-bottom: 150px; margin-top: 80px;">
-              <a href="{% url 'ctstem:previewCurriculumActivity'  curriculum.id 1 %}">
+              <a href="{% if pem_code %}
+                        {% url 'ctstem:previewCurriculumActivity'  curriculum.id 1 pem_code %}
+                       {% else %}
+                        {% url 'ctstem:previewCurriculumActivity'  curriculum.id 1 %}
+                       {% endif %}">
                 <button class="btn blue small continue" {% if total_steps == 0 %} disabled {% endif %}>
                   Start!
                 </button>
@@ -351,19 +384,31 @@
               {% endif %}
               <div class="save-buttons">
                 {% if step_order|add:0 > 0 %}
-                  <a href="{% url 'ctstem:previewCurriculumActivity'  curriculum.id step_order|add:'-1' %}">
+                  <a href="{% if pem_code %}
+                            {% url 'ctstem:previewCurriculumActivity'  curriculum.id step_order|add:'-1' pem_code %}
+                           {% else %}
+                            {% url 'ctstem:previewCurriculumActivity'  curriculum.id step_order|add:'-1' %}
+                           {% endif %}">
                     <button type="button" class="btn gray back">Back</button>
                   </a>
                 {% endif %}
 
                 {% if step_order|add:0 != total_steps %}
-                  <a href="{% url 'ctstem:previewCurriculumActivity'  curriculum.id step_order|add:'1' %}">
+                  <a href="{% if pem_code %}
+                            {% url 'ctstem:previewCurriculumActivity'  curriculum.id step_order|add:'1' pem_code %}
+                           {% else %}
+                            {% url 'ctstem:previewCurriculumActivity'  curriculum.id step_order|add:'1' %}
+                           {% endif %}">
                     <button type="button" class="btn blue submit" title="Next Step" >
                       Forward
                     </button>
                   </a>
                 {% else %}
-                  <a href="{% url 'ctstem:previewCurriculum'  curriculum.id %}">
+                  <a href="{% if pem_code %}
+                            {% url 'ctstem:previewCurriculum'  curriculum.id pem_code %}
+                           {% else %}
+                            {% url 'ctstem:previewCurriculum'  curriculum.id %}
+                           {% endif %}">
                     <button type="button" class="btn blue save"  title="Submit Assignment">
                       Exit
                     </button>

@@ -1535,6 +1535,11 @@ div.modal-content div.link {
   text-align: center;
   line-height: 1.25em;
 }
+
+div.modal-content div.link#curriculum_link {
+  font-size: 2em;
+  text-align: left;
+}
 div.modal-content div.modal-body p {
   font-size: 1.5em;
 }

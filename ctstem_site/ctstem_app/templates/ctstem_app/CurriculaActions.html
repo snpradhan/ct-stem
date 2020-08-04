@@ -5,7 +5,7 @@
   <a class="util-button fa fa-eye" aria-hidden="true" title="Preview Curriculum" href="{% url 'ctstem:previewCurriculum' curriculum.id %}" target="_blank">
 {% endif %}
 
-<!-- Edit -->
+<!-- Edit and Share-->
 {% check_curriculum_permission curriculum.id 'modify' as has_modify_permission %}
 {% if has_modify_permission == True %}
   {% if curriculum.status == 'A' %}
@@ -15,6 +15,7 @@
   {% else %}
     <a class="util-button fa fa-pencil" aria-hidden="true" aria-label="Edit Curriculum" title="Edit Curriculum" href="{% url 'ctstem:curriculum' curriculum.id %}"></a>
   {% endif %}
+  <a class="util-button fas fa-share-alt share" aria-hidden="true" aria-label="Share Curriculum" title="Share Curriculum" data-form="{% url 'ctstem:shareCurriculum' curriculum.id %}"></a>
 {% endif %}
 <!-- Delete -->
 {% check_curriculum_permission curriculum.id 'delete' as has_delete_permission %}

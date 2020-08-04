@@ -318,30 +318,54 @@ def get_teacher_groups(id):
   return groups
 
 @register.simple_tag(takes_context=True)
-def get_underlying_curriculum(context, curriculum_id, action='preview'):
+def get_underlying_curriculum(context, curriculum_id, action='preview', pem_code=''):
   request = context.get('request')
   curriculum = models.Curriculum.objects.get(id=curriculum_id)
-  underlying_curriculum = views.underlyingCurriculum(request, action, curriculum_id)
+  underlying_curriculum = views.underlyingCurriculum(request, action, curriculum_id, pem_code)
   list(messages.get_messages(request))
   return underlying_curriculum
 
 # get the next lesson in the sequence for an underlying lesson
-@register.filter
-def get_next_curriculum(curriculum_id):
+@register.simple_tag(takes_context=True)
+def get_next_curriculum(context, curriculum_id, pem_code=''):
   curriculum = models.Curriculum.objects.get(id=curriculum_id)
-  next_curriculum = models.Curriculum.objects.all().filter(unit=curriculum.unit, order=curriculum.order+1)
-  if len(next_curriculum) > 0:
-    return next_curriculum[0]
+  next_curricula = models.Curriculum.objects.all().filter(unit=curriculum.unit, order__gt=curriculum.order).order_by('order')
+
+  if len(next_curricula) > 0:
+    next_curriculum = None
+    for next_curr in next_curricula:
+      has_permission = False
+      if pem_code:
+        has_permission = check_curriculum_permission(context, next_curr.id, 'preview', pem_code)
+      else:
+        has_permission = check_curriculum_permission(context, next_curr.id, 'preview')
+
+      if has_permission:
+        next_curriculum = next_curr
+        break
+    return next_curriculum
   else:
     return None
 
 # get the previous lesson in the sequence for an underlying lesson
-@register.filter
-def get_previous_curriculum(curriculum_id):
+@register.simple_tag(takes_context=True)
+def get_previous_curriculum(context, curriculum_id, pem_code=''):
+  request = context.get('request')
   curriculum = models.Curriculum.objects.get(id=curriculum_id)
-  previous_curriculum = models.Curriculum.objects.all().filter(unit=curriculum.unit, order=curriculum.order-1)
-  if len(previous_curriculum) > 0:
-    return previous_curriculum[0]
+  previous_curricula = models.Curriculum.objects.all().filter(unit=curriculum.unit, order__lt=curriculum.order).order_by('-order')
+  if len(previous_curricula) > 0:
+    previous_curriculum = None
+    for prev_curr in previous_curricula:
+      has_permission = False
+      if pem_code:
+        has_permission = check_curriculum_permission(context, prev_curr.id, 'preview', pem_code)
+      else:
+        has_permission = check_curriculum_permission(context, prev_curr.id, 'preview')
+
+      if has_permission:
+        previous_curriculum = prev_curr
+        break
+    return previous_curriculum
   else:
     return None
 
@@ -414,9 +438,12 @@ def is_teacher_authored(curriculum):
   return False
 
 @register.simple_tag(takes_context=True)
-def check_curriculum_permission(context, curriculum_id, action):
+def check_curriculum_permission(context, curriculum_id, action, pem_code=''):
   request = context.get('request')
-  has_permission = views.check_curriculum_permission(request, curriculum_id, action)
+  if pem_code:
+    has_permission = views.check_curriculum_permission(request, curriculum_id, action, pem_code)
+  else:
+    has_permission = views.check_curriculum_permission(request, curriculum_id, action)
 
   list(messages.get_messages(request))
   return has_permission

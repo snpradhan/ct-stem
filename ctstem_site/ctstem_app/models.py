@@ -152,16 +152,18 @@ def upload_file_to(instance, filename):
 ####################################
 # GENERATE UNIQUE USER CODE HELPER
 ####################################
-def generate_code_helper():
+def generate_code_helper(length=5):
   allowed_chars = ''.join(('ABCDEFGHJKMNPQRSTUVWXYZ', '23456789'))
-  code = get_random_string(length=5, allowed_chars=allowed_chars)
+  code = get_random_string(length=length, allowed_chars=allowed_chars)
   schools = School.objects.all().filter(school_code=code)
   groups = UserGroup.objects.all().filter(group_code=code)
+  curricula = Curriculum.objects.all().filter(curriculum_code=code)
   # ensure the user code is unique across teachers and researchers
-  while schools.count() > 0 or groups.count() > 0:
-    code = get_random_string(length=5, allowed_chars=allowed_chars)
+  while schools.count() > 0 or groups.count() > 0 or curricula.count() > 0:
+    code = get_random_string(length=length, allowed_chars=allowed_chars)
     schools = School.objects.all().filter(school_code=code)
     groups = UserGroup.objects.all().filter(group_code=code)
+    curricula = Curriculum.objects.all().filter(curriculum_code=code)
 
   return code
 
@@ -192,6 +194,7 @@ class Curriculum (models.Model):
   order = models.IntegerField(null=True, blank=True, help_text="Order within the Unit")
   credits = RichTextUploadingField(null=True, blank=True, help_text="Author contributions")
   feature_rank = models.IntegerField(null=True, blank=True, help_text="Order in the feature pool")
+  curriculum_code = models.CharField(null=True, blank=True, max_length=30)
 
   class Meta:
       ordering = ['-id']

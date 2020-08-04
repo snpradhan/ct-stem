@@ -68,7 +68,7 @@
               {% endif %}
             </div>
           {% endif %}
-          <a href="{% url 'ctstem:previewCurriculum' curriculum.id %}">
+          <a href="{% if pem_code %} {% url 'ctstem:previewCurriculum' curriculum.id pem_code %} {% else %}  {% url 'ctstem:previewCurriculum' curriculum.id %} {% endif %}">
             <div class="detail">
               <div class="type">
                 {{curriculum.get_curriculum_type_display}}
@@ -81,7 +81,11 @@
               </div>
               <div class="period">
                 {% if curriculum.curriculum_type == 'U' %}
-                  {% get_underlying_curriculum curriculum.id 'preview' as underlying_curriculum %}
+                  {% if pem_code %}
+                    {% get_underlying_curriculum curriculum.id 'preview' pem_code as underlying_curriculum %}
+                  {% else %}
+                    {% get_underlying_curriculum curriculum.id 'preview' as underlying_curriculum %}
+                  {% endif %}
                   {{underlying_curriculum|length}} Lessons
                 {% else %}
                   {{curriculum.time}}

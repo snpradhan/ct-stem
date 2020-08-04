@@ -52,7 +52,7 @@
               <a class="bookmark util-button fa fa-star" href="{% url 'ctstem:removeBookmark' curriculum.id %}" style="{% if curriculum|is_bookmarked:user.teacher %} display: inline-block; {% else %} display: none; {% endif %}" title="Remove from Favorites"></a>
               <a class="bookmark util-button fa fa-star-o" href="{% url 'ctstem:bookmarkCurriculum' curriculum.id %}" style="{% if curriculum|is_bookmarked:user.teacher %} display: none; {% else %} display: inline-block; {% endif %}" title="Add to Favorites"></a>
             {% else %}
-              <a class="bookmark util-button fa fa-star-o" data-title="You need to be logged in as a teacher to favorite this curriculum"></a>
+              <a class="bookmark util-button fa fa-star-o warning" data-message="You need to be logged in as a teacher to favorite this curriculum"></a>
             {% endif %}
           {% endif %}
         </h3>
@@ -115,12 +115,16 @@
       </div>
 
       {% if curriculum.curriculum_type == 'U' %}
-        {% get_underlying_curriculum curriculum.id as underlying_curriculum %}
+        {% if pem_code %}
+          {% get_underlying_curriculum curriculum.id 'preview' pem_code as underlying_curriculum %}
+        {% else %}
+          {% get_underlying_curriculum curriculum.id 'preview' as underlying_curriculum %}
+        {% endif %}
         <div class="section">
           {% if underlying_curriculum %}
             <h3 class="left">Underlying Lessons</h3>
             <div class="row underlying_curricula" id="curricula_tiles">
-              {% include "ctstem_app/CurriculaTilesPaging.html" with curricula=underlying_curriculum parent='preview' %}
+              {% include "ctstem_app/CurriculaTilesPaging.html" with curricula=underlying_curriculum parent='preview' pem_code=pem_code %}
             </div>
           {% endif %}
         </div>
@@ -131,7 +135,11 @@
           <ul class="page_links">
             <li>
               <h5 class="left inline">0. Student Directions - </h5>
-              <a href="{% url 'ctstem:previewCurriculumActivity' curriculum.id 0 %}" target="_blank" title="Preview">
+              <a href="{% if pem_code %}
+                        {% url 'ctstem:previewCurriculumActivity' curriculum.id 0 pem_code %}
+                       {% else %}
+                        {% url 'ctstem:previewCurriculumActivity' curriculum.id 0 %}
+                       {% endif %}" target="_blank" title="Preview">
                 <h6 class="left inline"> Preview as Student <i class="fas fa-external-link-alt"></i></h6>
               </a>
             </li>
@@ -139,10 +147,13 @@
             {% for step in pages %}
               <li>
                 <h5 class="left inline">{{step.order}}. {{step.title}} - </h5>
-                <a href="{% url 'ctstem:previewCurriculumActivity' curriculum.id step.order %}" target="_blank" title="Preview">
+                <a href="{% if pem_code %}
+                          {% url 'ctstem:previewCurriculumActivity' curriculum.id step.order pem_code %}
+                         {% else %}
+                          {% url 'ctstem:previewCurriculumActivity' curriculum.id step.order %}
+                         {% endif %}" target="_blank" title="Preview">
                   <h6 class="left inline"> Preview as Student <i class="fas fa-external-link-alt"></i></h6>
                 </a>
-
               </li>
             {% endfor %}
           </ul>
@@ -150,23 +161,39 @@
       {% endif %}
 
       {% if curriculum.unit %}
+        {% if pem_code %}
+          {% get_previous_curriculum curriculum.id pem_code as previous_curriculum %}
+          {% get_next_curriculum curriculum.id pem_code as next_curriculum %}
+        {% else %}
+          {% get_previous_curriculum curriculum.id as previous_curriculum %}
+          {% get_next_curriculum curriculum.id as next_curriculum %}
+        {% endif %}
         <div class="row buttons">
           <div class="col">
-            <a type="button" class="btn normal darkblue" aria-hidden="true" href="{% url 'ctstem:previewCurriculum' curriculum.unit.id %}" aria-label="Back to Unit" title="Back to Unit">Back to Unit</a>
+            <a type="button" class="btn normal darkblue" aria-hidden="true" href="{% if pem_code %}
+                                                                                    {% url 'ctstem:previewCurriculum' curriculum.unit.id pem_code %}
+                                                                                  {% else %}
+                                                                                    {% url 'ctstem:previewCurriculum' curriculum.unit.id %}
+                                                                                  {% endif %}" aria-label="Back to Unit" title="Back to Unit">Back to Unit</a>
+
           </div>
           <div class="col">
-            {% with previous_curriculum=curriculum.id|get_previous_curriculum %}
-              {% if previous_curriculum %}
-                <a type="button" class="btn normal darkblue" aria-hidden="true" href="{% url 'ctstem:previewCurriculum' previous_curriculum.id %}" aria-label="Previous Lesson" title="Previous Lesson">Previous Lesson</a>
-              {% endif %}
-            {% endwith %}
+            {% if previous_curriculum %}
+              <a type="button" class="btn normal darkblue" aria-hidden="true" href="{% if pem_code %}
+                                                                                      {% url 'ctstem:previewCurriculum' previous_curriculum.id pem_code %}
+                                                                                    {% else %}
+                                                                                      {% url 'ctstem:previewCurriculum' previous_curriculum.id %}
+                                                                                    {% endif %}" aria-label="Previous Lesson" title="Previous Lesson">Previous Lesson</a>
+            {% endif %}
           </div>
           <div class="col">
-            {% with next_curriculum=curriculum.id|get_next_curriculum %}
-              {% if next_curriculum %}
-                <a type="button" class="btn normal darkblue" aria-hidden="true" href="{% url 'ctstem:previewCurriculum' next_curriculum.id %}" aria-label="Next Lesson" title="Next Lesson">Next Lesson</a>
-              {% endif %}
-            {% endwith %}
+            {% if next_curriculum %}
+              <a type="button" class="btn normal darkblue" aria-hidden="true" href="{% if pem_code %}
+                                                                                      {% url 'ctstem:previewCurriculum' next_curriculum.id pem_code %}
+                                                                                    {% else %}
+                                                                                      {% url 'ctstem:previewCurriculum' next_curriculum.id %}
+                                                                                    {% endif %}" aria-label="Next Lesson" title="Next Lesson">Next Lesson</a>
+            {% endif %}
           </div>
         </div>
       {% endif %}

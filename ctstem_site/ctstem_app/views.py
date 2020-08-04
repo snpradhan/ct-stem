@@ -425,10 +425,10 @@ def curriculum(request, id=''):
 ####################################
 # PREVIEW A Curriculum Activity page
 ####################################
-def previewCurriculumActivity(request, id='', step_order=0):
+def previewCurriculumActivity(request, id='', step_order=0,  pem_code=''):
   try:
     # check curriculum permission
-    has_permission = check_curriculum_permission(request, id, 'preview')
+    has_permission = check_curriculum_permission(request, id, 'preview', pem_code)
     if has_permission:
       curriculum = models.Curriculum.objects.get(id=id)
     else:
@@ -450,7 +450,7 @@ def previewCurriculumActivity(request, id='', step_order=0):
       if curriculum.curriculum_type != 'U' and curriculum.curriculum_type != 'L' and step_order == -1:
         step_order = 0
 
-      context = {'curriculum': curriculum, 'attachments': attachments, 'systems': systems, 'total_steps': total_steps, 'step_order': step_order}
+      context = {'curriculum': curriculum, 'attachments': attachments, 'systems': systems, 'total_steps': total_steps, 'step_order': step_order, 'pem_code': pem_code}
 
       if int(step_order) > 0:
         step = steps.get(order=int(step_order))
@@ -468,10 +468,10 @@ def previewCurriculumActivity(request, id='', step_order=0):
 ####################################
 # PREVIEW A Curriculum
 ####################################
-def previewCurriculum(request, id=''):
+def previewCurriculum(request, id='', pem_code=''):
   try:
     # check curriculum permission
-    has_permission = check_curriculum_permission(request, id, 'preview')
+    has_permission = check_curriculum_permission(request, id, 'preview', pem_code)
     if has_permission:
       curriculum = models.Curriculum.objects.get(id=id)
     else:
@@ -506,11 +506,47 @@ def previewCurriculum(request, id=''):
         icon = '/static/img/assessment.png'
 
 
-      context = {'curriculum': curriculum, 'pages': pages, 'systems': systems, 'icon': icon, 'student_attachments': student_attachments, 'teacher_attachments': teacher_attachments, 'teacher_resource_message': teacher_resource_message}
+      context = {'curriculum': curriculum, 'pages': pages, 'systems': systems, 'icon': icon, 'student_attachments': student_attachments, 'teacher_attachments': teacher_attachments, 'teacher_resource_message': teacher_resource_message, 'pem_code': pem_code}
 
       return render(request, 'ctstem_app/CurriculumPreview.html', context)
 
     return http.HttpResponseNotAllowed(['GET'])
+
+  except models.Curriculum.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested curriculum not found</h1>')
+
+
+####################################
+# Generate a link to share private curriculum
+####################################
+def shareCurriculum(request, id=''):
+  try:
+    # check if user has privilege to restore a deleted curriculum
+    has_permission = check_curriculum_permission(request, id, 'modify')
+
+    if has_permission:
+      curriculum = models.Curriculum.objects.get(id=id)
+      curriculum_code = None
+      if curriculum.unit:
+        curr_unit = curriculum.unit
+      else:
+        curr_unit = curriculum
+
+      if curr_unit.curriculum_code:
+        curriculum_code = curr_unit.curriculum_code
+      else:
+        curriculum_code = models.generate_code_helper(20)
+        curr_unit.curriculum_code = curriculum_code
+        curr_unit.save()
+
+      current_site = Site.objects.get_current()
+      domain = current_site.domain
+
+      context = {'domain': domain, 'curriculum': curriculum, 'curriculum_code': curriculum_code}
+
+      return render(request, 'ctstem_app/CurriculumShareModal.html', context)
+
+    return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
   except models.Curriculum.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested curriculum not found</h1>')
@@ -717,11 +753,11 @@ def deleteCurriculum(request, id=''):
 ####################################
 # Curriculum Copy
 ####################################
-def copyCurriculum(request, id=''):
+def copyCurriculum(request, id='', pem_code=''):
   try:
 
     # check if the user has permission to copy a curriculum
-    has_permission = check_curriculum_permission(request, id, 'copy')
+    has_permission = check_curriculum_permission(request, id, 'copy', pem_code)
 
     if not has_permission:
       return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
@@ -741,7 +777,10 @@ def copyCurriculum(request, id=''):
         #unit copy
         #copy underlying lessons
         if hasattr(request.user, 'teacher') or hasattr(request.user, 'researcher'):
-          underlying_curriculum =  original_curriculum.underlying_curriculum.all().filter(Q(status='P') | Q(unit__collaborators=request.user)).exclude(status='R').distinct()
+          if pem_code:
+            underlying_curriculum =  original_curriculum.underlying_curriculum.all().exclude(status='R').distinct()
+          else:
+            underlying_curriculum =  original_curriculum.underlying_curriculum.all().filter(Q(status='P') | Q(unit__collaborators=request.user)).exclude(status='R').distinct()
         else:
           underlying_curriculum = original_curriculum.underlying_curriculum.all().exclude(status='R').distinct()
 
@@ -777,6 +816,7 @@ def copyCurriculumMeta(request, id=''):
     curriculum.pk = None
     curriculum.id = None
     curriculum.icon = None
+    curriculum.curriculum_code = None
     curriculum.save()
 
     original_curriculum = models.Curriculum.objects.get(id=id)
@@ -2868,14 +2908,14 @@ def searchAssignment(request):
 ####################################
 # Get underlying lessons when assigning or previewing
 ####################################
-def underlyingCurriculum(request, action, id=''):
+def underlyingCurriculum(request, action, id='', pem_code=''):
 
   if request.method == 'GET' or request.method == 'POST':
     curriculum = models.Curriculum.objects.get(id=id)
     underlying_curriculum =  curriculum.underlying_curriculum.all().order_by('order').distinct()
     filtered_curriculum = []
     for curr in underlying_curriculum:
-      has_permission = check_curriculum_permission(request, curr.id, action)
+      has_permission = check_curriculum_permission(request, curr.id, action, pem_code)
       if has_permission:
         filtered_curriculum.append(curr)
 
@@ -3737,7 +3777,7 @@ def addAssignment(request, curriculum_id='', group_id=''):
 # to perform the specified action on the
 # curriculum
 ####################################
-def check_curriculum_permission(request, curriculum_id, action):
+def check_curriculum_permission(request, curriculum_id, action, pem_code=''):
   try:
     has_permission = False
     is_admin = is_researcher = is_author = is_school_admin = is_teacher = False
@@ -3792,6 +3832,9 @@ def check_curriculum_permission(request, curriculum_id, action):
               has_permission = True
             elif has_edit_privilege:
               has_permission = True
+            #if pem_code matches, allow copy of Unit regardless of status (but not deleted)
+            elif pem_code and curriculum.unit is None and pem_code == curriculum.curriculum_code:
+                has_permission = True
             else:
               has_permission = False
               messages.error(request, 'You do not have the privilege to copy this curriculum')
@@ -3849,8 +3892,18 @@ def check_curriculum_permission(request, curriculum_id, action):
 
         ############ PREVIEW ############
         elif action == 'preview':
+          #if pem_code matches, allow preview regardless of status (but not deleted)
+          if pem_code:
+            curriculum_code = None
+            if curriculum.unit:
+              curriculum_code = curriculum.unit.curriculum_code
+            else:
+              curriculum_code = curriculum.curriculum_code
+
+            if pem_code == curriculum_code:
+              has_permission = True
           #allow everyone to preview public curricula
-          if curriculum.status == 'P':
+          elif curriculum.status == 'P':
             has_permission = True
           # admin, author can preview any curricula
           elif is_admin or is_author:
@@ -3908,7 +3961,8 @@ def check_curriculum_permission(request, curriculum_id, action):
         elif action == 'favorite':
           # a teacher can mark a curriculum as favorite
           if is_teacher and curriculum.unit is None:
-            has_permission = True
+            if curriculum.status == 'P' or has_edit_privilege or has_view_privilege:
+              has_permission = True
 
           if not has_permission:
             messages.error(request, 'You do not have the privilege to mark this curriculum as favorite')

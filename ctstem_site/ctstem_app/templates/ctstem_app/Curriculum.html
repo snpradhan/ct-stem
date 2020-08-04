@@ -467,8 +467,12 @@
                 <br><br>
               {% endif %}
               <input type="submit" class="btn inbetween orange" id="previewBtn" value="Preview"/>
+              <br><br>
+              <a type="button" class="btn inbetween yellow share" id="shareBtn" data-form="{% url 'ctstem:shareCurriculum' form.instance.id %}">Share</a>
             {% else %}
               <input type="submit" class="btn inbetween orange" id="previewBtn" value="Preview" title="Save this curriculum for the Preview button to be enabled" disabled/>
+              <br><br>
+              <a type="button" class="btn inbetween yellow" id="shareBtn" title="Save this curriculum for the Share button to be enabled" disabled>Share</a>
             {% endif %}
             <br><br>
             <input type="hidden" name="preview" id="preview" value="0"/>
