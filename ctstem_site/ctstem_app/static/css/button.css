@@ -114,3 +114,9 @@
   background-color: #ffffff !important;
   color: var(--ctstem-color-purple) !important;
 }
+.google_signin {
+  text-align: center;
+}
+.google_signin img {
+  width: 22em;
+}

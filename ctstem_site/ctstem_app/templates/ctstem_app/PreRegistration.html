@@ -27,11 +27,16 @@
           <div class="error">{{ form.email.errors }}</div>
         </div>
       </div>
-
-       <div class="modal-footer">
+      <div class="modal-footer">
         <div class="form-group">
           <input type="submit" class="btn normal yellow" id="submit" value="Validate Email"/>
         </div>
+      </div>
+      <hr>
+      <div class="form-group button google_signin">
+        <a href="{% url 'social:begin' 'google-oauth2' %}?group_code={{group_code}}">
+          <img src="/static/img/google_signin.png"/>
+        </a>
       </div>
     </form>
   </div>

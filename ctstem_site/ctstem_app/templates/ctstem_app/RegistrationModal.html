@@ -153,6 +153,14 @@
             <input type="submit" class="btn normal yellow" id="submit" value="{% if group_id and school_id %} Register as a Student {% else %} Register as a Teacher {% endif %}" disabled/>
           {% endif %}
       </div>
+      {% if user.is_anonymous %}
+        <hr>
+        <div class="form-group google_signin">
+          <a href="{% url 'social:begin' 'google-oauth2' %}">
+            <img src="/static/img/google_signin.png"/>
+          </a>
+        </div>
+      {% endif %}
     </form>
   </div>
 </div>
