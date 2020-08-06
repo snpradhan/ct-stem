@@ -1405,7 +1405,7 @@ def user_login(request, user_name=''):
           response_data['redirect_url'] = redirect_url
 
         elif hasattr(user, 'teacher'):
-          messages.success(request, "Welcome to the CT-STEM website. If you need help with using the site, you can go to the <a href='/help'>Help and FAQ</a> page.", extra_tags='safe');
+          messages.success(request, "Welcome to the CT-STEM website. If you need help with using the site, you can go to the <a href='/help'>Help and FAQ</a> page.", extra_tags='safe')
           response_data['success'] = True
           response_data['redirect_url'] = '/groups/active/'
 
@@ -1443,6 +1443,15 @@ def user_logout(request):
   logout(request)
   messages.success(request, "You have logged out")
   return shortcuts.redirect('ctstem:home')
+
+@login_required
+def login_redirect(request):
+  if hasattr(request.user, 'teacher'):
+    messages.success(request, "Welcome to the CT-STEM website. If you need help with using the site, you can go to the <a href='/help'>Help and FAQ</a> page.", extra_tags='safe')
+    return shortcuts.redirect('ctstem:groups', status='active')
+  else:
+    messages.success(request, "You have logged in")
+    return shortcuts.redirect('ctstem:home')
 
 ####################################
 # USER PROFILE
@@ -4974,7 +4983,7 @@ def validate(request, username='', validation_code=''):
       user = User.objects.get(username=username)
       user.is_active = True
       user.save()
-
+      user = authenticate(username=username, password=password)
       response_data['redirect_url'] = '/'
       #check if this user added a new school
       if hasattr(user, 'teacher'):
@@ -4995,8 +5004,6 @@ def validate(request, username='', validation_code=''):
       response_data['html'] = render_to_string('ctstem_app/ValidationModal.html', context, request)
 
     return http.HttpResponse(json.dumps(response_data), content_type="application/json")
-
-
 
   return http.HttpResponseNotAllowed(['GET', 'POST'])
 

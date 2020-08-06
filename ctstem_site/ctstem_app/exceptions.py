@@ -1,0 +1,3 @@
+
+class GoogleLoginException(Exception):
+  pass

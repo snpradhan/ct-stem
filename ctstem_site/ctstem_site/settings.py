@@ -29,9 +29,9 @@ ALLOWED_HOSTS = ['*']
 
 SITE_ID = 1
 
-LOGIN_URL = '/auth/login/google-oauth2/'
-#LOGIN_URL = '/'
-LOGIN_REDIRECT_URL = '/'
+#LOGIN_URL = '/auth/login/google-oauth2/'
+LOGIN_URL = '/'
+LOGIN_REDIRECT_URL = '/login_redirect'
 LOGOUT_REDIRECT_URL = '/'
 
 # Application definition
@@ -70,11 +70,12 @@ MIDDLEWARE = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'ctstem_app.middleware.UpdateSession',
+    'ctstem_app.middleware.CustomExceptionMiddleware',
 )
 
 AUTHENTICATION_BACKENDS = (
     'social_core.backends.google.GoogleOAuth2',
-    'django.contrib.auth.backends.ModelBackend',
+    'django.contrib.auth.backends.AllowAllUsersModelBackend',
 )
 
 SOCIAL_AUTH_URL_NAMESPACE = 'social'
@@ -87,11 +88,12 @@ SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.social_user',
     'social_core.pipeline.user.get_username',
     'social_core.pipeline.social_auth.associate_by_email',
-    'social_core.pipeline.user.create_user',
+    #'social_core.pipeline.user.create_user',
+    'ctstem_app.pipeline.create_student', #custom pipeline
     'social_core.pipeline.social_auth.associate_user',
     'social_core.pipeline.social_auth.load_extra_data',
     'social_core.pipeline.user.user_details',
-    'ctstem_app.pipeline.associate_user_role',
+
 )
 
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'

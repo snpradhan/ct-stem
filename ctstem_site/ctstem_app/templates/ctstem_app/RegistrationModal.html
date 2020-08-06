@@ -156,9 +156,15 @@
       {% if user.is_anonymous %}
         <hr>
         <div class="form-group google_signin">
-          <a href="{% url 'social:begin' 'google-oauth2' %}">
-            <img src="/static/img/google_signin.png"/>
-          </a>
+          {% if group_code %}
+            <a href="{% url 'social:begin' 'google-oauth2' %}?group_code={{group_code}}">
+              <img src="/static/img/google_signin.png"/>
+            </a>
+          {% else %}
+            <a href="{% url 'social:begin' 'google-oauth2' %}">
+              <img src="/static/img/google_signin.png"/>
+            </a>
+          {% endif %}
         </div>
       {% endif %}
     </form>
