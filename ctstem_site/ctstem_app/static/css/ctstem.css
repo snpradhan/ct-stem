@@ -1534,12 +1534,10 @@ div.modal-content div.link {
   font-weight: bold;
   text-align: center;
   line-height: 1.25em;
+  overflow-wrap: break-word;
+  padding: 0 5%;
 }
 
-div.modal-content div.link#curriculum_link {
-  font-size: 2em;
-  text-align: left;
-}
 div.modal-content div.modal-body p {
   font-size: 1.5em;
 }

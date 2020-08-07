@@ -8,7 +8,7 @@
       </div>
 
       <div class="modal-body">
-        <div class="form-group link" id="curriculum_link">
+        <div class="form-group link" id="link">
           https://{{domain}}/curriculum/preview/{{curriculum.id}}/pem_code/{{curriculum_code}}
         </div>
         <div class="form-group warning">
@@ -29,7 +29,7 @@
   </div>
   <script type="text/javascript">
     $('a#copy').click(function(){
-      var el = document.getElementById('curriculum_link');
+      var el = document.getElementById('link');
       var range = document.createRange();
       range.selectNodeContents(el);
       var sel = window.getSelection();
