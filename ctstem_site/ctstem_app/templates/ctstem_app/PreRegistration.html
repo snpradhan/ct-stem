@@ -32,7 +32,11 @@
           <input type="submit" class="btn normal yellow" id="submit" value="Validate Email"/>
         </div>
       </div>
-      <hr>
+      <div class="col-container">
+        <div class="hr"><hr></div>
+        <div class="or"><h4>OR</h4></div>
+        <div class="hr"><hr></div>
+      </div>
       <div class="form-group button google_signin">
         <a href="{% url 'social:begin' 'google-oauth2' %}?group_code={{group_code}}">
           <img src="/static/img/google_signin.png"/>

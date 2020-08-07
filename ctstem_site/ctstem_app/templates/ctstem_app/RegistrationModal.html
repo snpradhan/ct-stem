@@ -154,7 +154,11 @@
           {% endif %}
       </div>
       {% if user.is_anonymous and group_code %}
-        <hr>
+        <div class="col-container">
+          <div class="hr"><hr></div>
+          <div class="or"><h4>OR</h4></div>
+          <div class="hr"><hr></div>
+        </div>
         <div class="form-group google_signin">
           <a href="{% url 'social:begin' 'google-oauth2' %}?group_code={{group_code}}">
             <img src="/static/img/google_signin.png"/>

@@ -1469,6 +1469,13 @@ div.content #curricula_tile  .row.button a {
 div.modal div.modal-dialog hr{
   border-top: 2px solid var(--ctstem-color-light-gray);
 }
+div.modal div.modal-dialog div.hr {
+  flex: 0 0 45%;
+}
+div.modal div.modal-dialog div.or {
+  flex: 0 0 10%;
+}
+
 div.modal .modal-sm {
   width: 37em;
 }
