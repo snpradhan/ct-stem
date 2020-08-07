@@ -3,26 +3,14 @@
   <!--div class="col">
     <a type="button" class="btn normal blue" href="#">Print</a>
   </div-->
-  <div class="col">
-    {% check_curriculum_permission curriculum.id 'assign' as has_assign_permission %}
-    {% if has_assign_permission == True %}
+
+  {% check_curriculum_permission curriculum.id 'assign' as has_assign_permission %}
+  {% if has_assign_permission == True %}
+    <div class="col">
       <a type="button" class="assign btn normal blue" aria-hidden="true" data-form="{% url 'ctstem:assignCurriculum' curriculum.id %}" aria-label="Assign Curriculum" title="Assign Curriculum">Assign</a>
-    {% elif user.is_authenticated and not user.researcher and not user.author %}
-      {% if curriculum.curriculum_type == 'U' %}
-        {% with msg="This unit cannot be assigned because none the underlying lessons are public.  If you need to assign this unit please ask the author to make them public" %}
-        <a type="button" class="assign btn normal blue warning" aria-hidden="true" data-message="{{msg}}">Assign</a>
-        {% endwith %}
-      {% else %}
-        {% with msg="This curriculum cannot be assigned because it is not public.  If you need to assign this curriculum please ask the author to make it public" %}
-        <a type="button" class="assign btn normal blue warning" aria-hidden="true" data-message="{{msg}}">Assign</a>
-        {% endwith %}
-      {% endif %}
-    {% else %}
-      {% with msg="Please login as a teacher to assign this curriculum" %}
-      <a type="button" class="assign btn normal blue warning" aria-hidden="true" data-message="{{msg}}">Assign</a>
-      {% endwith %}
-    {% endif %}
-  </div>
+    </div>
+  {% endif %}
+
   <div class="col">
     {% if pem_code %}
       {% check_curriculum_permission curriculum.id 'copy' pem_code as has_copy_permission %}
