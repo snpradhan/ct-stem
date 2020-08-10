@@ -33,7 +33,7 @@
         </div>
         <hr>
         <div class="form-group button google_signin">
-          <a href="{% url 'social:begin' 'google-oauth2' %}">
+          <a href="{% url 'social:begin' 'google-oauth2' %}{% if redirect_url %}?next={{redirect_url}}{% endif %}">
             <img src="/static/img/google_signin.png"/>
           </a>
         </div>

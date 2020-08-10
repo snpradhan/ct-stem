@@ -77,7 +77,7 @@
                         <div class="title">{{group.members.count}} Student(s)</div>
                         <div class="buttons">
                           {% if group.is_active %}
-                            <a type="button" class="btn inbetween yellow invite-modal" href="#" data-toggle="modal" data-target="#invite" data-invite-link="https://{{domain}}/?next=/preregister/group/{{group.group_code}}/" data-title="{{group.title}}" title="Student Invitation Link">
+                            <a type="button" class="btn inbetween yellow invite-modal" href="#" data-toggle="modal" data-target="#invite" data-invite-link="https://{{domain}}/?next=/preregister/group/{{group.group_code}}/" data-title="{{group.title}} Invitation Link" title="Student Invitation Link">
                                 <i class="fa fa-link"></i>
                             </a>
 
@@ -212,7 +212,7 @@
                     {% endif %}
                     <div>
                       {% if group.is_active %}
-                        <a type="button" class="btn yellow invite-modal" href="#" data-toggle="modal" data-target="#invite" data-invite-link="https://{{domain}}/?next=/preregister/group/{{group.group_code}}/" data-title="{{group.title}}" title="Student Invitation Link">
+                        <a type="button" class="btn yellow invite-modal" href="#" data-toggle="modal" data-target="#invite" data-invite-link="https://{{domain}}/?next=/preregister/group/{{group.group_code}}/" data-title="{{group.title}} Invitation Link" title="Student Invitation Link">
                           <i class="fa fa-link"></i>
                         </a>
                         <a type="button" class="btn green upload-modal" href="#" data-toggle="modal" data-target="#upload" data-id="{{group.id}}" data-title="{{group.title}}" title="Upload Students">
@@ -262,9 +262,6 @@
   {% block upload %}
     {% include "ctstem_app/UserUploadModal.html" %}
   {% endblock %}
-  {% block invite %}
-    {% include "ctstem_app/InviteModal.html" %}
-  {% endblock %}
   {% block assignment %}
     {% include "ctstem_app/AssignmentSearch.html" %}
   {% endblock %}
@@ -276,11 +273,6 @@
         $(this).children().each(function(){
           $(this).toggle();
         })
-      });
-
-      $('a.invite-modal').click(function(){
-        $("div.modal#invite .modal-title span").html($(this).data('title'));
-        $("div.modal#invite .modal-body .link").html($(this).data('invite-link'));
       });
 
     });

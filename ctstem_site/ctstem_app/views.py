@@ -31,8 +31,9 @@ from django.contrib.sites.models import Site
 from django.core import serializers
 import zipfile
 from django.core.files import File
-import urllib.request, urllib.parse, urllib.error, urllib.request, urllib.error, urllib.parse
+import urllib.request, urllib.parse, urllib.error, urllib.request, urllib.error
 from urllib.request import urlretrieve
+from urllib.parse import urlparse, parse_qs
 import base64
 from django.utils.encoding import smart_str
 from django.core.validators import validate_email
@@ -54,7 +55,15 @@ logger = logging.getLogger('django')
 def home(request):
   #get published lessons
   if hasattr(request.user, 'student') == True:
-    return shortcuts.redirect('ctstem:assignments', bucket='inbox')
+    url = request.GET.get('next', '')
+    if not url:
+      redirect_url = shortcuts.redirect('ctstem:assignments', bucket='inbox')
+    else:
+      url = parse_qs(urlparse(url).query)['next'][0]
+      redirect_url = http.HttpResponseRedirect(url)
+
+    return redirect_url
+
   else:
     curr_type = ['U', 'L']
     curricula = models.Curriculum.objects.all().filter(status='P', unit__isnull=True, curriculum_type__in=curr_type, feature_rank__isnull=False).order_by('feature_rank')[:4]
@@ -2807,10 +2816,12 @@ def group(request, id=''):
       uploadForm = forms.UploadFileForm(user=request.user)
       assignmentForm = forms.AssignmentSearchForm(user=request.user)
       studentAddForm = forms.StudentAddForm()
+      current_site = Site.objects.get_current()
+      domain = current_site.domain
 
       if request.method == 'GET':
         form = forms.UserGroupForm(user=request.user, instance=group, prefix='group')
-        context = {'form': form, 'role': 'group', 'uploadForm': uploadForm, 'assignmentForm': assignmentForm, 'studentAddForm': studentAddForm, 'assignments': assignments, 'keys': keys}
+        context = {'form': form, 'role': 'group', 'uploadForm': uploadForm, 'assignmentForm': assignmentForm, 'studentAddForm': studentAddForm, 'assignments': assignments, 'keys': keys, 'domain': domain}
 
         return render(request, 'ctstem_app/UserGroup.html', context)
 
@@ -2834,7 +2845,7 @@ def group(request, id=''):
         else:
           print(form.errors)
           messages.error(request, "The class could not be saved because there were errors.  Please check the errors below.")
-          context = {'form': form, 'role': 'group', 'uploadForm': uploadForm, 'assignmentForm': assignmentForm, 'studentAddForm': studentAddForm, 'assignments': assignments, 'keys': keys}
+          context = {'form': form, 'role': 'group', 'uploadForm': uploadForm, 'assignmentForm': assignmentForm, 'studentAddForm': studentAddForm, 'assignments': assignments, 'keys': keys, 'domain': domain}
 
         return render(request, 'ctstem_app/UserGroup.html', context)
 
@@ -3034,7 +3045,9 @@ def groupDashboard(request, id='', curriculum_status='active'):
             assignments[key] = {curriculum.order : {'assignment': assignment, 'status': status, 'serial': serial}}
 
       keys.sort(key=lambda x:x.title)
-      context = {'group': group, 'assignments': assignments, 'keys': keys, 'curriculum_status': curriculum_status}
+      current_site = Site.objects.get_current()
+      domain = current_site.domain
+      context = {'group': group, 'assignments': assignments, 'keys': keys, 'curriculum_status': curriculum_status, 'domain': domain}
       return render(request, 'ctstem_app/GroupDashboard.html', context)
 
     return http.HttpResponseNotAllowed(['GET'])
@@ -3112,6 +3125,9 @@ def assignments(request, bucket=''):
       #for each group
       tomorrow = datetime.date.today() + datetime.timedelta(days=1)
       assignments = models.Assignment.objects.all().filter(group__in=groups, assigned_date__lt=tomorrow).order_by('curriculum__unit__title', 'curriculum__order')
+      assignment_id = request.GET.get('assignment', '')
+      if assignment_id:
+        assignments = assignments.filter(id=assignment_id)
       assignment_list = []
       active_list = []
       archived_list = []

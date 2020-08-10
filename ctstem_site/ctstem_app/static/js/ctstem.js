@@ -318,6 +318,11 @@ $(function () {
     }
   });
 
+  $('a.invite-modal').click(function(){
+    $("div.modal#invite .modal-title span").html($(this).data('title'));
+    $("div.modal#invite .modal-body .link").html($(this).data('invite-link'));
+  });
+
   $("button.search_users").click(function(e){
     e.preventDefault();
     var url = $(this).data("form");

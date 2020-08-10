@@ -140,7 +140,8 @@
                   <table class="table table-striped table-condensed table-bordered inner_table">
                     <thead>
                       <tr>
-                        <th style="width:70%;" colspan="2">Assigned Curriculum</th>
+                        <th style="width:60%;" colspan="2">Assigned Curriculum</th>
+                        <th style="width:10%;">Direct Student Link</th>
                         <th style="width:10%;">Assigned On</th>
                         <th style="width:10%;">Lock on Completion <i class="fa fa-info-circle" aria-hidden="true" title="When locked, students will be unable to open and view the assignment once they submit"></i></th>
                         <th style="width:10%;">Delete</th>
@@ -170,6 +171,7 @@
                                 {% endif %}
                                 </b>
                                 &nbsp;{{assignment.curriculum.title}}
+
                               </div>
                             </td>
                           {% else %}
@@ -187,7 +189,11 @@
                                 </div>
                               </td>
                           {% endif %}
-
+                              <td style="text-align:center;">
+                                <a type="button" class="btn yellow invite-modal" href="#" data-toggle="modal" data-target="#invite" data-invite-link="https://{{domain}}/?next=/login?next=/assignments/inbox?assignment={{assignment.id}}" data-title="Direct Student Assignment Link" title="Direct Assignment Link">
+                                  <i class="fa fa-link"></i>
+                                </a>
+                              </td>
                               <td style="vertical-align:middle;">
                                 {{assignment.assigned_date|date }}
                               </td>
@@ -344,6 +350,7 @@
     {% block password_reset %}
       {% include "ctstem_app/UserPassword.html" %}
     {% endblock %}
+
   {% endif %}
 
   <script type="text/javascript">

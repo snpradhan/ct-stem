@@ -15,10 +15,11 @@
       {% include "ctstem_app/Tabs.html" with tab='group' group=group role='group_dashboard' curriculum_status=curriculum_status %}
 
       {% if assignments %}
-      <table class="table table-bordered table-condensed dt" id="groups">
+      <table class="table table-bordered table-condensed" id="groups">
         <thead>
           <tr>
-            <th width="50%" colspan="2"> Assigned Curriculum </th>
+            <th width="40%" colspan="2"> Assigned Curriculum </th>
+            <th width="10%">Direct Student Link</th>
             <th> Assigned On </th>
             <th width="30%"> Status </th>
             <th width="10%"> Student Activity </th>
@@ -76,12 +77,16 @@
                     </div>
                   </td>
               {% endif %}
-
+                  <td style="text-align:center;">
+                    <a type="button" class="btn yellow invite-modal" href="#" data-toggle="modal" data-target="#invite" data-invite-link="https://{{domain}}/?next=/login?next=/assignments/inbox?assignment={{assignment.assignment.id}}" data-title="Direct Student Assignment Link" title="Direct Student Assignment Link">
+                      <i class="fa fa-link"></i>
+                    </a>
+                  </td>
                   <td> {{assignment.assignment.assigned_date|date}} </td>
                   <td>
                     <div id="chart_{{assignment.serial}}" class="chart" name="{{assignment.status}}"></div>
                   </td>
-                  <td>
+                  <td style="text-align:center;">
                     <a type="button" class="btn small orange" href="{% url 'ctstem:assignmentDashboard' assignment.assignment.id %}" aria-label="View Assignment Dashboard" title="View Assignment Dashboard">
                       <i class="fas fa-tachometer-alt"></i>
                     </a>
