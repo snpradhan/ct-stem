@@ -18,12 +18,16 @@
         <thead>
           <tr>
             <th> Category </th>
+            <th> Abbrevation </th>
             <th> Description </th>
+            <th> Flag </th>
             <th> Questions </th>
           </tr>
           <tr id="filterrow">
             <th> Category </th>
+            <th> Abbrevation </th>
             <th> Description </th>
+            <th> Flag </th>
             <th> Questions </th>
           </tr>
         </thead>
@@ -40,9 +44,11 @@
                   </a>
                 </div>
               </td>
+              <td>{{category.abbrevation}}</td>
               <td>
                 {{ category.description}}
               </td>
+              <td>{{category.get_flag_display}}</td>
               <td>
                 {{category.questions.all|length}}
               </td>

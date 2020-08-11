@@ -926,6 +926,7 @@ def copyQuestion(request, id=''):
     original_question_id = question.id
     question.id = None
     question.pk = None
+    original_question = models.Question.objects.get(id=original_question_id)
     if question.sketch_background:
       try:
         source = question.sketch_background
@@ -935,15 +936,20 @@ def copyQuestion(request, id=''):
         new_filename = filename_array[0][:10] + '_' + dt + '.' + filename_array[1]
         question.sketch_background.save(new_filename, filecontent)
         source.file.close()
-        original_question = models.Question.objects.get(id=original_question_id)
         original_question.sketch_background.save(filename, filecontent)
         original_question.save()
       except IOError as e:
         question.sketch_background = None
     question.save()
+    question.research_category.add(*original_question.research_category.all())
 
     if request.is_ajax():
-      response_data = {'success': True, 'question_id': question.id, 'question_text': replace_iframe_tag(request, question.question_text)}
+      research_categories = []
+      for category in question.research_category.all():
+        if category.flag and category.abbrevation:
+          research_categories.append(category.abbrevation)
+
+      response_data = {'success': True, 'question_id': question.id, 'question_text': replace_iframe_tag(request, question.question_text), 'research_categories': research_categories}
       return http.HttpResponse(json.dumps(response_data), content_type="application/json")
     else:
       return question
@@ -4322,7 +4328,12 @@ def question(request, id=''):
     response_data = {}
     if questionForm.is_valid():
       question = questionForm.save()
-      response_data = {'success': True, 'question_id': question.id, 'question_text': replace_iframe_tag(request, question.question_text)}
+      research_categories = []
+      for category in question.research_category.all():
+        if category.flag and category.abbrevation:
+          research_categories.append(category.abbrevation)
+
+      response_data = {'success': True, 'question_id': question.id, 'question_text': replace_iframe_tag(request, question.question_text), 'research_categories': research_categories}
     else:
       print(questionForm.errors)
       context = {'questionForm': questionForm, 'title': title, 'disable_fields': disable_fields}

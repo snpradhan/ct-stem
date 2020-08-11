@@ -770,10 +770,11 @@ class ResearchCategoryForm(ModelForm):
 
   class Meta:
     model = models.ResearchCategory
-    fields = ['category', 'description']
+    fields = ['category', 'description', 'abbrevation', 'flag']
     widgets = {
       'category': forms.TextInput(attrs={'placeholder': 'Enter category here'}),
       'description': forms.Textarea(attrs={'rows':5, 'cols':60, 'placeholder': 'Category description'}),
+      'abbrevation': forms.TextInput(attrs={'placeholder': 'Enter abbrevation here'}),
     }
 
   def __init__(self, *args, **kwargs):
@@ -781,7 +782,7 @@ class ResearchCategoryForm(ModelForm):
 
     for field_name, field in list(self.fields.items()):
       field.widget.attrs['class'] = 'form-control'
-      field.widget.attrs['placeholder'] = field.help_text
+      #field.widget.attrs['placeholder'] = field.help_text
 
 ####################################
 # Subcategory Form

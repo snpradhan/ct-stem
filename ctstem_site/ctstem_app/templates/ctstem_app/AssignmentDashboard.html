@@ -144,11 +144,13 @@
         <thead>
           <tr>
             <th width="5%">Question No. </th>
+            <th>Research Categories</th>
             <th>Question </th>
             <th width="15%"> Action </th>
           </tr>
           <tr id="filterrow">
             <th width="5%">Question No. </th>
+            <th>Research Categories</th>
             <th>Question </th>
             <th width="15%"> Action </th>
           </tr>
@@ -157,6 +159,13 @@
           {% for question in question_details %}
             <tr>
               <td>{{question.step.order}}.{{question.order}}</td>
+              <td>
+                {% for category in question.question.get_flagged_categories %}
+                  {% if category.abbrevation %}
+                    {{category.abbrevation}} <br>
+                  {% endif %}
+                {% endfor %}
+              </td>
               <td>{{question.question.question_text|safe}}</td>
               <td><a type="button" class="btn small green" href="{% url 'ctstem:question_response_review' assignment.id  question.id %}" title="Review Question Response"> Review </a></td>
             </tr>

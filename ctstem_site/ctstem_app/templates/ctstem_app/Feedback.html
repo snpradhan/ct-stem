@@ -72,7 +72,7 @@
                   <div class="col-md-8">
                     <div>
                       <label>
-                        Question:
+                        Question {% include 'ctstem_app/QuestionCategoryDisplay.html' with question=question.instance.response.curriculum_question.question %}
                         {% if question.instance.response.curriculum_question.optional %}
                           <span class="optional">(optional)</span>
                         {% else %}

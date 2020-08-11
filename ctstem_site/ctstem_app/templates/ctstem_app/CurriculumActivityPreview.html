@@ -233,7 +233,10 @@
                   {% for curr_question in referenced_questions %}
                     <div class="referenced_question_response">
                       <div class="question">
-                        <label>Question {{curr_question.step.order}}.{{curr_question.order}}</label>
+                        <label>
+                          Question {{curr_question.step.order}}.{{curr_question.order}}
+                          {% include 'ctstem_app/QuestionCategoryDisplay.html' with question=curr_question.question %}
+                        </label>
                         <div class="text">
                           {{curr_question.question.question_text|inline_style|safe}}
                         </div>
@@ -257,7 +260,10 @@
                       {% if field_type != 'MH' %}
                         <div class="question_response_feedback {% if forloop.counter|divisibleby:2 %} even {% else %} odd {% endif %}">
                           <div class="question">
-                            <label>Question {{step.order}}.{{forloop.counter}}</label>
+                            <label>
+                              Question {{step.order}}.{{forloop.counter}}
+                              {% include 'ctstem_app/QuestionCategoryDisplay.html' with question=question %}
+                            </label>
                             <div class="text">
                               {{question|safe}}
                             </div>

@@ -1,0 +1,16 @@
+{% if question.get_flagged_categories.all %}
+  {% for category in question.get_flagged_categories.all %}
+    {% if category.abbrevation %}
+      {% if forloop.first %}
+      - (
+      {% endif %}
+      {{category.abbrevation}}
+      {% if not forloop.last %}
+      ,
+      {% endif %}
+      {% if forloop.last %}
+      )
+      {% endif %}
+    {% endif %}
+  {% endfor %}
+{% endif %}

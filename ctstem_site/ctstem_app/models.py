@@ -310,6 +310,8 @@ class BookmarkedCurriculum(models.Model):
 class ResearchCategory(models.Model):
   category = models.CharField(null=False, blank=False, max_length=256)
   description = models.TextField(null=True, blank=True)
+  abbrevation = models.CharField(null=True, blank=True, max_length=10)
+  flag = models.BooleanField(choices=((False, 'No'), (True, 'Yes')), default=False, help_text='Questions with category that are flagged will be identified as such.')
 
   def __str__(self):
     return '%s' % (self.category)
@@ -341,6 +343,9 @@ class Question(models.Model):
       self.sketch_background = resizeImage(self.sketch_background, 900, 500)
 
     super(Question, self).save(*args, **kwargs)
+
+  def get_flagged_categories(self):
+    return self.research_category.all().filter(flag=True)
 
 # Subject model
 class Subject(models.Model):

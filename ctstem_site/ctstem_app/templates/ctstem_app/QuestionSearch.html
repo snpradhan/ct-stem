@@ -115,6 +115,7 @@ $(function (){
             $("#questionResults table tbody").html(questions);
             $("#questionResults").show();
             $("#questionResults button.select_question").click(function(){
+              var question_select_button = $(this);
               var formset_div = $("input[id="+id_step+"]").parent();
               var question_table = $(formset_div).find("table.table.question");
               //ajax call to copy selected question and add to curriculum
@@ -123,9 +124,10 @@ $(function (){
                 url: "/question/copy/"+$(this).attr('id'),
                 success: function(data) {
                   if('success' in data && data['success'] == true) {
-                    add_to_question_table($(question_table), data['question_id'], data['question_text']);
+                    add_to_question_table($(question_table), data['question_id'], data['question_text'], data['research_categories'].join('<br>'));
                     rowAddorRemove($(question_table));
-                    $(this).attr('disabled', 'disabled');
+                    $(question_select_button).attr('disabled', 'disabled');
+                    highlight_div($("tr#question_row_"+data['question_id']));
                   }
                 },
                 error: function(xhr, ajaxOptions, thrownError){

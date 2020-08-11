@@ -638,11 +638,12 @@ function add_to_collaborator_table(collaborator_table, current_user_id, user_id,
 }
 
 //Add new question to question table in curriculum form
-function add_to_question_table(question_table, question_id, question_text) {
+function add_to_question_table(question_table, question_id, question_text, research_categories) {
   cloneSomeMore($(question_table).find('tr:last'), 'form', 'curriculumquestion_set');
   $(question_table).find("tr:nth-last-child(2)").attr('id', 'question_row_'+question_id);
   $(question_table).find("tr:nth-last-child(2) td.question_text input[type=hidden]").val(question_id);
   $(question_table).find("tr:nth-last-child(2) td.question_text div").html(question_text);
+  $(question_table).find("tr:nth-last-child(2) td.research_categories").html(research_categories);
   $(question_table).find("tr:nth-last-child(2) button.edit_question").attr("data-form", '/question/'+question_id+'/');
   $(question_table).find("tr:nth-last-child(2)").show();
   var question_order = $(question_table).find("tbody > tr:visible").length;
@@ -786,6 +787,19 @@ function reset_password(user_full_name, user_id, csrf_token){
   return false;
 }
 
+function highlight_div(div) {
+  $(div).addClass('highlight', 'slow')
+  //$(div).animate({'borderWidth': '3px', 'borderColor': '#FFD028', 'borderStyle': 'solid'}, 'slow');
+  var scrollPos = $(div).offset().top - 150;
+  $('html, body').animate({scrollTop:scrollPos}, 1000);
+
+  setTimeout(function() {
+      $(div).removeClass('highlight', 'slow')
+      //$(div).animate({'borderWidth': '1px', 'borderColor': '#ccc', 'borderStyle': 'solid'}, 'slow');
+    },
+    4000
+  );
+}
 
 /**
  * Detects if two elements are colliding

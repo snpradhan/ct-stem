@@ -406,6 +406,7 @@
                       <tr>
                         <th class="order">Q No.</th>
                         <th class="question_text">Question</th>
+                        <th> Research Categories</th>
                         <th class="referenced_by">
                           Referenced By
                           <span data-toggle="tooltip" data-placement="top" title="Provide a comma separated list of Page Numbers that will reference this question. This question will be available on those steps as readonly.">
@@ -418,21 +419,30 @@
                     </thead>
                     <tbody>
                       {% for questionForm in step.nested %}
-                        <tr style="{% if forloop.last %} display:none; {% endif %}" id="question_row_{{questionForm.question.value}}">
+                        <tr style="{% if forloop.last %} display:none; {% endif %}" id="question_row_{{questionForm.instance.question.id}}">
                           <td class="order">
                             {{questionForm.id}}
                             {{questionForm.ORDER}}
                           </td>
                           <td class="question_text">
-                            {% if questionForm.question.value and questionForm.question.value != 'None' %}
+                            {% if questionForm.instance and questionForm.instance.id != 'None' %}
                               {{questionForm.question.as_hidden}}
                               <div>
-                                {% replace_iframe_tag questionForm.question.value|selected_question as revised_test %}
+                                {% replace_iframe_tag questionForm.instance.question.question_text as revised_test %}
                                 {{ revised_test|safe }}
                               </div>
                             {% else %}
                               {{questionForm.question.as_hidden}}
                               <div></div>
+                            {% endif %}
+                          </td>
+                          <td class="research_categories">
+                            {% if questionForm.instance and questionForm.instance.id != 'None' %}
+                              {% for category in questionForm.instance.question.get_flagged_categories.all %}
+                                {% if category.abbrevation %}
+                                  {{category.abbrevation}} <br>
+                                {% endif %}
+                              {% endfor %}
                             {% endif %}
                           </td>
                           <td class="referenced_by">{{questionForm.referenced_by}}</td>
@@ -572,13 +582,7 @@
             CKEDITOR.replace($(this).attr('name'), config);
           }
         });
-        $(new_step_div).animate({'borderWidth': '3px', 'borderColor': '#FFD028'}, 'slow');
-        $('html, body').animate({scrollTop:$(new_step_div).offset().top}, 1000);
-        setTimeout(function() {
-            $(new_step_div).animate({'borderWidth': '1px', 'borderColor': '#ccc'}, 'slow');
-          },
-          4000
-        );
+        highlight_div($(new_step_div));
 
       });
 

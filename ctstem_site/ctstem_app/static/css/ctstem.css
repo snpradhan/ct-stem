@@ -715,6 +715,20 @@ label.switch#curricula_view {
   text-align: right;
 }
 
+.highlight {
+  border: 3px solid #FFD028 !important;
+}
+.highlight > td {
+  border-top: inherit !important;
+  border-bottom: inherit !important;
+}
+.highlight > td:first-child {
+  border-left: inherit !important;
+}
+.highlight > td:last-child {
+  border-right: inherit !important;
+}
+
 /*** TILES COMMON ****/
 div.content#curricula div.row#curricula_tiles,
 div.content#curricula div.row#curricula_filters,

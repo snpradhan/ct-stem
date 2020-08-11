@@ -199,13 +199,16 @@ $(function (){
 
           if(question_id != 'None'){
             $(question_table).find("tr#question_row_"+question_id+" td.question_text div").html(data['question_text']);
+            $(question_table).find("tr#question_row_"+question_id+" td.research_categories").html(data['research_categories'].join('<br>'));
           }
           else {
-            add_to_question_table($(question_table), data['question_id'], data['question_text']);
+            question_id = data['question_id'];
+            add_to_question_table($(question_table), data['question_id'], data['question_text'], data['research_categories'].join('<br>'));
           }
           $("#questionForm")[0].reset();
           $("#questionModal").modal('toggle');
           rowAddorRemove($(question_table));
+          highlight_div($("tr#question_row_"+question_id));
         }
         else{
           $('#questionModal').html(data['html']);

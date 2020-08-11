@@ -38,6 +38,7 @@
         <thead>
           <tr>
             <th>Question No.</th>
+            <th>Research Categories</th>
             <th>Question</th>
             <th>Options</th>
             <th>Correct Answer</th>
@@ -46,6 +47,13 @@
         <tbody>
           <tr>
             <td style="text-align: center;">{{curriculum_question.step.order}}.{{curriculum_question.order}}</td>
+            <td>
+              {% for category in curriculum_question.question.get_flagged_categories %}
+                {% if category.abbrevation %}
+                  {{category.abbrevation}} <br>
+                {% endif %}
+              {% endfor %}
+            </td>
             <td>{{curriculum_question.question.question_text|safe}}</td>
             <td>
               {% with field_type=curriculum_question.question.answer_field_type %}
