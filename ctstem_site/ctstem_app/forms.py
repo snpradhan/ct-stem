@@ -776,6 +776,9 @@ class ResearchCategoryForm(ModelForm):
       'description': forms.Textarea(attrs={'rows':5, 'cols':60, 'placeholder': 'Category description'}),
       'abbrevation': forms.TextInput(attrs={'placeholder': 'Enter abbrevation here'}),
     }
+    labels = {
+      'abbrevation': 'Abbreviation'
+    }
 
   def __init__(self, *args, **kwargs):
     super(ResearchCategoryForm, self).__init__(*args, **kwargs)
@@ -1379,6 +1382,9 @@ class SubjectForm(ModelForm):
   class Meta:
     model = models.Subject
     exclude = ('id',)
+    labels = {
+      'abbrevation': "Abbreviation"
+    }
 
   def __init__(self, *args, **kwargs):
     super(SubjectForm, self).__init__(*args, **kwargs)
