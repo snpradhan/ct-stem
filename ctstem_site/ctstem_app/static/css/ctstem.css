@@ -704,9 +704,14 @@ div.content#curricula > * {
   padding-right: 5%;
   color: white;
 }
+div.content#curricula .page-blurb {
+  padding-top: 5em;
+}
+
 div.content#curricula .page-blurb > * {
   color: inherit !important;
   text-align: center !important;
+  margin-top: 0 !important;
 }
 
 label.switch#curricula_view {
