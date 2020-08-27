@@ -1563,6 +1563,10 @@ div.modal-content div.modal-body p {
   font-size: 1.5em;
 }
 
+div.modal-content div#widget-div {
+  vertical-align: middle !important;
+}
+
 /***** Consent Form Modal *****/
 div.modal#consent div.modal-content form#consentForm div.modal-body{
   padding: 2.5em 2.5em 1em 2.5em;
