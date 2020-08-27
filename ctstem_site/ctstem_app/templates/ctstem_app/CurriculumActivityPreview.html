@@ -235,7 +235,6 @@
                       <div class="question">
                         <label>
                           Question {{curr_question.step.order}}.{{curr_question.order}}
-                          {% include 'ctstem_app/QuestionCategoryDisplay.html' with question=curr_question.question %}
                         </label>
                         <div class="text">
                           {{curr_question.question.question_text|inline_style|safe}}
@@ -262,7 +261,6 @@
                           <div class="question">
                             <label>
                               Question {{step.order}}.{{forloop.counter}}
-                              {% include 'ctstem_app/QuestionCategoryDisplay.html' with question=question %}
                             </label>
                             <div class="text">
                               {{question|safe}}
