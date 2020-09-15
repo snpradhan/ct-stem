@@ -7,6 +7,7 @@ $(function (){
     $(this).find('.msg .errorlist .error').html('');
     $(this).find('.results').hide();
     $(this).find('.results tbody').html('');
+    $(this).find('#widget-div').html('');
   });
 
 
