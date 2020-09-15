@@ -60,7 +60,6 @@
 
 <script type="text/javascript">
   $(function (){
-    var new_shared_with = [];
     $("#teacherForm").submit(function(e) {
       e.preventDefault();
       $("#teacherResults table tbody").empty();
@@ -113,8 +112,6 @@
                   $('table#teachers tbody tr#'+teacher_id).remove();
                   rowAddorRemove($('table#teachers'));
                 });
-                //add the teacher to a list
-                new_shared_with.push(teacher_name);
                 $(this).attr('disabled', 'disabled');
               });
             }
@@ -127,17 +124,6 @@
           alert(thrownError);
         },
       });
-    });
-
-    $('button.close').on('click', function(){
-      if(new_shared_with.length){
-        var text = "<p>This class has been shared with the following users:</p> <br> <ul><li><p>";
-        text = text + new_shared_with.join('</p></li><li><p>');
-        text = text + '</p></li></ul>';
-        new_shared_with = [];
-        $('#notification .modal-body').html(text);
-        $('#notification').modal('toggle');
-      }
     });
   });
 
