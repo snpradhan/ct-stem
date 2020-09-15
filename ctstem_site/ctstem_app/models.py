@@ -334,6 +334,8 @@ class Question(models.Model):
   answer = models.TextField(null=True, blank=True)
   sketch_background = models.ImageField(upload_to=upload_file_to, blank=True, null=True, help_text='Upload a background image at least 900x500 in resolution for the sketch pad')
   research_category = models.ManyToManyField(ResearchCategory, blank=True, related_name='questions')
+  created_date = models.DateTimeField(auto_now_add=True)
+  modified_date = models.DateTimeField(auto_now=True)
 
   def __str__(self):
       return '%s' % (self.question_text)
