@@ -383,14 +383,18 @@ def curriculum(request, id=''):
           obj.delete()
 
         formset.save(commit=False)
+        page_order = 1
         for stepform in formset.ordered_forms:
-          stepform.instance.order = stepform.cleaned_data['ORDER']
+          stepform.instance.order = page_order
           stepform.instance.curriculum = savedCurriculum
           stepform.instance.save()
+          page_order = page_order + 1
+          question_order = 1
           for qform in stepform.nested.ordered_forms:
-            qform.instance.order = qform.cleaned_data['ORDER']
+            qform.instance.order = question_order
             qform.instance.step = stepform.instance
             qform.instance.save()
+            question_order = question_order + 1
           for obj in stepform.nested.deleted_objects:
             obj.delete()
         #remove deleted questions
