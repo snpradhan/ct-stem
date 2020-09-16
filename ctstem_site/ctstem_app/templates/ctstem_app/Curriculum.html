@@ -494,7 +494,6 @@
         </div>
       </div>
     </form>
-    <div class="modal fade" id="questionModal" role="dialog" data-keyboard="false" data-backdrop="static"></div>
     <div class="modal fade" id="taxonomyModal" role="dialog"></div>
 
   </div>
@@ -508,6 +507,7 @@
         $("#questionModal").load(url, function() {
           $(this).modal('show');
           $("#questionModal input[id='id_step']").val(step_id);
+          $("#questionModal input[id='id_is_active']").closest('.form-group').hide();
         });
 
         return false;

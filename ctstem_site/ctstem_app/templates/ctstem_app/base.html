@@ -256,6 +256,7 @@
                       <li class="{% navactive request 'ctstem:schools' %}"><a href="{% url 'ctstem:schools' %}">Schools</a></li>
                       <li class="{% navactive request 'ctstem:categories' %}"><a href="{% url 'ctstem:categories' %}">Research Categories</a></li>
                       {% if user.administrator %}
+                        <li class="{% navactive request 'ctstem:questions' 'active' %}"><a href="{% url 'ctstem:questions' 'active' %}">Question Bank</a></li>
                         <li class="{% navactive request 'ctstem:teamMembers' %}"><a href="{% url 'ctstem:teamMembers' %}">Team Members</a></li>
                         <li><a href="{% url 'ctstem:clear_cache' %}">Clear Cache</a></li>
                       {% endif %}
@@ -458,6 +459,7 @@
       <div class="modal fade" id="consent" role="dialog" data-keyboard="false" data-backdrop="static"></div>
       <div class="modal fade" id="userSearch" role="dialog" data-keyboard="false" data-backdrop="static"></div>
       <div class="modal fade" id="assignmentModal" role="dialog"></div>
+      <div class="modal fade" id="questionModal" role="dialog" data-keyboard="false" data-backdrop="static"></div>
       {% block invite %}
         {% include "ctstem_app/InviteModal.html" %}
       {% endblock %}

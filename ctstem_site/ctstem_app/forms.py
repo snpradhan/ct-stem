@@ -694,7 +694,7 @@ class QuestionForm(ModelForm):
 
   class Meta:
     model = models.Question
-    fields = ['research_category', 'question_text', 'answer_field_type', 'sketch_background', 'options', 'display_other_option', 'answer']
+    fields = ['research_category', 'question_text', 'answer_field_type', 'sketch_background', 'options', 'display_other_option', 'answer', 'is_active']
     widgets = {
       'question_text': forms.TextInput(attrs={'placeholder': 'Enter question here'}),
       'options': forms.Textarea(attrs={'rows':5, 'cols':60}),
@@ -749,6 +749,7 @@ class QuestionSearchForm(forms.Form):
   answer_field_type = forms.ChoiceField(required = False, choices=(('','------------'),) + models.FIELD_TYPE_CHOICES)
   research_category = forms.ModelChoiceField(required = False, queryset=models.ResearchCategory.objects.all())
   question_text = forms.CharField(required = False, widget=forms.Textarea(attrs={'rows': 2, 'cols': 60, 'placeholder': 'Question text'}))
+  only_my_questions = forms.BooleanField(required=False)
 
   def __init__(self, *args, **kwargs):
     super(QuestionSearchForm, self).__init__(*args, **kwargs)

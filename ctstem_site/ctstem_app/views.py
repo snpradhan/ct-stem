@@ -399,8 +399,13 @@ def curriculum(request, id=''):
             qform.instance.save()
             question_order = question_order + 1
           for obj in stepform.nested.deleted_objects:
+            question = obj.question
             obj.delete()
+            reassign_question_parent(request, question.id)
+            question.delete()
+
         #remove deleted questions
+        print('am i back here')
         for obj in formset.deleted_objects:
           obj.delete()
 
@@ -937,7 +942,9 @@ def copyQuestion(request, id=''):
     original_question_id = question.id
     question.id = None
     question.pk = None
+    question.visibility = 'D'
     original_question = models.Question.objects.get(id=original_question_id)
+    question.parent = original_question
     if question.sketch_background:
       try:
         source = question.sketch_background
@@ -964,6 +971,30 @@ def copyQuestion(request, id=''):
       return http.HttpResponse(json.dumps(response_data), content_type="application/json")
     else:
       return question
+
+@login_required
+def deleteQuestion(request, id=''):
+  try:
+    # check if the user has permission to delete a question
+    if hasattr(request.user, 'administrator') == False:
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to delete this question</h1>')
+    # check if the lesson exists
+    if '' != id:
+      question = models.Question.objects.get(id=id)
+    else:
+      raise models.Question.DoesNotExist
+
+    if request.method == 'GET' or request.method == 'POST':
+      messages.success(request, 'Selected question has been deleted')
+      question.delete()
+
+      return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+    return http.HttpResponseNotAllowed(['GET', 'POST'])
+
+  except models.Question.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested question not found</h1>')
+
 
 @login_required
 def archiveCurriculum(request, id=''):
@@ -2022,35 +2053,72 @@ def searchQuestion(request):
 
   elif 'POST' == request.method:
     data = request.POST.copy()
-    query_filter = {}
+    public_filter = Q()
+    question_filter = Q()
+    curriculum_filter = Q()
+    query_filter = Q()
+    #question fields matching
     if data['research_category']:
-      query_filter['research_category'] = int(data['research_category'])
-    if data['page_number']:
-      query_filter['curriculum_question__step__order'] = int(data['page_number'])
-    if data['question_number']:
-      query_filter['curriculum_question__order'] = int(data['question_number'])
+      question_filter = question_filter & Q(research_category=int(data['research_category']))
+      #question_filter['research_category'] = int(data['research_category'])
     if data['answer_field_type']:
-      query_filter['answer_field_type'] = data['answer_field_type']
+      question_filter = question_filter & Q(answer_field_type=data['answer_field_type'])
+      #question_filter['answer_field_type'] = data['answer_field_type']
     if data['question_text']:
-      query_filter['question_text__icontains'] = str(data['question_text'])
+      question_filter = question_filter & Q(question_text__icontains=str(data['question_text']))
+      #question_filter['question_text__icontains'] = str(data['question_text'])
 
+    #question number and page number matching
+    if data['page_number']:
+      question_filter = question_filter & Q(curriculum_question__step__order=int(data['page_number']))
+      #question_filter['curriculum_question__step__order'] = int(data['page_number'])
+    if data['question_number']:
+      question_filter = question_filter & Q(curriculum_question__order=int(data['question_number']))
+      #question_filter['curriculum_question__order'] = int(data['question_number'])
+
+    #curriculum matching
     if hasattr(request.user, 'teacher') or hasattr(request.user, 'researcher'):
-      query_filter['curriculum_question__step__curriculum__unit__curriculumcollaborator__user__id'] = request.user.id
+      curriculum_filter = curriculum_filter & Q(curriculum_question__step__curriculum__unit__curriculumcollaborator__user__id=request.user.id)
+      #curriculum_filter['curriculum_question__step__curriculum__unit__curriculumcollaborator__user__id'] = request.user.id
     elif data['unit_id']:
-      query_filter['curriculum_question__step__curriculum__unit__id'] = int( data['unit_id'])
+      curriculum_filter = curriculum_filter & Q(curriculum_question__step__curriculum__unit__id=int( data['unit_id']))
+      #curriculum_filter['curriculum_question__step__curriculum__unit__id'] = int( data['unit_id'])
     elif data['curriculum_id']:
-      query_filter['curriculum_question__step__curriculum__id'] = int( data['curriculum_id'])
+      curriculum_filter = curriculum_filter & Q(curriculum_question__step__curriculum__id=int( data['curriculum_id']))
+      #curriculum_filter['curriculum_question__step__curriculum__id'] = int( data['curriculum_id'])
 
-    #print(query_filter)
-    questionList = models.Question.objects.filter(**query_filter).order_by('curriculum_question__step__curriculum__order',
+    if data['only_my_questions'] == 'false':
+      public_filter = Q(visibility='P') & Q(is_active=True)
+
+    query_filter = curriculum_filter | public_filter
+    query_filter = question_filter & query_filter
+    questionList = models.Question.objects.filter(query_filter).order_by('-visibility','curriculum_question__step__curriculum__order',
                                                                            'curriculum_question__step__order',
                                                                            'curriculum_question__order')
-    question_list = [{'lesson_number': question.curriculum_question.all()[0].step.curriculum.order or 'N/A',
-                      'page_number': question.curriculum_question.all()[0].step.order,
-                      'question_number': question.curriculum_question.all()[0].order ,
+    #print(questionList)
+    '''question_list = [{'lesson_number': question.curriculum_question.all()[0].step.curriculum.order or 'N/A',
+                      'page_number': question.curriculum_question.all()[0].step.order or 'N/A',
+                      'question_number': question.curriculum_question.all()[0].order  or 'N/A',
                       'question_text': replace_iframe_tag(request, question.question_text),
                       'id': question.id}
-                        for question in questionList]
+                        for question in questionList]'''
+    question_list = []
+    for question in questionList:
+      lesson_number = 'N/A'
+      page_number = 'N/A'
+      question_number = 'N/A'
+
+      if question.curriculum_question.all():
+        lesson_number = question.curriculum_question.all()[0].step.curriculum.order or 'N/A'
+        page_number = question.curriculum_question.all()[0].step.order or 'N/A'
+        question_number = question.curriculum_question.all()[0].order or 'N/A'
+
+      question_list.append({'lesson_number': lesson_number,
+                      'page_number': page_number,
+                      'question_number': question_number,
+                      'question_text': replace_iframe_tag(request, question.question_text),
+                      'id': question.id})
+
     return http.HttpResponse(json.dumps(question_list), content_type="application/json")
 
   return http.HttpResponseNotAllowed(['GET', 'POST'])
@@ -4337,15 +4405,21 @@ def question(request, id=''):
 
   elif 'POST' == request.method:
     data = request.POST.copy()
+    is_public = data['is_public']
     questionForm = forms.QuestionForm(data, request.FILES, instance=question, disable_fields=disable_fields)
     response_data = {}
     if questionForm.is_valid():
       question = questionForm.save()
+      if(is_public == 'true'):
+        question.visibility = 'P'
+        question.save()
       research_categories = []
       for category in question.research_category.all():
         if category.flag and category.abbrevation:
           research_categories.append(category.abbrevation)
 
+      if is_public == 'true':
+        messages.success(request, 'The question has been saved')
       response_data = {'success': True, 'question_id': question.id, 'question_text': replace_iframe_tag(request, question.question_text), 'research_categories': research_categories}
     else:
       print(questionForm.errors)
@@ -4356,6 +4430,25 @@ def question(request, id=''):
     return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 
   return http.HttpResponseNotAllowed(['GET', 'POST'])
+
+
+@login_required
+def questions(request, status='active'):
+  if hasattr(request.user, 'administrator') == False:
+    return http.HttpResponseNotFound('<h1>You do not have the privilege to view questions</h1>')
+
+  if status == 'active':
+    questions = models.Question.objects.all().filter(visibility='P', is_active=True)
+  else:
+    questions = models.Question.objects.all().filter(visibility='P', is_active=False)
+
+  order_by = 'created_date'
+  direction = 'desc'
+  ignorecase = 'false'
+  sort_order = [{'order_by': order_by, 'direction': direction, 'ignorecase': ignorecase}]
+  question_list = paginate(request, questions, sort_order, 25)
+  context = {'questions': question_list, 'status': status}
+  return render(request, 'ctstem_app/Questions.html', context)
 
 ####################################
 # Display the question response based on the answer field type
@@ -5201,3 +5294,13 @@ def clear_cache(request):
 def replace_iframe_tag(request, text):
   iframe_re = re.compile(r'<iframe.*</iframe>')
   return iframe_re.sub('<div class="iframe_replacement"><i class="far fa-file-code" title="iframe placeholder"></i></div>', text)
+
+@login_required
+#check if a question is being deleted
+def reassign_question_parent(request, id=''):
+  #if the question being deleted has a parent and children
+  question = models.Question.objects.get(id=id)
+  if question.parent and question.copied_questions.all():
+    for child_question in question.copied_questions.all():
+      child_question.parent = question.parent
+      child_question.save()

@@ -1,0 +1,90 @@
+{% extends "ctstem_app/base.html" %}
+{% load ctstem_extras %}
+{% block media %}
+  {{ block.super }}
+  {{ form.media }}
+{% endblock %}
+{% block title %}Public Questions |{% endblock %}
+
+{% block content %}
+  {{block.super}}
+  <div class="content">
+    <h2> Public Questions </h2>
+    <div class="btn-group">
+      <button class="btn blue normal edit_question" name="add_question" data-form="{% url 'ctstem:newQuestion' %}" aria-label="Add New Question" title="Add New Question">
+        Create Question
+      </button>
+    </div>
+    <ul class="nav nav-tabs">
+      <li {% if status == 'active' %} class="active"{% endif %}><a href="{% url 'ctstem:questions' 'active' %}">Active</a></li>
+      <li {% if status == 'inactive' %} class="active"{% endif %}><a href="{% url 'ctstem:questions' 'inactive' %}">Inactive</a></li>
+    </ul>
+
+    {% if questions %}
+      {% include "ctstem_app/Pagination.html" with model=questions %}
+      <table class="table table-striped table-bordered table-condensed" id="questions">
+        <thead>
+          <tr>
+            <th width="40%"> Question </th>
+            <th> Research Category </th>
+            <th> Field Type </th>
+            <th> Options </th>
+            <th> Answer </th>
+            <th> Created Date </th>
+            <th> Usage </th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for question in questions %}
+            <tr>
+              <td class="title">
+                {% replace_iframe_tag question.question_text as revised_test %}
+                {{ revised_test|safe }}
+
+                <div class="controls">
+                  <button type="button" class="btn green edit_question" name="edit_question"
+                       aria-label="Edit Question" title="Edit Question" data-form="{% url 'ctstem:question' question.id %}" >
+                    <i class="fas fa-pencil-alt" aria-hidden="true"></i>
+                  </button>
+                  <a type="button" class="btn red delete" aria-label="Delete Question" title="Delete Question" href="{% url 'ctstem:deleteQuestion' question.id %}" onclick="return confirm('Are you sure you want to delete this question?')">
+                    <i class="fa fa-trash" aria-hidden="true"></i>
+                  </a>
+                </div>
+              </td>
+              <td>{{ question.research_category.all|join:"<br>"}}</td>
+              <td>{{ question.get_answer_field_type_display}}</td>
+              <td>{{ question.options|splitlines|join:"<br>"}}</td>
+              <td>{{ question.answer}}</td>
+              <td>{{ question.created_date}}</td>
+              <td>{{ question.get_descendants_count}} </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% include "ctstem_app/Pagination.html" with model=questions %}
+    {% else %}
+      <p>No questions available.</p>
+    {% endif %}
+
+  </div>
+   <script type="text/javascript">
+    $(function (){
+      $("button.edit_question").click(function(e){
+        e.preventDefault();
+        var url = $(this).data("form");
+        var step_div = $(this).closest('.step');
+        var step_id = $(step_div).children(':hidden').first().attr('id');
+        $("#questionModal").load(url, function() {
+          $(this).modal('show');
+          $("#questionModal input[id='id_step']").val(step_id);
+          $("#questionModal input[id='is_public']").val('true');
+        });
+
+        return false;
+      });
+    });
+  </script>
+
+{% endblock %}
+
+

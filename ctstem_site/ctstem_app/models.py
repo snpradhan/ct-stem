@@ -12,7 +12,7 @@ from django.utils.crypto import get_random_string
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db.models import signals
 from django.dispatch import receiver
-from django.db.models.signals import pre_save, post_save, m2m_changed
+from django.db.models.signals import pre_save, post_save, m2m_changed, pre_delete
 from django.db.models.functions import Upper
 from django.conf import settings
 from django.core.mail import send_mail
@@ -26,6 +26,11 @@ CURRICULUM_STATUS_CHOICES = (
     ('P', 'Public'),
     ('A', 'Archived'),
     ('R', 'Deleted'),
+)
+
+QUESTION_VISIBILITY_CHOICES = (
+    ('D', 'Private'),
+    ('P', 'Public'),
 )
 
 CURRICULUM_TYPE_CHOICES = (
@@ -336,6 +341,9 @@ class Question(models.Model):
   research_category = models.ManyToManyField(ResearchCategory, blank=True, related_name='questions')
   created_date = models.DateTimeField(auto_now_add=True)
   modified_date = models.DateTimeField(auto_now=True)
+  visibility = models.CharField(max_length=1, default='D', choices=QUESTION_VISIBILITY_CHOICES)
+  parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL, related_name="copied_questions")
+  is_active = models.BooleanField(null=False, blank=False, default=True)
 
   def __str__(self):
       return '%s' % (self.question_text)
@@ -348,6 +356,16 @@ class Question(models.Model):
 
   def get_flagged_categories(self):
     return self.research_category.all().filter(flag=True)
+
+  def get_descendants_count(self):
+    children = self.copied_questions.all()
+    if children:
+      count = children.count()
+      for child in children:
+        count = count + child.get_descendants_count()
+      return count
+    else:
+      return 0
 
 # Subject model
 class Subject(models.Model):

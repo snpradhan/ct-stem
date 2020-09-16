@@ -18,6 +18,7 @@
       {{questionForm.media}}
       <input id="id_question" type="hidden" value="{{questionForm.instance.id}}"/>
       <input id="id_step" type="hidden" value=""/>
+      <input id="is_public" type="hidden" value="false"/>
       <div class="modal-body">
         {% for field in questionForm %}
           <div class="form-group {% if field.name == 'sketch_background' %}
@@ -52,6 +53,9 @@
             <div class="error">{{ field.errors }}</div>
           </div>
         {% endfor %}
+        <div id="spinner">
+          <img src="/static/img/page-loader.gif" class="icon"/>
+        </div>
       </div>
       <div class="modal-footer">
         <div class="form-group">
@@ -167,21 +171,15 @@ $(function (){
 
     e.preventDefault();
     var question_text = CKEDITOR.instances.id_question_text.getData(); //tinymce.get('id_question_text').getContent();
-    /*data = {}
-    data['question_text'] = question_text;
-    data['answer_field_type'] = $("#id_answer_field_type").val();
-    data['options'] = $("#id_options").val();
-    data['answer'] = $("#id_answer").val();
-    data['csrfmiddlewaretoken'] = $('#questionForm').find('input:hidden').eq(0).val();
-    var data = $.param(data); */
     var formData = new FormData(this);
     formData.append('question_text', question_text);
+    formData.append('is_public', $("#is_public").val());
 
     if($("#id_answer_field_type").val() != 'SK'){
       formData.append('sketch_background-clear', 'on');
     }
     var question_id = $("#id_question").val();
-    var id_step = $("#questionForm input[id='id_step']").val();
+    var id_step = $("#id_step").val();
 
     /*var url = "{% url 'ctstem:newQuestion' %}";*/
     $.ajax({
@@ -192,23 +190,35 @@ $(function (){
       cache:false,
       contentType: false,
       processData: false,
+      beforeSend: function(){
+        $('#questionForm #spinner').show();
+      },
+      complete: function(){
+        $('#questionForm #spinner').hide();
+      },
       success: function(data, status){
         if(data['success'] == true){
-          var formset_div = $("input[id="+id_step+"]").parent();
-          var question_table = $(formset_div).find("table.table.question");
+          if(id_step) {
+            var formset_div = $("input[id="+id_step+"]").parent();
+            var question_table = $(formset_div).find("table.table.question");
 
-          if(question_id != 'None'){
-            $(question_table).find("tr#question_row_"+question_id+" td.question_text div").html(data['question_text']);
-            $(question_table).find("tr#question_row_"+question_id+" td.research_categories").html(data['research_categories'].join('<br>'));
+            if(question_id != 'None'){
+              $(question_table).find("tr#question_row_"+question_id+" td.question_text div").html(data['question_text']);
+              $(question_table).find("tr#question_row_"+question_id+" td.research_categories").html(data['research_categories'].join('<br>'));
+            }
+            else {
+              question_id = data['question_id'];
+              add_to_question_table($(question_table), data['question_id'], data['question_text'], data['research_categories'].join('<br>'));
+            }
+            rowAddorRemove($(question_table));
+            highlight_div($("tr#question_row_"+question_id));
           }
           else {
-            question_id = data['question_id'];
-            add_to_question_table($(question_table), data['question_id'], data['question_text'], data['research_categories'].join('<br>'));
+            location.reload();
           }
           $("#questionForm")[0].reset();
           $("#questionModal").modal('toggle');
-          rowAddorRemove($(question_table));
-          highlight_div($("tr#question_row_"+question_id));
+
         }
         else{
           $('#questionModal').html(data['html']);

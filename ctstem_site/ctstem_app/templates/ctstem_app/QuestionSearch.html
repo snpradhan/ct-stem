@@ -39,6 +39,10 @@
             <label for="id_question_text">Question Text Contains</label>
             <div>{{form.question_text}}</div>
           </div>
+          <div class="form-group">
+            <label for="id_question_text">Search only questions in the Unit/Lesson</label>
+            <div>{{form.only_my_questions}}</div>
+          </div>
         </div>
       </div>
       <div class="modal-footer">
@@ -83,6 +87,7 @@ $(function (){
     data['question_text'] = $("#id_question_text").val();
     data['curriculum_id'] = $("#id_curriculum").val();
     data['unit_id'] = $("#id_unit").val();
+    data['only_my_questions'] = $('#id_only_my_questions').is(':checked');
     data['csrfmiddlewaretoken'] = $('#questionSearchForm').find('input:hidden').eq(0).val();
     var data = $.param(data);
     //ajax call to search question
@@ -103,7 +108,7 @@ $(function (){
                             <td>"+value['page_number']+"</td> \
                             <td>"+value['question_number']+"</td> \
                             <td>"+value['question_text']+"</td> \
-                            <td><button type='button' class='btn small blue select_question' id='"+value['id']+"''>Add</a></td> \
+                            <td><button style='width:75px;' type='button' class='btn small blue select_question' id='"+value['id']+"''>Add</button></td> \
                           </tr>";
           });
           if(questions.length == 0){
@@ -118,15 +123,22 @@ $(function (){
               var question_select_button = $(this);
               var formset_div = $("input[id="+id_step+"]").parent();
               var question_table = $(formset_div).find("table.table.question");
+              var inner_html = $(question_select_button).html();
               //ajax call to copy selected question and add to curriculum
               $.ajax({
                 type: 'GET',
                 url: "/question/copy/"+$(this).attr('id'),
+                beforeSend: function(){
+                  $(question_select_button).attr('disabled', 'disabled');
+                  $(question_select_button).html('<i class="fa fa-spinner fa-spin"></i>');
+                },
+                complete: function(){
+                  $(question_select_button).html(inner_html);
+                },
                 success: function(data) {
                   if('success' in data && data['success'] == true) {
                     add_to_question_table($(question_table), data['question_id'], data['question_text'], data['research_categories'].join('<br>'));
                     rowAddorRemove($(question_table));
-                    $(question_select_button).attr('disabled', 'disabled');
                     highlight_div($("tr#question_row_"+data['question_id']));
                   }
                 },
