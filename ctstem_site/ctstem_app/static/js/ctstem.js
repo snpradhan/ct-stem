@@ -627,13 +627,6 @@ function add_to_collaborator_table(collaborator_table, current_user_id, user_id,
 
   $(privilege_select).val(privilege_code);
   $(privilege_select).find('option[value=""]').remove();
-
-  if(current_user_id == user_id) {
-    $('<div>'+privilege_display+'</div>').insertAfter($(privilege_select));
-    $(privilege_select).hide();
-    $(collaborator_row).find("td.delete").hide();
-  }
-
   $(collaborator_row).show();
 }
 

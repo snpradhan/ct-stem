@@ -33,7 +33,7 @@
               <td class="full_name">{{collaborator.get_full_name}}</td>
               <td class="email">{{collaborator.email}}</td>
               <td class="edit_view">
-                {% if user != collaborator %}
+                {% if user != collaborator or user.administrator %}
                   {{collaboratorForm.privilege}}
                 {% else %}
                   <div>{{collaboratorForm.privilege.value|get_collaborator_privilege_display}}</div>
@@ -41,7 +41,7 @@
                 {% endif %}
               </td>
               <td class="delete">
-                {% if user != collaborator %}
+                {% if user != collaborator or user.administrator %}
                   <button type="button" class="btn small red remove_collaborator" name="remove_collaborator" aria-label="Remove this collaborator" title="Remove this collaborator" href="#">
                     <i class="fa fa-trash" aria-hidden="true"></i>
                   </button>
