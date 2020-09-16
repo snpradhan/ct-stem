@@ -276,6 +276,9 @@ def curriculum(request, id=''):
           unit_id = curriculum.id
         elif curriculum.unit:
           unit_id = curriculum.unit.id
+      elif request.user.is_anonymous:
+        list(messages.get_messages(request))
+        return http.HttpResponseRedirect('/?next=login/?next=/curriculum/%s' % id)
       else:
         if request.META.get('HTTP_REFERER'):
           if 'login' in request.META.get('HTTP_REFERER'):
@@ -485,10 +488,14 @@ def previewCurriculum(request, id='', pem_code=''):
   try:
     # check curriculum permission
     has_permission = check_curriculum_permission(request, id, 'preview', pem_code)
-    if has_permission:
-      curriculum = models.Curriculum.objects.get(id=id)
-    else:
-      return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+    curriculum = models.Curriculum.objects.get(id=id)
+
+    if not has_permission:
+      if curriculum.status != 'P' and request.user.is_anonymous:
+        list(messages.get_messages(request))
+        return http.HttpResponseRedirect('/?next=login/?next=/curriculum/preview/%s' % id)
+      else:
+        return shortcuts.redirect('ctstem:home')
 
     if request.method == 'GET':
       systems = models.System.objects.all()
@@ -3951,9 +3958,11 @@ def check_curriculum_permission(request, curriculum_id, action, pem_code=''):
               for lesson in curriculum.underlying_curriculum.all():
                 has_permission = check_curriculum_permission(request, lesson.id, action)
                 if has_permission:
+                  list(messages.get_messages(request))
                   break
 
           if not has_permission:
+            list(messages.get_messages(request))
             messages.error(request, 'You do not have the privilege to preview this curriculum')
 
         ############ ASSIGN ############
