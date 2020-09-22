@@ -178,7 +178,7 @@
                   </td>
                   <td>
                     <div class="feedback">
-                      {% if resp_feed.status == 'P' or resp_feed.status == 'S' %}
+                      {% if resp_feed.status == 'P' or resp_feed.status == 'S' or resp_feed.status == 'F' or resp_feed.status == 'A'%}
                         {% if resp_feed.question_feedback_form %}
                           {{resp_feed.question_feedback_form.id}}
                           {{resp_feed.question_feedback_form.feedback}}
@@ -186,8 +186,8 @@
                             <i class="fa fa-smile-o" aria-hidden="true"></i>
                           </a>
                         {% endif %}
-                      {% elif resp_feed.status == 'F' or resp_feed.status == 'A' %}
-                        {{resp_feed.message|safe}}
+                      {% else %}
+                        Assignment not yet started.
                       {% endif %}
                     </div>
                   </td>

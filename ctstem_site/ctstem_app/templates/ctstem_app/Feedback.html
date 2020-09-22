@@ -121,22 +121,14 @@
                     </div>
                   </div>
                   <div class="col-md-4">
-                    {% if form.instance.instance.status == 'P' or form.instance.instance.status == 'S' or form.instance.instance.status == 'F' %}
+                    {% if form.instance.instance.status == 'P' or form.instance.instance.status == 'S' or form.instance.instance.status == 'F' or form.instance.instance.status == 'A'%}
                       {% if question.instance.response.response or question.instance.response.response_file.all %}
                         <label>Feedback: </label>
                         <div class="feedback">
-                          {% if form.instance.instance.status == 'P' or form.instance.instance.status == 'S' %}
-                            {{question.feedback}}
-                            <a data-toggle="modal" data-target="#emojis" class="emoji-modal" href="#" data-id="{{question.feedback.auto_id}}">
-                              <i class="fa fa-smile-o" aria-hidden="true"></i>
-                            </a>
-                          {% elif form.instance.instance.status == 'F' or form.instance.instance.status == 'A'%}
-                            {% if question.feedback.value %}
-                              {{question.feedback.value}}
-                            {% else %}
-                              <span style="font-style: italic;">Feedback not provided</span>
-                            {% endif %}
-                          {% endif %}
+                          {{question.feedback}}
+                          <a data-toggle="modal" data-target="#emojis" class="emoji-modal" href="#" data-id="{{question.feedback.auto_id}}">
+                            <i class="fa fa-smile-o" aria-hidden="true"></i>
+                          </a>
                         </div>
                       {% endif %}
                     {% endif %}
@@ -150,12 +142,12 @@
 
         <div class="form-group button-group-fixed col-md-2">
           <input type="hidden" name="save_and_close" id="save_and_close" value="false" />
-          {% if form.instance.instance.status == 'P' %}
+          {% if form.instance.instance.status == 'P' or form.instance.instance.status == 'F' or form.instance.instance.status == 'A' %}
             <input type="submit" class="btn inbetween blue" id="save" value="Save"/>
           {% elif form.instance.instance.status == 'S' %}
             <input type="submit" class="btn inbetween blue" id="save" value="Save"/>
             <br><br>
-            <input type="button" class="btn inbetween green" id="close" value="Save and Close"/>
+            <input type="button" class="btn inbetween green" id="close" value="Submit Feedback"/>
             <br><br>
           {% endif %}
           {% if prevInstance %}

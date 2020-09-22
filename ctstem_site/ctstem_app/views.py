@@ -3021,7 +3021,7 @@ def groupDashboard(request, id='', curriculum_status='active'):
 
       assignments = {}
       serial = 0
-      status_map = {'N': 'New', 'P': 'In Progress', 'S': 'Submitted', 'F': 'Feedback Ready', 'A': 'Archived'}
+      status_map = {'N': 'New', 'P': 'In Progress', 'S': 'Submitted', 'F': 'Feedback Completed', 'A': 'Archived'}
       status_color = {'N': 'gray', 'P': 'blue', 'S': 'green', 'F': 'orange', 'A': 'black'}
       students = group.members.all()
       keys = []
@@ -3230,7 +3230,7 @@ def archiveAssignment(request, instance_id=''):
       instance.save()
       messages.success(request, 'Your assignment has been archived')
     else:
-      messages.success(request, 'Only assignments with status Feedback Ready can be archived')
+      messages.success(request, 'Only assignments with status Feedback Completed can be archived')
 
     return shortcuts.redirect('ctstem:assignments', bucket='inbox')
 
@@ -3617,7 +3617,7 @@ def question_response_review(request, assignment_id='', curriculum_question_id='
           step_feedback = models.StepFeedback.objects.get(assignment_feedback=feedback, step_response=question_response.step_response)
           question_feedback = models.QuestionFeedback.objects.get(step_feedback=step_feedback, response=question_response)
 
-          if status in ['P', 'S']:
+          if status in ['P', 'S', 'F', 'A']:
             if question_response.response or question_response.response_file.all():
               question_feedback_form = forms.QuestionFeedbackForm(instance=question_feedback, prefix=question_feedback.id)
               allow_save = True
@@ -4617,7 +4617,7 @@ def send_feedback_ready_email(email, curriculum):
           <div>Please login to our website https://%s to review the feedback. </div><br> \
           <div><b>CT-STEM Admin</b></div>'%(curriculum.title, domain)
 
-  send_mail('CT-STEM - Assignment Feedback Ready', body, settings.DEFAULT_FROM_EMAIL, [email], html_message=body)
+  send_mail('CT-STEM - Assignment Feedback Completed', body, settings.DEFAULT_FROM_EMAIL, [email], html_message=body)
 
 ################################################
 # Send account validation email after a user

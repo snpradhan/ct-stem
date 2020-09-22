@@ -81,7 +81,7 @@ ASSIGNMENT_STATUS = (
   ('N', 'New'),
   ('P', 'In Progress'),
   ('S', 'Submitted'),
-  ('F', 'Feedback Ready'),
+  ('F', 'Feedback Completed'),
   ('A', 'Archived'),
 )
 

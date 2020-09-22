@@ -107,15 +107,16 @@
                     {% endif %}
                   </div>
                 {% elif assignment_details.instance.status == 'F' %}
-                  <div> Feedback Provided </div>
+                  <div> Feedback Completed </div>
                   <div>
-                    <a type="button" class="btn small white" href="{% url 'ctstem:feedback' assignment.id  assignment_details.instance.id %}" title="View Response/Feedback"> <i class="far fa-eye" aria-hidden="true"></i> </a>
+                    <a type="button" class="btn small green" href="{% url 'ctstem:feedback' assignment.id  assignment_details.instance.id %}" title="View/Give Feedback"> <span class="far fa-comment-dots" aria-hidden="true"></span> </a>
+
                     <a type="button" class="btn small blue" href="{% url 'ctstem:export_student_response' assignment.id  student.id %}" title="Download Student Response"> <i class="fas fa-file-download"></i> </a>
                   </div>
                 {% elif assignment_details.instance.status == 'A' %}
                   <div> Archived </div>
                   <div>
-                    <a type="button" class="btn small white" href="{% url 'ctstem:feedback' assignment.id  assignment_details.instance.id %}" title="View Response/Feedback"> <i class="far fa-eye" aria-hidden="true"></i> </a>
+                    <a type="button" class="btn small green" href="{% url 'ctstem:feedback' assignment.id  assignment_details.instance.id %}" title="View/Give Feedback"> <span class="far fa-comment-dots" aria-hidden="true"></span> </a>
                     <a type="button" class="btn small blue" href="{% url 'ctstem:export_student_response' assignment.id  student.id %}" title="Download Student Response"> <i class="fas fa-file-download"></i> </a>
                   </div>
                 {% else %}
