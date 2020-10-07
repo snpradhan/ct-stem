@@ -358,14 +358,18 @@ class Question(models.Model):
     return self.research_category.all().filter(flag=True)
 
   def get_descendants_count(self):
+    descendants = self.get_descendants()
+    return len(descendants)
+
+  def get_descendants(self):
     children = self.copied_questions.all()
+    descendants = []
     if children:
-      count = children.count()
       for child in children:
-        count = count + child.get_descendants_count()
-      return count
-    else:
-      return 0
+        descendants.append(child)
+        descendants = descendants + child.get_descendants()
+
+    return descendants
 
 # Subject model
 class Subject(models.Model):

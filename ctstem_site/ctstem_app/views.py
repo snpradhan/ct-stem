@@ -2080,10 +2080,10 @@ def searchQuestion(request):
     if hasattr(request.user, 'teacher') or hasattr(request.user, 'researcher'):
       curriculum_filter = curriculum_filter & Q(curriculum_question__step__curriculum__unit__curriculumcollaborator__user__id=request.user.id)
       #curriculum_filter['curriculum_question__step__curriculum__unit__curriculumcollaborator__user__id'] = request.user.id
-    elif data['unit_id']:
+    elif data['unit_id'] and data['unit_id'] != 'None':
       curriculum_filter = curriculum_filter & Q(curriculum_question__step__curriculum__unit__id=int( data['unit_id']))
       #curriculum_filter['curriculum_question__step__curriculum__unit__id'] = int( data['unit_id'])
-    elif data['curriculum_id']:
+    elif data['curriculum_id'] and data['curriculum_id'] != 'None':
       curriculum_filter = curriculum_filter & Q(curriculum_question__step__curriculum__id=int( data['curriculum_id']))
       #curriculum_filter['curriculum_question__step__curriculum__id'] = int( data['curriculum_id'])
 
@@ -2092,7 +2092,7 @@ def searchQuestion(request):
 
     query_filter = curriculum_filter | public_filter
     query_filter = question_filter & query_filter
-    questionList = models.Question.objects.filter(query_filter).order_by('-visibility','curriculum_question__step__curriculum__order',
+    questionList = models.Question.objects.all().filter(query_filter).order_by('-visibility','curriculum_question__step__curriculum__order',
                                                                            'curriculum_question__step__order',
                                                                            'curriculum_question__order')
     #print(questionList)
@@ -4189,7 +4189,7 @@ def export_response(request, assignment_id='', student_id=''):
     row_num += 1
     ws.write(row_num, 0, '')
 
-    columns = ['Student', 'Student ID', 'Step No.', 'Step Title', 'Question No.', 'Question', 'Research Category', 'Options', 'Correct Answer', 'Student Response', 'Submission DateTime']
+    columns = ['Student', 'Student ID', 'Page No.', 'Page Title', 'Question No.', 'Question', 'Research Category', 'Options', 'Correct Answer', 'Student Response', 'Submission DateTime']
     font_styles = [font_style, font_style, font_style, font_style, font_style, font_style, font_style, font_style, font_style, font_style, date_time_format]
 
     row_num += 1
@@ -4253,7 +4253,7 @@ def export_all_response(request, curriculum_id=''):
     date_time_format.num_format_str = 'mm/dd/yyyy hh:mm AM/PM'
 
 
-    columns = ['Class', 'Curriculum', 'Assigned Date', 'Student', 'Student ID', 'Step No.', 'Step Title', 'Question No.', 'Question', 'Research Category', 'Options', 'Correct Answer', 'Student Response', 'Submission DateTime']
+    columns = ['Class', 'Curriculum', 'Assigned Date', 'Student', 'Student ID', 'Page No.', 'Page Title', 'Question No.', 'Question', 'Research Category', 'Options', 'Correct Answer', 'Student Response', 'Submission DateTime']
     font_styles = [font_style, font_style, date_format, font_style, font_style, font_style, font_style, font_style, font_style, font_style, font_style, font_style, font_style, date_time_format]
 
     if hasattr(request.user, 'administrator') == True or hasattr(request.user, 'researcher') == True or hasattr(request.user, 'school_administrator') == True:
@@ -4349,6 +4349,87 @@ def export_all_response(request, curriculum_id=''):
   except models.Curriculum.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested curriculum not found</h1>')
 
+
+####################################
+# Export Student Responses for a public questions including any copied questions
+####################################
+@login_required
+def export_question_response(request, question_id=''):
+  try:
+    question = models.Question.objects.get(id=question_id)
+    descendants = question.get_descendants()
+    question_responses = models.QuestionResponse.objects.all().filter(curriculum_question__question__in=descendants)
+    has_permission = False
+    if hasattr(request.user, 'administrator') or hasattr(request.user, 'researcher'):
+      has_permission = True
+
+    if not has_permission:
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to export student response for this question</h1>')
+
+    response = http.HttpResponse(content_type='application/ms-excel')
+    response['Content-Disposition'] = 'attachment; filename="question_%s_responses.xls"'%question_id
+
+    wb = xlwt.Workbook(encoding='utf-8')
+    ws = wb.add_sheet('Responses')
+
+    row_num = 0
+    bold_font_style = xlwt.XFStyle()
+    bold_font_style.font.bold = True
+    font_style = xlwt.XFStyle()
+    date_format = xlwt.XFStyle()
+    date_format.num_format_str = 'mm/dd/yyyy'
+    date_time_format = xlwt.XFStyle()
+    date_time_format.num_format_str = 'mm/dd/yyyy hh:mm AM/PM'
+
+    ws.write(row_num, 0, 'Question', bold_font_style)
+    ws.write(row_num, 1, smart_str(question.question_text), font_style)
+    row_num += 1
+    ws.write(row_num, 0, 'Answer Field Type', bold_font_style)
+    ws.write(row_num, 1, question.get_answer_field_type_display(), font_style)
+    row_num += 1
+    ws.write(row_num, 0, 'Research Category', bold_font_style)
+    ws.write(row_num, 1, smart_str(",".join(str(research_category.category) for research_category in question.research_category.all())) if question.research_category.exists() else '', font_style)
+    row_num += 1
+    ws.write(row_num, 0, 'Options', bold_font_style)
+    ws.write(row_num, 1, smart_str(question.options), font_style)
+    row_num += 1
+    ws.write(row_num, 0, 'Answer', bold_font_style)
+    ws.write(row_num, 1, smart_str(question.answer), font_style)
+    row_num += 1
+    ws.write(row_num, 0, '')
+
+
+    columns = ['Student', 'Student ID', 'Student Response', 'Submission DateTime']
+    font_styles = [font_style, font_style, font_style, date_time_format]
+
+    row_num += 1
+    for col_num in range(len(columns)):
+      ws.write(row_num, col_num, columns[col_num], bold_font_style)
+
+    for question_response in question_responses:
+      if hasattr(request.user, 'researcher'):
+        student = question_response.step_response.instance.student.user.id
+      else:
+        student = question_response.step_response.instance.student.user.get_full_name()
+
+      studentID = question_response.step_response.instance.student.user.id
+
+      response_text = get_response_text(request, question_response.step_response.instance.id, question_response)
+      row = [student,
+             studentID,
+             response_text,
+             question_response.modified_date.replace(tzinfo=None)]
+      row_num += 1
+      for col_num in range(len(row)):
+        ws.write(row_num, col_num, row[col_num], font_styles[col_num])
+
+    wb.save(response)
+    return response
+
+  except models.Question.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested question not found</h1>')
+
+
 ####################################
 # Get question response
 # If the question type is Text return the text response
@@ -4388,6 +4469,8 @@ def question(request, id=''):
     title = 'Add Question'
   else:
     question = models.Question.objects.get(id=id)
+    if question.visibility == 'P' and hasattr(request.user, 'administrator') == False:
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to edit a public question</h1>')
     curricula = models.Curriculum.objects.all().filter(steps__curriculumquestion__question=question)
     is_assigned = False
     for curriculum in curricula:
@@ -4434,7 +4517,7 @@ def question(request, id=''):
 
 @login_required
 def questions(request, status='active'):
-  if hasattr(request.user, 'administrator') == False:
+  if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'researcher') == False:
     return http.HttpResponseNotFound('<h1>You do not have the privilege to view questions</h1>')
 
   if status == 'active':
