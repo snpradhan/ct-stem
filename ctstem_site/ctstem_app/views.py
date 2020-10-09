@@ -2077,14 +2077,17 @@ def searchQuestion(request):
       #question_filter['curriculum_question__order'] = int(data['question_number'])
 
     #curriculum matching
-    if hasattr(request.user, 'teacher') or hasattr(request.user, 'researcher'):
-      curriculum_filter = curriculum_filter & Q(curriculum_question__step__curriculum__unit__curriculumcollaborator__user__id=request.user.id)
+
       #curriculum_filter['curriculum_question__step__curriculum__unit__curriculumcollaborator__user__id'] = request.user.id
-    elif data['unit_id'] and data['unit_id'] != 'None':
+    if data['unit_id'] and data['unit_id'] != 'None':
       curriculum_filter = curriculum_filter & Q(curriculum_question__step__curriculum__unit__id=int( data['unit_id']))
+      if hasattr(request.user, 'teacher') or hasattr(request.user, 'researcher'):
+        curriculum_filter = curriculum_filter & Q(curriculum_question__step__curriculum__unit__curriculumcollaborator__user__id=request.user.id)
       #curriculum_filter['curriculum_question__step__curriculum__unit__id'] = int( data['unit_id'])
     elif data['curriculum_id'] and data['curriculum_id'] != 'None':
       curriculum_filter = curriculum_filter & Q(curriculum_question__step__curriculum__id=int( data['curriculum_id']))
+      if hasattr(request.user, 'teacher') or hasattr(request.user, 'researcher'):
+        curriculum_filter = curriculum_filter & Q(curriculum_question__step__curriculum__curriculumcollaborator__user__id=request.user.id)
       #curriculum_filter['curriculum_question__step__curriculum__id'] = int( data['curriculum_id'])
 
     if data['only_my_questions'] == 'false':
