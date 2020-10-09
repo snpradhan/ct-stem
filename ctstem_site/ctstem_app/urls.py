@@ -98,6 +98,7 @@ urlpatterns = [
     url(r'^export_question_response/(?P<question_id>[\d]+)/$', views.export_question_response, name='export_question_response'),
     url(r'^dashboard/group/(?P<id>[\d]+)/(?P<curriculum_status>[\w-]+)/$', views.groupDashboard, name='groupDashboard'),
     url(r'^dashboard/assignment/(?P<id>[\d]+)/$', views.assignmentDashboard, name='assignmentDashboard'),
+    url(r'^dashboard/group/(?P<group_id>[\d]+)/curriculum/(?P<curriculum_id>[\d]+)/(?P<curriculum_status>[\w-]+)/$', views.groupCurriculumDashboard, name='groupCurriculumDashboard'),
     url(r'^subjects/$', views.subjects, name='subjects'),
     url(r'^subject/(?P<id>[\d]+)/$', views.subject, name='subject'),
     url(r'^subject/new/$', views.subject, name='newSubject'),

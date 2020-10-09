@@ -22,9 +22,23 @@ table.table tbody {
   /*font-family: 'Roboto Condensed Light';*/
   font-size: 1.4em;
 }
-
+table.table th {
+  vertical-align: middle !important;
+  position: sticky;
+  top: 92px;
+  z-index: 1000;
+  background-color: #666666;
+  color: #e5e5e5 !important;
+}
+div.response table.table th {
+  position: unset;
+}
+table.table th.top {
+  vertical-align: top !important;
+}
 table.table td {
   vertical-align: middle !important;
+  z-index: 1;
 }
 table.table td.status {
   font-weight: bold;
@@ -66,19 +80,14 @@ table.table.unit_lesson {
 table.table thead tr:not(#filterrow) th{
   text-align: center;
 }
-table.table thead {
-  background-color: #666666;
-  color: #e5e5e5;
-  position: sticky;
-  top: 92px;
-  z-index: 999;
+
+table.table thead a {
+  color: #e5e5e5 !important;
 }
-table.table.inner_table thead  {
+table.table.inner_table thead th {
   top: 0;
 }
-table.table.inner_table.with_caption thead  {
-  top: 2em;
-}
+
 table.table.inner_table img {
   max-width: 50% !important;
   height: auto !important;
@@ -278,4 +287,43 @@ table#publications td.description p {
 }
 table#publications td.action {
   width: 7%;
+}
+
+div.dashboard_container {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: auto;
+  position: relative;
+  height: 80vh;
+}
+
+table#group_curriculum_dashboard td.assignment_status_chart {
+  vertical-align: unset !important;
+  width: 13em;
+}
+
+div.dashboard_container::-webkit-scrollbar {
+  -webkit-appearance: none;
+  width: 7px;
+}
+div.dashboard_container::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+  background-color: rgba(0, 0, 0, .5);
+  -webkit-box-shadow: 0 0 1px rgba(255, 255, 255, .5);
+}
+
+table#group_curriculum_dashboard .student_col {
+  position: sticky;
+  left: 0;
+  background-color: #666666 !important;
+  color: white;
+}
+table#group_curriculum_dashboard thead th {
+  top: 0;
+}
+table#group_curriculum_dashboard thead th.student_col {
+  z-index: 1001;
+}
+table#group_curriculum_dashboard tbody th.student_col {
+  z-index: 999;
 }

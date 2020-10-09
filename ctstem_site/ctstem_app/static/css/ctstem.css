@@ -227,6 +227,11 @@ a {
 .dropdown-menu .col-container .col .profile {
   margin-bottom: 0.75em;
 }
+.dropdown-menu#lessons_in_unit {
+  right: 0;
+  left: unset;
+  z-index: 1002;
+}
 
 .icon-size{
   font-size: 87px;
@@ -1955,10 +1960,16 @@ div.content#publication .switch {
   background-color: #e6e6e6;
 }
 
-.nav-tabs > div.search {
+.nav-tabs > div.search, .nav-tabs > div.filter {
   float: right;
+  cursor: pointer;
 }
-
+.nav-tabs > div.filter {
+  margin-left: 1em;
+}
+.nav-tabs > div.filter > * {
+  background-image: linear-gradient(to bottom,#fff 0,#e0e0e0 100%);
+}
 .nav-tabs > div.search input[type='text'] {
   width: 20em;
 }
@@ -2172,4 +2183,30 @@ span.cke_top.focus, span.cke_bottom.focus {
 }
 .select2-container--default .select2-selection--single .select2-selection__rendered {
   line-height: unset !important;
+}
+
+.checkbox-menu li label {
+    display: block;
+    padding: 3px 10px;
+    clear: both;
+    font-weight: normal;
+    line-height: 1.42857143;
+    color: #333;
+    white-space: nowrap;
+    margin:0;
+    transition: background-color .4s ease;
+}
+.checkbox-menu li input {
+    margin: 0px 5px;
+    top: 2px;
+    position: relative;
+}
+
+.checkbox-menu li.active label {
+  font-weight:bold;
+}
+
+.checkbox-menu li label:hover,
+.checkbox-menu li label:focus {
+    background-color: #f5f5f5;
 }

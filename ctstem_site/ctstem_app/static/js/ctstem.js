@@ -381,6 +381,38 @@ $(function () {
     alert(msg);
   });
 
+  $("div.student_name").show();
+  $("div.student_mask").hide();
+  $('#student_identity .switch-input').change(function() {
+    $("div.student_name").toggle();
+    $("div.student_mask").toggle();
+  });
+
+  $('#group_assignment_select').on('change', function () {
+    var url = $(this).val(); // get selected value
+    if (url) { // require a URL
+      window.location = url; // redirect
+    }
+    return false;
+  });
+
+  $(".checkbox-menu").on("change", "input[type='checkbox']", function() {
+    $(this).closest("li").toggleClass("active", this.checked);
+  });
+
+  $("#lessons_in_unit.checkbox-menu").on("change", "input[type='checkbox']", function() {
+    if($(this).prop("checked")){
+      $('#group_curriculum_dashboard .'+$(this).val()).show();
+    }
+    else{
+      $('#group_curriculum_dashboard .'+$(this).val()).hide();
+    }
+  });
+
+  $("#lessons_in_unit.checkbox-menu").on("click", "#select_all_lessons", function() {
+    $("#lessons_in_unit .lesson_in_unit").prop("checked", true).trigger('change');
+  });
+
   bind_user_removal();
   bind_curriculum_delete_confirmation();
   bind_curriculum_share_action();

@@ -1,0 +1,184 @@
+{% extends "ctstem_app/base.html" %}
+{% load ctstem_extras %}
+
+{% block media %}
+  {{ block.super }}
+  {{ form.media }}
+  <script src="https://code.highcharts.com/highcharts.js"></script>
+{% endblock %}
+{% block title %}Class Dashboard |{% endblock %}
+
+{% block content %}
+  {{block.super}}
+  <div class="content" id="dashboard">
+    <h2> {{group}} - {{curriculum}} - Dashboard </h2>
+    {% include "ctstem_app/Tabs.html" with tab='group' group=group role='group_dashboard' %}
+
+    {% if student_assignment_details|length > 0 %}
+      <div class="dashboard_container">
+        <table class="table table-bordered table-condensed" id="group_curriculum_dashboard">
+          <thead>
+            <tr>
+              <th class="student_col">
+                Student
+                {% if not user.researcher %}
+                  <label class="switch" id="student_identity">
+                    <input class="switch-input" type="checkbox" />
+                    <span class="switch-label" data-on="Hide Names" data-off="Show Names"></span>
+                    <span class="switch-handle"></span>
+                  </label>
+                {% endif %}
+              </th>
+              {% for curr, assignment in assignment_header.items %}
+                <th class="lesson_{{curr.id}} top">
+                  {% if curr.order %}
+                  Lesson {{curr.order}}
+                  {% endif %}
+                  <br>
+                  {% if assignment %}
+                    <a href="{% url 'ctstem:assignmentDashboard' assignment.id %}"><u>{{curr.title|truncatechars:40}}</u></a>
+                  {% else %}
+                    {{curr.title|truncatechars:40}}
+                  {% endif %}
+                </th>
+              {% endfor %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for student, assignment_details in student_assignment_details.items %}
+              <tr style="background-color: {% if forloop.counter|divisibleby:2 %}  white; {% else %} #f9f9f9; {% endif %}">
+                <td class="student_col">
+                  <div class="student_name">
+                    {% if user.researcher %}
+                      <b>{{student.user.id}}</b><br>
+                    {% else %}
+                      <b>{{student}}</b><br>
+                    {% endif %}
+                  </div>
+                  <div class="student_mask">
+                    xxxxxxxxxxx
+                  </div>
+                </td>
+                {% for student_assignment in assignment_details %}
+                  {% if student_assignment.assignment is None %}
+                    <td style="text-align: center;" class="assignment_status_chart lesson_{{student_assignment.curriculum_id}}">
+                      <div> Not Assigned </div>
+                    </td>
+                  {% else %}
+                    <td style="text-align: center;" class="assignment_status_chart lesson_{{student_assignment.curriculum_id}}">
+                      <div id="chart_{{student_assignment.serial}}" class="chart" name={{student_assignment.percent_complete}}></div>
+                      <div style="display:none;">{{student_assignment.percent_complete}}</div>
+                      {% if student_assignment.instance.status == 'P' %}
+                        <div> In Progress </div>
+                        <div>
+                           <a type="button" class="btn small green" href="{% url 'ctstem:feedback' student_assignment.assignment.id  student_assignment.instance.id %}" title="Give Feedback"> <span class="far fa-comment-dots" aria-hidden="true"></span> </a>
+                        </div>
+                      {% elif student_assignment.instance.status == 'S' %}
+                        <div> Submitted </div>
+                        <div>
+                          <a type="button" class="btn small green" href="{% url 'ctstem:feedback' student_assignment.assignment.id  student_assignment.instance.id %}" title="Give Feedback"> <span class="far fa-comment-dots" aria-hidden="true"></span> </a>
+                          <a type="button" class="btn small blue" href="{% url 'ctstem:export_student_response' student_assignment.assignment.id  student.id %}" title="Download Student Response"> <i class="fas fa-file-download"></i> </a>
+                          {% if student_assignment.instance.assignment.curriculum.curriculum_type == 'L' %}
+                            <a type="button" class="btn small orange" href="{% url 'ctstem:unlockAssignment' student_assignment.assignment.id  student_assignment.instance.id %}" title="Unlock Assignment" onclick="return confirm('Are you sure you want to unlock this assignment? Unlocking the assignment will allow the student to edit his/her responses and resubmit.');"> <span class="fa fa-unlock" aria-hidden="true"></span> </a>
+                          {% endif %}
+                        </div>
+                      {% elif student_assignment.instance.status == 'F' %}
+                        <div> Feedback Completed </div>
+                        <div>
+                          <a type="button" class="btn small green" href="{% url 'ctstem:feedback' student_assignment.assignment.id  student_assignment.instance.id %}" title="View/Give Feedback"> <span class="far fa-comment-dots" aria-hidden="true"></span> </a>
+
+                          <a type="button" class="btn small blue" href="{% url 'ctstem:export_student_response' student_assignment.assignment.id  student.id %}" title="Download Student Response"> <i class="fas fa-file-download"></i> </a>
+                        </div>
+                      {% elif student_assignment.instance.status == 'A' %}
+                        <div> Archived </div>
+                        <div>
+                          <a type="button" class="btn small green" href="{% url 'ctstem:feedback' student_assignment.assignment.id  student_assignment.instance.id %}" title="View/Give Feedback"> <span class="far fa-comment-dots" aria-hidden="true"></span> </a>
+                          <a type="button" class="btn small blue" href="{% url 'ctstem:export_student_response' student_assignment.assignment.id  student.id %}" title="Download Student Response"> <i class="fas fa-file-download"></i> </a>
+                        </div>
+                      {% else %}
+                        <div> New </div>
+                      {% endif %}
+                    </td>
+                  {% endif %}
+                {% endfor %}
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p>No assignments available.</p>
+    {% endif %}
+  </div>
+
+  <script type="text/javascript">
+
+    $(window).resize(function(){
+      adjustDashboardSize();
+    });
+
+    function adjustDashboardSize() {
+      var minHeight = $(window).height() - $('.dashboard_container').offset().top;
+      $('.dashboard_container').height(minHeight + 40);
+    }
+    adjustDashboardSize();
+
+    $(".chart").each(function(){
+      var id = $(this).attr('id');
+      var complete = parseInt($(this).attr('name'));
+      var remaining = 100-complete;
+      $("#"+id).highcharts({
+        chart: {
+          type: 'pie',
+          height: 130,
+          width: 130,
+          backgroundColor: 'rgba(0,0,0,0)',
+        },
+        title: {
+          text: complete+'%',
+          align: 'center',
+          verticalAlign: 'middle',
+          y: 0,
+          style: {
+            fontSize: '1.2em',
+            color: 'black',
+          },
+        },
+        tooltip: false,
+        plotOptions: {
+          pie: {
+            dataLabels: {
+              enabled: false,
+            },
+            startAngle: 0,
+            endAngle: 360,
+          }
+        },
+        credits: {
+          enabled: false
+        },
+        series: [{
+          type: 'pie',
+          name: 'Work',
+          innerSize: '80%',
+          data: [
+            {
+              name: 'Complete',
+              y: complete,
+              color: 'green',
+            },
+            {
+              name: 'Remaining',
+              y: remaining,
+              color: 'grey',
+            },
+          ]
+        }]
+      });
+    });
+
+  </script>
+
+{% endblock %}
+
+

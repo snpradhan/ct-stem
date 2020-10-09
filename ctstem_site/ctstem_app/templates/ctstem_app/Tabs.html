@@ -56,13 +56,42 @@
 {% endif %}
 
 {% if tab == 'group' or tab == 'assignment' %}
-    {% if user.administrator or user.researcher or user.school_administrator or user.teacher %}
-      {% if group.id %}
-        <ul class="nav nav-tabs bottom">
-          {{status}}
-          <li {% if curriculum_status == 'active' %} class="active"{% endif %}><a href="{% url 'ctstem:groupDashboard' group.id 'active' %}">Active Assignments</a></li>
-          <li {% if curriculum_status == 'archived' %} class="active"{% endif %}><a href="{% url 'ctstem:groupDashboard' group.id 'archived' %}">Archived Assignments</a></li>
-        </ul>
-      {% endif %}
+  {% if user.administrator or user.researcher or user.school_administrator or user.teacher %}
+    {% if group.id %}
+      <ul class="nav nav-tabs bottom">
+        <li {% if curriculum_status == 'active' %} class="active"{% endif %}><a href="{% url 'ctstem:groupDashboard' group.id 'active' %}">Active Assignments</a></li>
+        <li {% if curriculum_status == 'archived' %} class="active"{% endif %}><a href="{% url 'ctstem:groupDashboard' group.id 'archived' %}">Archived Assignments</a></li>
+        {% if curriculum_status %}
+          {% if curriculum.curriculum_type == 'U' %}
+            <div class="filter dropdown">
+               <div class="dropdown-toggle form-control"
+                      id="filter_assigned_lesson_columns" data-toggle="dropdown"
+                      aria-haspopup="true" aria-expanded="true">
+                  Select Lessons To Display
+                  <span class="caret"></span>
+                </div>
+                <ul class="dropdown-menu checkbox-menu allow-focus" aria-labelledby="filter_assigned_lesson_columns" id="lessons_in_unit">
+                  <li>
+                    <label><a href="#" id="select_all_lessons"> Select All</a> </label>
+                  </li>
+                {% for curr in assignment_header %}
+                  <li class="active">
+                    <label ><input type="checkbox" name="lesson_in_unit" class="lesson_in_unit" value="lesson_{{curr.id}}" checked/> {{curr.title|title|truncatechars:60}} </label>
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+          <div class="search">
+            <select class="form-control" id="group_assignment_select">
+              <option {% if not curriculum %} selected {% endif %} value="{% url 'ctstem:groupDashboard' group.id curriculum_status %}">All {{curriculum_status|title}} Assignments</option>
+              {% for assignment in assignments_by_unit %}
+                <option {% if curriculum and assignment.id == curriculum.id %} selected {%endif%} value="{% url 'ctstem:groupCurriculumDashboard' group.id assignment.id curriculum_status %}">{{assignment.title|title|truncatechars:60}}</option>
+              {% endfor %}
+            </select>
+          </div>
+        {% endif %}
+      </ul>
     {% endif %}
   {% endif %}
+{% endif %}

@@ -2880,7 +2880,6 @@ def group(request, id=''):
       assignments = {}
       keys = []
       for assignment in models.Assignment.objects.all().filter(group=group).order_by('curriculum__unit__title', 'curriculum__order'):
-        instances = models.AssignmentInstance.objects.all().filter(assignment=assignment)
         curriculum = assignment.curriculum
 
         if curriculum.curriculum_type in ['L', 'A'] and curriculum.unit is not None:
@@ -2937,6 +2936,35 @@ def group(request, id=''):
 
   except models.UserGroup.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested class not found</h1>')
+
+@login_required
+def getGroupAssignmentsByUnit(request, group_id='', curriculum_status='active'):
+  group = None
+  if hasattr(request.user, 'researcher'):
+    has_permission = True
+  else:
+    has_permission = check_group_permission(request, group_id)
+  if has_permission:
+    group = models.UserGroup.objects.get(id=group_id)
+  else:
+    return http.HttpResponseNotFound('<h1>You do not have the privilege to assignments for this class</h1>')
+  assignments = []
+
+  for assignment in models.Assignment.objects.all().filter(group=group):
+    curriculum = assignment.curriculum
+    if (curriculum_status == 'active' and curriculum.status in ['D', 'P']) or (curriculum_status == 'archived' and curriculum.status == 'A'):
+
+      if curriculum.curriculum_type in ['L', 'A'] and curriculum.unit is not None:
+        assignment = curriculum.unit
+      else:
+        assignment = curriculum
+
+      if assignment not in assignments:
+        assignments.append(assignment)
+
+  assignments.sort(key=lambda x:x.title)
+
+  return assignments
 
 ####################################
 # Search Assignment
@@ -3072,6 +3100,7 @@ def deleteGroup(request, id=''):
 
 ####################################
 # Group Dashboard
+# List of assignments in a Class with aggregate status
 ####################################
 @login_required
 def groupDashboard(request, id='', curriculum_status='active'):
@@ -3092,6 +3121,7 @@ def groupDashboard(request, id='', curriculum_status='active'):
       status_color = {'N': 'gray', 'P': 'blue', 'S': 'green', 'F': 'orange', 'A': 'black'}
       students = group.members.all()
       keys = []
+      assignments_by_unit = getGroupAssignmentsByUnit(request, id, curriculum_status)
 
       for assignment in models.Assignment.objects.all().filter(group=group).order_by('curriculum__unit__title', 'curriculum__order'):
         instances = models.AssignmentInstance.objects.all().filter(assignment=assignment)
@@ -3131,7 +3161,7 @@ def groupDashboard(request, id='', curriculum_status='active'):
       keys.sort(key=lambda x:x.title)
       current_site = Site.objects.get_current()
       domain = current_site.domain
-      context = {'group': group, 'assignments': assignments, 'keys': keys, 'curriculum_status': curriculum_status, 'domain': domain}
+      context = {'group': group, 'assignments': assignments, 'keys': keys, 'curriculum_status': curriculum_status, 'domain': domain, 'assignments_by_unit': assignments_by_unit}
       return render(request, 'ctstem_app/GroupDashboard.html', context)
 
     return http.HttpResponseNotAllowed(['GET'])
@@ -3140,7 +3170,102 @@ def groupDashboard(request, id='', curriculum_status='active'):
     return http.HttpResponseNotFound('<h1>Requested class not found</h1>')
 
 ####################################
+# Group/Curriculum Dashboard
+# Dashboard for a specific curriculum/unit in a Class
+# List all students in a class and display their assignment status for each lesson
+####################################
+@login_required
+def groupCurriculumDashboard(request, group_id='', curriculum_id='', curriculum_status='active'):
+  try:
+    if request.method == 'GET':
+      if hasattr(request.user, 'researcher'):
+        has_permission = True
+      else:
+        has_permission = check_group_permission(request, group_id)
+
+      if not has_permission:
+        return http.HttpResponseNotFound('<h1>You do not have the privilege to view this class</h1>')
+
+      group = models.UserGroup.objects.get(id=group_id)
+      curriculum = models.Curriculum.objects.get(id=curriculum_id)
+      curricula = None
+      assignments_by_unit = getGroupAssignmentsByUnit(request, group_id, curriculum_status)
+
+      serial = 0
+      students = group.members.all()
+      if curriculum_status == 'active':
+        status = ['D', 'P']
+      else:
+        status = ['A']
+
+      if curriculum.curriculum_type == 'U':
+        curricula =  models.Curriculum.objects.all().filter(unit=curriculum, status__in=status).order_by('order')
+        assignments =  models.Assignment.objects.all().filter(group=group, curriculum__in=curricula).order_by('curriculum__order')
+      else:
+        curricula =  models.Curriculum.objects.all().filter(id=curriculum.id, status__in=status)
+        assignments =  models.Assignment.objects.all().filter(group=group, curriculum__in=curricula)
+
+      if assignments.count() == 0:
+        return http.HttpResponseNotFound('<h1>Requested assignment not found</h1>')
+
+      instances = models.AssignmentInstance.objects.all().filter(assignment__in=assignments)
+      student_assignment_details = {}
+      assignment_header = {}
+
+      # for each lesson in a unit
+      for curr in curricula:
+        #find an assignment
+        assignment = assignments.filter(curriculum=curr).first()
+        assignment_header[curr] = assignment
+        if assignment:
+          total_questions = models.CurriculumQuestion.objects.all().filter(step__curriculum=assignment.curriculum).count()
+          total_steps = assignment.curriculum.steps.count()
+
+        # for each student in class
+        for student in students:
+          if assignment:
+            try:
+              #find the assignment instance
+              instance = instances.get(assignment=assignment, student=student)
+              attempted_questions = models.QuestionResponse.objects.all().filter(step_response__instance=instance).exclude(response__exact='', response_file__isnull=True).count()
+              last_step = instance.last_step
+              if total_questions > 0:
+                percent_complete = float(attempted_questions)/float(total_questions)*100
+              else:
+                percent_complete = float(last_step)/float(total_steps)*100
+            except models.AssignmentInstance.DoesNotExist:
+              instance = None
+              percent_complete = 0
+          else:
+            instance = None
+            percent_complete = 0
+
+          serial += 1
+          student_assignment_status = {
+            'serial': serial,
+            'assignment': assignment,
+            'instance': instance,
+            'curriculum_id': curr.id,
+            'percent_complete': percent_complete,
+          }
+          if student in student_assignment_details:
+            student_assignment_details[student].append(student_assignment_status)
+          else:
+            student_assignment_details[student] = [student_assignment_status]
+
+      context = {'group': group, 'curriculum': curriculum, 'assignment_header': assignment_header, 'student_assignment_details': student_assignment_details, 'assignments_by_unit': assignments_by_unit, 'curriculum_status': curriculum_status}
+      return render(request, 'ctstem_app/GroupCurriculumDashboard.html', context)
+
+    return http.HttpResponseNotAllowed(['GET'])
+
+  except models.UserGroup.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested class not found</h1>')
+  except models.Curriculum.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested Curriculum not found</h1>')
+####################################
 # Assignment Dashboard
+# Dashboard for a specific assignment (Class/Lesson)
+# Lists all students in a class and their status for the specific lesson
 ####################################
 @login_required
 def assignmentDashboard(request, id=''):

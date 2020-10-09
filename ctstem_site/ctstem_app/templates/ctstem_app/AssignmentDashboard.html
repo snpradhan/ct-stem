@@ -188,7 +188,8 @@
         $("#"+id).highcharts({
           chart: {
             type: 'pie',
-            height:130,
+            height: 130,
+            width: 130,
             backgroundColor: 'rgba(0,0,0,0)',
           },
           title: {
@@ -242,12 +243,6 @@
         $("div#student_assignment_details_table").toggle();
       });
 
-      $("div.student_name").show();
-      $("div.student_mask").hide();
-      $('#student_identity .switch-input').change(function() {
-        $("div.student_name").toggle();
-        $("div.student_mask").toggle();
-      });
     });
   </script>
 
