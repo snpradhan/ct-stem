@@ -23,7 +23,7 @@ from django.utils.crypto import get_random_string
 import string
 import csv
 import xlwt
-from django.db.models import Q
+from django.db.models import Q, F
 from django.core.files.base import ContentFile
 from django.utils import timezone
 from django.core.mail import send_mail, EmailMessage
@@ -2060,56 +2060,47 @@ def searchQuestion(request):
     #question fields matching
     if data['research_category']:
       question_filter = question_filter & Q(research_category=int(data['research_category']))
-      #question_filter['research_category'] = int(data['research_category'])
     if data['answer_field_type']:
       question_filter = question_filter & Q(answer_field_type=data['answer_field_type'])
-      #question_filter['answer_field_type'] = data['answer_field_type']
     if data['question_text']:
       question_filter = question_filter & Q(question_text__icontains=str(data['question_text']))
-      #question_filter['question_text__icontains'] = str(data['question_text'])
 
     #question number and page number matching
     if data['page_number']:
       question_filter = question_filter & Q(curriculum_question__step__order=int(data['page_number']))
-      #question_filter['curriculum_question__step__order'] = int(data['page_number'])
     if data['question_number']:
       question_filter = question_filter & Q(curriculum_question__order=int(data['question_number']))
-      #question_filter['curriculum_question__order'] = int(data['question_number'])
 
     #curriculum matching
+    if hasattr(request.user, 'administrator') or hasattr(request.user, 'author') or data['only_my_questions'] == 'true':
+      if data['unit_id'] and data['unit_id'] != 'None':
+        curriculum_filter = Q(curriculum_question__step__curriculum__unit__id=int( data['unit_id']))
+      elif data['curriculum_id'] and data['curriculum_id'] != 'None':
+        curriculum_filter = Q(curriculum_question__step__curriculum__id=int( data['curriculum_id']))
 
-      #curriculum_filter['curriculum_question__step__curriculum__unit__curriculumcollaborator__user__id'] = request.user.id
-    if data['unit_id'] and data['unit_id'] != 'None':
-      curriculum_filter = curriculum_filter & Q(curriculum_question__step__curriculum__unit__id=int( data['unit_id']))
-      if hasattr(request.user, 'teacher') or hasattr(request.user, 'researcher'):
-        curriculum_filter = curriculum_filter & Q(curriculum_question__step__curriculum__unit__curriculumcollaborator__user__id=request.user.id)
-      #curriculum_filter['curriculum_question__step__curriculum__unit__id'] = int( data['unit_id'])
-    elif data['curriculum_id'] and data['curriculum_id'] != 'None':
-      curriculum_filter = curriculum_filter & Q(curriculum_question__step__curriculum__id=int( data['curriculum_id']))
-      if hasattr(request.user, 'teacher') or hasattr(request.user, 'researcher'):
-        curriculum_filter = curriculum_filter & Q(curriculum_question__step__curriculum__curriculumcollaborator__user__id=request.user.id)
-      #curriculum_filter['curriculum_question__step__curriculum__id'] = int( data['curriculum_id'])
+    else:
+      unit_filter = Q(curriculum_question__step__curriculum__unit__curriculumcollaborator__user__id=request.user.id) & Q(curriculum_question__step__curriculum__unit__curriculumcollaborator__privilege='E')
+
+      lesson_filter = Q(curriculum_question__step__curriculum__curriculumcollaborator__user__id=request.user.id) & Q(curriculum_question__step__curriculum__curriculumcollaborator__privilege='E')
+
+      curriculum_filter = unit_filter | lesson_filter
 
     if data['only_my_questions'] == 'false':
       public_filter = Q(visibility='P') & Q(is_active=True)
 
     query_filter = curriculum_filter | public_filter
     query_filter = question_filter & query_filter
-    questionList = models.Question.objects.all().filter(query_filter).order_by('-visibility','curriculum_question__step__curriculum__order',
+    questionList = models.Question.objects.all().filter(query_filter).order_by(F('visibility').desc(),'curriculum_question__step__curriculum__order',
                                                                            'curriculum_question__step__order',
                                                                            'curriculum_question__order')
-    #print(questionList)
-    '''question_list = [{'lesson_number': question.curriculum_question.all()[0].step.curriculum.order or 'N/A',
-                      'page_number': question.curriculum_question.all()[0].step.order or 'N/A',
-                      'question_number': question.curriculum_question.all()[0].order  or 'N/A',
-                      'question_text': replace_iframe_tag(request, question.question_text),
-                      'id': question.id}
-                        for question in questionList]'''
     question_list = []
     for question in questionList:
-      lesson_number = 'N/A'
-      page_number = 'N/A'
-      question_number = 'N/A'
+      lesson_number = ''
+      page_number = ''
+      question_number = ''
+      public = False
+      if question.visibility == 'P':
+        public = True
 
       if question.curriculum_question.all():
         lesson_number = question.curriculum_question.all()[0].step.curriculum.order or 'N/A'
@@ -2120,7 +2111,8 @@ def searchQuestion(request):
                       'page_number': page_number,
                       'question_number': question_number,
                       'question_text': replace_iframe_tag(request, question.question_text),
-                      'id': question.id})
+                      'id': question.id,
+                      'public': public})
 
     return http.HttpResponse(json.dumps(question_list), content_type="application/json")
 
@@ -4362,6 +4354,9 @@ def export_question_response(request, question_id=''):
     question = models.Question.objects.get(id=question_id)
     descendants = question.get_descendants()
     question_responses = models.QuestionResponse.objects.all().filter(curriculum_question__question__in=descendants)
+    #for researchers filter out responses of all students who have not consented
+    if hasattr(request.user, 'researcher'):
+      question_responses = question_responses.filter(step_response__instance__student__consent='A')
     has_permission = False
     if hasattr(request.user, 'administrator') or hasattr(request.user, 'researcher'):
       has_permission = True

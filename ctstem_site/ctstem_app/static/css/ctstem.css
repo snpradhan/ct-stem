@@ -1551,6 +1551,11 @@ div.modal-content div.results{
 div.modal-content div.results div.assignment_status, div.assignment_table div.assignment_status{
   font-weight: bold;
 }
+
+div.modal-content div.results td.public {
+  background: url(/static/img/logo/svg/dark/logomark_social.svg) center / 5em no-repeat;
+  width: 5em;
+}
 div.modal-content span.time {
   color: var(--ctstem-color-red);;
 }
@@ -1606,7 +1611,6 @@ div.modal#questionModal div.modal-content form#questionSearchForm div.form-inlin
   display: flex;
   flex-wrap: wrap;
 }
-
 div.modal .form-group {
   margin-bottom: 1.5em;
 }

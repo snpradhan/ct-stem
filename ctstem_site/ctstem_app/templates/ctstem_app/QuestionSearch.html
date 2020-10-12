@@ -5,7 +5,7 @@
   <div class="modal-content">
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal">&times;</button>
-      <h3 class="left">Search Questions in the Unit/Lesson</h3>
+      <h3 class="left">Search Questions</h3>
     </div>
     <div id="questionMsg" class="msg">
       <ul class="errorlist">
@@ -40,7 +40,7 @@
             <div>{{form.question_text}}</div>
           </div>
           <div class="form-group">
-            <label for="id_question_text">Search only questions in the Unit/Lesson</label>
+            <label for="id_question_text">Search only questions in this Unit/Lesson</label>
             <div>{{form.only_my_questions}}</div>
           </div>
         </div>
@@ -103,13 +103,21 @@ $(function (){
         else {
           var questions = "";
           $.each(data, function(key, value){
-            questions += "<tr>\
+            if(value['public'] == true) {
+              questions += "<tr>\
+                            <td class='public'></td> \
+                            <td class='public'></td> \
+                            <td class='public'></td>";
+            }
+            else {
+              questions += "<tr>\
                             <td>"+value['lesson_number']+"</td> \
                             <td>"+value['page_number']+"</td> \
-                            <td>"+value['question_number']+"</td> \
-                            <td>"+value['question_text']+"</td> \
-                            <td><button style='width:75px;' type='button' class='btn small blue select_question' id='"+value['id']+"''>Add</button></td> \
-                          </tr>";
+                            <td>"+value['question_number']+"</td>";
+            }
+            questions += "<td>"+value['question_text']+"</td> \
+                          <td><button style='width:75px;' type='button' class='btn small blue select_question' id='"+value['id']+"''>Add</button></td> \
+                        </tr>";
           });
           if(questions.length == 0){
             $('#questionMsg ul.errorlist li').addClass('error').html('No matching questions found');
