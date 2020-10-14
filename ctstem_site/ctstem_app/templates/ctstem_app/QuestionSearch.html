@@ -40,7 +40,7 @@
             <div>{{form.question_text}}</div>
           </div>
           <div class="form-group">
-            <label for="id_question_text">Search only questions in this Unit/Lesson</label>
+            <label for="id_only_my_questions" id="only_my_questions_label">Search only questions in this <span class="unit_or_lesson">Lesson</span></label>
             <div>{{form.only_my_questions}}</div>
           </div>
         </div>
@@ -50,14 +50,45 @@
           <button type="submit" id="search" class="btn normal yellow">
             Search
           </button>
+          <input type="button" class="btn normal orange" id="clear" value="Clear"/>
+        </div>
+        <div id="spinner">
+          <img src="/static/img/page-loader.gif" class="icon"/>
         </div>
       </div>
+
     </form>
-    <div id="questionResults" style="display:none;" class="results">
-      <table class="table table-bordered table-striped table-condensed inner_table">
+    <div id="publicQuestionResults" style="display:none;" class="results">
+      <table class="table table-bordered table-striped table-condensed inner_table with_caption">
+        <caption>
+          Public Questions
+          <span class="ec_questions" id="public_toggle">
+            <span><a href="#">(Collapse)</a></span>
+            <span style="display:none;"><a href="#">(Expand)</a></span>
+          </span>
+        </caption>
         <thead>
           <tr>
-            <th width="5%">Lesson #</th>
+            <th width="95%">Question Text</th>
+            <th width="5%">Select?</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </div>
+    <div id="privateQuestionResults" style="display:none;" class="results">
+      <table class="table table-bordered table-striped table-condensed inner_table with_caption">
+        <caption>
+          Questions in this <span class="unit_or_lesson"></span>
+          <span class="ec_questions" id="private_toggle">
+            <span><a href="#">(Collapse)</a></span>
+            <span style="display:none;"><a href="#">(Expand)</a></span>
+          </span>
+        </caption>
+        <thead>
+          <tr>
+            <th class="lesson_num">Lesson #</th>
             <th width="5%">Page #</th>
             <th width="5%">Question #</th>
             <th width="80%">Question Text</th>
@@ -73,12 +104,36 @@
 
 <script type="text/javascript">
 $(function (){
+  function show_results(element) {
+    $(element).show();
+    $(element).find('span.ec_questions span').hide();
+    $(element).find('span.ec_questions span:first-child').show();
+    $(element).find('thead').show();
+    $(element).find('tbody').show();
+
+  }
+  $("#id_unit").change(function(){
+    if($("#id_unit").val()){
+      $('label#only_my_questions_label span.unit_or_lesson').html('Unit');
+    }
+  });
+
+  $('.ec_questions').click(function(){
+    $(this).children().toggle();
+    $(this).closest('.results').find('thead').toggle();
+    $(this).closest('.results').find('tbody').toggle();
+  });
+
+  $('#questionSearchForm input#clear').on("click", function(){
+    $('#questionSearchForm')[0].reset();
+    //$("#questionSearchForm").trigger('submit');
+  });
 
   $("#questionSearchForm").submit(function(e) {
-
     e.preventDefault();
     var id_step = $("#questionSearchForm input[id='id_step']").val();
-    $("#questionResults table tbody").empty();
+    $(".results table tbody").empty();
+    $(".results").hide();
     data = {}
     data['page_number'] = $("#id_page_number").val();
     data['question_number'] = $("#id_question_number").val();
@@ -96,74 +151,104 @@ $(function (){
       url: this.action,
       data: data,
       context: this,
+      beforeSend: function(){
+        $('#questionSearchForm #spinner').show();
+      },
+      complete: function(){
+        $('#questionSearchForm #spinner').hide();
+      },
       success: function(data){
         if('error' in data){
           $('#questionMsg ul.errorlist li').addClass('error').html(data['error']);
+          $(".results").hide();
         }
         else {
           var questions = "";
           var search_text = $("#id_question_text").val();
-          $.each(data, function(key, value){
-            if(value['public'] == true) {
-              questions += "<tr>\
-                            <td class='public'></td> \
-                            <td class='public'></td> \
-                            <td class='public'></td>";
-            }
-            else {
-              questions += "<tr>\
-                            <td>"+value['lesson_number']+"</td> \
-                            <td>"+value['page_number']+"</td> \
-                            <td>"+value['question_number']+"</td>";
-            }
-            var question_text = value['question_text'];
-            if(search_text.length !== 0) {
-              var search_regexp = new RegExp(search_text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), "gi");
-              // (<[^<]*>)
-
-              question_text = question_text.replace(search_regexp, "<span class = 'search_match'>$&</span>");
-            }
-            questions += "<td>"+question_text+"</td> \
-                          <td><button style='width:75px;' type='button' class='btn small blue select_question' id='"+value['id']+"''>Add</button></td> \
-                        </tr>";
-          });
-          if(questions.length == 0){
-            $('#questionMsg ul.errorlist li').addClass('error').html('No matching questions found');
-            $("#questionResults").hide();
+          if(!($("#id_unit").val())){
+            $('#privateQuestionResults caption span.unit_or_lesson').html('Lesson');
+            $('#privateQuestionResults th.lesson_num').hide();
           }
           else{
-            $('#questionMsg ul.errorlist li').removeClass('error').html('');
-            $("#questionResults table tbody").html(questions);
-            $("#questionResults").show();
-            $("#questionResults button.select_question").click(function(){
-              var question_select_button = $(this);
-              var formset_div = $("input[id="+id_step+"]").parent();
-              var question_table = $(formset_div).find("table.table.question");
-              var inner_html = $(question_select_button).html();
-              //ajax call to copy selected question and add to curriculum
-              $.ajax({
-                type: 'GET',
-                url: "/question/copy/"+$(this).attr('id'),
-                beforeSend: function(){
-                  $(question_select_button).attr('disabled', 'disabled');
-                  $(question_select_button).html('<i class="fa fa-spinner fa-spin"></i>');
-                },
-                complete: function(){
-                  $(question_select_button).html(inner_html);
-                },
-                success: function(data) {
-                  if('success' in data && data['success'] == true) {
-                    add_to_question_table($(question_table), data['question_id'], data['question_text'], data['research_categories'].join('<br>'));
-                    rowAddorRemove($(question_table));
-                    highlight_div($("tr#question_row_"+data['question_id']));
-                  }
-                },
-                error: function(xhr, ajaxOptions, thrownError){
-                  $('#questionMsg ul.errorlist li').addClass('error').html(thrownError);
-                },
-              });
-            });
+            $('#privateQuestionResults caption span.unit_or_lesson').html('Unit');
+            $('#privateQuestionResults th.lesson_num').show();
           }
+
+          $.each(data, function(question_type, question_list){
+            questions = "";
+            $.each(question_list, function(key, value){
+              if(question_type == 'public') {
+                //public questions don't have lesson #, page # and question #
+                questions += "<tr>";
+              }
+              else {
+                questions += "<tr>";
+                if($("#id_unit").val()){
+                  //only underlying lessons have lesson #
+                  questions += "<td>"+value['lesson_number']+"</td>";
+                }
+                questions += "<td>"+value['page_number']+"</td> \
+                              <td>"+value['question_number']+"</td>";
+              }
+              var question_text = value['question_text'];
+              if(search_text.length !== 0) {
+                var search_regexp = new RegExp(search_text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), "gi");
+                // (<[^<]*>)
+                question_text = question_text.replace(search_regexp, "<span class = 'search_match'>$&</span>");
+              }
+              questions += "<td>"+question_text+"</td> \
+                            <td><button style='width:75px;' type='button' class='btn small blue select_question' id='"+value['id']+"''>Add</button></td> \
+                          </tr>";
+            });
+            if(questions.length !== 0) {
+              $('#questionMsg ul.errorlist li').removeClass('error').html('');
+
+              if(question_type == 'public') {
+                $("#publicQuestionResults table tbody").html(questions);
+                show_results($("#publicQuestionResults"));
+              }
+              else {
+                $("#privateQuestionResults table tbody").html(questions);
+                show_results($("#privateQuestionResults"));
+              }
+            }
+            else {
+              if(question_type == 'public') {
+                $("#publicQuestionResults").hide();
+              }
+              else {
+                $("#privateQuestionResults").hide();
+              }
+            }
+          });
+          $(".results button.select_question").click(function(){
+            var question_select_button = $(this);
+            var formset_div = $("input[id="+id_step+"]").parent();
+            var question_table = $(formset_div).find("table.table.question");
+            var inner_html = $(question_select_button).html();
+            //ajax call to copy selected question and add to curriculum
+            $.ajax({
+              type: 'GET',
+              url: "/question/copy/"+$(this).attr('id'),
+              beforeSend: function(){
+                $(question_select_button).attr('disabled', 'disabled');
+                $(question_select_button).html('<i class="fa fa-spinner fa-spin"></i>');
+              },
+              complete: function(){
+                $(question_select_button).html(inner_html);
+              },
+              success: function(data) {
+                if('success' in data && data['success'] == true) {
+                  add_to_question_table($(question_table), data['question_id'], data['question_text'], data['research_categories'].join('<br>'));
+                  rowAddorRemove($(question_table));
+                  highlight_div($("tr#question_row_"+data['question_id']));
+                }
+              },
+              error: function(xhr, ajaxOptions, thrownError){
+                $('#questionMsg ul.errorlist li').addClass('error').html(thrownError);
+              },
+            });
+          });
         }
         return false;
       },

@@ -532,7 +532,8 @@
           $(this).modal('show');
           $("#questionModal input[id='id_step']").val(step_id);
           $("#questionModal input[id='id_curriculum']").val(curriculum_id);
-          $("#questionModal input[id='id_unit']").val(unit_id);
+          $("#questionModal input[id='id_unit']").val(unit_id).trigger('change');
+
         });
         return false;
       });

@@ -76,6 +76,9 @@ table.table thead {
 table.table.inner_table thead  {
   top: 0;
 }
+table.table.inner_table.with_caption thead  {
+  top: 2em;
+}
 table.table.inner_table img {
   max-width: 50% !important;
   height: auto !important;
@@ -244,6 +247,15 @@ table.table th .fa-sort-asc, table.table th .fa-sort-desc {
 
 table.table td.donotwrap {
   white-space: nowrap;
+}
+table caption {
+  font-size: 1.5em;
+  font-weight: bold;
+  color: black;
+  position: sticky;
+  top: 0;
+  background-color: white;
+  z-index: 999;
 }
 
 /*

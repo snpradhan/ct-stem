@@ -2093,26 +2093,29 @@ def searchQuestion(request):
     questionList = models.Question.objects.all().filter(query_filter).order_by(F('visibility').desc(),'curriculum_question__step__curriculum__order',
                                                                            'curriculum_question__step__order',
                                                                            'curriculum_question__order')
-    question_list = []
-    for question in questionList:
-      lesson_number = ''
-      page_number = ''
-      question_number = ''
-      public = False
-      if question.visibility == 'P':
-        public = True
+    if questionList.count() == 0:
+      question_list = {'error': 'No matching questions found'}
+    else:
+      question_list = {'public': [], 'private': []}
+      for question in questionList:
+        lesson_number = ''
+        page_number = ''
+        question_number = ''
+        public = False
+        if question.visibility == 'P':
+          public = True
+          question_list['public'].append({'question_text': replace_iframe_tag(request, question.question_text),
+                                          'id': question.id})
+        elif question.curriculum_question.all():
+          lesson_number = question.curriculum_question.all()[0].step.curriculum.order or ''
+          page_number = question.curriculum_question.all()[0].step.order or ''
+          question_number = question.curriculum_question.all()[0].order or ''
 
-      if question.curriculum_question.all():
-        lesson_number = question.curriculum_question.all()[0].step.curriculum.order or 'N/A'
-        page_number = question.curriculum_question.all()[0].step.order or 'N/A'
-        question_number = question.curriculum_question.all()[0].order or 'N/A'
-
-      question_list.append({'lesson_number': lesson_number,
-                      'page_number': page_number,
-                      'question_number': question_number,
-                      'question_text': replace_iframe_tag(request, question.question_text),
-                      'id': question.id,
-                      'public': public})
+          question_list['private'].append({'lesson_number': lesson_number,
+                        'page_number': page_number,
+                        'question_number': question_number,
+                        'question_text': replace_iframe_tag(request, question.question_text),
+                        'id': question.id})
 
     return http.HttpResponse(json.dumps(question_list), content_type="application/json")
 
