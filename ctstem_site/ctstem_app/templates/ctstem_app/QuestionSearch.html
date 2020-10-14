@@ -102,6 +102,7 @@ $(function (){
         }
         else {
           var questions = "";
+          var search_text = $("#id_question_text").val();
           $.each(data, function(key, value){
             if(value['public'] == true) {
               questions += "<tr>\
@@ -115,7 +116,14 @@ $(function (){
                             <td>"+value['page_number']+"</td> \
                             <td>"+value['question_number']+"</td>";
             }
-            questions += "<td>"+value['question_text']+"</td> \
+            var question_text = value['question_text'];
+            if(search_text.length !== 0) {
+              var search_regexp = new RegExp(search_text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), "gi");
+              // (<[^<]*>)
+
+              question_text = question_text.replace(search_regexp, "<span class = 'search_match'>$&</span>");
+            }
+            questions += "<td>"+question_text+"</td> \
                           <td><button style='width:75px;' type='button' class='btn small blue select_question' id='"+value['id']+"''>Add</button></td> \
                         </tr>";
           });

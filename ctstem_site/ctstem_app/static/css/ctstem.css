@@ -733,6 +733,9 @@ label.switch#curricula_view {
 .highlight > td:last-child {
   border-right: inherit !important;
 }
+.search_match {
+  background-color: #FFD028 !important;
+}
 
 /*** TILES COMMON ****/
 div.content#curricula div.row#curricula_tiles,
