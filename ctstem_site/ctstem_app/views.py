@@ -4060,7 +4060,9 @@ def check_curriculum_permission(request, curriculum_id, action, pem_code=''):
               has_permission = True
           #only teachers and researchers can export student data of private curriculum that they own
           elif curriculum.status == 'D':
-            if is_researcher or is_teacher:
+            if is_admin:
+              has_permission = True
+            elif is_researcher or is_teacher:
               if has_edit_privilege:
                 has_permission = True
 
@@ -4129,6 +4131,7 @@ def export_response(request, assignment_id='', student_id=''):
   try:
     assignment = models.Assignment.objects.get(id=assignment_id)
     group = assignment.group
+
     if hasattr(request.user, 'researcher'):
       has_permission = True
       if '' != student_id:
@@ -4238,6 +4241,10 @@ def export_response(request, assignment_id='', student_id=''):
 def export_all_response(request, curriculum_id=''):
   # check if the user has permission to add a question
   try:
+    has_permission = check_curriculum_permission(request, curriculum_id, 'export_response')
+    if not has_permission:
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to export student response for this curriculum</h1>')
+
     curriculum = models.Curriculum.objects.get(id=curriculum_id)
     response = http.HttpResponse(content_type='application/ms-excel')
     response['Content-Disposition'] = 'attachment; filename="%s.xls"'%curriculum.title
