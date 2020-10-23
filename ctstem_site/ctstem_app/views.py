@@ -177,7 +177,7 @@ def curricula(request, bucket='unit', status='public'):
     if request.method == 'POST':
       data = request.POST.copy()
       if 'search_criteria' in data:
-        search_criteria = data['search_criteria']
+        search_criteria = data['search_criteria'].strip()
       searchForm = forms.SearchForm(data)
     else:
       searchForm = forms.SearchForm()
@@ -2027,9 +2027,9 @@ def searchTaxonomy(request):
     if data['category']:
       query_filter['category__id'] = int(data['category'])
     if data['title']:
-      query_filter['title__icontains'] = str(data['title'])
+      query_filter['title__icontains'] = str(data['title']).strip()
     if data['code']:
-      query_filter['code__icontains'] = str(data['code'])
+      query_filter['code__icontains'] = str(data['code']).strip()
     print(query_filter)
     taxonomyList = models.Subcategory.objects.filter(**query_filter).annotate(code_isnull=models.IsNull('code')).order_by('code_isnull', Lower('code'), Lower('category__standard__short_name'), Lower('category__name'), Lower('title'))
     taxonomy_list = [{'standard': subcategory.category.standard.short_name, 'category': subcategory.category.name, 'title': subcategory.title, 'code': subcategory.code, 'id': subcategory.id} for subcategory in taxonomyList]
@@ -2063,7 +2063,7 @@ def searchQuestion(request):
     if data['answer_field_type']:
       question_filter = question_filter & Q(answer_field_type=data['answer_field_type'])
     if data['question_text']:
-      question_filter = question_filter & Q(question_text__icontains=str(data['question_text']))
+      question_filter = question_filter & Q(question_text__icontains=str(data['question_text']).strip())
 
     #question number and page number matching
     if data['page_number']:
@@ -2138,15 +2138,16 @@ def searchStudents(request):
   elif 'POST' == request.method:
     data = request.POST.copy()
     print(data)
+
     query_filter = {}
     if data['username']:
-      query_filter['user__username__icontains'] = str(data['username'])
+      query_filter['user__username__icontains'] = str(data['username']).strip()
     if data['first_name']:
-      query_filter['user__first_name__icontains'] = str(data['first_name'])
+      query_filter['user__first_name__icontains'] = str(data['first_name']).strip()
     if data['last_name']:
-      query_filter['user__last_name__icontains'] = str(data['last_name'])
+      query_filter['user__last_name__icontains'] = str(data['last_name']).strip()
     if data['email']:
-      query_filter['user__email__icontains'] = str(data['email'])
+      query_filter['user__email__icontains'] = str(data['email']).strip()
 
     group = models.UserGroup.objects.get(id=int(data['group_id']))
     school = group.teacher.school
@@ -2182,13 +2183,13 @@ def searchTeachers(request):
     data = request.POST.copy()
     query_filter = {}
     if data['username']:
-      query_filter['user__username__icontains'] = str(data['username'])
+      query_filter['user__username__icontains'] = str(data['username']).strip()
     if data['first_name']:
-      query_filter['user__first_name__icontains'] = str(data['first_name'])
+      query_filter['user__first_name__icontains'] = str(data['first_name']).strip()
     if data['last_name']:
-      query_filter['user__last_name__icontains'] = str(data['last_name'])
+      query_filter['user__last_name__icontains'] = str(data['last_name']).strip()
     if data['email']:
-      query_filter['user__email__icontains'] = str(data['email'])
+      query_filter['user__email__icontains'] = str(data['email']).strip()
 
     teacherList = models.Teacher.objects.filter(**query_filter)
     teacher_list = [{'user_id': teacher.user.id, 'teacher_id': teacher.id, 'username': teacher.user.username, 'name': teacher.user.get_full_name(),
@@ -2217,13 +2218,13 @@ def searchCollaborators(request):
     print(data)
     query_filter = {}
     if data['username']:
-      query_filter['username__icontains'] = str(data['username'])
+      query_filter['username__icontains'] = str(data['username']).strip()
     if data['first_name']:
-      query_filter['first_name__icontains'] = str(data['first_name'])
+      query_filter['first_name__icontains'] = str(data['first_name']).strip()
     if data['last_name']:
-      query_filter['last_name__icontains'] = str(data['last_name'])
+      query_filter['last_name__icontains'] = str(data['last_name']).strip()
     if data['email']:
-      query_filter['email__icontains'] = str(data['email'])
+      query_filter['email__icontains'] = str(data['email']).strip()
 
     if hasattr(request.user, 'teacher') or hasattr(request.user, 'school_administrator') or hasattr(request.user, 'researcher'):
       collaboratorList = User.objects.filter(Q(teacher__isnull=False) | Q(researcher__isnull=False)).exclude(id=request.user.id)
@@ -2279,7 +2280,7 @@ def users(request, role):
 
       #search
       if 'search_criteria' in data:
-        search_criteria = data['search_criteria']
+        search_criteria = data['search_criteria'].strip()
       searchForm = forms.SearchForm(data)
     else:
       searchForm = forms.SearchForm()
@@ -2449,7 +2450,7 @@ def searchCurriculaTiles(request, queryset, search_criteria):
   if search_criteria:
     if 'keywords' in search_criteria and search_criteria['keywords'][0] != '':
 
-      keywords = search_criteria['keywords'][0]
+      keywords = search_criteria['keywords'][0].strip()
       #keyword search for units and standalone curricula
       keyword_filter = Q(title__icontains=keywords) | Q(time__icontains=keywords)
       keyword_filter = keyword_filter | (Q(curriculumcollaborator__user__first_name__icontains=keywords) & Q(curriculumcollaborator__privilege='E'))
@@ -2801,7 +2802,7 @@ def groups(request, status='active'):
       _do_action(request, id_list, 'group')
       #search
       if 'search_criteria' in data:
-        search_criteria = data['search_criteria']
+        search_criteria = data['search_criteria'].strip()
       searchForm = forms.SearchForm(data)
     else:
       searchForm = forms.SearchForm()
@@ -2959,7 +2960,7 @@ def searchAssignment(request):
       query_filter['unit__isnull'] = True
 
       if data['title']:
-        query_filter['title__icontains'] = str(data['title'])
+        query_filter['title__icontains'] = str(data['title']).strip()
       if data['subject']:
         query_filter['subject__id'] = data['subject']
 

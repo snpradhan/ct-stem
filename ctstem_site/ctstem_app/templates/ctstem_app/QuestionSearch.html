@@ -164,7 +164,9 @@ $(function (){
         }
         else {
           var questions = "";
-          var search_text = $("#id_question_text").val();
+          var search_text = $("#id_question_text").val().trim();
+          var question_text = "";
+          var search_regex = "";
           if(!($("#id_unit").val())){
             $('#privateQuestionResults caption span.unit_or_lesson').html('Lesson');
             $('#privateQuestionResults th.lesson_num').hide();
@@ -190,9 +192,9 @@ $(function (){
                 questions += "<td>"+value['page_number']+"</td> \
                               <td>"+value['question_number']+"</td>";
               }
-              var question_text = value['question_text'];
+              question_text = value['question_text'];
               if(search_text.length !== 0) {
-                var search_regexp = new RegExp(search_text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), "gi");
+                search_regexp = new RegExp(search_text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), "gi");
                 // (<[^<]*>)
                 question_text = question_text.replace(search_regexp, "<span class = 'search_match'>$&</span>");
               }
