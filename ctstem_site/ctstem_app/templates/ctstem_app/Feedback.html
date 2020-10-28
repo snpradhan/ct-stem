@@ -92,10 +92,10 @@
                             <canvas id="{{question.instance.id}}_sketch" width="900" height="500" class="assignment_sketch" style="{% if question.instance.response.curriculum_question.question.sketch_background %} background: url({{question.instance.response.curriculum_question.question.sketch_background.url}}) no-repeat;{% endif %}"></canvas>
                             <input type="hidden" name="{{question.instance.id}}_sketch_response" id="{{question.instance.id}}_sketch_response" value="{{question.instance.response.response}}"/>
                           {% elif question.instance.response.curriculum_question.question.answer_field_type == 'DT' %}
-                            <div class="dt_input" id="dt_input_{{forloop.counter}}">
+                            <div class="dt_input" id="dt_input_{{forloop.parentloop.counter}}_{{forloop.counter}}">
                               <input type="hidden" name="{{question.instance.id}}_dt_response" id="{{question.instance.id}}_dt_response" value='{{question.instance.response.response}}'/>
-                              <input type="hidden" name="column_headers" id="dt_col_headers_{{forloop.counter}}" value="{{question.instance.response.curriculum_question.question.options}}"/>
-                              <table class="table table-condensed table-bordered inner_table" id="dt_table_{{forloop.counter}}">
+                              <input type="hidden" name="column_headers" id="dt_col_headers_{{forloop.parentloop.counter}}_{{forloop.counter}}" value="{{question.instance.response.curriculum_question.question.options}}"/>
+                              <table class="table table-condensed table-bordered inner_table" id="dt_table_{{forloop.parentloop.counter}}_{{forloop.counter}}">
                                 <thead>
                                 </thead>
                                 <tbody>
