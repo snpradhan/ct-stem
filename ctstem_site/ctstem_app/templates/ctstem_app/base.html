@@ -194,6 +194,7 @@
                   <a href="#" class="dropdown-toggle" data-toggle="dropdown" id="training">Teacher Support  <b class="caret"></b></a>
                   <ul class="dropdown-menu">
                     <li class="{% navactive request 'ctstem:teacherSupport' %}"><a href="{% url 'ctstem:teacherSupport' %}">Professional Development</a></li>
+                    </li>
                     <li class="{% navactive request 'ctstem:help' %}"><a href="{% url 'ctstem:help' %}">Help and FAQ</a></li>
                     {% if user.administrator %}
                       <li class="{% navactive request 'ctstem:training_requests' %}"><a href="{% url 'ctstem:training_requests' %}">Training Requests</a></li>
@@ -260,6 +261,7 @@
                       <li class="{% navactive request 'ctstem:questions' 'active' %} {% navactive request 'ctstem:questions' 'inactive' %}"><a href="{% url 'ctstem:questions' 'active' %}">Question Bank</a></li>
                       {% if user.administrator %}
                         <li class="{% navactive request 'ctstem:teamMembers' %}"><a href="{% url 'ctstem:teamMembers' %}">Team Members</a></li>
+                        <li class="{% navactive request 'ctstem:releaseNotes' %}"><a href="{% url 'ctstem:releaseNotes' %}">Release Notes</a>
                         <li><a href="{% url 'ctstem:clear_cache' %}">Clear Cache</a></li>
                       {% endif %}
                     </ul>
@@ -499,6 +501,7 @@
                <li><a href="{% url 'ctstem:standards' %}">Standards</a></li>
                <li><a class="page-scroll" href="{% url 'ctstem:publications' %}#five">Research</a></li>
                <li><a href="{% url 'ctstem:team' %}">Team</a></li>
+               <li><a href="{% url 'ctstem:releaseNotes' %}">Release Notes</a></li>
              </ul>
            </div>
          </div>

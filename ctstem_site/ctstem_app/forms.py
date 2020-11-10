@@ -1021,6 +1021,41 @@ class PublicationForm(ModelForm):
       field.widget.attrs['placeholder'] = field.help_text
 
 ####################################
+# Release Note Form
+####################################
+class ReleaseNoteForm(ModelForm):
+
+  class Meta:
+    model = models.ReleaseNote
+    fields = ['version', 'release_date']
+    widgets = {
+      'release_date': forms.DateInput(),
+    }
+
+  def __init__(self, *args, **kwargs):
+    super(ReleaseNoteForm, self).__init__(*args, **kwargs)
+
+    for field_name, field in list(self.fields.items()):
+      if field_name == 'release_date':
+        field.widget.attrs['class'] = 'form-control datepicker'
+      else:
+        field.widget.attrs['class'] = 'form-control'
+
+class ReleaseChangeForm(ModelForm):
+  class Meta:
+    model = models.ReleaseChange
+    fields = ['change_type', 'description']
+    widgets = {
+      'description': forms.Textarea(attrs={'rows':5, 'cols':60}),
+      }
+
+  def __init__(self, *args, **kwargs):
+    super(ReleaseChangeForm, self).__init__(*args, **kwargs)
+
+    for field_name, field in list(self.fields.items()):
+      field.widget.attrs['class'] = 'form-control'
+
+####################################
 # User Group Form
 ####################################
 class UserGroupForm(ModelForm):

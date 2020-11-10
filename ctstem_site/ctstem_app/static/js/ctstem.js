@@ -413,6 +413,13 @@ $(function () {
     $("#lessons_in_unit .lesson_in_unit").prop("checked", true).trigger('change');
   });
 
+  $( ".datepicker" ).datepicker({
+    changeMonth: true,
+    changeYear: true,
+    /*yearRange: "1900:2100",*/
+    // You can put more options here.
+  });
+
   bind_user_removal();
   bind_curriculum_delete_confirmation();
   bind_curriculum_share_action();

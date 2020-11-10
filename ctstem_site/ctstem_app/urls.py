@@ -123,6 +123,10 @@ urlpatterns = [
     url(r'^terms/$', views.terms, name='terms'),
     url(r'^help/$', views.help, name='help'),
     url(r'^clear_cache/$', views.clear_cache, name='clear_cache'),
+    url(r'^release_note/(?P<id>[\d]+)/$', views.releaseNote, name='releaseNote'),
+    url(r'^release_note/delete/(?P<id>[\d]+)/$', views.deleteReleaseNote, name='deleteReleaseNote'),
+    url(r'^release_note/new/$', views.releaseNote, name='newReleaseNote'),
+    url(r'^release_notes/$', views.releaseNotes, name='releaseNotes'),
 
 
 ]

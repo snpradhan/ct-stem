@@ -1,0 +1,114 @@
+{% extends "ctstem_app/base.html" %}
+{% load ctstem_extras %}
+
+{% block media %}
+  {{ block.super }}
+  {{ form.media }}
+{% endblock %}
+{% block title %}Release Notes |{% endblock %}
+
+{% block content %}
+  {{block.super}}
+ <div class="content" id="release_notes">
+
+  <h2>Release Notes</h2>
+
+  {% if user.administrator %}
+    <div class="btn-group">
+      <a class="btn normal blue" href="{% url 'ctstem:newReleaseNote' %}" title="Create new release note">Create Release Note</a>
+      <label class="switch" id="release_notes_view">
+        <input class="switch-input" type="checkbox" />
+        <span class="switch-label" data-on="Table View" data-off="List View"></span>
+        <span class="switch-handle"></span>
+      </label>
+    </div>
+  {% endif %}
+
+  {% if release_notes %}
+    <table class="table table-striped table-condensed table-bordered" id="release_notes_table">
+      <thead>
+        <tr>
+          <th style="width:15%;">Version</th>
+          <th style="width:15%;">Release Date</th>
+          <th>Release Details</th>
+          {% if user.administrator %}
+            <th style="width:10%;">Edit/Delete</th>
+          {% endif %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for release_note in release_notes %}
+          <tr>
+            <td>v{{release_note.version}} </td>
+            <td>{{release_note.release_date}}</td>
+            <td>
+              {% for change_type, changes in release_note.changes.items %}
+                {% if changes %}
+                  <label>{{change_type}}</label>
+                  <ul>
+                    {% for change in changes %}
+                      <li>{{change}}</li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+              {% endfor %}
+            </td>
+            {% if user.administrator %}
+            <td style="width:10%;">
+              <a type="button" class="btn green edit" title="Edit Release Note" href="{% url 'ctstem:releaseNote' release_note.id %}">
+                <i class="fas fa-pencil-alt" aria-hidden="true"></i>
+              </a>
+              <a type="button" class="btn red delete" title="Delete Release Note" href="{% url 'ctstem:deleteReleaseNote' release_note.id %}" onclick="return confirm('Are you sure you want to delete release note v{{release_note.version}}?')">
+                <i class="fa fa-trash" aria-hidden="true"></i>
+              </a>
+            </td>
+            {% endif %}
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <div id="release_notes_list">
+      {% for release_note in release_notes %}
+        <div>
+          <table>
+            <tr>
+              <td><h3 class="left version">v{{release_note.version}}</h3></td>
+              {% if user.administrator %}
+              <td class="action">
+                <a class="fas fa-pencil-alt edit" title="Edit Release Note" href="{% url 'ctstem:releaseNote' release_note.id %}"></a>
+                <a class="delete fa fa-trash" title="Delete Release Note" href="{% url 'ctstem:deleteReleaseNote' release_note.id %}" onclick="return confirm('Are you sure you want to delete release note v{{release_note.version}}?')"></a>
+              </td>
+              {% endif %}
+            </tr>
+          </table>
+          <h5 class="left release_date">{{release_note.release_date}}</h5>
+          {% for change_type, changes in release_note.changes.items %}
+            {% if changes %}
+              <h5 class="left">{{change_type}}</h5>
+              <ul>
+                {% for change in changes %}
+                  <li>{{change}}</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          {% endfor %}
+        </div>
+        <hr>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>No release notes available.</p>
+  {% endif %}
+</div>
+<script type="text/javascript">
+  $("#release_notes_table").hide();
+  $("div#release_notes_list").show();
+
+  $('#release_notes_view .switch-input').change(function() {
+    $("#release_notes_table").toggle();
+    $("div#release_notes_list").toggle();
+  });
+</script>
+{% endblock %}
+
+

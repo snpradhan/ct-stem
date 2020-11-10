@@ -1,0 +1,93 @@
+{% extends "ctstem_app/base.html" %}
+{% load ctstem_extras %}
+
+{% block title %}Release Note |{% endblock %}
+
+{% block content %}
+  {{block.super}}
+  <div class="content">
+    <h2>Release Note</h2>
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="table" id="metadata">
+        {{form.management_form}}
+        {{form.media}}
+        <div class="row">
+          <div class="form-group col-md-6">
+            <label for="id_{{form.version.name}}">{{ form.version.label|title }} {% if form.version.field.required %}(<span class="required">*</span>){% endif %} </label>
+            <div>{{form.version}}</div>
+            <div class="error">{{ form.version.errors }}</div>
+          </div>
+          <div class="form-group col-md-6">
+            <label for="id_{{form.release_date.name}}">{{ form.release_date.label|title }} {% if form.release_date.field.required %}(<span class="required">*</span>){% endif %} </label>
+            <div>{{form.release_date}}</div>
+            <div class="error">{{ form.release_date.errors }}</div>
+          </div>
+        </div>
+        {{formset.management_form}}
+        <div class="form-group change_table">
+          <label for="id_change_table">Change(s)</label>
+          <a type="button" class="btn blue add_change" id="add_change" title="Add Change">
+            <i class="fas fa-plus" aria-hidden="true"></i>
+          </a>
+          <table class="table table-striped table-condensed table-bordered inner_table">
+            <thead>
+              <tr>
+                <th>Change Type</th>
+                <th>Description</th>
+                <th>Delete?</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for changeForm in formset %}
+                <tr style="{% if forloop.last %} display:none; {% endif %}">
+                  <td>
+                    {{changeForm.id}}
+                    <div>
+                      {{changeForm.change_type}}
+                    </div>
+                    <div class="error">{{ changeForm.change_type.errors }}</div>
+                  </td>
+                  <td>
+                    <div>{{changeForm.description}}
+                    <div class="help warning">{{changeForm.description.help_text|safe}}</div>
+                    <div class="error">{{ attachmentForm.description.errors }}</div>
+                  </td>
+                  <td>
+                    <button type="button" class="btn red delete_change" name="delete_change" aria-label="Delete Change" title="Delete Change">
+                      <i class="fa fa-trash" aria-hidden="true"></i>
+                    </button>
+                    {{changeForm.DELETE.as_hidden}}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="form-group">
+          <input type="submit" class="btn green inbetween" id="submit" value="Save"/>
+        </div>
+      </div>
+    </form>
+  </div>
+  <script type="text/javascript">
+    $('a#add_change').click(function() {
+      cloneMore('div.change_table table.table tbody tr:last', 'form');
+      var new_row = $('div.change_table table.table tbody tr:nth-last-child(2)');
+      $(new_row).toggle();
+      rowAddorRemove($('div.change_table table.inner_table'));
+    });
+
+    //deleting an existing change
+    $('button.delete_change').click(function(){
+      var r = confirm("Are you sure you want to delete this change?");
+      if (r == true) {
+        $(this).next('input').val('on');
+        $(this).closest('tr').hide();
+        rowAddorRemove($(this).closest('table.inner_table'));
+      }
+    });
+
+  </script>
+{% endblock %}

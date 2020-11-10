@@ -2787,6 +2787,108 @@ def deletePublication(request, id=''):
 
 
 ####################################
+# CREATE MODIFY A RELEASE NOTE
+####################################
+@login_required
+def releaseNote(request, id=''):
+  try:
+    # check if the user has permission to create or modify a lesson
+    if hasattr(request.user, 'administrator') == False:
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to modify this release note</h1>')
+    # check if the lesson exists
+    if '' != id:
+      release_note = models.ReleaseNote.objects.get(id=id)
+    else:
+      release_note = models.ReleaseNote()
+
+    if request.method == 'GET':
+        form = forms.ReleaseNoteForm(instance=release_note)
+        ChangeFormSet = inlineformset_factory(models.ReleaseNote, models.ReleaseChange, form=forms.ReleaseChangeForm, can_delete=True, can_order=True, extra=1)
+        formset = ChangeFormSet(instance=release_note, prefix='form')
+        context = {'form': form, 'formset': formset}
+        return render(request, 'ctstem_app/ReleaseNote.html', context)
+
+    elif request.method == 'POST':
+      data = request.POST.copy()
+      form = forms.ReleaseNoteForm(data, instance=release_note)
+      ChangeFormSet = inlineformset_factory(models.ReleaseNote, models.ReleaseChange, form=forms.ReleaseChangeForm, can_delete=True, can_order=True, extra=1)
+      formset = ChangeFormSet(data, instance=release_note, prefix='form')
+
+      if form.is_valid() and formset.is_valid():
+        savedReleaseNote = form.save()
+        formset.save(commit=False)
+        for changeform in formset.ordered_forms:
+          changeform.instance.order = changeform.cleaned_data['ORDER']
+          changeform.instance.release_note = savedReleaseNote
+          changeform.instance.save()
+
+        #remove deleted questions
+        for obj in formset.deleted_objects:
+          obj.delete()
+        messages.success(request, "Release Note Saved.")
+        return shortcuts.redirect('ctstem:releaseNotes',)
+      else:
+        print(form.errors)
+        messages.error(request, "The release note could not be saved because there were errors.  Please check the errors below.")
+        context = {'form': form, 'formset': formset}
+        return render(request, 'ctstem_app/ReleaseNote.html', context)
+
+    return http.HttpResponseNotAllowed(['GET', 'POST'])
+
+  except models.ReleaseNote.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested release note not found</h1>')
+
+####################################
+# RELEASE NOTES TABLE VIEW
+####################################
+def releaseNotes(request):
+  releases = models.ReleaseNote.objects.all()
+  release_notes = []
+  for release in releases:
+    release_note = {}
+    release_note['id'] = release.id
+    release_note['version'] = release.version
+    release_note['release_date'] = release.release_date
+    release_note['changes'] = {'Major Changes': [], 'Minor Changes': [], 'Bug Fixes': []}
+
+    for change in release.changes.all():
+      if change.change_type == 'A':
+        release_note['changes']['Major Changes'].append(change.description)
+      elif change.change_type == 'I':
+        release_note['changes']['Minor Changes'].append(change.description)
+      else:
+        release_note['changes']['Bug Fixes'].append(change.description)
+    release_notes.append(release_note)
+
+  context = {'release_notes': release_notes}
+  return render(request, 'ctstem_app/ReleaseNotes.html', context)
+
+
+####################################
+# DELETE RELEASE NOTES
+####################################
+def deleteReleaseNote(request, id=''):
+  try:
+    # check if the user has permission to delete a release note
+    if hasattr(request.user, 'administrator') == False:
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to delete this release note</h1>')
+    # check if the lesson exists
+    if '' != id:
+      release_note = models.ReleaseNote.objects.get(id=id)
+    else:
+      raise models.ReleaseNote.DoesNotExist
+
+    if request.method == 'GET' or request.method == 'POST':
+
+      release_note.delete()
+      messages.success(request, 'Release Note deleted')
+      return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+    return http.HttpResponseNotAllowed(['GET', 'POST'])
+
+  except models.ReleaseNote.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested release note not found</h1>')
+####################################
 # GROUPS TABLE VIEW
 ####################################
 @login_required

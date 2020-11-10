@@ -257,6 +257,10 @@ input.datepicker {
   background: url(/static/img/calendar.png) no-repeat right center;
   background-size: 30px;
   background-color: #fff !important;
+  width: auto;
+}
+div#ui-datepicker-div {
+  z-index: 1000 !important;
 }
 div#spinner {
   display:none;
@@ -719,10 +723,13 @@ div.content#curricula .page-blurb > * {
   margin-top: 0 !important;
 }
 
-label.switch#curricula_view {
+label.switch#curricula_view, label.switch#release_notes_view {
   position: absolute;
   right: 5%;
   text-align: right;
+}
+label.switch#release_notes_view {
+  right: 0;
 }
 
 .highlight {
@@ -2159,6 +2166,21 @@ div.modal select.form-control {
   border-color: var(--ctstem-color-yellow) !important;
   box-shadow: unset;
   color: black;
+}
+
+#release_notes #release_notes_table ul {
+  padding-left: 40px;
+}
+#release_notes #release_notes_list .version {
+  margin-right: 1.5em;
+}
+#release_notes #release_notes_list .release_date {
+  margin-bottom: 1em;
+}
+#release_notes #release_notes_list ul li {
+  font-size: 1.5em;
+  line-height: 1.4em;
+  margin-bottom: 0.75em;
 }
 
 /************************* CKEDITOR ***********************/

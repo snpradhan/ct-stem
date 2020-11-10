@@ -122,6 +122,12 @@ CURRICULA_SORT_CHOICES = (
   ('P', 'Most Popular'),
 )
 
+CHANGE_TYPE_CHOICES = (
+  ('A', 'Major Changes'),
+  ('I', 'Minor Changes'),
+  ('X', 'Bug Fixes'),
+)
+
 class IsNull(Func):
   template = "%(expressions)s IS NULL or %(expressions)s = ''"
 
@@ -718,6 +724,21 @@ class TrainingRequest(models.Model):
   subject = models.CharField(max_length=255, blank=False, null=False, help_text="Subject")
   created_date = models.DateTimeField(auto_now_add=True)
 
+
+class ReleaseNote(models.Model):
+  version = models.CharField(max_length=255, blank=False, null=False, unique=True, help_text="Format: 3.2.1")
+  release_date = models.DateField(blank=False, null=False)
+
+  class Meta:
+      ordering = ['-version']
+
+class ReleaseChange(models.Model):
+  release_note = models.ForeignKey(ReleaseNote, null=False, on_delete=models.CASCADE, related_name='changes')
+  change_type = models.CharField(max_length=1, choices=CHANGE_TYPE_CHOICES)
+  description = models.TextField(blank=False, null=False)
+
+  class Meta:
+      ordering = ['change_type']
 
 #signal used for is_active=False to is_active=True
 @receiver(pre_save, sender=User, dispatch_uid='active')
