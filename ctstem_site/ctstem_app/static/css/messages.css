@@ -7,7 +7,8 @@ ul.messages {
   width: 100%;
   position: fixed;
   top: 90px;
-  z-index: 99;
+  z-index: 1000;
+  padding-left: 0;
 }
 
 ul.errorlist {
@@ -15,6 +16,9 @@ ul.errorlist {
   padding-left: 0;
   padding-top: 0.5em;
   font-size: 1.4em;
+}
+table ul.errorlist {
+  font-size: inherit !important;
 }
 
 div.modal .msg {
@@ -24,6 +28,13 @@ div.modal .msg {
 ul.messages li {
   text-align: center;
   padding: 0.5em 0;
+}
+ul.messages i {
+  position: absolute;
+  right: 1em;
+  top: 0.5em;
+  color: gray;
+  cursor: pointer;
 }
 
 ul.errorlist li, ul.messages li {
@@ -54,3 +65,4 @@ ul.errorlist li, ul.messages li {
   padding: 0.25em 0;
   font-size: 1.5em;
 }
+

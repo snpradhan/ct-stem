@@ -500,25 +500,45 @@ class CurriculumForm(ModelForm):
 
   def __init__(self, *args, **kwargs):
     usr = kwargs.pop('user')
+    page = kwargs.pop('page')
     super(CurriculumForm, self).__init__(*args, **kwargs)
     forms.ModelForm.__init__(self, *args, **kwargs)
-    self.fields['taxonomy'].label = "Standards"
-    self.fields['order'].label = "Curriculum Order"
-    self.fields['unit'].queryset = models.Curriculum.objects.filter(curriculum_type='U').order_by(Lower('title'), 'version')
-    self.fields['unit'].label_from_instance = lambda obj: "%s - v%d." % (obj.title, obj.version)
-    if hasattr(usr, 'teacher') or hasattr(usr, 'researcher'):
-      self.fields['unit'].queryset = models.Curriculum.objects.filter(curriculum_type='U', curriculumcollaborator__user=usr, curriculumcollaborator__privilege='E').order_by(Lower('title'), 'version')
+
+    if page == 0:
+      self.fields.pop('curriculum_type')
+      self.fields.pop('unit')
+      self.fields.pop('order')
       self.fields.pop('feature_rank')
-      if self.instance.id and self.instance.status == 'P':
-        self.fields['status'].choices = models.CURRICULUM_STATUS_CHOICES[:3]
-      else:
-        self.fields['status'].choices = models.CURRICULUM_STATUS_CHOICES[:1] + models.CURRICULUM_STATUS_CHOICES[2:3]
+      self.fields.pop('title')
+      self.fields.pop('icon')
+      self.fields.pop('time')
+      self.fields.pop('level')
+      self.fields.pop('overview')
+      self.fields.pop('acknowledgement')
+      self.fields.pop('credits')
+      self.fields.pop('status')
+      self.fields.pop('subject')
+      self.fields.pop('compatible_system')
+      self.fields.pop('taxonomy')
+      self.fields.pop('teacher_notes')
     else:
-      self.fields['status'].choices = models.CURRICULUM_STATUS_CHOICES[:3]
+      self.fields.pop('student_overview')
+      self.fields['taxonomy'].label = "Standards"
+      self.fields['order'].label = "Curriculum Order"
+      self.fields['unit'].queryset = models.Curriculum.objects.filter(curriculum_type='U').order_by(Lower('title'), 'version')
+      self.fields['unit'].label_from_instance = lambda obj: "%s - v%d." % (obj.title, obj.version)
+      if hasattr(usr, 'teacher') or hasattr(usr, 'researcher'):
+        self.fields['unit'].queryset = models.Curriculum.objects.filter(curriculum_type='U', curriculumcollaborator__user=usr, curriculumcollaborator__privilege='E').order_by(Lower('title'), 'version')
+        self.fields.pop('feature_rank')
+        if self.instance.id and self.instance.status == 'P':
+          self.fields['status'].choices = models.CURRICULUM_STATUS_CHOICES[:3]
+        else:
+          self.fields['status'].choices = models.CURRICULUM_STATUS_CHOICES[:1] + models.CURRICULUM_STATUS_CHOICES[2:3]
+      else:
+        self.fields['status'].choices = models.CURRICULUM_STATUS_CHOICES[:3]
 
-
-    if self.instance.id:
-      self.fields['curriculum_type'].widget.attrs['disabled'] = True
+      if self.instance.id:
+        self.fields['curriculum_type'].widget.attrs['disabled'] = True
 
     for field_name, field in list(self.fields.items()):
       if field_name == 'order' or field_name == 'feature_rank':
@@ -527,66 +547,65 @@ class CurriculumForm(ModelForm):
         field.widget.attrs['class'] = 'form-control'
       field.widget.attrs['placeholder'] = field.help_text
 
-  def is_valid(self):
+  def is_valid(self, page):
     valid = super(CurriculumForm, self).is_valid()
     if not valid:
       return valid
 
     cleaned_data = super(CurriculumForm, self).clean()
-
-    if cleaned_data.get('icon'):
-      try:
-        cleaned_data.get('icon').read()
-        validateImage(cleaned_data.get('icon'), 400, 289)
-      except IOError as e:
-        self.add_error('icon', 'Icon file is invalid. Please upload a new icon.')
-        valid = False
-      except ValidationError as e:
-        self.add_error('icon', e.message)
-        valid = False
-
-    if cleaned_data.get('title') == '' or cleaned_data.get('title') is None:
-      self.add_error('title', 'Title is required')
-      valid = False
-    if cleaned_data.get('time') == '' or cleaned_data.get('time') is None:
-      self.add_error('time', 'Time is required')
-      valid = False
-    if not cleaned_data.get('unit'):
-      if cleaned_data.get('level') == '' or cleaned_data.get('level') is None:
-        self.add_error('level', 'Level is required')
-        valid = False
-      if cleaned_data.get('overview') == '' or cleaned_data.get('overview') is None:
-        self.add_error('overview', 'Overview is required')
-        valid = False
-      if not cleaned_data.get('taxonomy'):
-          self.add_error('taxonomy', 'Standards is required')
-          valid = False
-
-    if cleaned_data.get('curriculum_type') != 'U':
+    if page == 0:
       if cleaned_data.get('student_overview') == '' or cleaned_data.get('student_overview') is None:
         self.add_error('student_overview', 'Student Directions & Learning Objectives is required')
         valid = False
-
-    if cleaned_data.get('curriculum_type') == 'U'  or cleaned_data.get('curriculum_type') == 'L':
-      if not cleaned_data.get('unit'):
-        if not cleaned_data.get('subject'):
-          self.add_error('subject', 'Subject is required')
+    else:
+      if cleaned_data.get('icon'):
+        try:
+          cleaned_data.get('icon').read()
+          validateImage(cleaned_data.get('icon'), 400, 289)
+        except IOError as e:
+          self.add_error('icon', 'Icon file is invalid. Please upload a new icon.')
+          valid = False
+        except ValidationError as e:
+          self.add_error('icon', e.message)
           valid = False
 
-    if cleaned_data.get('status') == 'A':
-      inprogress_assignments = None
-      if cleaned_data.get('curriculum_type') == 'U':
-        unit = self.instance
-        lessons = unit.underlying_curriculum.all()
-        inprogress_assignments = models.AssignmentInstance.objects.all().filter(assignment__curriculum__in=lessons, status='P')
-      else:
-        lesson = self.instance
-        inprogress_assignments = models.AssignmentInstance.objects.all().filter(assignment__curriculum=lesson, status='P')
-
-      if inprogress_assignments:
-        self.add_error('status', 'You cannot archive this curriculum at this time because there may be students currently working on it. \
-                                  Archiving will affect all students and teachers who have assigned this curriculum. Please try again later.')
+      if cleaned_data.get('title') == '' or cleaned_data.get('title') is None:
+        self.add_error('title', 'Title is required')
         valid = False
+      if cleaned_data.get('time') == '' or cleaned_data.get('time') is None:
+        self.add_error('time', 'Time is required')
+        valid = False
+      if not cleaned_data.get('unit'):
+        if cleaned_data.get('level') == '' or cleaned_data.get('level') is None:
+          self.add_error('level', 'Level is required')
+          valid = False
+        if cleaned_data.get('overview') == '' or cleaned_data.get('overview') is None:
+          self.add_error('overview', 'Overview is required')
+          valid = False
+        if not cleaned_data.get('taxonomy'):
+            self.add_error('taxonomy', 'Standards is required')
+            valid = False
+
+      if cleaned_data.get('curriculum_type') == 'U'  or cleaned_data.get('curriculum_type') == 'L':
+        if not cleaned_data.get('unit'):
+          if not cleaned_data.get('subject'):
+            self.add_error('subject', 'Subject is required')
+            valid = False
+
+      if cleaned_data.get('status') == 'A':
+        inprogress_assignments = None
+        if cleaned_data.get('curriculum_type') == 'U':
+          unit = self.instance
+          lessons = unit.underlying_curriculum.all()
+          inprogress_assignments = models.AssignmentInstance.objects.all().filter(assignment__curriculum__in=lessons, status='P')
+        else:
+          lesson = self.instance
+          inprogress_assignments = models.AssignmentInstance.objects.all().filter(assignment__curriculum=lesson, status='P')
+
+        if inprogress_assignments:
+          self.add_error('status', 'You cannot archive this curriculum at this time because there may be students currently working on it. \
+                                    Archiving will affect all students and teachers who have assigned this curriculum. Please try again later.')
+          valid = False
 
     return valid
 
@@ -597,7 +616,7 @@ class StepForm(ModelForm):
 
   class Meta:
     model = models.Step
-    exclude = ('order',)
+    exclude = ('curriculum',)
     widgets = {
       'title': forms.TextInput(attrs={'placeholder': 'Step Title'}),
       'content': forms.Textarea(attrs={'rows':0, 'cols':60}),

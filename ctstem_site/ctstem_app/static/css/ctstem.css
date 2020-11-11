@@ -332,12 +332,45 @@ div#div_conditions {
   display: none;
 }
 
+.page-navigation {
+  margin-bottom: 0;
+  position: sticky;
+  top: 90px;
+  padding: 2em 0;
+  background-color: white;
+  z-index: 999;
+}
+
+.page-navigation > div#page_numbers nav#numbers {
+  vertical-align: middle;
+  font-family: 'Roboto Condensed', sans-serif;
+  text-align: center;
+}
+.page-navigation div, .page-navigation span {
+  font-family: 'Roboto Condensed', sans-serif;
+}
+
+.page-navigation nav .btn {
+  height: 30px !important;
+  text-align: center !important;
+  padding: 6px 0 !important;
+  border-radius: 15px !important;
+  margin: 0.5em !important;
+}
+
+.page-navigation nav .btn.overview {
+  padding: 6px 12px !important;
+}
+.page-navigation nav .btn:not(.overview) {
+  width: 30px !important;
+}
+
 div.curriculum_container, div.group_container {
   display: flex;
   justify-content: space-between;
 }
 div.curriculum_container div.left-navigation {
-  width: 12%;
+  width: 10%;
 }
 div.curriculum_container div.left-navigation ul {
   padding-left: 2em;
@@ -355,7 +388,7 @@ div.curriculum_container div.left-navigation label a:hover{
   text-decoration: underline;
 }
 div.curriculum_container div.curriculum_components {
-  width: 78%;
+  width: 80%;
 }
 div.group_container div.group_components {
   width: 90%;
@@ -368,8 +401,6 @@ div.table#curriculum, div.table#directions_attachments, div.table.step, div.tabl
 div.table#curriculumQuestions, div.table.activity, div.table#group, div.table#standard {
   width: 90%;
   padding: 3em 4em;
-  margin-top: 3em;
-  margin-bottom: 3em;
 }
 div.table#curriculum, div.table#directions_attachments, div.table.step, div.table.addStep {
   width: 100%;

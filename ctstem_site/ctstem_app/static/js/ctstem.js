@@ -230,6 +230,9 @@ $(function () {
   $('input[id$=ORDER]').addClass('form-control');
 
   $('ul.messages').delay(30000).fadeOut('slow');
+  $('ul.messages i').click(function(){
+    $('ul.messages').hide();
+  });
 
   $("a.profile").click(function(e){
     e.preventDefault();
@@ -272,9 +275,9 @@ $(function () {
     $('div#spinner').show();
   });
 
-  $('form#curriculumForm input#preview').on('click', function() {
+  /*$('form#curriculumForm input#preview').on('click', function() {
     $('div#spinner').show();
-  });
+  });*/
 
   /* handler for search and assign curriculum modal trigger */
   $('a.assignment-modal').click(function(){
@@ -671,7 +674,7 @@ function add_to_collaborator_table(collaborator_table, current_user_id, user_id,
 
 //Add new question to question table in curriculum form
 function add_to_question_table(question_table, question_id, question_text, research_categories) {
-  cloneSomeMore($(question_table).find('tr:last'), 'form', 'curriculumquestion_set');
+  cloneMore($(question_table).find('tr:last'), 'question_form');
   $(question_table).find("tr:nth-last-child(2)").attr('id', 'question_row_'+question_id);
   $(question_table).find("tr:nth-last-child(2) td.question_text input[type=hidden]").val(question_id);
   $(question_table).find("tr:nth-last-child(2) td.question_text div").html(question_text);

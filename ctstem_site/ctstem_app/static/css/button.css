@@ -25,7 +25,7 @@
   background-color: var(--ctstem-color-light-blue) !important;
   color: white !important;
 }
-.btn.lightblue:hover, button[class*="lightblue"]:hover  {
+.btn.lightblue:hover, button[class*="lightblue"]:hover, .btn.lightblue.active, button[class*="lightblue"][class="active"]  {
   border: 1px solid var(--ctstem-color-light-blue) !important;
   background-color: #ffffff !important;
   color: var(--ctstem-color-light-blue) !important;
@@ -34,7 +34,7 @@
   background-color: var(--ctstem-color-blue) !important;
   color: white !important;
 }
-.btn.blue:hover, button[class*="blue"]:hover  {
+.btn.blue:hover, button[class*="blue"]:hover, .btn.blue.active, button[class*="blue"][class="active"] {
   border: 1px solid var(--ctstem-color-blue) !important;
   background-color: #ffffff !important;
   color: var(--ctstem-color-blue) !important;
@@ -43,7 +43,7 @@
   background-color: var(--ctstem-color-dark-blue) !important;
   color: white !important;
 }
-.btn.darkblue:hover, button[class*="darkblue"]:hover {
+.btn.darkblue:hover, button[class*="darkblue"]:hover, .btn.darkblue.active, button[class*="darkblue"][class="active"] {
   border: 1px solid var(--ctstem-color-dark-blue) !important;
   background-color: #ffffff !important;
   color: var(--ctstem-color-dark-blue) !important;
@@ -52,7 +52,7 @@
   background-color: var(--ctstem-color-yellow) !important;
   color: black !important;
 }
-.btn.yellow:hover, button[class*="yellow"]:hover {
+.btn.yellow:hover, button[class*="yellow"]:hover, .btn.yellow.active, button[class*="yellow"][class="active"] {
   border: 1px solid var(--ctstem-color-yellow) !important;
   background-color: #ffffff !important;
   color: var(--ctstem-color-yellow) !important;
@@ -62,7 +62,7 @@
   background-color: #ffffff !important;
   color: black !important;
 }
-.btn.white:hover, button[class*="white"]:hover {
+.btn.white:hover, button[class*="white"]:hover, .btn.white.active, button[class*="white"][class="active"] {
   background-color: var(--ctstem-color-light-gray) !important;
   color: #ffffff !important;
 }
@@ -72,7 +72,7 @@
   background-color: var(--ctstem-color-light-gray) !important;
   color: white !important;
 }
-.btn.gray:hover, button[class*="gray"]:hover {
+.btn.gray:hover, button[class*="gray"]:hover, .btn.gray.active, button[class*="gray"][class="active"] {
   background-color: #ffffff !important;
   color: var(--ctstem-color-light-gray) !important;
 }
@@ -80,7 +80,7 @@
   background-color: var(--ctstem-color-red) !important;
   color: white !important;
 }
-.btn.red:hover, button[class*="red"]:hover {
+.btn.red:hover, button[class*="red"]:hover, .btn.red.active, button[class*="red"][class="active"] {
   border: 1px solid var(--ctstem-color-red) !important;
   background-color: #ffffff !important;
   color: var(--ctstem-color-red) !important;
@@ -90,7 +90,7 @@
   background-color: var(--ctstem-color-orange) !important;
   color: white !important;
 }
-.btn.orange:hover, button[class*="orange"]:hover {
+.btn.orange:hover, button[class*="orange"]:hover, .btn.orange.active, button[class*="orange"][class="active"] {
   border: 1px solid var(--ctstem-color-orange) !important;
   background-color: #ffffff !important;
   color: var(--ctstem-color-orange) !important;
@@ -100,7 +100,7 @@
   background-color: var(--ctstem-color-green) !important;
   color: white !important;
 }
-.btn.green:hover, button[class*="green"]:hover {
+.btn.green:hover, button[class*="green"]:hover, .btn.green.active, button[class*="green"][class="active"] {
   border: 1px solid var(--ctstem-color-green) !important;
   background-color: #ffffff !important;
   color: var(--ctstem-color-green) !important;
@@ -109,7 +109,7 @@
   background-color: var(--ctstem-color-purple) !important;
   color: white !important;
 }
-.btn.purple:hover, button[class*="purple"]:hover {
+.btn.purple:hover, button[class*="purple"]:hover, .btn.purple.active, button[class*="purple"][class="active"] {
   border: 1px solid var(--ctstem-color-purple) !important;
   background-color: #ffffff !important;
   color: var(--ctstem-color-purple) !important;

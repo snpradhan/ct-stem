@@ -25,3 +25,4 @@ class CustomExceptionMiddleware(MiddlewareMixin):
      messages.error(request, str(exception))
 
     return shortcuts.redirect('ctstem:home')
+

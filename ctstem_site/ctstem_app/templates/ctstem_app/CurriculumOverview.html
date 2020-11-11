@@ -1,0 +1,525 @@
+{% extends "ctstem_app/base.html" %}
+{% load ctstem_extras %}
+
+{% block title %}Curriculum |{% endblock %}
+
+{% block content %}
+  {{block.super}}
+  <div class="content">
+    <form method="post" enctype="multipart/form-data" id='curriculumForm'>
+      {% csrf_token %}
+      {{form.media}}
+      <div class="curriculum_container">
+        {% include "ctstem_app/CurriculumUnitNavigation.html" with flag="overview"%}
+        <div class="curriculum_components">
+          <div class="form-group page-navigation">
+            {% include "ctstem_app/CurriculumPageNavigation.html" with flag="overview" page=page %}
+          </div>
+          {% if page < 0 %}
+            <div class="table" id="curriculum">
+              <h4>
+                <span>&nbsp;</span>
+                <span class="curriculum_title" style="font-weight: bold; text-decoration: underline;">{{form.title.value|default_if_none:" "}}</span>
+                <span style="font-weight: bold;">(Overview)</span>
+                <span>&nbsp;</span>
+              </h4>
+
+              <div class="curriculum_content collapsible_content">
+
+                {{form.management_form}}
+                <!-- CURRICULUM TYPE -->
+                <div class="form-group">
+                  <label for="id_{{form.curriculum_type.name}}">{{ form.curriculum_type.label|title }} {% if form.curriculum_type.field.required %}(<span class="required">*</span>) {% endif %}</label>
+                  <div class="curriculum_input">
+                    {{form.curriculum_type}}
+                    {% if form.instance.id %}
+                      {{form.curriculum_type.as_hidden}}
+                    {% endif %}
+                  </div>
+                  <div class="help warning">{{form.curriculum_type.help_text|safe}}</div>
+                  <div class="error">{{ form.curriculum_type.errors }}</div>
+                </div>
+
+                <!-- UNIT -->
+                <div class="form-group">
+                  <label for="id_{{form.unit.name}}">{{ form.unit.label|title }} {% if form.unit.field.required %}(<span class="required">*</span>) {% endif %}</label>
+                  <div class="curriculum_input">
+                    {{form.unit}}
+                  </div>
+                  <div class="help warning">{{form.unit.help_text|safe}}</div>
+                  <div class="error">{{ form.unit.errors }}</div>
+                </div>
+
+                <!-- CURRICULUM TITLE -->
+                <div class="form-group">
+                  <label for="id_{{form.title.name}}">{{ form.title.label|title }} {% if form.title.field.required %}(<span class="required">*</span>) {% endif %}</label>
+                  <div class="curriculum_input">
+                    {{form.title}}
+                  </div>
+                  <div class="help warning">{{form.title.help_text|safe}}</div>
+                  <div class="error">{{ form.title.errors }}</div>
+                </div>
+
+                <!-- SUBJECT -->
+                <div class="form-group">
+                  <label for="id_{{form.subject.name}}">{{ form.subject.label|title }} {% if form.subject.field.required %}(<span class="required">*</span>) {% endif %}</label>
+                  <div class="curriculum_input">
+                    {{form.subject}}
+                  </div>
+                  <div class="help warning">{{form.subject.help_text|safe}}</div>
+                  <div class="error">{{ form.subject.errors }}</div>
+                </div>
+
+                <!-- FEATURE RANK/CURRICULUM ORDER AND STATUS -->
+                <div class="row">
+                  <!-- FEATURE RANK -->
+                  {% if form.feature_rank %}
+                    <div class="col-md-6 form-group">
+                      <label for="id_{{form.feature_rank.name}}">{{ form.feature_rank.label|title }} {% if form.feature_rank.field.required %}(<span class="required">*</span>) {% endif %}</label>
+                      <div class="curriculum_input">
+                        {{form.feature_rank}}
+                      </div>
+                      <div class="help warning">{{form.feature_rank.help_text|safe}}</div>
+                      <div class="error">{{ form.feature_rank.errors }}</div>
+                    </div>
+                  {% endif %}
+                   <!-- ORDER -->
+                  <div class="col-md-6 form-group">
+                    <label for="id_{{form.order.name}}">{{ form.order.label|title }} {% if form.order.field.required %}(<span class="required">*</span>) {% endif %}</label>
+                    <div class="curriculum_input">
+                      {{form.order}}
+                    </div>
+                    <div class="help warning">{{form.order.help_text|safe}}</div>
+                    <div class="error">{{ form.order.errors }}</div>
+                  </div>
+                  <!-- STATUS -->
+                  <div class="col-md-6 form-group">
+                    <label for="id_{{form.status.name}}">{{ form.status.label|title }} {% if form.status.field.required %}(<span class="required">*</span>) {% endif %}</label>
+                    <div class="curriculum_input">
+                      {{form.status}}
+                    </div>
+                    <div class="help warning">{{form.status.help_text|safe}}</div>
+                    <div class="error">{{ form.status.errors }}</div>
+                  </div>
+                </div>
+
+                {% include "ctstem_app/CurriculumCollaborators.html"%}
+
+                <!-- ICON -->
+                <div class="form-group">
+                  <label for="id_{{form.icon.name}}">{{ form.icon.label|title }} {% if form.icon.field.required %}(<span class="required">*</span>) {% endif %}</label>
+                  <div class="curriculum_input">
+                    {{form.icon}}
+                  </div>
+                  <div class="help warning">{{form.icon.help_text|safe}}</div>
+                  <div class="error">{{ form.icon.errors }}</div>
+                </div>
+
+                <!-- TIME -->
+                <div class="form-group">
+                  <label for="id_{{form.time.name}}">{{ form.time.label|title }} {% if form.time.field.required %}(<span class="required">*</span>) {% endif %}</label>
+                  <div class="curriculum_input">
+                    {{form.time}}
+                  </div>
+                  <div class="help warning">{{form.time.help_text|safe}}</div>
+                  <div class="error">{{ form.time.errors }}</div>
+                </div>
+
+                <!-- LEVEL -->
+                <div class="form-group">
+                  <label for="id_{{form.level.name}}">{{ form.level.label|title }} {% if form.level.field.required %}(<span class="required">*</span>) {% endif %}</label>
+                  <div class="curriculum_input">
+                    {{form.level}}
+                  </div>
+                  <div class="help warning">{{form.level.help_text|safe}}</div>
+                  <div class="error">{{ form.level.errors }}</div>
+                </div>
+
+                <!-- OVERVIEW -->
+                <div class="form-group">
+                  <label for="id_{{form.overview.name}}">{{ form.overview.label|title }} {% if form.overview.field.required %}(<span class="required">*</span>) {% endif %}</label>
+                  <div class="curriculum_input">
+                    {{form.overview}}
+                  </div>
+                  <div class="help warning">{{form.overview.help_text|safe}}</div>
+                  <div class="error">{{ form.overview.errors }}</div>
+                </div>
+
+                <!-- ACKNOWLEDGEMENT -->
+                <div class="form-group">
+                  <label for="id_{{form.acknowledgement.name}}">{{ form.acknowledgement.label|title }} {% if form.acknowledgement.field.required %}(<span class="required">*</span>) {% endif %}</label>
+                  <div class="curriculum_input">
+                    {{form.acknowledgement}}
+                  </div>
+                  <div class="help warning">{{form.acknowledgement.help_text|safe}}</div>
+                  <div class="error">{{ form.acknowledgement.errors }}</div>
+                </div>
+
+                <!-- CREDITS -->
+                <div class="form-group">
+                  <label for="id_{{form.credits.name}}">{{ form.credits.label|title }} {% if form.credits.field.required %}(<span class="required">*</span>) {% endif %}</label>
+                  <div class="curriculum_input">
+                    {{form.credits}}
+                  </div>
+                  <div class="help warning">{{form.credits.help_text|safe}}</div>
+                  <div class="error">{{ form.credits.errors }}</div>
+                </div>
+
+                <!-- COMPATIBLE SYSTEMS -->
+                <div class="form-group">
+                  <label for="id_{{form.compatible_system.name}}">{{ form.compatible_system.label|title }} {% if form.compatible_system.field.required %}(<span class="required">*</span>) {% endif %}</label>
+                  <div class="curriculum_input">
+                    {{form.compatible_system}}
+                  </div>
+                  <div class="help warning">{{form.compatible_system.help_text|safe}}</div>
+                  <div class="error">{{ form.compatible_system.errors }}</div>
+                </div>
+
+                <!-- TAXONOMY -->
+                <div class="form-group">
+                  <label for="id_{{form.taxonomy.name}}">{{ form.taxonomy.label|title }} {% if form.taxonomy.field.required %}(<span class="required">*</span>) {% endif %}</label>
+                  <div style="display:none;">
+                    {{form.taxonomy}}
+                  </div>
+                  <button class="btn blue search_taxonomy" name="search_taxonomy" data-form="{% url 'ctstem:searchTaxonomy' %}">
+                    <i class="fas fa-plus" aria-hidden="true"></i>
+                  </button>
+                  <span class="expand_collapse_other">
+                    <button type="button" class="btn orange" name="collapse_standards" aria-label="Collapse Standards" title="Collapse Standards">
+                      <span class="glyphicon glyphicon-collapse-up" aria-hidden="true"></span>
+                    </button>
+                    <button type="button" class="btn green" style="display:none;" name="expand_standards" aria-label="Expand Standards" title="Expand Standards">
+                      <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
+                    </button>
+                  </span>
+                  <div id="taxonomy_div" class="curriculum_input">
+                    <table class="table table-bordered table-striped table-condensed inner_table" id="taxonomy">
+                      <thead>
+                        <tr>
+                          <th>Standard</th>
+                          <th>Category</th>
+                          <th>Code</th>
+                          <th>Title</th>
+                          <th>Remove?</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for x in form.taxonomy.value %}
+                          {% with taxonomy=x|getTaxonomy %}
+                          <tr id="{{taxonomy.id}}">
+                            <td class="donotwrap">{{taxonomy.category.standard.short_name}}</td>
+                            <td>{{taxonomy.category.name}}</td>
+                            <td class="donotwrap">{{taxonomy.code}}</td>
+                            <td>{{taxonomy.title}}</td>
+                            <td>
+                              <button type="button" class="btn red remove_taxonomy" title="Remove Taxonomy">
+                                <i class="fa fa-trash" aria-hidden="true"></i>
+                              </button>
+                            </td>
+                          </tr>
+                          {% endwith %}
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+                  <div class="help warning">{{form.taxonomy.help_text|safe}}</div>
+                  <div class="error">{{ form.taxonomy.errors }}</div>
+                </div>
+
+                <!-- TEACHER NOTES -->
+                <div class="form-group">
+                  <label for="id_{{form.teacher_notes.name}}">{{ form.teacher_notes.label|title }} {% if form.teacher_notes.field.required %}(<span class="required">*</span>) {% endif %}</label>
+                  <span class="expand_collapse_other">
+                    <button type="button" class="btn orange" style="display:none;" name="collapse_notes" aria-label="Collapse Notes" title="Collapse Notes">
+                      <span class="glyphicon glyphicon-collapse-up" aria-hidden="true"></span>
+                    </button>
+                    <button type="button" class="btn green"  name="expand_notes" aria-label="Expand Notes" title="Expand Notes">
+                      <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
+                    </button>
+                  </span>
+                  <div style="display:none;" class="curriculum_input">
+                    {{form.teacher_notes}}
+                  </div>
+                  <div class="help warning">{{form.teacher_notes.help_text|safe}}</div>
+                  <div class="error">{{ form.teacher_notes.errors }}</div>
+                </div>
+
+                {% include "ctstem_app/CurriculumAttachments.html" with role='teacher' formset=teacher_attachment_formset %}
+
+              </div>
+            </div>
+          {% else %}
+
+            <!-- Student directions and attachments -->
+            <!-- Page 0 of Student view -->
+            <div class="table" id="directions_attachments">
+              <h4>
+                <span>&nbsp;</span>
+                <span class="step_title" style="font-weight: bold; text-decoration: underline;">Student Directions and Attachments</span>
+                <span>(Page 0)</span>
+                <span>&nbsp;</span>
+              </h4>
+              <div class="curriculum_content collapsible_content">
+                <!-- STUDENT OVERVIEW -->
+                <div class="form-group">
+                  <label for="id_{{form.student_overview.name}}">{{ form.student_overview.label|title }} (<span class="required">*</span>)</label>
+                  <div class="curriculum_input">
+                    {{form.student_overview}}
+                  </div>
+                  <div class="help warning">{{form.student_overview.help_text|safe}}</div>
+                  <div class="error">{{ form.student_overview.errors }}</div>
+                </div>
+
+                <!-- STUDENT ATTACHMENTS -->
+                {% include "ctstem_app/CurriculumAttachments.html" with role='student' formset=student_attachment_formset%}
+              </div>
+            </div>
+          {% endif %}
+        </div> <!-- end of curriculum form div-->
+
+        <div class="button-container">
+          <div class="form-group button-group-fixed">
+            {% if curriculum.id %}
+              {% check_curriculum_permission form.instance.id 'delete' as has_delete_permission %}
+              {% if has_delete_permission == True %}
+                <a type="button" class="btn inbetween red delete_curriculum" aria-hidden="true" aria-label="Delete Curriculum" title="Delete Curriculum" href="{% url 'ctstem:deleteCurriculum' curriculum.id %}">Delete {{form.instance.get_curriculum_type_display}}
+                </a>
+                <br><br>
+              {% endif %}
+              <input type="button" class="btn inbetween orange" id="previewBtn" value="Preview"/>
+              <br><br>
+              <a type="button" class="btn inbetween yellow share" id="shareBtn" data-form="{% url 'ctstem:shareCurriculum' curriculum.id %}">Share</a>
+            {% else %}
+              <input type="submit" class="btn inbetween orange" id="previewBtn" value="Preview" onclick="alert('Save this curriculum for the Preview button to be enabled');"/>
+              <br><br>
+              <a type="button" class="btn inbetween yellow" id="shareBtn" title="Save this curriculum for the Share button to be enabled" disabled>Share</a>
+            {% endif %}
+            <br><br>
+            <input type="hidden" name="preview" id="preview" value="0"/>
+            <input type="hidden" name="next" id="next"/>
+            <input type="submit" class="btn inbetween green" id="submit" value="Save"/>
+            <br><br>
+          </div>
+        </div>
+      </div>
+    </form>
+    <div class="modal fade" id="taxonomyModal" role="dialog"></div>
+
+  </div>
+  <script type="text/javascript">
+    $(function (){
+
+      $("button.search_taxonomy").click(function(e){
+        e.preventDefault();
+        var url = $(this).data("form");
+        $("#taxonomyModal").load(url, function() {
+          $(this).modal('show');
+        });
+        return false;
+      });
+
+      $("button.remove_taxonomy").click(function(e){
+        var taxonomy_id = $(this).closest('tr').attr('id');
+        $('#id_curriculum-taxonomy option[value="'+taxonomy_id+'"]').prop('selected', false);
+        $('div.curriculum_content div#taxonomy_div table#taxonomy tbody tr#'+taxonomy_id).remove();
+        rowAddorRemove($('table#taxonomy.inner_table'));
+      });
+
+      $('input#id_curriculum-title').on('input', function(){
+        $(this).closest('div.table').find('h4 span.curriculum_title').html($(this).val());
+      });
+      //adding new teacher attachments
+      $('a#add_teacher_attachment').click(function() {
+        cloneMore('div.teacher_attachment_table table.table tbody tr:last', 'teacher_attachment_form');
+        var new_row = $('div.teacher_attachment_table table.table tbody tr:nth-last-child(2)');
+        $(new_row).toggle();
+        rowAddorRemove($('div.teacher_attachment_table table.inner_table'));
+      });
+      //adding new student attachments
+      $('a#add_student_attachment').click(function() {
+        cloneMore('div.student_attachment_table table.table tbody tr:last', 'student_attachment_form');
+        var new_row = $('div.student_attachment_table table.table tbody tr:nth-last-child(2)');
+        $(new_row).toggle();
+        rowAddorRemove($('div.student_attachment_table table.inner_table'));
+      });
+      //deleting an existing attachment
+      $('button.delete_attachment').click(function(){
+        var r = confirm("Are you sure you want to delete this attachment?");
+        if (r == true) {
+          $(this).next('input').val('on');
+          $(this).closest('tr').hide();
+          rowAddorRemove($(this).closest('table.inner_table'));
+        }
+      });
+
+      reset_curriculum_metadata();
+
+      $('select#id_curriculum-curriculum_type').bind('change', (function(){
+        //reset field visibility
+        reset_curriculum_metadata();
+
+        //for all curriculum types, display author table, title, status, icon, time, teacher overview, acknowledgement, credits, subject and teacher notes
+        if($(this).val() == 'U' || $(this).val() == 'L' || $(this).val() == 'A') {
+          $('#id_curriculum-title').closest('.form-group').show();
+          $('#id_curriculum-status').closest('.form-group').show();
+          $('#id_curriculum-icon').closest('.form-group').show();
+          $('#id_curriculum-time').closest('.form-group').show();
+          $('#id_curriculum-time').closest('.form-group').find('label:first').html('Time (<span class="required">*</span>)');
+          $('#id_curriculum-overview').closest('.form-group').show();
+          $('#id_curriculum-acknowledgement').closest('.form-group').show();
+          $('#id_curriculum-credits').closest('.form-group').show();
+          $('#id_curriculum-subject').closest('.form-group').show();
+          $('#id_curriculum-teacher_notes').closest('.form-group').show();
+        }
+
+        //for unit, stand alone lesson/assessment mark overview required, display level, taxonomy and collaborators
+        if($(this).val() == 'U' || (($(this).val() == 'L' || $(this).val() == 'A') &&  $('select#id_curriculum-unit').val() == '' )) {
+          $('#id_curriculum-overview').closest('.form-group').find('label:first').html('Overview (<span class="required">*</span>)');
+          $('#id_curriculum-level').closest('.form-group').show();
+          $('#id_curriculum-level').closest('.form-group').find('label:first').html('Level (<span class="required">*</span>)');
+          $('#id_curriculum-taxonomy').closest('.form-group').show();
+          $('#id_curriculum-taxonomy').closest('.form-group').find('label:first').html('Standards (<span class="required">*</span>)');
+          $('div.collaborator_table').show();
+        }
+
+        //for unit and stand alone lesson mark subject required and display compatible systems and feature rank
+        if($(this).val() == 'U' || ($(this).val() == 'L' &&  $('select#id_curriculum-unit').val() == '' )) {
+          $('#id_curriculum-subject').closest('.form-group').show();
+          $('#id_curriculum-subject').closest('.form-group').find('label:first').html('Subject (<span class="required">*</span>)');
+          $('#id_curriculum-compatible_system').closest('.form-group').show();
+          $('#id_curriculum-feature_rank').closest('.form-group').show();
+        }
+
+        //for lesson and assessment, display unit, student directions and attachments
+        if($(this).val() == 'L' || $(this).val() == 'A') {
+          $('#id_curriculum-unit').closest('.form-group').show();
+          /*$('div.table#directions_attachments').show();
+          $('#id_curriculum-student_overview').closest('.form-group').show();
+          $('#id_curriculum-student_overview').closest('.form-group').find('label:first').html('Student Directions & Learning Objectives (<span class="required">*</span>)');
+
+          $('div.form-group.student_attachment_table').show();*/
+          $('div.form-group.teacher_attachment_table').show();
+          if($('select#id_curriculum-unit').val() != '') {
+            $('#id_curriculum-order').closest('.form-group').show();
+          }
+          else{
+            $('#id_curriculum-order').closest('.form-group').hide();
+          }
+        }
+        else{
+          //reset the unit field
+          $('#id_curriculum-unit').prop('selectedIndex', 0);
+        }
+      }));
+
+      $('select#id_curriculum-curriculum_type').trigger('change');
+
+      $('select#id_curriculum-unit').bind('change', (function(){
+        $('select#id_curriculum-curriculum_type').trigger('change');
+        if($('select#id_curriculum-unit').val() != '') {
+          $('#id_curriculum-order').closest('.form-group').show();
+        }
+        else{
+          $('#id_curriculum-order').closest('.form-group').hide();
+          //when unit is unselected, copy unit collaborators to the lesson
+          if('{{form.instance.id}}' != 'None' && '{{form.instance.unit}}' != 'None'){
+            $.ajax({
+              type: "GET",
+              url: '/collaborators/{{form.instance.unit.id}}/',
+              dataType: 'json',
+              success: function(data){
+                console.log(data);
+                var collaborator_table = $('table.table#collaborators');
+                $.each(data, function(index, value) {
+                  var user_id = value['user_id'];
+                  var username = value['username'];
+                  var full_name = value['name'];
+                  var email = value['email'];
+                  var order = value['order'];
+                  var privilege_code = value['privilege_code'];
+                  var privilege_display = value['privilege_display'];
+                  var current_user_id = '{{user.id}}';
+
+                  if($('table.table#collaborators tr#user_'+user_id).length == 0) {
+                    add_to_collaborator_table(collaborator_table, current_user_id, user_id, username, full_name, email, order, privilege_code, privilege_display);
+                  }
+                });
+                rowAddorRemove($('table#collaborators'));
+              },
+              error: function(xhr, ajaxOptions, thrownError){
+                $("ul.messages li").remove();
+                $("ul.messages").html('<li class="error">Unit collaborators could not be copied.</li>');
+                $('ul.messages').show();
+                $('ul.messages').delay(30000).fadeOut('slow');
+              },
+            });
+          }
+        }
+
+      }));
+      $('select#id_curriculum-unit').trigger('change');
+
+      function reset_curriculum_metadata(){
+        //hide all curriculum metadata fields if curriculum type is not selected
+        $('div#curriculum div.form-group').hide();
+        //$('div.table#directions_attachments').hide();
+        //only show the curriculum type field
+        $('#id_curriculum-curriculum_type').closest('.form-group').show();
+      }
+
+      //on click of preview, first save the curriculum and then generate the preview
+      $('input#previewBtn').click(function(e){
+        if('{{form.instance.id}}' != 'None'){
+          $('input#preview').val("1");
+          $('input#submit').click();
+        }
+      });
+
+      $('div.unit-navigation a').click(function(e){
+        var link = $(this);
+        e.preventDefault();
+        bootbox.confirm({ title: 'Confirm',
+                          message: "<p>If you haven't saved the current curriculum, click <strong>Close</strong> to dismiss this popup and then <strong>Save</strong> the curriculum before proceeding. Otherwise, click <strong>Proceed</strong> to proceed.</p>",
+                          buttons: {
+                            confirm: {
+                                label: 'Proceed',
+                                className: 'btn-normal-yellow'
+                            },
+                            cancel: {
+                                label: 'Close',
+                                className: 'btn-normal-red'
+                            }
+                          },
+                          callback: function(result){
+                            if (result == true) {
+                              if($(link).hasClass('fa-files-o')) {
+                                $('div#spinner').show();
+                              }
+                              window.location = $(link).attr("href");
+                            }
+                          },
+                        });
+      });
+
+      {% if modal_messages %}
+        var message = '';
+        {% for message in modal_messages %}
+          message = message + '{{message}} <br>';
+        {% endfor %}
+
+        $('#notification .modal-body p').html(message);
+        $('#notification').modal('show');
+      {% endif %}
+
+      //for each error message highlight the field causing the error
+      $('div.error').each(function(){
+        var error_length = $.trim($(this).text()).length;
+        if(error_length > 0) {
+          $(this).closest('.form-group').find('label, .curriculum_input .form-control:input, .curriculum_input .django-ckeditor-widget').addClass('input_error');
+        }
+      });
+
+    });
+  </script>
+
+{% endblock %}

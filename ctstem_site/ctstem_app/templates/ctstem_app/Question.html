@@ -180,6 +180,7 @@ $(function (){
     }
     var question_id = $("#id_question").val();
     var id_step = $("#id_step").val();
+    var is_public = $("#is_public").val();
 
     /*var url = "{% url 'ctstem:newQuestion' %}";*/
     $.ajax({
@@ -199,8 +200,7 @@ $(function (){
       success: function(data, status){
         if(data['success'] == true){
           if(id_step) {
-            var formset_div = $("input[id="+id_step+"]").parent();
-            var question_table = $(formset_div).find("table.table.question");
+            var question_table = $("table.table.question");
 
             if(question_id != 'None'){
               $(question_table).find("tr#question_row_"+question_id+" td.question_text div").html(data['question_text']);
@@ -224,6 +224,9 @@ $(function (){
           $('#questionModal').html(data['html']);
           $("#questionForm input[id='id_step']").val(id_step);
           $('#questionMsg .errorlist li:first-child').addClass('error').html(data['error']);
+          if(is_public == 'false') {
+            $("#questionModal input[id='id_is_active']").closest('.form-group').hide();
+          }
         }
         return false;
       },

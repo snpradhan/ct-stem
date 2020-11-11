@@ -1,0 +1,46 @@
+<div id="page_numbers">
+  <nav id="numbers">
+    {% if curriculum.curriculum_type != 'U' %}
+      {% if curriculum.id %}
+        {% if flag == "overview" and curriculum.id == form.instance.id %}
+          {% if page == 0 %}
+            <a type="button" class="btn inbetween blue linked overview" href="{% url 'ctstem:curriculumOverview' curriculum.id %}" title="Teacher Overview">Teacher Overview</a>
+            <a type="button" class="btn inbetween blue active page" title="Page 0: Student Directions and Attachments">0</a>
+          {% else %}
+            <a type="button" class="btn inbetween blue active overview" title="Teacher Overview">Teacher Overview</a>
+            <a type="button" class="btn inbetween blue linked" href="{% url 'ctstem:curriculumOverview' curriculum.id 0 %}" title="Page 0: Student Directions and Attachments">0</a>
+          {% endif %}
+        {% else %}
+           <a type="button" class="btn inbetween blue linked overview" href="{% url 'ctstem:curriculumOverview' curriculum.id %}" title="Teacher Overview">Teacher Overview</a>
+           <a type="button" class="btn inbetween blue linked" href="{% url 'ctstem:curriculumOverview' curriculum.id 0 %}" title="Page 0: Student Directions and Attachments">0</a>
+        {% endif %}
+
+        {% for step in steps %}
+          {% if flag == "step" and step.id == form.instance.id %}
+            <a type="button" class="btn inbetween blue active linked" href="{% url 'ctstem:curriculumStep' curriculum.id step.id %}" title="Page {{step.order}}: {{step.title|default_if_none:''}}">{{step.order}}</a>
+          {% else %}
+            <a type="button" class="btn inbetween blue linked" href="{% url 'ctstem:curriculumStep' curriculum.id step.id %}" title="Page {{step.order}}: {{step.title|default_if_none:''}}">{{step.order}}</a>
+          {% endif %}
+        {% endfor %}
+        {% if flag == "step" and form.instance.id is None %}
+          <a type="button" class="btn inbetween blue active linked" title="Page {{steps|length|add:1}}">{{steps|length|add:1}}</a>
+        {% endif %}
+        {% if flag == "overview" and page != 0 and curriculum.student_overview is None %}
+          <a type="button" class="btn inbetween blue linked" title="Add Page"  href="{% url 'ctstem:curriculumOverview' curriculum.id 0 %}" onclick="alert('Please add Student Directions on Page 0 before adding other pages');"><i class="fas fa-plus"></i></a>
+        {% else %}
+          <a type="button" class="btn inbetween blue linked" href="{% url 'ctstem:newCurriculumStep' curriculum.id %}" title="Add Page"><i class="fas fa-plus"></i></a>
+        {% endif %}
+      {% endif %}
+    {% endif %}
+  </nav>
+</div>
+<script type="text/javascript">
+  $(function (){
+    $('a.linked').click(function(e){
+      e.preventDefault();
+      var next = $(this).attr('href');
+      $('input#next').val(next);
+      $('input#submit').click();
+    });
+  });
+</script>

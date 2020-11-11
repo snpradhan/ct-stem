@@ -1,0 +1,323 @@
+{% extends "ctstem_app/base.html" %}
+{% load ctstem_extras %}
+
+{% block title %}Curriculum |{% endblock %}
+
+{% block content %}
+  {{block.super}}
+  <div class="content">
+    <form method="post" enctype="multipart/form-data" id='stepForm'>
+      {% csrf_token %}
+      {{form.media}}
+      <div class="curriculum_container">
+        {% include "ctstem_app/CurriculumUnitNavigation.html"%}
+        <div class="curriculum_components">
+          <div class="form-group page-navigation">
+            {% include "ctstem_app/CurriculumPageNavigation.html" with flag="step" %}
+          </div>
+          <div class="table step">
+            {{form.management_form}}
+            <h4>
+              <span>&nbsp;</span>
+              <span class="step_title" style="font-weight: bold; text-decoration: underline;">{{form.title.value|default_if_none:"  "}}</span>
+              <span class="page_number">{% if form.order.value %}(Page {{form.order.value}}) {% endif %}</span>
+              <span>&nbsp;</span>
+            </h4>
+            <div class="curriculum_content collapsible_content">
+              <div class="form-group order">
+                <label for="id_{{form.ORDER.name}}"> Page #.</label>
+                <div>{{form.order}} {{form.curriculum.as_hidden}}</div>
+                <div class="error">{{ form.order.errors }}</div>
+              </div>
+              <div class="form-group step_title">
+                <label for="id_{{form.title.name}}">{{ form.title.label }} {% if form.title.field.required %}(<span class="required">*</span>) {% endif %}</label>
+                <div class="step_title">{{form.title}}</div>
+                <div class="error">{{ form.title.errors }}</div>
+              </div>
+              <div class="form-group step_content">
+                <label for="id_{{form.content.name}}">{{ form.content.label }} {% if form.content.field.required %}(<span class="required">*</span>) {% endif %}</label>
+                <div>
+                  {{form.content}}
+                </div>
+                <div class="error">{{ form.content.errors }}</div>
+              </div>
+              <div class="form-group question_table">
+                {{formset.management_form}}
+                <label for="id_question_table">Question(s)</label>
+                <button class="btn blue search_question" name="search_question" data-form="{% url 'ctstem:searchQuestion' %}">
+                  <i class="fas fa-search" aria-hidden="true"></i>
+                </button>
+                <button class="btn blue edit_question" name="add_question" data-form="{% url 'ctstem:newQuestion' %}" aria-label="Add New Question" title="Add New Question">
+                  <i class="fas fa-plus" aria-hidden="true"></i>
+                </button>
+                <table class="table table-striped table-condensed table-bordered question inner_table">
+                  <thead>
+                    <tr>
+                      <th class="order">Q No.</th>
+                      <th class="question_text">Question</th>
+                      <th> Research Categories</th>
+                      <th class="referenced_by">
+                        Referenced By
+                        <span data-toggle="tooltip" data-placement="top" title="Provide a comma separated list of Page Numbers that will reference this question. This question will be available on those steps as readonly.">
+                          <i class="fa fa-info-circle" aria-hidden="true"></i>
+                        </span>
+                      </th>
+                      <th class="optional">Optional?</th>
+                      <th class="question_edit">Delete/Edit</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for questionForm in formset %}
+                      <tr style="{% if forloop.last %} display:none; {% endif %}" id="question_row_{{questionForm.instance.question.id}}">
+                        <td class="order">
+                          {{questionForm.id}}
+                          {{questionForm.ORDER}}
+                        </td>
+                        <td class="question_text">
+                          {% if questionForm.instance and questionForm.instance.id != 'None' %}
+                            {{questionForm.question.as_hidden}}
+                            <div>
+                              {% replace_iframe_tag questionForm.instance.question.question_text as revised_test %}
+                              {{ revised_test|safe }}
+                            </div>
+                          {% else %}
+                            {{questionForm.question.as_hidden}}
+                            <div></div>
+                          {% endif %}
+                        </td>
+                        <td class="research_categories">
+                          {% if questionForm.instance and questionForm.instance.id != 'None' %}
+                            {% for category in questionForm.instance.question.get_flagged_categories.all %}
+                              {% if category.abbrevation %}
+                                {{category.abbrevation}} <br>
+                              {% endif %}
+                            {% endfor %}
+                          {% endif %}
+                        </td>
+                        <td class="referenced_by">{{questionForm.referenced_by}}</td>
+                        <td class="optional">{{questionForm.optional}}</td>
+                        <td class="question_edit">
+                          <button type="button" class="btn red delete_question" name="delete_question" aria-label="Delete Question" title="Delete Question">
+                            <i class="fa fa-trash" aria-hidden="true"></i>
+                          </button>
+                          {{questionForm.DELETE.as_hidden}}
+                          <button type="button" class="btn green edit_question" name="edit_question" aria-label="Edit Question" title="Edit Question" data-form="{% url 'ctstem:question' questionForm.question.value|default:0 %}" >
+                            <i class="fas fa-pencil-alt" aria-hidden="true"></i>
+                          </button>
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+        </div> <!-- end of curriculum form div-->
+
+        <div class="button-container">
+          <div class="form-group button-group-fixed">
+            {% if curriculum.id %}
+              {% check_curriculum_permission curriculum.id 'delete' as has_delete_permission %}
+              {% if has_delete_permission == True %}
+                <a type="button" class="btn inbetween red delete_curriculum" aria-hidden="true" aria-label="Delete Curriculum" title="Delete Curriculum" href="{% url 'ctstem:deleteCurriculum' curriculum.id %}">Delete Lesson
+                </a>
+                <br><br>
+              {% endif %}
+              <input type="submit" class="btn inbetween orange" id="previewBtn" value="Preview"/>
+              <br><br>
+              <a type="button" class="btn inbetween yellow share" id="shareBtn" data-form="{% url 'ctstem:shareCurriculum' curriculum.id %}">Share</a>
+            {% endif %}
+            <br><br>
+            <input type="hidden" name="preview" id="preview" value="0"/>
+            <input type="hidden" name="next" id="next"/>
+            {% if form.instance.id %}
+              <input type="button" class="btn inbetween red delete_step" name="delete_step" aria-label="Delete Page" value="Delete Page"/>
+              <br><br>
+            {% endif %}
+            <input type="submit" class="btn inbetween green" id="submit" value="Save"/>
+            <br><br>
+          </div>
+        </div>
+      </div>
+    </form>
+    <div class="modal fade" id="taxonomyModal" role="dialog"></div>
+
+  </div>
+  <script type="text/javascript">
+    $(function (){
+      $("button.edit_question").click(function(e){
+        e.preventDefault();
+        var url = $(this).data("form");
+        var step_div = $(this).closest('.step');
+        //var step_id = $(step_div).children(':hidden').first().attr('id');
+        $("#questionModal").load(url, function() {
+          $(this).modal('show');
+          $("#questionModal input[id='id_step']").val("{{form.instance.id}}");
+          $("#questionModal input[id='id_is_active']").closest('.form-group').hide();
+        });
+
+        return false;
+      });
+
+
+      $("button.search_question").click(function(e){
+        e.preventDefault();
+        var url = $(this).data("form");
+        var step_div = $(this).closest('.step');
+        //var step_id = $(step_div).children(':hidden').first().attr('id');
+        var curriculum_id = "{{form.instance.curriculum.id}}";
+        var unit_id = "{{form.instance.curriculum.unit.id}}";
+        $("#questionModal").load(url, function() {
+          $(this).modal('show');
+          $("#questionModal input[id='id_step']").val("{{form.instance.id}}");
+          $("#questionModal input[id='id_curriculum']").val(curriculum_id);
+          $("#questionModal input[id='id_unit']").val(unit_id).trigger('change');
+
+        });
+        return false;
+      });
+
+
+      $('div.step_title input').on('input', function(){
+        $(this).closest('div.table.step').find('h4 span.step_title').html($(this).val());
+      });
+
+      $('input.delete_step').click(function(){
+        var step = $(this);
+        var is_assigned = false;
+        if("{{form.instance.id}}"){
+          var id = "{{form.instance.curriculum.id}}";
+          is_assigned = is_curriculum_assigned_ajax(id);
+
+          if(is_assigned){
+            bootbox.alert({ title: 'Warning',
+                            message: '<p class="warning">The curriculum has already been assigned and so this page cannot be deleted.</p>',
+                            buttons: {
+                              ok: {
+                                label: 'Ok',
+                                className: 'btn-normal-yellow'
+                              }
+                            },
+                          });
+          }
+          else{
+            bootbox.confirm({ title: 'Confirm',
+                              message: "<p>Are you sure you want to delete this page?</p>",
+                              buttons: {
+                                confirm: {
+                                    label: 'Yes',
+                                    className: 'btn-normal-yellow'
+                                },
+                                cancel: {
+                                    label: 'No',
+                                    className: 'btn-normal-red'
+                                }
+                              },
+                              callback: function(result){
+                                if (result == true) {
+                                  window.location = "/curriculum/{{form.instance.curriculum.id}}/page/{{form.instance.id}}/delete";
+                                }
+                              },
+                            });
+
+          }
+        }
+      });
+      $('button.delete_question').click(function(){
+        var question = $(this);
+        var is_assigned = false;
+        if("{{form.instance}}"){
+          var id = "{{form.instance.curriculum.id}}";
+          is_assigned = is_curriculum_assigned_ajax(id);
+        }
+        if(is_assigned){
+          bootbox.alert({ title: 'Warning',
+                          message: '<p class="warning">The curriculum has already been assigned and so this question cannot be deleted.</p>',
+                          buttons: {
+                            ok: {
+                              label: 'Ok',
+                              className: 'btn-normal-yellow'
+                            }
+                          },
+                        });
+        }
+        else{
+          bootbox.confirm({ title: 'Confirm',
+                            message: "<p>Are you sure you want to delete this question?</p>",
+                            buttons: {
+                              confirm: {
+                                  label: 'Yes',
+                                  className: 'btn-normal-yellow'
+                              },
+                              cancel: {
+                                  label: 'No',
+                                  className: 'btn-normal-red'
+                              }
+                            },
+                            callback: function(result){
+                              if (result == true) {
+                                $(question).next('input').val('on');
+                                $(question).closest('tr').hide();
+                                rowAddorRemove( $(question).closest('table.inner_table'));
+                              }
+                            },
+                          });
+
+        }
+      });
+
+      //on click of preview, first save the curriculum page and then generate the preview
+      $('input#previewBtn').click(function(e){
+        $('input#preview').val("1");
+        $('input#submit').click();
+      });
+
+      $('div.unit-navigation a').click(function(e){
+        var link = $(this);
+        e.preventDefault();
+        bootbox.confirm({ title: 'Confirm',
+                          message: "<p>If you haven't saved the current curriculum, click <strong>Close</strong> to dismiss this popup and then <strong>Save</strong> the curriculum before proceeding. Otherwise, click <strong>Proceed</strong> to proceed.</p>",
+                          buttons: {
+                            confirm: {
+                                label: 'Proceed',
+                                className: 'btn-normal-yellow'
+                            },
+                            cancel: {
+                                label: 'Close',
+                                className: 'btn-normal-red'
+                            }
+                          },
+                          callback: function(result){
+                            if (result == true) {
+                              if($(link).hasClass('fa-files-o')) {
+                                $('div#spinner').show();
+                              }
+                              window.location = $(link).attr("href");
+                            }
+                          },
+                        });
+      });
+
+      {% if modal_messages %}
+        var message = '';
+        {% for message in modal_messages %}
+          message = message + '{{message}} <br>';
+        {% endfor %}
+
+        $('#notification .modal-body p').html(message);
+        $('#notification').modal('show');
+      {% endif %}
+
+      //for each error message highlight the field causing the error
+      $('div.error').each(function(){
+        var error_length = $.trim($(this).text()).length;
+        if(error_length > 0) {
+          $(this).closest('.form-group').find('label, .curriculum_input .form-control:input, .curriculum_input .django-ckeditor-widget').addClass('input_error');
+        }
+      });
+
+    });
+  </script>
+
+{% endblock %}

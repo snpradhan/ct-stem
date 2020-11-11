@@ -327,7 +327,10 @@
 
     {% block content %}
       <ul class="messages bg-light-gray">
-        {% for message in messages %}
+        {% if messages %}
+          <i class="far fa-times-circle"></i>
+        {% endif %}
+        {% for message in messages|get_unique_messages %}
           {% if not message.extra_tags or message.extra_tags != 'modal_message' %}
             <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message|safe }}</li>
           {% endif %}

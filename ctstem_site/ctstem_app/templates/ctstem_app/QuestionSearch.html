@@ -225,8 +225,7 @@ $(function (){
           });
           $(".results button.select_question").click(function(){
             var question_select_button = $(this);
-            var formset_div = $("input[id="+id_step+"]").parent();
-            var question_table = $(formset_div).find("table.table.question");
+            var question_table = $("table.table.question");
             var inner_html = $(question_select_button).html();
             //ajax call to copy selected question and add to curriculum
             $.ajax({

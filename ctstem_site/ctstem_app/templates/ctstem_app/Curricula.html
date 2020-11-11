@@ -36,7 +36,7 @@
     </div>
     <div class="btn-group">
       {% if user.administrator or user.researcher or user.author or user.teacher %}
-        <a type="button" class="btn normal green" href="{% url 'ctstem:newCurriculum' %}" title="Create new curriculum">Create Curriculum</a>
+        <a type="button" class="btn normal green" href="{% url 'ctstem:newCurriculumOverview' %}" title="Create new curriculum">Create Curriculum</a>
       {% endif %}
     </div>
     <form method="post">

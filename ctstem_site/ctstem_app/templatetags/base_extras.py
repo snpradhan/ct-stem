@@ -39,3 +39,13 @@ def staticfile(path):
     if absolute_path:
         return '%s%s?v=%s' % (settings.STATIC_URL, path, os.stat(absolute_path)[stat.ST_MTIME])
     return path
+
+@register.filter
+def get_unique_messages(msg):
+  unique_message_texts = []
+  unique_message_objects = []
+  for m in msg:
+    if m.message not in unique_message_texts:
+      unique_message_texts.append(m.message)
+      unique_message_objects.append(m)
+  return unique_message_objects
