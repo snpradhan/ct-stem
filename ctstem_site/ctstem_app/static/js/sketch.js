@@ -121,8 +121,14 @@ var __slice = Array.prototype.slice;
 
     Sketch.prototype.onEvent = function(e) {
       if (e.originalEvent && e.originalEvent.targetTouches) {
-        e.pageX = e.originalEvent.targetTouches[0].pageX;
-        e.pageY = e.originalEvent.targetTouches[0].pageY;
+        //e.pageX = e.originalEvent.targetTouches[0].pageX;
+        //e.pageY = e.originalEvent.targetTouches[0].pageY;
+        if (e.originalEvent.targetTouches[0] !== undefined && e.originalEvent.targetTouches[0].pageX !== undefined){
+          e.pageX = e.originalEvent.targetTouches[0].pageX;
+        }
+        if (e.originalEvent.targetTouches[0] !== undefined && e.originalEvent.targetTouches[0].pageY !==undefined){
+          e.pageY = e.originalEvent.targetTouches[0].pageY;
+        }
       }
       $.sketch.tools[$(this).data('sketch').tool].onEvent.call($(this).data('sketch'), e);
       e.preventDefault();
