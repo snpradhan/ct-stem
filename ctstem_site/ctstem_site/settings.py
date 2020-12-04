@@ -128,7 +128,7 @@ CKEDITOR_CONFIGS = {
         'toolbar': [
              ['Bold', 'Italic', 'Underline','-', 'Subscript', 'Superscript', '-', 'NumberedList',
             'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', '-', 'JustifyLeft', 'JustifyCenter',
-            'JustifyRight', 'JustifyBlock', 'Image', 'Table', 'HorizontalRule', 'SpecialChar', 'Mathjax', 'Iframe' ,
+            'JustifyRight', 'JustifyBlock', 'Image', 'Table', 'HorizontalRule', 'SpecialChar', 'Mathjax', 'Iframe', '-', 'NLModels',
              '-','Link', 'Unlink'] ,
              "/",
              ['Styles', 'Format', 'Font', 'FontSize', 'TextColor',
@@ -140,7 +140,7 @@ CKEDITOR_CONFIGS = {
         'mathJaxLib': '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_HTMLorMML',
         'codeSnippet_theme': 'monokai_sublime',
         'extraPlugins': ','.join(
-            ['mathjax', 'codesnippet', 'scayt', 'autogrow', 'uploadwidget', 'iframe_upload']
+            ['mathjax', 'codesnippet', 'scayt', 'autogrow', 'uploadwidget', 'iframe_upload', 'ajax', 'iframedialog', 'NLModels']
         ),
         'autoGrow_onStartup': True,
         'scayt_autoStartup': True,
@@ -152,7 +152,7 @@ CKEDITOR_CONFIGS = {
         'toolbar': [
                  ['Bold', 'Italic', 'Underline','-', 'Subscript', 'Superscript', '-', 'NumberedList',
                 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', '-', 'JustifyLeft', 'JustifyCenter',
-                'JustifyRight', 'JustifyBlock', 'Image', 'Table', 'HorizontalRule', 'SpecialChar', 'Mathjax', 'Iframe' ,
+                'JustifyRight', 'JustifyBlock', 'Image', 'Table', 'HorizontalRule', 'SpecialChar', 'Mathjax', 'Iframe', '-', 'NLModels',
                  '-','Link', 'Unlink'] ,
                  "/",
                  ['Styles', 'Format', 'Font', 'FontSize', 'TextColor',
@@ -163,7 +163,7 @@ CKEDITOR_CONFIGS = {
         'allowedContent': True,
         'mathJaxLib': '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_HTMLorMML',
         'extraPlugins': ','.join(
-            ['mathjax', 'scayt', 'uploadwidget', 'iframe_upload']
+            ['mathjax', 'scayt', 'uploadwidget', 'iframe_upload', 'ajax', 'iframedialog', 'NLModels']
         ),
         'scayt_autoStartup': True,
         'scayt_sLang': 'en_US',
