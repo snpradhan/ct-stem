@@ -184,12 +184,51 @@ six = "*"
 tests = ["pytest", "pytest-django", "pytest-pythonpath"]
 
 [[package]]
+name = "django-haystack"
+version = "3.0"
+description = "Pluggable search for Django."
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+Django = ">=2.2"
+
+[[package]]
 name = "django-js-asset"
 version = "1.2.2"
 description = "script tag with additional attributes for django.forms.Media"
 category = "main"
 optional = false
 python-versions = "*"
+
+[[package]]
+name = "django-machina"
+version = "1.1.3"
+description = "A Django forum engine for building powerful community driven websites."
+category = "main"
+optional = false
+python-versions = ">=3.5,<4.0"
+
+[package.dependencies]
+django = ">=2.2"
+django-haystack = ">=2.1"
+django-mptt = ">=0.10.0"
+django-widget-tweaks = ">=1.4"
+markdown2 = ">=2.3"
+pillow = ">=2.2"
+
+[[package]]
+name = "django-mptt"
+version = "0.11.0"
+description = "Utilities for implementing Modified Preorder Tree Traversal with your Django Models and working with trees of Model instances."
+category = "main"
+optional = false
+python-versions = ">=3.5"
+
+[package.dependencies]
+Django = ">=1.11"
+django-js-asset = "*"
 
 [[package]]
 name = "django-nested-formset"
@@ -264,6 +303,14 @@ optional = false
 python-versions = "*"
 
 [[package]]
+name = "django-widget-tweaks"
+version = "1.4.8"
+description = "Tweak the form field rendering in templates, not in python-level form definitions."
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "future"
 version = "0.18.2"
 description = "Clean single-source support for Python 3 and 2"
@@ -304,6 +351,14 @@ description = "JSON Matching Expressions"
 category = "main"
 optional = false
 python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
+
+[[package]]
+name = "markdown2"
+version = "2.3.10"
+description = "A fast and complete Python implementation of Markdown"
+category = "main"
+optional = false
+python-versions = "*"
 
 [[package]]
 name = "oauthlib"
@@ -588,7 +643,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "3.7"
-content-hash = "78f2cad5323b49ac3cc13a6e0aed25a9d4f2da28957a90a118c7ec30970c92f1"
+content-hash = "5f9912f2f156a919ba5bf49a9d4cac517a67fc9f71be87e2eb412d37d382df31"
 
 [metadata.files]
 arabic-reshaper = [
@@ -701,9 +756,20 @@ django-dbbackup = [
 django-dia = [
     {file = "django_dia-0.4.1-py2.py3-none-any.whl", hash = "sha256:e4136f248e1baf2ddce1d0669d25db871c138ac687168fc9738f00e1b5cbc261"},
 ]
+django-haystack = [
+    {file = "django-haystack-3.0.tar.gz", hash = "sha256:d490f920afa85471dd1fa5000bc8eff4b704daacbe09aee1a64e75cbc426f3be"},
+]
 django-js-asset = [
     {file = "django-js-asset-1.2.2.tar.gz", hash = "sha256:c163ae80d2e0b22d8fb598047cd0dcef31f81830e127cfecae278ad574167260"},
     {file = "django_js_asset-1.2.2-py2.py3-none-any.whl", hash = "sha256:8ec12017f26eec524cab436c64ae73033368a372970af4cf42d9354fcb166bdd"},
+]
+django-machina = [
+    {file = "django-machina-1.1.3.tar.gz", hash = "sha256:9c7df9adfa65f2f262f108d17398125de1c2487ef7ec306de26525c5e82a6659"},
+    {file = "django_machina-1.1.3-py3-none-any.whl", hash = "sha256:565a001fd3e60ac985a2460bdc8f2cf145febb784b9230d342d69e7fc0caf988"},
+]
+django-mptt = [
+    {file = "django-mptt-0.11.0.tar.gz", hash = "sha256:dfdb3af75ad27cdd4458b0544ec8574174f2b90f99bc2cafab6a15b4bc1895a8"},
+    {file = "django_mptt-0.11.0-py2.py3-none-any.whl", hash = "sha256:90eb236eb4f1a92124bd7c37852bbe09c0d21158477cc237556d59842a91c509"},
 ]
 django-nested-formset = [
     {file = "django-nested-formset-0.1.4.tar.gz", hash = "sha256:3c847c3df8ce3a2b8a2c342a6c2291a990aab1ef57dc5a3a398e311917cb50ab"},
@@ -727,6 +793,10 @@ django-tinymce = [
     {file = "django-tinymce-2.8.0.tar.gz", hash = "sha256:bb7311a2ce705a0b95f4ae8fab4f17445982719b557f4e935d68dae514f7df0a"},
     {file = "django_tinymce-2.8.0-py2.py3-none-any.whl", hash = "sha256:5a6e21406daafab22124be5c447abdfe78937307420daae0b997d2be0f08c58b"},
 ]
+django-widget-tweaks = [
+    {file = "django-widget-tweaks-1.4.8.tar.gz", hash = "sha256:9f91ca4217199b7671971d3c1f323a2bec71a0c27dec6260b3c006fa541bc489"},
+    {file = "django_widget_tweaks-1.4.8-py2.py3-none-any.whl", hash = "sha256:f80bff4a8a59b278bb277a405a76a8b9a884e4bae7a6c70e78a39c626cd1c836"},
+]
 future = [
     {file = "future-0.18.2.tar.gz", hash = "sha256:b1bead90b70cf6ec3f0710ae53a525360fa360d306a86583adc6bf83a4db537d"},
 ]
@@ -741,6 +811,10 @@ idna = [
 jmespath = [
     {file = "jmespath-0.10.0-py2.py3-none-any.whl", hash = "sha256:cdf6525904cc597730141d61b36f2e4b8ecc257c420fa2f4549bac2c2d0cb72f"},
     {file = "jmespath-0.10.0.tar.gz", hash = "sha256:b85d0567b8666149a93172712e68920734333c0ce7e89b78b3e987f71e5ed4f9"},
+]
+markdown2 = [
+    {file = "markdown2-2.3.10-py2.py3-none-any.whl", hash = "sha256:fef148e5fd68d4532286c3e2943e9d2c076a8ad781b0a70a9d599a0ffe91652d"},
+    {file = "markdown2-2.3.10.tar.gz", hash = "sha256:85956d8119fa6378156fef65545d66705a842819d2e1b50379a2b9d2aaa17cf0"},
 ]
 oauthlib = [
     {file = "oauthlib-3.1.0-py2.py3-none-any.whl", hash = "sha256:df884cd6cbe20e32633f1db1072e9356f53638e4361bef4e8b03c9127c9328ea"},

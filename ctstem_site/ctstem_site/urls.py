@@ -14,17 +14,20 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include(blog_urls))
 """
 from django.conf import settings
-from django.conf.urls import include, url
+from django.conf.urls import url
 from django.contrib import admin
 from ckeditor_uploader import views
 from ctstem_app.views import SchoolAutocomplete
 from django.conf.urls.static import static
+from machina import urls as machina_urls
+from django.urls import path, include
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     #url(r'^tinymce/', include('tinymce.urls')),
     #url(r'^ckeditor/', include('ckeditor_uploader.urls')),
     url(r'^password_reset/', include('password_reset.urls')),
+    path('forum/', include(machina_urls)),
     url(r'^', include('ctstem_app.urls', namespace="ctstem")),
     url(r'^ckeditor/upload/', views.upload, name='ckeditor_upload'),
     url(r'^ckeditor/browse/', views.browse, name='ckeditor_browse'),
