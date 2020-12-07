@@ -19,7 +19,6 @@ from django.contrib import admin
 from ckeditor_uploader import views
 from ctstem_app.views import SchoolAutocomplete
 from django.conf.urls.static import static
-from django.contrib.auth.views import logout
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -38,4 +37,3 @@ urlpatterns = [
 '''urlpatterns += patterns('',
     (r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT}),
 )'''
-
