@@ -11,7 +11,6 @@ from django.forms.models import inlineformset_factory, modelformset_factory
 from nested_formset import nestedformset_factory
 from slugify import slugify
 import json
-from django_xhtml2pdf.utils import render_to_pdf_response
 from django.template.loader import render_to_string, get_template
 from django.template import Context
 import io as StringIO
