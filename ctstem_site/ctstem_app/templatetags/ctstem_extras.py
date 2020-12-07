@@ -461,7 +461,7 @@ def get_collaborator_privilege_display(privilege_value):
   privilege_display = dict(models.CURRICULUM_PRIVILEGE_CHOICES)[privilege_value]
   return privilege_display
 
-@register.assignment_tag(takes_context=True)
+@register.simple_tag(takes_context=True)
 def is_my_curriculum(context, curriculum):
   request = context.get('request')
   is_author = False
@@ -474,17 +474,17 @@ def is_my_curriculum(context, curriculum):
 
   return is_author
 
-@register.assignment_tag(takes_context=True)
+@register.simple_tag(takes_context=True)
 def is_curriculum_shared_with_me(context, curriculum):
   request = context.get('request')
   return views.is_curriculum_shared_with_me(request, curriculum.id)
 
-@register.assignment_tag(takes_context=True)
+@register.simple_tag(takes_context=True)
 def is_curriculum_assigned(context, curriculum):
   request = context.get('request')
   return views.is_curriculum_assigned(request, curriculum.id)
 
-@register.assignment_tag(takes_context=True)
+@register.simple_tag(takes_context=True)
 def is_curriculum_assigned_by_me(context, curriculum):
   request = context.get('request')
   return views.is_curriculum_assigned_by_me(request, curriculum.id)
