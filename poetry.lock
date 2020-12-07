@@ -256,6 +256,14 @@ libcloud = ["apache-libcloud"]
 sftp = ["paramiko"]
 
 [[package]]
+name = "django-tinymce"
+version = "2.8.0"
+description = "A Django application that contains a widget to render a form field as a TinyMCE editor."
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "future"
 version = "0.18.2"
 description = "Clean single-source support for Python 3 and 2"
@@ -580,7 +588,7 @@ python-versions = "*"
 [metadata]
 lock-version = "1.1"
 python-versions = "3.7"
-content-hash = "6a49c886cccde1139c251c2b49aeb42f718584b39285a1d66187f713b6440bba"
+content-hash = "78f2cad5323b49ac3cc13a6e0aed25a9d4f2da28957a90a118c7ec30970c92f1"
 
 [metadata.files]
 arabic-reshaper = [
@@ -714,6 +722,10 @@ django-smart-selects = [
 django-storages = [
     {file = "django-storages-1.9.1.tar.gz", hash = "sha256:a59e9923cbce7068792f75344ed7727021ee4ac20f227cf17297d0d03d141e91"},
     {file = "django_storages-1.9.1-py2.py3-none-any.whl", hash = "sha256:3103991c2ee8cef8a2ff096709973ffe7106183d211a79f22cf855f33533d924"},
+]
+django-tinymce = [
+    {file = "django-tinymce-2.8.0.tar.gz", hash = "sha256:bb7311a2ce705a0b95f4ae8fab4f17445982719b557f4e935d68dae514f7df0a"},
+    {file = "django_tinymce-2.8.0-py2.py3-none-any.whl", hash = "sha256:5a6e21406daafab22124be5c447abdfe78937307420daae0b997d2be0f08c58b"},
 ]
 future = [
     {file = "future-0.18.2.tar.gz", hash = "sha256:b1bead90b70cf6ec3f0710ae53a525360fa360d306a86583adc6bf83a4db537d"},

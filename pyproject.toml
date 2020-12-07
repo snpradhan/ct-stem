@@ -25,6 +25,7 @@ boto3 = "^1.10.36"
 xhtml2pdf = "^0.2.3"
 xlwt = "^1.3.0"
 django-reset-migrations = "^0.4.0"
+django-tinymce = "2.8.0"
 
 [tool.poetry.dev-dependencies]
 
