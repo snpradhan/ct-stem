@@ -134,6 +134,10 @@ DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
 DBBACKUP_STORAGE_OPTIONS = {'location': '/var/backups/ctstem'}
 DBBACKUP_AWS_S3_BUCKET = 'ct-stem-db-backup'
 
+MACHINA_MARKUP_LANGUAGE = None
+MACHINA_MARKUP_WIDGET = 'ckeditor.widgets.CKEditorWidget'
+MACHINA_FORUM_NAME = 'CT-STEM Forum'
+
 #CKEDITOR_JQUERY_URL = 'https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js'
 CKEDITOR_UPLOAD_PATH = "uploads/"
 CKEDITOR_UPLOAD_SLUGIFY_FILENAME = False
@@ -205,13 +209,11 @@ MEDIA_ROOT = os.environ.get('MEDIA_ROOT',os.path.join(BASE_DIR, 'media'))
 MEDIA_URL = '/media/'
 
 ROOT_URLCONF = 'ctstem_site.urls'
-
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            os.path.join(BASE_DIR, 'ctstem_app/templates'),
-            MACHINA_MAIN_TEMPLATE_DIR,
+            os.path.join(BASE_DIR, 'ctstem_app/templates/machina'),
             ],
         'OPTIONS': {
             'context_processors': [
