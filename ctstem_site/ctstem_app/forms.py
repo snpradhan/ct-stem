@@ -924,7 +924,7 @@ class CurriculaSearchForm(forms.Form):
     user = kwargs.pop('user')
     super(CurriculaSearchForm, self).__init__(*args, **kwargs)
 
-    if user.is_anonymous() or hasattr(user, 'student') or hasattr(user, 'school_administrator'):
+    if user.is_anonymous or hasattr(user, 'student') or hasattr(user, 'school_administrator'):
       self.fields.pop('status')
       self.fields.pop('buckets')
     elif hasattr(user, 'teacher'):
