@@ -32,7 +32,7 @@ CKEDITOR.dialog.add( 'NLModelsDialog', function( editor ) {
     // Manually override button appearance
     buttons: [
       CKEDITOR.dialog.cancelButton.override( {} ),
-      CKEDITOR.dialog.okButton.override( { label : 'Insert Model'} ),
+      CKEDITOR.dialog.okButton.override( { label : 'Insert Model', disabled: true} ),
     ],
     // Dialog window content definition.
     contents: [
@@ -54,8 +54,10 @@ CKEDITOR.dialog.add( 'NLModelsDialog', function( editor ) {
               this.add('-- select a model to preview -- ', '')
             },
             onChange: function() {
+              var dialog = this.getDialog();
+              dialog.disableButton("ok");
               // Set the iframe src to the selected option
-              this.getDialog().getContentElement('tab', 'nlw-preview').getElement().setAttribute('src',this.getValue())
+              dialog.getContentElement('tab', 'nlw-preview').getElement().setAttribute('src',this.getValue());
             },
           },
           {
@@ -70,7 +72,7 @@ CKEDITOR.dialog.add( 'NLModelsDialog', function( editor ) {
 
     onLoad: function() {
 
-      var dialog = this
+      var dialog = this;
       // Fetch the NLW Models Library resources we need
       var modelJSON = CKEDITOR.ajax.load( NETLOGOWEB_SITE + MODEL_JSON_PATH, function( modelJSON ) {
         var modelNames = JSON.parse(modelJSON)
@@ -93,19 +95,21 @@ CKEDITOR.dialog.add( 'NLModelsDialog', function( editor ) {
       window.addEventListener('message',
         function handleMessage(e) {
           // Check that the message is from where we think
-          if (e.origin = NETLOGOWEB_SITE) {
+          if (e.origin = NETLOGOWEB_SITE && e.data.type == 'nlw-resize') {
             // load in the iframe, resize, and render a border
-
             nlwPreview = dialog.getContentElement('tab', 'nlw-preview').getElement()
             nlwPreview.setStyle('width',  (e.data.width + "px"))
             nlwPreview.setStyle('height', (e.data.height + "px"))
             nlwPreview.setStyle("border", "1px solid black")
+            dialog.enableButton("ok");
           }
         }, false);
     },
 
     // Invoked when the dialog is loaded.
     onShow: function() {
+      var dialog = this;
+      dialog.disableButton("ok");
       // Get the selection from the editor.
       var selection = editor.getSelection();
       // Get the element at the start of the selection.
