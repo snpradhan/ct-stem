@@ -1339,8 +1339,8 @@ class QuestionResponseFileForm(ModelForm):
     cleaned_data = super(QuestionResponseFileForm, self).clean()
     file = cleaned_data.get('file')
     delete = cleaned_data.get('DELETE')
-    if not delete and file.size > 5*1024*1024:
-      self.add_error('file', 'Uploaded file cannot be bigger than 5MB')
+    if not delete and file.size > 10*1024*1024:
+      self.add_error('file', 'Uploaded file cannot be bigger than 10MB')
 
 ####################################
 # Feedback Form
