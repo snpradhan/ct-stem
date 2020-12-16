@@ -34,13 +34,32 @@
     {% endif %}
   </nav>
 </div>
+
 <script type="text/javascript">
-  $(function (){
+  $(function() {
     $('a.linked').click(function(e){
-      e.preventDefault();
       var next = $(this).attr('href');
-      $('input#next').val(next);
-      $('input#submit').click();
+      e.preventDefault();
+      bootbox.dialog({title: 'Confirm',
+                      message: "<p>You are about to navigate to another page.  If you would like to save this page and then proceed click <strong>Save and Proceed</strong>. If you would like to proceed without saving, click <strong>Proceed without Saving</strong>.  If you would like to remain in the current page, close this dialog.</p>",
+                      buttons: {
+                        proceed_wo_saving: {
+                            label: 'Proceed without Saving',
+                            className: 'btn-normal-yellow',
+                            callback: function(){
+                              window.location = next;
+                            }
+                        },
+                        save_and_proceed: {
+                            label: 'Save and Proceed',
+                            className: 'btn-normal-green',
+                            callback: function(){
+                              $('input#next').val(next);
+                              $('input#submit').click();
+                            }
+                        }
+                      }
+                    });
     });
   });
 </script>

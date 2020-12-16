@@ -273,32 +273,6 @@
         $('input#submit').click();
       });
 
-      $('div.unit-navigation a').click(function(e){
-        var link = $(this);
-        e.preventDefault();
-        bootbox.confirm({ title: 'Confirm',
-                          message: "<p>If you haven't saved the current curriculum, click <strong>Close</strong> to dismiss this popup and then <strong>Save</strong> the curriculum before proceeding. Otherwise, click <strong>Proceed</strong> to proceed.</p>",
-                          buttons: {
-                            confirm: {
-                                label: 'Proceed',
-                                className: 'btn-normal-yellow'
-                            },
-                            cancel: {
-                                label: 'Close',
-                                className: 'btn-normal-red'
-                            }
-                          },
-                          callback: function(result){
-                            if (result == true) {
-                              if($(link).hasClass('fa-files-o')) {
-                                $('div#spinner').show();
-                              }
-                              window.location = $(link).attr("href");
-                            }
-                          },
-                        });
-      });
-
       {% if modal_messages %}
         var message = '';
         {% for message in modal_messages %}
