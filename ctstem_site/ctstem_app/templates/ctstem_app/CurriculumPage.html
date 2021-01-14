@@ -17,6 +17,8 @@
           </div>
           <div class="table step">
             {{form.management_form}}
+
+            {% include "ctstem_app/CurriculumActions.html" with page=form.order.value %}
             <h4>
               <span>&nbsp;</span>
               <span class="step_title" style="font-weight: bold; text-decoration: underline;">{{form.title.value|default_if_none:"  "}}</span>
@@ -111,41 +113,26 @@
                 </table>
               </div>
             </div>
+            {% include "ctstem_app/CurriculumActions.html" with page=form.order.value %}
+
           </div>
 
         </div> <!-- end of curriculum form div-->
-
-        <div class="button-container">
-          <div class="form-group button-group-fixed">
-            {% if curriculum.id %}
-              {% check_curriculum_permission curriculum.id 'delete' as has_delete_permission %}
-              {% if has_delete_permission == True %}
-                <a type="button" class="btn inbetween red delete_curriculum" aria-hidden="true" aria-label="Delete Curriculum" title="Delete Curriculum" href="{% url 'ctstem:deleteCurriculum' curriculum.id %}">Delete Lesson
-                </a>
-                <br><br>
-              {% endif %}
-              <input type="submit" class="btn inbetween orange" id="previewBtn" value="Preview"/>
-              <br><br>
-              <a type="button" class="btn inbetween yellow share" id="shareBtn" data-form="{% url 'ctstem:shareCurriculum' curriculum.id %}">Share</a>
-            {% endif %}
-            <br><br>
-            <input type="hidden" name="preview" id="preview" value="0"/>
-            <input type="hidden" name="next" id="next"/>
-            {% if form.instance.id %}
-              <input type="button" class="btn inbetween red delete_step" name="delete_step" aria-label="Delete Page" value="Delete Page"/>
-              <br><br>
-            {% endif %}
-            <input type="submit" class="btn inbetween green" id="submit" value="Save"/>
-            <br><br>
-          </div>
+        <div>
+          <input type="hidden" name="preview" id="preview" value="0"/>
+          <input type="hidden" name="next" id="next"/>
+          <input type="hidden" name="save_and_continue" id="save_and_continue" value="0"/>
         </div>
+
       </div>
     </form>
     <div class="modal fade" id="taxonomyModal" role="dialog"></div>
+    <div class="modal fade" id="reorderModal" role="dialog"></div>
 
   </div>
   <script type="text/javascript">
     $(function (){
+
       $("button.edit_question").click(function(e){
         e.preventDefault();
         var url = $(this).data("form");
@@ -183,9 +170,11 @@
         $(this).closest('div.table.step').find('h4 span.step_title').html($(this).val());
       });
 
-      $('input.delete_step').click(function(){
+      $('a.delete_step').click(function(e){
+        e.preventDefault();
         var step = $(this);
         var is_assigned = false;
+        var next = $(this).attr('href');
         if("{{form.instance.id}}"){
           var id = "{{form.instance.curriculum.id}}";
           is_assigned = is_curriculum_assigned_ajax(id);
@@ -216,7 +205,7 @@
                               },
                               callback: function(result){
                                 if (result == true) {
-                                  window.location = "/curriculum/{{form.instance.curriculum.id}}/page/{{form.instance.id}}/delete";
+                                  window.location = next;
                                 }
                               },
                             });
@@ -224,6 +213,19 @@
           }
         }
       });
+
+      $("a.reorder_steps").click(function(e){
+        e.preventDefault();
+        var url = $(this).attr("href");
+        var current_step_id = $(this).data("step_id");
+        $("#reorderModal").load(url, function() {
+          $('table#page_reorder tr#'+current_step_id).addClass('current');
+          $(this).modal('show');
+        });
+
+        return false;
+      });
+
       $('button.delete_question').click(function(){
         var question = $(this);
         var is_assigned = false;
@@ -268,9 +270,13 @@
       });
 
       //on click of preview, first save the curriculum page and then generate the preview
-      $('input#previewBtn').click(function(e){
+      $('.previewLesson').click(function(e){
         $('input#preview').val("1");
-        $('input#submit').click();
+        $('#submit').click();
+      });
+      $('.previewPage').click(function(e){
+        $('input#preview').val("2");
+        $('#submit').click();
       });
 
       {% if modal_messages %}

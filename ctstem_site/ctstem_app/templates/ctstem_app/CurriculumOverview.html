@@ -17,6 +17,7 @@
           </div>
           {% if page < 0 %}
             <div class="table" id="curriculum">
+              {% include "ctstem_app/CurriculumActions.html" with page=page %}
               <h4>
                 <span>&nbsp;</span>
                 <span class="curriculum_title" style="font-weight: bold; text-decoration: underline;">{{form.title.value|default_if_none:" "}}</span>
@@ -247,12 +248,14 @@
                 {% include "ctstem_app/CurriculumAttachments.html" with role='teacher' formset=teacher_attachment_formset %}
 
               </div>
+              {% include "ctstem_app/CurriculumActions.html" with page=page %}
             </div>
           {% else %}
 
             <!-- Student directions and attachments -->
             <!-- Page 0 of Student view -->
             <div class="table" id="directions_attachments">
+              {% include "ctstem_app/CurriculumActions.html" with page=page %}
               <h4>
                 <span>&nbsp;</span>
                 <span class="step_title" style="font-weight: bold; text-decoration: underline;">Student Directions and Attachments</span>
@@ -273,37 +276,20 @@
                 <!-- STUDENT ATTACHMENTS -->
                 {% include "ctstem_app/CurriculumAttachments.html" with role='student' formset=student_attachment_formset%}
               </div>
+              {% include "ctstem_app/CurriculumActions.html" with page=page %}
             </div>
           {% endif %}
         </div> <!-- end of curriculum form div-->
 
-        <div class="button-container">
-          <div class="form-group button-group-fixed">
-            {% if curriculum.id %}
-              {% check_curriculum_permission form.instance.id 'delete' as has_delete_permission %}
-              {% if has_delete_permission == True %}
-                <a type="button" class="btn inbetween red delete_curriculum" aria-hidden="true" aria-label="Delete Curriculum" title="Delete Curriculum" href="{% url 'ctstem:deleteCurriculum' curriculum.id %}">Delete {{form.instance.get_curriculum_type_display}}
-                </a>
-                <br><br>
-              {% endif %}
-              <input type="button" class="btn inbetween orange" id="previewBtn" value="Preview"/>
-              <br><br>
-              <a type="button" class="btn inbetween yellow share" id="shareBtn" data-form="{% url 'ctstem:shareCurriculum' curriculum.id %}">Share</a>
-            {% else %}
-              <input type="submit" class="btn inbetween orange" id="previewBtn" value="Preview" onclick="alert('Save this curriculum for the Preview button to be enabled');"/>
-              <br><br>
-              <a type="button" class="btn inbetween yellow" id="shareBtn" title="Save this curriculum for the Share button to be enabled" disabled>Share</a>
-            {% endif %}
-            <br><br>
-            <input type="hidden" name="preview" id="preview" value="0"/>
-            <input type="hidden" name="next" id="next"/>
-            <input type="submit" class="btn inbetween green" id="submit" value="Save"/>
-            <br><br>
-          </div>
+        <div>
+          <input type="hidden" name="preview" id="preview" value="0"/>
+          <input type="hidden" name="next" id="next"/>
+          <input type="hidden" name="save_and_continue" id="save_and_continue" value="0"/>
         </div>
       </div>
     </form>
     <div class="modal fade" id="taxonomyModal" role="dialog"></div>
+    <div class="modal fade" id="reorderModal" role="dialog"></div>
 
   </div>
   <script type="text/javascript">
@@ -393,6 +379,7 @@
         //for lesson and assessment, display unit, student directions and attachments
         if($(this).val() == 'L' || $(this).val() == 'A') {
           $('#id_curriculum-unit').closest('.form-group').show();
+          $('button#save_continue').show();
           /*$('div.table#directions_attachments').show();
           $('#id_curriculum-student_overview').closest('.form-group').show();
           $('#id_curriculum-student_overview').closest('.form-group').find('label:first').html('Student Directions & Learning Objectives (<span class="required">*</span>)');
@@ -409,6 +396,7 @@
         else{
           //reset the unit field
           $('#id_curriculum-unit').prop('selectedIndex', 0);
+          $('button#save_continue').hide();
         }
       }));
 
@@ -468,12 +456,29 @@
       }
 
       //on click of preview, first save the curriculum and then generate the preview
-      $('input#previewBtn').click(function(e){
+      $('.previewLesson').click(function(e){
         if('{{form.instance.id}}' != 'None'){
           $('input#preview').val("1");
-          $('input#submit').click();
+          $('#submit').click();
         }
       });
+      $('.previewPage').click(function(e){
+        $('input#preview').val("2");
+        $('#submit').click();
+      });
+
+      $("a.reorder_steps").click(function(e){
+        e.preventDefault();
+        var url = $(this).attr("href");
+        var current_step_id = $(this).data("step_id");
+        $("#reorderModal").load(url, function() {
+          $('table#page_reorder tr#'+current_step_id).addClass('current');
+          $(this).modal('show');
+        });
+
+        return false;
+      });
+
 
       {% if modal_messages %}
         var message = '';

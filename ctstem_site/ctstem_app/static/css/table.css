@@ -327,3 +327,11 @@ table#group_curriculum_dashboard thead th.student_col {
 table#group_curriculum_dashboard tbody th.student_col {
   z-index: 999;
 }
+
+table.table#page_reorder tr.current {
+  background-color: var(--ctstem-color-pale-gray);
+}
+
+table.table#page_reorder td.page_number, table.table#page_reorder td.action {
+  text-align: center;
+}

@@ -1,0 +1,134 @@
+<div class="modal-dialog modal-md">
+  <div class="modal-content">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal">&times;</button>
+      <h3 class="modal-title">Reorder Pages</h3>
+    </div>
+    <div id="pagesMsg" class="msg">
+      <ul class="errorlist">
+        <li></li>
+      </ul>
+    </div>
+    <form class="form" id="reorderForm" method="post" action="{% url 'ctstem:reorderSteps' curriculum.id %}">
+      {% csrf_token %}
+
+      <div class="modal-body">
+          {{formset.management_form}}
+          <table class="table table-striped table-condensed table-bordered inner_table" id="page_reorder">
+            <thead>
+              <tr>
+                <th style="width:10%">Page #</th>
+                <th>Page Title </th>
+                <th style="width:15%">Action </th>
+              </tr>
+            </thead>
+            <tbody>
+
+            {% for step in formset %}
+              <tr id="{{step.id.value}}">
+                <td class="page_number">
+                  {{step.id}}
+                  <div class="shown_value">
+                    {{step.order.value}}
+                  </div>
+                  <div class="hidden_value">
+                    {{step.order.as_hidden}}
+                  </div>
+                </td>
+                <td>
+                  {{step.title.value}}
+                  {{step.title.as_hidden}}
+                  {{step.content.as_hidden}}
+                </td>
+                <td class="action">
+                  <a href="#" class="up" title="Move Up"><i class="fas fa-chevron-up"></i></a>
+                  <a href="#" class="down" title="Move Down"><i class="fas fa-chevron-down"></i></a>
+                </td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        <div id="spinner">
+          <img src="/static/img/page-loader.gif" class="icon"/>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div class="form-group">
+          <button type="submit" id="saveOrder" class="btn normal yellow">
+            Save
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script type="text/javascript">
+$(function (){
+
+  $("#reorderForm").submit(function(e) {
+    e.preventDefault();
+    $.ajax({
+      type: $(this).attr('method'),
+      url: this.action,
+      data: $(this).serialize(),
+      context: this,
+
+      beforeSend: function(){
+        $('#reorderForm #spinner').show();
+      },
+      complete: function(){
+        $('#reorderForm #spinner').hide();
+      },
+      success: function(data){
+        if(data['success'] == true){
+          location.reload();
+          $("#reorderModal").modal('toggle');
+        }
+        else{
+          $('#reorderModal').html(data['html']);
+          $('#pagesMsg .errorlist li:first-child').addClass('error').html(data['error']);
+        }
+        return false;
+      },
+      error: function(xhr, ajaxOptions, thrownError){
+        alert(thrownError);
+      },
+    });
+  });
+
+  $(".up,.down").click(function(){
+    var row = $(this).parents("tr:first");
+    if ($(this).is(".up")) {
+      if(row.prev().length){
+        var prev_row = row.prev();
+        var prev_row_num = $(prev_row).find('.hidden_value input[type="hidden"]').val();
+        var current_row_num = $(row).find('.hidden_value input[type="hidden"]').val();
+        $(prev_row).find('.hidden_value input[type="hidden"]').val(current_row_num);
+        $(prev_row).find('.shown_value').html(current_row_num);
+        $(row).find('.hidden_value input[type="hidden"]').val(prev_row_num);
+        $(row).find('.shown_value').html(prev_row_num);
+        row.insertBefore(row.prev());
+      }
+    }
+    else {
+      if(row.next().length){
+        var next_row = row.next();
+        var next_row_num = $(next_row).find('.hidden_value input[type="hidden"]').val();
+        var current_row_num = $(row).find('.hidden_value input[type="hidden"]').val();
+        console.log('next '+next_row_num);
+        console.log('current '+current_row_num);
+        $(next_row).find('.hidden_value input[type="hidden"]').val(current_row_num);
+        $(next_row).find('.shown_value').html(current_row_num);
+        $(row).find('.hidden_value input[type="hidden"]').val(next_row_num);
+        $(row).find('.shown_value').html(next_row_num);
+
+        row.insertAfter(row.next());
+      }
+
+    }
+  });
+
+});
+
+</script>

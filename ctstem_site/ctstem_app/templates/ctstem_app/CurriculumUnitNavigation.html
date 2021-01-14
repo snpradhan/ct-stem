@@ -2,36 +2,40 @@
 <div class="left-navigation">
   <div class="form-group unit-navigation">
     {% if unit_id %}
-      {% if flag == "overview" and form.instance.id == unit_id %}
-        <label class="current_curriculum">
+      <label class="{% if flag == 'overview' and form.instance.id == unit_id %} current_curriculum {% endif %}">
+        {% if flag == "overview" and form.instance.id == unit_id %}
           <strong>Unit</strong>
-          &nbsp;&nbsp;
-          <a class="fa fa-files-o" href="{% url 'ctstem:copyCurriculum' unit_id %}" title="Copy Unit"></a>
-        </label>
-      {% else %}
-         <label>
+        {% else %}
           <a href="{% url 'ctstem:curriculumOverview' unit_id %}">Unit</a>
-          &nbsp;&nbsp;
-          <a class="fa fa-files-o" href="{% url 'ctstem:copyCurriculum' unit_id %}" title="Copy Unit"></a>
-        </label>
-      {% endif %}
+        {% endif %}
+        &nbsp;
+        <a class="fa fa-files-o copy_curriculum" href="{% url 'ctstem:copyCurriculum' unit_id %}" title="Copy Unit"></a>
+        {% check_curriculum_permission unit_id 'delete' as has_delete_permission %}
+        {% if has_delete_permission == True %}
+          &nbsp;
+          <a class="fa fa-trash delete_curriculum" aria-hidden="true" aria-label="Delete Unit" title="Delete Unit" href="{% url 'ctstem:deleteCurriculum' unit_id %}">
+          </a>
+        {% endif %}
+      </label>
       {% get_underlying_curriculum unit_id 'modify' as underlying_curriculum %}
       <ul>
         {% for lesson in underlying_curriculum %}
           <li>
-            {% if curriculum.id != lesson.id %}
-              <label>
-                <a href="{% url 'ctstem:curriculumOverview' lesson.id %}">Lesson {{lesson.order}}</a>
-                &nbsp;&nbsp;
-                <a class="fa fa-files-o" href="{% url 'ctstem:copyCurriculum' lesson.id %}" title="Copy Lesson"></a>
-              </label>
-            {% else %}
-             <label class="current_curriculum">
-              <strong>Lesson {{forloop.counter}}</strong>
-              &nbsp;&nbsp;
-              <a class="fa fa-files-o" href="{% url 'ctstem:copyCurriculum' lesson.id %}" title="Copy Lesson"></a>
+            <label class="{% if curriculum.id == lesson.id %} current_curriculum {% endif %}">
+              {% if curriculum.id == lesson.id %}
+                <strong>Lesson {{forloop.counter}}</strong>
+              {% else %}
+                <a class="edit_curriculum" href="{% url 'ctstem:curriculumOverview' lesson.id %}">Lesson {{lesson.order}}</a>
+              {% endif %}
+              &nbsp;
+              <a class="fa fa-files-o copy_curriculum" href="{% url 'ctstem:copyCurriculum' lesson.id %}" title="Copy Lesson"></a>
+              {% check_curriculum_permission lesson.id 'delete' as has_delete_permission %}
+              {% if has_delete_permission == True %}
+                &nbsp;
+                <a class="fa fa-trash delete_curriculum" aria-hidden="true" aria-label="Delete Lesson" title="Delete Lesson" href="{% url 'ctstem:deleteCurriculum' lesson.id %}">
+                </a>
+              {% endif %}
             </label>
-            {% endif %}
           </li>
         {% endfor %}
         {% if curriculum.id is None %}
@@ -40,7 +44,7 @@
         </li>
         {% endif %}
         <li>
-          <label><strong><a href="{% url 'ctstem:newCurriculumOverview' %}?unit_id={{unit_id}}">Add Lesson</a></strong></label>
+          <label><strong><a class="add_curriculum" href="{% url 'ctstem:newCurriculumOverview' %}?unit_id={{unit_id}}">Add Lesson</a></strong></label>
         </li>
       </ul>
     {% endif %}
@@ -48,7 +52,7 @@
 </div>
 <script type="text/javascript">
   $(function() {
-    $('div.unit-navigation a').click(function(e){
+    $('div.unit-navigation a:not(.delete_curriculum)').click(function(e){
       var link = $(this);
       e.preventDefault();
       bootbox.confirm({ title: 'Confirm',

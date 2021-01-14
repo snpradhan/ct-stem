@@ -27,6 +27,8 @@
         {% endif %}
         {% if flag == "overview" and page != 0 and curriculum.student_overview is None %}
           <a type="button" class="btn inbetween blue linked" title="Add Page"  href="{% url 'ctstem:curriculumOverview' curriculum.id 0 %}" onclick="alert('Please add Student Directions on Page 0 before adding other pages');"><i class="fas fa-plus"></i></a>
+        {% elif flag == "overview" and page == 0 %}
+          <a type="button" class="btn inbetween blue linked from_page_zero" href="{% url 'ctstem:newCurriculumStep' curriculum.id %}" title="Add Page"><i class="fas fa-plus"></i></a>
         {% else %}
           <a type="button" class="btn inbetween blue linked" href="{% url 'ctstem:newCurriculumStep' curriculum.id %}" title="Add Page"><i class="fas fa-plus"></i></a>
         {% endif %}
@@ -40,14 +42,33 @@
     $('a.linked').click(function(e){
       var next = $(this).attr('href');
       e.preventDefault();
-      bootbox.dialog({title: 'Confirm',
+      var proceed = true;
+      var old_student_overview_exists = true;
+      if($(this).hasClass('from_page_zero')) {
+        var new_student_overview = CKEDITOR.instances['id_curriculum-student_overview'].getData();
+        var old_student_overview = '{{form.student_overview.value}}';
+        if(new_student_overview == ''){
+          proceed = false;
+        }
+        if(old_student_overview == 'None') {
+          old_student_overview_exists = false;
+        }
+        // submit the form
+      }
+      if(proceed) {
+        bootbox.dialog({title: 'Confirm',
                       message: "<p>You are about to navigate to another page.  If you would like to save this page and then proceed click <strong>Save and Proceed</strong>. If you would like to proceed without saving, click <strong>Proceed without Saving</strong>.  If you would like to remain in the current page, close this dialog.</p>",
                       buttons: {
                         proceed_wo_saving: {
                             label: 'Proceed without Saving',
                             className: 'btn-normal-yellow',
                             callback: function(){
-                              window.location = next;
+                              if(old_student_overview_exists) {
+                                window.location = next;
+                              }
+                              else {
+                                alert('Please save Student Directions on Page 0 to add other pages');
+                              }
                             }
                         },
                         save_and_proceed: {
@@ -55,11 +76,15 @@
                             className: 'btn-normal-green',
                             callback: function(){
                               $('input#next').val(next);
-                              $('input#submit').click();
+                              $('#submit').click();
                             }
                         }
                       }
                     });
+      }
+      else {
+        alert('Please add Student Directions on Page 0 before adding other pages');
+      }
     });
   });
 </script>

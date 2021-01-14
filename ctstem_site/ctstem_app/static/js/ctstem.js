@@ -267,7 +267,7 @@ $(function () {
     $('div#spinner').show();
   });
 
-  $('.content').on("click", 'a.copy_curriculum', function(e) {
+  $('.content').on("click", 'a.copy_step', function(e) {
     $('div#spinner').show();
   });
 

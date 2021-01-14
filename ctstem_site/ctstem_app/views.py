@@ -528,6 +528,7 @@ def curriculumOverview(request, id='', page=''):
     elif request.method == 'POST':
       data = request.POST.copy()
       preview = data['preview']
+      save_and_continue = data['save_and_continue']
       redirect_url = data['next']
       form = forms.CurriculumForm(user=request.user, page=page, data=data, files=request.FILES, instance=curriculum, prefix="curriculum")
       AttachmentFormSet = inlineformset_factory(models.Curriculum, models.Attachment, form=forms.AttachmentForm, can_delete=True, can_order=True, extra=1)
@@ -582,18 +583,27 @@ def curriculumOverview(request, id='', page=''):
           else:
             messages.success(request, "%s Overview Saved." %(savedCurriculum.get_curriculum_type_display()))
 
+
           if preview == '1':
             return shortcuts.redirect('ctstem:previewCurriculum', id=savedCurriculum.id)
-          #new lesson
-          elif '' == id and page != 0 and savedCurriculum.curriculum_type != 'U':
-            return shortcuts.redirect('/curriculum/%s/overview/0/' % savedCurriculum.id)
+          elif preview == '2':
+            return shortcuts.redirect('ctstem:previewCurriculumActivity', id=savedCurriculum.id, step_order=0)
           elif redirect_url:
             return shortcuts.redirect(redirect_url)
           else:
             if page == 0:
-              return shortcuts.redirect('/curriculum/%s/overview/0/' % savedCurriculum.id)
+              if save_and_continue == '1':
+                if not steps:
+                  return shortcuts.redirect('/curriculum/%s/page/new/' % savedCurriculum.id)
+                else:
+                  return shortcuts.redirect('ctstem:curriculumStep', curriculum_id=savedCurriculum.id, id=steps.first().id)
+              else:
+                return shortcuts.redirect('/curriculum/%s/overview/0/' % savedCurriculum.id)
             else:
-              return shortcuts.redirect('/curriculum/%s/overview' % savedCurriculum.id)
+              if save_and_continue == '1':
+                return shortcuts.redirect('/curriculum/%s/overview/0/' % savedCurriculum.id)
+              else:
+                return shortcuts.redirect('/curriculum/%s/overview' % savedCurriculum.id)
       else:
         print('form.errors', form.errors)
         if page == 0:
@@ -611,7 +621,7 @@ def curriculumOverview(request, id='', page=''):
           return http.HttpResponse(json.dumps(response_data), content_type = 'application/json')
         else:
           #check which submit button was clicked and display error message accordingly
-          if preview == '1':
+          if preview == '1' or preview == '2':
             messages.error(request, "The preview could not be generated because some mandatory fields are missing.")
           else:
             messages.error(request, "The curriculum could not be saved because there were errors.  Please check the errors below before saving or proceeding to another page.")
@@ -681,6 +691,7 @@ def curriculumStep(request, curriculum_id='', id=''):
     elif request.method == 'POST':
       data = request.POST.copy()
       preview = data['preview']
+      save_and_continue = data['save_and_continue']
       redirect_url = data['next']
 
       form = forms.StepForm(data=data, files=request.FILES, instance=step, prefix="form")
@@ -715,10 +726,22 @@ def curriculumStep(request, curriculum_id='', id=''):
           messages.success(request, "Page %s Saved." % (savedStep.order))
           if preview == '1':
             return shortcuts.redirect('ctstem:previewCurriculum', id=curriculum_id)
+          elif preview == '2':
+            return shortcuts.redirect('ctstem:previewCurriculumActivity', id=curriculum_id, step_order=savedStep.order)
           elif redirect_url:
             return shortcuts.redirect(redirect_url)
           else:
-            return shortcuts.redirect('/curriculum/%s/page/%s' % (curriculum_id, savedStep.id))
+            if save_and_continue == '1':
+              steps = models.Step.objects.all().filter(curriculum__id=curriculum_id)
+              next_steps = steps.filter(order__gt=savedStep.order)
+              print('next_steps', next_steps)
+              if not next_steps:
+                return shortcuts.redirect('/curriculum/%s/page/new/' % curriculum_id)
+              else:
+                return shortcuts.redirect('/curriculum/%s/page/%s' % (curriculum_id, next_steps.first().id))
+
+            else:
+              return shortcuts.redirect('/curriculum/%s/page/%s' % (curriculum_id, savedStep.id))
 
       else:
         print('form.errors', form.errors)
@@ -728,7 +751,7 @@ def curriculumStep(request, curriculum_id='', id=''):
           return http.HttpResponse(json.dumps(response_data), content_type = 'application/json')
         else:
           #check which submit button was clicked and display error message accordingly
-          if preview == '1':
+          if preview == '1' or preview == '2':
             messages.error(request, "The preview could not be generated because some mandatory fields are missing.")
           else:
             messages.error(request, "The page could not be saved because there were errors.  Please check the errors below.")
@@ -1084,6 +1107,7 @@ def deleteStep(request, curriculum_id='', id=''):
     step = models.Step.objects.get(id=id)
     step_order = step.order
     curriculum = models.Curriculum.objects.get(id=curriculum_id)
+    step_count = models.Step.objects.all().filter(curriculum=curriculum).count()
     has_permission = check_curriculum_permission(request, curriculum_id, 'modify')
 
     if not has_permission:
@@ -1091,8 +1115,11 @@ def deleteStep(request, curriculum_id='', id=''):
 
     if request.method == 'GET' or request.method == 'POST':
       step.delete()
-      reorder_curriculum_pages(request, curriculum_id)
-      messages.success(request, "Page '%s' has been deleted and remaining pages reordered" % (step_order))
+      if step_order < step_count:
+        reorder_curriculum_pages(request, curriculum_id)
+        messages.success(request, "Page '%s' has been deleted and remaining pages reordered" % (step_order))
+      else:
+        messages.success(request, "Page '%s' has been deleted" % (step_order))
 
       previous_step_order = step_order - 1
 
@@ -1101,6 +1128,101 @@ def deleteStep(request, curriculum_id='', id=''):
       else:
         previous_step = models.Step.objects.all().filter(curriculum__id=curriculum_id, order=previous_step_order).first()
         return shortcuts.redirect('ctstem:curriculumStep', curriculum_id=curriculum_id, id=previous_step.id)
+
+    return http.HttpResponseNotAllowed(['GET', 'POST'])
+
+  except models.Curriculum.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested assessment not found</h1>')
+
+####################################
+# Copy a page in a curriculum
+####################################
+def copyStep(request, curriculum_id='', id=''):
+  try:
+    # check if the user has permission to modify a curriculum
+    step = models.Step.objects.get(id=id)
+    step_order = step.order
+    title = step.title
+    curriculum = models.Curriculum.objects.get(id=curriculum_id)
+    has_permission = check_curriculum_permission(request, curriculum_id, 'modify')
+
+    if not has_permission:
+      return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+    if request.method == 'GET' or request.method == 'POST':
+      step_questions = models.CurriculumQuestion.objects.all().filter(step=step)
+      step.pk = None
+      step.id = None
+      step.title = 'zzz'
+      step.save()
+
+      original_step = models.Step.objects.get(id=id)
+      original_step.title = 'yyy'
+      original_step.save()
+
+      reorder_curriculum_pages(request, curriculum_id)
+
+      original_step.title = title
+      original_step.save()
+
+      step = models.Step.objects.get(id=step.id)
+      if title:
+        step.title = 'Copy of %s' % title
+      else:
+        step.title = 'Copy of page %s' % step_order
+      step.save()
+
+      for step_question in step_questions:
+        question = copyQuestion(request, step_question.question.id)
+        step_question.id = None
+        step_question.pk = None
+        step_question.question = question
+        step_question.step = step
+        step_question.save()
+
+      messages.success(request, "Page '%s' has been copied and remaining pages reordered" % (step_order))
+      return shortcuts.redirect('ctstem:curriculumStep', curriculum_id=curriculum_id, id=step.id)
+
+    return http.HttpResponseNotAllowed(['GET', 'POST'])
+
+  except models.Curriculum.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested assessment not found</h1>')
+
+####################################
+# Reorder page in a curriculum
+####################################
+def reorderSteps(request, curriculum_id=''):
+  try:
+    # check if the user has permission to modify a curriculum
+    has_permission = check_curriculum_permission(request, curriculum_id, 'modify')
+
+    if not has_permission:
+      return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+    curriculum = models.Curriculum.objects.get(id=curriculum_id)
+
+    StepFormSet = inlineformset_factory(models.Curriculum, models.Step, form=forms.StepForm, can_delete=False, can_order=True, extra=0)
+
+    if request.method == 'GET':
+      formset = StepFormSet(instance=curriculum, prefix='form')
+      context = {'curriculum': curriculum, 'formset': formset}
+      return render(request, 'ctstem_app/CurriculumPageReorder.html', context)
+
+    elif request.method == 'POST':
+      data = request.POST.copy()
+      formset = StepFormSet(instance=curriculum, data=data, prefix='form')
+      if formset.is_valid():
+        for form in formset.forms:
+          form.instance.save()
+
+        reorder_curriculum_pages(request, curriculum_id)
+        response_data = {'success': True}
+      else:
+        context = {'curriculum': curriculum, 'formset': formset}
+        html = render_to_string('ctstem_app/CurriculumPageReorder.html', context, request)
+        response_data = {'success': False, 'html': html, 'error': 'The pages could not be reordered.'}
+
+      return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 
     return http.HttpResponseNotAllowed(['GET', 'POST'])
 
@@ -5905,7 +6027,7 @@ def reorder_underlying_curricula(request, unit_id):
 
 @login_required
 def reorder_curriculum_pages(request, id):
-  steps = models.Step.objects.all().filter(curriculum__id=id).order_by('order')
+  steps = models.Step.objects.all().filter(curriculum__id=id).order_by('order', 'title')
   order = 1
   for step in steps:
     if step.order != order:
