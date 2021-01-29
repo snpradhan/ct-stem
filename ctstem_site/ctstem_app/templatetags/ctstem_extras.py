@@ -80,7 +80,6 @@ def get_curriculum_object(curriculum_id):
 def is_in(var, obj):
     return var in obj
 
-
 @register.filter(name='sort')
 def listsort(value):
   if isinstance(value,dict):
@@ -188,6 +187,11 @@ def getFeedback(response_id):
 @register.filter
 def get_item(dictionary, key):
   return dictionary.get(key)
+
+@register.filter
+def remove_key(dictionary, key):
+  del dictionary[key]
+  return dictionary
 
 @register.filter
 def get_type(value):
@@ -410,6 +414,47 @@ def get_class_assignment_status(assignment_id):
       break
 
   return status
+
+@register.filter
+def get_assignment_status(assignment_id):
+  assignment = models.Assignment.objects.get(id=assignment_id)
+  students = assignment.group.members.all()
+  instances = models.AssignmentInstance.objects.all().filter(assignment__id=assignment_id)
+  status = []
+  assignment_status = {'N': 0, 'P': 0, 'C': 0}
+  status_map = {'N': 'New', 'P': 'In Progress', 'C': 'Completed'}
+  status_color = {'N': '#fa7921', 'P': '#00ADFF', 'C': '#0ad35e'}
+
+  for student in students:
+    try:
+      instance = instances.get(student=student)
+      if instance.status in assignment_status:
+        assignment_status[instance.status] += 1
+      else:
+        assignment_status['C'] += 1
+    except models.AssignmentInstance.DoesNotExist:
+      if 'N' in assignment_status:
+        assignment_status['N'] += 1
+      else:
+        assignment_status['N'] = 1
+
+  for key, value in list(assignment_status.items()):
+    status.append({'name': status_map[key], 'y': value, 'color': status_color[key]})
+
+  return status
+
+@register.filter
+def get_assignment_percent_complete(obj):
+  total = 0
+  complete = 0
+  for status in obj:
+    if status['name'] == 'Completed':
+      complete = status['y']
+    total += status['y']
+  if total > 0:
+    return int(complete/total*100)
+  else:
+    return 0
 
 @register.filter
 def subtract(value, arg):

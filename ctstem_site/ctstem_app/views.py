@@ -3653,6 +3653,78 @@ def deleteGroup(request, id=''):
   except models.UserGroup.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested class not found</h1>')
 
+
+@login_required
+def teacherDashboard(request, id='', status='active'):
+  if hasattr(request.user, 'administrator'):
+    privilege = 1
+  elif hasattr(request.user, 'teacher') and request.user.teacher.id == id:
+    privilege = 1
+  else:
+    privilege = 0
+
+  if privilege == 0:
+    return http.HttpResponseNotFound('<h1>You do not have the privilege view this dashboard</h1>')
+
+  if request.method == 'GET' or request.method == 'POST':
+    is_active = True
+    group_count = 0
+    student_count = 0
+    assignment_count = 0
+    if status == 'inactive':
+      is_active = False
+
+    teacher = models.Teacher.objects.get(id=id)
+    all_groups = models.UserGroup.objects.all().filter(Q(is_active=is_active), Q(teacher=teacher) | Q(shared_with=teacher)).distinct()
+    group_count = all_groups.count()
+    filtered_groups = all_groups[:6]
+    all_assignments = models.Assignment.objects.all().filter(group__in=all_groups).distinct()
+    assignment_count = all_assignments.count()
+    filtered_assignments = all_assignments[:4]
+    all_students = models.Student.objects.all().filter(member_of__in=all_groups).distinct()
+    student_count = all_students.count()
+    filtered_students = all_students[:8]
+    groups = []
+    for group in filtered_groups:
+      assignment_status = {'N': 0, 'P': 0, 'C': 0}
+      students = group.members.all()
+      assignments = models.Assignment.objects.all().filter(group=group)
+
+      for assignment in assignments:
+        instances = models.AssignmentInstance.objects.all().filter(assignment=assignment)
+
+        for student in students:
+          try:
+            instance = instances.get(student=student)
+            if instance.status in assignment_status:
+              assignment_status[instance.status] += 1
+            else:
+              assignment_status['C'] += 1
+          except models.AssignmentInstance.DoesNotExist:
+            assignment_status['N'] += 1
+
+      total = assignment_status['N'] + assignment_status['P'] + assignment_status['C']
+      complete = assignment_status['C']
+      percent_complete = 0
+      if total > 0:
+        percent_complete = int(complete/total*100)
+      groups.append({'group': group, 'percent_complete': percent_complete})
+
+    current_site = Site.objects.get_current()
+    domain = current_site.domain
+    uploadForm = forms.UploadFileForm(user=request.user)
+    assignmentForm = forms.AssignmentSearchForm(user=request.user)
+
+    context = {'teacher': teacher, 'groups': groups, 'group_count': group_count, 'students': filtered_students,
+               'student_count': student_count, 'assignments': filtered_assignments, 'assignment_count':assignment_count,
+               'role':'groups', 'uploadForm': uploadForm,
+               'status': status, 'domain': domain, 'assignmentForm': assignmentForm
+               }
+    return render(request, 'ctstem_app/TeacherDashboard.html', context)
+
+  return http.HttpResponseNotAllowed(['GET', 'POST'])
+
+
 ####################################
 # Group Dashboard
 # List of assignments in a Class with aggregate status
