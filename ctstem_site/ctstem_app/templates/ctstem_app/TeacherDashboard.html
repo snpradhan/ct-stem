@@ -1,0 +1,336 @@
+{% extends "ctstem_app/base.html" %}
+{% load ctstem_extras %}
+
+{% block media %}
+  {{ block.super }}
+  {{ form.media }}
+  <script src="https://code.highcharts.com/highcharts.js"></script>
+{% endblock %}
+{% block title %}Dashboard |{% endblock %}
+
+{% block content %}
+{{block.super}}
+<div class="content" id="teacher_dashboard">
+  <div id="dashboard_header">
+    <h3 class="left welcome">Howdy, {{teacher.user.get_full_name}}</h3>
+    <div class="quick_links">
+        <h5><a href="{% url 'ctstem:help' %}"><i class="far fa-question-circle"></i> Help </a></h5>
+        <h5><a href="{% url 'ctstem:curriculatiles' %}?bucket=my_curricula">My Curricula</a></h5>
+        <h5><a href="{% url 'ctstem:curriculatiles' %}?bucket=favorite_curricula"><i class="far fa-star"></i> Favorites</a></h5>
+    </div>
+  </div>
+  <div id="recent_activity">
+    <div id="class_activity">
+      <div class="title">
+        <h3 class="left">Recent Class Activity</h3>
+      </div>
+      <hr>
+      <div class="activities">
+        {% if group_activity %}
+          {% with sorted_group_activity=group_activity|sort:'1' %}
+          {% for key, activities in sorted_group_activity.items %}
+            {% for activity in activities %}
+              <div class="activity">
+                <div class="description">
+                  {% with activity_type=activity|get_item:'activity_type' %}
+                  {% if activity_type == 'new_class' %}
+                    New class <strong>{{activity|get_item:'class'}}</strong> created
+                  {% elif activity_type == 'modified_class' %}
+                    Class <strong>{{activity|get_item:'class'}}</strong> modified
+                  {% elif activity_type == 'new_assignment' %}
+                    New assignment <strong>{{activity|get_item:'assignment'}}</strong> added to class <strong>{{activity|get_item:'class'}}</strong>
+                  {% elif activity_type == 'new_member' %}
+                    New student <strong>{{activity|get_item:'student'}}</strong> added to class <strong>{{activity|get_item:'class'}}</strong>
+                  {% endif %}
+                  {% endwith %}
+                </div>
+                <div class="time">
+                  {{activity|get_item:'time'|timesince}} ago
+                </div>
+              </div>
+            {% endfor %}
+          {% endfor %}
+          {% endwith %}
+        {% else %}
+          <h4>No Class Activity</h3>
+        {% endif %}
+      </div>
+    </div>
+    <div id="student_activity">
+      <div class="title">
+        <h3 class="left">Recent Student Activity</h3>
+      </div>
+      <hr>
+      <div class="activities">
+        {% if student_activity %}
+          {% with sorted_student_activity=student_activity|sort:'1' %}
+          {% for key, activities in sorted_student_activity.items %}
+            {% for activity in activities %}
+              <div class="activity">
+                <div class="description">
+                  {% with activity_type=activity|get_item:'activity_type' %}
+                  {% if activity_type == 'assignment_start' %}
+                    Student <strong>{{activity|get_item:'student'}}</strong> in class <strong>{{activity|get_item:'class'}}</strong> started assignment <strong>{{activity|get_item:'assignment'}}</strong>
+                  {% elif activity_type == 'assignment_inprogress' %}
+                    Student <strong>{{activity|get_item:'student'}}</strong> in class <strong>{{activity|get_item:'class'}}</strong> saved assignment <strong>{{activity|get_item:'assignment'}}</strong>
+                  {% elif activity_type == 'assignment_complete' %}
+                    Student <strong>{{activity|get_item:'student'}}</strong> in class <strong>{{activity|get_item:'class'}}</strong> completed assignment <strong>{{activity|get_item:'assignment'}}</strong>
+                  {% endif %}
+                  {% endwith %}
+                </div>
+                <div class="time">
+                  {{activity|get_item:'time'|timesince}} ago
+                </div>
+              </div>
+            {% endfor %}
+          {% endfor %}
+          {% endwith %}
+        {% else %}
+          <h4>No Student Activity</h3>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <div id="dashboard_classes">
+    <div class="title">
+      <h3 class="left">{{status|title}} Classes ({{groups|length}} of {{group_count}})</h3>
+      <a type="button" class="btn normal yellow" href="/group/new/" title="Create new class"> Add New</a>
+    </div>
+    <hr>
+    <div class="row" id="class_tiles">
+      {% for grp in groups %}
+      {% with group=grp|get_item:'group' percent_complete=grp|get_item:'percent_complete' %}
+      <div class="col tile">
+        <div class="class_icon">
+          {% if group.icon %}
+            <img src="{{group.icon.url}}" class="icon" alt="">
+          {% elif group.subject and group.subject.icon %}
+            <img src="{{group.subject.icon.url}}" class="icon" alt="">
+          {% else %}
+            <i class="fa fa-sitemap icon" aria-hidden="true"></i>
+          {% endif %}
+        </div>
+        <div class="class_students">
+          <h5 class="left class_title"><a href="{% url 'ctstem:group' group.id %}">{{group.title}}</a></h5>
+          <h6 class="left">{{group.members.count}} Student{% if group.members.count > 1 %}s{% endif %}</h6>
+          <div class="actions">
+            {% if group.is_active %}
+              <a class="invite-modal action" href="#" data-toggle="modal" data-target="#invite" data-invite-link="https://{{domain}}/?next=/preregister/group/{{group.group_code}}/" data-title="{{group.title}} Invitation Link" title="Student Invitation Link">
+                <i class="fa fa-link"></i> Invite
+              </a>
+              &nbsp;&nbsp;&nbsp;&nbsp;
+              <a class="upload-modal action" href="#" data-toggle="modal" data-target="#upload" data-id="{{group.id}}" data-title="{{group.title}}" title="Add Students">
+                <i class="fa fa-user-plus"></i> Add
+              </a>
+            {% endif %}
+          </div>
+        </div>
+        <div class="class_assignments">
+          <!--div id="group_chart_{{group.id}}" class="group_chart" data-percent-complete="{{percent_complete}}">
+          </div-->
+          <div class="progress">
+            <div class="progress-bar" role="progressbar" aria-valuenow="{{percent_complete}}" aria-valuemin="0" aria-valuemax="100" data-percent-complete="{{percent_complete}}">{{percent_complete}}%</div>
+          </div>
+          <h6 class="left">{{group.assignments.count}} Assignment{% if group.assignments.count > 1 %}s{% endif %}</h6>
+          <div class="actions">
+            <a class="action" href="{% url 'ctstem:groupDashboard' group.id 'active' %}" aria-label="View Class Dashboard" title="View Class Dashboard">
+              <i class="fas fa-tachometer-alt"></i> Dashboard
+            </a>
+            {% if group.is_active %}
+              &nbsp;&nbsp;&nbsp;&nbsp;
+              <a class="assignment-modal action" href="#" data-toggle="modal" data-target="#assignment" data-id="{{group.id}}" data-title="{{group.title}}" data-subject="{{group.subject.id}}" title="Search and Add Assignments">
+                <i class="fa fa-tasks"></i> Assign
+              </a>
+            {% endif %}
+          </div>
+        </div>
+
+      </div>
+      {% endwith %}
+      {% endfor %}
+    </div>
+    <h5 class="view_all"><a href="#">View All</a></h5>
+  </div>
+  <div id="assignments_students">
+    <div id="dashboard_assignments">
+      <div class="title">
+        <h3 class="left">Assignments ({{assignments|length}} of {{assignment_count}})</h3>
+        <a type="button" class="btn normal yellow assignment-modal" href="#" data-toggle="modal" data-target="#assignment" title="Search and Add Assignments">Add New</a>
+      </div>
+      <hr>
+      <div id="assignments">
+        {% for assignment in assignments %}
+        <div class="assignment tile">
+          <div class="assignment_icon">
+            {% if assignment.curriculum.icon %}
+              <img src="{{assignment.curriculum.icon.url}}" class="icon" alt="">
+            {% else %}
+              <i class="fa fa-tasks icon"></i>
+            {% endif %}
+          </div>
+          {% with assignment_status=assignment.id|get_assignment_status %}
+
+          <div class="assignment_details">
+            <h5 class="left"><a href="{% url 'ctstem:assignmentDashboard' assignment.id %}">
+              {{assignment.curriculum.title}}</a>
+            </h5>
+            <h6 class="left">Class: {{assignment.group.title}}</h6>
+            <div class="actions">
+              {% for status in assignment_status %}
+                {% if status.name == 'New' %}
+                  <span class="action new"><i class="far fa-user"></i> {{status.y}} {{status.name}}</span>
+                {% elif status.name == 'In Progress' %}
+                  <span class="action in_progress"><i class="far fa-clock"></i> {{status.y}} {{status.name}}</span>
+                {% elif status.name == 'Submitted' %}
+                  <span class="action submitted"><i class="fas fa-check"></i> {{status.y}} {{status.name}}</span>
+                {% elif status.name == 'Feedback Ready' %}
+                  <span class="action feedback_ready"><i class="far fa-comment-dots"></i> {{status.y}} {{status.name}}</span>
+                {% elif status.name == 'Archived' %}
+                  <span class="action archived"><i class="fa fa-archive"></i> {{status.y}} {{status.name}}</span>
+                {% endif %}
+                &nbsp;&nbsp;&nbsp;&nbsp;
+              {% endfor %}
+            </div>
+          </div>
+          <div class="assignment_status_chart">
+            <div id="assignment_chart_{{assignment.id}}" class="assignment_chart" name="{{assignment_status}}" data-percent-complete="{{assignment_status|get_assignment_percent_complete}}"></div>
+          </div>
+          {% endwith %}
+        </div>
+        <!--hr-->
+        {% endfor %}
+      </div>
+      <h5 class="view_all"><a href="#">View All</a></h5>
+    </div>
+
+    <div id="dashboard_students">
+      <div class="title">
+        <h3 class="left">Students ({{student_count}})</h3>
+        <a type="button" class="btn normal yellow upload-modal" href="#" data-toggle="modal" data-target="#upload" title="Upload Students">
+          Add New
+        </a>
+      </div>
+      <hr>
+      <div id="students">
+        {% for student in students %}
+          {% with assignment_status=student.id|get_student_assignment_status:teacher.id %}
+          <div class="student tile">
+            <div class="student_details">
+              <h5 class="left">{{student.user.get_full_name}}</h5>
+              <div class="actions">
+                <span class="action">
+                  <i class="fas fa-chart-bar"></i> View Work
+                </span>
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                <span class="action">
+                  <i class="far fa-comment-dots"></i> Feedback
+                </span>
+              </div>
+            </div>
+            <div class="assignment_status_list">
+              {% for status in assignment_status %}
+                {% if status.name == 'New' %}
+                  <div class="action new"><i class="far fa-user"></i> {{status.y}} {{status.name}}</div>
+                {% elif status.name == 'In Progress' %}
+                  <div class="action in_progress"><i class="far fa-clock"></i> {{status.y}} {{status.name}}</div>
+                {% elif status.name == 'Submitted' %}
+                  <div class="action submitted"><i class="fas fa-check"></i> {{status.y}} {{status.name}}</div>
+                {% elif status.name == 'Feedback Ready' %}
+                  <div class="action feedback_ready"><i class="far fa-comment-dots"></i> {{status.y}} {{status.name}}</div>
+                {% elif status.name == 'Archived' %}
+                  <div class="action archived"><i class="fa fa-archive"></i> {{status.y}} {{status.name}}</div>
+                {% endif %}
+              {% endfor %}
+            </div>
+            <div class="assignment_status_chart">
+              <div id="assignment_chart_{{student.id}}" class="assignment_chart" name="{{assignment_status}}" data-percent-complete="{{assignment_status|get_assignment_percent_complete}}"></div>
+            </div>
+          </div>
+          {% endwith %}
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% block upload %}
+{% include "ctstem_app/UserUploadModal.html" %}
+{% endblock %}
+{% block assignment %}
+{% include "ctstem_app/AssignmentSearch.html" %}
+{% endblock %}
+
+<script type="text/javascript">
+  $(function(){
+    $(".expand_collapse2").click(function(){
+      $(this).next().toggle();
+      $(this).children().each(function(){
+        $(this).toggle();
+      })
+    });
+    $(".progress").each(function(){
+      $(this).css({'background-color': '#E5F7FF', '-webkit-box-shadow': 'none', 'box-shadow': 'none', 'background-image': 'none'});
+    });
+    $(".progress-bar").each(function(){
+      var complete = $(this).data('percent-complete');
+      $(this).css({'background-color': '#00ADFF', 'background-image': 'none', 'width': complete+'%'})
+      if(complete < 10){
+         $(this).css({'color': 'black'});
+      }
+    });
+
+    $(".assignment_chart").each(function(){
+      var id = $(this).attr('id');
+      var status_str = $(this).attr('name').replace(/'/g, '"');
+      var status = $.parseJSON(status_str);
+      var complete = $(this).data('percent-complete');
+      $("#"+id).highcharts({
+        chart: {
+          renderTo: 'container',
+          type: 'pie',
+          height: 120,
+          width: 120,
+          backgroundColor: 'rgba(0,0,0,0)',
+        },
+        title: {
+          text: complete+"%",
+          align: 'center',
+          verticalAlign: 'middle',
+          y: 12,
+          style: {
+            fontWeight: 'bold',
+            color: 'black',
+            fontSize: '16px'
+          },
+          filter: {
+            property: 'name',
+            operator: '===',
+            value: 'New'
+          },
+        },
+        tooltip: false,
+        plotOptions: {
+          pie: {
+            dataLabels: {
+              enabled: false,
+
+            }
+          }
+        },
+        credits: {
+          enabled: false
+        },
+        series: [{
+          name: 'Status',
+          innerSize: '80%',
+          data: status,
+        }]
+      });
+    });
+
+  });
+
+</script>
+
+{% endblock %}
+
+

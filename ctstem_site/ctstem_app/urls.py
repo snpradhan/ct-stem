@@ -106,6 +106,7 @@ urlpatterns = [
     path('export_response/<int:assignment_id>/<int:student_id>/', views.export_response, name='export_student_response'),
     path('export_all_response/<int:curriculum_id>/', views.export_all_response, name='export_all_response'),
     path('export_question_response/<int:question_id>/', views.export_question_response, name='export_question_response'),
+    path('dashboard/teacher/<int:id>/<str:status>/', views.teacherDashboard, name='teacherDashboard'),
     path('dashboard/group/<int:id>/<str:curriculum_status>/', views.groupDashboard, name='groupDashboard'),
     path('dashboard/assignment/<int:id>/', views.assignmentDashboard, name='assignmentDashboard'),
     path('dashboard/group/<int:group_id>/curriculum/<int:curriculum_id>/<str:curriculum_status>/', views.groupCurriculumDashboard, name='groupCurriculumDashboard'),
