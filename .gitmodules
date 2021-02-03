@@ -1,0 +1,3 @@
+[submodule "/Users/connorbain/bainco-git/ct-stem/ctstem_site/ctstem_app/static/ckeditor/ckeditor/plugins/NLModels"]
+	path = /Users/connorbain/bainco-git/ct-stem/ctstem_site/ctstem_app/static/ckeditor/ckeditor/plugins/NLModels
+	url = git@github.com:bainco/NLModels-CKEditor.git
