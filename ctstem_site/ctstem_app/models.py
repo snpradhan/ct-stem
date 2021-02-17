@@ -128,6 +128,11 @@ CHANGE_TYPE_CHOICES = (
   ('X', 'Bug Fixes'),
 )
 
+TOPIC_TYPE_CHOICES = (
+  ('teacher_guide', 'Teacher Guide'),
+  ('faq', 'Help and FAQ'),
+)
+
 class IsNull(Func):
   template = "%(expressions)s IS NULL or %(expressions)s = ''"
 
@@ -739,6 +744,30 @@ class ReleaseChange(models.Model):
 
   class Meta:
       ordering = ['change_type']
+
+class Topic(models.Model):
+  name = models.CharField(max_length=512, blank=False)
+  order = models.IntegerField(null=False, blank=False)
+  topic_type = models.CharField(max_length=255, choices=TOPIC_TYPE_CHOICES)
+
+  def __str__(self):
+    return '%s' % (self.name)
+
+  class Meta:
+      ordering = ['order']
+
+class SubTopic(models.Model):
+  topic = models.ForeignKey(Topic, null=False, on_delete=models.CASCADE, related_name='subtopics')
+  name = models.CharField(max_length=512, blank=False)
+  order = models.IntegerField(blank=False, null=False)
+  description = RichTextUploadingField(null=True, blank=True)
+  modified_date = models.DateTimeField(auto_now=True)
+
+  def __str__(self):
+    return '%s' % (self.name)
+
+  class Meta:
+      ordering = ['order']
 
 #signal used for is_active=False to is_active=True
 @receiver(pre_save, sender=User, dispatch_uid='active')

@@ -1,0 +1,80 @@
+<div class="modal-dialog modal-lg">
+  <div class="modal-content">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal">&times;</button>
+      <h3 class="modal-title">{% if topic_type == 'teacher_guide' %}Teacher Guide {% elif topic_type == 'faq' %} Help and FAQ {% endif %}Topic</h3>
+    </div>
+    <div id="guideMsg" class="msg">
+      <ul class="errorlist">
+        <li></li>
+      </ul>
+    </div>
+    <form class="form" id="guideForm" method="post" enctype="multipart/form-data" action="{% if form.instance.id %} {% url 'ctstem:topic' form.instance.id %} {% else %} {% url 'ctstem:newTopic' topic_type %} {% endif %}">
+      {% csrf_token %}
+      {{form.management_form}}
+      <div class="modal-body">
+        {% for field in form %}
+          <div class="form-group">
+            <label for="id_{{field.name}}">{{ field.label|title }} {% if field.field.required %}(<span class="required">*</span>){% endif %} </label>
+            <div>
+              {{field}}
+            </div>
+            <div class="help warning">{{field.help_text|safe}}</div>
+            <div class="error">{{ field.errors }}</div>
+          </div>
+        {% endfor %}
+        <div id="spinner">
+          <img src="/static/img/page-loader.gif" class="icon"/>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div class="form-group">
+          <button type="submit" id="saveTopic" class="btn normal yellow">
+            Save
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script type="text/javascript">
+  $(function (){
+    $("form").submit(function(e) {
+
+      e.preventDefault();
+      var formData = new FormData(this);
+      $.ajax({
+        type: $(this).attr('method'),
+        url: this.action,
+        data: formData,
+        context: this,
+        cache:false,
+        contentType: false,
+        processData: false,
+        beforeSend: function(){
+          $('form #spinner').show();
+        },
+        complete: function(){
+          $('form #spinner').hide();
+        },
+        success: function(data, status){
+          if(data['success'] == true){
+            location.reload();
+            $("form")[0].reset();
+            $("form").modal('toggle');
+          }
+          else{
+            $('form').html(data['html']);
+            $('#guideMsg .errorlist li:first-child').addClass('error').html(data['error']);
+          }
+          return false;
+        },
+        error: function(xhr, ajaxOptions, thrownError){
+          alert(thrownError);
+        },
+      });
+    });
+  });
+</script>
+

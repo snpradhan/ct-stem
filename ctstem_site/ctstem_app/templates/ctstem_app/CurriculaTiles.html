@@ -12,9 +12,11 @@
       <div class="page-blurb">
         {% include "ctstem_app/CurriculaSwitch.html" with on='false' %}
         <h2> Curricula </h2>
-        <p>
-          Our curricular units are developed and tested with high school teachers to bring authentic CT practices with disciplinary content to your classroom. Find or create curriculum below.
-        </p>
+        <div class="page-blurb">
+          <p>
+            Our curricular units are developed and tested with high school teachers to bring authentic CT practices with disciplinary content to your classroom. Find or create curriculum below.
+          </p>
+        </div>
         <div class="btn-group center">
           {% if user.is_authenticated %}
             {% if user.administrator or user.researcher or user.author or user.teacher %}

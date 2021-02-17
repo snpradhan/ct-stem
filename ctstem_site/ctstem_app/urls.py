@@ -135,6 +135,14 @@ urlpatterns = [
     url(r'^release_note/delete/(?P<id>[\d]+)/$', views.deleteReleaseNote, name='deleteReleaseNote'),
     url(r'^release_note/new/$', views.releaseNote, name='newReleaseNote'),
     url(r'^release_notes/$', views.releaseNotes, name='releaseNotes'),
+    url(r'^topic/(?P<id>[\d]+)/$', views.topic, name='topic'),
+    url(r'^topic/new/(?P<topic_type>[a-zA-Z0-9_]+)/$', views.topic, name='newTopic'),
+    url(r'^topic/delete/(?P<id>[\d]+)/$', views.deleteTopic, name='deleteTopic'),
+    url(r'^topic/(?P<topic_id>[\d]+)/subtopic/(?P<id>[\d]+)/$', views.subTopic, name='subTopic'),
+    url(r'^topic/(?P<topic_id>[\d]+)/subtopic/new/$', views.subTopic, name='newSubTopic'),
+    url(r'^topic/(?P<topic_id>[\d]+)/subtopic/delete/(?P<id>[\d]+)/$', views.deleteSubTopic, name='deleteSubTopic'),
+    url(r'^topics/(?P<topic_type>[a-zA-Z0-9_]+)/$', views.topics, name='topics'),
+
 
 
 ]

@@ -774,13 +774,13 @@ div.content#curricula .page-blurb > * {
   margin-top: 0 !important;
 }
 
-label.switch#curricula_view, label.switch#release_notes_view {
+label.switch#curricula_view {
   position: absolute;
   right: 5%;
   text-align: right;
 }
 label.switch#release_notes_view {
-  right: 0;
+  float: right;
 }
 
 .highlight {
@@ -1817,6 +1817,9 @@ h1.left, h2.left, h3.left, h4.left, h5.left, h6.left {
 h1.inline, h2.inline, h3.inline, h4.inline, h5.inline, h6.inline {
   display: inline-block;
 }
+h1.right, h2.right, h3.right, h4.right, h5.right, h6.right {
+  text-align: right;
+}
 
 h1 {
   font-size: 4em;
@@ -2283,3 +2286,81 @@ span.cke_top.focus, span.cke_bottom.focus {
 .checkbox-menu li label:focus {
     background-color: #f5f5f5;
 }
+
+
+/********** USER GUIDE AND FAQ ***************/
+  #user_guide_faq .page-blurb {
+    width: 100%;
+  }
+  #user_guide_faq .create {
+    float: left;
+  }
+  #user_guide_faq .updated {
+    float: right;
+  }
+  .topic .topic_details {
+    display: flex;
+    background-color: var(--ctstem-color-blue);
+    align-items: center;
+    border-bottom: 2px solid var(--ctstem-color-pale-blue);
+    justify-content: space-between;
+  }
+  .topic .topic_details * {
+    color: white !important;
+  }
+  .topic .name {
+    flex: 0 1 80%;
+    display: flex;
+    cursor: pointer;
+    align-items: center;
+  }
+  .topic .name h3 {
+    margin-top: 15px;
+    margin-bottom: 15px;
+  }
+  .topic .topic_details .name {
+    padding-left: 2em;
+  }
+  .topic .actions {
+    flex: 0 0 auto;
+    padding-right: 2em;
+  }
+   .topic .actions a {
+    cursor: pointer;
+   }
+  .topic .subtopic {
+    display: flex;
+    background-color: var(--ctstem-color-pale-blue);
+    border-bottom: 1px solid white;
+    justify-content: space-between;
+  }
+  .topic .subtopic .subtopic_name {
+    align-self: flex-start;
+    padding-left: 4em;
+  }
+  .topic.expanded .subtopic_details div {
+    margin: 2em 4em;
+  }
+  .topic .fa-chevron-right {
+    display: inline-block !important;
+  }
+  .topic.expanded .topic_details .fa-chevron-right,
+  .topic.expanded .subtopics .subtopic.expanded .fa-chevron-right{
+    transform: rotate(90deg);
+  }
+  .topic .subtopics,
+  .topic .subtopic_details {
+   opacity: 0;
+   max-height: 0;
+   overflow: hidden;
+   transition: opacity 1500ms ease-out, max-height 1500ms ease-out;
+  }
+
+  .topic.expanded .subtopics,
+  .topic.expanded .subtopics .subtopic_details.expanded {
+    opacity: 1;
+    max-height: 10000px;
+    transition: opacity 1500ms ease-in, max-height 1500ms ease-in;
+  }
+
+/*********** END OF USER GUIDE ***********/

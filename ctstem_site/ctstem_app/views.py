@@ -3316,7 +3316,6 @@ def releaseNotes(request):
   context = {'release_notes': release_notes}
   return render(request, 'ctstem_app/ReleaseNotes.html', context)
 
-
 ####################################
 # DELETE RELEASE NOTES
 ####################################
@@ -3341,6 +3340,150 @@ def deleteReleaseNote(request, id=''):
 
   except models.ReleaseNote.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested release note not found</h1>')
+
+
+def topic(request, id='', topic_type=''):
+  try:
+    # check if the user has permission to create or modify a topic
+    if hasattr(request.user, 'administrator') == False:
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to modify this topic</h1>')
+    # check if the lesson exists
+    if '' != id:
+      topic = models.Topic.objects.get(id=id)
+      topic_type = topic.topic_type
+    elif '' != topic_type:
+      topic_count = models.Topic.objects.all().filter(topic_type=topic_type).count()
+      topic = models.Topic(topic_type=topic_type, order=topic_count+1)
+
+    if request.method == 'GET':
+      form = forms.TopicForm(instance=topic)
+      context = {'form': form, 'topic_type': topic_type}
+      return render(request, 'ctstem_app/Topic.html', context)
+    elif request.method == 'POST':
+      data = request.POST.copy()
+      form = forms.TopicForm(data, instance=topic)
+      if form.is_valid():
+        savedTopic = form.save()
+        messages.success(request, "Topic Saved.")
+        response_data = {'success': True}
+      else:
+        context = {'form': form, 'topic_type': topic_type}
+        html =  render_to_string('ctstem_app/Topic.html', context, request)
+        response_data = {'success': False, 'html': html, 'error': 'This topic could not be saved because there were errors. Please check the errors below.'}
+
+      return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+
+    return http.HttpResponseNotAllowed(['GET', 'POST'])
+
+  except models.Topic.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested Topic not found</h1>')
+
+def deleteTopic(request, id=''):
+  try:
+    # check if the user has permission to create or modify a lesson
+    if hasattr(request.user, 'administrator') == False:
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to modify this user guide topic</h1>')
+    # check if the lesson exists
+    if '' != id:
+      topic = models.Topic.objects.get(id=id)
+    else:
+      raise models.Topic.DoesNotExist
+
+    if request.method == 'GET' or request.method == 'POST':
+
+      topic.delete()
+      messages.success(request, 'Topic deleted')
+      return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+    return http.HttpResponseNotAllowed(['GET', 'POST'])
+
+  except models.Topic.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested Topic not found</h1>')
+
+def subTopic(request, topic_id='', id=''):
+  try:
+    # check if the user has permission to create or modify a lesson
+    if hasattr(request.user, 'administrator') == False:
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to modify this sub topic</h1>')
+    # check if the lesson exists
+    if '' != id:
+      subtopic = models.SubTopic.objects.get(id=id)
+    else:
+      topic = models.Topic.objects.get(id=topic_id)
+      subtopic_count = models.SubTopic.objects.all().filter(topic=topic).count()
+      subtopic = models.SubTopic(topic=topic, order=subtopic_count+1)
+
+    if request.method == 'GET':
+      form = forms.SubTopicForm(instance=subtopic, topic_type=subtopic.topic.topic_type)
+      context = {'topic_id': topic_id, 'form': form, 'topic_type': subtopic.topic.topic_type}
+      return render(request, 'ctstem_app/SubTopic.html', context)
+
+    elif request.method == 'POST':
+      data = request.POST.copy()
+      form = forms.SubTopicForm(data, instance=subtopic, topic_type=subtopic.topic.topic_type)
+      if form.is_valid():
+        savedSubTopic = form.save()
+        messages.success(request, "Sub Topic Saved.")
+        response_data = {'success': True}
+      else:
+        print(form.errors)
+        context = {'topic_id': topic_id, 'form': form, 'topic_type': subtopic.topic.topic_type}
+        html =  render_to_string('ctstem_app/SubTopic.html', context, request)
+        response_data = {'success': False, 'html': html, 'error': 'This sub topic could not be saved because there were errors. Please check the errors below.'}
+
+      return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+
+    return http.HttpResponseNotAllowed(['GET', 'POST'])
+
+  except models.SubTopic.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested sub topic not found</h1>')
+
+def deleteSubTopic(request, topic_id='', id=''):
+  try:
+    # check if the user has permission to create or modify a lesson
+    if hasattr(request.user, 'administrator') == False:
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to modify this sub topic</h1>')
+    # check if the lesson exists
+    if '' != id:
+      subtopic = models.SubTopic.objects.get(id=id)
+    else:
+      raise models.SubTopic.DoesNotExist
+
+    if request.method == 'GET' or request.method == 'POST':
+
+      subtopic.delete()
+      messages.success(request, 'Sub Topic deleted')
+      return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+    return http.HttpResponseNotAllowed(['GET', 'POST'])
+
+  except models.UserGuideTopic.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested Sub Topic not found</h1>')
+
+def topics(request, topic_type=''):
+  topic_objs = models.Topic.objects.all().filter(topic_type=topic_type).order_by('order')
+
+  topics = []
+  last_updated = None
+  for topic_obj in topic_objs:
+    topic = {}
+    topic['id'] = topic_obj.id
+    topic['name'] = topic_obj.name
+    topic['order'] = topic_obj.order
+    topic['subtopics'] = []
+
+    subtopics = models.SubTopic.objects.all().filter(topic__id=topic_obj.id).order_by('order')
+    for subtopic in subtopics:
+      topic['subtopics'].append({'id': subtopic.id, 'name': subtopic.name, 'order': subtopic.order, 'description': subtopic.description})
+      if last_updated is None or last_updated < subtopic.modified_date:
+        last_updated = subtopic.modified_date
+
+    topics.append(topic)
+
+  context = {'topics': topics, 'last_updated': last_updated, 'topic_type': topic_type}
+  return render(request, 'ctstem_app/UserGuideFAQ.html', context)
+
+
 ####################################
 # GROUPS TABLE VIEW
 ####################################

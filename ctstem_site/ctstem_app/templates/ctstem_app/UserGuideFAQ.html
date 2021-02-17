@@ -1,0 +1,163 @@
+{% extends "ctstem_app/base.html" %}
+{% load ctstem_extras %}
+{% block media %}
+  {{ block.super }}
+  {{ form.media }}
+{% endblock %}
+{% block title %}{% if topic_type == 'teacher_guide' %}Teacher Guide{% elif topic_type == 'faq' %} Help and FAQ {% endif %} |{% endblock %}
+
+{% block content %}
+  {{block.super}}
+  <div class="content" id="user_guide_faq">
+    <h2> {% if topic_type == 'teacher_guide' %}Teacher Guide{% elif topic_type == 'faq' %} Help and FAQ {% endif %} </h2>
+    {% if topic_type == 'H' %}
+      <div class="page-blurb">
+        <p>
+          This Help page is a living document that continues to grow, so please reach out to us at <a href="mailto:ctstem@northwestern.edu">ctstem@northwestern.edu</a> if you have any other questions. Your questions will be added to this list and help us better support other users of this site.
+        </p>
+      </div>
+    {% endif %}
+    <div class="btn-group">
+      {% if user.administrator %}
+        <div class="create">
+          <a type="button" class="btn blue normal edit_guide" name="add_topic" data-form="{% url 'ctstem:newTopic' topic_type %}" aria-label="Add New Topic" title="Add New Topic">
+          Create New {% if topic_type == 'teacher_guide' %}Teacher Guide{% elif topic_type == 'faq' %} Help and FAQ {% endif %} Topic
+          </a>
+        </div>
+      {% endif %}
+      {% if last_updated %}
+        <div class="updated">
+          <h4>Updated: {{last_updated|date:"m/d/Y"}}</h4>
+        </div>
+      {% endif %}
+    </div>
+
+    {% if topics %}
+      {% for topic in topics %}
+        <div class="topic collapsed">
+          <div class="topic_details">
+            <div class="topic_name name">
+              <h3>{{topic.name}}</h3>
+              <div>&nbsp;&nbsp;&nbsp;&nbsp;</div>
+              <h3 class="expand_collapse">
+                <i class="fas fa-chevron-right"></i>
+              </h3>
+            </div>
+            <div class="topic_actions actions">
+              <h4 class="right">
+                <a aria-label="Expand Topic" title="Expand Topic" class="expand_topic">Expand All</a>
+                {% if user.administrator %}
+                  &nbsp;
+                  <a class='edit_guide' aria-label="Edit Topic" title="Edit Topic" data-form="{% url 'ctstem:topic' topic.id %}">
+                    <i class="fas fa-pencil-alt" aria-hidden="true"></i>
+                  </a>
+                  &nbsp;
+                  <a aria-label="Delete Topic" title="Delete Topic" href="{% url 'ctstem:deleteTopic' topic.id %}" onclick="return confirm('Are you sure you want to delete {{topic.name}}?')">
+                    <i class="fa fa-trash" aria-hidden="true"></i>
+                  </a>
+                  &nbsp;
+                  <a class='edit_guide' aria-label="Add Sub Topic" title="Add Sub Topic" data-form="{% url 'ctstem:newSubTopic' topic.id %}">
+                    <i class="fas fa-plus" aria-hidden="true"></i>
+                  </a>
+                {% endif %}
+              </h4>
+
+            </div>
+          </div>
+          <div class="subtopics">
+            {% for subtopic in topic.subtopics %}
+              <div class="subtopic collapsed">
+                <div class="subtopic_name name">
+                  <h4> {{subtopic.name}} </h4>
+                  <div>&nbsp;&nbsp;&nbsp;&nbsp;</div>
+                  <h4 class="expand_collapse">
+                    <i class="fas fa-chevron-right"></i>
+                  </h4>
+                </div>
+                <div class="subtopic_actions actions">
+                  {% if user.administrator %}
+                    <h5 class="right">
+                      <a class='edit_guide' aria-label="Edit Sub Topic" title="Edit Sub Topic" data-form="{% url 'ctstem:subTopic' topic.id subtopic.id %}">
+                        <i class="fas fa-pencil-alt" aria-hidden="true"></i>
+                      </a>
+                      &nbsp;
+                      <a aria-label="Delete Sub Topic" title="Delete Sub Topic" href="{% url 'ctstem:deleteSubTopic' topic.id subtopic.id %}" onclick="return confirm('Are you sure you want to delete {{subtopic.name}}?')">
+                        <i class="fa fa-trash" aria-hidden="true"></i>
+                      </a>
+                    </h5>
+                  {% endif %}
+                </div>
+              </div>
+              <div class="subtopic_details collapsed">
+                <div>
+                  {{subtopic.description|safe}}
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p>No Topics available.</p>
+    {% endif %}
+    <div class="modal fade" id="userGuideModal" role="dialog"></div>
+
+
+  </div>
+
+   <script type="text/javascript">
+
+    $(function(){
+      //$('.topic .collapse').hide();
+      $('.topic_name').click(function(){
+        var topic = $(this).closest('.topic');
+        $(topic).toggleClass('expanded').toggleClass('collapsed');
+        $(topic).find('.subtopic, .subtopic_details').each(function(){
+          if($(this).hasClass('expanded')) {
+          $(this).removeClass('expanded');
+          }
+          if(!$(this).hasClass('collapsed')) {
+            $(this).addClass('collapsed');
+          }
+        });
+      });
+      $('.subtopic_name').click(function(){
+        $(this).closest('.subtopic').toggleClass('expanded').toggleClass('collapsed');
+        $(this).closest('.subtopic').next().toggleClass('expanded').toggleClass('collapsed');
+      });
+
+      $('.expand_topic').click(function(){
+        var topic = $(this).closest('.topic');
+        if($(topic).hasClass('collapsed')) {
+          $(topic).removeClass('collapsed');
+        }
+        if(!$(topic).hasClass('expanded')) {
+          $(topic).addClass('expanded');
+        }
+        $(topic).find('.subtopic, .subtopic_details').each(function(){
+          if($(this).hasClass('collapsed')) {
+          $(this).removeClass('collapsed');
+          }
+          if(!$(this).hasClass('expanded')) {
+            $(this).addClass('expanded');
+          }
+        });
+      });
+
+      $("a.edit_guide").click(function(e){
+        e.preventDefault();
+        var url = $(this).data("form");
+        $("#userGuideModal").load(url, function() {
+          $(this).modal('show');
+        });
+
+        return false;
+      });
+
+    });
+
+  </script>
+
+{% endblock %}
+
+

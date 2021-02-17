@@ -197,7 +197,8 @@
                   <ul class="dropdown-menu">
                     <li class="{% navactive request 'ctstem:teacherSupport' %}"><a href="{% url 'ctstem:teacherSupport' %}">Professional Development</a></li>
                     </li>
-                    <li class="{% navactive request 'ctstem:help' %}"><a href="{% url 'ctstem:help' %}">Help and FAQ</a></li>
+                    <li class="{% navactive request 'ctstem:topics' 'faq' %}"><a href="{% url 'ctstem:topics' 'faq' %}">Help and FAQ</a></li>
+                    <li class="{% navactive request 'ctstem:topics' 'teacher_guide' %}"><a href="{% url 'ctstem:topics' 'teacher_guide' %}">User Guide</a></li>
                     {% if user.administrator %}
                       <li class="{% navactive request 'ctstem:training_requests' %}"><a href="{% url 'ctstem:training_requests' %}">Training Requests</a></li>
                     {% endif %}

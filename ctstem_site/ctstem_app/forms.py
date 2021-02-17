@@ -1075,6 +1075,49 @@ class ReleaseChangeForm(ModelForm):
       field.widget.attrs['class'] = 'form-control'
 
 ####################################
+# Topic Form
+####################################
+class TopicForm(ModelForm):
+
+  class Meta:
+    model = models.Topic
+    fields = ['name', 'order']
+
+  def __init__(self, *args, **kwargs):
+    super(TopicForm, self).__init__(*args, **kwargs)
+
+    for field_name, field in list(self.fields.items()):
+      if field_name == 'order':
+        field.widget.attrs['class'] = 'form-control order'
+      else:
+        field.widget.attrs['class'] = 'form-control'
+      field.widget.attrs['placeholder'] = field.help_text
+
+####################################
+# Sub Topic Form
+####################################
+class SubTopicForm(ModelForm):
+
+  class Meta:
+    model = models.SubTopic
+    fields = ['topic', 'name', 'description', 'order']
+    widgets = {
+      'description': forms.Textarea(attrs={'rows':0, 'cols':60}),
+    }
+
+  def __init__(self, *args, **kwargs):
+    topic_type = kwargs.pop('topic_type')
+    super(SubTopicForm, self).__init__(*args, **kwargs)
+    self.fields['topic'].queryset = models.Topic.objects.all().filter(topic_type=topic_type)
+
+    for field_name, field in list(self.fields.items()):
+      if field_name == 'order':
+        field.widget.attrs['class'] = 'form-control order'
+      else:
+        field.widget.attrs['class'] = 'form-control'
+      field.widget.attrs['placeholder'] = field.help_text
+
+####################################
 # User Group Form
 ####################################
 class UserGroupForm(ModelForm):
