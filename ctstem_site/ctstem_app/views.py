@@ -3675,7 +3675,71 @@ def teacherDashboard(request, id='', status='active'):
       is_active = False
 
     teacher = models.Teacher.objects.get(id=id)
-    all_groups = models.UserGroup.objects.all().filter(Q(is_active=is_active), Q(teacher=teacher) | Q(shared_with=teacher)).distinct()
+    all_groups = models.UserGroup.objects.all().filter(Q(is_active=is_active), Q(teacher=teacher) | Q(shared_with=teacher))
+
+    #activity feed data
+    teacher_last_login = teacher.user.last_login
+    new_groups = all_groups.filter(created_date__gte=teacher_last_login).distinct()
+    new_group_ids = new_groups.values('id')
+    modified_groups = all_groups.filter(modified_date__gte=teacher_last_login).exclude(id__in=new_group_ids).distinct()
+    new_assignments = models.Assignment.objects.all().filter(group__in=all_groups, assigned_date__gte=teacher_last_login)
+    new_members = models.Membership.objects.all().filter(group__in=all_groups, joined_on__gte=teacher_last_login)
+
+    group_activity = {}
+    for new_group in new_groups:
+      key = new_group.created_date.strftime('%s')
+      if key in group_activity:
+        group_activity[key].append({'activity_type': 'new_class', 'class': new_group.title, 'time': new_group.created_date})
+      else:
+        group_activity[key] = [{'activity_type': 'new_class', 'class': new_group.title, 'time': new_group.created_date}]
+
+    for modified_group in modified_groups:
+      key = modified_group.modified_date.strftime('%s')
+      if key in group_activity:
+        group_activity[key].append({'activity_type': 'modified_class', 'class': modified_group.title, 'time': modified_group.modified_date})
+      else:
+        group_activity[key] = [{'activity_type': 'modified_class', 'class': modified_group.title, 'time': modified_group.modified_date}]
+
+    for new_assignment in new_assignments:
+      key = new_assignment.assigned_date.strftime('%s')
+      if key in group_activity:
+        group_activity[key].append({'activity_type': 'new_assignment', 'assignment': new_assignment.curriculum.title, 'class': new_assignment.group.title, 'time': new_assignment.assigned_date})
+      else:
+        group_activity[key] = [{'activity_type': 'new_assignment', 'assignment': new_assignment.curriculum.title, 'class': new_assignment.group.title, 'time': new_assignment.assigned_date}]
+
+    for new_member in new_members:
+      key = new_member.joined_on.strftime('%s')
+      if key in group_activity:
+        group_activity[key].append({'activity_type': 'new_member', 'student': new_member.student, 'class': new_member.group.title, 'time': new_member.joined_on})
+      else:
+        group_activity[key] = [{'activity_type': 'new_member', 'student': new_member.student, 'class': new_member.group.title, 'time': new_member.joined_on}]
+
+    assignment_starts = models.AssignmentInstance.objects.all().filter(assignment__group__in=all_groups, created_date__gte=teacher_last_login).distinct()
+    assignment_start_ids = assignment_starts.values('id')
+    assignment_inprogress = models.AssignmentInstance.objects.all().filter(assignment__group__in=all_groups, modified_date__gte=teacher_last_login, status='P').exclude(id__in=assignment_start_ids).distinct()
+    assignment_complete = models.AssignmentInstance.objects.all().filter(assignment__group__in=all_groups, modified_date__gte=teacher_last_login, status__in=['S', 'F', 'A']).exclude(id__in=assignment_start_ids).distinct()
+    student_activity = {}
+    for assignment_instance in assignment_starts:
+      key = assignment_instance.created_date.strftime('%s')
+      if key in student_activity:
+        student_activity[key].append({'activity_type': 'assignment_start', 'student': assignment_instance.student, 'assignment': assignment_instance.assignment.curriculum.title, 'class': assignment_instance.assignment.group.title, 'time': assignment_instance.created_date})
+      else:
+        student_activity[key] = [{'activity_type': 'assignment_start', 'student': assignment_instance.student, 'assignment': assignment_instance.assignment.curriculum.title, 'class': assignment_instance.assignment.group.title, 'time': assignment_instance.created_date}]
+
+    for assignment_instance in assignment_inprogress:
+      key = assignment_instance.modified_date.strftime('%s')
+      if key in student_activity:
+        student_activity[key].append({'activity_type': 'assignment_inprogress', 'student': assignment_instance.student, 'assignment': assignment_instance.assignment.curriculum.title, 'class': assignment_instance.assignment.group.title, 'time': assignment_instance.modified_date})
+      else:
+        student_activity[key] = [{'activity_type': 'assignment_inprogress', 'student': assignment_instance.student, 'assignment': assignment_instance.assignment.curriculum.title, 'class': assignment_instance.assignment.group.title, 'time': assignment_instance.modified_date}]
+
+    for assignment_instance in assignment_complete:
+      key = assignment_instance.modified_date.strftime('%s')
+      if key in student_activity:
+        student_activity[key].append({'activity_type': 'assignment_copmplete', 'student': assignment_instance.student, 'assignment': assignment_instance.assignment.curriculum.title, 'class': assignment_instance.assignment.group.title, 'time': assignment_instance.modified_date})
+      else:
+        student_activity[key] = [{'activity_type': 'assignment_copmplete', 'student': assignment_instance.student, 'assignment': assignment_instance.assignment.curriculum.title, 'class': assignment_instance.assignment.group.title, 'time': assignment_instance.modified_date}]
+
     group_count = all_groups.count()
     filtered_groups = all_groups[:6]
     all_assignments = models.Assignment.objects.all().filter(group__in=all_groups).distinct()
@@ -3718,7 +3782,7 @@ def teacherDashboard(request, id='', status='active'):
     context = {'teacher': teacher, 'groups': groups, 'group_count': group_count, 'students': filtered_students,
                'student_count': student_count, 'assignments': filtered_assignments, 'assignment_count':assignment_count,
                'role':'groups', 'uploadForm': uploadForm,
-               'status': status, 'domain': domain, 'assignmentForm': assignmentForm
+               'status': status, 'domain': domain, 'assignmentForm': assignmentForm, 'group_activity': group_activity, 'student_activity': student_activity
                }
     return render(request, 'ctstem_app/TeacherDashboard.html', context)
 

@@ -19,38 +19,81 @@
         <h5><a href="{% url 'ctstem:curriculatiles' %}?bucket=favorite_curricula"><i class="far fa-star"></i> Favorites</a></h5>
     </div>
   </div>
-  <div id="dashboard_stats">
-    <div class="tile" id="assignment_stat">
-      <div>
-        <h2 class="left">{{assignment_count}}</h2>
-        <h4 class="left">Assignments</h4>
+  <div id="recent_activity">
+    <div id="class_activity">
+      <div class="title">
+        <h3 class="left">Recent Class Activity</h3>
       </div>
-      <div>
-        <i class="fa fa-tasks"></i>
+      <hr>
+      <div class="activities">
+        {% if group_activity %}
+          {% with sorted_group_activity=group_activity|sort:'1' %}
+          {% for key, activities in sorted_group_activity.items %}
+            {% for activity in activities %}
+              <div class="activity">
+                <div class="description">
+                  {% with activity_type=activity|get_item:'activity_type' %}
+                  {% if activity_type == 'new_class' %}
+                    New class <strong>{{activity|get_item:'class'}}</strong> created
+                  {% elif activity_type == 'modified_class' %}
+                    Class <strong>{{activity|get_item:'class'}}</strong> modified
+                  {% elif activity_type == 'new_assignment' %}
+                    New assignment <strong>{{activity|get_item:'assignment'}}</strong> added to class <strong>{{activity|get_item:'class'}}</strong>
+                  {% elif activity_type == 'new_member' %}
+                    New student <strong>{{activity|get_item:'student'}}</strong> added to class <strong>{{activity|get_item:'class'}}</strong>
+                  {% endif %}
+                  {% endwith %}
+                </div>
+                <div class="time">
+                  {{activity|get_item:'time'|timesince}} ago
+                </div>
+              </div>
+            {% endfor %}
+          {% endfor %}
+          {% endwith %}
+        {% else %}
+          <h4>No Class Activity</h3>
+        {% endif %}
       </div>
     </div>
-    <div class="tile" id="class_stat">
-      <div>
-        <h2 class="left">{{group_count}}</h2>
-        <h4 class="left">Classes</h4>
+    <div id="student_activity">
+      <div class="title">
+        <h3 class="left">Recent Student Activity</h3>
       </div>
-      <div>
-        <i class="fa fa-sitemap" aria-hidden="true"></i>
-      </div>
-    </div>
-    <div class="tile" id="student_stat">
-      <div>
-        <h2 class="left">{{student_count}}</h2>
-        <h4 class="left">Students</h4>
-      </div>
-      <div>
-        <i class="far fa-user" aria-hidden="true"></i>
+      <hr>
+      <div class="activities">
+        {% if student_activity %}
+          {% with sorted_student_activity=student_activity|sort:'1' %}
+          {% for key, activities in sorted_student_activity.items %}
+            {% for activity in activities %}
+              <div class="activity">
+                <div class="description">
+                  {% with activity_type=activity|get_item:'activity_type' %}
+                  {% if activity_type == 'assignment_start' %}
+                    Student <strong>{{activity|get_item:'student'}}</strong> in class <strong>{{activity|get_item:'class'}}</strong> started assignment <strong>{{activity|get_item:'assignment'}}</strong>
+                  {% elif activity_type == 'assignment_inprogress' %}
+                    Student <strong>{{activity|get_item:'student'}}</strong> in class <strong>{{activity|get_item:'class'}}</strong> saved assignment <strong>{{activity|get_item:'assignment'}}</strong>
+                  {% elif activity_type == 'assignment_complete' %}
+                    Student <strong>{{activity|get_item:'student'}}</strong> in class <strong>{{activity|get_item:'class'}}</strong> completed assignment <strong>{{activity|get_item:'assignment'}}</strong>
+                  {% endif %}
+                  {% endwith %}
+                </div>
+                <div class="time">
+                  {{activity|get_item:'time'|timesince}} ago
+                </div>
+              </div>
+            {% endfor %}
+          {% endfor %}
+          {% endwith %}
+        {% else %}
+          <h4>No Student Activity</h3>
+        {% endif %}
       </div>
     </div>
   </div>
   <div id="dashboard_classes">
     <div class="title">
-      <h3 class="left">{{status|title}} Classes</h3>
+      <h3 class="left">{{status|title}} Classes ({{groups|length}} of {{group_count}})</h3>
       <a type="button" class="btn normal yellow" href="/group/new/" title="Create new class"> Add New</a>
     </div>
     <hr>
@@ -111,7 +154,7 @@
   <div id="assignments_students">
     <div id="dashboard_assignments">
       <div class="title">
-        <h3 class="left">Assignments</h3>
+        <h3 class="left">Assignments ({{assignments|length}} of {{assignment_count}})</h3>
         <a type="button" class="btn normal yellow assignment-modal" href="#" data-toggle="modal" data-target="#assignment" title="Search and Add Assignments">Add New</a>
       </div>
       <hr>
@@ -156,7 +199,7 @@
 
     <div id="dashboard_students">
       <div class="title">
-        <h3 class="left">Students</h3>
+        <h3 class="left">Students ({{students|length}} of {{student_count}})</h3>
         <a type="button" class="btn normal yellow upload-modal" href="#" data-toggle="modal" data-target="#upload" title="Upload Students">
           Add New
         </a>

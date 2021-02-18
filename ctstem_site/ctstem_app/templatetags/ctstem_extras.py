@@ -81,17 +81,23 @@ def is_in(var, obj):
     return var in obj
 
 @register.filter(name='sort')
-def listsort(value):
+def listsort(value, reverse='0'):
   if isinstance(value,dict):
     new_dict = OrderedDict()
     key_list = list(value.keys())
-    key_list.sort()
+    if reverse == '1':
+      key_list.sort(reverse=True)
+    else:
+      key_list.sort()
     for key in key_list:
       new_dict[key] = value[key]
     return new_dict
   elif isinstance(value, list):
     new_list = list(value)
-    new_list.sort()
+    if reverse == '1':
+      new_list.sort(reverse=True)
+    else:
+      new_list.sort()
     return new_list
   else:
     return value

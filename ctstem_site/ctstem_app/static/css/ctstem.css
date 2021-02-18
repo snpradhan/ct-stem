@@ -853,26 +853,8 @@ div.content#teacher_dashboard a {
 div.content#teacher_dashboard a:hover {
   color: var(--ctstem-color-blue);
 }
-div.content#teacher_dashboard div#dashboard_stats div.tile {
-  flex: 0 0 33%;
-  text-align: center;
-  margin: auto;
-}
-div.content#teacher_dashboard div#dashboard_stats div.tile > * > * {
-  color: white;
-}
-div.content#teacher_dashboard div#dashboard_stats div.tile i {
-  font-size: 4em;
-}
-div.content#teacher_dashboard div#dashboard_stats div.tile:nth-child(1) {
-  background-color: var(--ctstem-color-orange);
-}
-div.content#teacher_dashboard div#dashboard_stats div.tile:nth-child(2) {
-  background-color: var(--ctstem-color-blue);
-}
-div.content#teacher_dashboard div#dashboard_stats div.tile:nth-child(3) {
-  background-color: var(--ctstem-color-green);
-}
+div.content#teacher_dashboard div#class_activity,
+div.content#teacher_dashboard div#student_activity,
 div.content#teacher_dashboard div#dashboard_classes,
 div.content#teacher_dashboard div#dashboard_assignments,
 div.content#teacher_dashboard div#dashboard_students{
@@ -886,17 +868,41 @@ div.content#teacher_dashboard div.title {
   align-items: center;
   padding: 2em;
 }
-
+div.content#teacher_dashboard div#recent_activity,
+div.content#teacher_dashboard div#recent_activity div.activity,
 div.content#teacher_dashboard div#dashboard_classes div#class_tiles {
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
   align-items: stretch;
 }
+div.content#teacher_dashboard div#recent_activity #class_activity,
+div.content#teacher_dashboard div#recent_activity #student_activity {
+  flex: 0 0 48%;
+}
+div.content#teacher_dashboard div#recent_activity .activities {
+  margin: 2em;
+  max-height: 25em;
+  overflow-y: scroll;
+}
+div.content#teacher_dashboard div#recent_activity div.activity {
+  align-items: center;
+  padding: 1em 0;
+  font-size: 1.3em;
+}
+div.content#teacher_dashboard div#recent_activity div.activity:nth-child(even){
+  background-color: #F9F9F9F9;
+}
+div.content#teacher_dashboard div#recent_activity div.activity .description {
+  flex: 0 0 75%;
+}
+div.content#teacher_dashboard div#recent_activity div.activity .time {
+  flex: 0 0 25%;
+  text-align: right;
+}
 div.content#teacher_dashboard div#dashboard_classes div#class_tiles div.tile {
   flex: 0 0 45%;
   border: 1px solid var(--ctstem-color-pale-blue);
-  box-shadow: 5px 5px var(--ctstem-color-pale-blue);
   display: flex;
   justify-content: space-between;
   align-items: stretch;
