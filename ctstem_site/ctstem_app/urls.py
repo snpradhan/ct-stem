@@ -62,6 +62,7 @@ urlpatterns = [
     url(r'^login/(?P<user_name>[A-Za-z0-9._@+\-]+)/$', views.user_login, name='login'),
     url(r'^logout/$', views.user_logout, name='logout'),
     url(r'^user/(?P<id>[\d]+)/$', views.userProfile, name='userProfile'),
+    url(r'^user/delete/(?P<id>[\d]+)/(?P<validation_code>[a-zA-Z0-9_]+)/$', views.deleteUser, name='deleteTeacher'),
     url(r'^user/delete/(?P<id>[\d]+)/$', views.deleteUser, name='deleteUser'),
     url(r'^user/reset_password/(?P<id>[\d]+)/$', views.resetPassword, name='resetPassword'),
     url(r'^student/remove/(?P<group_id>[\d]+)/(?P<student_id>[\d]+)$', views.removeStudent, name='removeStudent'),

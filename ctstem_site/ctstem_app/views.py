@@ -2164,7 +2164,7 @@ def consent(request):
 ####################################
 # DELETE USER
 ####################################
-def deleteUser(request, id=''):
+def deleteUser(request, id='', validation_code=''):
   try:
     # check if the lesson exists
     if '' != id:
@@ -2173,7 +2173,12 @@ def deleteUser(request, id=''):
     privilege = 1
     # check if the user has permission to delete a user
     if request.user.is_anonymous:
-      privilege = 0
+      #new teacher is deleting the account
+      regEnd = datetime.datetime.today() - datetime.timedelta(hours = 24)
+      if '' != validation_code and hasattr(user, 'teacher') and user.teacher.validation_code == validation_code and user.date_joined.replace(tzinfo=None) > regEnd and user.is_active == False:
+        privilege = 1
+      else:
+        privilege = 0
     elif hasattr(request.user, 'author') or hasattr(request.user, 'student') or hasattr(request.user, 'researcher'):
       privilege = 0
     elif hasattr(request.user, 'school_administrator'):
@@ -2197,8 +2202,11 @@ def deleteUser(request, id=''):
       flag = transferCurriculum(request, user)
       if flag:
         user.delete()
-        messages.success(request, '%s deleted' % user.username)
-      return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+        messages.success(request, 'Account %s deleted' % user.username)
+      if '' != validation_code:
+        return shortcuts.redirect('ctstem:home')
+      else:
+        return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
     return http.HttpResponseNotAllowed(['GET', 'POST'])
 
@@ -5636,9 +5644,10 @@ def send_teacher_account_validation_email(teacher):
   domain = current_site.domain
   body =  '<div>Welcome to Computational Thinking in STEM. </div><br> \
            <div>Your e-mail address was used to create a teacher account on our website. If you made this request, please follow the instructions below.<div><br> \
-           <div>Please click this link https://%s?next=/validate/%s/%s/ to validate your account. </div><br><br> \
+           <div>Please click this link https://%s?next=/validate/%s/%s/ to validate your account. </div><br> \
+           <div>If you wanted to sign up as a Student or a Researcher and you accidentally created a teacher account, please click this link https://%s/user/delete/%s/%s  to delete this account immediately.</div><br><br>\
            <div>If you did not request this account you can safely ignore this email. Rest assured your e-mail address and the associated account will be deleted from our system in 24 hours.</div><br> \
-           <div><b>CT-STEM Admin</b></div>' % (domain, teacher.user.username, teacher.validation_code)
+           <div><b>CT-STEM Admin</b></div>' % (domain, teacher.user.username, teacher.validation_code, domain, teacher.user.id, teacher.validation_code)
 
   send_mail('CT-STEM - Teacher Account Validation', body, settings.DEFAULT_FROM_EMAIL, [teacher.user.email], html_message=body)
 
