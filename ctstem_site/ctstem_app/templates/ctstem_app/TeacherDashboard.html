@@ -171,22 +171,28 @@
           {% with assignment_status=assignment.id|get_assignment_status %}
 
           <div class="assignment_details">
-            <h5 class="left"><a href="{% url 'ctstem:assignmentDashboard' assignment.id %}">{{assignment.curriculum.title}}</a></h5>
+            <h5 class="left"><a href="{% url 'ctstem:assignmentDashboard' assignment.id %}">
+              {{assignment.curriculum.title}}</a>
+            </h5>
+            <h6 class="left">Class: {{assignment.group.title}}</h6>
             <div class="actions">
               {% for status in assignment_status %}
                 {% if status.name == 'New' %}
                   <span class="action new"><i class="far fa-user"></i> {{status.y}} {{status.name}}</span>
-
                 {% elif status.name == 'In Progress' %}
                   <span class="action in_progress"><i class="far fa-clock"></i> {{status.y}} {{status.name}}</span>
-                {% elif status.name == 'Completed' %}
-                  <span class="action completed"><i class="fas fa-check"></i> {{status.y}} {{status.name}}</span>
+                {% elif status.name == 'Submitted' %}
+                  <span class="action submitted"><i class="fas fa-check"></i> {{status.y}} {{status.name}}</span>
+                {% elif status.name == 'Feedback Ready' %}
+                  <span class="action feedback_ready"><i class="far fa-comment-dots"></i> {{status.y}} {{status.name}}</span>
+                {% elif status.name == 'Archived' %}
+                  <span class="action archived"><i class="fa fa-archive"></i> {{status.y}} {{status.name}}</span>
                 {% endif %}
                 &nbsp;&nbsp;&nbsp;&nbsp;
               {% endfor %}
             </div>
           </div>
-          <div class="assignment_status">
+          <div class="assignment_status_chart">
             <div id="assignment_chart_{{assignment.id}}" class="assignment_chart" name="{{assignment_status}}" data-percent-complete="{{assignment_status|get_assignment_percent_complete}}"></div>
           </div>
           {% endwith %}
@@ -199,7 +205,7 @@
 
     <div id="dashboard_students">
       <div class="title">
-        <h3 class="left">Students ({{students|length}} of {{student_count}})</h3>
+        <h3 class="left">Students ({{student_count}})</h3>
         <a type="button" class="btn normal yellow upload-modal" href="#" data-toggle="modal" data-target="#upload" title="Upload Students">
           Add New
         </a>
@@ -207,27 +213,42 @@
       <hr>
       <div id="students">
         {% for student in students %}
-          <div class="student">
-            <h5 class="left">{{student.user.get_full_name}}</h5>
-            <div class="actions">
-              <span class="action">
-                <i class="fas fa-chart-bar"></i> View Work
-              </span>
-              &nbsp;&nbsp;&nbsp;&nbsp;
-              <span class="action">
-                <i class="far fa-comment-dots"></i> Feedback
-              </span>
+          {% with assignment_status=student.id|get_student_assignment_status:teacher.id %}
+          <div class="student tile">
+            <div class="student_details">
+              <h5 class="left">{{student.user.get_full_name}}</h5>
+              <div class="actions">
+                <span class="action">
+                  <i class="fas fa-chart-bar"></i> View Work
+                </span>
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                <span class="action">
+                  <i class="far fa-comment-dots"></i> Feedback
+                </span>
+              </div>
+            </div>
+            <div class="assignment_status_list">
+              {% for status in assignment_status %}
+                {% if status.name == 'New' %}
+                  <div class="action new"><i class="far fa-user"></i> {{status.y}} {{status.name}}</div>
+                {% elif status.name == 'In Progress' %}
+                  <div class="action in_progress"><i class="far fa-clock"></i> {{status.y}} {{status.name}}</div>
+                {% elif status.name == 'Submitted' %}
+                  <div class="action submitted"><i class="fas fa-check"></i> {{status.y}} {{status.name}}</div>
+                {% elif status.name == 'Feedback Ready' %}
+                  <div class="action feedback_ready"><i class="far fa-comment-dots"></i> {{status.y}} {{status.name}}</div>
+                {% elif status.name == 'Archived' %}
+                  <div class="action archived"><i class="fa fa-archive"></i> {{status.y}} {{status.name}}</div>
+                {% endif %}
+              {% endfor %}
+            </div>
+            <div class="assignment_status_chart">
+              <div id="assignment_chart_{{student.id}}" class="assignment_chart" name="{{assignment_status}}" data-percent-complete="{{assignment_status|get_assignment_percent_complete}}"></div>
             </div>
           </div>
-
-          {% if forloop.counter|divisibleby:2 %}
-          {% else %}
-            <div class="gap tile">
-            </div>
-          {% endif %}
+          {% endwith %}
         {% endfor %}
       </div>
-      <h5 class="view_all"><a href="#">View All</a></h5>
     </div>
   </div>
 </div>

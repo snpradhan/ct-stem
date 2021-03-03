@@ -3675,9 +3675,11 @@ def teacherDashboard(request, id='', status='active'):
       is_active = False
 
     teacher = models.Teacher.objects.get(id=id)
-    all_groups = models.UserGroup.objects.all().filter(Q(is_active=is_active), Q(teacher=teacher) | Q(shared_with=teacher))
+    all_groups = models.UserGroup.objects.all().filter(Q(is_active=is_active), Q(teacher=teacher) | Q(shared_with=teacher)).order_by('title')
 
-    #activity feed data
+    ##########################
+    # ACTIVITY FEED START
+    ##########################
     teacher_last_login = teacher.user.last_login
     new_groups = all_groups.filter(created_date__gte=teacher_last_login).distinct()
     new_group_ids = new_groups.values('id')
@@ -3739,18 +3741,25 @@ def teacherDashboard(request, id='', status='active'):
         student_activity[key].append({'activity_type': 'assignment_copmplete', 'student': assignment_instance.student, 'assignment': assignment_instance.assignment.curriculum.title, 'class': assignment_instance.assignment.group.title, 'time': assignment_instance.modified_date})
       else:
         student_activity[key] = [{'activity_type': 'assignment_copmplete', 'student': assignment_instance.student, 'assignment': assignment_instance.assignment.curriculum.title, 'class': assignment_instance.assignment.group.title, 'time': assignment_instance.modified_date}]
+    ##########################
+    # ACTIVITY FEED END
+    ##########################
 
     group_count = all_groups.count()
     filtered_groups = all_groups[:6]
-    all_assignments = models.Assignment.objects.all().filter(group__in=all_groups).distinct()
+    all_assignments = models.Assignment.objects.all().filter(group__in=all_groups).distinct().order_by('curriculum__title')
     assignment_count = all_assignments.count()
     filtered_assignments = all_assignments[:4]
-    all_students = models.Student.objects.all().filter(member_of__in=all_groups).distinct()
+    all_students = models.Student.objects.all().filter(member_of__in=all_groups).distinct().order_by('user__first_name', 'user__last_name')
     student_count = all_students.count()
-    filtered_students = all_students[:8]
+    filtered_students = all_students
+
+    ##########################
+    # CLASSES START
+    ##########################
     groups = []
     for group in filtered_groups:
-      assignment_status = {'N': 0, 'P': 0, 'C': 0}
+      assignment_status = {'N': 0, 'P': 0, 'S': 0, 'F': 0, 'A': 0}
       students = group.members.all()
       assignments = models.Assignment.objects.all().filter(group=group)
 
@@ -3760,19 +3769,19 @@ def teacherDashboard(request, id='', status='active'):
         for student in students:
           try:
             instance = instances.get(student=student)
-            if instance.status in assignment_status:
-              assignment_status[instance.status] += 1
-            else:
-              assignment_status['C'] += 1
+            assignment_status[instance.status] += 1
           except models.AssignmentInstance.DoesNotExist:
             assignment_status['N'] += 1
 
-      total = assignment_status['N'] + assignment_status['P'] + assignment_status['C']
-      complete = assignment_status['C']
+      total = assignment_status['N'] + assignment_status['P'] + assignment_status['S'] +  assignment_status['F'] +  assignment_status['A']
+      complete = assignment_status['S'] +  assignment_status['F'] +  assignment_status['A']
       percent_complete = 0
       if total > 0:
         percent_complete = int(complete/total*100)
       groups.append({'group': group, 'percent_complete': percent_complete})
+    ##########################
+    # CLASSES END
+    ##########################
 
     current_site = Site.objects.get_current()
     domain = current_site.domain

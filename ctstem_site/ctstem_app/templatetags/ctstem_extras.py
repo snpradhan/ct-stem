@@ -427,22 +427,40 @@ def get_assignment_status(assignment_id):
   students = assignment.group.members.all()
   instances = models.AssignmentInstance.objects.all().filter(assignment__id=assignment_id)
   status = []
-  assignment_status = {'N': 0, 'P': 0, 'C': 0}
-  status_map = {'N': 'New', 'P': 'In Progress', 'C': 'Completed'}
-  status_color = {'N': '#fa7921', 'P': '#00ADFF', 'C': '#0ad35e'}
+  assignment_status = {'N': 0, 'P': 0, 'S': 0, 'F': 0, 'A': 0}
+  status_map = {'N': 'New', 'P': 'In Progress', 'S': 'Submitted', 'F': 'Feedback Ready', 'A': 'Archived'}
+  status_color = {'N': '#fa7921', 'P': '#00ADFF', 'S': '#0ad35e', 'F': '#079342', 'A': '#343D51'}
 
   for student in students:
     try:
       instance = instances.get(student=student)
-      if instance.status in assignment_status:
-        assignment_status[instance.status] += 1
-      else:
-        assignment_status['C'] += 1
+      assignment_status[instance.status] += 1
     except models.AssignmentInstance.DoesNotExist:
-      if 'N' in assignment_status:
-        assignment_status['N'] += 1
-      else:
-        assignment_status['N'] = 1
+      assignment_status['N'] += 1
+
+  for key, value in list(assignment_status.items()):
+    status.append({'name': status_map[key], 'y': value, 'color': status_color[key]})
+
+  return status
+
+@register.filter
+def get_student_assignment_status(student_id, teacher_id):
+
+  student = models.Student.objects.get(id=student_id)
+  groups = models.Membership.objects.all().filter(student=student).values_list('group', flat=True)
+  assignments = models.Assignment.objects.all().filter(Q(group__in=groups), Q(group__teacher__id=teacher_id) | Q(group__shared_with__id=teacher_id))
+  instances = models.AssignmentInstance.objects.all().filter(assignment__in=assignments, student=student)
+  status = []
+  assignment_status = {'N': 0, 'P': 0, 'S': 0, 'F': 0, 'A': 0}
+  status_map = {'N': 'New', 'P': 'In Progress', 'S': 'Submitted', 'F': 'Feedback Ready', 'A': 'Archived'}
+  status_color = {'N': '#fa7921', 'P': '#00ADFF', 'S': '#0ad35e', 'F': '#079342', 'A': '#343D51'}
+
+  for assignment in assignments:
+    try:
+      instance = instances.get(assignment=assignment)
+      assignment_status[instance.status] += 1
+    except models.AssignmentInstance.DoesNotExist:
+      assignment_status['N'] += 1
 
   for key, value in list(assignment_status.items()):
     status.append({'name': status_map[key], 'y': value, 'color': status_color[key]})
@@ -454,8 +472,8 @@ def get_assignment_percent_complete(obj):
   total = 0
   complete = 0
   for status in obj:
-    if status['name'] == 'Completed':
-      complete = status['y']
+    if status['name'] in ['Submitted', 'Feedback Ready', 'Archived']:
+      complete += status['y']
     total += status['y']
   if total > 0:
     return int(complete/total*100)
