@@ -4386,7 +4386,7 @@ def feedback(request, assignment_id='', instance_id=''):
     if '' != instance_id:
       instance = models.AssignmentInstance.objects.get(assignment__id=assignment_id, id=instance_id)
       #get the previous and next student instances
-      groupInstances = models.AssignmentInstance.objects.all().filter(assignment__id=assignment_id)
+      groupInstances = models.AssignmentInstance.objects.all().filter(assignment__id=assignment_id).order_by('student__user__last_name', 'student__user__first_name')
       count = groupInstances.count()
       prevIdx = nextIdx = 0
       prevInstance = nextInstance = None

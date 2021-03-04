@@ -670,7 +670,7 @@ class QuestionResponseFile(models.Model):
 # Assignment Feedback Model
 #######################################################
 class AssignmentFeedback(models.Model):
-  instance = models.ForeignKey(AssignmentInstance, on_delete=models.CASCADE)
+  instance = models.ForeignKey(AssignmentInstance, unique=True, on_delete=models.CASCADE)
 
 #######################################################
 # Step Feedback Model
