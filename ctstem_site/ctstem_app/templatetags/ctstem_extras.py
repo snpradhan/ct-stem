@@ -443,10 +443,8 @@ def get_assignment_status(assignment_id):
   assignment = models.Assignment.objects.get(id=assignment_id)
   students = assignment.group.members.all()
   instances = models.AssignmentInstance.objects.all().filter(assignment__id=assignment_id)
-  status = []
+
   assignment_status = {'N': 0, 'P': 0, 'S': 0, 'F': 0, 'A': 0}
-  status_map = {'N': 'New', 'P': 'In Progress', 'S': 'Submitted', 'F': 'Feedback Ready', 'A': 'Archived'}
-  status_color = {'N': '#fa7921', 'P': '#00ADFF', 'S': '#0ad35e', 'F': '#079342', 'A': '#343D51'}
 
   for student in students:
     try:
@@ -455,9 +453,15 @@ def get_assignment_status(assignment_id):
     except models.AssignmentInstance.DoesNotExist:
       assignment_status['N'] += 1
 
+  return get_chart_config(assignment_status)
+
+@register.filter
+def get_chart_config(assignment_status):
+  status = []
+  status_map = {'N': 'New', 'P': 'In Progress', 'S': 'Submitted', 'F': 'Feedback Ready', 'A': 'Archived'}
+  status_color = {'N': '#fa7921', 'P': '#00ADFF', 'S': '#0ad35e', 'F': '#079342', 'A': '#343D51'}
   for key, value in list(assignment_status.items()):
     status.append({'name': status_map[key], 'y': value, 'color': status_color[key]})
-
   return status
 
 @register.filter

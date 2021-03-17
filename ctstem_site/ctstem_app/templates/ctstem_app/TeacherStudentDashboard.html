@@ -1,0 +1,271 @@
+{% extends "ctstem_app/base.html" %}
+{% load ctstem_extras %}
+
+{% block media %}
+  {{ block.super }}
+  {{ form.media }}
+  <script src="https://code.highcharts.com/highcharts.js"></script>
+{% endblock %}
+{% block title %}Dashboard |{% endblock %}
+
+{% block content %}
+{{block.super}}
+<div class="content" id="teacher_assignment_dashboard">
+  <h2> Assignments </h2>
+  <div id="dashboard_header">
+    <h5 class="left"><a href="{% url 'ctstem:teacherDashboard' teacher.id status %}"><i class="fas fa-arrow-left"></i> Back to Teacher Dashboard</a></h5>
+    <div class="quick_links">
+        <h5><a href="{% url 'ctstem:help' %}"><i class="far fa-question-circle"></i> Help </a></h5>
+        <h5><a href="{% url 'ctstem:curriculatiles' %}?bucket=my_curricula">My Curricula</a></h5>
+        <h5><a href="{% url 'ctstem:curriculatiles' %}?bucket=favorite_curricula"><i class="far fa-star"></i> Favorites</a></h5>
+    </div>
+  </div>
+  <!---div id="dashboard_search">
+    <form method="post" action="{% url 'ctstem:teacherAssignmentDashboard' teacher.id status %}" id="assignment_search">
+      {% csrf_token %}
+      <div class="assignment_filter">
+        <div class="col form-group">
+          <div>{{searchForm.assignment}}</div>
+          <div class="error">{{ searchForm.assignment.errors }}</div>
+        </div>
+        <div class="col form-group">
+          <div>{{searchForm.sort_by}}</div>
+          <div class="error">{{ searchForm.sort_by.errors }}</div>
+        </div>
+        <div class="col form-group">
+          <div>{{searchForm.group}}</div>
+          <div class="error">{{ searchForm.group.errors }}</div>
+        </div>
+        <div class="form-group">
+          <button type="button" id="reset" class="btn yellow normal">
+            Clear Filter
+          </button>
+        </div>
+
+      </div>
+
+    </form>
+  </div-->
+  {% for id, student in students.items %}
+  {% with name=student|get_item:'assignments' assignments=student|get_item:'assignments' student_assignment_status=student|get_item:'assignment_status' %}
+  <div class="student_details">
+    <div>
+      <h5>{{name</h5>
+      &nbsp;
+      <span class="expanded_collapsed collapsed">
+        <i class="fas fa-chevron-right"></i>
+      </span>
+    </div>
+    <div class="actions">
+      {% for status in student_assignment_status|get_chart_config %}
+        {% if status.name == 'New' %}
+          <div class="action new"><i class="far fa-user"></i> {{status.y}} {{status.name}}</div>
+        {% elif status.name == 'In Progress' %}
+          <div class="action in_progress"><i class="far fa-clock"></i> {{status.y}} {{status.name}}</div>
+        {% elif status.name == 'Submitted' %}
+          <div class="action submitted"><i class="fas fa-check"></i> {{status.y}} {{status.name}}</div>
+        {% elif status.name == 'Feedback Ready' %}
+          <div class="action feedback_ready"><i class="far fa-comment-dots"></i> {{status.y}} {{status.name}}</div>
+        {% elif status.name == 'Archived' %}
+          <div class="action archived"><i class="fa fa-archive"></i> {{status.y}} {{status.name}}</div>
+        {% endif %}
+        &nbsp;&nbsp;&nbsp;&nbsp;
+      {% endfor %}
+    </div>
+  </div>
+  <div id="dashboard_assignments">
+    <div id="assignments">
+      <div class="assignment tile">
+        <div class="assignment_details">
+          <h5 class="left">
+            Assignment Title</a>
+          </h5>
+        </div>
+        <div class="assignment_status_chart"></div>
+        <div class="assignment_stats">
+          <div><h5 class="left">Last Opened</h5></div>
+          <div><h5 class="left">Assigned Date</h5></div>
+        </div>
+      </div>
+      {% for key, assignment in assignments.items %}
+      <div class="assignment tile">
+        <div class="assignment_details">
+          {% with assignment_id=assignment|get_item:'assignment_id' curriculum_id=assignment|get_item:'curriculum_id' group=assignment|get_item:'group'%}
+          <h5 class="left">
+            {% if assignment_id %}
+              <a href="{% url 'ctstem:assignmentDashboard' assignment_id %}">
+                {{assignment|get_item:'title'}}
+              </a>
+            {% else %}
+              {{assignment|get_item:'title'}}
+            {% endif %}
+
+          {% if assignment|get_item:'curriculum_type' == 'Unit' %}
+            &nbsp;
+            <span class="expanded_collapsed collapsed">
+              <i class="fas fa-chevron-right"></i>
+            </span>
+          {% endif %}
+          </h5>
+          <h6 class="left">Class: {{group.title}}</h6>
+          {% endwith %}
+          <div class="actions">
+            {% for status in assignment|get_item:'assignment_status'|get_chart_config %}
+              {% if status.name == 'New' %}
+                <div class="action new"><i class="far fa-user"></i> {{status.y}} {{status.name}}</div>
+              {% elif status.name == 'In Progress' %}
+                <div class="action in_progress"><i class="far fa-clock"></i> {{status.y}} {{status.name}}</div>
+              {% elif status.name == 'Submitted' %}
+                <div class="action submitted"><i class="fas fa-check"></i> {{status.y}} {{status.name}}</div>
+              {% elif status.name == 'Feedback Ready' %}
+                <div class="action feedback_ready"><i class="far fa-comment-dots"></i> {{status.y}} {{status.name}}</div>
+              {% elif status.name == 'Archived' %}
+                <div class="action archived"><i class="fa fa-archive"></i> {{status.y}} {{status.name}}</div>
+              {% endif %}
+              &nbsp;&nbsp;&nbsp;&nbsp;
+            {% endfor %}
+          </div>
+        </div>
+        <div class="assignment_status_chart">
+          <div id="assignment_chart_{{key}}" class="assignment_chart" name="{{assignment|get_item:'assignment_status'|get_chart_config}}" data-percent-complete="{{assignment|get_item:'percent_complete'}}"></div>
+        </div>
+        <div class="assignment_stats">
+          <div class="last_opened">{{assignment|get_item:'last_opened'|date:'M j, Y'|default_if_none:''}}</div>
+          <div class="assigned_date">{{assignment|get_item:'assigned_date'|date:'M j, Y'|default_if_none:''}}</div>
+        </div>
+      </div>
+      {% if assignment|get_item:'lessons' %}
+        <div class="underlying_lesson_assignments">
+          {% with lessons=assignment|get_item:'lessons'|sort %}
+          {% for order, lesson in lessons.items %}
+             <div class="assignment tile">
+              <div class="assignment_details">
+                <h5 class="left">
+                  <a href="{% url 'ctstem:assignmentDashboard' lesson|get_item:'assignment_id' %}">{{order}}. {{lesson|get_item:'title'}}</a>
+                </h5>
+                <div class="actions">
+                  {% for status in lesson|get_item:'assignment_status'|get_chart_config %}
+                    {% if status.name == 'New' %}
+                      <div class="action new"><i class="far fa-user"></i> {{status.y}} {{status.name}}</div>
+                    {% elif status.name == 'In Progress' %}
+                      <div class="action in_progress"><i class="far fa-clock"></i> {{status.y}} {{status.name}}</div>
+                    {% elif status.name == 'Submitted' %}
+                      <div class="action submitted"><i class="fas fa-check"></i> {{status.y}} {{status.name}}</div>
+                    {% elif status.name == 'Feedback Ready' %}
+                      <div class="action feedback_ready"><i class="far fa-comment-dots"></i> {{status.y}} {{status.name}}</div>
+                    {% elif status.name == 'Archived' %}
+                      <div class="action archived"><i class="fa fa-archive"></i> {{status.y}} {{status.name}}</div>
+                    {% endif %}
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                  {% endfor %}
+                </div>
+              </div>
+              <div class="assignment_status_chart">
+                <div id="assignment_chart_{{lesson|get_item:'curriculum_id'}}" class="assignment_chart" name="{{lesson|get_item:'assignment_status'|get_chart_config}}" data-percent-complete="{{lesson|get_item:'percent_complete'}}"></div>
+              </div>
+              <div class="assignment_stats">
+                <div class="last_opened">{{lesson|get_item:'last_opened'|date:'M j, Y'|default_if_none:''}}</div>
+                <div class="assigned_date">{{lesson|get_item:'assigned_date'|date:'M j, Y'|default_if_none:''}}</div>
+              </div>
+            </div>
+          {% endfor %}
+          {% endwith %}
+        </div>
+      {% endif %}
+      <!--hr-->
+      {% endfor %}
+    </div>
+  </div>
+  {% endwith %}
+  {% endfor %}
+</div>
+
+
+<script type="text/javascript">
+  $(function(){
+    $(".expanded_collapsed").click(function(){
+      $(this).closest('.assignment').next('.underlying_lesson_assignments').toggle();
+      $(this).toggleClass('expanded').toggleClass('collapsed');
+    });
+
+    $('button#reset').click(function(){
+      $('#assignment_search :input').not(':button, :submit, :reset, :hidden').val('');
+      $('#assignment_search').submit();
+    });
+
+    //on page load, apply existing filters and load results
+    //auto_submit_search();
+
+    //add a class to checkbox and radio button in search form on Safari only
+    if (navigator.userAgent.search("Safari") >= 0 && navigator.userAgent.search("Chrome") < 0) {
+      $('#assignment_search :radio, #assignment_search :checkbox').addClass('safari');
+    }
+
+    var timeout = null;
+    $('#assignment_search select').on('change', function(){
+      auto_submit_search();
+    });
+
+    function auto_submit_search() {
+      clearTimeout(timeout);
+      timeout = setTimeout(function(){
+        $('#assignment_search').submit();
+      }, 800);
+    }
+
+    $(".assignment_chart").each(function(){
+      var id = $(this).attr('id');
+      var status_str = $(this).attr('name').replace(/'/g, '"');
+      var status = $.parseJSON(status_str);
+      var complete = $(this).data('percent-complete');
+      $("#"+id).highcharts({
+        chart: {
+          renderTo: 'container',
+          type: 'pie',
+          height: 120,
+          width: 120,
+          backgroundColor: 'rgba(0,0,0,0)',
+        },
+        title: {
+          text: complete+"%",
+          align: 'center',
+          verticalAlign: 'middle',
+          y: 12,
+          style: {
+            fontWeight: 'bold',
+            color: 'black',
+            fontSize: '16px'
+          },
+          filter: {
+            property: 'name',
+            operator: '===',
+            value: 'New'
+          },
+        },
+        tooltip: false,
+        plotOptions: {
+          pie: {
+            dataLabels: {
+              enabled: false,
+
+            }
+          }
+        },
+        credits: {
+          enabled: false
+        },
+        series: [{
+          name: 'Status',
+          innerSize: '80%',
+          data: status,
+        }]
+      });
+    });
+
+  });
+
+</script>
+
+{% endblock %}
+
+

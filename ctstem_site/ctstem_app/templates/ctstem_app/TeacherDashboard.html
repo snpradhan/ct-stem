@@ -200,7 +200,7 @@
         <!--hr-->
         {% endfor %}
       </div>
-      <h5 class="view_all"><a href="#">View All</a></h5>
+      <h5 class="view_all"><a href="{% url 'ctstem:teacherAssignmentDashboard' teacher.id status %}">View All</a></h5>
     </div>
 
     <div id="dashboard_students">

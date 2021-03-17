@@ -842,15 +842,18 @@ div.content#teacher_dashboard hr {
 div.content#teacher_dashboard .view_all {
   padding: 1.5em 0;
 }
-div.content#teacher_dashboard div#dashboard_header {
+div.content#teacher_dashboard div#dashboard_header,
+div.content#teacher_assignment_dashboard div#dashboard_header {
   display: flex;
   flex-flow: wrap;
   justify-content: space-between;
 }
-div.content#teacher_dashboard div#dashboard_header .welcome {
+div.content#teacher_dashboard div#dashboard_header .welcome,
+div.content#teacher_assignment_dashboard div#dashboard_header .welcome {
   flex: 0 0 66%;
 }
-div.content#teacher_dashboard div#dashboard_header .quick_links {
+div.content#teacher_dashboard div#dashboard_header .quick_links,
+div.content#teacher_assignment_dashboard div#dashboard_header .quick_links {
   flex: 0 0 33%;
   display: flex;
   justify-content: space-around;
@@ -864,37 +867,46 @@ div.content#teacher_dashboard div.tile {
   display: flex !important;
   justify-content: space-between !important;
   padding: 2em;
-  align-items: center !important;
+  align-items: stretch !important;
   border-radius: 10px;
 }
-div.content#teacher_dashboard .actions {
+div.content#teacher_dashboard .actions,
+div.content#teacher_assignment_dashboard .actions {
   display: flex;
   justify-content: flex-start;
   flex-wrap: wrap;
 }
-div.content#teacher_dashboard .action {
+div.content#teacher_dashboard .action,
+div.content#teacher_assignment_dashboard .action {
   font-size: 1.2em;
   margin: 0.25em 0;
 }
-div.content#teacher_dashboard .action.new {
+div.content#teacher_dashboard .action.new,
+div.content#teacher_assignment_dashboard .action.new {
   color: var(--ctstem-color-orange);
 }
-div.content#teacher_dashboard .action.in_progress {
+div.content#teacher_dashboard .action.in_progress,
+div.content#teacher_assignment_dashboard .action.in_progress {
   color: var(--ctstem-color-blue);
 }
-div.content#teacher_dashboard .action.submitted {
+div.content#teacher_dashboard .action.submitted,
+div.content#teacher_assignment_dashboard .action.submitted {
   color: var(--ctstem-color-green);
 }
-div.content#teacher_dashboard .action.feedback_ready {
+div.content#teacher_dashboard .action.feedback_ready,
+div.content#teacher_assignment_dashboard .action.feedback_ready {
   color: var(--ctstem-color-dark-green);
 }
-div.content#teacher_dashboard .action.archived {
+div.content#teacher_dashboard .action.archived,
+div.content#teacher_assignment_dashboard .action.archived {
   color: var(--ctstem-color-dark-blue);
 }
-div.content#teacher_dashboard a {
+div.content#teacher_dashboard a,
+div.content#teacher_assignment_dashboard a {
   color: black;
 }
-div.content#teacher_dashboard a:hover {
+div.content#teacher_dashboard a:hover,
+div.content#teacher_assignment_dashboard a:hover {
   color: var(--ctstem-color-blue);
 }
 div.content#teacher_dashboard div#class_activity,
@@ -1033,6 +1045,10 @@ div.content#teacher_dashboard div#dashboard_students div#students div.student di
 div.content#teacher_dashboard div#dashboard_students div#students div.student div.assignment_status_chart {
   flex: 0 0 20%;
 }
+div.content#teacher_dashboard div#dashboard_students div#students div.student div.assignment_status_chart div.highcharts-container {
+  margin-left: auto;
+  margin-right: auto;
+}
  @media (max-width: 1024px) {
   div.content#teacher_dashboard div#dashboard_classes div#class_tiles div.tile {
     flex: 0 0 90%;
@@ -1046,6 +1062,75 @@ div.content#teacher_dashboard div#dashboard_students div#students div.student di
   }
 }
 /*******************TEACHER DASHBOARD END**************************/
+/*******************TEACHER ASSIGNMENT DASHBOARD START**************************/
+div.content#teacher_assignment_dashboard div#dashboard_search {
+  padding: 2em 0;
+  margin: 2em 0;
+  background-color: #e6e6e6;
+}
+div.content#teacher_assignment_dashboard div#dashboard_search div.assignment_filter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 1em;
+}
+div.content#teacher_assignment_dashboard div#dashboard_search div.assignment_filter .form-group {
+  margin-bottom: unset !important;
+}
+div.content#teacher_assignment_dashboard div#dashboard_assignments div#assignments {
+  display: flex;
+  flex-direction: column;
+  overflow-y: scroll;
+}
+div.content#teacher_assignment_dashboard div#dashboard_assignments div#assignments div.assignment {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  border: unset;
+  border-bottom: 1px solid #eee;
+  border-radius: unset;
+  margin: 0;
+}
+div.content#teacher_assignment_dashboard div#dashboard_assignments div.assignment div.assignment_details {
+  flex: 0 0 50%;
+  align-self: center;
+}
+div.content#teacher_assignment_dashboard .actions {
+  max-width: 50em;
+}
+div.content#teacher_assignment_dashboard div#dashboard_assignments div.assignment div.assignment_details .expanded_collapsed {
+  cursor: pointer;
+}
+div.content#teacher_assignment_dashboard div#dashboard_assignments div.assignment div.assignment_details .expanded .fa-chevron-right{
+  transform: rotate(90deg);
+}
+div.content#teacher_assignment_dashboard div#dashboard_assignments div.assignment div.assignment_status_chart {
+  flex: 0 0 20%;
+  align-self: center;
+}
+div.content#teacher_assignment_dashboard div#dashboard_assignments div.assignment div.assignment_stats {
+  flex: 0 0 30%;
+  align-self: center;
+  display: flex;
+  justify-content: space-between;
+}
+div.content#teacher_assignment_dashboard div#dashboard_assignments div.assignment div.assignment_stats > div {
+  flex: 0 0 50%;
+}
+div.content#teacher_assignment_dashboard div#dashboard_assignments div.assignment div.assignment_stats div.last_opened,
+div.content#teacher_assignment_dashboard div#dashboard_assignments div.assignment div.assignment_stats div.assigned_date {
+  font-size: 1.3em;
+  font-weight: bold;
+}
+
+div.content#teacher_assignment_dashboard div#dashboard_assignments div.underlying_lesson_assignments {
+  display: none;
+}
+div.content#teacher_assignment_dashboard div#dashboard_assignments div.underlying_lesson_assignments div.assignment_details {
+  padding-left: 4em;
+}
+
+/*******************TEACHER ASSIGNMENT DASHBOARD END**************************/
 label.switch#curricula_view, label.switch#release_notes_view {
   position: absolute;
   right: 5%;
