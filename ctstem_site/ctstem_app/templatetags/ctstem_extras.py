@@ -453,19 +453,41 @@ def get_assignment_status(assignment_id):
     except models.AssignmentInstance.DoesNotExist:
       assignment_status['N'] += 1
 
-  return get_chart_config(assignment_status)
+  return assignment_status
 
-@register.filter
-def get_chart_config(assignment_status):
+
+@register.simple_tag(takes_context=True)
+def get_assignment_status_chart_config(context, assignment_id, chart_type):
+  assignment_status = get_assignment_status(context, assignment_id)
+  return get_chart_config(context, assignment_status, chart_type)
+
+@register.simple_tag(takes_context=True)
+def get_chart_config(context, assignment_status, chart_type):
   status = []
   status_map = {'N': 'New', 'P': 'In Progress', 'S': 'Submitted', 'F': 'Feedback Ready', 'A': 'Archived'}
   status_color = {'N': '#fa7921', 'P': '#00ADFF', 'S': '#0ad35e', 'F': '#079342', 'A': '#343D51'}
-  for key, value in list(assignment_status.items()):
-    status.append({'name': status_map[key], 'y': value, 'color': status_color[key]})
+
+  if chart_type == 'pie':
+    for key, value in list(assignment_status.items()):
+      status.append({'name': status_map[key], 'y': value, 'color': status_color[key]})
+  elif chart_type == 'stacked_bar':
+    for key, value in list(assignment_status.items()):
+      status.append({'name': status_map[key], 'data': [value], 'color': status_color[key]})
+
   return status
 
-@register.filter
-def get_student_assignment_status(student_id, teacher_id):
+@register.simple_tag(takes_context=True)
+def get_chart_color(context, assignment_status):
+  status_color = {'N': '#fa7921', 'P': '#00ADFF', 'S': '#0ad35e', 'F': '#079342', 'A': '#343D51'}
+  return status_color[assignment_status]
+
+@register.simple_tag(takes_context=True)
+def get_student_assignment_status_chart_config(context, student_id, teacher_id, chart_type):
+  assignment_status = get_student_assignment_status(context, student_id, teacher_id)
+  return get_chart_config(context, assignment_status, chart_type)
+
+@register.simple_tag(takes_context=True)
+def get_student_assignment_status(context, student_id, teacher_id):
 
   student = models.Student.objects.get(id=student_id)
   groups = models.Membership.objects.all().filter(student=student).values_list('group', flat=True)
@@ -473,8 +495,6 @@ def get_student_assignment_status(student_id, teacher_id):
   instances = models.AssignmentInstance.objects.all().filter(assignment__in=assignments, student=student)
   status = []
   assignment_status = {'N': 0, 'P': 0, 'S': 0, 'F': 0, 'A': 0}
-  status_map = {'N': 'New', 'P': 'In Progress', 'S': 'Submitted', 'F': 'Feedback Ready', 'A': 'Archived'}
-  status_color = {'N': '#fa7921', 'P': '#00ADFF', 'S': '#0ad35e', 'F': '#079342', 'A': '#343D51'}
 
   for assignment in assignments:
     try:
@@ -483,10 +503,18 @@ def get_student_assignment_status(student_id, teacher_id):
     except models.AssignmentInstance.DoesNotExist:
       assignment_status['N'] += 1
 
-  for key, value in list(assignment_status.items()):
-    status.append({'name': status_map[key], 'y': value, 'color': status_color[key]})
+  return assignment_status
 
-  return status
+@register.simple_tag(takes_context=True)
+def get_student_assignment_count(context, student_id, teacher_id):
+  assignment_status = get_student_assignment_status(context, student_id, teacher_id)
+  total = sum(assignment_status.values())
+  return total
+
+@register.simple_tag(takes_context=True)
+def get_student_assignment_instance_percent_complete(context, student_id, assignment_id):
+  request = context.get('request')
+  return views.get_student_assignment_instance_percent_complete(request, student_id, assignment_id.id)
 
 @register.filter
 def get_assignment_percent_complete(obj):

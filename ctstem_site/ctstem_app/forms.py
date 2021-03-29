@@ -954,11 +954,13 @@ class AssignmentSearchForm(forms.Form):
         field.widget.attrs['placeholder'] = field.help_text
 
 
+########################################################
+# Assignment Search Form on Teacher Assignment Dashboard
+########################################################
 class TeacherAssignmentDashboardSearchForm(forms.Form):
   assignment = forms.ModelChoiceField(queryset=models.Curriculum.objects.all(), required=False)
   sort_by = forms.ChoiceField(choices=(('', 'Sort By'),
                                        ('curriculum', 'Curriculum'),
-                                       ('percent_complete', 'Percent Complete'),
                                        ('last_opened', 'Last Opened'),
                                        ('assigned_date', 'Assigned On'),
                                        ('class', 'Class')
@@ -972,6 +974,33 @@ class TeacherAssignmentDashboardSearchForm(forms.Form):
     groups = models.UserGroup.objects.all().filter(Q(is_active=is_active), Q(teacher=teacher) | Q(shared_with=teacher)).order_by('title')
     self.fields['group'].queryset = groups
     self.fields['group'].empty_label = 'Filter by Class'
+    curricula = models.Curriculum.objects.all().filter(Q(unit__isnull=True), Q(assignments__group__in=groups) | Q(underlying_curriculum__assignments__group__in=groups)).distinct().order_by('title')
+    self.fields['assignment'].queryset = curricula #models.Assignment.objects.all().filter(group__in=groups).distinct().order_by('curriculum__title')
+    self.fields['assignment'].empty_label = 'Filter by Assignment'
+    for field_name, field in list(self.fields.items()):
+      field.widget.attrs['class'] = 'form-control'
+      if field.help_text:
+        field.widget.attrs['placeholder'] = field.help_text
+
+
+########################################################
+# Assignment Search Form on Teacher Student Dashboard
+########################################################
+class TeacherStudentDashboardSearchForm(forms.Form):
+  student = forms.ModelChoiceField(queryset=models.Student.objects.all(), required=False)
+  assignment = forms.ModelChoiceField(queryset=models.Curriculum.objects.all(), required=False)
+  group = forms.ModelChoiceField(queryset=models.UserGroup.objects.all(), label="Class", required=False)
+
+  def __init__(self, *args, **kwargs):
+    teacher = kwargs.pop('teacher')
+    is_active = kwargs.pop('is_active')
+    super(TeacherStudentDashboardSearchForm, self).__init__(*args, **kwargs)
+    groups = models.UserGroup.objects.all().filter(Q(is_active=is_active), Q(teacher=teacher) | Q(shared_with=teacher)).order_by('title')
+    self.fields['group'].queryset = groups
+    self.fields['group'].empty_label = 'Filter by Class'
+    students = models.Student.objects.all().filter(student_membership__group__in=groups).distinct().order_by('user__last_name', 'user__first_name')
+    self.fields['student'].queryset = students
+    self.fields['student'].empty_label = 'Filter by Student'
     curricula = models.Curriculum.objects.all().filter(Q(unit__isnull=True), Q(assignments__group__in=groups) | Q(underlying_curriculum__assignments__group__in=groups)).distinct().order_by('title')
     self.fields['assignment'].queryset = curricula #models.Assignment.objects.all().filter(group__in=groups).distinct().order_by('curriculum__title')
     self.fields['assignment'].empty_label = 'Filter by Assignment'

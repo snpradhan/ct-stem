@@ -99,7 +99,8 @@
     <hr>
     <div class="row" id="class_tiles">
       {% for grp in groups %}
-      {% with group=grp|get_item:'group' percent_complete=grp|get_item:'percent_complete' %}
+      {% with group=grp|get_item:'group' percent_complete=grp|get_item:'percent_complete' group_assignment_status=grp|get_item:'assignment_status' total=grp|get_item:'total' %}
+      {% get_chart_config group_assignment_status 'stacked_bar' as group_assignment_chart_config %}
       <div class="col tile">
         <div class="class_icon">
           {% if group.icon %}
@@ -126,11 +127,10 @@
           </div>
         </div>
         <div class="class_assignments">
-          <!--div id="group_chart_{{group.id}}" class="group_chart" data-percent-complete="{{percent_complete}}">
-          </div-->
-          <div class="progress">
-            <div class="progress-bar" role="progressbar" aria-valuenow="{{percent_complete}}" aria-valuemin="0" aria-valuemax="100" data-percent-complete="{{percent_complete}}">{{percent_complete}}%</div>
+          <div class="assignment_status_chart">
+            <div id="assignment_chart_group_{{group.id}}" class="progress_chart" data-percent-complete="{{percent_complete}}"></div>
           </div>
+
           <h6 class="left">{{group.assignments.count}} Assignment{% if group.assignments.count > 1 %}s{% endif %}</h6>
           <div class="actions">
             <a class="action" href="{% url 'ctstem:groupDashboard' group.id 'active' %}" aria-label="View Class Dashboard" title="View Class Dashboard">
@@ -160,16 +160,15 @@
       <hr>
       <div id="assignments">
         {% for assignment in assignments %}
+        {% get_assignment_status_chart_config assignment.id 'stacked_bar' as assignment_status %}
         <div class="assignment tile">
-          <div class="assignment_icon">
+          <!--div class="assignment_icon">
             {% if assignment.curriculum.icon %}
               <img src="{{assignment.curriculum.icon.url}}" class="icon" alt="">
             {% else %}
               <i class="fa fa-tasks icon"></i>
             {% endif %}
-          </div>
-          {% with assignment_status=assignment.id|get_assignment_status %}
-
+          </div-->
           <div class="assignment_details">
             <h5 class="left"><a href="{% url 'ctstem:assignmentDashboard' assignment.id %}">
               {{assignment.curriculum.title}}</a>
@@ -178,24 +177,24 @@
             <div class="actions">
               {% for status in assignment_status %}
                 {% if status.name == 'New' %}
-                  <span class="action new"><i class="far fa-user"></i> {{status.y}} {{status.name}}</span>
+                  <span class="action new"><i class="far fa-user"></i> {{status.data.0}} {{status.name}}</span>
                 {% elif status.name == 'In Progress' %}
-                  <span class="action in_progress"><i class="far fa-clock"></i> {{status.y}} {{status.name}}</span>
+                  <span class="action in_progress"><i class="far fa-clock"></i> {{status.data.0}} {{status.name}}</span>
                 {% elif status.name == 'Submitted' %}
-                  <span class="action submitted"><i class="fas fa-check"></i> {{status.y}} {{status.name}}</span>
+                  <span class="action submitted"><i class="fas fa-check"></i> {{status.data.0}} {{status.name}}</span>
                 {% elif status.name == 'Feedback Ready' %}
-                  <span class="action feedback_ready"><i class="far fa-comment-dots"></i> {{status.y}} {{status.name}}</span>
+                  <span class="action feedback_ready"><i class="far fa-comment-dots"></i> {{status.data.0}} {{status.name}}</span>
                 {% elif status.name == 'Archived' %}
-                  <span class="action archived"><i class="fa fa-archive"></i> {{status.y}} {{status.name}}</span>
+                  <span class="action archived"><i class="fa fa-archive"></i> {{status.data.0}} {{status.name}}</span>
                 {% endif %}
                 &nbsp;&nbsp;&nbsp;&nbsp;
               {% endfor %}
             </div>
           </div>
           <div class="assignment_status_chart">
-            <div id="assignment_chart_{{assignment.id}}" class="assignment_chart" name="{{assignment_status}}" data-percent-complete="{{assignment_status|get_assignment_percent_complete}}"></div>
+            <div id="assignment_chart_{{assignment.id}}" class="stacked_bar_chart" name="{{assignment_status}}" data-total="{{assignment.group.members.count}}"></div>
           </div>
-          {% endwith %}
+
         </div>
         <!--hr-->
         {% endfor %}
@@ -213,7 +212,8 @@
       <hr>
       <div id="students">
         {% for student in students %}
-          {% with assignment_status=student.id|get_student_assignment_status:teacher.id %}
+          {% get_student_assignment_status_chart_config student.id teacher.id 'stacked_bar' as student_assignment_status %}
+          {% get_student_assignment_count student.id teacher.id as assignment_count %}
           <div class="student tile">
             <div class="student_details">
               <h5 class="left">{{student.user.get_full_name}}</h5>
@@ -227,28 +227,28 @@
                 </span>
               </div>
             </div>
-            <div class="assignment_status_list">
-              {% for status in assignment_status %}
+            <!--div class="assignment_status_list">
+              {% for status in student_assignment_status %}
                 {% if status.name == 'New' %}
-                  <div class="action new"><i class="far fa-user"></i> {{status.y}} {{status.name}}</div>
+                  <div class="action new"><i class="far fa-user"></i> {{status.data.0}} {{status.name}}</div>
                 {% elif status.name == 'In Progress' %}
-                  <div class="action in_progress"><i class="far fa-clock"></i> {{status.y}} {{status.name}}</div>
+                  <div class="action in_progress"><i class="far fa-clock"></i> {{status.data.0}} {{status.name}}</div>
                 {% elif status.name == 'Submitted' %}
-                  <div class="action submitted"><i class="fas fa-check"></i> {{status.y}} {{status.name}}</div>
+                  <div class="action submitted"><i class="fas fa-check"></i> {{status.data.0}} {{status.name}}</div>
                 {% elif status.name == 'Feedback Ready' %}
-                  <div class="action feedback_ready"><i class="far fa-comment-dots"></i> {{status.y}} {{status.name}}</div>
+                  <div class="action feedback_ready"><i class="far fa-comment-dots"></i> {{status.data.0}} {{status.name}}</div>
                 {% elif status.name == 'Archived' %}
-                  <div class="action archived"><i class="fa fa-archive"></i> {{status.y}} {{status.name}}</div>
+                  <div class="action archived"><i class="fa fa-archive"></i> {{status.data.0}} {{status.name}}</div>
                 {% endif %}
               {% endfor %}
-            </div>
+            </div-->
             <div class="assignment_status_chart">
-              <div id="assignment_chart_{{student.id}}" class="assignment_chart" name="{{assignment_status}}" data-percent-complete="{{assignment_status|get_assignment_percent_complete}}"></div>
+              <div id="assignment_chart_{{student.id}}" class="stacked_bar_chart" name="{{student_assignment_status}}" data-total="{{assignment_count}}"></div>
             </div>
           </div>
-          {% endwith %}
         {% endfor %}
       </div>
+      <h5 class="view_all"><a href="{% url 'ctstem:teacherStudentDashboard' teacher.id status %}">View All</a></h5>
     </div>
   </div>
 </div>
@@ -278,53 +278,11 @@
       }
     });
 
-    $(".assignment_chart").each(function(){
-      var id = $(this).attr('id');
-      var status_str = $(this).attr('name').replace(/'/g, '"');
-      var status = $.parseJSON(status_str);
-      var complete = $(this).data('percent-complete');
-      $("#"+id).highcharts({
-        chart: {
-          renderTo: 'container',
-          type: 'pie',
-          height: 120,
-          width: 120,
-          backgroundColor: 'rgba(0,0,0,0)',
-        },
-        title: {
-          text: complete+"%",
-          align: 'center',
-          verticalAlign: 'middle',
-          y: 12,
-          style: {
-            fontWeight: 'bold',
-            color: 'black',
-            fontSize: '16px'
-          },
-          filter: {
-            property: 'name',
-            operator: '===',
-            value: 'New'
-          },
-        },
-        tooltip: false,
-        plotOptions: {
-          pie: {
-            dataLabels: {
-              enabled: false,
-
-            }
-          }
-        },
-        credits: {
-          enabled: false
-        },
-        series: [{
-          name: 'Status',
-          innerSize: '80%',
-          data: status,
-        }]
-      });
+    $('.stacked_bar_chart').each(function(){
+      render_stacked_bar_chart($(this));
+    });
+    $('.progress_chart').each(function(){
+      render_progress_chart($(this));
     });
 
   });
