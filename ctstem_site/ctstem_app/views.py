@@ -1738,6 +1738,10 @@ def register(request, group_code='', email=''):
           newUser.school = school
         else:
           newUser.school = form.cleaned_data['school']
+
+        if 'test_account' in form.cleaned_data and form.cleaned_data['test_account']:
+          newUser.test_account = form.cleaned_data['test_account']
+
         newUser.user = user
         newUser.save()
         if group_id:
@@ -2301,21 +2305,21 @@ def createStudent(request, group_id=''):
     if not has_permission:
       return http.HttpResponseNotFound('<h1>You do not have the privilege to add students from this class</h1>')
 
-    if request.method == 'POST':
-      data=request.POST
+    if request.method == 'GET':
+      form = forms.StudentAddForm()
+      context = {'form': form, 'group_id': group_id}
+      return render(request, 'ctstem_app/CreateAndAddStudent.html', context)
+    elif request.method == 'POST':
+      data = request.POST.copy()
       response_data = {}
-      username = data['username'].lower()
-      email = data['email']
-      first_name = data['first_name']
-      last_name = data['last_name']
+      form = forms.StudentAddForm(data=data)
+      if form.is_valid():
+        username = form.cleaned_data['username']
+        email = form.cleaned_data['email']
+        first_name = form.cleaned_data['first_name']
+        last_name = form.cleaned_data['last_name']
+        test_account = form.cleaned_data['test_account']
 
-      if User.objects.filter(username=username).exists():
-        response_data['error'] = 'The username is already in use. Please choose another.'
-      elif User.objects.filter(email=email).exists():
-        response_data['error'] = 'The email is already in use. Please choose another.'
-      elif not re.match(r"[^@]+@[^@]+\.[^@]+", email):
-        response_data['error'] = 'The email format in invalid'
-      else:
         #generate a random password
         password = User.objects.make_random_password()
         user = User.objects.create_user(username=username, email=email, password=password)
@@ -2325,19 +2329,25 @@ def createStudent(request, group_id=''):
 
         #create student account
         group = models.UserGroup.objects.get(id=group_id)
-        student = models.Student.objects.create(user=user, school=group.teacher.school)
+        student = models.Student.objects.create(user=user, school=group.teacher.school, test_account=test_account)
         membership, created = models.Membership.objects.get_or_create(student=student, group=group)
 
-        response_data = {'result': 'Success', 'student': {'user_id': user.id, 'student_id': student.id, 'username': user.username,
+        response_data = {'success': True, 'student': {'user_id': user.id, 'student_id': student.id, 'username': user.username,
                           'name': user.get_full_name(), 'email': user.email, 'status': 'Active' if user.is_active else 'Inactive',
                           'last_login': user.last_login.strftime('%B %d, %Y') if user.last_login else '', 'group': group.id,
-                          'student_consent': student.get_consent(), 'member_since': user.date_joined.strftime('%B %d, %Y')}
+                          'student_consent': student.get_consent(), 'member_since': user.date_joined.strftime('%B %d, %Y'),
+                          'test_account': test_account}
                         }
 
         send_account_by_admin_confirmation_email('student', user, password)
-
-      return http.HttpResponse(json.dumps(response_data), content_type="application/json")
-    return http.HttpResponseNotAllowed(['POST'])
+        return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+      else:
+        print(form.errors)
+        context = {'form': form, 'group_id': group_id}
+        response_data['success'] = False
+        response_data['html'] = render_to_string('ctstem_app/CreateAndAddStudent.html', context, request)
+        return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+    return http.HttpResponseNotAllowed(['GET', 'POST'])
 
   except models.UserGroup.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested class not found</h1>')
@@ -4660,13 +4670,17 @@ def deleteAssignment(request, assignment_id=''):
 
   if has_permission:
     assignment = models.Assignment.objects.get(id=assignment_id)
-    assignment_instances = models.AssignmentInstance.objects.all().filter(assignment__id=assignment_id)
-    status = 'N'
-    for instance in assignment_instances:
-      if instance.status != 'N':
-        status = instance.status
-        break
-    if status == 'N':
+    group = models.UserGroup.objects.get(id=assignment.group.id)
+    all_test_account = all_test_accounts_in_class(request, group)
+    if not all_test_account:
+      assignment_instances = models.AssignmentInstance.objects.all().filter(assignment__id=assignment_id)
+      status = 'N'
+      for instance in assignment_instances:
+        if instance.status != 'N':
+          status = instance.status
+          break
+
+    if all_test_account or status == 'N':
       assignment.delete()
       response_data['success'] = True
 
@@ -4674,7 +4688,7 @@ def deleteAssignment(request, assignment_id=''):
     return http.HttpResponse(json.dumps(response_data), content_type="application/json")
   else:
     if has_permission:
-      if status == 'N':
+      if all_test_account or status == 'N':
         messages.success(request, 'The assignment %s has been deleted' % (assignment.curriculum))
       else:
         messages.error(request, 'The assignment %s is in progress and cannot be deleted' % (assignment.curriculum))
@@ -4827,8 +4841,13 @@ def check_curriculum_permission(request, curriculum_id, action, pem_code=''):
                   messages.error(request, 'You do not have the privilege to modify this curriculum because it is already assigned')
 
               elif action == 'delete':
-                has_permission = False
-                messages.error(request, 'You do not have the privilege to delete this curriculum because it is already assigned')
+                #check if only assigned to test student accounts
+                assignment_count = models.Assignment.objects.all().filter(Q(curriculum=curriculum) | Q(curriculum__in=curriculum.underlying_curriculum.all()), Q(group__members__test_account=False)).count()
+                if assignment_count > 0:
+                  has_permission = False
+                  messages.error(request, 'You do not have the privilege to delete this curriculum because it is already assigned')
+                else:
+                  has_permission = True
 
         ############ PREVIEW ############
         elif action == 'preview':
@@ -4953,7 +4972,6 @@ def check_assignment_permission(request, assignment_id=''):
     has_permission = False
 
   return has_permission
-
 
 ####################################
 # Export Student Responses
@@ -5443,7 +5461,6 @@ def user_upload(request):
   invalid = 0
   added_students = {}
   msg = {'error': [], 'success': []}
-
   if request.method == 'POST':
     form = forms.UploadFileForm(request.POST, request.FILES, user=request.user)
     data = request.POST.copy()
@@ -6238,3 +6255,14 @@ def reassign_question_parent(request, id=''):
     for child_question in question.copied_questions.all():
       child_question.parent = question.parent
       child_question.save()
+
+@login_required
+def all_test_accounts_in_class(request, group):
+  memberships = models.Membership.objects.all().filter(group=group)
+  test_account = True
+  for membership in memberships:
+    test_account = membership.student.test_account
+    if not test_account:
+      break
+
+  return test_account

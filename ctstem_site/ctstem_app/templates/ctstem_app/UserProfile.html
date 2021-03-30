@@ -26,7 +26,6 @@
                 </span>
               {% endif %}
               </label>
-
               {{field}}
               <div class="error">{{ field.errors }}</div>
             </div>
@@ -42,6 +41,11 @@
               {% endif %}
               {% if field.field.required %}
                 (<span class="required">*</span>)
+              {% endif %}
+              {% if field.name == 'test_account' %}
+                <span data-toggle="tooltip" data-placement="top" title="Curriculum exclusively assigned to Test Student accounts can be deleted without any restriction.">
+                  <i class="fa fa-info-circle" aria-hidden="true"></i>
+                </span>
               {% endif %}
             </label>
             <!-- do not allow school admin, teacher and student to modify the school in their or their subordinates profile -->

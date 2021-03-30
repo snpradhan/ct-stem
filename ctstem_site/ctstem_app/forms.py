@@ -88,6 +88,7 @@ class RegistrationForm (forms.Form):
                                   widget=autocomplete.ModelSelect2(url='school-autocomplete',
                                                                    attrs={'data-placeholder': 'Start typing the school name ...',}),
                                   )
+  test_account = forms.BooleanField(required=False)
 
   def __init__(self, *args, **kwargs):
     user = kwargs.pop('user')
@@ -106,11 +107,12 @@ class RegistrationForm (forms.Form):
 
     elif group_id:
       self.fields.pop('confirm_email')
-
+      self.fields.pop('test_account')
       self.fields['account_type'].choices = models.USER_ROLE_CHOICES[3:]
       if kwargs.get('initial', None) and kwargs['initial']['email']:
         self.fields['email'].widget.attrs['readonly'] = True
     else:
+      self.fields.pop('test_account')
       self.fields['account_type'].choices = models.USER_ROLE_CHOICES[4:5]
 
     for field_name, field in list(self.fields.items()):
@@ -342,7 +344,7 @@ class UserProfileForm(ModelForm):
 class StudentForm (ModelForm):
   class Meta:
     model = models.Student
-    fields = ['school', 'consent']
+    fields = ['school', 'consent', 'test_account']
     widgets = {
       'consent': forms.RadioSelect(),
       'school': autocomplete.ModelSelect2(url='school-autocomplete', attrs={'data-placeholder': 'Start typing the school name ...',})
@@ -367,13 +369,17 @@ class StudentForm (ModelForm):
         self.fields['school'].queryset = models.School.objects.filter(~Q(school_code='OTHER'), is_active=True).order_by('name')
 
       if hasattr(user, 'student') == False:
-        del self.fields['consent']
+        self.fields.pop('consent')
+      else:
+        self.fields.pop('test_account')
 
     for field_name, field in list(self.fields.items()):
       if field_name != 'consent':
         field.widget.attrs['class'] = 'form-control'
         field.widget.attrs['aria-describedby'] = field.label
         field.widget.attrs['placeholder'] = field.help_text
+        if field_name == 'test_account':
+          field.label = 'Test Account?'
       else:
         field.label = 'Online Consent'
 
@@ -878,6 +884,7 @@ class StudentAddForm(forms.Form):
   first_name = forms.CharField(required=True, max_length=30, label='First name')
   last_name = forms.CharField(required=True, max_length=30, label='Last name')
   email = forms.EmailField(required=True, max_length=75, label='Email')
+  test_account = forms.BooleanField(required=False, label='Test Account?')
 
   def __init__(self, *args, **kwargs):
     super(StudentAddForm, self).__init__(*args, **kwargs)
@@ -888,6 +895,37 @@ class StudentAddForm(forms.Form):
         field.widget.attrs['required'] = 'required'
       if field.help_text:
         field.widget.attrs['placeholder'] = field.help_text
+
+  def clean_username(self):
+    return self.cleaned_data['username'].lower().strip()
+
+  def clean_email(self):
+    return self.cleaned_data['email'].lower().strip()
+
+
+  def clean(self):
+    cleaned_data = super(StudentAddForm, self).clean()
+    username = cleaned_data.get('username')
+    first_name = cleaned_data.get('first_name')
+    last_name = cleaned_data.get('last_name')
+    email = cleaned_data.get('email')
+    test_account = cleaned_data.get('test_account')
+
+    if username is None:
+      self.fields['username'].widget.attrs['class'] += ' error'
+    elif User.objects.filter(username=username.lower()).count() > 0:
+      self.add_error('username', 'This username is already taken. Please choose another.')
+      self.fields['username'].widget.attrs['class'] += ' error'
+
+    if first_name is None:
+      self.fields['first_name'].widget.attrs['class'] += ' error'
+    if last_name is None:
+      self.fields['last_name'].widget.attrs['class'] += ' error'
+    if email is None:
+      self.fields['email'].widget.attrs['class'] += ' error'
+    elif User.objects.filter(email=email).count() > 0:
+      self.add_error('email', 'This email is already taken. Please choose another.')
+      self.fields['email'].widget.attrs['class'] += ' error'
 
 ####################################
 # Assignment Search Form

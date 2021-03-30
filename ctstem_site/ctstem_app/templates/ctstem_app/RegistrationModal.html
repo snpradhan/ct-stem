@@ -121,6 +121,13 @@
             </div>
           </div>
         {% endif %}
+        {% if form.test_account %}
+          <div class="form-group" id="div_test_account">
+            <label for="id_{{form.test_account.name}}">{{ form.test_account.label }}?</label>
+            {{form.test_account}}
+            <div class="error">{{ form.test_account.errors }}</div>
+          </div>
+        {% endif %}
         {% if user.is_anonymous %}
           <div class="col-container center">
             <div class="form-group col left" id="agree_terms">
@@ -190,6 +197,12 @@
       }
       else {
         $('#div_school').show();
+      }
+      if(account_type == 'S') {
+        $('#div_test_account').show();
+      }
+      else{
+        $('#div_test_account').hide();
       }
     }
 

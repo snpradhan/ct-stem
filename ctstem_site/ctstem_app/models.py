@@ -470,6 +470,7 @@ class Student(models.Model):
   school = models.ForeignKey(School, null=True, on_delete=models.SET_NULL)
   consent = models.CharField(null=False, max_length=1, default='U', choices=CONSENT_CHOICES)
   parental_consent = models.CharField(null=False, max_length=1, default='U', choices=PARENTAL_CONSENT_CHOICES)
+  test_account = models.BooleanField(null=False, blank=False, default=False)
 
   def __str__(self):
       return '%s, %s' % (self.user.last_name, self.user.first_name)
@@ -799,6 +800,9 @@ def check_curriculum_status_change(sender, instance, **kwargs):
         #otherwise only update the status of active (undeleted) underlying curricula
         else:
           Curriculum.objects.filter(unit=obj).exclude(status='R').update(status=instance.status)
+          # if deleting a unit, also delete associated assignments
+          if instance.status == 'R':
+            Assignment.objects.filter(curriculum__unit__id=instance.id).delete()
       # if changing the status of an underlying curriculum to Public, also make Unit Public
       elif obj.unit and obj.unit.status != 'P' and instance.status == 'P':
         Curriculum.objects.filter(id=obj.unit.id).update(status='P')
@@ -808,6 +812,9 @@ def check_curriculum_status_change(sender, instance, **kwargs):
       # if a curriculum is archived, also archive the associated assignments
       elif obj.status != 'R' and instance.status == 'A':
         AssignmentInstance.objects.filter(assignment__curriculum__id=instance.id).update(status= 'A')
+      # if deleting a curriculum, also delete the associated assignments
+      elif instance.status == 'R':
+        Assignment.objects.filter(curriculum__id=instance.id).delete()
 
 #signal to check if curriculum shared with has changed
 @receiver(pre_save, sender=CurriculumCollaborator)

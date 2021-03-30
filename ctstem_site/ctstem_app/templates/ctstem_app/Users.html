@@ -42,6 +42,7 @@
                 {% endif %}
                 {% if role == 'students' %}
                   <th id="user__student__consent"> Student Consent </th>
+                  <th id="user__student__test_account"> Test Account? </th>
                 {% endif %}
               {% endif %}
               <th id="user__date_joined">Member Since</th>
@@ -147,6 +148,9 @@
                       {% endif %}
                     </td>
                     {% endwith %}
+                    <td>
+                      {{userProfile.test_account|yesno:"Yes,No"}}
+                    </td>
                   {% endif %}
                 {% endif %}
                 <td> {{userProfile.user.date_joined|date}} </td>

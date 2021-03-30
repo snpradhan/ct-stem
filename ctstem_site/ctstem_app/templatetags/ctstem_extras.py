@@ -411,6 +411,11 @@ def get_class_assignment_status(assignment_id):
 
   return status
 
+@register.simple_tag(takes_context=True)
+def all_test_accounts_in_class(context, group):
+  request = context.get('request')
+  return views.all_test_accounts_in_class(request, group)
+
 @register.filter
 def subtract(value, arg):
   return value - arg

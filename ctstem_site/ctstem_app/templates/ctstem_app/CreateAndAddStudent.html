@@ -1,48 +1,52 @@
-<div class="modal fade" id="addStudent" role="dialog">
-  <div class="modal-dialog modal-md">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h3 class="modal-title">Create New Student</h3>
-      </div>
-      <div id="studentAddMsg" class="msg">
-        <ul class="errorlist">
-          <li></li>
-        </ul>
-      </div>
-      <form class="form" id="studentAddForm" method="post" action="{% url 'ctstem:createStudent' form.instance.id %}">
-        {% csrf_token %}
-        <input type="hidden" name="group_id" value="{{form.instance.id}}"/>
-        <div class="modal-body">
-          {% for field in studentAddForm %}
-            <div class="form-group">
-              <label for="id_{{field.name}}">{{ field.label|title }} (<span class="required">*</span>)
+<div class="modal-dialog modal-md">
+  <div class="modal-content">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal">&times;</button>
+      <h3 class="modal-title">Create New Student</h3>
+    </div>
+    <div id="studentAddMsg" class="msg">
+      <ul class="errorlist">
+        <li></li>
+      </ul>
+    </div>
+    <form class="form" id="studentAddForm" method="post" action="{% url 'ctstem:createStudent' group_id %}">
+      {% csrf_token %}
+      <div class="modal-body">
+        {% for field in form %}
+          <div class="form-group">
+            <label for="id_{{field.name}}">
+              {{ field.label|title }}
+              {% if field.field.required %}
+                (<span class="required">*</span>)
+              {% endif %}
               {% if field.name == 'username' %}
                 <span data-toggle="tooltip" data-placement="top" title="Please enter the username in lowercase.">
                   <i class="fa fa-info-circle" aria-hidden="true"></i>
                 </span>
+              {% elif field.name == 'test_account' %}
+                <span data-toggle="tooltip" data-placement="top" title="Curriculum exclusively assigned to Test Student accounts can be deleted without any restriction.">
+                  <i class="fa fa-info-circle" aria-hidden="true"></i>
+                </span>
               {% endif %}
-              </label>
-              {{field}}
-              <div class="error">{{ field.errors }}</div>
-            </div>
-          {% endfor %}
-          <div id="spinner">
-            <img src="/static/img/page-loader.gif" class="icon"/>
+            </label>
+            {{field}}
+            <div class="error">{{ field.errors }}</div>
           </div>
+        {% endfor %}
+        <div id="spinner">
+          <img src="/static/img/page-loader.gif" class="icon"/>
         </div>
-        <div class="modal-footer">
-          <div class="form-group">
-            <button type="submit" id="add" class="btn normal yellow">
-              Add to Class
-            </button>
-          </div>
+      </div>
+      <div class="modal-footer">
+        <div class="form-group">
+          <button type="submit" id="add" class="btn normal yellow">
+            Add to Class
+          </button>
         </div>
-      </form>
-    </div>
+      </div>
+    </form>
   </div>
 </div>
-
 
 <script type="text/javascript">
   $(function (){
@@ -59,13 +63,9 @@
         complete: function(){
           $('form#studentAddForm #spinner').hide();
         },
-        success: function(data){
-          if('error' in data){
-            $('#studentAddMsg .errorlist li').removeClass('success').addClass('error').html(data['error']);
-          }
-          else if(data['result'] == 'Success') {
-            $("#addStudent").modal('toggle');
-
+        success: function(data, status) {
+          if(data['success'] == true){
+            $('#addStudent').modal('toggle');
             $("ul.messages li").remove();
             $("ul.messages").html('<li class="success">Student created and add to class</li>');
             $('ul.messages').show();
@@ -73,8 +73,11 @@
 
             add_student_to_data_table(data['student'], '{{csrf_token}}');
             bind_user_removal();
+            return false;
           }
-          return false;
+          else{
+            $('#addStudent').html(data['html']);
+          }
         },
         error: function(xhr, ajaxOptions, thrownError){
           alert(thrownError);
@@ -97,6 +100,10 @@
       } else {
         $('#studentAddForm button#add').prop('disabled', false);
       }
+    });
+
+    $('#addStudent').on('hidden.bs.modal', function () {
+     location.reload();
     });
   });
 </script>

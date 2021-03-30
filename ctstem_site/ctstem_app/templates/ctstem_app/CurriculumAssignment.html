@@ -31,6 +31,7 @@
             </thead>
             <tbody>
               {% for group in groups %}
+                {% all_test_accounts_in_class group as all_test_account %}
                 <tr class="unit group_{{group.id}} {% if forloop.counter|divisibleby:2 %} even {% else %} odd {% endif %}" >
                   <td rowspan="{% if curriculum.curriculum_type|slugify == 'U'|slugify %} {{curriculum_list|length|add:1}} {% endif %}">
                     {{group}}
@@ -57,7 +58,7 @@
                   {% endif %}
                   <td style="text-align:center;">
                     <!--In work assignment, cannot be unassigned  -->
-                    {% if instances|get_item:group.id|get_item:curriculum.id > 0 %}
+                    {% if instances|get_item:group.id|get_item:curriculum.id > 0 and not all_test_account %}
                       <input type="checkbox" id="display_assigned_{{group.id}}_{{curriculum.id}}" name="display_assigned_{{group.id}}_{{curriculum.id}}" disabled
                       checked/>
                       <input type="hidden" id="assigned_{{group.id}}_{{curriculum.id}}" name="assigned_{{group.id}}_{{curriculum.id}}" value="1" />
@@ -78,7 +79,7 @@
                       {% endif %}
                       <td style="display:none; text-align:center;">
                         <!--In work assignment, cannot be unassigned  -->
-                        {% if instances|get_item:group.id|get_item:curr.id > 0 %}
+                        {% if instances|get_item:group.id|get_item:curr.id > 0 and not all_test_account %}
                           <input type="checkbox" id="display_assigned_{{group.id}}_{{curr.id}}" name="display_assigned_{{group.id}}_{{curr.id}}" disabled
                           checked/>
                           <input type="hidden" id="assigned_{{group.id}}_{{curr.id}}" name="assigned_{{group.id}}_{{curr.id}}" value="1" />
