@@ -140,10 +140,11 @@
                   <table class="table table-striped table-condensed table-bordered inner_table">
                     <thead>
                       <tr>
-                        <th style="width:60%;" colspan="2">Assigned Curriculum</th>
+                        <th style="width:50%;" colspan="2">Assigned Curriculum</th>
                         <th style="width:10%;">Direct Student Link</th>
                         <th style="width:10%;">Assigned On</th>
                         <th style="width:10%;">Lock on Completion <i class="fa fa-info-circle" aria-hidden="true" title="When locked, students will be unable to open and view the assignment once they submit"></i></th>
+                        <th style="width:10%;">Realtime Feedback <i class="fa fa-info-circle" aria-hidden="true" title="When checked, sudents will be given correctness feedback for Drop down and Multiple choice questions on Save"></i></th>
                         <th style="width:10%;">Delete</th>
                       </tr>
                     </thead>
@@ -199,6 +200,9 @@
                               </td>
                               <td class="lock_on_completion" style="text-align:center;">
                                 <input type="checkbox" class="lock_assignment" {% if assignment.lock_on_completion %} checked {% endif %} data-id="{{assignment.id}}" data-title="{{assignment.curriculum.title}}" {% if not form.instance.is_active %} disabled {% endif %}/>
+                              </td>
+                              <td class="realtime_feedback" style="text-align:center;">
+                                <input type="checkbox" class="feedback_assignment" {% if assignment.realtime_feedback %} checked {% endif %} data-id="{{assignment.id}}" data-title="{{assignment.curriculum.title}}" {% if not form.instance.is_active %} disabled {% endif %}/>
                               </td>
                               <td style="text-align:center;">
                                 <!-- only allow assignments to be deleted if the class is active and the assignment in question is still New -->
@@ -384,6 +388,24 @@
           flag = 1;
         }
         var url = '/assignment/lock_on_completion/'+assignment_id+'/'+flag+'/';
+        $.ajax({
+          type: 'GET',
+          url: url,
+          success: function(data){
+          },
+          error: function(){
+            alert('error');
+          }
+        });
+      });
+
+      $('.feedback_assignment').on('click', function(){
+        var flag = 0;
+        var assignment_id = $(this).data('id');
+        if($(this).is(':checked')){
+          flag = 1;
+        }
+        var url = '/assignment/realtime_feedback/'+assignment_id+'/'+flag+'/';
         $.ajax({
           type: 'GET',
           url: url,

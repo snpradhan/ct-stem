@@ -585,6 +585,7 @@ class Assignment(models.Model):
   group = models.ForeignKey(UserGroup, related_name="assignments", on_delete=models.CASCADE)
   assigned_date = models.DateTimeField(auto_now_add=True)
   lock_on_completion = models.BooleanField(default=False)
+  realtime_feedback = models.BooleanField(default=False)
 
   def __str__(self):
     return '%s' % (self.curriculum.title)

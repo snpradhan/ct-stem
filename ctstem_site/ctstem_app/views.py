@@ -2608,7 +2608,6 @@ def searchStudents(request):
 
   elif 'POST' == request.method:
     data = request.POST.copy()
-    print(data)
 
     query_filter = {}
     if data['username']:
@@ -4444,6 +4443,16 @@ def feedback(request, assignment_id='', instance_id=''):
 
         formset = StepFeedbackFormSet(instance=feedback, prefix='form')
 
+        for stepFeedbackForm in formset.forms:
+          for questionFeedbackForm in stepFeedbackForm.nested:
+            if questionFeedbackForm.instance.feedback is None:
+              correct = autocomment_question_response(request, questionFeedbackForm.instance.response.id)
+              if correct is not None:
+                if correct:
+                  questionFeedbackForm.initial = {'feedback': 'Correct'}
+                else:
+                  questionFeedbackForm.initial = {'feedback': 'Incorrect'}
+
         context = {'form': form, 'formset': formset, 'nextInstance': nextInstance, 'prevInstance': prevInstance}
         return render(request, 'ctstem_app/Feedback.html', context)
       elif 'POST' == request.method:
@@ -4528,6 +4537,15 @@ def question_response_review(request, assignment_id='', curriculum_question_id='
           if status in ['P', 'S', 'F', 'A']:
             if question_response.response or question_response.response_file.all():
               question_feedback_form = forms.QuestionFeedbackForm(instance=question_feedback, prefix=question_feedback.id)
+              #if feedback hasn't been provided, try autocorrecting
+              if question_feedback.feedback is None:
+                correct = autocomment_question_response(request, question_response.id)
+                if correct is not None:
+                  if correct:
+                    question_feedback_form.initial = {'feedback': 'Correct'}
+                  else:
+                    question_feedback_form.initial = {'feedback': 'Incorrect'}
+
               allow_save = True
               message = None
             else:
@@ -4599,6 +4617,35 @@ def question_response_review(request, assignment_id='', curriculum_question_id='
     return http.HttpResponseNotFound('<h1>Question not found </h1>')
 
 @login_required
+def autocomment_question_response(request, id):
+  try:
+    questionResponse = models.QuestionResponse.objects.get(id=id)
+    question = questionResponse.curriculum_question.question
+    response = questionResponse.response
+    answer_field_type = question.answer_field_type
+    answer = question.answer
+    if answer is not None and answer != '' and response is not None and response != '' and answer_field_type in ['DD', 'MC', 'MI', 'MH', 'MS']:
+      if answer_field_type in ['DD', 'MC', 'MI', 'MH']:
+        student_response = response
+        teacher_answer = answer
+      elif answer_field_type == 'MS':
+        #response is comma separated
+        student_response = response.split(',')
+        student_response.sort()
+        #answer is newline separated
+        teacher_answer = answer.splitlines()
+        teacher_answer.sort()
+
+      if student_response == teacher_answer:
+        return True
+      else:
+        return False
+    else:
+      return None
+  except models.QuestionResponse.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Student Response not found </h1>')
+
+@login_required
 def create_feedback_hierarchy(request, instance):
   feedback, created = models.AssignmentFeedback.objects.get_or_create(instance=instance)
   curriculum_id = instance.assignment.curriculum.id
@@ -4659,6 +4706,23 @@ def lock_on_completion(request, assignment_id='', flag='0'):
     response_data['success'] = True
   return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 
+####################################
+# Set realtime_feedback flag for the assignment
+####################################
+@login_required
+def realtime_feedback(request, assignment_id='', flag='0'):
+  # check if the user has permission to do this operation
+  has_permission = check_assignment_permission(request, assignment_id)
+  response_data = {'success': False }
+  if has_permission:
+    assignment = models.Assignment.objects.get(id=assignment_id)
+    if flag == '0':
+      assignment.realtime_feedback = False
+    else:
+      assignment.realtime_feedback = True
+    assignment.save()
+    response_data['success'] = True
+  return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 ####################################
 # Delete Assignment
 ####################################

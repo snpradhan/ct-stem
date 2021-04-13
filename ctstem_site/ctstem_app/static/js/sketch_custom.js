@@ -57,6 +57,13 @@ $(function(){
       $(canvasId).sketch().redraw();
     }
   });
+  $(window).on('resize', function(){
+    $('canvas').each(function(){
+      var container_width = $(this).parent().width();
+      var canvas_width = Math.min(container_width, 900);
+      $(this).css('width', canvas_width);
+    });
+  });
 
 });
 

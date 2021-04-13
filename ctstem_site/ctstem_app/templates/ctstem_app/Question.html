@@ -36,6 +36,10 @@
                 <a href="#" class="info" id="other_info" rel="popover" data-content="">
                   <i class="fa fa-info-circle" aria-hidden="true" />
                 </a>
+              {% elif field.name == 'answer' %}
+                <a href="#" class="info" id="answer_info" rel="popover" data-content="">
+                  <i class="fa fa-info-circle" aria-hidden="true" />
+                </a>
               {% endif %}
             </label>
             <div class="question_input">
@@ -114,7 +118,14 @@ $(function (){
     html: true ,
     content: function(){
       return 'Select this checkbox if you would like to give students the option to provide their own answer other than the ones provided in the Options field';
-
+    }
+  });
+  $("#answer_info").popover({
+    placement: 'right',
+    title: 'Answer option',
+    html: true ,
+    content: function(){
+      return 'For auto commenting on Drop Down, Multi-Select and Multiple Choice questions, provide an answer that matches exactly with one of the Options';
     }
   });
 

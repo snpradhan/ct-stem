@@ -516,6 +516,9 @@ div.question_response_feedback {
 div.question_response_feedback.odd, div.referenced_question_response.odd{
   background-color: #f9f9f9;
 }
+div.question_response_feedback div.feedback {
+  margin-top: 1em;
+}
 div.question_response_feedback div.text,  div.referenced_question_response div.text {
   margin-left: 2em;
 }

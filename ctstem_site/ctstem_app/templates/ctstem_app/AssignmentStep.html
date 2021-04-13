@@ -434,14 +434,13 @@
                       </div>
 
                       {% if instance.status == 'P' or instance.status == 'S' or instance.status == 'F' or instance.status == 'A' %}
-                        {% with feedback=questionForm.instance.id|getFeedback %}
-                          {% if feedback %}
+                        {% get_feedback questionForm.instance.id as feedback %}
+                        {% if feedback %}
                           <div class="feedback">
                             <label>Feedback:</label>
                             <div class="text">{{feedback}}</div>
                           </div>
-                          {% endif %}
-                        {% endwith %}
+                        {% endif %}
                       {% endif %}
                     </div>
                     {% if forloop.last == False %}

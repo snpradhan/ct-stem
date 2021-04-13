@@ -177,13 +177,25 @@ def is_bookmarked(curriculum, teacher):
 def is_favorite(curriculum_id, teacher_id):
   return models.BookmarkedCurriculum.objects.all().filter(curriculum__id=curriculum_id, teacher__id=teacher_id).exists()
 
-@register.filter
-def getFeedback(response_id):
+@register.simple_tag(takes_context=True)
+def get_feedback(context, response_id):
+  request = context.get('request')
+  feedback = None
   feedback_queryset = models.QuestionFeedback.objects.all().filter(response__id=response_id)
   if feedback_queryset:
-    return feedback_queryset[0].feedback
-  else:
-    return None
+    feedback = feedback_queryset[0].feedback
+  if not feedback:
+    question_response = models.QuestionResponse.objects.get(id=response_id)
+    assignment = question_response.step_response.instance.assignment
+    if assignment.realtime_feedback:
+      correct = views.autocomment_question_response(request, response_id)
+      if correct is not None:
+        if correct:
+          feedback = 'Correct!'
+        else:
+          feedback = 'Incorrect, please try again.'
+
+  return feedback
 
 @register.filter
 def get_item(dictionary, key):

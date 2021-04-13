@@ -457,13 +457,24 @@ div.table.feedback {
 div.question_answer_feedback {
   font-size: 14px;
   padding: 1em;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
 }
 
 div.row.question_answer_feedback:nth-of-type(odd){
   background-color: #f9f9f9;
 }
 
-div.question_answer_feedback div.question, div.question_table div.question_text div.question {
+div.question_answer_feedback div.question_answer {
+  flex: 0 0 70%;
+}
+div.question_answer_feedback div.feedback {
+  flex: 0 0 30%;
+}
+div.question_answer_feedback div.question,
+div.question_table div.question_text div.question {
   color: #428bca;
 }
 
@@ -472,7 +483,6 @@ div.question_table div.answer_field div.response div.readonly div.text {
   color: #5cb85c;
 }
 
-div.question_answer_feedback div.feedback ,
 div.question_answer_feedback div.feedback textarea,
 div.question_table div.feedback div.feedback
 {

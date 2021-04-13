@@ -69,8 +69,8 @@
               {% for question in step.nested %}
                 <div class="row question_answer_feedback">
                   {{question.id}}
-                  <div class="col-md-8">
-                    <div>
+                  <div class="question_answer">
+                    <div class="question_text">
                       <label>
                         Question {% include 'ctstem_app/QuestionCategoryDisplay.html' with question=question.instance.response.curriculum_question.question %}
                         {% if question.instance.response.curriculum_question.optional %}
@@ -120,11 +120,11 @@
                       </div>
                     </div>
                   </div>
-                  <div class="col-md-4">
+                  <div class="feedback">
                     {% if form.instance.instance.status == 'P' or form.instance.instance.status == 'S' or form.instance.instance.status == 'F' or form.instance.instance.status == 'A'%}
                       {% if question.instance.response.response or question.instance.response.response_file.all %}
                         <label>Feedback: </label>
-                        <div class="feedback">
+                        <div>
                           {{question.feedback}}
                           <a data-toggle="modal" data-target="#emojis" class="emoji-modal" href="#" data-id="{{question.feedback.auto_id}}">
                             <i class="fa fa-smile-o" aria-hidden="true"></i>

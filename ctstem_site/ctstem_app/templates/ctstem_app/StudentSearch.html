@@ -5,6 +5,9 @@
       <h3 class="modal-title">Search Students</h3>
     </div>
     <div id="studentMsg" class="msg">
+      <ul class="errorlist">
+        <li></li>
+      </ul>
     </div>
     <form class="form" id="studentForm" method="post" action="{% url 'ctstem:searchStudents' %}">
       {% csrf_token %}
@@ -100,7 +103,6 @@ $(function (){
                       $('#studentMsg .errorlist li').removeClass('success').addClass('error').html(data['error']);
                     }
                     else {
-                      bind_user_removal();
                       $('#studentMsg .errorlist li').removeClass('error').addClass('success').html(value['username']+" added to class");
                     }
                     return false;
