@@ -1,0 +1,4 @@
+[submodule "ctstem_site/ctstem_app/static/ckeditor/ckeditor/plugins/NLModels"]
+	path = ctstem_site/ctstem_app/static/ckeditor/ckeditor/plugins/NLModels
+	url = https://github.com/bainco/NLModels-CKEditor
+	branch = main
