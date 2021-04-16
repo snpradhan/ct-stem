@@ -14,6 +14,7 @@
 
     <form method="post">
       {% csrf_token %}
+      {% with online_users=request.online_now_ids %}
       {% include "ctstem_app/UserControls.html" with tab='user' %}
       {% include "ctstem_app/Tabs.html" with tab='user' %}
       {% if users %}
@@ -154,7 +155,13 @@
                   {% endif %}
                 {% endif %}
                 <td> {{userProfile.user.date_joined|date}} </td>
-                <td> {{userProfile.user.last_login|date}} </td>
+                <td>
+                  {% if userProfile.user.id in online_users %}
+                    <div class="success">Online</div>
+                  {% else %}
+                    {{userProfile.user.last_login|date}}
+                  {% endif %}
+                </td>
               </tr>
             {% endfor %}
           </tbody>
@@ -163,6 +170,7 @@
       {% else %}
         <p>No Users</p>
       {% endif %}
+      {% endwith %}
     </form>
   </div>
 

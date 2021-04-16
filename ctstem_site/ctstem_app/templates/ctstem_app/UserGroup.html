@@ -267,6 +267,7 @@
                       </tr>
                     </thead>
                     <tbody>
+                      {% with online_users=request.online_now_ids %}
                       {% for x in form.members.value %}
                         {% with student=x|getStudentInfo %}
                         <tr id="{{student.id}}">
@@ -309,10 +310,17 @@
                           </td>
                           <td>{{student.test_account|yesno:"Yes,No"}}</td>
                           <td>{{student.user.date_joined|date}} </td>
-                          <td>{{student.user.last_login|date}}</td>
+                          <td>
+                            {% if student.user.id in online_users %}
+                              <div class="success">Online</div>
+                            {% else %}
+                              {{student.user.last_login|date}}
+                            {% endif %}
+                          </td>
                         </tr>
                         {% endwith %}
                       {% endfor %}
+                      {% endwith %}
                     </tbody>
                   </table>
                 </div>

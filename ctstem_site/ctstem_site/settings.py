@@ -71,6 +71,7 @@ MIDDLEWARE = (
     'django.middleware.security.SecurityMiddleware',
     'ctstem_app.middleware.UpdateSession',
     'ctstem_app.middleware.CustomExceptionMiddleware',
+    'ctstem_app.middleware.OnlineNowMiddleware',
 )
 
 AUTHENTICATION_BACKENDS = (
@@ -237,6 +238,7 @@ AUTO_LOGOUT_DELAY = 30
 
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 10000
 
+ONLINE_THRESHOLD = 60
 #Cron jobs
 CRONJOBS = [
     # run cron at midnight to clean up inactive teacher accounts
