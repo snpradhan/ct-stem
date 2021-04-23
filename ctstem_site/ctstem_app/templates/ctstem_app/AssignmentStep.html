@@ -67,6 +67,15 @@
             {% endif %}
           {% endif %}
         {% endfor %}
+        &nbsp;
+        <button id="menu-button"><span class="fa fa-navicon"></span></button>
+      </nav>
+      <nav id="side-nav">
+        <ul>
+          <li><label><a href="{% url 'ctstem:assignments' 'inbox' %}">My Assignments</a></label></li>
+          <li><label><a href="{% url 'ctstem:userProfile' user.id %}">My Profile</a></label></li>
+          <li><label><a href="{% url 'ctstem:logout' %}">Logout</a></label></li>
+        </ul>
       </nav>
     </div>
   </header>
@@ -761,6 +770,10 @@
         cloneMore($(tr), $(this).attr('id'));
         //var new_row = $('div.attachment_table table.table tr:nth-last-child(2)');
         $(tr).toggle();
+      });
+
+      $('#menu-button').mousedown(function() {
+        $('#side-nav').toggleClass('activated');
       });
 
       $('input[type="file"][id="selectedFile"]').change(function(){

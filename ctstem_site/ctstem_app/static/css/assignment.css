@@ -108,10 +108,10 @@ header nav#side-nav ul {
 
 /*header nav#side-nav ul li { padding: 0 0 0.5rem 0; }*/
 
-header nav#side-nav ul.underlying_curriculum {
+header nav#side-nav ul {
   padding-left: 1.5em;
 }
-header nav#side-nav ul.underlying_curriculum li {
+header nav#side-nav ul li {
   padding: 0.25em 0;
   line-height: 1.25em;
 }
