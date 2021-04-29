@@ -160,7 +160,7 @@
 
               {% if user.student %}
                 <!-- Student role -->
-                <li class="{% navactive request 'ctstem:assignments' 'inbox' %}"><a href="{% url 'ctstem:assignments' 'inbox' %}">My Assignments</a></li>
+                <li class="{% navactive request 'ctstem:assignments' %}"><a href="{% url 'ctstem:assignments' %}">My Assignments</a></li>
               {% endif %}
 
               {% if not user.student %}

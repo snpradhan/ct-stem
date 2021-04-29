@@ -92,9 +92,9 @@ ASSIGNMENT_STATUS = (
 
 ASSIGNMENT_SORT = (
   ('assigned', 'Assigned Date'),
-  ('group', 'Group'),
-  ('due', 'Due Date'),
-  ('status', 'Status'),
+  ('title', 'Assignment Title'),
+  ('group', 'Class'),
+  ('status', 'Assignment Status'),
   ('percent', 'Percent Complete'),
   ('modified', 'Last Modified')
 )
@@ -557,7 +557,7 @@ class UserGroup(models.Model):
   teacher = models.ForeignKey(Teacher, null=True, related_name='groups', on_delete=models.SET_NULL)
   description = models.TextField(null=True, blank=True)
   members = models.ManyToManyField(Student, through='Membership', blank=True, related_name='member_of')
-  shared_with = models.ManyToManyField(Teacher, blank=True, help_text='Select teachers to share this class with.' )
+  shared_with = models.ManyToManyField(Teacher, blank=True, related_name='shared_groups', help_text='Select teachers to share this class with.' )
   group_code = models.CharField(null=False, blank=False, max_length=10, unique=True, default=generate_code_helper)
   is_active = models.BooleanField(null=False, blank=False, default=True)
   icon = models.ImageField(upload_to=upload_file_to, blank=True, null=True, help_text='Upload an image at least 400x289 in resolution that represents this class')

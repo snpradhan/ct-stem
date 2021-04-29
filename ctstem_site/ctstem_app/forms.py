@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import ModelForm
 from django.forms.formsets import BaseFormSet
-from ctstem_app import models, widgets
+from ctstem_app import models, widgets, util
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
@@ -1460,18 +1460,48 @@ class QuestionFeedbackForm(ModelForm):
       field.widget.attrs['placeholder'] = field.help_text
 
 ####################################
-# Assignment Sort Form
+# Student Inbox Filter Form
 ####################################
-class InboxSortForm (forms.Form):
-  sort_by = forms.ChoiceField(required=False, choices = models.ASSIGNMENT_SORT)
+class InboxFilterForm (forms.Form):
+  bucket = forms.ChoiceField(required=True, choices=(('active', 'Active'), ('archived', 'Archived')), initial='active', label='Folder', widget=forms.RadioSelect())
+  group = forms.ModelChoiceField(required=False, queryset=models.UserGroup.objects.all().order_by('title'), label='Class')
+  assignment = forms.ChoiceField(required=False, choices=(('', '---------'),), label='Assignment')
+  teacher = forms.ModelChoiceField(required=False, queryset=models.Teacher.objects.all().filter().order_by('user__last_name', 'user__first_name'), label='Teacher')
+  sort_by = forms.ChoiceField(required=False, choices=models.ASSIGNMENT_SORT, initial='title', label='Sort by')
 
   def __init__(self, *args, **kwargs):
-    super(InboxSortForm, self).__init__(*args, **kwargs)
-    self.initial['sort_by'] = 'A'
+    student_id = group_id = curr_id = teacher_id = None
+    if 'student_id' in kwargs:
+      student_id = kwargs.pop('student_id')
+    if 'group_id' in kwargs:
+      group_id = kwargs.pop('group_id')
+    if 'curr_id' in kwargs:
+      curr_id = kwargs.pop('curr_id')
+    if 'teacher_id' in kwargs:
+      teacher_id = kwargs.pop('teacher_id')
+    super(InboxFilterForm, self).__init__(*args, **kwargs)
+
+    #populating classes and initial select
+    #expand underlying curricula under unit
+    groups = models.Membership.objects.all().filter(student__id=student_id).values_list('group', flat=True)
+    if group_id:
+      self.fields['group'].initial = group_id
+
+    assignment_choices = util.group_assignment_dropdown_list(groups)
+    self.fields['assignment'].choices = tuple(assignment_choices)
+    if curr_id:
+      self.fields['assignment'].initial = curr_id
+
+    #populating teachers and initial select
+    teachers = models.Teacher.objects.all().filter(Q(groups__id__in=groups) | Q(shared_groups__id__in=groups)).distinct()
+    self.fields['teacher'].queryset = teachers
+    if teacher_id:
+      self.fields['teacher'].initial = teacher_id
 
     for field_name, field in list(self.fields.items()):
-      field.widget.attrs['class'] = 'form-control'
-      field.widget.attrs['placeholder'] = field.help_text
+      if field_name != 'bucket':
+        field.widget.attrs['class'] = 'form-control'
+        field.widget.attrs['placeholder'] = field.help_text
 
 ####################################
 # School Form

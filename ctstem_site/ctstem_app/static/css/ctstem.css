@@ -266,10 +266,12 @@ div#spinner {
   display:none;
   text-align: center;
 }
-
+div#spinner img.icon {
+  margin-top: 2em;
+}
 div#spinner img#loading {
   position: fixed;
-  top:0;
+  top: 0;
   bottom: 0;
   left: 0;
   right: 0;
@@ -1023,31 +1025,45 @@ div.row#assignment_tiles .col .tile {
 }
 div.row#assignment_tiles .col .tile .detail {
   max-height: none;
+  min-height: 21em;
+  height: auto;
 }
 div.row#assignment_tiles .col .tile .detail > .title{
   font-size: 1.5em;
   height: 2em;
   margin-bottom: 1em;
 }
-div.row#assignment_tiles .col .tile .detail > .row {
+div.row#assignment_tiles .col .tile .detail .dates_chart_container {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
 }
-div.row#assignment_tiles .col .tile .detail .dates > .row {
-  margin-bottom: 0.7em;
+div.row#assignment_tiles .col .tile .detail .dates_chart_container .dates {
+  flex: 0 0 70%;
+}
+div.row#assignment_tiles .col .tile .detail .dates_chart_container .dates > div {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin-bottom: 0.5em;
+}
+div.row#assignment_tiles .col .tile .detail .dates_chart_container .dates > div > .title {
+  flex: 0 0 40%;
+  font-size: 1.4em;
+}
+div.row#assignment_tiles .col .tile .detail .dates_chart_container .dates > div > .value {
+  flex: 0 0 60%;
+  font-size: 1.2em;
 }
 
-div.row#assignment_tiles .col .tile .detail > .row .title {
-  font-size: 1.4em;
-  text-align: right;
+div.row#assignment_tiles .col .tile .detail .dates_chart_container .chart_container {
+  flex: 0 0 30%;
 }
-div.row#assignment_tiles .col .tile .detail > .row .value {
-  font-size: 1.2em;
-  text-align: left;
-}
+
 div.row#assignment_tiles .col .tile .detail .button_row {
   display: flex;
+  justify-content: center;
 }
 
 /******* assignment tiles end *******/
@@ -1376,18 +1392,62 @@ div.content section.portfolio.bg-light-gray .portfolio-item .portfolio-caption {
 }
 
 div.content#assignments {
-  width: 80%;
+  width: 100%;
 }
 
 div.content.teacher#classes ul.nav.top {
   display: none;
 }
-
+div.content#assignments div#inbox_search_toggle {
+  text-align: right;
+  margin-bottom: unset;
+  background-color: white;
+  padding-right: 5%;
+}
+div.content#assignments div#inbox_search_toggle label {
+  cursor: pointer;
+}
+div.content#assignments div#inbox_search {
+  position: sticky;
+  top: 90px;
+  z-index: 1000;
+}
 div.content#assignments div.inbox_filter {
-  float: right;
-  margin-right: 2em;
+  background-color: var(--ctstem-color-blue);
+  padding: 2em 5%;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+div.content#assignments div.inbox_filter .form-group {
+  margin-bottom: 1em !important;
+  max-width: 30em;
 }
 
+div.content#assignments div.inbox_filter .form-group label {
+  color: white;
+}
+
+div.content#assignments div.inbox_filter .form-group select {
+  max-width: min(30em, 100%);
+  width: 30em;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+
+div.content#assignments div.inbox_filter .form-group input[type='radio'] {
+  margin-left: 0.5em;
+  -ms-transform: scale(1.15);
+  -moz-transform: scale(1.15);
+  -webkit-transform:scale(1.15);
+  -o-transform: scale(1.15);
+}
+div.content#assignments div.inbox_filter .form-group input[type='radio'].safari {
+  zoom: 1.15;
+}
 div.content#assignments .chart_container {
   max-width: 200px;
   margin-left: auto;

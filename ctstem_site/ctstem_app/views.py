@@ -1,4 +1,4 @@
-from ctstem_app import models, forms
+from ctstem_app import models, forms, util
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
@@ -57,7 +57,7 @@ def home(request):
   if hasattr(request.user, 'student') == True:
     url = request.GET.get('next', '')
     if not url:
-      redirect_url = shortcuts.redirect('ctstem:assignments', bucket='inbox')
+      redirect_url = shortcuts.redirect('ctstem:assignments')
     else:
       url = parse_qs(urlparse(url).query)['next'][0]
       redirect_url = http.HttpResponseRedirect(url)
@@ -4038,20 +4038,56 @@ def assignmentDashboard(request, id=''):
 # STUDENT ASSIGNMENTS
 ####################################
 @login_required
-def assignments(request, bucket=''):
+def assignments(request):
+  try:
+    if hasattr(request.user, 'student') == False:
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to view assignments</h1>')
+
+    student = request.user.student
+    if request.method == 'GET':
+      assignment_id = request.GET.get('assignment', '')
+      if assignment_id:
+        assignment = models.Assignment.objects.get(id=assignment_id)
+        group_id = assignment.group.id
+        curr_id = assignment.curriculum.id
+        teacher_id = assignment.group.teacher.id
+        filter_form = forms.InboxFilterForm(student_id=student.id, group_id=group_id, curr_id=curr_id, teacher_id=teacher_id)
+      else:
+        filter_form = forms.InboxFilterForm(student_id=student.id)
+
+      context = {'filter_form': filter_form, 'consent': student.consent}
+      return render(request, 'ctstem_app/MyAssignments.html', context)
+    return http.HttpResponseNotAllowed(['GET'])
+
+  except models.Student.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested student not found</h1>')
+
+@login_required
+def assignmenttiles(request):
   try:
     if hasattr(request.user, 'student') == False:
       return http.HttpResponseNotFound('<h1>You do not have the privilege to view assignments</h1>')
 
     student = request.user.student
     if request.method == 'GET' or request.method == 'POST':
-      groups = models.Membership.objects.all().filter(student=student).values_list('group', flat=True)
+      student_groups = models.Membership.objects.all().filter(student=student).values_list('group', flat=True)
       #for each group
       tomorrow = datetime.date.today() + datetime.timedelta(days=1)
-      assignments = models.Assignment.objects.all().filter(group__in=groups, assigned_date__lt=tomorrow).order_by('curriculum__unit__title', 'curriculum__order')
-      assignment_id = request.GET.get('assignment', '')
-      if assignment_id:
-        assignments = assignments.filter(id=assignment_id)
+      assignments = models.Assignment.objects.all().filter(group__in=student_groups, assigned_date__lt=tomorrow).order_by('curriculum__unit__title', 'curriculum__order')
+      data = filtered_class = filtered_assignment = filtered_teacher = None
+      if request.method == 'POST':
+        data = request.POST.copy()
+        filtered_teacher = data['teacher']
+        if filtered_teacher:
+          assignments = assignments.filter(Q(group__teacher__id=filtered_teacher) | Q(group__shared_with__id=filtered_teacher))
+        filtered_class = data['group']
+        if filtered_class:
+          assignments = assignments.filter(group__id=filtered_class)
+        filtered_assignment = data['assignment']
+        if filtered_assignment:
+          assignments = assignments.filter(Q(curriculum__unit__id=filtered_assignment) | Q(curriculum__id=filtered_assignment))
+
+
       assignment_list = []
       active_list = []
       archived_list = []
@@ -4087,39 +4123,59 @@ def assignments(request, bucket=''):
 
         serial += 1
 
-      if bucket == 'inbox':
+      if request.method == 'GET':
+        sort_by = 'title'
         assignment_list = active_list
       else:
-        assignment_list = archived_list
-
-      if request.method == 'GET':
-        sort_by = 'assigned'
-        sort_form = forms.InboxSortForm()
-      else:
-        data = request.POST.copy()
         sort_by = data['sort_by']
-        sort_form = forms.InboxSortForm(data)
+        bucket = data['bucket']
+        if bucket == 'active':
+          assignment_list = active_list
+        else:
+          assignment_list = archived_list
 
-      # print sort_by
-      # if sort_by == 'assigned':
-      #   assignment_list.sort(key=lambda item:item['assignment'].assigned_date)
-      # elif sort_by == 'group':
-      #   assignment_list.sort(key=lambda item:item['assignment'].group)
-      # elif sort_by == 'status':
-      #   assignment_list.sort(key=lambda item:item['status'])
-      # elif sort_by == 'percent':
-      #   assignment_list.sort(key=lambda item:item['percent_complete'])
-      # elif sort_by == 'modified':
-      #   assignment_list.sort(key=lambda item:item['modified_date'])
-      assignment_list.sort(key=lambda item:item['title'].lower())
 
-      context = {'assignment_list': assignment_list, 'new': new_count, 'inbox': len(active_list), 'archived': len(archived_list), 'sort_form': sort_form, 'consent': student.consent}
-      return render(request, 'ctstem_app/MyAssignments.html', context)
+      if sort_by == 'assigned':
+        assignment_list.sort(key=lambda item:item['assignment'].assigned_date)
+      elif sort_by == 'group':
+        assignment_list.sort(key=lambda item:item['assignment'].group.title)
+      elif sort_by == 'status':
+        assignment_list.sort(key=lambda item:item['status'])
+      elif sort_by == 'percent':
+        assignment_list.sort(key=lambda item:item['percent_complete'])
+      elif sort_by == 'modified':
+        assignment_list.sort(key=lambda item:item['modified_date'])
+      else:
+        assignment_list.sort(key=lambda item:item['title'].lower())
+
+      context = {'assignment_list': assignment_list}
+      html = render_to_string('ctstem_app/AssignmentTiles.html', context, request)
+
+      #all groups the student is a member of
+      groups = models.UserGroup.objects.all().filter(Q(id__in=student_groups))
+      #if a teacher is selected, filter groups the teacher owns or co-owns
+      if filtered_teacher:
+        groups = groups.filter(Q(teacher__id=filtered_teacher) | Q(shared_with__id=filtered_teacher))
+
+
+      context = {'choices': util.group_dropdown_list(groups), 'selected_value': filtered_class}
+      filtered_groups_html = render_to_string('ctstem_app/DropdownListOptions.html', context, request)
+
+      #if a class is selected, limit the group to that class
+      if filtered_class:
+        groups = groups.filter(Q(id=filtered_class))
+
+      context = {'choices': util.group_assignment_dropdown_list(groups), 'selected_value': filtered_assignment}
+      filtered_assignments_html = render_to_string('ctstem_app/DropdownListOptions.html', context, request)
+
+      response_data = {'success': True, 'html': html, 'new': new_count, 'active': len(active_list), 'archived': len(archived_list),
+                       'assignments_html': filtered_assignments_html, 'groups_html': filtered_groups_html}
+
+      return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+
     return http.HttpResponseNotAllowed(['GET', 'POST'])
-
   except models.Student.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested student not found</h1>')
-
 ####################################
 # STUDENT archives assignment
 ####################################
@@ -4139,7 +4195,7 @@ def archiveAssignment(request, instance_id=''):
     else:
       messages.success(request, 'Only assignments with status Feedback Completed can be archived')
 
-    return shortcuts.redirect('ctstem:assignments', bucket='inbox')
+    return shortcuts.redirect('ctstem:assignments')
 
   except models.AssignmentInstance.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested assignment not found</h1>')

@@ -1,0 +1,3 @@
+{% for choice in choices %}
+  <option value="{{ choice.0 }}" {% if choice.0|slugify == selected_value|slugify %} selected {% endif %}>{{ choice.1 }}</option>
+{% endfor %}

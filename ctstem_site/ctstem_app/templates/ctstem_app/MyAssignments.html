@@ -13,148 +13,43 @@
   {{block.super}}
   <div class="content" id="assignments">
     <h2> My Assignments </h2>
-    <ul class="nav nav-tabs">
-      <li class="{% navactive request 'ctstem:assignments' 'inbox' %}"><a href="{% url 'ctstem:assignments' 'inbox' %}">Inbox ({{new}}/{{inbox}})</a></li>
-      <li class="{% navactive request 'ctstem:assignments' 'archive' %}"><a href="{% url 'ctstem:assignments' 'archive' %}">Archive ({{archived}})</a></li>
-    </ul>
-    {% if assignment_list %}
-    <!--div class="inbox_filter">
-      <form method="post" class="form-horizontal">
+    <div id="inbox_search">
+      <div class="form-group" id="inbox_search_toggle">
+        <label style="display:none;">Show Filters <span class="fa fa-plus-circle"></span></label>
+        <label>Hide Filters <span class="fa fa-minus-circle"></span></label>
+      </div>
+      <form method="post" action="{% url 'ctstem:assignmenttiles' %}" id="inbox_search_form">
         {% csrf_token %}
-        <div class="form-group">
-          <label for="id_{{sort_form.sort_by.name}}" class="col-md-4 control-label"> {{sort_form.sort_by.label}}</label>
-          <div class="col-md-8">{{sort_form.sort_by}}</div>
+        <div class="inbox_filter">
+          <div class="form-group" id="id_bucket">
+            {% for radio in filter_form.bucket %}
+              <div>{{radio.tag}}&nbsp;&nbsp;<label>{{radio.choice_label}}</label></div>
+            {% endfor %}
+          </div>
+          <div class="form-group">
+            <label>{{filter_form.teacher.label|title}}</label>
+            <div>{{filter_form.teacher}}</div>
+          </div>
+          <div class="form-group">
+            <label>{{filter_form.group.label|title}}</label>
+            <div>{{filter_form.group}}</div>
+          </div>
+          <div class="form-group">
+            <label>{{filter_form.assignment.label|title}}</label>
+            <div>{{filter_form.assignment}}</div>
+          </div>
+          <div class="form-group">
+            <label>{{filter_form.sort_by.label|title}}</label>
+            <div>{{filter_form.sort_by}}</div>
+          </div>
+          <div class="form-group">
+            <input type="button" class="btn normal yellow" id="clear" value="Clear Filter"/>
+          </div>
         </div>
       </form>
-    </div-->
-    <div class="row_container">
-      <div class="row" id="assignment_tiles">
-        {% for assignment_details in assignment_list %}
-          <div class="col col-{{forloop.counter}}">
-            <div class="tile">
-              <div class="icon">
-              {% if assignment_details.instance %}
-                {% if assignment_details.instance.status == 'N' %}
-                  <a href="{% url 'ctstem:resumeAssignment' assignment_details.assignment.id assignment_details.instance.id assignment_details.instance.last_step %}">
-                {% elif assignment_details.instance.status == 'P' %}
-                  <a href="{% url 'ctstem:resumeAssignment' assignment_details.assignment.id assignment_details.instance.id assignment_details.instance.last_step|add:'1' %}">
-                {% else %}
-                  {% if not assignment_details.assignment.lock_on_completion %}
-                    <a href="{% url 'ctstem:resumeAssignment' assignment_details.assignment.id assignment_details.instance.id 0 %}">
-                  {% else %}
-                    <a class="lock_on_completion">
-                  {% endif %}
-                {% endif %}
-              {% else %}
-                <a href="{% url 'ctstem:startAssignment' assignment_details.assignment.id %}">
-              {% endif %}
-              {% if assignment_details.assignment.curriculum.icon and assignment_details.assignment.curriculum.icon.url %}
-                <img src="{{assignment_details.assignment.curriculum.icon.url}}" class="img-responsive" alt=""/>
-              {% elif assignment_details.assignment.curriculum.unit and assignment_details.assignment.curriculum.unit.icon and assignment_details.assignment.curriculum.unit.icon.url %}
-                <img src="{{assignment_details.assignment.curriculum.unit.icon.url}}" class="img-responsive" alt=""/>
-              {% else %}
-                <img src="/static/img/assessment.png" class="img-responsive" alt="">
-              {% endif %}
-              </a>
-              </div>
-              <div class="detail">
-                <div class="title">
-                  {{assignment_details.title|truncatechars:45}}
-                  {% if assignment_details.assignment.curriculum.unit %}
-                    <br>
-                    {% if assignment_details.assignment.curriculum.order %}
-                      {{assignment_details.assignment.curriculum.order}}.
-                    {% endif %}
-                    {{assignment_details.assignment.curriculum.title|truncatechars:45}}
-                  {% endif %}
-
-                </div>
-                <div class="row">
-                  <div class="col-md-8 dates">
-                    <div class="row">
-                      <div class="col-md-5 title">Class:</div>
-                      <div class="col-md-7 value">{{assignment_details.assignment.group}}</div>
-                    </div>
-                    <div class="row">
-                      <div class="col-md-5 title">Teacher:</div>
-                      <div class="col-md-7 value">
-                        {{assignment_details.assignment.group.teacher}}
-                        {% if assignment_details.assignment.group.shared_with.all %}
-                          <span class="glyphicon glyphicon-option-horizontal"
-                            title="{{assignment_details.assignment.group.shared_with.all|join:', '}}"></span>
-                        {% endif %}
-                      </div>
-                    </div>
-                    <div class="row">
-                      <div class="col-md-5 title">Assigned:</div>
-                      <div class="col-md-7 value">{{assignment_details.assignment.assigned_date|date}}</div>
-                    </div>
-
-                    <div class="row">
-                      <div class="col-md-5 title">Modified:</div>
-                      <div class="col-md-7 value">{% if assignment_details.instance %}
-                                  {{assignment_details.instance.modified_date|date}}
-                                {% else %}
-                                  -
-                                {% endif %}</div>
-                    </div>
-                    <!--div class="row">
-                      <div class="col-md-6 title">Status:</div>
-                      <div class="col-md-6 value">
-                          {% if assignment_details.instance %}
-                            {{assignment_details.instance.get_status_display}}
-                          {% else %}
-                            New
-                          {% endif %}
-                      </div>
-                    </div-->
-                  </div>
-                  <div class="col-md-4 chart_container">
-                    <div id="chart_{{assignment_details.serial}}" class="chart" name={{assignment_details.percent_complete}}></div>
-                  </div>
-                </div>
-                <div class="row">
-                  {% if assignment_details.instance %}
-                    {% if assignment_details.instance.status == 'N' %}
-                      <a type="button" class="btn green inbetween" aria-label="Start Assignment" title="Start Assignment" href="{% url 'ctstem:resumeAssignment' assignment_details.assignment.id assignment_details.instance.id assignment_details.instance.last_step %}">
-                        Start <i class="fas fa-play"></i>
-                      </a>
-                    {% elif assignment_details.instance.status == 'P' %}
-                      <a type="button" class="btn orange inbetween" aria-label="Resume Assignment" title="Resume Assignment" href="{% url 'ctstem:resumeAssignment' assignment_details.assignment.id assignment_details.instance.id assignment_details.instance.last_step|add:'1' %}">
-                        Resume <i class="fas fa-arrow-right"></i>
-                      </a>
-                    {% else %}
-                      {% if not assignment_details.assignment.lock_on_completion %}
-                        <a type="button" class="btn blue inbetween" aria-label="Resume Assignment" title="Resume Assignment" href="{% url 'ctstem:resumeAssignment' assignment_details.assignment.id assignment_details.instance.id 0 %}">
-                          {% if assignment_details.instance.status == 'F' or assignment_details.instance.status == 'A'%}
-                            Review Feedback
-                          {% else %}
-                            View
-                          {% endif %}
-                          <i class="far fa-eye" aria-hidden="true"></i>
-                        </a>
-                      {% endif %}
-                    {% endif %}
-                    {% if assignment_details.instance.status == 'F' %}
-                      <a type="button" class="btn orange inbetween" aria-label="Archive Assignment" title="Archive Assignment" href="{% url 'ctstem:archiveAssignment' assignment_details.instance.id %}">
-                        Archive <i class="fas fa-archive"></i>
-                      </a>
-                    {% endif %}
-                  {% else %}
-                    <a type="button" class="btn green inbetween" aria-label="Start Assignment" title="Start Assignment" href="{% url 'ctstem:startAssignment' assignment_details.assignment.id %}">
-                        Start <i class="fas fa-play"></i>
-                    </a>
-                  {% endif %}
-                </div>
-              </div>
-            </div>
-          </div>
-        {% endfor %}
-      </div>
     </div>
-    {% else %}
-      <p>You do not have any assignments.</p>
-    {% endif %}
+    <div class="row" id="assignment_tiles">
+    </div>
 
     <div class="modal fade" id="assessmentModal" role="dialog"></div>
 
@@ -163,9 +58,78 @@
   <script type="text/javascript">
     $(function (){
 
-      $("select#id_sort_by").change(function(){
-        this.form.submit();
+      $('input#clear').on("click", function(){
+        $('#inbox_search_form').find(':radio, :checkbox').removeAttr('checked').end()
+            .find('textarea, :text, select').val('');
+        $('#inbox_search_form #id_bucket input[name="bucket"][value="active"]').prop('checked', true);
+        $('#inbox_search_form select#id_sort_by').val('title');
+        auto_submit_search();
       });
+
+      //on page load, apply existing filters and load results
+      auto_submit_search();
+
+      //add a class to checkbox and radio button in search form on Safari only
+      if (navigator.userAgent.search("Safari") >= 0 && navigator.userAgent.search("Chrome") < 0) {
+        $('#inbox_search_form :radio, #inbox_search_form :checkbox').addClass('safari');
+      }
+
+      var timeout = null;
+      $('#inbox_search_form select, #inbox_search_form :radio').on('change', function(){
+        if($(this).attr('id') == 'id_teacher'){
+          $('select#id_group').val('');
+          $('select#id_assignment').val('');
+        }
+        if($(this).attr('id') == 'id_group'){
+          $('select#id_assignment').val('');
+        }
+        auto_submit_search();
+      });
+
+      function auto_submit_search() {
+        clearTimeout(timeout);
+        timeout = setTimeout(function(){
+          var url = $('form').attr('action');
+          submit_search(url);
+        }, 800);
+      }
+
+      function submit_search(url) {
+        $.ajax({
+          type: "POST",
+          url: url,
+          data: $('form').serialize(),
+          beforeSend: function(){
+            $('#assignment_tiles').html('<div id="spinner"> \
+                                          <img src="/static/img/page-loader.gif" class="icon"/>\
+                                        </div>');
+            $('#spinner').show();
+          },
+          complete: function(){
+            $('#spinner').hide();
+          },
+          success: function(data){
+            if(data['success'] == true){
+              $("#inbox_search_form #id_bucket input[name='bucket'][value='active']").next().text(' Active ('+data['new']+'/'+data['active']+')');
+              $("#inbox_search_form #id_bucket input[name='bucket'][value='archived']").next().text(' Archived ('+data['archived']+')');
+              $('#assignment_tiles').html(data['html']);
+              $('select#id_group').html(data['groups_html'])
+              $('select#id_assignment').html(data['assignments_html']);
+              renderChart()
+            }
+            return false;
+          },
+          error: function(xhr, ajaxOptions, thrownError){
+            alert("Something went wrong.  Try again later!");
+          },
+        });
+      }
+
+
+      $('#inbox_search_toggle label').click(function(){
+        $('#inbox_search_toggle label').toggle();
+        $('.inbox_filter').toggle();
+      })
 
       $("a.assessment_info").click(function(e){
         e.preventDefault();
@@ -180,58 +144,60 @@
         alert("You cannot view this assignment after submission");
       });
 
-      $(".chart").each(function(){
-      var id = $(this).attr('id');
-      var complete = parseInt($(this).attr('name'));
-      var remaining = 100-complete;
-      Highcharts.chart(id, {
-        chart: {
-          type: 'pie',
-          height:100,
-          backgroundColor: 'rgba(0,0,0,0)',
-        },
-        title: {
-          text: complete+'%',
-          align: 'center',
-          verticalAlign: 'middle',
-          y: 10,
-          style: {
-            fontSize: '1.2em',
-            color: 'black',
-          },
-        },
-        tooltip: false,
-        plotOptions: {
-          pie: {
-            dataLabels: {
-              enabled: false,
+      function renderChart() {
+        $(".chart").each(function(){
+          var id = $(this).attr('id');
+          var complete = parseInt($(this).attr('name'));
+          var remaining = 100-complete;
+          Highcharts.chart(id, {
+            chart: {
+              type: 'pie',
+              height:100,
+              backgroundColor: 'rgba(0,0,0,0)',
             },
-            startAngle: 0,
-            endAngle: 360,
-          }
-        },
-        credits: {
-          enabled: false
-        },
-        series: [{
-          type: 'pie',
-          name: 'Work',
-          innerSize: '80%',
-          data: [
-            {
-              name: 'Complete',
-              y: complete,
-              color: 'green',
+            title: {
+              text: complete+'%',
+              align: 'center',
+              verticalAlign: 'middle',
+              y: 10,
+              style: {
+                fontSize: '1.2em',
+                color: 'black',
+              },
             },
-            {
-              name: 'Remaining',
-              y: remaining,
-              color: 'grey',
+            tooltip: false,
+            plotOptions: {
+              pie: {
+                dataLabels: {
+                  enabled: false,
+                },
+                startAngle: 0,
+                endAngle: 360,
+              }
             },
-          ]
-        }]
-      });
-    });
+            credits: {
+              enabled: false
+            },
+            series: [{
+              type: 'pie',
+              name: 'Work',
+              innerSize: '80%',
+              data: [
+                {
+                  name: 'Complete',
+                  y: complete,
+                  color: 'green',
+                },
+                {
+                  name: 'Remaining',
+                  y: remaining,
+                  color: 'grey',
+                },
+              ]
+            }]
+          });
+        });
+      }
 
     });
   </script>
