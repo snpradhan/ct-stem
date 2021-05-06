@@ -46,6 +46,7 @@ from dal import autocomplete
 from django.core.cache import cache
 import re
 import html
+import time
 
 logger = logging.getLogger('django')
 
@@ -3651,7 +3652,7 @@ def teacherDashboard(request, id='', status='active'):
     ##########################
     # ACTIVITY FEED START
     ##########################
-    teacher_last_login = teacher.user.last_login
+    '''teacher_last_login = teacher.user.last_login
     new_groups = all_groups.filter(created_date__gte=teacher_last_login).distinct()
     new_group_ids = new_groups.values('id')
     modified_groups = all_groups.filter(modified_date__gte=teacher_last_login).exclude(id__in=new_group_ids).distinct()
@@ -3712,6 +3713,7 @@ def teacherDashboard(request, id='', status='active'):
         student_activity[key].append({'activity_type': 'assignment_complete', 'student': assignment_instance.student, 'assignment': assignment_instance.assignment.curriculum.title, 'class': assignment_instance.assignment.group.title, 'time': assignment_instance.modified_date})
       else:
         student_activity[key] = [{'activity_type': 'assignment_complete', 'student': assignment_instance.student, 'assignment': assignment_instance.assignment.curriculum.title, 'class': assignment_instance.assignment.group.title, 'time': assignment_instance.modified_date}]
+    '''
     ##########################
     # ACTIVITY FEED END
     ##########################
@@ -3723,7 +3725,7 @@ def teacherDashboard(request, id='', status='active'):
     filtered_assignments = all_assignments[:4]
     all_students = models.Student.objects.all().filter(member_of__in=all_groups).distinct().order_by('user__last_name', 'user__first_name')
     student_count = all_students.count()
-    filtered_students = all_students
+    filtered_students = all_students[:4]
 
     ##########################
     # CLASSES START
@@ -3762,7 +3764,7 @@ def teacherDashboard(request, id='', status='active'):
     context = {'teacher': teacher, 'groups': groups, 'group_count': group_count, 'students': filtered_students,
                'student_count': student_count, 'assignments': filtered_assignments, 'assignment_count':assignment_count,
                'role':'groups', 'uploadForm': uploadForm,
-               'status': status, 'domain': domain, 'assignmentForm': assignmentForm, 'group_activity': group_activity, 'student_activity': student_activity
+               'status': status, 'domain': domain, 'assignmentForm': assignmentForm
                }
     return render(request, 'ctstem_app/TeacherDashboard.html', context)
 
@@ -3952,7 +3954,7 @@ def teacherStudentDashboard(request, id='', status='active'):
       searchForm = forms.TeacherStudentDashboardSearchForm(teacher=teacher, is_active=is_active)
 
     groups = models.UserGroup.objects.all().filter(Q(is_active=is_active), Q(teacher=teacher) | Q(shared_with=teacher)).order_by('title')
-    all_assignments = models.Assignment.objects.all().filter(group__in=groups).distinct().order_by('curriculum__title')
+    all_assignments = models.Assignment.objects.all().filter(group__in=groups).distinct().order_by('curriculum__unit__title', 'curriculum__title')
     student_id = None
     sort_by = None
     if search_criteria:
@@ -3971,9 +3973,10 @@ def teacherStudentDashboard(request, id='', status='active'):
         if curriculum_id:
           all_assignments = all_assignments.filter(Q(curriculum__id=curriculum_id) | Q(curriculum__unit__id=curriculum_id))
 
-
     students = {}
+
     if all_assignments.count() > 0:
+
       if student_id:
         members = [student_id]
       else:
@@ -3992,22 +3995,21 @@ def teacherStudentDashboard(request, id='', status='active'):
           instance = None
           last_opened = None
           status_key = None
-          percent_complete = 0
           try:
             instance = models.AssignmentInstance.objects.get(assignment=assignment, student=student)
             status_key = instance.status
             last_opened = instance.modified_date
-            percent_complete = get_student_assignment_instance_percent_complete(request, student.id, assignment.id)
+
           except models.AssignmentInstance.DoesNotExist:
             status_key = 'N'
-            percent_complete = 0
 
           students[student_key]['assignment_status'][status_key] += 1
           students[student_key]['total'] += 1
 
+          #underlying lesson
           if curriculum.curriculum_type in ['L', 'A'] and curriculum.unit is not None:
             assignment_key = str(curriculum.unit.id) + '_' + str(assignment.group.id)
-            lesson = {'curriculum_id': curriculum.id, 'assignment_id': assignment.id, 'title': curriculum.title, 'assigned_date': assignment_date, 'last_opened': last_opened, 'assignment_status': status_key, 'percent_complete': percent_complete}
+            lesson = {'curriculum_id': curriculum.id, 'assignment_id': assignment.id, 'title': curriculum.title, 'assigned_date': assignment_date, 'last_opened': last_opened, 'assignment_status': status_key}
 
             if assignment_key in students[student_key]['assignments']:
               if assignment_date is not None and students[student_key]['assignments'][assignment_key]['assigned_date'] is not None:
@@ -4025,60 +4027,38 @@ def teacherStudentDashboard(request, id='', status='active'):
               if status_key in ['S', 'F', 'A']:
                 students[student_key]['assignments'][assignment_key]['complete'] += 1
 
-              if students[student_key]['assignments'][assignment_key]['total'] > 0:
-                students[student_key]['assignments'][assignment_key]['percent_complete'] = int((float(students[student_key]['assignments'][assignment_key]['complete'])/float(students[student_key]['assignments'][assignment_key]['total']))*100)
-
               students[student_key]['assignments'][assignment_key]['lessons'][curriculum.order] = lesson
             else:
               students[student_key]['assignments'][assignment_key] = {'curriculum_id': curriculum.unit.id,
-                                  'curriculum_type': 'Unit',
-                                  'group': assignment.group,
-                                   'title': curriculum.unit.title,
-                                   'assigned_date': assignment_date,
-                                   'last_opened': last_opened,
-                                   'assignment_status': {'N': 0, 'P': 0, 'S': 0, 'F': 0, 'A': 0},
-                                   'total': 1,
-                                   'complete': 0,
-                                   'percent_complete': 0,
-                                   'lessons': {curriculum.order: lesson}
-                                   }
+                                                                      'curriculum_type': 'Unit',
+                                                                      'group': assignment.group,
+                                                                       'title': curriculum.unit.title,
+                                                                       'assigned_date': assignment_date,
+                                                                       'last_opened': last_opened,
+                                                                       'assignment_status': {'N': 0, 'P': 0, 'S': 0, 'F': 0, 'A': 0},
+                                                                       'total': 1,
+                                                                       'complete': 0,
+                                                                       'lessons': {curriculum.order: lesson}
+                                                                       }
               students[student_key]['assignments'][assignment_key]['assignment_status'][status_key] += 1
 
               if status_key in ['S', 'F', 'A']:
                 students[student_key]['assignments'][assignment_key]['complete'] = 1
 
-              students[student_key]['assignments'][assignment_key]['percent_complete'] = int((float(students[student_key]['assignments'][assignment_key]['complete'])/float(students[student_key]['assignments'][assignment_key]['total']))*100)
-
+          #stand alone lesson
           else:
             assignment_key = str(curriculum.id) + '_' + str(assignment.group.id)
             students[student_key]['assignments'][assignment_key] = {'curriculum_id': curriculum.id,
-                                          'assignment_id': assignment.id,
-                                           'curriculum_type': curriculum.get_curriculum_type_display(),
-                                           'group': assignment.group,
-                                           'title': curriculum.title,
-                                           'assigned_date': assignment_date,
-                                           'last_opened': last_opened,
-                                           'assignment_status': status_key,
-                                           'percent_complete': percent_complete
-                                           }
+                                                                    'assignment_id': assignment.id,
+                                                                    'curriculum_type': curriculum.get_curriculum_type_display(),
+                                                                    'group': assignment.group,
+                                                                    'title': curriculum.title,
+                                                                    'assigned_date': assignment_date,
+                                                                    'last_opened': last_opened,
+                                                                    'assignment_status': status_key,
+                                                                    }
 
         students[student_key]['assignments'] = {k: v for k, v in sorted(students[student_key]['assignments'].items(), key=lambda item: item[1]['title'])}
-      #assignments.sort(key=lambda x:x['title'])
-      #print(sorted(assignments.items(), key=lambda item: item[1]['title']))
-      '''if sort_by:
-        if sort_by == 'curriculum':
-          assignments = {k: v for k, v in sorted(assignments.items(), key=lambda item: item[1]['title'])}
-        elif sort_by == 'class':
-          assignments = {k: v for k, v in sorted(assignments.items(), key=lambda item: item[1]['group'])}
-        elif sort_by == 'last_opened':
-          assignments = {k: v for k, v in sorted(assignments.items(), key=lambda item: item[1]['last_opened'])}
-        elif sort_by == 'assigned_date':
-          assignments = {k: v for k, v in sorted(assignments.items(), key=lambda item: item[1]['assigned_date'])}
-        elif sort_by == 'percent_complete':
-          assignments = {k: v for k, v in sorted(assignments.items(), key=lambda item: item[1]['percent_complete'])}
-
-      else:
-        assignments = {k: v for k, v in sorted(assignments.items(), key=lambda item: item[1]['title'])}'''
 
     current_site = Site.objects.get_current()
     domain = current_site.domain
@@ -6661,18 +6641,43 @@ def get_student_assignment_instance_percent_complete(request, student_id, assign
   try:
     assignment = models.Assignment.objects.get(id=assignment_id)
     instance = models.AssignmentInstance.objects.get(assignment__id=assignment_id, student__id=student_id)
-    total_questions = models.CurriculumQuestion.objects.all().filter(step__curriculum=assignment.curriculum).count()
-    attempted_questions = models.QuestionResponse.objects.all().filter(step_response__instance=instance).exclude(response__exact='', response_file__isnull=True).count()
-    total_steps = instance.assignment.curriculum.steps.count()
-    last_step = instance.last_step
     if instance.status in ['N', 'P']:
+      total_questions = get_total_questions_in_curriculum(assignment.curriculum.id)
+      #total_questions = models.CurriculumQuestion.objects.all().filter(step__curriculum__id=assignment.curriculum.id).count()
       if total_questions > 0:
-        percent_complete = int(float(attempted_questions)/float(total_questions)*100)
+        attempted_questions = models.QuestionResponse.objects.all().filter(step_response__instance=instance).exclude(response__exact='', response_file__isnull=True).count()
+        percent_complete = int((float(attempted_questions)/float(total_questions))*100)
       else:
-        percent_complete = int(float(last_step)/float(total_steps)*100)
+        last_step = instance.last_step
+        total_steps = get_total_steps_in_curriculum(assignment.curriculum.id)
+        #total_steps =  models.Step.objects.all().filter(curriculum__id=assignment.curriculum.id).count()
+        percent_complete = int((float(last_step)/float(total_steps))*100)
     else:
       percent_complete = 100
   except models.AssignmentInstance.DoesNotExist:
     percent_complete = 0
 
-  return percent_complete
+  if request.is_ajax():
+    response_data = {'success': True, 'percent_complete': percent_complete}
+    return http.HttpResponse(json.dumps(response_data), content_type = 'application/json')
+  else:
+    return percent_complete
+
+def get_total_questions_in_curriculum(curriculum_id):
+  cache_key = 'curriculum_question_count_%s'%(curriculum_id)
+  question_count = cache.get(cache_key)
+  if question_count is None:
+    question_count = models.CurriculumQuestion.objects.all().filter(step__curriculum__id=curriculum_id).count()
+    cache.set(cache_key, question_count, 60*60)
+
+  return question_count
+
+def get_total_steps_in_curriculum(curriculum_id):
+  cache_key = 'curriculum_step_count_%s'%(curriculum_id)
+  step_count = cache.get(cache_key)
+  if step_count is None:
+    step_count = models.Step.objects.all().filter(curriculum__id=curriculum_id).count()
+    cache.set(cache_key, step_count, 60*60)
+
+  return step_count
+

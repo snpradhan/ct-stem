@@ -96,8 +96,31 @@ function render_stacked_bar_chart(element) {
 }
 function render_progress_chart(element) {
   var id = $(element).attr('id');
+  var student_id = $(element).data('student-id');
+  var assignment_id = $(element).data('assignment-id');
   var percent_complete = $(element).data('percent-complete');
-  var chart_color = $(element).data('color');
+  if(student_id && assignment_id) {
+    $.ajax({
+      type: 'GET',
+      url: '/assignment_percent_complete/'+student_id+'/'+assignment_id+'/',
+      success: function(data){
+        if(data['success'] == true) {
+          percent_complete = data['percent_complete'];
+          render_progress_chart_with_percent_complete(id, percent_complete);
+        }
+        return false;
+      },
+      error: function(xhr, ajaxOptions, thrownError){
+        alert(thrownError);
+      },
+    });
+  }
+  else {
+    render_progress_chart_with_percent_complete(id, percent_complete);
+  }
+}
+function render_progress_chart_with_percent_complete(id, percent_complete) {
+
   var text_color = 'black';
   if(parseInt(percent_complete) > 15 ){
     text_color = 'white';

@@ -95,7 +95,7 @@
   <div class="dashboard_assignments">
     <div class="assignments">
       {% for key, assignment in assignments.items %}
-      {% with assignment_id=assignment|get_item:'assignment_id' curriculum_id=assignment|get_item:'curriculum_id' group=assignment|get_item:'group' assignment_status=assignment|get_item:'assignment_status' percent_complete=assignment|get_item:'percent_complete' %}
+      {% with assignment_id=assignment|get_item:'assignment_id' curriculum_id=assignment|get_item:'curriculum_id' group=assignment|get_item:'group' assignment_status=assignment|get_item:'assignment_status' %}
       <div class="assignment tile standalone">
         <div class="assignment_details">
           <h5 class="left">
@@ -153,7 +153,7 @@
             <div id="assignment_chart_student_{{id}}_curriculum_{{key}}" class="stacked_bar_chart unrendered" name="{{assignment_chart_config}}" data-total="{{assignment|get_item:'total'}}"></div>
           {% else %}
             {% get_chart_color assignment_status as color %}
-            <div id="assignment_chart_student_{{id}}_curriculum_{{key}}" class="progress_chart unrendered" data-percent-complete="{{percent_complete}}" data-color="{{color}}"></div>
+            <div id="assignment_chart_student_{{id}}_curriculum_{{key}}" class="progress_chart unrendered" data-percent-complete="" data-color="{{color}}" data-student-id="{{id}}" data-assignment-id="{{assignment_id}}"></div>
           {% endif %}
         </div>
         <div class="assignment_stats">
@@ -190,7 +190,7 @@
               <div class="assignment_status_chart">
                 {% with percent_complete=lesson|get_item:'percent_complete' assignment_status=lesson|get_item:'assignment_status' %}
                 {% get_chart_color assignment_status as color %}
-                  <div id="assignment_chart_student_{{id}}_curriculum_{{key}}_lesson_{{order}}" class="progress_chart unrendered" data-percent-complete="{{percent_complete}}" data-color="{{color}}"></div>
+                  <div id="assignment_chart_student_{{id}}_curriculum_{{key}}_lesson_{{order}}" class="progress_chart unrendered" data-percent-complete="" data-color="{{color}}" data-student-id="{{id}}" data-assignment-id="{{lesson|get_item:'assignment_id'}}"></div>
                 {% endwith %}
               </div>
               <div class="assignment_stats">
@@ -246,16 +246,6 @@
     $('button#reset').click(function(){
       $('#assignment_search :input').not(':button, :submit, :reset, :hidden').val('');
       $('#assignment_search').submit();
-    });
-    $(".progress").each(function(){
-      $(this).css({'background-color': '#E5F7FF', '-webkit-box-shadow': 'none', 'box-shadow': 'none', 'background-image': 'none'});
-    });
-    $(".progress-bar").each(function(){
-      var complete = $(this).data('percent-complete');
-      $(this).css({'background-color': '#00ADFF', 'background-image': 'none', 'width': complete+'%'})
-      if(complete < 10){
-         $(this).css({'color': 'black'});
-      }
     });
 
     //on page load, apply existing filters and load results

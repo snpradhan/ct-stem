@@ -19,78 +19,7 @@
         <h5><a href="{% url 'ctstem:curriculatiles' %}?bucket=favorite_curricula"><i class="far fa-star"></i> Favorites</a></h5>
     </div>
   </div>
-  <div id="recent_activity">
-    <div id="class_activity">
-      <div class="title">
-        <h3 class="left">Recent Class Activity</h3>
-      </div>
-      <hr>
-      <div class="activities">
-        {% if group_activity %}
-          {% with sorted_group_activity=group_activity|sort:'1' %}
-          {% for key, activities in sorted_group_activity.items %}
-            {% for activity in activities %}
-              <div class="activity">
-                <div class="description">
-                  {% with activity_type=activity|get_item:'activity_type' %}
-                  {% if activity_type == 'new_class' %}
-                    New class <strong>{{activity|get_item:'class'}}</strong> created
-                  {% elif activity_type == 'modified_class' %}
-                    Class <strong>{{activity|get_item:'class'}}</strong> modified
-                  {% elif activity_type == 'new_assignment' %}
-                    New assignment <strong>{{activity|get_item:'assignment'}}</strong> added to class <strong>{{activity|get_item:'class'}}</strong>
-                  {% elif activity_type == 'new_member' %}
-                    New student <strong>{{activity|get_item:'student'}}</strong> added to class <strong>{{activity|get_item:'class'}}</strong>
-                  {% endif %}
-                  {% endwith %}
-                </div>
-                <div class="time">
-                  {{activity|get_item:'time'|timesince}} ago
-                </div>
-              </div>
-            {% endfor %}
-          {% endfor %}
-          {% endwith %}
-        {% else %}
-          <h4>No Class Activity</h3>
-        {% endif %}
-      </div>
-    </div>
-    <div id="student_activity">
-      <div class="title">
-        <h3 class="left">Recent Student Activity</h3>
-      </div>
-      <hr>
-      <div class="activities">
-        {% if student_activity %}
-          {% with sorted_student_activity=student_activity|sort:'1' %}
-          {% for key, activities in sorted_student_activity.items %}
-            {% for activity in activities %}
-              <div class="activity">
-                <div class="description">
-                  {% with activity_type=activity|get_item:'activity_type' %}
-                  {% if activity_type == 'assignment_start' %}
-                    Student <strong>{{activity|get_item:'student'}}</strong> in class <strong>{{activity|get_item:'class'}}</strong> started assignment <strong>{{activity|get_item:'assignment'}}</strong>
-                  {% elif activity_type == 'assignment_inprogress' %}
-                    Student <strong>{{activity|get_item:'student'}}</strong> in class <strong>{{activity|get_item:'class'}}</strong> saved assignment <strong>{{activity|get_item:'assignment'}}</strong>
-                  {% elif activity_type == 'assignment_complete' %}
-                    Student <strong>{{activity|get_item:'student'}}</strong> in class <strong>{{activity|get_item:'class'}}</strong> completed assignment <strong>{{activity|get_item:'assignment'}}</strong>
-                  {% endif %}
-                  {% endwith %}
-                </div>
-                <div class="time">
-                  {{activity|get_item:'time'|timesince}} ago
-                </div>
-              </div>
-            {% endfor %}
-          {% endfor %}
-          {% endwith %}
-        {% else %}
-          <h4>No Student Activity</h3>
-        {% endif %}
-      </div>
-    </div>
-  </div>
+
   <div id="dashboard_classes">
     <div class="title">
       <h3 class="left">{{status|title}} Classes ({{groups|length}} of {{group_count}})</h3>
@@ -204,7 +133,7 @@
 
     <div id="dashboard_students">
       <div class="title">
-        <h3 class="left">Students ({{student_count}})</h3>
+        <h3 class="left">Students ({{students|length}} of {{student_count}})</h3>
         <a type="button" class="btn normal yellow upload-modal" href="#" data-toggle="modal" data-target="#upload" title="Upload Students">
           Add New
         </a>
@@ -266,16 +195,6 @@
       $(this).children().each(function(){
         $(this).toggle();
       })
-    });
-    $(".progress").each(function(){
-      $(this).css({'background-color': '#E5F7FF', '-webkit-box-shadow': 'none', 'box-shadow': 'none', 'background-image': 'none'});
-    });
-    $(".progress-bar").each(function(){
-      var complete = $(this).data('percent-complete');
-      $(this).css({'background-color': '#00ADFF', 'background-image': 'none', 'width': complete+'%'})
-      if(complete < 10){
-         $(this).css({'color': 'black'});
-      }
     });
 
     $('.stacked_bar_chart').each(function(){
