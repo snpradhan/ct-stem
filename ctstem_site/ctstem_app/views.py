@@ -4280,6 +4280,111 @@ def assignmentDashboard(request, id=''):
   except models.Assignment.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested assignment not found</h1>')
 
+
+@login_required
+def assignmentProgressDashboard(request, teacher_id=''):
+  try:
+    if request.method == 'GET' or request.method == 'POST':
+      header = []
+      student_progress = {}
+      assignment = assignment_id = group_id = sort_by = None
+
+      if request.method == 'GET':
+        assignment_id = request.GET.get('assignment', '')
+        sort_by = None
+      else:
+        data = request.POST.copy()
+        group_id = data['group']
+        curriculum_id = data['assignment']
+        if group_id and curriculum_id:
+          assignment_id = models.Assignment.objects.all().filter(group__id=group_id, curriculum__id=curriculum_id)[0].id
+        sort_by = data['sort_by']
+
+
+      if assignment_id:
+        assignment = models.Assignment.objects.get(id=assignment_id)
+        group_id = assignment.group.id
+
+      if group_id:
+        if hasattr(request.user, 'researcher'):
+          has_permission = True
+        else:
+          has_permission = check_group_permission(request, group_id)
+
+        if not has_permission:
+          return http.HttpResponseNotFound('<h1>You do not have the privilege to view this assignment</h1>')
+
+      filter_form = forms.ProgressDashboardSearchForm(teacher_id=teacher_id, group_id=group_id, assignment_id=assignment_id, sort_choice=sort_by)
+
+      if assignment:
+        students = assignment.group.members.all().order_by(Lower('user__last_name'), Lower('user__first_name'))
+        curriculum = models.Curriculum.objects.get(id=assignment.curriculum.id)
+        steps = models.Step.objects.all().filter(curriculum__id=curriculum.id).order_by('order')
+        questions = models.CurriculumQuestion.objects.all().filter(step__curriculum=assignment.curriculum)
+        question_responses = models.QuestionResponse.objects.all().filter(step_response__instance__assignment=assignment)
+        question_feedback = models.QuestionFeedback.objects.all().filter(response__in=question_responses)
+
+        for step in steps:
+          step_questions = questions.filter(step=step).order_by('order')
+          header.append({'id': step.id, 'title': step.title, 'order': step.order, 'questions': [question for question in step_questions]})
+
+        #for researchers filter out students who have opted out
+        if hasattr(request.user, 'researcher'):
+          students = students.filter(consent='A')
+
+        instances = models.AssignmentInstance.objects.all().filter(assignment=assignment)
+        student_assignment_details = []
+        serial = 1
+
+        for student in students:
+          student_progress[student.id] = {'student': student, 'progress': []}
+          try:
+            instance = instances.get(student=student)
+            student_question_response = question_responses.filter(step_response__instance=instance)
+            for step in steps:
+              step_questions = questions.filter(step=step).order_by('order')
+              if step_questions:
+                for question in step_questions:
+                  try:
+                    response = question_responses.filter(step_response__step=step, curriculum_question=question, step_response__instance=instance)
+                    if response and (response[0].response or response[0].response_file.all()):
+                      feedback = question_feedback.filter(response=response[0])
+                      if feedback and feedback[0]:
+                        student_progress[student.id]['progress'].append({'response': response[0], 'feedback': feedback[0]})
+                      else:
+                        student_progress[student.id]['progress'].append({'response': response[0], 'feedback': None})
+                    else:
+                      student_progress[student.id]['progress'].append(1)
+                  except models.QuestionResponse.DoesNotExist:
+                    student_progress[student.id]['progress'].append(1)
+              else:
+                student_progress[student.id]['progress'].append(0)
+
+            percent_complete = get_student_assignment_instance_percent_complete(request, student.id, assignment.id)
+            student_progress[student.id]['percent_complete'] = percent_complete
+            student_progress[student.id]['instance'] = instance
+          except models.AssignmentInstance.DoesNotExist:
+            instance = None
+            percent_complete = 0
+            for step in steps:
+              question_count = questions.filter(step=step).count()
+              if question_count:
+                for index in range(0, question_count):
+                  student_progress[student.id]['progress'].append(1)
+              else:
+                student_progress[student.id]['progress'].append(0)
+
+            student_progress[student.id]['percent_complete'] = percent_complete
+            student_progress[student.id]['instance'] = instance
+
+      context = {'teacher_id': teacher_id, 'assignment': assignment, 'student_progress': student_progress, 'header': header, 'filter_form': filter_form}
+      return render(request, 'ctstem_app/AssignmentProgressDashboard.html', context)
+
+    return http.HttpResponseNotAllowed(['GET', 'POST'])
+
+  except models.Assignment.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested assignment not found</h1>')
+
 ####################################
 # STUDENT ASSIGNMENTS
 ####################################
@@ -4788,6 +4893,43 @@ def feedback(request, assignment_id='', instance_id=''):
   except models.Step.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Curriculum Step not found </h1>')
 
+@login_required
+def question_feedback(request, response_id=''):
+  try:
+    if '' != response_id:
+      questionResponse = models.QuestionResponse.objects.get(id=response_id)
+      curriculum_question = questionResponse.curriculum_question
+      stepResponse = questionResponse.step_response
+      instance = stepResponse.instance
+
+      feedback, created = models.AssignmentFeedback.objects.get_or_create(instance=instance)
+      stepFeeback, created = models.StepFeedback.objects.get_or_create(assignment_feedback=feedback, step_response=stepResponse)
+      questionFeedback, created = models.QuestionFeedback.objects.get_or_create(step_feedback=stepFeeback, response=questionResponse)
+
+      if 'GET' == request.method:
+        form = forms.QuestionFeedbackForm(instance=questionFeedback)
+        context = {'form': form, 'curriculum_question': curriculum_question, 'question_response': questionResponse}
+        return render(request, 'ctstem_app/QuestionFeedback.html', context)
+      elif 'POST' == request.method:
+        data = request.POST.copy()
+        form = forms.QuestionFeedbackForm(data, instance=questionFeedback)
+        response_data = {}
+        if form.is_valid():
+          form.save()
+          response_data = {'success': True }
+        else:
+          context = {'form': form, 'curriculum_question': curriculum_question, 'question_response': questionResponse}
+          html = render_to_string('ctstem_app/QuestionFeedback.html', context, request)
+          response_data = {'success': False, 'html': html, 'error': 'The feedback could not be saved because there were errors. Please check the errors below.'}
+
+        return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+
+      return http.HttpResponseNotAllowed(['GET', 'POST'])
+
+    else:
+      raise models.QuestionResponse.DoesNotExist
+  except models.QuestionResponse.DoesNotExist:
+    return http.HttpResponseNotFound(('<h1>Requested response not found</h1>'))
 ####################################
 # Teacher feedback
 ####################################

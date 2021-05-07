@@ -99,7 +99,7 @@
             {% endif %}
           </div-->
           <div class="assignment_details">
-            <h5 class="left"><a href="{% url 'ctstem:assignmentDashboard' assignment.id %}">
+            <h5 class="left"><a href="{% url 'ctstem:assignmentProgressDashboard' teacher.id %}?assignment={{assignment.id}}">
               {{assignment.curriculum.title}}</a>
             </h5>
             <h6 class="left">Class: {{assignment.group.title}}</h6>

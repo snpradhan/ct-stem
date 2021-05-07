@@ -1,6 +1,6 @@
 from ctstem_app import models
 
-def group_assignment_dropdown_list(groups):
+def group_assignment_dropdown_list(groups, for_student_inbox=True):
   curricula = models.Curriculum.objects.all().filter(assignments__group__in=groups).exclude(status='R').distinct().order_by('title')
   assignment_list = {}
   for curriculum in curricula:
@@ -18,12 +18,20 @@ def group_assignment_dropdown_list(groups):
       assignment_list[curriculum.id] = {'title': curriculum.title}
 
   assignment_list = {k: v for k, v in sorted(assignment_list.items(), key=lambda item: item[1]['title'])}
-  assignment_choices = [('', '---------')]
+  if for_student_inbox:
+    assignment_choices = [('', '---------')]
+  else:
+    assignment_choices = [('', 'Select an Assignment')]
   for curriculum_id, details in assignment_list.items():
-    assignment_choices.append((curriculum_id, details['title']))
     if 'lessons' in details.keys():
+      if for_student_inbox:
+        assignment_choices.append((curriculum_id, details['title']))
+      else:
+        assignment_choices.append(('', {'label': details['title'], 'disabled': True}))
       for order in sorted(details['lessons']):
         assignment_choices.append((details['lessons'][order].id, '-----  '+details['lessons'][order].title))
+    else:
+      assignment_choices.append((curriculum_id, details['title']))
 
   return assignment_choices
 

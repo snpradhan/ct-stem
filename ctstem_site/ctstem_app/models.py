@@ -99,6 +99,14 @@ ASSIGNMENT_SORT = (
   ('modified', 'Last Modified')
 )
 
+PROGRESS_DASHBOARD_SORT = (
+  ('most_progress', 'Most Progress'),
+  ('least_progress', 'Least Progress'),
+  ('most_time', 'Most Time Spent'),
+  ('least_time', 'Least Time Spent'),
+  ('newest_update', 'Most Recent Update'),
+  ('oldest_update', 'Least Recent Update')
+)
 REQUESTER_ROLE = (
   ('', 'I am:'),
   ('T', 'Teacher'),

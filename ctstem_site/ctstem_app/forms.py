@@ -1569,6 +1569,54 @@ class InboxFilterForm (forms.Form):
         field.widget.attrs['class'] = 'form-control'
         field.widget.attrs['placeholder'] = field.help_text
 
+class ProgressDashboardSearchForm(forms.Form):
+  group = forms.ModelChoiceField(required=True, queryset=models.UserGroup.objects.all().order_by('title'), label='Class', empty_label=None)
+  assignment = forms.ChoiceField(required=True, choices=(('', '---------'),), label='Assignment', widget=widgets.SelectWithDisabled)
+  sort_by = forms.ChoiceField(required=True, choices=models.PROGRESS_DASHBOARD_SORT, initial='title', label='Sort by')
+
+  def __init__(self, *args, **kwargs):
+    teacher_id = group_id = assignment_id = sort_choice = None
+    if 'teacher_id' in kwargs:
+      teacher_id = kwargs.pop('teacher_id')
+    if 'group_id' in kwargs:
+      group_id = kwargs.pop('group_id')
+    if 'assignment_id' in kwargs:
+      assignment_id = kwargs.pop('assignment_id')
+    if 'sort_choice' in kwargs:
+      sort_choice = kwargs.pop('sort_choice')
+
+    super(ProgressDashboardSearchForm, self).__init__(*args, **kwargs)
+
+    for field_name, field in list(self.fields.items()):
+      field.widget.attrs['class'] = 'form-control'
+      field.widget.attrs['placeholder'] = field.help_text
+
+    #populating classes and initial select
+    #expand underlying curricula under unit
+    teacher = models.Teacher.objects.get(id=teacher_id)
+    groups = models.UserGroup.objects.all().filter(Q(teacher=teacher) | Q(shared_with=teacher)).order_by('title')
+    self.fields['group'].queryset = groups
+    selected_group = models.UserGroup.objects.all().filter(id=group_id)
+    self.fields['group'].initial = group_id
+
+    assignment_choices = util.group_assignment_dropdown_list(selected_group, False)
+    self.fields['assignment'].choices = tuple(assignment_choices)
+    if assignment_id:
+      assignment = models.Assignment.objects.get(id=assignment_id)
+      self.fields['assignment'].initial = assignment.curriculum.id
+    else:
+      self.fields['assignment'].widget.attrs['class'] += ' error'
+
+    if sort_choice:
+      self.fields['sort_by'].initial = sort_choice
+
+
+
+
+    #self.add_error('icon', 'Icon file is invalid. Please upload a new file.')
+
+
+
 ####################################
 # School Form
 ####################################

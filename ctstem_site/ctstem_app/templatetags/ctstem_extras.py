@@ -458,7 +458,7 @@ def get_assignment_status(assignment_id):
 
 @register.simple_tag(takes_context=True)
 def get_assignment_status_chart_config(context, assignment_id, chart_type):
-  assignment_status = get_assignment_status(context, assignment_id)
+  assignment_status = get_assignment_status(assignment_id)
   return get_chart_config(context, assignment_status, chart_type)
 
 @register.simple_tag(takes_context=True)

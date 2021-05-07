@@ -1,0 +1,141 @@
+
+<div class="modal-dialog modal-lg">
+  <div class="modal-content">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal">&times;</button>
+      <h3 class="modal-title">Feedback for Question {{curriculum_question.step.order}}.{{curriculum_question.order}}</h3>
+    </div>
+    <div id="questionFeedbackMsg" class="msg">
+      <ul class="errorlist">
+        <li></li>
+      </ul>
+    </div>
+    <form class="form" id="questionFeedbackForm" method="post" action="{% url 'ctstem:questionFeedback' question_response.id %}">
+      {% csrf_token %}
+      {{form.media}}
+      <div class="modal-body">
+        <div class="form-group">
+          <label>
+            Question {% include 'ctstem_app/QuestionCategoryDisplay.html' with question=curriculum_question.question %}
+            {% if curriculum_question.optional %}
+              <span class="optional">(optional)</span>
+            {% else %}
+              <span class="mandatory">*</span>
+            {% endif %}
+            :
+          </label>
+          <div class="question"> {{curriculum_question.question|safe}}</div>
+        </div>
+        <div class="form-group">
+          <label>Student Response:</label>
+          <div class="response">
+            {% if question_response %}
+              {% if question_response.response %}
+                {% if curriculum_question.question.answer_field_type == 'MI' %}
+                  <img src="{{question_response.response}}" class="image_option"/>
+                {% elif curriculum_question.question.answer_field_type == 'SK' %}
+                  <canvas id="{{question_response.id}}_sketch" width="900" height="500" class="assignment_sketch" style="{% if curriculum_question.question.sketch_background %} background: url({{curriculum_question.question.sketch_background.url}}) no-repeat;{% endif %}"></canvas>
+                  <input type="hidden" name="{{question_response.id}}_sketch_response" id="{{question_response.id}}_sketch_response" value="{{question_response.response}}"/>
+                {% elif curriculum_question.question.answer_field_type == 'DT' %}
+                  <div class="dt_input" id="dt_input_{{forloop.counter}}">
+                    <input type="hidden" name="{{question_response.id}}_dt_response" id="{{question_response.id}}_dt_response" value='{{question_response.response}}'/>
+                    <input type="hidden" name="column_headers" id="dt_col_headers_{{question_response.id}}" value="{{curriculum_question.question.options}}"/>
+                    <table class="table table-condensed table-bordered inner_table" id="dt_table_{{question_response.id}}">
+                      <thead>
+                      </thead>
+                      <tbody>
+                      </tbody>
+                    </table>
+                  </div>
+                {% elif curriculum_question.question.answer_field_type == 'TA' %}
+                  {{question_response.response|safe}}
+                {% else %}
+                  {{question_response.response}}
+                {% endif %}
+              {% elif question_response.response_file.all %}
+                Uploaded file(s):
+                <ul>
+                {% for response_file in question_response.response_file.all %}
+                  <li><a href="{{response_file.file.url}}" target="_blank">Click here to view file {{forloop.counter}}</a></li>
+                {% endfor %}
+                </ul>
+              {% else %}
+                <span style="font-style: italic;">No response yet</span>
+              {% endif %}
+            {% else %}
+              <span style="font-style: italic;">No response yet</span>
+            {% endif %}
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Feedback</label>
+          <div class="feedback">
+            {{form.feedback}}
+          </div>
+        </div>
+
+        <div id="spinner">
+          <img src="/static/img/page-loader.gif" class="icon"/>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div class="form-group">
+          <button type="submit" id="saveFeedback" class="btn inbetween yellow">
+            Save
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script type="text/javascript">
+$(function (){
+
+  //loadCanvasData();
+  //loadDataTable(false);
+
+  $("#questionFeedbackForm").submit(function(e) {
+
+    e.preventDefault();
+
+    $.ajax({
+      type: $(this).attr('method'),
+      url: this.action,
+      data: $(this).serialize(),
+      context: this,
+      beforeSend: function(){
+        $('#questionFeedbackForm #spinner').show();
+      },
+      complete: function(){
+        $('#questionFeedbackForm #spinner').hide();
+      },
+      success: function(data, status){
+        if(data['success'] == true){
+          $("#questionFeedbackForm")[0].reset();
+          $("#questionModal").modal('toggle');
+        }
+        else{
+          $('#questionModal').html(data['html']);
+          $('#questionFeedbackMsg .errorlist li:first-child').addClass('error').html(data['error']);
+        }
+        return false;
+      },
+      error: function(xhr, ajaxOptions, thrownError){
+        alert(thrownError);
+      },
+    });
+  });
+
+
+  //for each error message highlight the field causing the error
+  $('div.error').each(function(){
+    var error_length = $.trim($(this).text()).length;
+    if(error_length > 0) {
+      $(this).closest('.form-group').find('label, .question_input .form-control:input, .question_input .django-ckeditor-widget').addClass('input_error');
+    }
+  });
+
+});
+
+</script>

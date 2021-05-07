@@ -47,6 +47,61 @@ function render_pie_chart(element) {
   });
 }
 
+function render_donut_chart(element) {
+
+  var id = $(element).attr('id');
+  var complete = parseInt($(element).attr('name'));
+  var remaining = 100-complete;
+  $("#"+id).highcharts({
+    chart: {
+      type: 'pie',
+      height: 130,
+      width: 130,
+      backgroundColor: 'rgba(0,0,0,0)',
+    },
+    title: {
+      text: complete+'%',
+      align: 'center',
+      verticalAlign: 'middle',
+      y: 0,
+      style: {
+        fontSize: '1.2em',
+        color: 'black',
+      },
+    },
+    tooltip: false,
+    plotOptions: {
+      pie: {
+        dataLabels: {
+          enabled: false,
+        },
+        startAngle: 0,
+        endAngle: 360,
+      }
+    },
+    credits: {
+      enabled: false
+    },
+    series: [{
+      type: 'pie',
+      name: 'Work',
+      innerSize: '80%',
+      data: [
+        {
+          name: 'Complete',
+          y: complete,
+          color: 'green',
+        },
+        {
+          name: 'Remaining',
+          y: remaining,
+          color: 'grey',
+        },
+      ]
+    }]
+  });
+}
+
 function render_stacked_bar_chart(element) {
   var id = $(element).attr('id');
   var status_str = $(element).attr('name').replace(/'/g, '"');

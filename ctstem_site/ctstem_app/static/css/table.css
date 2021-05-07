@@ -312,19 +312,19 @@ div.dashboard_container::-webkit-scrollbar-thumb {
   -webkit-box-shadow: 0 0 1px rgba(255, 255, 255, .5);
 }
 
-table#group_curriculum_dashboard .student_col {
+div.dashboard_container .student_col {
   position: sticky;
   left: 0;
   background-color: #666666 !important;
   color: white;
 }
-table#group_curriculum_dashboard thead th {
+div.dashboard_container thead th {
   top: 0;
 }
-table#group_curriculum_dashboard thead th.student_col {
+div.dashboard_container thead th.student_col {
   z-index: 1001;
 }
-table#group_curriculum_dashboard tbody th.student_col {
+div.dashboard_container tbody th.student_col {
   z-index: 999;
 }
 

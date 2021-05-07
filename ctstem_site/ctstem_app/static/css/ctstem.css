@@ -1189,7 +1189,37 @@ div.content#teacher_student_dashboard div.dashboard_assignments div.underlying_l
 }
 
 /*******************TEACHER STUDENT DASHBOARD END**************************/
-
+div.content#assignment_progress_dashboard .legends {
+  display: flex;
+  justify-content: space-between;
+  width: 60em;
+  margin-left: auto;
+  margin-top: 1em;
+  margin-bottom: 1em;
+  border: 1px solid black;
+  border-radius: 2px;
+  padding: 1em;
+}
+div.content#assignment_progress_dashboard .legends > div {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+div.content#assignment_progress_dashboard td.question {
+  text-align: center;
+}
+div.content#assignment_progress_dashboard td.percent_complete {
+  width: 5em;
+  text-align: center;
+}
+div.content#assignment_progress_dashboard td.time_spent {
+  width: 10em;
+  text-align: center;
+}
+div.content#assignment_progress_dashboard td.last_modified {
+  width: 10em;
+  text-align: center;
+}
 label.switch#curricula_view, label.switch#release_notes_view {
   position: absolute;
   right: 5%;
@@ -1798,7 +1828,8 @@ div.content#assignments div#inbox_search {
   top: 90px;
   z-index: 1000;
 }
-div.content#assignments div.inbox_filter {
+div.content#assignments div.inbox_filter,
+div.content#assignment_progress_dashboard div.progress_filter {
   background-color: var(--ctstem-color-blue);
   padding: 2em 5%;
   display: flex;
@@ -1806,16 +1837,19 @@ div.content#assignments div.inbox_filter {
   align-items: flex-end;
   flex-wrap: wrap;
 }
-div.content#assignments div.inbox_filter .form-group {
+div.content#assignments div.inbox_filter .form-group,
+div.content#assignment_progress_dashboard div.progress_filter .form-group {
   margin-bottom: 1em !important;
   max-width: 30em;
 }
 
-div.content#assignments div.inbox_filter .form-group label {
+div.content#assignments div.inbox_filter .form-group label,
+div.content#assignment_progress_dashboard div.progress_filter .form-group label {
   color: white;
 }
 
-div.content#assignments div.inbox_filter .form-group select {
+div.content#assignments div.inbox_filter .form-group select,
+div.content#assignment_progress_dashboard div.progress_filter .form-group select {
   max-width: min(30em, 100%);
   width: 30em;
   overflow: hidden;
