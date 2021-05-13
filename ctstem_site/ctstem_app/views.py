@@ -4073,19 +4073,19 @@ def assignmenttiles(request):
       student_groups = models.Membership.objects.all().filter(student=student).values_list('group', flat=True)
       #for each group
       tomorrow = datetime.date.today() + datetime.timedelta(days=1)
-      assignments = models.Assignment.objects.all().filter(group__in=student_groups, assigned_date__lt=tomorrow).order_by('curriculum__unit__title', 'curriculum__order')
+      assignments = models.Assignment.objects.all().filter(group__in=student_groups, assigned_date__lt=tomorrow).order_by('curriculum__unit__title', 'curriculum__order').distinct()
       data = filtered_class = filtered_assignment = filtered_teacher = None
       if request.method == 'POST':
         data = request.POST.copy()
         filtered_teacher = data['teacher']
         if filtered_teacher:
-          assignments = assignments.filter(Q(group__teacher__id=filtered_teacher) | Q(group__shared_with__id=filtered_teacher))
+          assignments = assignments.filter(Q(group__teacher__id=filtered_teacher) | Q(group__shared_with__id=filtered_teacher)).distinct()
         filtered_class = data['group']
         if filtered_class:
           assignments = assignments.filter(group__id=filtered_class)
         filtered_assignment = data['assignment']
         if filtered_assignment:
-          assignments = assignments.filter(Q(curriculum__unit__id=filtered_assignment) | Q(curriculum__id=filtered_assignment))
+          assignments = assignments.filter(Q(curriculum__unit__id=filtered_assignment) | Q(curriculum__id=filtered_assignment)).distinct()
 
 
       assignment_list = []
@@ -4152,10 +4152,10 @@ def assignmenttiles(request):
       html = render_to_string('ctstem_app/AssignmentTiles.html', context, request)
 
       #all groups the student is a member of
-      groups = models.UserGroup.objects.all().filter(Q(id__in=student_groups))
+      groups = models.UserGroup.objects.all().filter(Q(id__in=student_groups)).distinct()
       #if a teacher is selected, filter groups the teacher owns or co-owns
       if filtered_teacher:
-        groups = groups.filter(Q(teacher__id=filtered_teacher) | Q(shared_with__id=filtered_teacher))
+        groups = groups.filter(Q(teacher__id=filtered_teacher) | Q(shared_with__id=filtered_teacher)).distinct()
 
 
       context = {'choices': util.group_dropdown_list(groups), 'selected_value': filtered_class}
@@ -4163,7 +4163,7 @@ def assignmenttiles(request):
 
       #if a class is selected, limit the group to that class
       if filtered_class:
-        groups = groups.filter(Q(id=filtered_class))
+        groups = groups.filter(Q(id=filtered_class)).distinct()
 
       context = {'choices': util.group_assignment_dropdown_list(groups), 'selected_value': filtered_assignment}
       filtered_assignments_html = render_to_string('ctstem_app/DropdownListOptions.html', context, request)
