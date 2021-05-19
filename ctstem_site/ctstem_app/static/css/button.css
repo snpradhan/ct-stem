@@ -21,6 +21,10 @@
   font-size: 1em !important;
   padding: 0.6em 1em !important;
 }
+.btn.tiny, button[class*="tiny"] {
+  font-size: 0.75em !important;
+  padding: 0.25em 0.75em !important;
+}
 .btn.lightblue, button[class*="lightblue"] {
   background-color: var(--ctstem-color-light-blue) !important;
   color: white !important;
@@ -57,6 +61,16 @@
   background-color: #ffffff !important;
   color: var(--ctstem-color-yellow) !important;
 }
+.btn.lightyellow, button[class*="lightyellow"] {
+  background-color: var(--ctstem-color-light-yellow) !important;
+  color: black !important;
+}
+.btn.lightyellow:hover, button[class*="lightyellow"]:hover, .btn.lightyellow.active, button[class*="lightyellow"][class="active"] {
+  border: 1px solid var(--ctstem-color-light-yellow) !important;
+  background-color: #ffffff !important;
+  color: var(--ctstem-color-light-yellow) !important;
+}
+
 .btn.white, button[class*="white"] {
   border: 1px solid var(--ctstem-color-light-gray) !important;
   background-color: #ffffff !important;

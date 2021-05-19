@@ -11,8 +11,20 @@
 
 {% block content %}
   {{block.super}}
-  <div class="content" id="assignment_progress_dashboard">
-    <h5 class="left"><a href="{{ request.META.HTTP_REFERER }}"><i class="fas fa-arrow-left"></i> Back </a></h5>
+  <div class="content teacher_detailed_dashboard" id="assignment_progress_dashboard">
+    <h2> Assignment Progress </h2>
+    <div id="dashboard_header">
+      <div class="navigation">
+        <h5 class="left"><a href="{% url 'ctstem:teacherDashboard' teacher_id 'active' %}"><i class="fas fa-chevron-left"></i><i class="fas fa-chevron-left"></i> Back to Teacher Dashboard</a></h5>
+        &nbsp; &nbsp;&nbsp; &nbsp;
+        <h5 class="left"><a href="{% url 'ctstem:teacherAssignmentDashboard' teacher_id 'active' %}"><i class="fas fa-chevron-left"></i><i class="fas fa-chevron-left"></i> Back to All Assignments </a></h5>
+      </div>
+      <div class="quick_links">
+          <h5><a href="{% url 'ctstem:help' %}"><i class="far fa-question-circle"></i> Help </a></h5>
+          <h5><a href="{% url 'ctstem:curriculatiles' %}?bucket=my_curricula">My Curricula</a></h5>
+          <h5><a href="{% url 'ctstem:curriculatiles' %}?bucket=favorite_curricula"><i class="far fa-star"></i> Favorites</a></h5>
+      </div>
+    </div>
     <div class="legends">
       <div>
         <a type="button" class="btn small green"> <i class="far fa-comment-dots"></i> </a>
@@ -45,7 +57,6 @@
         <div class="form-group">
           <label>{{filter_form.assignment.label|title}}</label>
           <div>{{filter_form.assignment}}</div>
-          <div class="warning">{{ filter_form.assignment.errors }}</div>
         </div>
         <div class="form-group">
           <label>{{filter_form.sort_by.label|title}}</label>
@@ -61,7 +72,11 @@
             <th class="student_col"></th>
             {% for step in header %}
               {% with questions=step|get_item:'questions' %}
-                <th colspan={{questions|length}}>P{{step|get_item:'order'}}: {{step|get_item:'title'}}</th>
+                <th colspan={{questions|length}}>
+                  P{{step|get_item:'order'}}:
+                  <a href="#" class="fa fa-info-circle info" rel="popover" data-title="Page {{step.order}}" data-content="{{step|get_item:'title'}}">
+                  </a>
+                </th>
               {% endwith %}
             {% endfor %}
             <th colspan="3">
@@ -69,15 +84,18 @@
           </tr>
           <tr>
             <th class="student_col">
+              {% if not user.researcher %}
+                {% include "ctstem_app/AnonymizeStudentSwitch.html" with anonymize_student=assignment.anonymize_student assignment_id=assignment.id %}
+              {% endif %}
             </th>
             {% for step in header %}
               {% with questions=step|get_item:'questions' %}
                 {% if questions %}
                   {% for question in questions %}
                     <th>
-                      Q: {{step.order}}.{{question.order}}
+                      Q{{step.order}}.{{question.order}}
                       <br>
-                      <a href="{% url 'ctstem:question_response_review' assignment.id question.id %}" title="Give Feedback"> <span class="far fa-comment-dots" aria-hidden="true"></span> </a>
+                      <a class="btn tiny white" href="{% url 'ctstem:question_response_review' assignment.id question.id %}" title="Review student responses for question {{step.order}}.{{question.order}}"> <span class="far fa-comment-dots" aria-hidden="true"></span> </a>
                     </th>
                   {% endfor %}
                 {% else %}
@@ -86,17 +104,29 @@
               {% endwith %}
             {% endfor %}
             <th>% Complete</th>
-            <th>Time Spent</th>
+            <th>Time Spent <br> hh:mm:ss</th>
             <th>Last Worked On</th>
           </tr>
         </thead>
         <tbody>
-          {% for student_id, details in student_progress.items %}
-          {% with student=details|get_item:'student' progress=details|get_item:'progress' percent_complete=details|get_item:'percent_complete' instance=details|get_item:'instance' %}
+          {% for details in students_progress %}
+          {% with student=details|get_item:'student' progress=details|get_item:'progress' percent_complete=details|get_item:'percent_complete' instance=details|get_item:'instance' time_spent=details|get_item:'time_spent' modified_date=details|get_item:'modified_date' %}
           <tr>
             <td class="student_col">
-              {{student}}
-              <a href="{% url 'ctstem:feedback' assignment.id instance.id %}" title="Give Feedback"> <span class="far fa-comment-dots" aria-hidden="true"></span> </a>
+              <div class="student_name">
+                {% if user.researcher %}
+                  <b>{{student.user.id}}</b><br>
+                {% else %}
+                  <b>{{student}}</b><br>
+                {% endif %}
+              </div>
+              <div class="student_mask">
+                xxxxxxxxxxx
+              </div>
+
+              {% if instance %}
+                <a class="btn tiny white" href="{% url 'ctstem:feedback' assignment.id instance.id %}" title="Review student's response"> <span class="far fa-comment-dots" aria-hidden="true"></span> </a>
+              {% endif %}
             </td>
             {% for question_progress in progress %}
               <td class="question">
@@ -106,7 +136,9 @@
                   <i class="far fa-window-minimize"></i>
                 {% else %}
                   {% with response=question_progress|get_item:'response' feedback=question_progress|get_item:'feedback' %}
-                    <a type="button" class="btn small add_feedback {% if feedback and feedback.feedback %} green {% else %} yellow {% endif %}" data-form="{% url 'ctstem:questionFeedback' response.id %}" title="Give Feedback"> <span class="far fa-comment-dots" aria-hidden="true"></span> </a>
+                    {% if response %}
+                      <a type="button" class="btn small add_feedback {% if feedback and feedback.feedback %} green {% else %} yellow {% endif %}" data-form="{% url 'ctstem:questionFeedback' response.id %}" title="{% if feedback and feedback.feedback %} Review response and feedback {% else %} Review response and give feedback {% endif %}"> <span class="far fa-comment-dots" aria-hidden="true"></span> </a>
+                    {% endif %}
                   {% endwith %}
                 {% endif %}
               </td>
@@ -114,8 +146,12 @@
             <td class="percent_complete">
               {{percent_complete}}%
             </td>
-            <td class="time_spent">{{instance.time_spent|format_time}}</td>
-            <td class="last_modified">{{instance.modified_date|date}}</td>
+            <td class="time_spent">{{time_spent|format_time}}</td>
+            <td class="last_modified">
+              {% if modified_date %}
+                {{modified_date|date}}
+              {% endif %}
+            </td>
           </tr>
           {% endwith %}
           {% endfor %}
@@ -142,12 +178,34 @@
       });
 
       var timeout = null;
-      $('#progress_search_form select, #progress_search_form :radio').on('change', function(){
+      $('#progress_search_form select, \
+         #progress_search_form input[type=radio], \
+         #progress_search_form input[type=checkbox]').on('change', function(){
+
         if($(this).attr('id') == 'id_group'){
           $('select#id_assignment').val('');
         }
+
         $('#progress_search_form').submit();
       });
+
+      $(".info").click(function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $(".info").not(this).popover('hide');
+      });
+
+      $(document).click(function (e) {
+        if (($('.popover').has(e.target).length == 0) || $(e.target).is('.close')) {
+          $(".info").popover('hide');
+        }
+      });
+      $(".info").popover({
+        placement: 'bottom',
+        html: true,
+        container: 'body',
+      });
+
 
     });
   </script>

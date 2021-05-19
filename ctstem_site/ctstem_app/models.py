@@ -100,6 +100,7 @@ ASSIGNMENT_SORT = (
 )
 
 PROGRESS_DASHBOARD_SORT = (
+  ('student', 'Student Name (Last, First)'),
   ('most_progress', 'Most Progress'),
   ('least_progress', 'Least Progress'),
   ('most_time', 'Most Time Spent'),
@@ -594,6 +595,7 @@ class Assignment(models.Model):
   assigned_date = models.DateTimeField(auto_now_add=True)
   lock_on_completion = models.BooleanField(default=False)
   realtime_feedback = models.BooleanField(default=False)
+  anonymize_student = models.BooleanField(default=False)
 
   def __str__(self):
     return '%s' % (self.curriculum.title)

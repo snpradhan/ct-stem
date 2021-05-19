@@ -110,9 +110,10 @@ function render_stacked_bar_chart(element) {
   $("#"+id).highcharts({
     chart: {
       renderTo: 'container',
-      height: 80,
+      height: 40,
       type: 'bar',
       backgroundColor: 'rgba(0,0,0,0)',
+      margin: 0,
     },
     credits: false,
     title: {
@@ -185,8 +186,9 @@ function render_progress_chart_with_percent_complete(id, percent_complete) {
     chart: {
       renderTo: 'container',
       type: 'bar',
-      height: 100,
+      height: 25,
       backgroundColor: 'rgba(0,0,0,0)',
+      margin: 0,
     },
     credits: false,
     title: {
@@ -210,7 +212,7 @@ function render_progress_chart_with_percent_complete(id, percent_complete) {
       enableMouseTracking: false,
       showInLegend: false,
       color: '#e5f7ff',
-      pointWidth: 25,
+      pointWidth: 20,
       borderWidth: 0,
       dataLabels: {
         className: 'highlight',
@@ -227,7 +229,7 @@ function render_progress_chart_with_percent_complete(id, percent_complete) {
       data: [percent_complete],
       color: '#00adff',
       borderWidth: 0,
-      pointWidth: 25,
+      pointWidth: 20,
       dataLabels: {
         enabled: true,
         inside: true,

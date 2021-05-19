@@ -101,11 +101,7 @@
                 <th width="15%">
                   <div>Student/Teammates</div>
                   {% if not user.researcher %}
-                    <label class="switch">
-                      <input class="switch-input" type="checkbox" />
-                      <span class="switch-label" data-on="Hide Names" data-off="Show Names"></span>
-                      <span class="switch-handle"></span>
-                    </label>
+                    {% include "ctstem_app/AnonymizeStudentSwitch.html" with anonymize_student=assignment.anonymize_student assignment_id=assignment.id %}
                   {% endif %}
                 </th>
                 <th>Response</th>
@@ -223,13 +219,6 @@
 
       loadCanvasData();
       loadDataTable(false);
-
-      $("div.student_name").show();
-      $("div.student_mask").hide();
-      $('.switch-input').change(function() {
-        $("div.student_name").toggle();
-        $("div.student_mask").toggle();
-      });
 
     });
 

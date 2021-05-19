@@ -47,6 +47,7 @@ from django.core.cache import cache
 import re
 import html
 import time
+import pytz
 
 logger = logging.getLogger('django')
 
@@ -3647,83 +3648,14 @@ def teacherDashboard(request, id='', status='active'):
       is_active = False
 
     teacher = models.Teacher.objects.get(id=id)
-    all_groups = models.UserGroup.objects.all().filter(Q(is_active=is_active), Q(teacher=teacher) | Q(shared_with=teacher)).order_by('title')
-
-    ##########################
-    # ACTIVITY FEED START
-    ##########################
-    '''teacher_last_login = teacher.user.last_login
-    new_groups = all_groups.filter(created_date__gte=teacher_last_login).distinct()
-    new_group_ids = new_groups.values('id')
-    modified_groups = all_groups.filter(modified_date__gte=teacher_last_login).exclude(id__in=new_group_ids).distinct()
-    new_assignments = models.Assignment.objects.all().filter(group__in=all_groups, assigned_date__gte=teacher_last_login)
-    new_members = models.Membership.objects.all().filter(group__in=all_groups, joined_on__gte=teacher_last_login)
-
-    group_activity = {}
-    for new_group in new_groups:
-      key = new_group.created_date.strftime('%s')
-      if key in group_activity:
-        group_activity[key].append({'activity_type': 'new_class', 'class': new_group.title, 'time': new_group.created_date})
-      else:
-        group_activity[key] = [{'activity_type': 'new_class', 'class': new_group.title, 'time': new_group.created_date}]
-
-    for modified_group in modified_groups:
-      key = modified_group.modified_date.strftime('%s')
-      if key in group_activity:
-        group_activity[key].append({'activity_type': 'modified_class', 'class': modified_group.title, 'time': modified_group.modified_date})
-      else:
-        group_activity[key] = [{'activity_type': 'modified_class', 'class': modified_group.title, 'time': modified_group.modified_date}]
-
-    for new_assignment in new_assignments:
-      key = new_assignment.assigned_date.strftime('%s')
-      if key in group_activity:
-        group_activity[key].append({'activity_type': 'new_assignment', 'assignment': new_assignment.curriculum.title, 'class': new_assignment.group.title, 'time': new_assignment.assigned_date})
-      else:
-        group_activity[key] = [{'activity_type': 'new_assignment', 'assignment': new_assignment.curriculum.title, 'class': new_assignment.group.title, 'time': new_assignment.assigned_date}]
-
-    for new_member in new_members:
-      key = new_member.joined_on.strftime('%s')
-      if key in group_activity:
-        group_activity[key].append({'activity_type': 'new_member', 'student': new_member.student, 'class': new_member.group.title, 'time': new_member.joined_on})
-      else:
-        group_activity[key] = [{'activity_type': 'new_member', 'student': new_member.student, 'class': new_member.group.title, 'time': new_member.joined_on}]
-
-    assignment_starts = models.AssignmentInstance.objects.all().filter(assignment__group__in=all_groups, created_date__gte=teacher_last_login).distinct()
-    assignment_start_ids = assignment_starts.values('id')
-    assignment_inprogress = models.AssignmentInstance.objects.all().filter(assignment__group__in=all_groups, modified_date__gte=teacher_last_login, status='P').exclude(id__in=assignment_start_ids).distinct()
-    assignment_complete = models.AssignmentInstance.objects.all().filter(assignment__group__in=all_groups, modified_date__gte=teacher_last_login, status__in=['S', 'F', 'A']).exclude(id__in=assignment_start_ids).distinct()
-    student_activity = {}
-    for assignment_instance in assignment_starts:
-      key = assignment_instance.created_date.strftime('%s')
-      if key in student_activity:
-        student_activity[key].append({'activity_type': 'assignment_start', 'student': assignment_instance.student, 'assignment': assignment_instance.assignment.curriculum.title, 'class': assignment_instance.assignment.group.title, 'time': assignment_instance.created_date})
-      else:
-        student_activity[key] = [{'activity_type': 'assignment_start', 'student': assignment_instance.student, 'assignment': assignment_instance.assignment.curriculum.title, 'class': assignment_instance.assignment.group.title, 'time': assignment_instance.created_date}]
-
-    for assignment_instance in assignment_inprogress:
-      key = assignment_instance.modified_date.strftime('%s')
-      if key in student_activity:
-        student_activity[key].append({'activity_type': 'assignment_inprogress', 'student': assignment_instance.student, 'assignment': assignment_instance.assignment.curriculum.title, 'class': assignment_instance.assignment.group.title, 'time': assignment_instance.modified_date})
-      else:
-        student_activity[key] = [{'activity_type': 'assignment_inprogress', 'student': assignment_instance.student, 'assignment': assignment_instance.assignment.curriculum.title, 'class': assignment_instance.assignment.group.title, 'time': assignment_instance.modified_date}]
-
-    for assignment_instance in assignment_complete:
-      key = assignment_instance.modified_date.strftime('%s')
-      if key in student_activity:
-        student_activity[key].append({'activity_type': 'assignment_complete', 'student': assignment_instance.student, 'assignment': assignment_instance.assignment.curriculum.title, 'class': assignment_instance.assignment.group.title, 'time': assignment_instance.modified_date})
-      else:
-        student_activity[key] = [{'activity_type': 'assignment_complete', 'student': assignment_instance.student, 'assignment': assignment_instance.assignment.curriculum.title, 'class': assignment_instance.assignment.group.title, 'time': assignment_instance.modified_date}]
-    '''
-    ##########################
-    # ACTIVITY FEED END
-    ##########################
+    all_groups = models.UserGroup.objects.all().filter(Q(is_active=is_active), Q(teacher=teacher) | Q(shared_with=teacher)).order_by(Lower('title'))
 
     group_count = all_groups.count()
     filtered_groups = all_groups[:6]
-    all_assignments = models.Assignment.objects.all().filter(group__in=all_groups).distinct().order_by('curriculum__title')
+    all_assignments = models.Assignment.objects.all().filter(group__in=all_groups).distinct().order_by(Lower('curriculum__title'))
     assignment_count = all_assignments.count()
     filtered_assignments = all_assignments[:4]
-    all_students = models.Student.objects.all().filter(member_of__in=all_groups).distinct().order_by('user__last_name', 'user__first_name')
+    all_students = models.Student.objects.all().filter(member_of__in=all_groups).distinct().order_by(Lower('user__last_name'), Lower('user__first_name'))
     student_count = all_students.count()
     filtered_students = all_students[:4]
 
@@ -3792,13 +3724,14 @@ def teacherAssignmentDashboard(request, id='', status='active'):
     search_criteria = None
     if request.method == 'POST':
       data = request.POST.copy()
-      searchForm = forms.TeacherAssignmentDashboardSearchForm(teacher=teacher, is_active=is_active, data=data)
+      group_id = data['group']
+      searchForm = forms.TeacherAssignmentDashboardSearchForm(teacher=teacher, is_active=is_active, group_id=group_id, data=data)
       search_criteria = eval(json.dumps(dict(data.lists())))
     else:
       searchForm = forms.TeacherAssignmentDashboardSearchForm(teacher=teacher, is_active=is_active)
 
-    groups = models.UserGroup.objects.all().filter(Q(is_active=is_active), Q(teacher=teacher) | Q(shared_with=teacher)).order_by('title')
-    all_assignments = models.Assignment.objects.all().filter(group__in=groups).distinct().order_by('curriculum__title')
+    groups = models.UserGroup.objects.all().filter(Q(is_active=is_active), Q(teacher=teacher) | Q(shared_with=teacher)).order_by(Lower('title'))
+    all_assignments = models.Assignment.objects.all().filter(group__in=groups).distinct().order_by(Lower('curriculum__title'))
 
     sort_by = None
     if search_criteria:
@@ -3901,9 +3834,9 @@ def teacherAssignmentDashboard(request, id='', status='active'):
     #print(sorted(assignments.items(), key=lambda item: item[1]['title']))
     if sort_by:
       if sort_by == 'curriculum':
-        assignments = {k: v for k, v in sorted(assignments.items(), key=lambda item: item[1]['title'])}
+        assignments = {k: v for k, v in sorted(assignments.items(), key=lambda item: item[1]['title'].lower())}
       elif sort_by == 'class':
-        assignments = {k: v for k, v in sorted(assignments.items(), key=lambda item: item[1]['group_title'])}
+        assignments = {k: v for k, v in sorted(assignments.items(), key=lambda item: item[1]['group_title'].lower())}
       elif sort_by == 'last_opened':
         assignments = {k: v for k, v in sorted(assignments.items(), key=lambda item: (item[1]['last_opened'] is None, item[1]['last_opened']))}
       elif sort_by == 'assigned_date':
@@ -3912,7 +3845,7 @@ def teacherAssignmentDashboard(request, id='', status='active'):
         assignments = {k: v for k, v in sorted(assignments.items(), key=lambda item: item[1]['percent_complete'])}
 
     else:
-      assignments = {k: v for k, v in sorted(assignments.items(), key=lambda item: item[1]['title'])}
+      assignments = {k: v for k, v in sorted(assignments.items(), key=lambda item: item[1]['title'].lower())}
 
     current_site = Site.objects.get_current()
     domain = current_site.domain
@@ -3948,13 +3881,14 @@ def teacherStudentDashboard(request, id='', status='active'):
     search_criteria = None
     if request.method == 'POST':
       data = request.POST.copy()
-      searchForm = forms.TeacherStudentDashboardSearchForm(teacher=teacher, is_active=is_active, data=data)
+      group_id = data['group']
+      searchForm = forms.TeacherStudentDashboardSearchForm(teacher=teacher, is_active=is_active, group_id=group_id, data=data)
       search_criteria = eval(json.dumps(dict(data.lists())))
     else:
       searchForm = forms.TeacherStudentDashboardSearchForm(teacher=teacher, is_active=is_active)
 
-    groups = models.UserGroup.objects.all().filter(Q(is_active=is_active), Q(teacher=teacher) | Q(shared_with=teacher)).order_by('title')
-    all_assignments = models.Assignment.objects.all().filter(group__in=groups).distinct().order_by('curriculum__unit__title', 'curriculum__title')
+    groups = models.UserGroup.objects.all().filter(Q(is_active=is_active), Q(teacher=teacher) | Q(shared_with=teacher)).order_by(Lower('title'))
+    all_assignments = models.Assignment.objects.all().filter(group__in=groups).distinct().order_by(Lower('curriculum__unit__title'), Lower('curriculum__title'))
     student_id = None
     sort_by = None
     if search_criteria:
@@ -3981,10 +3915,10 @@ def teacherStudentDashboard(request, id='', status='active'):
         members = [student_id]
       else:
         members = models.Membership.objects.all().filter(group__in=groups).values_list('student', flat=True)
-      for student in models.Student.objects.all().filter(id__in=members).order_by('user__last_name', 'user__first_name').distinct():
+      for student in models.Student.objects.all().filter(id__in=members).order_by(Lower('user__last_name'), Lower('user__first_name')).distinct():
         student_key = student.id
         students[student_key] = {'id': student.id,
-                               'name': student.user.get_full_name(),
+                               'name': student.user.last_name + ', ' + student.user.first_name,
                                'assignment_status': {'N': 0, 'P': 0, 'S': 0, 'F': 0, 'A': 0},
                                'total': 0,
                                'assignments': {}
@@ -4058,7 +3992,9 @@ def teacherStudentDashboard(request, id='', status='active'):
                                                                     'assignment_status': status_key,
                                                                     }
 
-        students[student_key]['assignments'] = {k: v for k, v in sorted(students[student_key]['assignments'].items(), key=lambda item: item[1]['title'])}
+        students[student_key]['assignments'] = {k: v for k, v in sorted(students[student_key]['assignments'].items(), key=lambda item: item[1]['title'].lower())}
+
+    #students = {k: v for k, v in sorted(students.items(), key=lambda item: item[1]['name'])}
 
     current_site = Site.objects.get_current()
     domain = current_site.domain
@@ -4185,6 +4121,8 @@ def groupCurriculumDashboard(request, group_id='', curriculum_id='', curriculum_
       instances = models.AssignmentInstance.objects.all().filter(assignment__in=assignments)
       student_assignment_details = {}
       assignment_header = {}
+      anonymize_student = False
+      assignment_ids = []
 
       # for each lesson in a unit
       for curr in curricula:
@@ -4194,6 +4132,9 @@ def groupCurriculumDashboard(request, group_id='', curriculum_id='', curriculum_
         if assignment:
           total_questions = models.CurriculumQuestion.objects.all().filter(step__curriculum=assignment.curriculum).count()
           total_steps = assignment.curriculum.steps.count()
+          if not anonymize_student and assignment.anonymize_student:
+            anonymize_student = True
+          assignment_ids.append(assignment.id)
 
         # for each student in class
         for student in students:
@@ -4222,7 +4163,7 @@ def groupCurriculumDashboard(request, group_id='', curriculum_id='', curriculum_
           else:
             student_assignment_details[student] = [student_assignment_status]
 
-      context = {'group': group, 'curriculum': curriculum, 'assignment_header': assignment_header, 'student_assignment_details': student_assignment_details, 'assignments_by_unit': assignments_by_unit, 'curriculum_status': curriculum_status}
+      context = {'group': group, 'curriculum': curriculum, 'assignment_header': assignment_header, 'student_assignment_details': student_assignment_details, 'assignments_by_unit': assignments_by_unit, 'curriculum_status': curriculum_status, 'anonymize_student': anonymize_student, 'assignment_ids': assignment_ids}
       return render(request, 'ctstem_app/GroupCurriculumDashboard.html', context)
 
     return http.HttpResponseNotAllowed(['GET'])
@@ -4286,35 +4227,37 @@ def assignmentProgressDashboard(request, teacher_id=''):
   try:
     if request.method == 'GET' or request.method == 'POST':
       header = []
-      student_progress = {}
-      assignment = assignment_id = group_id = sort_by = None
+      students_progress = []
+      assignment = assignment_id = group_id = sort_by = data = None
 
       if request.method == 'GET':
         assignment_id = request.GET.get('assignment', '')
+        assignment = models.Assignment.objects.get(id=assignment_id)
+        group_id = assignment.group.id
         sort_by = None
       else:
         data = request.POST.copy()
+
         group_id = data['group']
         curriculum_id = data['assignment']
-        if group_id and curriculum_id:
-          assignment_id = models.Assignment.objects.all().filter(group__id=group_id, curriculum__id=curriculum_id)[0].id
         sort_by = data['sort_by']
 
+        if group_id and curriculum_id:
+          assignment = models.Assignment.objects.all().filter(group__id=group_id, curriculum__id=curriculum_id)[0]
+          assignment_id = assignment.id
 
-      if assignment_id:
-        assignment = models.Assignment.objects.get(id=assignment_id)
-        group_id = assignment.group.id
+      if hasattr(request.user, 'researcher'):
+        has_permission = True
+      elif group_id:
+        has_permission = check_group_permission(request, group_id)
 
-      if group_id:
-        if hasattr(request.user, 'researcher'):
-          has_permission = True
-        else:
-          has_permission = check_group_permission(request, group_id)
+      if not has_permission:
+        return http.HttpResponseNotFound('<h1>You do not have the privilege to view this assignment</h1>')
 
-        if not has_permission:
-          return http.HttpResponseNotFound('<h1>You do not have the privilege to view this assignment</h1>')
-
-      filter_form = forms.ProgressDashboardSearchForm(teacher_id=teacher_id, group_id=group_id, assignment_id=assignment_id, sort_choice=sort_by)
+      if data:
+        filter_form = forms.ProgressDashboardSearchForm(teacher_id=teacher_id, group_id=group_id, assignment_id=assignment_id, data=data)
+      else:
+        filter_form = forms.ProgressDashboardSearchForm(teacher_id=teacher_id, group_id=group_id, assignment_id=assignment_id)
 
       if assignment:
         students = assignment.group.members.all().order_by(Lower('user__last_name'), Lower('user__first_name'))
@@ -4335,9 +4278,10 @@ def assignmentProgressDashboard(request, teacher_id=''):
         instances = models.AssignmentInstance.objects.all().filter(assignment=assignment)
         student_assignment_details = []
         serial = 1
-
+        timezone = pytz.timezone(settings.TIME_ZONE)
+        epoch = datetime.datetime(1970, 1, 1, 0, 0, 0, 0, timezone)
         for student in students:
-          student_progress[student.id] = {'student': student, 'progress': []}
+          student_progress = {'student': student, 'progress': []}
           try:
             instance = instances.get(student=student)
             student_question_response = question_responses.filter(step_response__instance=instance)
@@ -4350,19 +4294,21 @@ def assignmentProgressDashboard(request, teacher_id=''):
                     if response and (response[0].response or response[0].response_file.all()):
                       feedback = question_feedback.filter(response=response[0])
                       if feedback and feedback[0]:
-                        student_progress[student.id]['progress'].append({'response': response[0], 'feedback': feedback[0]})
+                        student_progress['progress'].append({'response': response[0], 'feedback': feedback[0]})
                       else:
-                        student_progress[student.id]['progress'].append({'response': response[0], 'feedback': None})
+                        student_progress['progress'].append({'response': response[0], 'feedback': None})
                     else:
-                      student_progress[student.id]['progress'].append(1)
+                      student_progress['progress'].append(1)
                   except models.QuestionResponse.DoesNotExist:
-                    student_progress[student.id]['progress'].append(1)
+                    student_progress['progress'].append(1)
               else:
-                student_progress[student.id]['progress'].append(0)
+                student_progress['progress'].append(0)
 
             percent_complete = get_student_assignment_instance_percent_complete(request, student.id, assignment.id)
-            student_progress[student.id]['percent_complete'] = percent_complete
-            student_progress[student.id]['instance'] = instance
+            student_progress['percent_complete'] = percent_complete
+            student_progress['instance'] = instance
+            student_progress['time_spent'] = instance.time_spent
+            student_progress['modified_date'] = instance.modified_date
           except models.AssignmentInstance.DoesNotExist:
             instance = None
             percent_complete = 0
@@ -4370,14 +4316,33 @@ def assignmentProgressDashboard(request, teacher_id=''):
               question_count = questions.filter(step=step).count()
               if question_count:
                 for index in range(0, question_count):
-                  student_progress[student.id]['progress'].append(1)
+                  student_progress['progress'].append(1)
               else:
-                student_progress[student.id]['progress'].append(0)
+                student_progress['progress'].append(0)
 
-            student_progress[student.id]['percent_complete'] = percent_complete
-            student_progress[student.id]['instance'] = instance
+            student_progress['percent_complete'] = percent_complete
+            student_progress['instance'] = instance
+            student_progress['time_spent'] = 0
+            student_progress['modified_date'] = None
 
-      context = {'teacher_id': teacher_id, 'assignment': assignment, 'student_progress': student_progress, 'header': header, 'filter_form': filter_form}
+          students_progress.append(student_progress)
+
+      if sort_by is None or sort_by == 'student':
+        students_progress.sort(key=lambda item:(item['student'].user.last_name.lower(), item['student'].user.first_name.lower()))
+      elif sort_by == 'most_progress':
+        students_progress.sort(key=lambda item:item['percent_complete'], reverse=True)
+      elif sort_by == 'least_progress':
+        students_progress.sort(key=lambda item:item['percent_complete'])
+      elif sort_by == 'most_time':
+        students_progress.sort(key=lambda item:item['time_spent'], reverse=True)
+      elif sort_by == 'least_time':
+        students_progress.sort(key=lambda item:item['time_spent'])
+      elif sort_by == 'newest_update':
+        students_progress.sort(key=lambda item:item['modified_date'] if item['modified_date'] else epoch, reverse=True)
+      else:
+        students_progress.sort(key=lambda item:item['modified_date'] if item['modified_date'] else epoch)
+
+      context = {'teacher_id': teacher_id, 'assignment': assignment, 'students_progress': students_progress, 'header': header, 'filter_form': filter_form}
       return render(request, 'ctstem_app/AssignmentProgressDashboard.html', context)
 
     return http.HttpResponseNotAllowed(['GET', 'POST'])
@@ -5157,6 +5122,28 @@ def realtime_feedback(request, assignment_id='', flag='0'):
       assignment.realtime_feedback = True
     assignment.save()
     response_data['success'] = True
+  return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+
+####################################
+# Set anonymize flag for the assignment
+####################################
+@login_required
+def anonymize_student(request, assignment_id='', flag='0'):
+  # check if the user has permission to do this operation
+
+  has_permission = check_assignment_permission(request, assignment_id)
+  response_data = {'success': False }
+  if has_permission:
+    print('assignment', assignment_id)
+    print('flag', flag)
+    assignment = models.Assignment.objects.get(id=assignment_id)
+    if flag == '0':
+      assignment.anonymize_student = False
+    else:
+      assignment.anonymize_student = True
+    assignment.save()
+    response_data['success'] = True
+    print('after update', assignment.anonymize_student)
   return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 ####################################
 # Delete Assignment

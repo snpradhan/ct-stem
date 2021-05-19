@@ -26,7 +26,7 @@
       <a type="button" class="btn normal yellow" href="/group/new/" title="Create new class"> Add New</a>
     </div>
     <hr>
-    <div class="row" id="class_tiles">
+    <div id="class_tiles">
       {% for grp in groups %}
       {% with group=grp|get_item:'group' percent_complete=grp|get_item:'percent_complete' group_assignment_status=grp|get_item:'assignment_status' total=grp|get_item:'total' %}
       {% get_chart_config group_assignment_status 'stacked_bar' as group_assignment_chart_config %}
@@ -40,7 +40,41 @@
             <i class="fa fa-sitemap icon" aria-hidden="true"></i>
           {% endif %}
         </div>
-        <div class="class_students">
+        <div class="class_details">
+          <h5 class="left class_title"><a href="{% url 'ctstem:group' group.id %}">{{group.title}}</a></h5>
+          <div class="assignment_status_chart">
+            <div id="assignment_chart_group_{{group.id}}" class="progress_chart" data-percent-complete="{{percent_complete}}"></div>
+          </div>
+          <div class="class_detail">
+            <h6 class="left">{{group.members.count}} Student{% if group.members.count > 1 %}s{% endif %}</h6>
+            <h6 class="left">{{group.assignments.count}} Assignment{% if group.assignments.count > 1 %}s{% endif %}</h6>
+          </div>
+          <div class="class_detail">
+            <div class="class_actions">
+              {% if group.is_active %}
+                <a class="invite-modal action btn small lightyellow" href="#" data-toggle="modal" data-target="#invite" data-invite-link="https://{{domain}}/?next=/preregister/group/{{group.group_code}}/" data-title="{{group.title}} Invitation Link" title="Student Invitation Link">
+                  <i class="fa fa-link"></i> Invite
+                </a>
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                <a class="upload-modal action btn small lightyellow" href="#" data-toggle="modal" data-target="#upload" data-id="{{group.id}}" data-title="{{group.title}}" title="Add Students">
+                  <i class="fa fa-user-plus"></i> Add
+                </a>
+              {% endif %}
+            </div>
+            <div class="class_actions">
+              <a class="action btn small lightyellow" href="{% url 'ctstem:groupDashboard' group.id 'active' %}" aria-label="View Class Dashboard" title="View Class Dashboard">
+                <i class="fas fa-tachometer-alt"></i> Dashboard
+              </a>
+              {% if group.is_active %}
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                <a class="assignment-modal action btn small lightyellow" href="#" data-toggle="modal" data-target="#assignment" data-id="{{group.id}}" data-title="{{group.title}}" data-subject="{{group.subject.id}}" title="Search and Add Assignments">
+                  <i class="fa fa-tasks"></i> Assign
+                </a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        <!--div class="class_students">
           <h5 class="left class_title"><a href="{% url 'ctstem:group' group.id %}">{{group.title}}</a></h5>
           <h6 class="left">{{group.members.count}} Student{% if group.members.count > 1 %}s{% endif %}</h6>
           <div class="actions">
@@ -72,7 +106,7 @@
               </a>
             {% endif %}
           </div>
-        </div>
+        </div-->
 
       </div>
       {% endwith %}
@@ -90,42 +124,15 @@
       <div id="assignments">
         {% for assignment in assignments %}
         {% get_assignment_status_chart_config assignment.id 'stacked_bar' as assignment_status %}
-        <div class="assignment tile">
-          <!--div class="assignment_icon">
-            {% if assignment.curriculum.icon %}
-              <img src="{{assignment.curriculum.icon.url}}" class="icon" alt="">
-            {% else %}
-              <i class="fa fa-tasks icon"></i>
-            {% endif %}
-          </div-->
-          <div class="assignment_details">
+          <div class="assignment tile">
             <h5 class="left"><a href="{% url 'ctstem:assignmentProgressDashboard' teacher.id %}?assignment={{assignment.id}}">
               {{assignment.curriculum.title}}</a>
             </h5>
             <h6 class="left">Class: {{assignment.group.title}}</h6>
-            <div class="actions">
-              {% for status in assignment_status %}
-                {% if status.name == 'New' %}
-                  <span class="action new"><i class="far fa-user"></i> {{status.data.0}} {{status.name}}</span>
-                {% elif status.name == 'In Progress' %}
-                  <span class="action in_progress"><i class="far fa-clock"></i> {{status.data.0}} {{status.name}}</span>
-                {% elif status.name == 'Submitted' %}
-                  <span class="action submitted"><i class="fas fa-check"></i> {{status.data.0}} {{status.name}}</span>
-                {% elif status.name == 'Feedback Ready' %}
-                  <span class="action feedback_ready"><i class="far fa-comment-dots"></i> {{status.data.0}} {{status.name}}</span>
-                {% elif status.name == 'Archived' %}
-                  <span class="action archived"><i class="fa fa-archive"></i> {{status.data.0}} {{status.name}}</span>
-                {% endif %}
-                &nbsp;&nbsp;&nbsp;&nbsp;
-              {% endfor %}
+            <div class="assignment_status_chart">
+              <div id="assignment_chart_{{assignment.id}}" class="stacked_bar_chart" name="{{assignment_status}}" data-total="{{assignment.group.members.count}}"></div>
             </div>
           </div>
-          <div class="assignment_status_chart">
-            <div id="assignment_chart_{{assignment.id}}" class="stacked_bar_chart" name="{{assignment_status}}" data-total="{{assignment.group.members.count}}"></div>
-          </div>
-
-        </div>
-        <!--hr-->
         {% endfor %}
       </div>
       <h5 class="view_all"><a href="{% url 'ctstem:teacherAssignmentDashboard' teacher.id status %}">View All</a></h5>
@@ -144,33 +151,12 @@
           {% get_student_assignment_status_chart_config student.id teacher.id 'stacked_bar' as student_assignment_status %}
           {% get_student_assignment_count student.id teacher.id as assignment_count %}
           <div class="student tile">
-            <div class="student_details">
-              <h5 class="left">{{student.user.get_full_name}}</h5>
-              <div class="actions">
-                <span class="action">
-                  <i class="fas fa-chart-bar"></i> View Work
-                </span>
-                &nbsp;&nbsp;&nbsp;&nbsp;
-                <span class="action">
-                  <i class="far fa-comment-dots"></i> Feedback
-                </span>
-              </div>
-            </div>
-            <!--div class="assignment_status_list">
-              {% for status in student_assignment_status %}
-                {% if status.name == 'New' %}
-                  <div class="action new"><i class="far fa-user"></i> {{status.data.0}} {{status.name}}</div>
-                {% elif status.name == 'In Progress' %}
-                  <div class="action in_progress"><i class="far fa-clock"></i> {{status.data.0}} {{status.name}}</div>
-                {% elif status.name == 'Submitted' %}
-                  <div class="action submitted"><i class="fas fa-check"></i> {{status.data.0}} {{status.name}}</div>
-                {% elif status.name == 'Feedback Ready' %}
-                  <div class="action feedback_ready"><i class="far fa-comment-dots"></i> {{status.data.0}} {{status.name}}</div>
-                {% elif status.name == 'Archived' %}
-                  <div class="action archived"><i class="fa fa-archive"></i> {{status.data.0}} {{status.name}}</div>
-                {% endif %}
-              {% endfor %}
-            </div-->
+
+              <h5 class="left">{{student.user.last_name}}, {{student.user.first_name}}</h5>
+              <a class="btn small lightyellow" href="#" title="View Student Work" onClick="TODO">
+                <i class="fas fa-chart-bar"></i> View Work
+              </a>
+
             <div class="assignment_status_chart">
               <div id="assignment_chart_{{student.id}}" class="stacked_bar_chart" name="{{student_assignment_status}}" data-total="{{assignment_count}}"></div>
             </div>

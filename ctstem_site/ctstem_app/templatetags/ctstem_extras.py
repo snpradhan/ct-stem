@@ -606,3 +606,7 @@ def is_curriculum_assigned(context, curriculum):
 def is_curriculum_assigned_by_me(context, curriculum):
   request = context.get('request')
   return views.is_curriculum_assigned_by_me(request, curriculum.id)
+
+@register.filter(name='fromunix')
+def fromunix(value):
+    return datetime.datetime.fromtimestamp(int(value))

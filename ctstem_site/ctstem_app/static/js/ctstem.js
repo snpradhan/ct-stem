@@ -384,12 +384,34 @@ $(function () {
     alert(msg);
   });
 
-  $("div.student_name").show();
-  $("div.student_mask").hide();
-  $('#student_identity .switch-input').change(function() {
-    $("div.student_name").toggle();
-    $("div.student_mask").toggle();
+  $('#id_anonymize_student.switch-input').change(function() {
+    var flag = 0;
+    if($(this).is(':checked')){
+      flag = 1;
+    }
+    var assignment_id = $(this).data('assignment-id');
+    var assignment_ids = $(this).data('assignment-ids');
+    if(assignment_id) {
+      assignments = [assignment_id];
+    }
+    else if (assignment_ids) {
+      assignments = assignment_ids;
+    }
+    $.each(assignments, function(index, assignment_id) {
+      $.ajax({
+        type: "GET",
+        url: '/assignment/anonymize_student/'+assignment_id+'/'+flag,
+        dataType: 'json',
+        success: function(data) {
+        },
+        error: function(){
+          alert("Something went wrong.");
+        }
+      });
+    });
+    initialize_student_identity_column();
   });
+
 
   $('#group_assignment_select').on('change', function () {
     var url = $(this).val(); // get selected value
@@ -427,8 +449,23 @@ $(function () {
   bind_curriculum_delete_confirmation();
   bind_curriculum_share_action();
 
+  initialize_student_identity_column();
+
 });
 
+function initialize_student_identity_column(){
+  if($("div.student_name").length && $("div.student_mask").length){
+    $("div.student_name").hide();
+    $("div.student_mask").hide();
+
+    if($('#id_anonymize_student.switch-input').is(':checked')) {
+      $("div.student_mask").show();
+    }
+    else{
+      $("div.student_name").show();
+    }
+  }
+}
 function bind_curriculum_share_action() {
   $("a.share").click(function(e){
     e.preventDefault();

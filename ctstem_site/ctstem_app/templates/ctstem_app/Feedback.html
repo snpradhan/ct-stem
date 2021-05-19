@@ -39,13 +39,21 @@
               {% if user.researcher %}
                 <b>{{form.instance.instance.student.user.id}}<b><br>
               {% else %}
-                <b>{{form.instance.instance.student}}<b><br>
+                {% if form.instance.instance.assignment.anonymize_student %}
+                  xxxxxxxxxxx <br>
+                {% else %}
+                  <b>{{form.instance.instance.student}}<b><br>
+                {% endif %}
               {% endif %}
               {% for teammate in form.instance.instance.teammates.all %}
-                {% if user.researcher %}
-                  {{teammate.user.id}} (T) <br>
+                {% if form.instance.instance.assignment.anonymize_student %}
+                  xxxxxxxxxxx (T) <br>
                 {% else %}
-                  {{teammate}} (T) <br>
+                  {% if user.researcher %}
+                    {{teammate.user.id}} (T) <br>
+                  {% else %}
+                    {{teammate}} (T) <br>
+                  {% endif %}
                 {% endif %}
               {% endfor %}
             </td>

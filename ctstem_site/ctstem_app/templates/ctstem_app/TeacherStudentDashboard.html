@@ -13,7 +13,9 @@
 <div class="content teacher_detailed_dashboard" id="teacher_student_dashboard">
   <h2> Students </h2>
   <div id="dashboard_header">
-    <h5 class="left"><a href="{% url 'ctstem:teacherDashboard' teacher.id status %}"><i class="fas fa-arrow-left"></i> Back to Teacher Dashboard</a></h5>
+    <div class="navigation">
+      <h5 class="left"><a href="{% url 'ctstem:teacherDashboard' teacher.id status %}"><i class="fas fa-chevron-left"></i><i class="fas fa-chevron-left"></i> Back to Teacher Dashboard</a></h5>
+    </div>
     <div class="quick_links">
         <h5><a href="{% url 'ctstem:help' %}"><i class="far fa-question-circle"></i> Help </a></h5>
         <h5><a href="{% url 'ctstem:curriculatiles' %}?bucket=my_curricula">My Curricula</a></h5>
@@ -24,18 +26,19 @@
     <form method="post" action="{% url 'ctstem:teacherStudentDashboard' teacher.id status %}" id="assignment_search">
       {% csrf_token %}
       <div class="assignment_filter">
-        <div class="col form-group">
-          <div>{{searchForm.student}}</div>
-          <div class="error">{{ searchForm.student.errors }}</div>
-        </div>
-        <div class="col form-group">
-          <div>{{searchForm.assignment}}</div>
-          <div class="error">{{ searchForm.assignment.errors }}</div>
-        </div>
-        <div class="col form-group">
+        <div class="form-group">
+          <label>{{searchForm.group.label|title}}</label>
           <div>{{searchForm.group}}</div>
-          <div class="error">{{ searchForm.group.errors }}</div>
         </div>
+        <div class="form-group">
+          <label>{{searchForm.student.label|title}}</label>
+          <div>{{searchForm.student}}</div>
+        </div>
+        <div class="form-group">
+          <label>{{searchForm.assignment.label|title}}</label>
+          <div>{{searchForm.assignment}}</div>
+        </div>
+
         <div class="form-group">
           <button type="button" id="reset" class="btn yellow normal">
             Clear Filter

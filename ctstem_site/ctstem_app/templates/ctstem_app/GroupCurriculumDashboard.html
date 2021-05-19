@@ -22,11 +22,7 @@
               <th class="student_col">
                 Student
                 {% if not user.researcher %}
-                  <label class="switch" id="student_identity">
-                    <input class="switch-input" type="checkbox" />
-                    <span class="switch-label" data-on="Hide Names" data-off="Show Names"></span>
-                    <span class="switch-handle"></span>
-                  </label>
+                  {% include "ctstem_app/AnonymizeStudentSwitch.html" with anonymize_student=anonymize_student assignment_ids=assignment_ids %}
                 {% endif %}
               </th>
               {% for curr, assignment in assignment_header.items %}

@@ -17,7 +17,7 @@ def group_assignment_dropdown_list(groups, for_student_inbox=True):
     else:
       assignment_list[curriculum.id] = {'title': curriculum.title}
 
-  assignment_list = {k: v for k, v in sorted(assignment_list.items(), key=lambda item: item[1]['title'])}
+  assignment_list = {k: v for k, v in sorted(assignment_list.items(), key=lambda item: item[1]['title'].lower())}
   if for_student_inbox:
     assignment_choices = [('', '---------')]
   else:
