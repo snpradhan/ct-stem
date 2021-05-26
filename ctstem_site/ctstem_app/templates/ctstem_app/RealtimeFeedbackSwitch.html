@@ -1,0 +1,11 @@
+<div class="switch_container">
+  <label class="switch">
+    <input class="switch-input" type="checkbox" id="id_realtime_feedback"
+           {% if assignment_id %} data-assignment-id="{{assignment_id}}" {% endif %}
+           {% if realtime_feedback %} checked {% endif %}/>
+    <span class="switch-label" data-on="" data-off=""></span>
+    <span class="switch-handle"></span>
+  </label>
+  &nbsp;
+  <label class="switch_label">Realtime Feedback</label>
+</div>

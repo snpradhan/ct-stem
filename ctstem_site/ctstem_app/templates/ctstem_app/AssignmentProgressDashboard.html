@@ -25,27 +25,42 @@
           <h5><a href="{% url 'ctstem:curriculatiles' %}?bucket=favorite_curricula"><i class="far fa-star"></i> Favorites</a></h5>
       </div>
     </div>
-    <div class="legends">
-      <div>
-        <a type="button" class="btn small green"> <i class="far fa-comment-dots"></i> </a>
-        &nbsp;
-        <label>Feedback Given</label>
+    <div class="legends_and_settings">
+      <div class="legends_container">
+        <h5 class="left">Legends</h6>
+        <div class="legends">
+          <div class="legend">
+            <a type="button" class="btn tiny green"> <i class="far fa-comment-dots"></i> </a>
+            &nbsp;
+            <label>Feedback Given</label>
+          </div>
+          <div class="legend">
+            <a type="button" class="btn tiny yellow"> <i class="far fa-comment-dots"></i> </a>
+            &nbsp;
+            <label>Feedback Pending</label>
+          </div>
+          <div class="legend">
+            <i class="fas fa-times"></i>
+            &nbsp;
+            <label>Not yet started</label>
+          </div>
+          <div class="legend">
+            <i class="far fa-window-minimize"></i>
+            &nbsp;
+            <label>No Question</label>
+          </div>
+        </div>
       </div>
-      <div>
-        <a type="button" class="btn small yellow"> <i class="far fa-comment-dots"></i> </a>
-        &nbsp;
-        <label>Feedback Pending</label>
-      </div>
-      <div>
-        <i class="fas fa-times fa-2x"></i>
-        &nbsp;
-        <label>Not yet started</label>
-      </div>
-      <div>
-        <i class="far fa-window-minimize fa-2x"></i>
-        &nbsp;
-        <label>No Question</label>
-      </div>
+      {% if not user.researcher %}
+        <div class="settings_container">
+          <h5 class="left">Assignment Settings</h6>
+          <div class="settings">
+            {% include "ctstem_app/AnonymizeStudentSwitch.html" with anonymize_student=assignment.anonymize_student assignment_id=assignment.id %}
+            {% include "ctstem_app/LockOnCompletionSwitch.html" with lock_on_completion=assignment.lock_on_completion assignment_id=assignment.id %}
+            {% include "ctstem_app/RealtimeFeedbackSwitch.html" with realtime_feedback=assignment.realtime_feedback assignment_id=assignment.id %}
+          </div>
+        </div>
+      {% endif %}
     </div>
     <form method="post" action="{% url 'ctstem:assignmentProgressDashboard' teacher_id %}" id="progress_search_form">
       {% csrf_token %}
@@ -84,9 +99,6 @@
           </tr>
           <tr>
             <th class="student_col">
-              {% if not user.researcher %}
-                {% include "ctstem_app/AnonymizeStudentSwitch.html" with anonymize_student=assignment.anonymize_student assignment_id=assignment.id %}
-              {% endif %}
             </th>
             {% for step in header %}
               {% with questions=step|get_item:'questions' %}

@@ -1,13 +1,12 @@
 <div class="switch_container">
   <label class="switch">
-    <input class="switch-input" type="checkbox" id="id_anonymize_student"
-           {% if assignment_ids %} data-assignment-ids="{{assignment_ids}}" {% endif %}
+    <input class="switch-input" type="checkbox" id="id_lock_on_completion"
            {% if assignment_id %} data-assignment-id="{{assignment_id}}" {% endif %}
-           {% if anonymize_student %} checked {% endif %}/>
+           {% if lock_on_completion %} checked {% endif %}/>
     <span class="switch-label" data-on="" data-off=""></span>
     <span class="switch-handle"></span>
   </label>
   &nbsp;
-  <label class="switch_label">Hide Names</label>
+  <label class="switch_label">Lock on Completion</<label>
 </div>
 

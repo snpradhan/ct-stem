@@ -411,6 +411,41 @@ $(function () {
     });
     initialize_student_identity_column();
   });
+  $('#id_lock_on_completion.switch-input').on('click', function(){
+    var flag = 0;
+    if($(this).is(':checked')){
+      flag = 1;
+    }
+    var assignment_id = $(this).data('assignment-id');
+    var url = '/assignment/lock_on_completion/'+assignment_id+'/'+flag+'/';
+    $.ajax({
+      type: 'GET',
+      url: url,
+      success: function(data){
+      },
+      error: function(){
+        alert('error');
+      }
+    });
+  });
+
+ $('#id_realtime_feedback.switch-input').on('click', function(){
+    var flag = 0;
+    if($(this).is(':checked')){
+      flag = 1;
+    }
+    var assignment_id = $(this).data('assignment-id');
+    var url = '/assignment/realtime_feedback/'+assignment_id+'/'+flag+'/';
+    $.ajax({
+      type: 'GET',
+      url: url,
+      success: function(data){
+      },
+      error: function(){
+        alert('error');
+      }
+    });
+  });
 
 
   $('#group_assignment_select').on('change', function () {

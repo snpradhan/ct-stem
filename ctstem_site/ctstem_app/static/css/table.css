@@ -127,12 +127,6 @@ table.table#question_header {
   margin-bottom: 2em;
 }
 
-table.table#assignment_info .switch {
-  float: none;
-  margin-left: auto;
-  margin-right: auto;
-}
-
 table.table#feedback_header {
   width: 100%;
 }
@@ -294,7 +288,7 @@ div.dashboard_container {
   overflow-x: auto;
   overflow-y: auto;
   position: relative;
-  height: 80vh;
+  max-height: 80vh;
 }
 
 table#group_curriculum_dashboard td.assignment_status_chart {
@@ -317,6 +311,7 @@ div.dashboard_container .student_col {
   left: 0;
   background-color: #666666 !important;
   color: white;
+  width: 12em;
 }
 div.dashboard_container thead th {
   top: 0;

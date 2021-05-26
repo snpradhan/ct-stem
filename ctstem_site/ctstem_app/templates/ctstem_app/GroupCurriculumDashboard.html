@@ -20,7 +20,7 @@
           <thead>
             <tr>
               <th class="student_col">
-                Student
+                Student <br>
                 {% if not user.researcher %}
                   {% include "ctstem_app/AnonymizeStudentSwitch.html" with anonymize_student=anonymize_student assignment_ids=assignment_ids %}
                 {% endif %}

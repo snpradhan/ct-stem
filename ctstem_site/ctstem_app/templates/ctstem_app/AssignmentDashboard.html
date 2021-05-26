@@ -28,11 +28,18 @@
           <td>{{assignment.curriculum.title}}</td>
           <td>{{assignment.assigned_date|date}}</td>
           <td>
-            <label class="switch" id="review_by">
-              <input class="switch-input" type="checkbox" />
-              <span class="switch-label" data-on="Question" data-off="Student"></span>
-              <span class="switch-handle"></span>
-            </label>
+            <div class="switch_container">
+              <span>Student</span>
+              &nbsp;
+              <label class="switch" id="review_by">
+                <input class="switch-input" type="checkbox" />
+                <span class="switch-label" data-on="" data-off=""></span>
+                <span class="switch-handle"></span>
+              </label>
+              &nbsp;
+              <span>Question</span>
+            </div>
+          </td>
         </tr>
       </tbody>
     </table>
