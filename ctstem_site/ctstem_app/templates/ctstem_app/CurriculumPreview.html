@@ -219,17 +219,6 @@
           {% endwith %}
         </div>
       </div>
-      <div class="section" id="compatibility">
-        <h3 class="left">Compatibility</h3>
-        <div class="row">
-          {% for system in systems %}
-            <div class="col compatible-item {% if system not in curriculum.compatible_system.all %} incompatible {% endif %}">
-              <span class="fa fa-{{system.icon}}"></span><br>
-              {{system.name}}
-            </div>
-          {% endfor %}
-        </div>
-      </div>
 
       {% if curriculum.credits %}
         <div class="section" id="credits">

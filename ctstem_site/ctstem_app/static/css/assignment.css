@@ -656,28 +656,6 @@ a.add_attachment {
 .util-button:hover { color: rgb(70, 160, 215); }
 .util-button:active { color: red; }
 
-
-
-/* TECHNOLOGY COMPATIBILITY */
-.compatible-item {
-  font-family: Helvetica, sans-serif;
-  font-size: 0.8rem;
-  display: inline-block;
-  text-align: center;
-  margin: 0.5rem 1.5rem 0 0;
-  color: black;
-  vertical-align: top;
-}
-
-.compatible-item span.fa {
-  font-size: 2rem;
-}
-
-.compatible-item.incompatible {
-  text-decoration: line-through;
-  color: #ccc;
-}
-
 /* OVERVIEW */
 .overview .lesson_overview_content {
   display: none;

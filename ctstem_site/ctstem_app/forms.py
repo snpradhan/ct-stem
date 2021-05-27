@@ -487,7 +487,7 @@ class CurriculumForm(ModelForm):
 
   class Meta:
     model = models.Curriculum
-    fields = ['curriculum_type', 'unit', 'order', 'feature_rank', 'title', 'icon', 'time', 'level', 'overview', 'student_overview', 'acknowledgement', 'credits', 'status', 'subject', 'compatible_system', 'taxonomy', 'teacher_notes']
+    fields = ['curriculum_type', 'unit', 'order', 'feature_rank', 'title', 'icon', 'time', 'level', 'overview', 'student_overview', 'acknowledgement', 'credits', 'status', 'subject', 'taxonomy', 'teacher_notes']
 
     widgets = {
       'title': forms.TextInput(attrs={'placeholder': 'Lesson Title'}),
@@ -499,7 +499,6 @@ class CurriculumForm(ModelForm):
       'teacher_notes': forms.Textarea(attrs={'rows':0, 'cols':60}),
       'taxonomy': forms.SelectMultiple(attrs={'size':5}),
       'subject': forms.SelectMultiple(attrs={'size':4}),
-      'compatible_system': forms.SelectMultiple(attrs={'size':6}),
       'acknowledgement': forms.Textarea(attrs={'rows':0, 'cols':60}),
       'credits': forms.Textarea(attrs={'rows':0, 'cols':60}),
     }
@@ -524,7 +523,6 @@ class CurriculumForm(ModelForm):
       self.fields.pop('credits')
       self.fields.pop('status')
       self.fields.pop('subject')
-      self.fields.pop('compatible_system')
       self.fields.pop('taxonomy')
       self.fields.pop('teacher_notes')
     else:

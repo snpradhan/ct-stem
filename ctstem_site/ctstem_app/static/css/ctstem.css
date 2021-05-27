@@ -1187,24 +1187,6 @@ div.content#preview div.row.buttons .col {
   margin-bottom: 1.5em;
 }
 
-div.content#preview div#compatibility div.row .col.compatible-item {
-  font-family: Helvetica, sans-serif;
-  display: inline-block;
-  text-align: center;
-  color: black;
-  vertical-align: top;
-  margin-right: 3em;
-}
-
-div.content#preview div#compatibility div.row .col.compatible-item span.fa {
-  font-size: 4em;
-}
-
-div.content#preview div#compatibility div.row .col.compatible-item.incompatible {
-  text-decoration: line-through;
-  color: #ccc;
-}
-
 div.content#preview div#standards div.row .col {
   flex: 1;
 }
