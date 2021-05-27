@@ -2432,14 +2432,14 @@ span.cke_top.focus, span.cke_bottom.focus {
    opacity: 0;
    max-height: 0;
    overflow: hidden;
-   transition: opacity 1500ms ease-out, max-height 1500ms ease-out;
+   /*transition: opacity 1500ms ease-out, max-height 1500ms ease-out;*/
   }
 
   .topic.expanded .subtopics,
   .topic.expanded .subtopics .subtopic_details.expanded {
     opacity: 1;
     max-height: 10000px;
-    transition: opacity 1500ms ease-in, max-height 1500ms ease-in;
+    /*transition: opacity 1500ms ease-in, max-height 1500ms ease-in;*/
   }
 
 /*********** END OF USER GUIDE ***********/
