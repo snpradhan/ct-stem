@@ -64,9 +64,12 @@
                 <!-- SUBJECT -->
                 <div class="form-group">
                   <label for="id_{{form.subject.name}}">{{ form.subject.label|title }} {% if form.subject.field.required %}(<span class="required">*</span>) {% endif %}</label>
-                  <div class="curriculum_input">
-                    {{form.subject}}
+                  <div class="curriculum_input form-control" id="id_curriculum-subject">
+                    {% for sub in form.subject %}
+                      <div class="subject_input">{{sub.tag}} &nbsp;&nbsp; <label for="{{sub.id_for_label}}">{{sub.choice_label}}</label></div>
+                    {% endfor %}
                   </div>
+
                   <div class="help warning">{{form.subject.help_text|safe}}</div>
                   <div class="error">{{ form.subject.errors }}</div>
                 </div>

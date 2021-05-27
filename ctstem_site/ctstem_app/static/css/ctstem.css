@@ -409,6 +409,33 @@ div.curriculum_container div.curriculum_components .dropdown-menu {
 div.curriculum_container div.curriculum_components .dropdown-menu li a:hover {
   border-bottom: 3px solid #A4A7BF !important;
 }
+
+div.curriculum_container div.curriculum_components #id_curriculum-subject {
+  display: flex;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  height: unset;
+  font-size: inherit;
+  color: inherit;
+}
+div.curriculum_container div.curriculum_components div#id_curriculum-subject div.subject_input{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-right: 2em;
+}
+
+div.curriculum_container div.curriculum_components input[type='checkbox'] {
+  margin-left: 0.25em;
+  -ms-transform: scale(1.5);
+  -moz-transform: scale(1.5);
+  -webkit-transform:scale(1.5);
+  -o-transform: scale(1.5);
+}
+div.curriculum_container div.curriculum_components input[type='checkbox'].safari {
+  zoom: 1.05;
+}
+
 div.group_container div.group_components {
   width: 90%;
 }

@@ -498,7 +498,7 @@ class CurriculumForm(ModelForm):
       'content': forms.Textarea(attrs={'rows':0, 'cols':60}),
       'teacher_notes': forms.Textarea(attrs={'rows':0, 'cols':60}),
       'taxonomy': forms.SelectMultiple(attrs={'size':5}),
-      'subject': forms.SelectMultiple(attrs={'size':4}),
+      'subject': forms.CheckboxSelectMultiple(),
       'acknowledgement': forms.Textarea(attrs={'rows':0, 'cols':60}),
       'credits': forms.Textarea(attrs={'rows':0, 'cols':60}),
     }
