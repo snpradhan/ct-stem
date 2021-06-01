@@ -3641,7 +3641,6 @@ def teacherDashboard(request, id='', status='active'):
 
   if request.method == 'GET' or request.method == 'POST':
     is_active = True
-    group_count = 0
     student_count = 0
     assignment_count = 0
     if status == 'inactive':
@@ -3650,8 +3649,7 @@ def teacherDashboard(request, id='', status='active'):
     teacher = models.Teacher.objects.get(id=id)
     all_groups = models.UserGroup.objects.all().filter(Q(is_active=is_active), Q(teacher=teacher) | Q(shared_with=teacher)).order_by(Lower('title'))
 
-    group_count = all_groups.count()
-    filtered_groups = all_groups[:6]
+    filtered_groups = all_groups
     all_assignments = models.Assignment.objects.all().filter(group__in=all_groups).distinct().order_by(Lower('curriculum__title'))
     assignment_count = all_assignments.count()
     filtered_assignments = all_assignments[:4]
@@ -3693,7 +3691,7 @@ def teacherDashboard(request, id='', status='active'):
     uploadForm = forms.UploadFileForm(user=request.user)
     assignmentForm = forms.AssignmentSearchForm(user=request.user)
 
-    context = {'teacher': teacher, 'groups': groups, 'group_count': group_count, 'students': filtered_students,
+    context = {'teacher': teacher, 'groups': groups, 'students': filtered_students,
                'student_count': student_count, 'assignments': filtered_assignments, 'assignment_count':assignment_count,
                'role':'groups', 'uploadForm': uploadForm,
                'status': status, 'domain': domain, 'assignmentForm': assignmentForm

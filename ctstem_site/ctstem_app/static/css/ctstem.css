@@ -844,6 +844,7 @@ div.content#teacher_dashboard hr {
 }
 div.content#teacher_dashboard .view_all {
   padding: 1.5em 0;
+  text-align: center;
 }
 div.content#teacher_dashboard div#dashboard_header,
 div.content.teacher_detailed_dashboard div#dashboard_header {
@@ -939,6 +940,9 @@ div.content#teacher_dashboard div#dashboard_classes div#class_tiles div.tile {
   display: flex;
   justify-content: space-between;
   align-items: stretch;
+}
+div.content#teacher_dashboard div#dashboard_classes div#class_tiles div.tile.extra {
+  display: none !important;
 }
 div.content#teacher_dashboard div#dashboard_classes div#class_tiles div.tile div.class_icon {
   flex: 0 0 20%;

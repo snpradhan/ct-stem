@@ -22,7 +22,7 @@
 
   <div id="dashboard_classes">
     <div class="title">
-      <h3 class="left">{{status|title}} Classes ({{groups|length}} of {{group_count}})</h3>
+      <h3 class="left">{{status|title}} Classes (<span class="class_count">{% if groups|length > 6 %}6{% else %} {{groups|length}} {% endif %}</span> of {{groups|length}})</h3>
       <a type="button" class="btn normal yellow" href="/group/new/" title="Create new class"> Add New</a>
     </div>
     <hr>
@@ -30,7 +30,7 @@
       {% for grp in groups %}
       {% with group=grp|get_item:'group' percent_complete=grp|get_item:'percent_complete' group_assignment_status=grp|get_item:'assignment_status' total=grp|get_item:'total' %}
       {% get_chart_config group_assignment_status 'stacked_bar' as group_assignment_chart_config %}
-      <div class="col tile">
+      <div class="col tile {% if forloop.counter > 6%} extra {% endif %}">
         <div class="class_icon">
           {% if group.icon %}
             <img src="{{group.icon.url}}" class="icon" alt="">
@@ -74,45 +74,15 @@
             </div>
           </div>
         </div>
-        <!--div class="class_students">
-          <h5 class="left class_title"><a href="{% url 'ctstem:group' group.id %}">{{group.title}}</a></h5>
-          <h6 class="left">{{group.members.count}} Student{% if group.members.count > 1 %}s{% endif %}</h6>
-          <div class="actions">
-            {% if group.is_active %}
-              <a class="invite-modal action" href="#" data-toggle="modal" data-target="#invite" data-invite-link="https://{{domain}}/?next=/preregister/group/{{group.group_code}}/" data-title="{{group.title}} Invitation Link" title="Student Invitation Link">
-                <i class="fa fa-link"></i> Invite
-              </a>
-              &nbsp;&nbsp;&nbsp;&nbsp;
-              <a class="upload-modal action" href="#" data-toggle="modal" data-target="#upload" data-id="{{group.id}}" data-title="{{group.title}}" title="Add Students">
-                <i class="fa fa-user-plus"></i> Add
-              </a>
-            {% endif %}
-          </div>
-        </div>
-        <div class="class_assignments">
-          <div class="assignment_status_chart">
-            <div id="assignment_chart_group_{{group.id}}" class="progress_chart" data-percent-complete="{{percent_complete}}"></div>
-          </div>
-
-          <h6 class="left">{{group.assignments.count}} Assignment{% if group.assignments.count > 1 %}s{% endif %}</h6>
-          <div class="actions">
-            <a class="action" href="{% url 'ctstem:groupDashboard' group.id 'active' %}" aria-label="View Class Dashboard" title="View Class Dashboard">
-              <i class="fas fa-tachometer-alt"></i> Dashboard
-            </a>
-            {% if group.is_active %}
-              &nbsp;&nbsp;&nbsp;&nbsp;
-              <a class="assignment-modal action" href="#" data-toggle="modal" data-target="#assignment" data-id="{{group.id}}" data-title="{{group.title}}" data-subject="{{group.subject.id}}" title="Search and Add Assignments">
-                <i class="fa fa-tasks"></i> Assign
-              </a>
-            {% endif %}
-          </div>
-        </div-->
-
       </div>
       {% endwith %}
       {% endfor %}
     </div>
-    <h5 class="view_all"><a href="#">View All</a></h5>
+    {% if groups|length > 6 %}
+      <div class="view_all">
+        <a type="button" class="view_all_class btn inbetween darkblue">View All</a>
+      </div>
+    {% endif %}
   </div>
   <div id="assignments_students">
     <div id="dashboard_assignments">
@@ -135,7 +105,11 @@
           </div>
         {% endfor %}
       </div>
-      <h5 class="view_all"><a href="{% url 'ctstem:teacherAssignmentDashboard' teacher.id status %}">View All</a></h5>
+      {% if assignments|length > 0 %}
+        <div class="view_all">
+          <a type="button" class="btn inbetween darkblue" href="{% url 'ctstem:teacherAssignmentDashboard' teacher.id status %}">View All</a>
+        </div>
+      {% endif %}
     </div>
 
     <div id="dashboard_students">
@@ -163,7 +137,11 @@
           </div>
         {% endfor %}
       </div>
-      <h5 class="view_all"><a href="{% url 'ctstem:teacherStudentDashboard' teacher.id status %}">View All</a></h5>
+      {% if students|length > 0 %}
+        <div class="view_all">
+          <a type="button" class="btn inbetween darkblue" href="{% url 'ctstem:teacherStudentDashboard' teacher.id status %}">View All</a>
+        </div>
+      {% endif %}
     </div>
   </div>
 </div>
@@ -189,6 +167,11 @@
     $('.progress_chart').each(function(){
       render_progress_chart($(this));
     });
+    $('.view_all_class').click(function(){
+      $('#class_tiles div.tile.extra').removeClass('extra');
+      $('.class_count').html('{{groups|length}}');
+      $(this).toggle();
+    })
 
   });
 
