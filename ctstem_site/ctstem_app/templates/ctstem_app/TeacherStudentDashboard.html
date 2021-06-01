@@ -60,25 +60,31 @@
     <div class="student_details">
       <h5 class="left">Student/Assignment</h5>
     </div>
+    {% if not group %}
+    <div class="assignment_class">
+      <h5 class="left">Class</h5>
+    </div>
+    {% endif %}
     <div class="assignment_status_chart">
+      <h5 class="left">Status</h5>
     </div>
     <div class="assignment_stats">
-      <div><h5 class="left">Last Opened</h5></div>
-      <div><h5 class="left">Assigned Date</h5></div>
+      <h5 class="left">Last Opened</h5>
+    </div>
+    <div class="assignment_stats">
+      <h5 class="left">Assigned Date</h5>
     </div>
   </div>
   {% for id, student in students.items %}
-  {% with name=student|get_item:'name' assignments=student|get_item:'assignments' student_assignment_status=student|get_item:'assignment_status' %}
+  {% with name=student|get_item:'name' assignments=student|get_item:'assignments' student_assignment_status=student|get_item:'assignment_status' student_groups=student|get_item:'student_groups' %}
   {% get_chart_config student_assignment_status 'stacked_bar' as student_chart_config %}
   <div class="student">
     <div class="student_details">
-      <h5 class="left">{{name}}
-      &nbsp;
-      <span class="expanded_collapsed collapsed">
+      <h5 class="left expanded_collapsed collapsed" title="Expand student assignments">
+        {{name}} &nbsp;
         <i class="fas fa-chevron-right"></i>
-      </span>
       </h5>
-      <div class="actions">
+      <!--div class="actions">
         {% for status in student_chart_config %}
           {% if status.name == 'New' %}
             <div class="action new"><i class="far fa-user"></i> {{status.data.0}} {{status.name}}</div>
@@ -93,10 +99,17 @@
           {% endif %}
           &nbsp;&nbsp;&nbsp;&nbsp;
         {% endfor %}
-      </div>
+      </div-->
     </div>
+    {% if not group %}
+    <div class="assignment_class">
+      <h6 class="left" title="{{student_groups|join:', '}}">{{student_groups|length}} Class{{student_groups|pluralize:'es'}}</h6>
+    </div>
+    {% endif %}
     <div class="assignment_status_chart">
       <div id="assignment_chart_student_{{id}}" class="stacked_bar_chart rendered" name="{{student_chart_config}}" data-total="{{student|get_item:'total'}}"></div>
+    </div>
+    <div class="assignment_stats">
     </div>
     <div class="assignment_stats">
     </div>
@@ -105,58 +118,64 @@
   <div class="dashboard_assignments">
     <div class="assignments">
       {% for key, assignment in assignments.items %}
-      {% with assignment_id=assignment|get_item:'assignment_id' curriculum_id=assignment|get_item:'curriculum_id' group=assignment|get_item:'group' assignment_status=assignment|get_item:'assignment_status' %}
+      {% with assignment_id=assignment|get_item:'assignment_id' curriculum_id=assignment|get_item:'curriculum_id' assignment_group=assignment|get_item:'group' assignment_status=assignment|get_item:'assignment_status' instance=assignment|get_item:'instance' %}
       <div class="assignment tile standalone">
-        <div class="assignment_details">
+        <div class="assignment_title">
           <h5 class="left">
-            {% if assignment_id %}
-              <a href="{% url 'ctstem:assignmentDashboard' assignment_id %}">
+            {% if assignment_id and instance %}
+              <a href="{% url 'ctstem:feedback' assignment_id instance.id%}" title="Review student response">
                 {{assignment|get_item:'title'}}
               </a>
+            {% elif assignment|get_item:'curriculum_type' == 'Unit' %}
+              <span class="expanded_collapsed collapsed" title="Expand underlying lessons">
+                {{assignment|get_item:'title'}}
+                &nbsp;
+                <i class="fas fa-chevron-right"></i>
+              </span>
             {% else %}
-              {{assignment|get_item:'title'}}
+             <a onclick='alert("Student hasn&apos;t started this assignment");' title="Review student response">
+                {{assignment|get_item:'title'}}
+              </a>
             {% endif %}
-
-          {% if assignment|get_item:'curriculum_type' == 'Unit' %}
-            &nbsp;
-            <span class="expanded_collapsed collapsed">
-              <i class="fas fa-chevron-right"></i>
-            </span>
-          {% endif %}
           </h5>
-          <h6 class="left">Class: {{group.title}}</h6>
-          <div class="actions">
-            {% if assignment|get_item:'curriculum_type' == 'Unit' %}
-              {% get_chart_config assignment_status 'stacked_bar' as assignment_chart_config %}
-              {% for status in assignment_chart_config %}
-                {% if status.name == 'New' %}
-                  <div class="action new"><i class="far fa-user"></i> {{status.data.0}} {{status.name}}</div>
-                {% elif status.name == 'In Progress' %}
-                  <div class="action in_progress"><i class="far fa-clock"></i> {{status.data.0}} {{status.name}}</div>
-                {% elif status.name == 'Submitted' %}
-                  <div class="action submitted"><i class="fas fa-check"></i> {{status.data.0}} {{status.name}}</div>
-                {% elif status.name == 'Feedback Ready' %}
-                  <div class="action feedback_ready"><i class="far fa-comment-dots"></i> {{status.data.0}} {{status.name}}</div>
-                {% elif status.name == 'Archived' %}
-                  <div class="action archived"><i class="fa fa-archive"></i> {{status.data.0}} {{status.name}}</div>
-                {% endif %}
-                &nbsp;&nbsp;&nbsp;&nbsp;
-              {% endfor %}
-            {% else %}
-              {% if assignment_status == 'N' %}
-                <div class="action new"><i class="far fa-user"></i> New</div>
-              {% elif assignment_status == 'P' %}
-                <div class="action in_progress"><i class="far fa-clock"></i> In Progress</div>
-              {% elif assignment_status == 'S' %}
-                <div class="action submitted"><i class="fas fa-check"></i> Submitted</div>
-              {% elif assignment_status == 'F' %}
-                <div class="action feedback_ready"><i class="far fa-comment-dots"></i> Feedback Ready</div>
-              {% elif assignment_status == 'A' %}
-                <div class="action archived"><i class="fa fa-archive"></i> Archived</div>
-              {% endif %}
-            {% endif %}
-          </div>
         </div>
+        {% if not group %}
+        <div class="assignment_class">
+          <h6 class="left">{{assignment_group.title}}</h6>
+        </div>
+        {% endif %}
+        <!--div class="actions">
+          {% if assignment|get_item:'curriculum_type' == 'Unit' %}
+            {% get_chart_config assignment_status 'stacked_bar' as assignment_chart_config %}
+            {% for status in assignment_chart_config %}
+              {% if status.name == 'New' %}
+                <div class="action new"><i class="far fa-user"></i> {{status.data.0}} {{status.name}}</div>
+              {% elif status.name == 'In Progress' %}
+                <div class="action in_progress"><i class="far fa-clock"></i> {{status.data.0}} {{status.name}}</div>
+              {% elif status.name == 'Submitted' %}
+                <div class="action submitted"><i class="fas fa-check"></i> {{status.data.0}} {{status.name}}</div>
+              {% elif status.name == 'Feedback Ready' %}
+                <div class="action feedback_ready"><i class="far fa-comment-dots"></i> {{status.data.0}} {{status.name}}</div>
+              {% elif status.name == 'Archived' %}
+                <div class="action archived"><i class="fa fa-archive"></i> {{status.data.0}} {{status.name}}</div>
+              {% endif %}
+              &nbsp;&nbsp;&nbsp;&nbsp;
+            {% endfor %}
+          {% else %}
+            {% if assignment_status == 'N' %}
+              <div class="action new"><i class="far fa-user"></i> New</div>
+            {% elif assignment_status == 'P' %}
+              <div class="action in_progress"><i class="far fa-clock"></i> In Progress</div>
+            {% elif assignment_status == 'S' %}
+              <div class="action submitted"><i class="fas fa-check"></i> Submitted</div>
+            {% elif assignment_status == 'F' %}
+              <div class="action feedback_ready"><i class="far fa-comment-dots"></i> Feedback Ready</div>
+            {% elif assignment_status == 'A' %}
+              <div class="action archived"><i class="fa fa-archive"></i> Archived</div>
+            {% endif %}
+          {% endif %}
+        </div-->
+
         <div class="assignment_status_chart">
           {% if assignment|get_item:'curriculum_type' == 'Unit' %}
             {% get_chart_config assignment_status 'stacked_bar' as assignment_chart_config %}
@@ -167,8 +186,10 @@
           {% endif %}
         </div>
         <div class="assignment_stats">
-          <div class="last_opened">{{assignment|get_item:'last_opened'|date:'M j, Y'|default_if_none:''}}</div>
-          <div class="assigned_date">{{assignment|get_item:'assigned_date'|date:'M j, Y'|default_if_none:''}}</div>
+          <h6 class="left last_opened">{{assignment|get_item:'last_opened'|date:'M j, Y'|default_if_none:''}}</h6>
+        </div>
+        <div class="assignment_stats">
+          <h6 class="left assigned_date">{{assignment|get_item:'assigned_date'|date:'M j, Y'|default_if_none:''}}</h6>
         </div>
       </div>
       {% endwith %}
@@ -176,12 +197,17 @@
         <div class="underlying_lesson_assignments">
           {% with lessons=assignment|get_item:'lessons'|sort %}
           {% for order, lesson in lessons.items %}
+            {% with percent_complete=lesson|get_item:'percent_complete' assignment_status=lesson|get_item:'assignment_status' assignment_id=lesson|get_item:'assignment_id' instance=lesson|get_item:'instance'%}
              <div class="assignment tile">
-              <div class="assignment_details">
+              <div class="assignment_title">
                 <h5 class="left">
-                  <a href="{% url 'ctstem:assignmentDashboard' lesson|get_item:'assignment_id' %}">{{order}}. {{lesson|get_item:'title'}}</a>
+                  {% if instance %}
+                    <a href="{% url 'ctstem:feedback' assignment_id instance.id %}" title="Review student response">{{order}}. {{lesson|get_item:'title'}}</a>
+                  {% else %}
+                    <a onclick='alert("Student hasn&apos;t started this assignment");' title="Review student response">{{order}}. {{lesson|get_item:'title'}}</a>
+                  {% endif %}
                 </h5>
-                <div class="actions">
+                <!--div class="actions">
                   {% with lesson_assignment_status=lesson|get_item:'assignment_status'%}
                     {% if lesson_assignment_status == 'N' %}
                       <div class="action new"><i class="far fa-user"></i> New</div>
@@ -195,19 +221,25 @@
                       <div class="action archived"><i class="fa fa-archive"></i> Archived</div>
                     {% endif %}
                   {% endwith %}
-                </div>
+                </div-->
               </div>
+              {% if not group %}
+              <div class="assignment_class">
+              </div>
+              {% endif %}
               <div class="assignment_status_chart">
-                {% with percent_complete=lesson|get_item:'percent_complete' assignment_status=lesson|get_item:'assignment_status' %}
                 {% get_chart_color assignment_status as color %}
-                  <div id="assignment_chart_student_{{id}}_curriculum_{{key}}_lesson_{{order}}" class="progress_chart unrendered" data-percent-complete="" data-color="{{color}}" data-student-id="{{id}}" data-assignment-id="{{lesson|get_item:'assignment_id'}}"></div>
-                {% endwith %}
+                <div id="assignment_chart_student_{{id}}_curriculum_{{key}}_lesson_{{order}}" class="progress_chart unrendered" data-percent-complete="" data-color="{{color}}" data-student-id="{{id}}" data-assignment-id="{{lesson|get_item:'assignment_id'}}"></div>
+
               </div>
               <div class="assignment_stats">
-                <div class="last_opened">{{lesson|get_item:'last_opened'|date:'M j, Y'|default_if_none:''}}</div>
-                <div class="assigned_date">{{lesson|get_item:'assigned_date'|date:'M j, Y'|default_if_none:''}}</div>
+                <h6 class="left last_opened">{{lesson|get_item:'last_opened'|date:'M j, Y'|default_if_none:''}}</h6>
+              </div>
+              <div class="assignment_stats">
+                <h6 class="left assigned_date">{{lesson|get_item:'assigned_date'|date:'M j, Y'|default_if_none:''}}</h6>
               </div>
             </div>
+            {% endwith %}
           {% endfor %}
           {% endwith %}
         </div>

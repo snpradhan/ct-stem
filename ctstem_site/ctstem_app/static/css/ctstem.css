@@ -1060,12 +1060,14 @@ div.content.teacher_detailed_dashboard div#dashboard_assignments div#assignments
 }
 div.content.teacher_detailed_dashboard div.dashboard_assignments div.assignments div.assignment {
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
   width: 100%;
   border: unset;
   border-bottom: 1px solid #eee;
   border-radius: unset;
   margin: 0;
+  padding: 0 2%;
+  align-items: center;
 }
 div.content.teacher_detailed_dashboard div.header {
   position: sticky;
@@ -1077,9 +1079,12 @@ div.content.teacher_detailed_dashboard div.header {
 div.content.teacher_detailed_dashboard div.header * {
   color: inherit;
 }
-div.content.teacher_detailed_dashboard div.dashboard_assignments div.assignment div.assignment_details {
-  flex: 0 0 45%;
-  align-self: center;
+div.content.teacher_detailed_dashboard div.dashboard_assignments div.assignment div.assignment_title {
+  flex: 0 0 30%;
+  align-items: center;
+}
+div.content.teacher_detailed_dashboard div.dashboard_assignments div.assignment div.assignment_class {
+  flex: 0 0 15%;
 }
 div.content.teacher_detailed_dashboard .actions {
   max-width: 50em;
@@ -1091,29 +1096,23 @@ div.content.teacher_detailed_dashboard  .expanded_collapsed.expanded .fa-chevron
   transform: rotate(90deg);
 }
 div.content.teacher_detailed_dashboard div.dashboard_assignments div.assignment div.assignment_status_chart {
-  flex: 0 0 25%;
-  align-self: center;
-}
-div.content.teacher_detailed_dashboard div.dashboard_assignments div.assignment div.assignment_stats {
   flex: 0 0 20%;
   align-self: center;
-  display: flex;
-  justify-content: space-between;
+  max-width: 20%;
+}
+div.content.teacher_detailed_dashboard div.dashboard_assignments div.assignment div.assignment_stats {
+  flex: 0 0 10%;
+  align-self: center;
 }
 div.content.teacher_detailed_dashboard div.dashboard_assignments div.assignment div.assignment_stats > div {
   flex: 0 0 50%;
-}
-div.content.teacher_detailed_dashboard div.dashboard_assignments div.assignment div.assignment_stats div.last_opened,
-div.content.teacher_detailed_dashboard div.dashboard_assignments div.assignment div.assignment_stats div.assigned_date {
-  font-size: 1.3em;
-  font-weight: bold;
 }
 
 div.content.teacher_detailed_dashboard div.dashboard_assignments div.underlying_lesson_assignments {
   display: none;
 }
-div.content#teacher_assignment_dashboard div.dashboard_assignments div.underlying_lesson_assignments div.assignment_details {
-  padding-left: 4em;
+div.content#teacher_assignment_dashboard div.dashboard_assignments div.underlying_lesson_assignments div.assignment_title {
+  padding-left: 2em;
 }
 
 
@@ -1122,26 +1121,31 @@ div.content#teacher_assignment_dashboard div.dashboard_assignments div.underlyin
 /*******************TEACHER STUDENT DASHBOARD START**************************/
 div.content.teacher_detailed_dashboard div.student  {
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
   width: 100%;
   border: unset;
   border-bottom: 1px solid #eee;
   border-radius: unset;
   margin: 0;
+  padding: 0 2%;
+  align-items: center;
 }
 div.content.teacher_detailed_dashboard div.student div.student_details {
-  flex: 0 0 45%;
+  flex: 0 0 30%;
+  align-self: center;
+}
+div.content.teacher_detailed_dashboard div.student div.assignment_class {
+  flex: 0 0 15%;
   align-self: center;
 }
 div.content.teacher_detailed_dashboard div.student  div.assignment_status_chart {
-  flex: 0 0 25%;
-  align-self: center;
-}
-div.content.teacher_detailed_dashboard div.student  div.assignment_stats {
   flex: 0 0 20%;
   align-self: center;
-  display: flex;
-  justify-content: space-between;
+  max-width: 20%;
+}
+div.content.teacher_detailed_dashboard div.student  div.assignment_stats {
+  flex: 0 0 10%;
+  align-self: center;
 }
 div.content.teacher_detailed_dashboard div.student  div.assignment_stats > div {
   flex: 0 0 50%;
@@ -1152,11 +1156,11 @@ div.content#teacher_student_dashboard div.dashboard_assignments {
 div.content#teacher_student_dashboard div.dashboard_assignments div.underlying_lesson_assignments {
   display: none;
 }
-div.content#teacher_student_dashboard div.dashboard_assignments div.assignment_details {
-  padding-left: 4em;
+div.content#teacher_student_dashboard div.dashboard_assignments div.assignment_title {
+  padding-left: 2em;
 }
-div.content#teacher_student_dashboard div.dashboard_assignments div.underlying_lesson_assignments div.assignment_details {
-  padding-left: 8em;
+div.content#teacher_student_dashboard div.dashboard_assignments div.underlying_lesson_assignments div.assignment_title {
+  padding-left: 4em;
 }
 
 /*******************TEACHER STUDENT DASHBOARD END**************************/
@@ -1835,7 +1839,7 @@ div.content#assignments div.inbox_filter,
 div.content#assignment_progress_dashboard div.progress_filter,
 div.content.teacher_detailed_dashboard div#dashboard_search div.assignment_filter {
   background-color: var(--ctstem-color-blue);
-  padding: 1em 5%;
+  padding: 1em 2%;
   display: flex;
   justify-content: space-between;
   align-items: flex-end;

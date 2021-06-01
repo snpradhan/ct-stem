@@ -3912,13 +3912,16 @@ def teacherStudentDashboard(request, id='', status='active'):
         members = models.Membership.objects.all().filter(group__in=groups).values_list('student', flat=True)
       for student in models.Student.objects.all().filter(id__in=members).order_by(Lower('user__last_name'), Lower('user__first_name')).distinct():
         student_key = student.id
+        student_groups = groups.filter(group_members__student__id=student.id).order_by(Lower('title')).distinct()
         students[student_key] = {'id': student.id,
                                'name': student.user.last_name + ', ' + student.user.first_name,
                                'assignment_status': {'N': 0, 'P': 0, 'S': 0, 'F': 0, 'A': 0},
                                'total': 0,
-                               'assignments': {}
+                               'assignments': {},
+                               'student_groups': student_groups
                               }
-        for assignment in all_assignments:
+        #print(all_groups.filter(group_members__student__id=student.id).order_by(Lower('title')).distinct())
+        for assignment in all_assignments.filter(group__in=student_groups):
           curriculum = assignment.curriculum
           assignment_date = assignment.assigned_date
           instance = None
@@ -3938,7 +3941,7 @@ def teacherStudentDashboard(request, id='', status='active'):
           #underlying lesson
           if curriculum.curriculum_type in ['L', 'A'] and curriculum.unit is not None:
             assignment_key = str(curriculum.unit.id) + '_' + str(assignment.group.id)
-            lesson = {'curriculum_id': curriculum.id, 'assignment_id': assignment.id, 'title': curriculum.title, 'assigned_date': assignment_date, 'last_opened': last_opened, 'assignment_status': status_key}
+            lesson = {'curriculum_id': curriculum.id, 'assignment_id': assignment.id, 'title': curriculum.title, 'assigned_date': assignment_date, 'last_opened': last_opened, 'assignment_status': status_key, 'instance': instance}
 
             if assignment_key in students[student_key]['assignments']:
               if assignment_date is not None and students[student_key]['assignments'][assignment_key]['assigned_date'] is not None:
@@ -3985,6 +3988,7 @@ def teacherStudentDashboard(request, id='', status='active'):
                                                                     'assigned_date': assignment_date,
                                                                     'last_opened': last_opened,
                                                                     'assignment_status': status_key,
+                                                                    'instance': instance,
                                                                     }
 
         students[student_key]['assignments'] = {k: v for k, v in sorted(students[student_key]['assignments'].items(), key=lambda item: item[1]['title'].lower())}
@@ -3996,7 +4000,7 @@ def teacherStudentDashboard(request, id='', status='active'):
     uploadForm = forms.UploadFileForm(user=request.user)
     assignmentForm = forms.AssignmentSearchForm(user=request.user)
 
-    context = {'teacher': teacher, 'groups': groups, 'group': group, 'students': students,
+    context = {'teacher': teacher, 'group': group, 'students': students,
                 'role':'groups', 'uploadForm': uploadForm, 'status': status, 'domain': domain, 'searchForm': searchForm
                }
     return render(request, 'ctstem_app/TeacherStudentDashboard.html', context)

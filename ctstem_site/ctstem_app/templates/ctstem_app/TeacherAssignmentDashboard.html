@@ -56,41 +56,52 @@
   <div class="dashboard_assignments">
     <div class="assignments">
       <div class="assignment tile header">
-        <div class="assignment_details">
-          <h5 class="left">
-            Assignment Title</a>
-          </h5>
+        <div class="assignment_title">
+          <h5 class="left">Assignment</h5>
         </div>
-        <div class="assignment_status_chart"></div>
+        {% if not group %}
+        <div class="assignment_class">
+          <h5 class="left">Class</h5>
+        </div>
+        {% endif %}
+        <div class="assignment_status_chart">
+          <h5 class="left">Status</h5>
+        </div>
         <div class="assignment_stats">
-          <div><h5 class="left">Last Opened</h5></div>
-          <div><h5 class="left">Assigned Date</h5></div>
+          <h5 class="left">Last Opened</h5>
+        </div>
+        <div class="assignment_stats">
+          <h5 class="left">Assigned Date</h5>
         </div>
       </div>
       {% for key, assignment in assignments.items %}
-        {% with assignment_id=assignment|get_item:'assignment_id' curriculum_id=assignment|get_item:'curriculum_id' group=assignment|get_item:'group' assignment_status=assignment|get_item:'assignment_status'%}
+        {% with assignment_id=assignment|get_item:'assignment_id' curriculum_id=assignment|get_item:'curriculum_id' assignment_group=assignment|get_item:'group' assignment_status=assignment|get_item:'assignment_status'%}
         {% get_chart_config assignment_status 'stacked_bar' as assignment_status_chart_config %}
         <div class="assignment tile">
-          <div class="assignment_details">
+          <div class="assignment_title">
             <h5 class="left">
               {% if assignment_id %}
-                <a href="{% url 'ctstem:assignmentProgressDashboard' teacher.id %}?assignment={{assignment_id}}">
+                <a href="{% url 'ctstem:assignmentProgressDashboard' teacher.id %}?assignment={{assignment_id}}" title="View Assignment Progress Dashboard">
                   {{assignment|get_item:'title'}}
                 </a>
+              {% elif assignment|get_item:'curriculum_type' == 'Unit' %}
+                <span class="expanded_collapsed collapsed" title="Expand underlying lessons">
+                  {{assignment|get_item:'title'}}
+                  &nbsp;
+                  <i class="fas fa-chevron-right"></i>
+                </span>
               {% else %}
                 {{assignment|get_item:'title'}}
               {% endif %}
-
-            {% if assignment|get_item:'curriculum_type' == 'Unit' %}
-              &nbsp;
-              <span class="expanded_collapsed collapsed">
-                <i class="fas fa-chevron-right"></i>
-              </span>
-            {% endif %}
             </h5>
-            <h6 class="left">Class: {{group.title}}</h6>
+          </div>
+          {% if not group %}
+          <div class="assignment_class">
+            <h6 class="left">{{assignment_group.title}}</h6>
+          </div>
+          {% endif %}
 
-            <div class="actions">
+            <!--div class="actions">
               {% for status in assignment_status_chart_config %}
                 {% if status.name == 'New' %}
                   <div class="action new"><i class="far fa-user"></i> {{status.data.0}} {{status.name}}</div>
@@ -105,14 +116,16 @@
                 {% endif %}
                 &nbsp;&nbsp;&nbsp;&nbsp;
               {% endfor %}
-            </div>
-          </div>
+            </div-->
+
           <div class="assignment_status_chart">
             <div id="assignment_chart_{{key}}" class="stacked_bar_chart rendered" name="{{assignment_status_chart_config}}" data-total="{{assignment|get_item:'total'}}"></div>
           </div>
           <div class="assignment_stats">
-            <div class="last_opened">{{assignment|get_item:'last_opened'|date:'M j, Y'|default_if_none:''}}</div>
-            <div class="assigned_date">{{assignment|get_item:'assigned_date'|date:'M j, Y'|default_if_none:''}}</div>
+            <h6 class="left last_opened">{{assignment|get_item:'last_opened'|date:'M j, Y'|default_if_none:''}}</h6>
+          </div>
+          <div class="assignment_stats">
+            <h6 class="left assigned_date">{{assignment|get_item:'assigned_date'|date:'M j, Y'|default_if_none:''}}</h6>
           </div>
         </div>
         {% if assignment|get_item:'lessons' %}
@@ -122,11 +135,11 @@
                 {% with lesson_assignment_status=lesson|get_item:'assignment_status' %}
                 {% get_chart_config lesson_assignment_status 'stacked_bar' as lesson_chart_config %}
                  <div class="assignment tile">
-                  <div class="assignment_details">
+                  <div class="assignment_title">
                     <h5 class="left">
-                      <a href="{% url 'ctstem:assignmentProgressDashboard' teacher.id %}?assignment={{lesson|get_item:'assignment_id'}}">{{order}}. {{lesson|get_item:'title'}}</a>
+                      <a href="{% url 'ctstem:assignmentProgressDashboard' teacher.id %}?assignment={{lesson|get_item:'assignment_id'}}" title="View Assignment Progress Dashboard">{{order}}. {{lesson|get_item:'title'}}</a>
                     </h5>
-                    <div class="actions">
+                    <!--div class="actions">
                       {% for status in lesson_chart_config %}
                         {% if status.name == 'New' %}
                           <div class="action new"><i class="far fa-user"></i> {{status.data.0}} {{status.name}}</div>
@@ -141,14 +154,20 @@
                         {% endif %}
                         &nbsp;&nbsp;&nbsp;&nbsp;
                       {% endfor %}
-                    </div>
+                    </div-->
                   </div>
+                  {% if not group %}
+                  <div class="assignment_class">
+                  </div>
+                  {% endif %}
                   <div class="assignment_status_chart">
                     <div id="assignment_chart_{{key}}_{{order}}" class="stacked_bar_chart unrendered" name="{{lesson_chart_config}}" data-total="{{lesson|get_item:'total'}}"></div>
                   </div>
                   <div class="assignment_stats">
-                    <div class="last_opened">{{lesson|get_item:'last_opened'|date:'M j, Y'|default_if_none:''}}</div>
-                    <div class="assigned_date">{{lesson|get_item:'assigned_date'|date:'M j, Y'|default_if_none:''}}</div>
+                    <h6 class="left last_opened">{{lesson|get_item:'last_opened'|date:'M j, Y'|default_if_none:''}}</h6>
+                  </div>
+                  <div class="assignment_stats">
+                    <h6 class="left assigned_date">{{lesson|get_item:'assigned_date'|date:'M j, Y'|default_if_none:''}}</h6>
                   </div>
                 </div>
                 {% endwith %}
