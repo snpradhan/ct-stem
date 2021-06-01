@@ -3715,6 +3715,7 @@ def teacherAssignmentDashboard(request, id='', status='active'):
   if request.method == 'GET' or request.method == 'POST':
     is_active = True
     assignment_count = 0
+    curriculum_id = group_id = sort_by = data = group = None
     if status == 'inactive':
       is_active = False
 
@@ -3723,27 +3724,25 @@ def teacherAssignmentDashboard(request, id='', status='active'):
     if request.method == 'POST':
       data = request.POST.copy()
       group_id = data['group']
+      curriculum_id = data['assignment']
+      sort_by = data['sort_by']
       searchForm = forms.TeacherAssignmentDashboardSearchForm(teacher=teacher, is_active=is_active, group_id=group_id, data=data)
       search_criteria = eval(json.dumps(dict(data.lists())))
     else:
-      searchForm = forms.TeacherAssignmentDashboardSearchForm(teacher=teacher, is_active=is_active)
+      group_id = request.GET.get('group', '')
+      searchForm = forms.TeacherAssignmentDashboardSearchForm(teacher=teacher, is_active=is_active, group_id=group_id)
 
     groups = models.UserGroup.objects.all().filter(Q(is_active=is_active), Q(teacher=teacher) | Q(shared_with=teacher)).order_by(Lower('title'))
     all_assignments = models.Assignment.objects.all().filter(group__in=groups).distinct().order_by(Lower('curriculum__title'))
 
-    sort_by = None
-    if search_criteria:
-      if 'group' in search_criteria:
-        group_id = search_criteria['group'][0]
-        if group_id:
-          groups = groups.filter(id=group_id)
-          all_assignments = all_assignments.filter(group__in=groups)
-      if 'assignment' in search_criteria:
-        curriculum_id = search_criteria['assignment'][0]
-        if curriculum_id:
-          all_assignments = all_assignments.filter(Q(curriculum__id=curriculum_id) | Q(curriculum__unit__id=curriculum_id))
-      if 'sort_by' in search_criteria:
-        sort_by = search_criteria['sort_by'][0]
+    if group_id:
+      groups = groups.filter(id=group_id)
+      group = groups[0]
+      all_assignments = all_assignments.filter(group__in=groups)
+
+    if curriculum_id:
+      all_assignments = all_assignments.filter(Q(curriculum__id=curriculum_id) | Q(curriculum__unit__id=curriculum_id))
+
 
     assignments = {}
     for assignment in all_assignments:
@@ -3850,7 +3849,7 @@ def teacherAssignmentDashboard(request, id='', status='active'):
     uploadForm = forms.UploadFileForm(user=request.user)
     assignmentForm = forms.AssignmentSearchForm(user=request.user)
 
-    context = {'teacher': teacher, 'groups': groups, 'assignments': assignments,
+    context = {'teacher': teacher, 'groups': groups, 'group': group, 'assignments': assignments,
                 'role':'groups', 'uploadForm': uploadForm, 'status': status, 'domain': domain, 'searchForm': searchForm
                }
     return render(request, 'ctstem_app/TeacherAssignmentDashboard.html', context)
@@ -3872,6 +3871,7 @@ def teacherStudentDashboard(request, id='', status='active'):
   if request.method == 'GET' or request.method == 'POST':
     is_active = True
     assignment_count = 0
+    curriculum_id = group_id = student_id = group = data = None
     if status == 'inactive':
       is_active = False
 
@@ -3880,30 +3880,27 @@ def teacherStudentDashboard(request, id='', status='active'):
     if request.method == 'POST':
       data = request.POST.copy()
       group_id = data['group']
+      curriculum_id = data['assignment']
+      student_id = data['student']
       searchForm = forms.TeacherStudentDashboardSearchForm(teacher=teacher, is_active=is_active, group_id=group_id, data=data)
-      search_criteria = eval(json.dumps(dict(data.lists())))
     else:
-      searchForm = forms.TeacherStudentDashboardSearchForm(teacher=teacher, is_active=is_active)
+      group_id = request.GET.get('group', '')
+      searchForm = forms.TeacherStudentDashboardSearchForm(teacher=teacher, is_active=is_active, group_id=group_id)
 
     groups = models.UserGroup.objects.all().filter(Q(is_active=is_active), Q(teacher=teacher) | Q(shared_with=teacher)).order_by(Lower('title'))
     all_assignments = models.Assignment.objects.all().filter(group__in=groups).distinct().order_by(Lower('curriculum__unit__title'), Lower('curriculum__title'))
-    student_id = None
-    sort_by = None
-    if search_criteria:
-      if 'student' in search_criteria:
-        student_id = search_criteria['student'][0]
-        if student_id:
-          groups = groups.filter(group_members__student__id=student_id)
-          all_assignments = all_assignments.filter(group__in=groups)
-      if 'group' in search_criteria:
-        group_id = search_criteria['group'][0]
-        if group_id:
-          groups = groups.filter(id=group_id)
-          all_assignments = all_assignments.filter(group__in=groups)
-      if 'assignment' in search_criteria:
-        curriculum_id = search_criteria['assignment'][0]
-        if curriculum_id:
-          all_assignments = all_assignments.filter(Q(curriculum__id=curriculum_id) | Q(curriculum__unit__id=curriculum_id))
+
+    if student_id:
+      groups = groups.filter(group_members__student__id=student_id)
+      all_assignments = all_assignments.filter(group__in=groups)
+
+    if group_id:
+      groups = groups.filter(id=group_id)
+      group = groups[0]
+      all_assignments = all_assignments.filter(group__in=groups)
+
+    if curriculum_id:
+      all_assignments = all_assignments.filter(Q(curriculum__id=curriculum_id) | Q(curriculum__unit__id=curriculum_id))
 
     students = {}
 
@@ -3999,7 +3996,7 @@ def teacherStudentDashboard(request, id='', status='active'):
     uploadForm = forms.UploadFileForm(user=request.user)
     assignmentForm = forms.AssignmentSearchForm(user=request.user)
 
-    context = {'teacher': teacher, 'groups': groups, 'students': students,
+    context = {'teacher': teacher, 'groups': groups, 'group': group, 'students': students,
                 'role':'groups', 'uploadForm': uploadForm, 'status': status, 'domain': domain, 'searchForm': searchForm
                }
     return render(request, 'ctstem_app/TeacherStudentDashboard.html', context)

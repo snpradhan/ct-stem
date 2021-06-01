@@ -11,7 +11,14 @@
 {% block content %}
 {{block.super}}
 <div class="content teacher_detailed_dashboard" id="teacher_assignment_dashboard">
-  <h2> Assignments </h2>
+  <h2>
+    {% if group %}
+      {{group.title}} -
+    {% else %}
+     All
+    {% endif %}
+    Assignments
+  </h2>
   <div id="dashboard_header">
     <div class="navigation">
       <h5 class="left"><a href="{% url 'ctstem:teacherDashboard' teacher.id status %}"><i class="fas fa-chevron-left"></i><i class="fas fa-chevron-left"></i> Back to Teacher Dashboard</a></h5>

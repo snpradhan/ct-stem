@@ -46,8 +46,16 @@
             <div id="assignment_chart_group_{{group.id}}" class="progress_chart" data-percent-complete="{{percent_complete}}"></div>
           </div>
           <div class="class_detail">
-            <h6 class="left">{{group.members.count}} Student{% if group.members.count > 1 %}s{% endif %}</h6>
-            <h6 class="left">{{group.assignments.count}} Assignment{% if group.assignments.count > 1 %}s{% endif %}</h6>
+            <h6 class="left">
+              <a href="{% url 'ctstem:teacherStudentDashboard' teacher.id status %}?group={{group.id}}">
+                {{group.members.count}} Student{% if group.members.count > 1 %}s{% endif %}
+              </a>
+            </h6>
+            <h6 class="left">
+              <a href="{% url 'ctstem:teacherAssignmentDashboard' teacher.id status %}?group={{group.id}}">
+                {{group.assignments.count}} Assignment{% if group.assignments.count > 1 %}s{% endif %}
+              </a>
+            </h6>
           </div>
           <div class="class_detail">
             <div class="class_actions">
@@ -62,11 +70,8 @@
               {% endif %}
             </div>
             <div class="class_actions">
-              <a class="action btn small lightyellow" href="{% url 'ctstem:groupDashboard' group.id 'active' %}" aria-label="View Class Dashboard" title="View Class Dashboard">
-                <i class="fas fa-tachometer-alt"></i> Dashboard
-              </a>
+
               {% if group.is_active %}
-                &nbsp;&nbsp;&nbsp;&nbsp;
                 <a class="assignment-modal action btn small lightyellow" href="#" data-toggle="modal" data-target="#assignment" data-id="{{group.id}}" data-title="{{group.title}}" data-subject="{{group.subject.id}}" title="Search and Add Assignments">
                   <i class="fa fa-tasks"></i> Assign
                 </a>

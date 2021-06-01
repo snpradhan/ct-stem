@@ -980,6 +980,8 @@ class TeacherAssignmentDashboardSearchForm(forms.Form):
 
     if group_id:
       groups = models.UserGroup.objects.all().filter(id=group_id)
+      self.fields['group'].initial = group_id
+
     #if group is selected, limit assignments from that group
     curricula = models.Curriculum.objects.all().filter(Q(unit__isnull=True), Q(assignments__group__in=groups) | Q(underlying_curriculum__assignments__group__in=groups)).distinct().order_by(Lower('title'))
     self.fields['assignment'].queryset = curricula #models.Assignment.objects.all().filter(group__in=groups).distinct().order_by('curriculum__title')
@@ -1003,12 +1005,13 @@ class TeacherStudentDashboardSearchForm(forms.Form):
     is_active = kwargs.pop('is_active')
     if 'group_id' in kwargs:
       group_id = kwargs.pop('group_id')
+
     super(TeacherStudentDashboardSearchForm, self).__init__(*args, **kwargs)
     groups = models.UserGroup.objects.all().filter(Q(is_active=is_active), Q(teacher=teacher) | Q(shared_with=teacher)).order_by(Lower('title'))
     self.fields['group'].queryset = groups
-
     if group_id:
       groups = models.UserGroup.objects.all().filter(id=group_id)
+      self.fields['group'].initial = group_id
     #if group is selected, limit students and assignments from that group
     students = models.Student.objects.all().filter(student_membership__group__in=groups).distinct().order_by(Lower('user__last_name'), Lower('user__first_name'))
     self.fields['student'].queryset = students

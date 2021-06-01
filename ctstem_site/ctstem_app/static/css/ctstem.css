@@ -957,19 +957,21 @@ div.content#teacher_dashboard div#dashboard_classes div#class_tiles div.tile div
 }
 div.content#teacher_dashboard div#dashboard_classes div#class_tiles div.tile div.class_details > * {
   max-width: 100%;
+  margin-bottom: 12px;
 }
 div.content#teacher_dashboard div#dashboard_classes div#class_tiles div.tile div.class_details div.class_detail{
   display: flex;
   justify-content: space-between;
   height: auto;
-  margin: 0.5em 0;
 }
-div.content#teacher_dashboard div#dashboard_classes div#class_tiles div.tile div.class_details div.class_detail > :first-child {
-  flex: 0 1 60%;
-}
-div.content#teacher_dashboard div#dashboard_classes div#class_tiles div.tile div.class_details div.class_detail > :nth-child(2) {
+div.content#teacher_dashboard div#dashboard_classes div#class_tiles div.tile div.class_details div.class_detail > * {
   flex: 0 1 50%;
 }
+div.content#teacher_dashboard div#dashboard_classes div#class_tiles div.tile div.class_details div.class_detail > h6 {
+  text-decoration: underline;
+  margin-bottom: 0;
+}
+
 div.content#teacher_dashboard div#dashboard_classes div#class_tiles div.tile div.class_details div.class_detail .class_actions {
   text-align: left;
 }
