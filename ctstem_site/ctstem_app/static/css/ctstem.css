@@ -2222,11 +2222,6 @@ div.modal .form-group.button.right {
     margin-right: auto;
   }
 }
-div.modal#studentSearch {
-  height: auto;
-  max-height: 88em;
-}
-
 div.modal-content div.modal-footer div.extra {
   font-size: 1.3em;
   margin-bottom: 0.5em;

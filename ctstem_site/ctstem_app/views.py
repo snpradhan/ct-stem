@@ -2079,11 +2079,10 @@ def addStudent(request, group_id='', student_id=''):
 
     group = models.UserGroup.objects.get(id=group_id)
     student = models.Student.objects.get(id=student_id)
-
     if request.method == 'POST':
       membership = models.Membership.objects.get_or_create(group=group, student=student)
       send_added_to_group_confirmation_email(student.user.email, group)
-      response_data = {'result': 'Success'}
+      response_data = {'success': True}
       return http.HttpResponse(json.dumps(response_data), content_type="application/json")
 
     return http.HttpResponseNotAllowed(['POST'])
@@ -2106,11 +2105,7 @@ def createStudent(request, group_id=''):
     if not has_permission:
       return http.HttpResponseNotFound('<h1>You do not have the privilege to add students from this class</h1>')
 
-    if request.method == 'GET':
-      form = forms.StudentAddForm()
-      context = {'form': form, 'group_id': group_id}
-      return render(request, 'ctstem_app/CreateAndAddStudent.html', context)
-    elif request.method == 'POST':
+    if request.method == 'POST':
       data = request.POST.copy()
       response_data = {}
       form = forms.StudentAddForm(data=data)
@@ -2143,17 +2138,30 @@ def createStudent(request, group_id=''):
         send_account_by_admin_confirmation_email('student', user, password)
         return http.HttpResponse(json.dumps(response_data), content_type="application/json")
       else:
-        print(form.errors)
-        context = {'form': form, 'group_id': group_id}
         response_data['success'] = False
-        response_data['html'] = render_to_string('ctstem_app/CreateAndAddStudent.html', context, request)
         return http.HttpResponse(json.dumps(response_data), content_type="application/json")
-    return http.HttpResponseNotAllowed(['GET', 'POST'])
+    return http.HttpResponseNotAllowed(['POST'])
 
   except models.UserGroup.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested class not found</h1>')
   except models.Student.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested student not found</h1>')
+
+
+def addStudentsToClass(request, group_id=''):
+
+  if request.method == 'GET':
+
+    current_site = Site.objects.get_current()
+    domain = current_site.domain
+    group = models.UserGroup.objects.get(id=group_id)
+    studentCreateForm = forms.StudentAddForm()
+    studentSearchForm = forms.UserSearchForm()
+    studentUploadForm = forms.UploadFileForm(user=request.user)
+
+    context = {'studentCreateForm': studentCreateForm, 'studentSearchForm': studentSearchForm, 'studentUploadForm': studentUploadForm, 'group': group, 'domain': domain}
+    return render(request, 'ctstem_app/AddStudentsToClass.html', context)
+  return http.HttpResponseNotAllowed(['GET'])
 
 def notimplemented(request):
   return render(request, 'ctstem_app/NotImplemented.html')
@@ -2397,17 +2405,12 @@ def searchQuestion(request):
 # Search Students
 ####################################
 @login_required
-def searchStudents(request):
+def searchStudents(request, group_id=''):
   # check if the user has permission to add a question
   if hasattr(request.user, 'teacher') == False and hasattr(request.user, 'school_administrator') == False and  hasattr(request.user, 'administrator') == False:
     return http.HttpResponseNotFound('<h1>You do not have the privilege search students</h1>')
 
-  if 'GET' == request.method:
-    studentSearchForm = forms.UserSearchForm()
-    context = {'studentSearchForm': studentSearchForm}
-    return render(request, 'ctstem_app/StudentSearch.html', context)
-
-  elif 'POST' == request.method:
+  if 'POST' == request.method:
     data = request.POST.copy()
 
     query_filter = {}
@@ -2420,11 +2423,11 @@ def searchStudents(request):
     if data['email']:
       query_filter['user__email__icontains'] = str(data['email']).strip()
 
-    group = models.UserGroup.objects.get(id=int(data['group_id']))
+    group = models.UserGroup.objects.get(id=int(group_id))
     school = group.teacher.school
     query_filter['school__id'] = school.id
 
-    studentList = models.Student.objects.filter(**query_filter)
+    studentList = models.Student.objects.filter(**query_filter).exclude(student_membership__group__id=group_id)
     student_list = [{'user_id': student.user.id, 'student_id': student.id, 'username': student.user.username, 'name': student.user.get_full_name(),
                      'email': student.user.email, 'status': 'Active' if student.user.is_active else 'Inactive',
                      'last_login': student.user.last_login.strftime('%B %d, %Y') if student.user.last_login else '',
@@ -2433,7 +2436,7 @@ def searchStudents(request):
                 for student in studentList]
     return http.HttpResponse(json.dumps(student_list), content_type="application/json")
 
-  return http.HttpResponseNotAllowed(['GET', 'POST'])
+  return http.HttpResponseNotAllowed(['POST'])
 
 
 ####################################
@@ -2600,10 +2603,9 @@ def users(request, role):
     sort_order = [{'order_by': order_by, 'direction': direction, 'ignorecase': ignorecase}]
     user_list = paginate(request, users, sort_order, 100)
 
-    uploadForm = forms.UploadFileForm(user=request.user)
     assignmentForm = forms.AssignmentSearchForm(user=request.user)
 
-    context = {'users': user_list, 'role': role, 'uploadForm': uploadForm, 'assignmentForm': assignmentForm, 'searchForm': searchForm, 'order_by': order_by, 'direction': direction}
+    context = {'users': user_list, 'role': role, 'assignmentForm': assignmentForm, 'searchForm': searchForm, 'order_by': order_by, 'direction': direction}
 
     return render(request, 'ctstem_app/Users.html', context)
 
@@ -3372,9 +3374,8 @@ def groups(request, status='active'):
 
     current_site = Site.objects.get_current()
     domain = current_site.domain
-    uploadForm = forms.UploadFileForm(user=request.user)
     assignmentForm = forms.AssignmentSearchForm(user=request.user)
-    context = {'groups': group_list, 'role':'groups', 'uploadForm': uploadForm,
+    context = {'groups': group_list, 'role':'groups',
                'group_status': status, 'domain': domain, 'assignmentForm': assignmentForm,
                'searchForm': searchForm, 'order_by': order_by, 'direction': direction,
                'active_group_count': active_group_count,
@@ -3424,15 +3425,13 @@ def group(request, id=''):
           assignments[key] = {curriculum.order: assignment}
 
       keys.sort(key=lambda x:x.title)
-      uploadForm = forms.UploadFileForm(user=request.user)
       assignmentForm = forms.AssignmentSearchForm(user=request.user)
-      studentAddForm = forms.StudentAddForm()
       current_site = Site.objects.get_current()
       domain = current_site.domain
 
       if request.method == 'GET':
         form = forms.UserGroupForm(user=request.user, instance=group, prefix='group')
-        context = {'form': form, 'role': 'group', 'uploadForm': uploadForm, 'assignmentForm': assignmentForm, 'studentAddForm': studentAddForm, 'assignments': assignments, 'keys': keys, 'domain': domain}
+        context = {'form': form, 'role': 'group', 'assignmentForm': assignmentForm, 'assignments': assignments, 'keys': keys, 'domain': domain}
 
         return render(request, 'ctstem_app/UserGroup.html', context)
 
@@ -3688,13 +3687,11 @@ def teacherDashboard(request, id='', status='active'):
 
     current_site = Site.objects.get_current()
     domain = current_site.domain
-    uploadForm = forms.UploadFileForm(user=request.user)
     assignmentForm = forms.AssignmentSearchForm(user=request.user)
 
     context = {'teacher': teacher, 'groups': groups, 'students': filtered_students,
                'student_count': student_count, 'assignments': filtered_assignments, 'assignment_count':assignment_count,
-               'role':'groups', 'uploadForm': uploadForm,
-               'status': status, 'domain': domain, 'assignmentForm': assignmentForm
+               'role':'groups', 'status': status, 'domain': domain, 'assignmentForm': assignmentForm
                }
     return render(request, 'ctstem_app/TeacherDashboard.html', context)
 
@@ -3846,11 +3843,10 @@ def teacherAssignmentDashboard(request, id='', status='active'):
 
     current_site = Site.objects.get_current()
     domain = current_site.domain
-    uploadForm = forms.UploadFileForm(user=request.user)
     assignmentForm = forms.AssignmentSearchForm(user=request.user)
 
     context = {'teacher': teacher, 'groups': groups, 'group': group, 'assignments': assignments,
-                'role':'groups', 'uploadForm': uploadForm, 'status': status, 'domain': domain, 'searchForm': searchForm
+                'role':'groups', 'status': status, 'domain': domain, 'searchForm': searchForm
                }
     return render(request, 'ctstem_app/TeacherAssignmentDashboard.html', context)
 
@@ -3997,11 +3993,10 @@ def teacherStudentDashboard(request, id='', status='active'):
 
     current_site = Site.objects.get_current()
     domain = current_site.domain
-    uploadForm = forms.UploadFileForm(user=request.user)
     assignmentForm = forms.AssignmentSearchForm(user=request.user)
 
     context = {'teacher': teacher, 'group': group, 'students': students,
-                'role':'groups', 'uploadForm': uploadForm, 'status': status, 'domain': domain, 'searchForm': searchForm
+                'role':'groups', 'status': status, 'domain': domain, 'searchForm': searchForm
                }
     return render(request, 'ctstem_app/TeacherStudentDashboard.html', context)
 
@@ -6124,7 +6119,6 @@ def send_added_to_group_confirmation_email(email, group):
           <div>or retype it there. Once you have returned to CT-STEM, we will give instructions to proceed. </div><br> \
           <div><b>CT-STEM Admin</b></div>'%(group.title.title(), student.user.username, domain, student.user.username, domain)
   subject = 'CT-STEM - Student Account added to %s' % group.title.title()
-
   send_mail(subject, body, settings.DEFAULT_FROM_EMAIL, [email], html_message=body)
 
 ################################################

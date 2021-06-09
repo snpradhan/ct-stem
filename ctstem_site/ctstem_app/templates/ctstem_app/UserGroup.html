@@ -192,7 +192,7 @@
                               </td>
                           {% endif %}
                               <td style="text-align:center;">
-                                <a type="button" class="btn yellow invite-modal" href="#" data-toggle="modal" data-target="#invite" data-invite-link="https://{{domain}}/?next=/login?next=/assignments?assignment={{assignment.id}}" data-title="Direct Student Assignment Link" title="Direct Assignment Link">
+                                <a class="btn yellow assignment_link" href="#" data-toggle="modal" data-target="#assignmentLinkModal" data-invite-link="https://{{domain}}/?next=/login?next=/assignments?assignment={{assignment.id}}" data-title="Direct Student Assignment Link" title="Direct Assignment Link">
                                   <i class="fa fa-link"></i>
                                 </a>
                               </td>
@@ -243,13 +243,9 @@
                 </div>
                 <div>
                   {% if form.instance.is_active %}
-                    <button class="btn inbetween blue search_users" data-target="#userSearch" data-id="{{form.instance.id}}" data-form="{% url 'ctstem:searchStudents' %}" title="Search and Add existing Students to this class">
-                      <i class="fas fa-search"></i>
+                    <button class="btn inbetween blue add_student" data-target="#addStudentModal" data-form="{% url 'ctstem:addStudentsToClass'  form.instance.id %}" title="Search and Add existing Students to this class">
+                      <i class="fas fa-plus"></i>
                     </button>
-                    <a type="button" class="btn inbetween green upload-modal" href="#" data-toggle="modal" data-target="#upload" data-id="{{form.instance.id}}" data-title="{{form.instance.title}}" title="Upload new and existing Students to this class">
-                      <i class="fa fa-user-plus"></i>
-                    </a>
-                    <a type="button" class="btn inbetween blue modal-open" data-toggle="modal" data-target="#addStudent" data-dismiss="modal" data-href="{% url 'ctstem:createStudent' form.instance.id %}" href="#"><i class="fas fa-plus"></i></a>
 
                     {% if user.administrator %}
                       {% student_in_group_admin_actions %}
@@ -358,18 +354,10 @@
   </div>
 
   {% if form.instance.id %}
-    {% block upload %}
-      {% include "ctstem_app/UserUploadModal.html" %}
-    {% endblock %}
 
     {% block assignment %}
       {% include "ctstem_app/AssignmentSearch.html" %}
     {% endblock %}
-
-    {% block create_and_add_student %}
-      <div class="modal fade" id="addStudent" role="dialog"></div>
-    {% endblock %}
-
     {% block password_reset %}
       {% include "ctstem_app/UserPassword.html" %}
     {% endblock %}

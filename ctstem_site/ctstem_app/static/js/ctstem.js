@@ -88,99 +88,6 @@ $(function () {
     });
   });
 
-  //user upload modal submit
-  $("#formUpload").submit(function(e) {
-    e.preventDefault();
-    //var data = $(this).serialize();
-    //var data = new FormData($('form#formUpload').get(0));
-    var emails = $('#formUpload textarea#id_emails').val();
-    var file = $('#formUpload input#id_uploadFile').val();
-    if(emails == '' && file == ''){
-      $('#uploadMsg .errorlist .error').html("Please select a class and either a list of student emails or a student email csv to upload.")
-    }
-    else {
-
-      //create options for ajax call
-      var options = {
-        type: "POST",
-        url: "/upload/users/",
-        beforeSend: function(){
-          $('#formUpload #spinner').show();
-        },
-        complete: function(){
-          $('#formUpload #spinner').hide();
-        },
-        success: function(data){
-          if(data['success'] == true){
-            if(window.location.href.indexOf('/group/') != -1){
-
-              for(var student in  data['new_students']){
-                if($('tr#'+student).length == 0){
-                  var group = data['new_students'][student]['group'];
-                  var user_id = data['new_students'][student]['user_id'];
-                  var membership_id = data['new_students'][student]['membership_id']
-                  //add student detail to the table
-                  $('table.table#members tbody').append('<tr id='+student+'>\
-                    <td><input id="student_'+student+'" type="checkbox" class="action-select" value="'+student+'" name="student_'+student+'">\
-                    <td>'+data['new_students'][student]['username']+'\
-                      <div class="controls">\
-                        <a type="button" class="btn green small edit" aria-label="Edit User" title="Edit User" href="/user/'+user_id+'">\
-                          <i class="fas fa-pencil-alt"></i>\
-                        </a>\
-                        <a type="button" class="btn orange small removeUser" aria-label="Remove Student" title="Remove Student" href="/student/remove/'+group+'/'+student+'" data-id="'+student+'">\
-                          <i class="fa fa-trash"></i>\
-                        </a>\
-                      </div>\
-                    </td>\
-                    <td>'+data['new_students'][student]['full_name']+'</td>\
-                    <td>'+data['new_students'][student]['email']+'</td>\
-                    <td>'+data['new_students'][student]['status']+'</td>\
-                    <td>'+data['new_students'][student]['student_consent']+'</td>\
-                    <td>'+data['new_students'][student]['parental_consent']+'</td>\
-                    <td>'+data['new_students'][student]['member_since']+'</td>\
-                    <td>'+data['new_students'][student]['last_login']+'</td></tr>');
-
-                  //add student membership hidden input
-                  $('table.table#members').before('<input id="id_group-members_'+student+'" name="group-members" type="hidden" value="'+student+'">');
-
-                }
-              }
-              $("#upload").modal('toggle');
-              bind_user_removal();
-              display_messages(data['messages'])
-            }
-            else {
-              //location is users or groups page
-              $("#upload").modal('toggle');
-              window.location.reload();
-            }
-          }
-          else{
-            $('#uploadMsg .errorlist .error').html(data['message']);
-          }
-        },
-        error: function(xhr, ajaxOptions, thrownError){
-          $('#uploadMsg .errorlist .error').html("Something went wrong.  Try again later!");
-        },
-      };
-
-      if(file == '') {
-        options['data'] = $(this).serialize();
-      }
-      else{
-        options['data'] = new FormData($('form#formUpload').get(0));
-        options['enctype'] = 'multipart/form-data';
-        options['cache'] = false;
-        options['processData'] = false;
-        options['contentType'] = false;
-      }
-
-      $.ajax(options);
-    }
-  });
-
-
-
   $(".expand_collapse").click(function(){
     $(this).closest('.table').children('.collapsible_content').toggle();
     $(this).children().each(function(){
@@ -302,40 +209,32 @@ $(function () {
     }
   });
 
-  /* handler for user upload modal trigger */
-  $('a.upload-modal').click(function(){
-    $("div.modal#upload select#id_group option:selected").prop('selected', false);
-    $("div.modal#upload select#id_group option[value='"+$(this).data('id')+"']").prop('selected', true);
-
-    var title = 'Class';
-    if($(this).data('title') !== undefined){
-      title = '<div>'+$(this).data('title')+'</div>';
-    }
-    $("div.modal#upload .modal-title span").html(title);
-
-    if($(this).data('id') != null){
-      $("div.modal#upload select#id_group").closest('.form-group').hide();
-    }
-    else{
-      $("div.modal#upload select#id_group").closest('.form-group').show();
-    }
-  });
-
-  $('a.invite-modal').click(function(){
-    $("div.modal#invite .modal-title span").html($(this).data('title'));
-    $("div.modal#invite .modal-body .link").html($(this).data('invite-link'));
-  });
-
+  /* Search Collaborators and Teachers */
   $("button.search_users").click(function(e){
     e.preventDefault();
     var url = $(this).data("form");
     var modal = $(this).data("target");
-    var group_id = $(this).data("id");
     $(modal).load(url, function() {
-      $(this).find('input[name="group_id"]').val(group_id);
       $(this).modal('show');
     });
     return false;
+  });
+
+  /* trigger AddStudentsToClass Modal */
+  $("button.add_student").click(function(e){
+    e.preventDefault();
+    var url = $(this).data("form");
+    var modal = $(this).data("target");
+    $(modal).load(url, function() {
+      $(this).modal('show');
+    });
+    return false;
+  });
+
+  /* trigger Direct Assignment Link Modal */
+  $("a.assignment_link").click(function(e){
+    $("div.modal#assignmentLinkModal .modal-title span").html($(this).data('title'));
+    $("div.modal#assignmentLinkModal .modal-body .link").html($(this).data('invite-link'));
   });
 
   //bind remove function

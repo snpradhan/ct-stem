@@ -11,7 +11,7 @@ $(function (){
   });
 
 
-  $("a.modal-open").click(function(e){
+  $(".modal-open").click(function(e){
     e.preventDefault();
     var url = $(this).data('href');
     var target = $(this).data('target');

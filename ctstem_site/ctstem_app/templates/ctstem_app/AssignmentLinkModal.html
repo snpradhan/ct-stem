@@ -1,4 +1,4 @@
-<div class="modal fade" id="invite" role="dialog">
+<div class="modal fade" id="assignmentLinkModal" role="dialog">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
@@ -15,19 +15,11 @@
       <div class="modal-footer">
         <div class="form-group">
           <a type="button" class="btn normal yellow" id="copy">Copy Link</a>
-          <a type="button" class="btn normal red" data-dismiss="modal">Cancel</a>
         </div>
-        <div class="form-group">
-           <label>Share the link on Google Classroom</label>
-           <div id="widget-div"></div>
-        </div>
-        <div class="form-group">
-          <label>Need a shorter invitation link? Generate one on <a href="http://yellkey.com" target="_blank">YellKey</a></label>
-        </div>
+
       </div>
     </div>
   </div>
-  <script src="https://apis.google.com/js/platform.js"></script>
   <script type="text/javascript">
     $(function(){
       $('a#copy').click(function(){
@@ -40,17 +32,6 @@
         document.execCommand('copy');
         alert("Link copied to clipboard.");
         return false;
-      });
-      window.___gcfg = {
-        parsetags: 'explicit'
-      };
-      $('#invite').on('shown.bs.modal', function () {
-        setTimeout(function(){
-          var el = document.getElementById('link');
-          var link = $(el).html();
-          gapi.sharetoclassroom.render("widget-div",
-              {"url": link, "size": 48} );
-        }, 3000);
       });
 
     });

@@ -1,0 +1,428 @@
+<div class="modal-dialog modal-lg">
+  <div class="modal-content">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal">&times;</button>
+      <h3 class="modal-title">Add students to {{group.title|title}}</h3>
+    </div>
+    <div class="msg">
+      <ul class="errorlist">
+        <li></li>
+      </ul>
+    </div>
+    <ul class="nav nav-tabs">
+      <li class="add_tab" id="invite_tab"><a>Invite Link</a></li>
+      <li class="add_tab" id="search_tab"><a href="#">Search Students</a></li>
+      <li class="add_tab"id="upload_tab"><a href="#">Upload Students</a></li>
+      <li class="add_tab" id="create_tab"><a href="#">Create New Student</a></li>
+    </ul>
+
+    <div id="invite_student" class="add_option">
+      <div class="modal-body">
+        <div class="link" id="link">
+          https://{{domain}}/?next=/preregister/group/{{group.group_code}}/
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div class="form-group">
+          <a type="button" class="btn normal yellow" id="copy">Copy Link</a>
+        </div>
+        <div class="form-group">
+           <label>Share the link on Google Classroom</label>
+           <div id="widget-div"></div>
+        </div>
+        <div class="form-group">
+          <label>Need a shorter invitation link? Generate one on <a href="http://yellkey.com" target="_blank">YellKey</a></label>
+        </div>
+      </div>
+    </div>
+
+    <div id="search_student" class="add_option">
+      <form class="form" id="studentSearchForm" method="post" action="{% url 'ctstem:searchStudents' group.id %}">
+        {% csrf_token %}
+        <div class="modal-body">
+          <div class="form-inline">
+            <div class="form-group">
+              <label for="id_username">Username</label>
+              <div>{{studentSearchForm.username}}</div>
+            </div>
+            <div class="form-group">
+              <label for="id_first_name">First Name</label>
+              <div>{{studentSearchForm.first_name}}</div>
+            </div>
+            <div class="form-group">
+              <label for="id_last_name">Last Name</label>
+              <div>{{studentSearchForm.last_name}}</div>
+            </div>
+            <div class="form-group">
+              <label for="id_email">Email</label>
+              <div>{{studentSearchForm.email}}</div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <div class="form-group button-row">
+            <button type="submit" id="search" class="btn yellow normal">Search </button>
+          </div>
+        </div>
+      </form>
+      <div id="studentResults" style="display:none;" class="results">
+        <table class="table table-bordered table-striped table-condensed inner_table">
+          <thead>
+            <tr>
+              <th>Username</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Status</th>
+              <th>Last Login </th>
+              <th>Select?</th>
+            </tr>
+          </thead>
+          <tbody>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="create_student" class="add_option">
+      <form class="form" id="studentCreateForm" method="post" action="{% url 'ctstem:createStudent' group.id %}">
+        {% csrf_token %}
+        <div class="modal-body">
+          {% for field in studentCreateForm %}
+            <div class="form-group">
+              <label for="id_{{field.name}}">
+                {{ field.label|title }}
+                {% if field.field.required %}
+                  (<span class="required">*</span>)
+                {% endif %}
+                {% if field.name == 'username' %}
+                  <span data-toggle="tooltip" data-placement="top" title="Please enter the username in lowercase.">
+                    <i class="fa fa-info-circle" aria-hidden="true"></i>
+                  </span>
+                {% elif field.name == 'test_account' %}
+                  <span data-toggle="tooltip" data-placement="top" title="Curriculum exclusively assigned to Test Student accounts can be deleted without any restriction.">
+                    <i class="fa fa-info-circle" aria-hidden="true"></i>
+                  </span>
+                {% endif %}
+              </label>
+              {{field}}
+              <div class="error">{{ field.errors }}</div>
+            </div>
+          {% endfor %}
+          <div id="spinner">
+            <img src="/static/img/page-loader.gif" class="icon"/>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <div class="form-group">
+            <button type="submit" id="add" class="btn normal yellow">Add to Class</button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div id="upload_student" class="add_option">
+      <form enctype="multipart/form-data" class="form" id="studentUploadForm" method="post" action="{% url 'ctstem:user_upload' %}">
+        {% csrf_token %}
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="id_group">Class (<span class="required">*</span>)</label>
+            {{studentUploadForm.group}}
+          </div>
+          <div class="form-group">
+            <label for="id_emails">Student Emails</label>
+            {{studentUploadForm.emails}}
+          </div>
+          <div class="form-group">
+            <label for="id_uploadFile">Upload a CSV</label>
+            {{studentUploadForm.uploadFile}}
+          </div>
+           <div class="form-group">
+            <h5 class=""></h5>
+          </div>
+          <div id="spinner">
+            <img src="/static/img/page-loader.gif" class="icon"/>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <div class="form-group">
+            <button type="submit" id="btnUpload" class="btn normal yellow">Add to Class</button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+  </div>
+</div>
+<script>
+  window.___gcfg = {
+    parsetags: 'explicit'
+  };
+</script>
+
+<script type="text/javascript">
+  $(function(){
+
+    //reload parent page when modal is dismissed
+    $('#addStudentModal').on('hidden.bs.modal', function () {
+      location.reload();
+    });
+
+    // on tab click display the corresponding sections
+    $('ul.nav li.add_tab a').click(function(){
+      var tab = $(this).parent();
+      $(tab).siblings().removeClass('active');
+      $(tab).addClass('active');
+      var option_id = $(tab).attr('id').substring(0, $(tab).attr('id').indexOf('_'))+'_student';
+      $('div.add_option:not(#'+option_id+')').hide();
+      $('div#'+option_id).show();
+    });
+
+    //display invite section by default
+    $('li#invite_tab a').trigger('click');
+
+    //Invite
+    $('a#copy').click(function(){
+      var el = document.getElementById('link');
+      var range = document.createRange();
+      range.selectNodeContents(el);
+      var sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+      document.execCommand('copy');
+      alert("Link copied to clipboard.");
+      return false;
+    });
+
+    //delay Google classroom button display
+    $('#addStudentModal').on('shown.bs.modal', function () {
+      setTimeout(function(){
+        gapi.sharetoclassroom.render("widget-div",
+            {"url": "https://{{domain}}/?next=/preregister/group/{{group.group_code}}/", "size": 48} );
+      }, 3000);
+    });
+    // Invite End
+
+
+    //Create
+    // disable add button on Create form
+    $('#studentCreateForm button#add').prop('disabled', true);
+
+    //check if all mandatory fields are filled
+    $('#studentCreateForm input:required').keyup(function() {
+      var empty = false;
+      $('#studentCreateForm input:required').each(function() {
+        if ($(this).val() === '') {
+          empty = true;
+        }
+      });
+
+      if (empty) {
+        $('#studentCreateForm button#add').prop('disabled', true);
+      } else {
+        $('#studentCreateForm button#add').prop('disabled', false);
+      }
+    });
+
+    $("#studentCreateForm").submit(function(e) {
+      e.preventDefault();
+      $.ajax({
+        type: $(this).attr('method'),
+        url: this.action,
+        data: $(this).serialize(),
+        context: this,
+        beforeSend: function(){
+          $('form#studentCreateForm #spinner').show();
+        },
+        complete: function(){
+          $('form#studentCreateForm #spinner').hide();
+        },
+        success: function(data, status) {
+          if(data['success'] == true){
+            $('#addStudentModal').modal('toggle');
+            $("ul.messages li").remove();
+            $("ul.messages").html('<li class="success">Student created and add to class</li>');
+            $('ul.messages').show();
+            $('ul.messages').delay(30000).fadeOut('slow');
+
+            //add_student_to_data_table(data['student'], '{{csrf_token}}');
+            //bind_user_removal();
+            return false;
+          }
+          else{
+            $('#addStudentModal div.create').html(data['html']);
+          }
+        },
+        error: function(xhr, ajaxOptions, thrownError){
+          alert(thrownError);
+        },
+      });
+    });
+
+
+    //Create End
+
+
+    //Search
+    $("#studentSearchForm").submit(function(e) {
+      e.preventDefault();
+      $("#studentResults table tbody").empty();
+      $.ajax({
+        type: $(this).attr('method'),
+        url: this.action,
+        data: $(this).serialize(),
+        context: this,
+        success: function(data){
+          if('error' in data){
+            $('.msg .errorlist li').removeClass('success').addClass('error').html(data['error']);
+          }
+          else {
+            var student_row = "";
+            $.each(data, function(key, value){
+              //if the student isn't already added
+              student_row = "<tr><td>"+value['username']+"</td><td>"+value['name']+"</td><<td>"+value['email']+"</td><td>"+value['status']+"</td><td>"+value['last_login']+"</td><td><button type='button' class='btn small blue select_student' id='"+value['student_id']+"''>Add to Class</a></td></tr>";
+
+              $("#studentResults table tbody").append(student_row);
+              $("#studentResults button.select_student#"+value["student_id"]).click(function(){
+                // ajax add student to group
+                var frmdata = {};
+                frmdata['csrfmiddlewaretoken'] = $('#studentSearchForm').find('input:hidden').eq(0).val();
+                //add_student_to_data_table(value, data['csrfmiddlewaretoken']);
+                $.ajax({
+                  type: 'POST',
+                  url: '/student/add/'+value['group']+'/'+value['student_id'],
+                  data: frmdata,
+                  context: this,
+                  success: function(data){
+                    console.log(data);
+                    if(data['success'] == true){
+                      $('.msg .errorlist li').removeClass('error').addClass('success').html(value['username']+" added to class");
+                    }
+                    else {
+                      $('.msg .errorlist li').removeClass('success').addClass('error').html(value['username']+" could not be added to class");
+                    }
+                    return false;
+                  },
+                });
+                $(this).attr('disabled', 'disabled');
+              });
+            });
+            if(student_row.length == 0){
+              $('.msg .errorlist li').removeClass('success').addClass('error').html('No matching students found');
+              $("#studentResults").hide();
+            }
+            else{
+              $('.msg .errorlist li').html('');
+              $("#studentResults").show();
+            }
+          }
+          return false;
+        },
+        error: function(xhr, ajaxOptions, thrownError){
+          alert(thrownError);
+        },
+      });
+    });
+    //Search End
+
+    //Upload
+    $("#studentUploadForm select#id_group option:selected").prop('selected', false);
+    $("#studentUploadForm select#id_group option[value='{{group.id}}']").prop('selected', true);
+    $("#studentUploadForm select#id_group").closest('.form-group').hide();
+
+    $("#studentUploadForm").submit(function(e) {
+      e.preventDefault();
+      //var data = $(this).serialize();
+      //var data = new FormData($('form#formUpload').get(0));
+      var emails = $('#studentUploadForm textarea#id_emails').val();
+      var file = $('#studentUploadForm input#id_uploadFile').val();
+      if(emails == '' && file == ''){
+        $('.msg .errorlist li').removeClass('success').addClass('error').html('Please enter a list of student emails or upload student email csv file.');
+      }
+      else {
+
+        //create options for ajax call
+        var options = {
+          type: "POST",
+          url: this.action,
+          beforeSend: function(){
+            $('#studentUploadForm #spinner').show();
+          },
+          complete: function(){
+            $('#studentUploadForm #spinner').hide();
+          },
+          success: function(data){
+            if(data['success'] == true){
+              if(window.location.href.indexOf('/group/') != -1){
+
+                for(var student in  data['new_students']){
+                  if($('tr#'+student).length == 0){
+                    var group = data['new_students'][student]['group'];
+                    var user_id = data['new_students'][student]['user_id'];
+                    var membership_id = data['new_students'][student]['membership_id']
+                    //add student detail to the table
+                    $('table.table#members tbody').append('<tr id='+student+'>\
+                      <td><input id="student_'+student+'" type="checkbox" class="action-select" value="'+student+'" name="student_'+student+'">\
+                      <td>'+data['new_students'][student]['username']+'\
+                        <div class="controls">\
+                          <a type="button" class="btn green small edit" aria-label="Edit User" title="Edit User" href="/user/'+user_id+'">\
+                            <i class="fas fa-pencil-alt"></i>\
+                          </a>\
+                          <a type="button" class="btn orange small removeUser" aria-label="Remove Student" title="Remove Student" href="/student/remove/'+group+'/'+student+'" data-id="'+student+'">\
+                            <i class="fa fa-trash"></i>\
+                          </a>\
+                        </div>\
+                      </td>\
+                      <td>'+data['new_students'][student]['full_name']+'</td>\
+                      <td>'+data['new_students'][student]['email']+'</td>\
+                      <td>'+data['new_students'][student]['status']+'</td>\
+                      <td>'+data['new_students'][student]['student_consent']+'</td>\
+                      <td>'+data['new_students'][student]['parental_consent']+'</td>\
+                      <td>'+data['new_students'][student]['member_since']+'</td>\
+                      <td>'+data['new_students'][student]['last_login']+'</td></tr>');
+
+                    //add student membership hidden input
+                    $('table.table#members').before('<input id="id_group-members_'+student+'" name="group-members" type="hidden" value="'+student+'">');
+
+                  }
+                }
+                $("#addStudentModal").modal('toggle');
+                bind_user_removal();
+                display_messages(data['messages'])
+              }
+              else {
+                //location is users or groups page
+                $("#addStudentModal").modal('toggle');
+                window.location.reload();
+              }
+            }
+            else{
+              $('.msg .errorlist .error').html(data['message']);
+            }
+          },
+          error: function(xhr, ajaxOptions, thrownError){
+            $('.msg .errorlist .error').html("Something went wrong.  Try again later!");
+          },
+        };
+
+        if(file == '') {
+          options['data'] = $(this).serialize();
+        }
+        else{
+          options['data'] = new FormData($('form#studentUploadForm').get(0));
+          options['enctype'] = 'multipart/form-data';
+          options['cache'] = false;
+          options['processData'] = false;
+          options['contentType'] = false;
+        }
+
+        $.ajax(options);
+      }
+    });
+
+
+  });
+
+</script>
+<script src="https://apis.google.com/js/platform.js" async defer></script>
+
+

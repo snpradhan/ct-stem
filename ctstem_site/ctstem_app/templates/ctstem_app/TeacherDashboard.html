@@ -60,13 +60,10 @@
           <div class="class_detail">
             <div class="class_actions">
               {% if group.is_active %}
-                <a class="invite-modal action btn small lightyellow" href="#" data-toggle="modal" data-target="#invite" data-invite-link="https://{{domain}}/?next=/preregister/group/{{group.group_code}}/" data-title="{{group.title}} Invitation Link" title="Student Invitation Link">
-                  <i class="fa fa-link"></i> Invite
-                </a>
-                &nbsp;&nbsp;&nbsp;&nbsp;
-                <a class="upload-modal action btn small lightyellow" href="#" data-toggle="modal" data-target="#upload" data-id="{{group.id}}" data-title="{{group.title}}" title="Add Students">
-                  <i class="fa fa-user-plus"></i> Add
-                </a>
+                <button class="btn small lightyellow add_student" data-target="#addStudentModal" data-form="{% url 'ctstem:addStudentsToClass'  group.id %}" title="Search and Add existing Students to this class">
+                    <i class="fa fa-user-plus"></i> Add
+                </button>
+
               {% endif %}
             </div>
             <div class="class_actions">
@@ -120,9 +117,6 @@
     <div id="dashboard_students">
       <div class="title">
         <h3 class="left">Students ({{students|length}} of {{student_count}})</h3>
-        <a type="button" class="btn normal yellow upload-modal" href="#" data-toggle="modal" data-target="#upload" title="Upload Students">
-          Add New
-        </a>
       </div>
       <hr>
       <div id="students">
@@ -150,9 +144,6 @@
     </div>
   </div>
 </div>
-{% block upload %}
-{% include "ctstem_app/UserUploadModal.html" %}
-{% endblock %}
 {% block assignment %}
 {% include "ctstem_app/AssignmentSearch.html" %}
 {% endblock %}
