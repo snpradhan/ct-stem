@@ -67,7 +67,6 @@
               {% endif %}
             </div>
             <div class="class_actions">
-
               {% if group.is_active %}
                 <a class="assignment-modal action btn small lightyellow" href="#" data-toggle="modal" data-target="#assignment" data-id="{{group.id}}" data-title="{{group.title}}" data-subject="{{group.subject.id}}" title="Search and Add Assignments">
                   <i class="fa fa-tasks"></i> Assign
@@ -89,23 +88,32 @@
   <div id="assignments_students">
     <div id="dashboard_assignments">
       <div class="title">
-        <h3 class="left">Assignments ({{assignments|length}} of {{assignment_count}})</h3>
+        <h3 class="left">Assignments ({% if assignments|length > 4 %}4{% else %} {{assignments|length}} {% endif %} of {{assignment_count}})</h3>
         <a type="button" class="btn normal yellow assignment-modal" href="#" data-toggle="modal" data-target="#assignment" title="Search and Add Assignments">Add New</a>
       </div>
       <hr>
       <div id="assignments">
-        {% for assignment in assignments %}
-        {% get_assignment_status_chart_config assignment.id 'stacked_bar' as assignment_status %}
-          <div class="assignment tile">
-            <h5 class="left"><a href="{% url 'ctstem:assignmentProgressDashboard' teacher.id %}?assignment={{assignment.id}}">
-              {{assignment.curriculum.title}}</a>
-            </h5>
-            <h6 class="left">Class: {{assignment.group.title}}</h6>
-            <div class="assignment_status_chart">
-              <div id="assignment_chart_{{assignment.id}}" class="stacked_bar_chart" name="{{assignment_status}}" data-total="{{assignment.group.members.count}}"></div>
+        {% for key, assign in assignments.items %}
+          {% if forloop.counter < 5 %}
+          {% with assignment=assign|get_item:'assignment' awaiting_feedback_count=assign|get_item:'awaiting_feedback_count' last_updated=assign|get_item:'last_updated' %}
+          {% get_assignment_status_chart_config assignment.id 'stacked_bar' as assignment_status %}
+            <div class="assignment tile">
+              <h5 class="left"><a href="{% url 'ctstem:assignmentProgressDashboard' teacher.id %}?assignment={{assignment.id}}">
+                {{assignment.curriculum.title}}</a>
+              </h5>
+              <div class="assignment_info">
+                <div>Class: {{assignment.group.title}}</div>
+                <div>Last Updated: {{last_updated|date}}</div>
+                <div>{{awaiting_feedback_count}} Awaiting Feedback</div>
+              </div>
+              <div class="assignment_status_chart">
+                <div id="assignment_chart_{{assignment.id}}" class="stacked_bar_chart" name="{{assignment_status}}" data-total="{{assignment.group.members.count}}"></div>
+              </div>
             </div>
-          </div>
+          {% endwith %}
+          {% endif %}
         {% endfor %}
+
       </div>
       {% if assignments|length > 0 %}
         <div class="view_all">

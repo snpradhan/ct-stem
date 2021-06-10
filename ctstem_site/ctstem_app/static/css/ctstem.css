@@ -1012,6 +1012,17 @@ div.content#teacher_dashboard div#dashboard_students div#students div.student {
   margin: 0;
   display: block !important;
 }
+div.content#teacher_dashboard div#dashboard_assignments div#assignments div.assignment div.assignment_info {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+div.content#teacher_dashboard div#dashboard_assignments div#assignments div.assignment div.assignment_info div {
+  font-weight: bold;
+  font-size: 1.2em;
+}
+
 div.content#teacher_dashboard div#dashboard_students div#students h5 {
   margin-bottom: 0.5em;
 }
@@ -1036,6 +1047,7 @@ div.content#teacher_dashboard div#dashboard_students div#students div.student di
     flex: 0 1 100%;
     max-width: 100%;
   }
+
   div.content#teacher_dashboard div#dashboard_students {
     flex: 0 1 100%;
     max-width: 100%;

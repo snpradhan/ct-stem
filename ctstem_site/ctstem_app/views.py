@@ -3649,9 +3649,8 @@ def teacherDashboard(request, id='', status='active'):
     all_groups = models.UserGroup.objects.all().filter(Q(is_active=is_active), Q(teacher=teacher) | Q(shared_with=teacher)).order_by(Lower('title'))
 
     filtered_groups = all_groups
-    all_assignments = models.Assignment.objects.all().filter(group__in=all_groups).distinct().order_by(Lower('curriculum__title'))
+    all_assignments = models.Assignment.objects.all().filter(group__in=all_groups).distinct()
     assignment_count = all_assignments.count()
-    filtered_assignments = all_assignments[:4]
     all_students = models.Student.objects.all().filter(member_of__in=all_groups).distinct().order_by(Lower('user__last_name'), Lower('user__first_name'))
     student_count = all_students.count()
     filtered_students = all_students[:4]
@@ -3683,6 +3682,21 @@ def teacherDashboard(request, id='', status='active'):
       groups.append({'group': group, 'percent_complete': percent_complete, 'assignment_status': assignment_status, 'total': total})
     ##########################
     # CLASSES END
+    ##########################
+
+    ##########################
+    # ASSIGNMENTS START
+    ##########################
+    filtered_assignments = {}
+    for assignment in all_assignments:
+      awaiting_feedback = models.AssignmentInstance.objects.all().filter(assignment=assignment, status='S')
+      awaiting_feedback_count = awaiting_feedback.count()
+      last_updated = awaiting_feedback.aggregate(Max('modified_date'))['modified_date__max']
+      filtered_assignments[assignment.id] = {'assignment': assignment, 'awaiting_feedback_count': awaiting_feedback_count, 'last_updated': last_updated}
+
+    filtered_assignments = {k: v for k, v in sorted(filtered_assignments.items(), key=lambda item: item[1]['awaiting_feedback_count'], reverse=True)}
+    ##########################
+    # ASSIGNMENTS END
     ##########################
 
     current_site = Site.objects.get_current()

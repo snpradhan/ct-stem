@@ -517,19 +517,6 @@ def get_student_assignment_instance_percent_complete(context, student_id, assign
   return views.get_student_assignment_instance_percent_complete(request, student_id, assignment_id.id)
 
 @register.filter
-def get_assignment_percent_complete(obj):
-  total = 0
-  complete = 0
-  for status in obj:
-    if status['name'] in ['Submitted', 'Feedback Ready', 'Archived']:
-      complete += status['y']
-    total += status['y']
-  if total > 0:
-    return int(complete/total*100)
-  else:
-    return 0
-
-@register.filter
 def subtract(value, arg):
   return value - arg
 
