@@ -1210,6 +1210,15 @@ div.content#assignment_progress_dashboard .settings_container .settings .switch_
   font-size: 1.5em;
   margin-bottom: 1em;
 }
+div.content#assignment_progress_dashboard .legends_container  .legends .legend .crossed {
+  height: 1.5em;
+  width: 1.5em;
+  border: 1px solid var(--ctstem-color-pale-gray);
+  background-image: linear-gradient(to bottom right,  transparent calc(50% - 1px), var(--ctstem-color-pale-gray), transparent calc(50% + 1px));
+}
+div.content#assignment_progress_dashboard .legends_container  .legends .legend label {
+  margin-bottom: 0;
+}
 div.switch_container {
   display: flex;
   justify-content: center;
@@ -1223,7 +1232,8 @@ div.content#assignment_progress_dashboard td.student_col {
 }
 div.content#assignment_progress_dashboard td.question {
   text-align: center;
-  width: 5em;
+  width: 2em;
+  padding: 0;
 }
 div.content#assignment_progress_dashboard td.percent_complete {
   width: 5em;

@@ -40,12 +40,12 @@
             <label>Feedback Pending</label>
           </div>
           <div class="legend">
-            <i class="fas fa-times"></i>
+            <i class="far fa-window-minimize"></i>
             &nbsp;
             <label>Not yet started</label>
           </div>
           <div class="legend">
-            <i class="far fa-window-minimize"></i>
+            <div class="crossed"></div>
             &nbsp;
             <label>No Question</label>
           </div>
@@ -111,7 +111,10 @@
                     </th>
                   {% endfor %}
                 {% else %}
-                  <th><i class="far fa-window-minimize"></i></th>
+                  <th>
+                    <div class="crossed">
+                    </div>
+                  </th>
                 {% endif %}
               {% endwith %}
             {% endfor %}
@@ -143,9 +146,9 @@
             {% for question_progress in progress %}
               <td class="question">
                 {% if question_progress == 1 %}
-                  <i class="fas fa-times"></i>
-                {% elif question_progress == 0 %}
                   <i class="far fa-window-minimize"></i>
+                {% elif question_progress == 0 %}
+                    <div class="crossed"></div>
                 {% else %}
                   {% with response=question_progress|get_item:'response' feedback=question_progress|get_item:'feedback' %}
                     {% if response %}

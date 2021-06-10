@@ -330,3 +330,8 @@ table.table#page_reorder tr.current {
 table.table#page_reorder td.page_number, table.table#page_reorder td.action {
   text-align: center;
 }
+
+table#assignment_progress div.crossed {
+  height: 3.5em;
+  background-image: linear-gradient(to bottom right,  transparent calc(50% - 1px), var(--ctstem-color-pale-gray), transparent calc(50% + 1px));
+}
