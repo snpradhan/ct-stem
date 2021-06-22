@@ -27,7 +27,7 @@
                                     other
                                  {% endif %}" >
             <label for="id_{{field.name}}">
-              {{ field.label|title }} <span class="required_or_optional">{% if field.field.required %} (<span class="required">*</span>) {% endif %}</span>
+              {{ field.label|title }} <span class="required_or_optional">{% if field.field.required or field.name == 'research_category' %} (<span class="required">*</span>) {% endif %}</span>
               {% if field.name == 'options' %}
                 <a href="#" class="info" id="options_info" rel="popover" data-content="">
                   <i class="fa fa-info-circle" aria-hidden="true" />

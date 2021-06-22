@@ -349,7 +349,7 @@ class Question(models.Model):
   display_other_option = models.BooleanField(null=False, blank=False, default=False)
   answer = models.TextField(null=True, blank=True)
   sketch_background = models.ImageField(upload_to=upload_file_to, blank=True, null=True, help_text='Upload a background image at least 900x500 in resolution for the sketch pad')
-  research_category = models.ManyToManyField(ResearchCategory, blank=True, related_name='questions')
+  research_category = models.ManyToManyField(ResearchCategory, blank=True, related_name='questions', help_text='On Windows use Ctrl+Click to make multiple selection.  On a Mac use Cmd+Click to make multiple selection')
   created_date = models.DateTimeField(auto_now_add=True)
   modified_date = models.DateTimeField(auto_now=True)
   visibility = models.CharField(max_length=1, default='D', choices=QUESTION_VISIBILITY_CHOICES)

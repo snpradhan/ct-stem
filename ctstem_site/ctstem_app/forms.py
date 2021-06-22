@@ -748,6 +748,9 @@ class QuestionForm(ModelForm):
 
     cleaned_data = super(QuestionForm, self).clean()
 
+    if cleaned_data.get('research_category').count() == 0:
+      self.add_error('research_category', 'Select at least one Research Category for this question.')
+      valid = False
     if cleaned_data.get('sketch_background'):
       try:
         cleaned_data.get('sketch_background').read()
@@ -761,6 +764,7 @@ class QuestionForm(ModelForm):
     if cleaned_data.get('answer_field_type') in ['DD', 'MC', 'MS', 'MI', 'MH', 'DT'] and cleaned_data.get('options') == '':
       self.add_error('options', 'Options is required for %s'% dict(self.fields['answer_field_type'].choices)[cleaned_data.get('answer_field_type')])
       valid = False
+
     return valid
 
 ####################################
