@@ -1067,19 +1067,22 @@ class InboxFilterForm (forms.Form):
         field.widget.attrs['class'] = 'form-control'
         field.widget.attrs['placeholder'] = field.help_text
 
+####################################
+# Assignment Progress Dashboard Search Form
+####################################
 class ProgressDashboardSearchForm(forms.Form):
   group = forms.ModelChoiceField(required=True, queryset=models.UserGroup.objects.all().order_by('title'), label='Class', empty_label=None)
   assignment = forms.ChoiceField(required=True, choices=(('', '---------'),), label='Assignment', widget=widgets.SelectWithDisabled)
   sort_by = forms.ChoiceField(required=True, choices=models.PROGRESS_DASHBOARD_SORT, initial='title', label='Sort by')
 
   def __init__(self, *args, **kwargs):
-    teacher_id = group_id = assignment_id = None
+    teacher_id = group_id = curriculum_id = None
     if 'teacher_id' in kwargs:
       teacher_id = kwargs.pop('teacher_id')
     if 'group_id' in kwargs:
       group_id = kwargs.pop('group_id')
-    if 'assignment_id' in kwargs:
-      assignment_id = kwargs.pop('assignment_id')
+    if 'curriculum_id' in kwargs:
+      curriculum_id = kwargs.pop('curriculum_id')
 
     super(ProgressDashboardSearchForm, self).__init__(*args, **kwargs)
 
@@ -1090,17 +1093,128 @@ class ProgressDashboardSearchForm(forms.Form):
     #populating classes and initial select
     #expand underlying curricula under unit
     teacher = models.Teacher.objects.get(id=teacher_id)
-    groups = models.UserGroup.objects.all().filter(Q(teacher=teacher) | Q(shared_with=teacher)).order_by(Lower('title'))
-    self.fields['group'].queryset = groups
     selected_group = models.UserGroup.objects.all().filter(id=group_id)
+    groups = models.UserGroup.objects.all().filter(Q(is_active=selected_group[0].is_active), Q(teacher=teacher) | Q(shared_with=teacher)).order_by(Lower('title'))
+    self.fields['group'].queryset = groups
     self.fields['group'].initial = selected_group[0].id
-    assignment_choices = util.group_assignment_dropdown_list(selected_group, False)
+    assignment_choices = util.group_assignment_dropdown_list(selected_group, False, False)
     self.fields['assignment'].choices = tuple(assignment_choices)
-    if assignment_id:
-      assignment = models.Assignment.objects.get(id=assignment_id)
-      self.fields['assignment'].initial = assignment.curriculum.id
+    if curriculum_id:
+      self.fields['assignment'].initial = curriculum_id
     else:
       self.fields['assignment'].widget.attrs['class'] += ' error'
+
+####################################
+# Student Feedback Search Form
+####################################
+class StudentFeedbackSearchForm(forms.Form):
+  group = forms.ModelChoiceField(required=True, queryset=models.UserGroup.objects.all().order_by('title'), label='Class', empty_label=None)
+  assignment = forms.ChoiceField(required=True, choices=(('', '---------'),), label='Assignment', widget=widgets.SelectWithDisabled)
+  student = forms.ChoiceField(required=True, choices=(('', '---------'),), label='Filter by Student')
+
+  def __init__(self, *args, **kwargs):
+    teacher_id = group_id = curriculum_id = student_id = None
+    if 'teacher_id' in kwargs:
+      teacher_id = kwargs.pop('teacher_id')
+    if 'group_id' in kwargs:
+      group_id = kwargs.pop('group_id')
+    if 'curriculum_id' in kwargs:
+      curriculum_id = kwargs.pop('curriculum_id')
+    if 'student_id' in kwargs:
+      student_id = kwargs.pop('student_id')
+
+    super(StudentFeedbackSearchForm, self).__init__(*args, **kwargs)
+
+    for field_name, field in list(self.fields.items()):
+      field.widget.attrs['class'] = 'form-control'
+      field.widget.attrs['placeholder'] = field.help_text
+
+    #populating classes and initial select
+    teacher = models.Teacher.objects.get(id=teacher_id)
+    selected_group = models.UserGroup.objects.all().filter(id=group_id)
+    groups = models.UserGroup.objects.all().filter(Q(is_active=selected_group[0].is_active), Q(teacher=teacher) | Q(shared_with=teacher)).order_by(Lower('title'))
+    students = models.Student.objects.all().filter(student_membership__group__id=group_id).distinct().order_by(Lower('user__last_name'), Lower('user__first_name'))
+
+    self.fields['group'].queryset = groups
+
+    self.fields['group'].initial = selected_group[0].id
+
+    #populating assignments and initial select
+    assignment_choices = util.group_assignment_dropdown_list(selected_group, False, True)
+    student_choices = None
+
+    self.fields['assignment'].choices = tuple(assignment_choices)
+    if curriculum_id:
+      assignment = models.Assignment.objects.all().filter(group__id=group_id, curriculum__id=curriculum_id)[0]
+      self.fields['assignment'].initial = curriculum_id
+      student_choices = util.student_dropdown_list(students, assignment.anonymize_student)
+      if student_id:
+        self.fields['student'].initial = student_id
+      else:
+        self.fields['student'].widget.attrs['class'] += ' error'
+    else:
+      self.fields['assignment'].widget.attrs['class'] += ' error'
+      self.fields['student'].widget.attrs['disabled'] = True
+      student_choices = (('', '---------'),)
+
+    #populating students and initial select
+    self.fields['student'].choices = tuple(student_choices)
+
+
+
+####################################
+# Question Feedback Search Form
+####################################
+class QuestionFeedbackSearchForm(forms.Form):
+  group = forms.ModelChoiceField(required=True, queryset=models.UserGroup.objects.all().order_by('title'), label='Class', empty_label=None)
+  assignment = forms.ChoiceField(required=True, choices=(('', '---------'),), label='Assignment', widget=widgets.SelectWithDisabled)
+  question = forms.ChoiceField(required=True, choices=(('', '---------'),), label='Filter by Question')
+
+  def __init__(self, *args, **kwargs):
+    teacher_id = group_id = assignment_id = question_id = None
+    if 'teacher_id' in kwargs:
+      teacher_id = kwargs.pop('teacher_id')
+    if 'group_id' in kwargs:
+      group_id = kwargs.pop('group_id')
+    if 'curriculum_id' in kwargs:
+      curriculum_id = kwargs.pop('curriculum_id')
+    if 'question_id' in kwargs:
+      question_id = kwargs.pop('question_id')
+
+    super(QuestionFeedbackSearchForm, self).__init__(*args, **kwargs)
+
+    for field_name, field in list(self.fields.items()):
+      field.widget.attrs['class'] = 'form-control'
+      field.widget.attrs['placeholder'] = field.help_text
+
+    #populating classes and initial select
+    teacher = models.Teacher.objects.get(id=teacher_id)
+    selected_group = models.UserGroup.objects.all().filter(id=group_id)
+    groups = models.UserGroup.objects.all().filter(Q(is_active=selected_group[0].is_active), Q(teacher=teacher) | Q(shared_with=teacher)).order_by(Lower('title'))
+
+    self.fields['group'].queryset = groups
+    self.fields['group'].initial = selected_group[0].id
+
+    #populating assignments and initial select
+    assignment_choices = util.group_assignment_dropdown_list(selected_group, False, True)
+    question_choices = None
+
+    self.fields['assignment'].choices = tuple(assignment_choices)
+    if curriculum_id:
+      self.fields['assignment'].initial = curriculum_id
+      curriculum_questions = models.CurriculumQuestion.objects.all().filter(step__curriculum__id=curriculum_id).order_by('step__order', 'order')
+      question_choices = util.question_dropdown_list(curriculum_questions)
+      if question_id:
+        self.fields['question'].initial = question_id
+      else:
+        self.fields['question'].widget.attrs['class'] += ' error'
+    else:
+      self.fields['assignment'].widget.attrs['class'] += ' error'
+      self.fields['question'].widget.attrs['disabled'] = True
+      question_choices = (('', '---------'),)
+
+    #populating questions and initial select
+    self.fields['question'].choices = tuple(question_choices)
 
 
 ####################################

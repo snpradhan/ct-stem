@@ -223,13 +223,14 @@
                       {% if group.assignments.count > 0 %}
                         {{group.assignments.count}} Assignment(s)
                         <div>
-                          <a type="button" class="btn orange" href="{% url 'ctstem:groupDashboard' group.id 'active' %}" aria-label="View Class Dashboard" title="View Class Dashboard">
+                          {% with status=group.is_active|yesno:"active,inactive"%}
+                          <a type="button" class="btn orange" href="{% url 'ctstem:teacherAssignmentDashboard' group.teacher.id status %}?group={{group.id}}">
                             <i class="fas fa-tachometer-alt"></i>
                           </a>
+                          {% endwith %}
                       {% else %}
                         No Assignment
                         <div>
-
                       {% endif %}
 
                       {% if group.is_active and not user.researcher %}

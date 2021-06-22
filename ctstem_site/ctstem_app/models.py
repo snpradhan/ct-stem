@@ -482,7 +482,7 @@ class Student(models.Model):
   test_account = models.BooleanField(null=False, blank=False, default=False)
 
   def __str__(self):
-      return '%s, %s' % (self.user.last_name, self.user.first_name)
+      return '%s, %s' % (self.user.last_name.title(), self.user.first_name.title())
 
   def get_consent(self):
     if self.consent == 'A':

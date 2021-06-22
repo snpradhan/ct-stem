@@ -84,7 +84,7 @@ table.table thead tr:not(#filterrow) th{
 table.table thead a {
   color: #e5e5e5 !important;
 }
-table.table.inner_table thead th {
+table.table.inner_table th {
   top: 0;
 }
 
@@ -117,14 +117,15 @@ table.table.sub a:hover {
 
 table.table#assignment_info, table.table#feedback_header {
   text-align: center;
-  font-size: 1.2em;
   font-weight: bold;
   margin-bottom: 2em;
+  margin-top: 0;
 }
 
 table.table#question_header {
   text-align: left;
   margin-bottom: 2em;
+  margin-top: 0;
 }
 
 table.table#feedback_header {
@@ -331,7 +332,8 @@ table.table#page_reorder td.page_number, table.table#page_reorder td.action {
   text-align: center;
 }
 
-table#assignment_progress div.crossed {
+table#assignment_progress div.crossed,
+table#unit_progress div.crossed {
   height: 3.5em;
   background-image: linear-gradient(to bottom right,  transparent calc(50% - 1px), var(--ctstem-color-pale-gray), transparent calc(50% + 1px));
 }

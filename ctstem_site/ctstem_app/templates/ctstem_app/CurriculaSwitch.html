@@ -1,9 +1,9 @@
 {% if user.is_authenticated %}
-<label class="switch" id="curricula_view">
+<div id="curricula_view">
   {% if on == 'true' %}
     <a type="button" class="btn yellow small" href="{% url 'ctstem:curriculatiles' %}">Switch to Tile View</a>
   {% else %}
     <a type="button" class="btn yellow small" href="{% url 'ctstem:curricula' 'unit' 'public' %}">Switch to Table View</a>
   {% endif %}
-</label>
+</div>
 {% endif %}

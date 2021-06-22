@@ -540,7 +540,6 @@ def curriculumStep(request, curriculum_id='', id=''):
             if save_and_continue == '1':
               steps = models.Step.objects.all().filter(curriculum__id=curriculum_id)
               next_steps = steps.filter(order__gt=savedStep.order)
-              print('next_steps', next_steps)
               if not next_steps:
                 return shortcuts.redirect('/curriculum/%s/page/new/' % curriculum_id)
               else:
@@ -1464,7 +1463,6 @@ def register(request, group_code='', email=''):
     other_school = models.School.objects.get(school_code='OTHER')
 
   if request.method == 'POST':
-    #print request.POST.copy()
     school_form = None
     new_school = None
     response_data = {}
@@ -1722,7 +1720,7 @@ def user_login(request, user_name=''):
         elif hasattr(user, 'teacher'):
           messages.success(request, "Welcome to the CT-STEM website. If you need help with using the site, you can go to the <a href='/help'>Help and FAQ</a> page.", extra_tags='safe')
           response_data['success'] = True
-          response_data['redirect_url'] = '/groups/active/'
+          response_data['redirect_url'] = '/dashboard/teacher/%s/active' % user.teacher.id
 
         else:
           messages.success(request, "You have logged in")
@@ -1763,7 +1761,7 @@ def user_logout(request):
 def login_redirect(request):
   if hasattr(request.user, 'teacher'):
     messages.success(request, "Welcome to the CT-STEM website. If you need help with using the site, you can go to the <a href='/help'>Help and FAQ</a> page.", extra_tags='safe')
-    return shortcuts.redirect('ctstem:groups', status='active')
+    return shortcuts.redirect('ctstem:teacherDashboard', id=request.user.teacher.id, status='active')
   else:
     messages.success(request, "You have logged in")
     return shortcuts.redirect('ctstem:home')
@@ -2889,7 +2887,6 @@ def _do_action(request, id_list, model, object_id=None):
     groups = models.UserGroup.objects.filter(id__in=id_list)
     if 'activate_selected' == action_params.get('action'):
       groups.update(is_active=True)
-      print('activation done')
       messages.success(request, "Selected class(es) activated.")
       return True
     elif 'inactivate_selected' == action_params.get('action'):
@@ -3465,7 +3462,7 @@ def group(request, id=''):
     return http.HttpResponseNotFound('<h1>Requested class not found</h1>')
 
 @login_required
-def getGroupAssignmentsByUnit(request, group_id='', curriculum_status='active'):
+def getGroupAssignmentsByUnit(request, group_id=''):
   group = None
   if hasattr(request.user, 'researcher'):
     has_permission = True
@@ -3479,7 +3476,7 @@ def getGroupAssignmentsByUnit(request, group_id='', curriculum_status='active'):
 
   for assignment in models.Assignment.objects.all().filter(group=group):
     curriculum = assignment.curriculum
-    if (curriculum_status == 'active' and curriculum.status in ['D', 'P']) or (curriculum_status == 'archived' and curriculum.status == 'A'):
+    if curriculum.status in ['D', 'P', 'A']:
 
       if curriculum.curriculum_type in ['L', 'A'] and curriculum.unit is not None:
         assignment = curriculum.unit
@@ -3628,9 +3625,10 @@ def deleteGroup(request, id=''):
 
 @login_required
 def teacherDashboard(request, id='', status='active'):
+
   if hasattr(request.user, 'administrator'):
     privilege = 1
-  elif hasattr(request.user, 'teacher') and request.user.teacher.id == id:
+  elif hasattr(request.user, 'teacher') and str(request.user.teacher.id) == str(id):
     privilege = 1
   else:
     privilege = 0
@@ -3715,7 +3713,7 @@ def teacherDashboard(request, id='', status='active'):
 def teacherAssignmentDashboard(request, id='', status='active'):
   if hasattr(request.user, 'administrator'):
     privilege = 1
-  elif hasattr(request.user, 'teacher') and request.user.teacher.id == id:
+  elif hasattr(request.user, 'teacher') and str(request.user.teacher.id) == str(id):
     privilege = 1
   else:
     privilege = 0
@@ -3838,8 +3836,6 @@ def teacherAssignmentDashboard(request, id='', status='active'):
                                        'icon': curriculum.icon
                                        }
 
-    #assignments.sort(key=lambda x:x['title'])
-    #print(sorted(assignments.items(), key=lambda item: item[1]['title']))
     if sort_by:
       if sort_by == 'curriculum':
         assignments = {k: v for k, v in sorted(assignments.items(), key=lambda item: item[1]['title'].lower())}
@@ -3870,7 +3866,7 @@ def teacherAssignmentDashboard(request, id='', status='active'):
 def teacherStudentDashboard(request, id='', status='active'):
   if hasattr(request.user, 'administrator'):
     privilege = 1
-  elif hasattr(request.user, 'teacher') and request.user.teacher.id == id:
+  elif hasattr(request.user, 'teacher') and str(request.user.teacher.id) == str(id):
     privilege = 1
   else:
     privilege = 0
@@ -3924,13 +3920,12 @@ def teacherStudentDashboard(request, id='', status='active'):
         student_key = student.id
         student_groups = groups.filter(group_members__student__id=student.id).order_by(Lower('title')).distinct()
         students[student_key] = {'id': student.id,
-                               'name': student.user.last_name + ', ' + student.user.first_name,
+                               'name': student.user.last_name.title() + ', ' + student.user.first_name.title(),
                                'assignment_status': {'N': 0, 'P': 0, 'S': 0, 'F': 0, 'A': 0},
                                'total': 0,
                                'assignments': {},
                                'student_groups': student_groups
                               }
-        #print(all_groups.filter(group_members__student__id=student.id).order_by(Lower('title')).distinct())
         for assignment in all_assignments.filter(group__in=student_groups):
           curriculum = assignment.curriculum
           assignment_date = assignment.assigned_date
@@ -4009,6 +4004,7 @@ def teacherStudentDashboard(request, id='', status='active'):
     domain = current_site.domain
     assignmentForm = forms.AssignmentSearchForm(user=request.user)
 
+
     context = {'teacher': teacher, 'group': group, 'students': students,
                 'role':'groups', 'status': status, 'domain': domain, 'searchForm': searchForm
                }
@@ -4039,7 +4035,7 @@ def groupDashboard(request, id='', curriculum_status='active'):
       status_color = {'N': 'gray', 'P': 'blue', 'S': 'green', 'F': 'orange', 'A': 'black'}
       students = group.members.all()
       keys = []
-      assignments_by_unit = getGroupAssignmentsByUnit(request, id, curriculum_status)
+      assignments_by_unit = getGroupAssignmentsByUnit(request, id)
 
       for assignment in models.Assignment.objects.all().filter(group=group).order_by('curriculum__unit__title', 'curriculum__order'):
         instances = models.AssignmentInstance.objects.all().filter(assignment=assignment)
@@ -4093,7 +4089,7 @@ def groupDashboard(request, id='', curriculum_status='active'):
 # List all students in a class and display their assignment status for each lesson
 ####################################
 @login_required
-def groupCurriculumDashboard(request, group_id='', curriculum_id='', curriculum_status='active'):
+def assignmentUnitProgressDashboardOriginal(request, teacher_id=''):
   try:
     if request.method == 'GET':
       if hasattr(request.user, 'researcher'):
@@ -4107,7 +4103,7 @@ def groupCurriculumDashboard(request, group_id='', curriculum_id='', curriculum_
       group = models.UserGroup.objects.get(id=group_id)
       curriculum = models.Curriculum.objects.get(id=curriculum_id)
       curricula = None
-      assignments_by_unit = getGroupAssignmentsByUnit(request, group_id, curriculum_status)
+      assignments_by_unit = getGroupAssignmentsByUnit(request, group_id)
 
       serial = 0
       students = group.members.all()
@@ -4236,21 +4232,23 @@ def assignmentProgressDashboard(request, teacher_id=''):
     if request.method == 'GET' or request.method == 'POST':
       header = []
       students_progress = []
-      assignment = assignment_id = group_id = sort_by = data = None
+      assignment = assignment_id = curriculum_id = group_id = sort_by = data = None
 
       if request.method == 'GET':
-        assignment_id = request.GET.get('assignment', '')
-        assignment = models.Assignment.objects.get(id=assignment_id)
-        group_id = assignment.group.id
+        group_id = request.GET.get('group', '')
+        curriculum_id = request.GET.get('assignment', '')
         sort_by = None
       else:
         data = request.POST.copy()
-
         group_id = data['group']
         curriculum_id = data['assignment']
         sort_by = data['sort_by']
 
-        if group_id and curriculum_id:
+      if group_id and curriculum_id:
+        curriculum = models.Curriculum.objects.get(id=curriculum_id)
+        if curriculum.curriculum_type == 'U':
+          return shortcuts.redirect('/dashboard/unitProgress/%s?group=%s&assignment=%s' % (teacher_id, group_id, curriculum_id))
+        else:
           assignment = models.Assignment.objects.all().filter(group__id=group_id, curriculum__id=curriculum_id)[0]
           assignment_id = assignment.id
 
@@ -4263,9 +4261,9 @@ def assignmentProgressDashboard(request, teacher_id=''):
         return http.HttpResponseNotFound('<h1>You do not have the privilege to view this assignment</h1>')
 
       if data:
-        filter_form = forms.ProgressDashboardSearchForm(teacher_id=teacher_id, group_id=group_id, assignment_id=assignment_id, data=data)
+        filter_form = forms.ProgressDashboardSearchForm(teacher_id=teacher_id, group_id=group_id, curriculum_id=curriculum_id, data=data)
       else:
-        filter_form = forms.ProgressDashboardSearchForm(teacher_id=teacher_id, group_id=group_id, assignment_id=assignment_id)
+        filter_form = forms.ProgressDashboardSearchForm(teacher_id=teacher_id, group_id=group_id, curriculum_id=curriculum_id)
 
       if assignment:
         students = assignment.group.members.all().order_by(Lower('user__last_name'), Lower('user__first_name'))
@@ -4357,6 +4355,119 @@ def assignmentProgressDashboard(request, teacher_id=''):
 
   except models.Assignment.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested assignment not found</h1>')
+
+
+####################################
+# Group/Curriculum Dashboard
+# Dashboard for a specific curriculum/unit in a Class
+# List all students in a class and display their assignment status for each lesson
+####################################
+@login_required
+def unitProgressDashboard(request, teacher_id=''):
+  try:
+
+    if request.method == 'GET' or request.method == 'POST':
+      curriculum_id = curriculum = group_id = group = sort_by = data = None
+
+      if request.method == 'GET':
+        group_id = request.GET.get('group', '')
+        curriculum_id = request.GET.get('assignment', '')
+        sort_by = None
+      else:
+        data = request.POST.copy()
+        group_id = data['group']
+        curriculum_id = data['assignment']
+        sort_by = data['sort_by']
+
+      if group_id and curriculum_id:
+        curriculum = models.Curriculum.objects.get(id=curriculum_id)
+        if curriculum.curriculum_type != 'U':
+          return shortcuts.redirect('/dashboard/assignmentProgress/%s?group=%s&assignment=%s' % (teacher_id, group_id, curriculum_id))
+
+
+      if hasattr(request.user, 'researcher'):
+        has_permission = True
+      elif group_id:
+        has_permission = check_group_permission(request, group_id)
+
+      if not has_permission:
+        return http.HttpResponseNotFound('<h1>You do not have the privilege to view this assignment</h1>')
+
+      if data:
+        filter_form = forms.ProgressDashboardSearchForm(teacher_id=teacher_id, group_id=group_id, curriculum_id=curriculum_id, data=data)
+      else:
+        filter_form = forms.ProgressDashboardSearchForm(teacher_id=teacher_id, group_id=group_id, curriculum_id=curriculum_id)
+
+      student_assignment_details = {}
+      assignment_header = {}
+      anonymize_student = False
+      assignment_ids = []
+      assignments_by_unit = None
+
+      if group_id and curriculum_id:
+        group = models.UserGroup.objects.get(id=group_id)
+        curricula = None
+        assignments_by_unit = getGroupAssignmentsByUnit(request, group_id)
+
+        serial = 0
+        students = group.members.all()
+        status = ['D', 'P', 'A']
+        curricula =  models.Curriculum.objects.all().filter(unit=curriculum, status__in=status).order_by('order')
+        assignments =  models.Assignment.objects.all().filter(group=group, curriculum__in=curricula).order_by('curriculum__order')
+
+        if assignments.count() == 0:
+          return http.HttpResponseNotFound('<h1>Requested assignment not found</h1>')
+
+        instances = models.AssignmentInstance.objects.all().filter(assignment__in=assignments)
+
+        # for each lesson in a unit
+        for curr in curricula:
+          #find an assignment
+          assignment = assignments.filter(curriculum=curr).first()
+          assignment_header[curr] = assignment
+          if assignment:
+            total_questions = models.CurriculumQuestion.objects.all().filter(step__curriculum=assignment.curriculum).count()
+            total_steps = assignment.curriculum.steps.count()
+            if not anonymize_student and assignment.anonymize_student:
+              anonymize_student = True
+            assignment_ids.append(assignment.id)
+
+          # for each student in class
+          for student in students:
+            if assignment:
+              try:
+                #find the assignment instance
+                instance = instances.get(assignment=assignment, student=student)
+                percent_complete = get_student_assignment_instance_percent_complete(request, student.id, assignment.id)
+              except models.AssignmentInstance.DoesNotExist:
+                instance = None
+                percent_complete = 0
+            else:
+              instance = None
+              percent_complete = 0
+
+            serial += 1
+            student_assignment_status = {
+              'serial': serial,
+              'assignment': assignment,
+              'instance': instance,
+              'curriculum_id': curr.id,
+              'percent_complete': percent_complete,
+            }
+            if student in student_assignment_details:
+              student_assignment_details[student].append(student_assignment_status)
+            else:
+              student_assignment_details[student] = [student_assignment_status]
+
+      context = {'teacher_id': teacher_id, 'group': group, 'curriculum': curriculum, 'assignment_header': assignment_header, 'student_assignment_details': student_assignment_details, 'assignments_by_unit': assignments_by_unit, 'anonymize_student': anonymize_student, 'assignment_ids': assignment_ids, 'filter_form': filter_form}
+      return render(request, 'ctstem_app/UnitProgressDashboard.html', context)
+
+    return http.HttpResponseNotAllowed(['GET', 'POST'])
+
+  except models.UserGroup.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested class not found</h1>')
+  except models.Curriculum.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested Curriculum not found</h1>')
 
 ####################################
 # STUDENT ASSIGNMENTS
@@ -4701,7 +4812,6 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
                   questionResponse = questionform.save()
                 else:
                   questionform.instance.save()
-                #print 'question order ', questionform.instance.curriculum_question.order
                 questionResponses['id_form-%d-id'%(questionform.instance.curriculum_question.order-1)] = questionform.instance.id
             else: # non ajax post
               formset.save()
@@ -4756,44 +4866,72 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
   except models.Step.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Curriculum Step not found </h1>')
 
-####################################
-# Teacher feedback
-####################################
+########################################################################
+# Teacher feedback for one assignment for one student
+########################################################################
 @login_required
-def feedback(request, assignment_id='', instance_id=''):
+def assignmentStudentFeedback(request, teacher_id=''):
   try:
+    assignment = assignment_id = curriculum_id = group_id = student_id = student = instance = data = prevStudent = nextStudent = None
 
-    if '' != instance_id:
-      instance = models.AssignmentInstance.objects.get(assignment__id=assignment_id, id=instance_id)
+    if request.method == 'GET':
+      group_id = request.GET.get('group', '')
+      curriculum_id = request.GET.get('assignment', '')
+      student_id = request.GET.get('student', '')
+    else:
+      search_data = request.POST.copy()
+      group_id = search_data['group']
+      curriculum_id = search_data['assignment']
+      student_id = search_data['student']
+
+    if group_id and curriculum_id:
+      assignment = models.Assignment.objects.all().filter(group__id=group_id, curriculum__id=curriculum_id)[0]
+      assignment_id = assignment.id
+      group = models.UserGroup.objects.get(id=group_id)
+
+    if student_id:
+      student = models.Student.objects.get(id=student_id)
+      school = student.school
+
+      if assignment_id:
+        instance_qryset = models.AssignmentInstance.objects.all().filter(assignment__id=assignment_id, student__id=student_id)
+        if instance_qryset.count() > 0:
+          instance = instance_qryset[0]
       #get the previous and next student instances
-      groupInstances = models.AssignmentInstance.objects.all().filter(assignment__id=assignment_id).order_by('student__user__last_name', 'student__user__first_name')
-      count = groupInstances.count()
+      students = assignment.group.members.all().order_by(Lower('user__last_name'), Lower('user__first_name'))
+      count = students.count()
       prevIdx = nextIdx = 0
-      prevInstance = nextInstance = None
-      for idx, inst in enumerate(groupInstances):
-        if instance == inst:
+      for idx, stud in enumerate(students):
+        if student == stud:
           prevIdx = idx - 1
           nextIdx = idx + 1
       if prevIdx >= 0 and prevIdx < count:
-        prevInstance = groupInstances[prevIdx]
+        prevStudent = students[prevIdx]
       if nextIdx >= 0 and nextIdx < count:
-        nextInstance = groupInstances[nextIdx]
+        nextStudent = students[nextIdx]
 
-      school = instance.student.school
-      group = instance.assignment.group
-      student = instance.student
-
-      if hasattr(request.user, 'researcher'):
+    if hasattr(request.user, 'researcher'):
+      if student:
         if student.consent == 'A':
           has_permission = True
         else:
           has_permission = False
       else:
-        has_permission = check_group_permission(request, group.id)
+        has_permission = True
+    else:
+      has_permission = check_group_permission(request, group_id)
 
-      if not has_permission:
-        return http.HttpResponseNotFound('<h1>You do not have the privilege to provide feedback on this assignment</h1>')
+    if not has_permission:
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to provide feedback on this assignment</h1>')
 
+    if data:
+      filter_form = forms.StudentFeedbackSearchForm(teacher_id=teacher_id, group_id=group_id, curriculum_id=curriculum_id, student_id=student_id, data=search_data)
+    else:
+      filter_form = forms.StudentFeedbackSearchForm(teacher_id=teacher_id, group_id=group_id, curriculum_id=curriculum_id, student_id=student_id)
+
+    filter_form.is_valid()
+    context = None
+    if instance:
       feedback, created = models.AssignmentFeedback.objects.get_or_create(instance=instance)
       stepResponses = models.AssignmentStepResponse.objects.all().filter(instance=instance).order_by('step__order')
       for stepResponse in stepResponses:
@@ -4824,11 +4962,10 @@ def feedback(request, assignment_id='', instance_id=''):
                 else:
                   questionFeedbackForm.initial = {'feedback': 'Incorrect'}
 
-        context = {'form': form, 'formset': formset, 'nextInstance': nextInstance, 'prevInstance': prevInstance}
-        return render(request, 'ctstem_app/Feedback.html', context)
+        context = {'assignment': assignment, 'student': student, 'assignment_instance': instance, 'form': form, 'formset': formset, 'nextStudent': nextStudent, 'prevStudent': prevStudent, 'teacher_id': teacher_id, 'filter_form': filter_form}
+
       elif 'POST' == request.method:
         data = request.POST.copy()
-
         form = forms.FeedbackForm(data, instance=feedback, prefix='feedback')
         #AssessmentStepFormSet = inlineformset_factory(models.Assessment, models.AssessmentStep, form=forms.AssessmentStepForm,can_delete=True, can_order=True, extra=1)
 
@@ -4851,23 +4988,29 @@ def feedback(request, assignment_id='', instance_id=''):
             #return shortcuts.redirect('ctstem:assignmentDashboard', id=assignment_id)
           else:
             messages.success(request, 'Your feedback has been saved')
+
+          return shortcuts.redirect('/assignment/student/feedback/%s?group=%s&assignment=%s&student=%s' % (teacher_id, group_id, curriculum_id, student_id))
         else:
           print(form.errors)
           print(formset.errors)
           messages.error(request, 'Your feedback could not be saved')
+          context = {'assignment': assignment, 'student': student, 'assignment_instance': instance, 'form': form, 'formset': formset, 'nextStudent': nextStudent, 'prevStudent': prevStudent, 'teacher_id': teacher_id, 'filter_form': filter_form}
 
-        context = {'form': form, 'formset': formset, 'nextInstance': nextInstance, 'prevInstance': prevInstance}
-        return render(request, 'ctstem_app/Feedback.html', context)
     else:
-      raise models.AssignmentInstance.DoesNotExist
+      context = {'assignment': assignment, 'student': student, 'assignment_instance': None, 'nextStudent': nextStudent, 'prevStudent': prevStudent, 'teacher_id': teacher_id, 'filter_form': filter_form}
+
+    return render(request, 'ctstem_app/AssignmentStudentFeedback.html', context)
 
   except models.AssignmentInstance.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested assignment not found</h1>')
   except models.Step.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Curriculum Step not found </h1>')
 
+########################################################################
+# Teacher feedback for one question in an assignment for one student
+########################################################################
 @login_required
-def question_feedback(request, response_id=''):
+def assignmentStudentQuestionFeedback(request, response_id=''):
   try:
     if '' != response_id:
       questionResponse = models.QuestionResponse.objects.get(id=response_id)
@@ -4882,7 +5025,7 @@ def question_feedback(request, response_id=''):
       if 'GET' == request.method:
         form = forms.QuestionFeedbackForm(instance=questionFeedback)
         context = {'form': form, 'curriculum_question': curriculum_question, 'question_response': questionResponse}
-        return render(request, 'ctstem_app/QuestionFeedback.html', context)
+        return render(request, 'ctstem_app/AssignmentStudentQuestionFeedback.html', context)
       elif 'POST' == request.method:
         data = request.POST.copy()
         form = forms.QuestionFeedbackForm(data, instance=questionFeedback)
@@ -4892,7 +5035,7 @@ def question_feedback(request, response_id=''):
           response_data = {'success': True }
         else:
           context = {'form': form, 'curriculum_question': curriculum_question, 'question_response': questionResponse}
-          html = render_to_string('ctstem_app/QuestionFeedback.html', context, request)
+          html = render_to_string('ctstem_app/AssignmentStudentQuestionFeedback.html', context, request)
           response_data = {'success': False, 'html': html, 'error': 'The feedback could not be saved because there were errors. Please check the errors below.'}
 
         return http.HttpResponse(json.dumps(response_data), content_type="application/json")
@@ -4903,34 +5046,66 @@ def question_feedback(request, response_id=''):
       raise models.QuestionResponse.DoesNotExist
   except models.QuestionResponse.DoesNotExist:
     return http.HttpResponseNotFound(('<h1>Requested response not found</h1>'))
-####################################
-# Teacher feedback
-####################################
+
+########################################################################
+# Teacher feedback for one question in an assignment for all students in class
+########################################################################
 @login_required
-def question_response_review(request, assignment_id='', curriculum_question_id=''):
+def assignmentQuestionFeedback(request, teacher_id=''):
   try:
-    if '' != assignment_id:
-      assignment = models.Assignment.objects.get(id=assignment_id)
-      school = assignment.group.teacher.school
-      group = assignment.group
-      allow_save = False
+    assignment = assignment_id = curriculum_id = group_id = question_id = curriculum_question = data = prevQuestion = nextQuestion = None
 
+    if request.method == 'GET':
+      group_id = request.GET.get('group', '')
+      curriculum_id = request.GET.get('assignment', '')
+      question_id = request.GET.get('question', '')
+    else:
+      search_data = request.POST.copy()
+      group_id = search_data['group']
+      curriculum_id = search_data['assignment']
+      question_id = search_data['question']
 
-      if hasattr(request.user, 'researcher'):
-        has_permission = True
-      else:
-        has_permission = check_group_permission(request, group.id)
+    if group_id and curriculum_id:
+      assignment = models.Assignment.objects.all().filter(group__id=group_id, curriculum__id=curriculum_id)[0]
+      assignment_id = assignment.id
+      group = models.UserGroup.objects.get(id=group_id)
 
-      if not has_permission:
-        return http.HttpResponseNotFound('<h1>You do not have the privilege to review responses for this question</h1>')
+    allow_save = False
+
+    if hasattr(request.user, 'researcher'):
+      has_permission = True
+    else:
+      has_permission = check_group_permission(request, group_id)
+
+    if not has_permission:
+      return http.HttpResponseNotFound('<h1>You do not have the privilege to review responses for this question</h1>')
+
+    if data:
+      filter_form = forms.QuestionFeedbackSearchForm(teacher_id=teacher_id, group_id=group_id, curriculum_id=curriculum_id, question_id=question_id, data=search_data)
+    else:
+      filter_form = forms.QuestionFeedbackSearchForm(teacher_id=teacher_id, group_id=group_id, curriculum_id=curriculum_id, question_id=question_id)
+
+    if question_id:
+      curriculum_question = models.CurriculumQuestion.objects.get(id=question_id)
+      #get the previous and next student instances
+      curriculum_questions = models.CurriculumQuestion.objects.all().filter(step__curriculum__id=curriculum_question.step.curriculum.id).order_by('step__order', 'order')
+      count = curriculum_questions.count()
+      prevIdx = nextIdx = 0
+      for idx, quest in enumerate(curriculum_questions):
+        if curriculum_question == quest:
+          prevIdx = idx - 1
+          nextIdx = idx + 1
+      if prevIdx >= 0 and prevIdx < count:
+        prevQuestion = curriculum_questions[prevIdx]
+      if nextIdx >= 0 and nextIdx < count:
+        nextQuestion = curriculum_questions[nextIdx]
+
 
       members = group.members
-
       if hasattr(request.user, 'researcher'):
         members = members.filter(consent='A')
-
       members = members.order_by(Lower('user__last_name'), Lower('user__first_name'))
-      curriculum_question = models.CurriculumQuestion.objects.get(id=curriculum_question_id)
+
       response_feedback = []
       for member in members:
         try:
@@ -4981,23 +5156,9 @@ def question_response_review(request, assignment_id='', curriculum_question_id='
 
         response_feedback.append({'student': member, 'question_response': question_response, 'question_feedback_form': question_feedback_form, 'message': message, 'status': status})
 
-      #get the previous and next student instances
-      curriculum_questions = models.CurriculumQuestion.objects.all().filter(step__curriculum__id=curriculum_question.step.curriculum.id).order_by('step__order', 'order')
-      count = curriculum_questions.count()
-      prevIdx = nextIdx = 0
-      prevQuestion = nextQuestion = None
-      for idx, quest in enumerate(curriculum_questions):
-        if curriculum_question == quest:
-          prevIdx = idx - 1
-          nextIdx = idx + 1
-      if prevIdx >= 0 and prevIdx < count:
-        prevQuestion = curriculum_questions[prevIdx]
-      if nextIdx >= 0 and nextIdx < count:
-        nextQuestion = curriculum_questions[nextIdx]
-
       if 'GET' == request.method:
-        context = {'group': group, 'assignment': assignment, 'curriculum_question': curriculum_question, 'response_feedback': response_feedback, 'nextQuestion': nextQuestion, 'prevQuestion': prevQuestion, 'allow_save': allow_save}
-        return render(request, 'ctstem_app/QuestionReview.html', context)
+        context = {'assignment': assignment, 'curriculum_question': curriculum_question, 'response_feedback': response_feedback, 'nextQuestion': nextQuestion, 'prevQuestion': prevQuestion, 'allow_save': allow_save, 'teacher_id': teacher_id, 'filter_form': filter_form}
+        return render(request, 'ctstem_app/AssignmentQuestionFeedback.html', context)
 
       elif 'POST' == request.method:
         data = request.POST.copy()
@@ -5012,12 +5173,14 @@ def question_response_review(request, assignment_id='', curriculum_question_id='
         if feedback_saved:
           messages.success(request, "Feedback Saved.")
 
-        return shortcuts.redirect('ctstem:question_response_review', assignment_id, curriculum_question_id)
-
-      return http.HttpResponseNotAllowed(['GET', 'POST'])
+        return shortcuts.redirect('/assignment/question/feedback/%s?group=%s&assignment=%s&question=%s' % (teacher_id, group_id, curriculum_id, question_id))
 
     else:
-      raise models.Assignment.DoesNotExist
+      context = {'assignment': assignment, 'allow_save': allow_save, 'teacher_id': teacher_id, 'filter_form': filter_form}
+      return render(request, 'ctstem_app/AssignmentQuestionFeedback.html', context)
+
+    return http.HttpResponseNotAllowed(['GET', 'POST'])
+
 
   except models.Assignment.DoesNotExist:
     return http.HttpResponseNotFound('<h1>Requested assignment not found</h1>')
@@ -5142,8 +5305,6 @@ def anonymize_student(request, assignment_id='', flag='0'):
   has_permission = check_assignment_permission(request, assignment_id)
   response_data = {'success': False }
   if has_permission:
-    print('assignment', assignment_id)
-    print('flag', flag)
     assignment = models.Assignment.objects.get(id=assignment_id)
     if flag == '0':
       assignment.anonymize_student = False
@@ -5151,8 +5312,8 @@ def anonymize_student(request, assignment_id='', flag='0'):
       assignment.anonymize_student = True
     assignment.save()
     response_data['success'] = True
-    print('after update', assignment.anonymize_student)
   return http.HttpResponse(json.dumps(response_data), content_type="application/json")
+
 ####################################
 # Delete Assignment
 ####################################
@@ -5899,7 +6060,6 @@ def questionResponse(request, instance_id='', response_id=''):
     # check if the user has permission to view student response
     if '' != instance_id and '' != response_id:
       instance = models.AssignmentInstance.objects.get(id=instance_id)
-      print('instance', instance)
       school = instance.student.school
       group = instance.assignment.group
       privilege = 0
@@ -5916,7 +6076,6 @@ def questionResponse(request, instance_id='', response_id=''):
       if 'GET' == request.method:
         #get the question response
         question_response = models.QuestionResponse.objects.get(id=response_id, step_response__instance__id=instance_id)
-        print('response', question_response)
         question = question_response.curriculum_question.question
         question_response_files = question_response.response_file.all()
         context = {'question': question, 'question_response': question_response, 'response_files': question_response_files}
@@ -6601,7 +6760,6 @@ def resetPassword(request, id=''):
         password = User.objects.make_random_password()
         user.set_password(password)
         user.save()
-        print('password reset')
         response_data = {'result': 'Success', 'full_name': user.get_full_name(), 'username': user.username, 'password': password}
       return http.HttpResponse(json.dumps(response_data), content_type="application/json")
     except models.User.DoesNotExist:

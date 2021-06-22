@@ -98,12 +98,12 @@
                 {% if assignment_details.instance.status == 'P' %}
                   <div> In Progress </div>
                   <div>
-                     <a type="button" class="btn small green" href="{% url 'ctstem:feedback' assignment.id  assignment_details.instance.id %}" title="Give Feedback"> <span class="far fa-comment-dots" aria-hidden="true"></span> </a>
+                     <a type="button" class="btn small green" href="{% url 'ctstem:assignmentStudentFeedback' assignment.id  assignment_details.instance.id %}" title="Give Feedback"> <span class="far fa-comment-dots" aria-hidden="true"></span> </a>
                   </div>
                 {% elif assignment_details.instance.status == 'S' %}
                   <div> Submitted </div>
                   <div>
-                    <a type="button" class="btn small green" href="{% url 'ctstem:feedback' assignment.id  assignment_details.instance.id %}" title="Give Feedback"> <span class="far fa-comment-dots" aria-hidden="true"></span> </a>
+                    <a type="button" class="btn small green" href="{% url 'ctstem:assignmentStudentFeedback' assignment.id  assignment_details.instance.id %}" title="Give Feedback"> <span class="far fa-comment-dots" aria-hidden="true"></span> </a>
                     <a type="button" class="btn small blue" href="{% url 'ctstem:export_student_response' assignment.id  student.id %}" title="Download Student Response"> <i class="fas fa-file-download"></i> </a>
                     {% if assignment_details.instance.assignment.curriculum.curriculum_type == 'L' %}
                       <a type="button" class="btn small orange" href="{% url 'ctstem:unlockAssignment' assignment.id  assignment_details.instance.id %}" title="Unlock Assignment" onclick="return confirm('Are you sure you want to unlock this assignment? Unlocking the assignment will allow the student to edit his/her responses and resubmit.');"> <span class="fa fa-unlock" aria-hidden="true"></span> </a>
@@ -112,14 +112,14 @@
                 {% elif assignment_details.instance.status == 'F' %}
                   <div> Feedback Completed </div>
                   <div>
-                    <a type="button" class="btn small green" href="{% url 'ctstem:feedback' assignment.id  assignment_details.instance.id %}" title="View/Give Feedback"> <span class="far fa-comment-dots" aria-hidden="true"></span> </a>
+                    <a type="button" class="btn small green" href="{% url 'ctstem:assignmentStudentFeedback' assignment.id  assignment_details.instance.id %}" title="View/Give Feedback"> <span class="far fa-comment-dots" aria-hidden="true"></span> </a>
 
                     <a type="button" class="btn small blue" href="{% url 'ctstem:export_student_response' assignment.id  student.id %}" title="Download Student Response"> <i class="fas fa-file-download"></i> </a>
                   </div>
                 {% elif assignment_details.instance.status == 'A' %}
                   <div> Archived </div>
                   <div>
-                    <a type="button" class="btn small green" href="{% url 'ctstem:feedback' assignment.id  assignment_details.instance.id %}" title="View/Give Feedback"> <span class="far fa-comment-dots" aria-hidden="true"></span> </a>
+                    <a type="button" class="btn small green" href="{% url 'ctstem:assignmentStudentFeedback' assignment.id  assignment_details.instance.id %}" title="View/Give Feedback"> <span class="far fa-comment-dots" aria-hidden="true"></span> </a>
                     <a type="button" class="btn small blue" href="{% url 'ctstem:export_student_response' assignment.id  student.id %}" title="Download Student Response"> <i class="fas fa-file-download"></i> </a>
                   </div>
                 {% else %}
@@ -171,7 +171,7 @@
                 {% endfor %}
               </td>
               <td>{{question.question.question_text|safe}}</td>
-              <td><a type="button" class="btn small green" href="{% url 'ctstem:question_response_review' assignment.id  question.id %}" title="Review Question Response"> Review </a></td>
+              <td><a type="button" class="btn small green" href="{% url 'ctstem:assignmentQuestionFeedback' assignment.id  question.id %}" title="Review Question Response"> Review </a></td>
             </tr>
           {% endfor %}
         </tbody>

@@ -15,9 +15,11 @@
     <h2> Assignment Progress </h2>
     <div id="dashboard_header">
       <div class="navigation">
-        <h5 class="left"><a href="{% url 'ctstem:teacherDashboard' teacher_id 'active' %}"><i class="fas fa-chevron-left"></i><i class="fas fa-chevron-left"></i> Back to Teacher Dashboard</a></h5>
+        {% with status=assignment.group.is_active|yesno:"active,inactive"%}
+        <h5 class="left"><a href="{% url 'ctstem:teacherDashboard' teacher_id status %}"><i class="fas fa-chevron-left"></i><i class="fas fa-chevron-left"></i> Back to Teacher Dashboard</a></h5>
         &nbsp; &nbsp;&nbsp; &nbsp;
-        <h5 class="left"><a href="{% url 'ctstem:teacherAssignmentDashboard' teacher_id 'active' %}"><i class="fas fa-chevron-left"></i><i class="fas fa-chevron-left"></i> Back to All Assignments </a></h5>
+        <h5 class="left"><a href="{% url 'ctstem:teacherAssignmentDashboard' teacher_id status %}"><i class="fas fa-chevron-left"></i><i class="fas fa-chevron-left"></i> Back to All Assignments </a></h5>
+        {% endwith %}
       </div>
       <div class="quick_links">
           <h5><a href="{% url 'ctstem:help' %}"><i class="far fa-question-circle"></i> Help </a></h5>
@@ -27,7 +29,7 @@
     </div>
     <div class="legends_and_settings">
       <div class="legends_container">
-        <h5 class="left">Legends</h6>
+        <h5 class="left">Legends</h5>
         <div class="legends">
           <div class="legend">
             <a type="button" class="btn tiny green"> <i class="far fa-comment-dots"></i> </a>
@@ -42,7 +44,7 @@
           <div class="legend">
             <i class="far fa-window-minimize"></i>
             &nbsp;
-            <label>Not yet started</label>
+            <label>Not Yet Started</label>
           </div>
           <div class="legend">
             <div class="crossed"></div>
@@ -53,11 +55,11 @@
       </div>
       {% if not user.researcher %}
         <div class="settings_container">
-          <h5 class="left">Assignment Settings</h6>
+          <h5 class="left">Assignment Settings</h5>
           <div class="settings">
-            {% include "ctstem_app/AnonymizeStudentSwitch.html" with anonymize_student=assignment.anonymize_student assignment_id=assignment.id %}
-            {% include "ctstem_app/LockOnCompletionSwitch.html" with lock_on_completion=assignment.lock_on_completion assignment_id=assignment.id %}
-            {% include "ctstem_app/RealtimeFeedbackSwitch.html" with realtime_feedback=assignment.realtime_feedback assignment_id=assignment.id %}
+            {% include "ctstem_app/AnonymizeStudentSwitch.html" with anonymize_student=assignment.anonymize_student assignment_id=assignment.id is_class_active=assignment.group.is_active %}
+            {% include "ctstem_app/LockOnCompletionSwitch.html" with lock_on_completion=assignment.lock_on_completion assignment_id=assignment.id is_class_active=assignment.group.is_active %}
+            {% include "ctstem_app/RealtimeFeedbackSwitch.html" with realtime_feedback=assignment.realtime_feedback assignment_id=assignment.id is_class_active=assignment.group.is_active %}
           </div>
         </div>
       {% endif %}
@@ -79,9 +81,9 @@
         </div>
       </div>
     </form>
+    {% if students_progress %}
     <div class="dashboard_container">
       <table class="table table-striped table-bordered table-condensed" id="assignment_progress">
-
         <thead>
           <tr>
             <th class="student_col"></th>
@@ -107,7 +109,7 @@
                     <th>
                       Q{{step.order}}.{{question.order}}
                       <br>
-                      <a class="btn tiny white" href="{% url 'ctstem:question_response_review' assignment.id question.id %}" title="Review student responses for question {{step.order}}.{{question.order}}"> <span class="far fa-comment-dots" aria-hidden="true"></span> </a>
+                      <a class="btn tiny white" href="{% url 'ctstem:assignmentQuestionFeedback' teacher_id %}?group={{assignment.group.id}}&assignment={{assignment.curriculum.id}}&question={{question.id}}" title="Review student responses for question {{step.order}}.{{question.order}}"> <span class="far fa-comment-dots" aria-hidden="true"></span> </a>
                     </th>
                   {% endfor %}
                 {% else %}
@@ -140,7 +142,7 @@
               </div>
 
               {% if instance %}
-                <a class="btn tiny white" href="{% url 'ctstem:feedback' assignment.id instance.id %}" title="Review student's response"> <span class="far fa-comment-dots" aria-hidden="true"></span> </a>
+                <a class="btn tiny white" href="{% url 'ctstem:assignmentStudentFeedback' teacher_id %}?group={{assignment.group.id}}&assignment={{assignment.curriculum.id}}&student={{student.id}}" title="Review student's response"> <span class="far fa-comment-dots" aria-hidden="true"></span> </a>
               {% endif %}
             </td>
             {% for question_progress in progress %}
@@ -152,7 +154,7 @@
                 {% else %}
                   {% with response=question_progress|get_item:'response' feedback=question_progress|get_item:'feedback' %}
                     {% if response %}
-                      <a type="button" class="btn small add_feedback {% if feedback and feedback.feedback %} green {% else %} yellow {% endif %}" data-form="{% url 'ctstem:questionFeedback' response.id %}" title="{% if feedback and feedback.feedback %} Review response and feedback {% else %} Review response and give feedback {% endif %}"> <span class="far fa-comment-dots" aria-hidden="true"></span> </a>
+                      <a type="button" class="btn tiny add_feedback {% if feedback and feedback.feedback %} green {% else %} yellow {% endif %}" data-form="{% url 'ctstem:assignmentStudentQuestionFeedback' response.id %}" title="{% if feedback and feedback.feedback %} Review response and feedback {% else %} Review response and give feedback {% endif %}"> <span class="far fa-comment-dots" aria-hidden="true"></span> </a>
                     {% endif %}
                   {% endwith %}
                 {% endif %}
@@ -173,6 +175,7 @@
         </tbody>
       </table>
     </div>
+    {% endif %}
   </div>
 
   <script type="text/javascript">

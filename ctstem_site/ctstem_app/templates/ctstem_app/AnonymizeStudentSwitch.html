@@ -1,9 +1,9 @@
-<div class="switch_container">
+<div class="switch_container assignment-setting {% if not is_class_active %} inactive {% endif %}">
   <label class="switch">
     <input class="switch-input" type="checkbox" id="id_anonymize_student"
            {% if assignment_ids %} data-assignment-ids="{{assignment_ids}}" {% endif %}
            {% if assignment_id %} data-assignment-id="{{assignment_id}}" {% endif %}
-           {% if anonymize_student %} checked {% endif %}/>
+           {% if anonymize_student %} checked {% endif %}  {% if not is_class_active %} disabled  {% endif %}/>
     <span class="switch-label" data-on="" data-off=""></span>
     <span class="switch-handle"></span>
   </label>

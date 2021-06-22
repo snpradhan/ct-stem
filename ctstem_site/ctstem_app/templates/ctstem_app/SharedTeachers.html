@@ -1,9 +1,15 @@
 {% load ctstem_extras %}
 <div class="form-group shared_with_table">
-  <label for="id_{{form.shared_with.name}}">{{ form.shared_with.label|title }} {% if form.shared_with.field.required %}(<span class="required">*</span>) {% endif %}</label>
-  <button class="btn inbetween blue search_users" data-target="#userSearch" data-form="{% url 'ctstem:searchTeachers' %}">
-    <i class="fas fa-plus"></i>
-  </button>
+  <div>
+    <label for="id_{{form.shared_with.name}}">{{ form.shared_with.label|title }} {% if form.shared_with.field.required %}(<span class="required">*</span>) {% endif %}</label>
+  </div>
+  <div>
+    {% if form.instance.is_active %}
+      <button class="btn inbetween blue search_users" data-target="#userSearch" data-form="{% url 'ctstem:searchTeachers' %}">
+        <i class="fas fa-plus"></i>
+      </button>
+    {% endif %}
+  </div>
   <div class="controls table_container">
     <div style="display:none;">
       {{form.shared_with}}

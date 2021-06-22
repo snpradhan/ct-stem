@@ -487,7 +487,6 @@ div.table.feedback {
 }
 
 div.question_answer_feedback {
-  font-size: 14px;
   padding: 1em;
   display: flex;
   justify-content: space-between;
@@ -847,9 +846,14 @@ div.content#teacher_dashboard .view_all {
   text-align: center;
 }
 div.content#teacher_dashboard div#dashboard_header,
-div.content.teacher_detailed_dashboard div#dashboard_header {
+div.content.teacher_detailed_dashboard div#dashboard_header,
+div.content.assignment_feedback div#dashboard_header {
   display: flex;
   flex-flow: wrap;
+  justify-content: space-between;
+}
+div.content div#dashboard_header .navigation {
+  display: flex;
   justify-content: space-between;
 }
 div.content#teacher_dashboard div#dashboard_header .welcome,
@@ -906,11 +910,13 @@ div.content.teacher_detailed_dashboard .action.archived {
   color: var(--ctstem-color-dark-blue);
 }
 div.content#teacher_dashboard a,
-div.content.teacher_detailed_dashboard a {
+div.content.teacher_detailed_dashboard a,
+div.content.assignment_feedback a {
   color: black;
 }
 div.content#teacher_dashboard a:hover,
-div.content.teacher_detailed_dashboard a:hover {
+div.content.teacher_detailed_dashboard a:hover,
+div.content.assignment_feedback a:hover {
   color: var(--ctstem-color-blue);
 }
 
@@ -1056,10 +1062,7 @@ div.content#teacher_dashboard div#dashboard_students div#students div.student di
 }
 /*******************TEACHER DASHBOARD END**************************/
 /*******************TEACHER ASSIGNMENT DASHBOARD START**************************/
-div.content.teacher_detailed_dashboard div#dashboard_header .navigation {
-  display: flex;
-  justify-content: space-between;
-}
+
 div.content.teacher_detailed_dashboard div#dashboard_search {
   position: sticky;
   top: 100px;
@@ -1224,6 +1227,9 @@ div.switch_container {
   justify-content: center;
   align-items: center;
 }
+div.switch_container.inactive {
+  opacity: 0.5;
+}
 div.switch_container label {
   margin-bottom: 0 !important;
 }
@@ -1249,12 +1255,12 @@ div.content#assignment_progress_dashboard td.last_modified {
 }
 /*******************ASSIGNMENT PROGRESS DASHBOARD END**************************/
 
-label.switch#curricula_view, label.switch#release_notes_view {
+#curricula_view, #release_notes_view {
   position: absolute;
   right: 5%;
   text-align: right;
 }
-label.switch#release_notes_view {
+#release_notes_view {
   float: right;
 }
 
@@ -1859,7 +1865,8 @@ div.content#assignments div#inbox_search {
 }
 div.content#assignments div.inbox_filter,
 div.content#assignment_progress_dashboard div.progress_filter,
-div.content.teacher_detailed_dashboard div#dashboard_search div.assignment_filter {
+div.content.teacher_detailed_dashboard div#dashboard_search div.assignment_filter,
+div.content.assignment_feedback div.search_filter {
   background-color: var(--ctstem-color-blue);
   padding: 1em 2%;
   display: flex;
@@ -1869,20 +1876,23 @@ div.content.teacher_detailed_dashboard div#dashboard_search div.assignment_filte
 }
 div.content#assignments div.inbox_filter .form-group,
 div.content#assignment_progress_dashboard div.progress_filter .form-group,
-div.content.teacher_detailed_dashboard div#dashboard_search div.assignment_filter .form-group {
+div.content.teacher_detailed_dashboard div#dashboard_search div.assignment_filter .form-group,
+div.content.assignment_feedback div.search_filter .form-group {
   margin-bottom: 1em !important;
   max-width: 30em;
 }
 
 div.content#assignments div.inbox_filter .form-group label,
 div.content#assignment_progress_dashboard div.progress_filter .form-group label,
-div.content.teacher_detailed_dashboard div#dashboard_search div.assignment_filter .form-group label {
+div.content.teacher_detailed_dashboard div#dashboard_search div.assignment_filter .form-group label,
+div.content.assignment_feedback div.search_filter .form-group label {
   color: white;
 }
 
 div.content#assignments div.inbox_filter .form-group select,
 div.content#assignment_progress_dashboard div.progress_filter .form-group select,
-div.content.teacher_detailed_dashboard div#dashboard_search div.assignment_filter  .form-group select {
+div.content.teacher_detailed_dashboard div#dashboard_search div.assignment_filter  .form-group select,
+div.content.assignment_feedback div.search_filter .form-group select {
   max-width: min(30em, 100%);
   width: 30em;
   overflow: hidden;
@@ -1941,6 +1951,16 @@ div.button-group-fixed {
   margin-top: 4em;
   text-align: right;
   position: static;
+}
+
+div.button-group-sticky {
+  margin-bottom: 0;
+  position: sticky;
+  top: 90px;
+  padding: 1em 0;
+  text-align: right;
+  background-color: white;
+  z-index: 1001;
 }
 div.unit-navigation {
   margin-top: 4em;

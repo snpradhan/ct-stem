@@ -283,7 +283,12 @@ $(function () {
     alert(msg);
   });
 
-  $('#id_anonymize_student.switch-input').change(function() {
+  $('.assignment-setting').on('click', function() {
+    if($(this).hasClass('inactive')){
+      alert('This assignment is in an inactive class. So this settings cannot be changed.');
+    }
+  });
+  $('#id_anonymize_student.switch-input').on('click', function() {
     var flag = 0;
     if($(this).is(':checked')){
       flag = 1;

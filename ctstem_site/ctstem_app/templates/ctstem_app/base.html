@@ -277,9 +277,9 @@
               {% block profile %}
                 {% if user.is_authenticated %}
                   {% if user.teacher %}
-                    <li class="{% navactive request 'ctstem:groups' 'active' %}
-                               {% navactive request 'ctstem:groups' 'inactive' %}" >
-                      <a href="{% url 'ctstem:groups' 'active' %}">Teacher Dashboard</a>
+                    <li class="{% navactive request 'ctstem:teacherDashboard' user.teacher.id 'active' %}
+                               {% navactive request 'ctstem:teacherDashboard' user.teacher.id 'inactive' %}" >
+                      <a href="{% url 'ctstem:teacherDashboard' user.teacher.id 'active' %}">Teacher Dashboard</a>
                     </li>
                   {% endif %}
                   <li class="dropdown {% navactive request 'ctstem:userProfile' user.id %}">

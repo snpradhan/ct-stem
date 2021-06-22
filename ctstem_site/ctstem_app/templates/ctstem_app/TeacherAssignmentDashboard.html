@@ -81,7 +81,7 @@
           <div class="assignment_title">
             <h5 class="left">
               {% if assignment_id %}
-                <a href="{% url 'ctstem:assignmentProgressDashboard' teacher.id %}?assignment={{assignment_id}}" title="View Assignment Progress Dashboard">
+                <a href="{% url 'ctstem:assignmentProgressDashboard' teacher.id %}?group={{assignment_group.id}}&assignment={{curriculum_id}}" title="View Assignment Progress Dashboard">
                   {{assignment|get_item:'title'}}
                 </a>
               {% elif assignment|get_item:'curriculum_type' == 'Unit' %}
@@ -137,7 +137,7 @@
                  <div class="assignment tile">
                   <div class="assignment_title">
                     <h5 class="left">
-                      <a href="{% url 'ctstem:assignmentProgressDashboard' teacher.id %}?assignment={{lesson|get_item:'assignment_id'}}" title="View Assignment Progress Dashboard">{{order}}. {{lesson|get_item:'title'}}</a>
+                      <a href="{% url 'ctstem:assignmentProgressDashboard' teacher.id %}?group={{assignment_group.id}}&assignment={{lesson|get_item:'curriculum_id'}}" title="View Assignment Progress Dashboard">{{order}}. {{lesson|get_item:'title'}}</a>
                     </h5>
                     <!--div class="actions">
                       {% for status in lesson_chart_config %}

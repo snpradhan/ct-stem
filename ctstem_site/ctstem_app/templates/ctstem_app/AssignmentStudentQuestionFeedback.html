@@ -10,7 +10,7 @@
         <li></li>
       </ul>
     </div>
-    <form class="form" id="questionFeedbackForm" method="post" action="{% url 'ctstem:questionFeedback' question_response.id %}">
+    <form class="form" id="questionFeedbackForm" method="post" action="{% url 'ctstem:assignmentStudentQuestionFeedback' question_response.id %}">
       {% csrf_token %}
       {{form.media}}
       <div class="modal-body">

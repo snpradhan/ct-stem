@@ -123,7 +123,7 @@
         <div class="assignment_title">
           <h5 class="left">
             {% if assignment_id and instance %}
-              <a href="{% url 'ctstem:feedback' assignment_id instance.id%}" title="Review student response">
+              <a href="{% url 'ctstem:assignmentStudentFeedback' teacher.id %}?group={{assignment_group.id}}&assignment={{curriculum_id}}&student={{instance.student.id}}" title="Review student response">
                 {{assignment|get_item:'title'}}
               </a>
             {% elif assignment|get_item:'curriculum_type' == 'Unit' %}
@@ -202,7 +202,7 @@
               <div class="assignment_title">
                 <h5 class="left">
                   {% if instance %}
-                    <a href="{% url 'ctstem:feedback' assignment_id instance.id %}" title="Review student response">{{order}}. {{lesson|get_item:'title'}}</a>
+                    <a href="{% url 'ctstem:assignmentStudentFeedback' teacher.id %}?group={{instance.assignment.group.id}}&assignment={{instance.assignment.curriculum.id}}&student={{instance.student.id}}" title="Review student response">{{order}}. {{lesson|get_item:'title'}}</a>
                   {% else %}
                     <a onclick='alert("Student hasn&apos;t started this assignment");' title="Review student response">{{order}}. {{lesson|get_item:'title'}}</a>
                   {% endif %}

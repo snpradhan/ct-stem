@@ -20,7 +20,19 @@
     {% else %}
       <h2>Add New Class</h2>
     {% endif %}
-    {% include "ctstem_app/Tabs.html" with tab='group' group=form.instance role='group'%}
+    <div id="dashboard_header">
+      <div class="navigation">
+        {% if user.teacher %}
+          <h5 class="left"><a href="{% url 'ctstem:teacherDashboard' user.teacher.id 'active' %}">
+            <i class="fas fa-chevron-left"></i><i class="fas fa-chevron-left"></i> Back to Teacher Dashboard</a>
+          </h5>
+        {% elif form.instance.id %}
+          <h5 class="left"><a href="{% url 'ctstem:teacherDashboard' form.teacher.value 'active' %}">
+            <i class="fas fa-chevron-left"></i><i class="fas fa-chevron-left"></i> Back to Teacher Dashboard</a>
+          </h5>
+        {% endif %}
+      </div>
+    </div>
     <form method="post" id="userGroupForm" enctype="multipart/form-data">
       {% csrf_token %}
       <div class="group_container">
@@ -129,12 +141,23 @@
                  <div>
                 {% if form.instance.is_active %}
                   <a type="button" class="btn inbetween blue assignment-modal" href="#" data-toggle="modal" data-target="#assignment" data-id="{{form.instance.id}}" data-title="{{form.instance.title}}" data-subject="{{form.instance.subject.id}}" title="Search and Add Assignments">
-                      <i class="fa fa-tasks"></i>
+                      <i class="fas fa-plus"></i>
                   </a>
                 {% endif %}
-                <a type="button" class="btn inbetween orange" href="{% url 'ctstem:groupDashboard' form.instance.id 'active' %}" aria-label="View Class Dashboard" title="View Class Dashboard">
-                  <i class="fas fa-tachometer-alt"></i>
-                </a>
+
+                {% if assignments|length > 0 %}
+                  {% with status=form.instance.is_active|yesno:"active,inactive"%}
+                    {% if user.teacher %}
+                      <a type="button" class="btn inbetween orange" href="{% url 'ctstem:teacherAssignmentDashboard' user.teacher.id status %}?group={{form.instance.id}}">
+                        <i class="fas fa-tachometer-alt"></i>
+                      </a>
+                    {% else %}
+                      <a type="button" class="btn inbetween orange" href="{% url 'ctstem:teacherAssignmentDashboard' form.teacher.value status %}?group={{form.instance.id}}">
+                        <i class="fas fa-tachometer-alt"></i>
+                      </a>
+                    {% endif %}
+                  {% endwith %}
+                {% endif %}
                 </div>
                 <div class="table_container">
                   <table class="table table-striped table-condensed table-bordered inner_table">
@@ -192,24 +215,26 @@
                               </td>
                           {% endif %}
                               <td style="text-align:center;">
-                                <a class="btn yellow assignment_link" href="#" data-toggle="modal" data-target="#assignmentLinkModal" data-invite-link="https://{{domain}}/?next=/login?next=/assignments?assignment={{assignment.id}}" data-title="Direct Student Assignment Link" title="Direct Assignment Link">
-                                  <i class="fa fa-link"></i>
-                                </a>
+                                {% if form.instance.is_active %}
+                                  <a class="btn yellow assignment_link" href="#" data-toggle="modal" data-target="#assignmentLinkModal" data-invite-link="https://{{domain}}/?next=/login?next=/assignments?assignment={{assignment.id}}" data-title="Direct Student Assignment Link" title="Direct Assignment Link">
+                                    <i class="fa fa-link"></i>
+                                  </a>
+                                {% endif %}
                               </td>
                               <td style="vertical-align:middle;">
                                 {{assignment.assigned_date|date }}
                               </td>
                               <td class="anonymize_student_name" style="text-align:center;">
                                 <!--input type="checkbox" class="anonymize_student" {% if assignment.anonymize_student %} checked {% endif %} data-id="{{assignment.id}}" data-title="{{assignment.curriculum.title}}" {% if not form.instance.is_active %} disabled {% endif %}/-->
-                                {% include "ctstem_app/AnonymizeStudentSwitch.html" with anonymize_student=assignment.anonymize_student assignment_id=assignment.id %}
+                                {% include "ctstem_app/AnonymizeStudentSwitch.html" with anonymize_student=assignment.anonymize_student assignment_id=assignment.id is_class_active=form.instance.is_active %}
                               </td>
                               <td class="lock_on_completion" style="text-align:center;">
                                 <!--input type="checkbox" class="lock_assignment" {% if assignment.lock_on_completion %} checked {% endif %} data-id="{{assignment.id}}" data-title="{{assignment.curriculum.title}}" {% if not form.instance.is_active %} disabled {% endif %}/-->
-                                {% include "ctstem_app/LockOnCompletionSwitch.html" with lock_on_completion=assignment.lock_on_completion assignment_id=assignment.id %}
+                                {% include "ctstem_app/LockOnCompletionSwitch.html" with lock_on_completion=assignment.lock_on_completion assignment_id=assignment.id is_class_active=form.instance.is_active %}
                               </td>
                               <td class="realtime_feedback" style="text-align:center;">
                                 <!--input type="checkbox" class="feedback_assignment" {% if assignment.realtime_feedback %} checked {% endif %} data-id="{{assignment.id}}" data-title="{{assignment.curriculum.title}}" {% if not form.instance.is_active %} disabled {% endif %}/-->
-                                {% include "ctstem_app/RealtimeFeedbackSwitch.html" with realtime_feedback=assignment.realtime_feedback assignment_id=assignment.id %}
+                                {% include "ctstem_app/RealtimeFeedbackSwitch.html" with realtime_feedback=assignment.realtime_feedback assignment_id=assignment.id is_class_active=form.instance.is_active %}
                               </td>
 
                               <td style="text-align:center;">

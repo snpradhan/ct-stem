@@ -1,0 +1,235 @@
+{% extends "ctstem_app/base.html" %}
+{% load ctstem_extras %}
+{% load base_extras %}
+
+{% block title %}Feedback |{% endblock %}
+
+{% block custom_media %}
+  <link rel="stylesheet" href="{% staticfile 'css/sketch.css' %}">
+  <script type="text/javascript" src="{% staticfile 'js/sketch.js' %}"></script>
+  <script type="text/javascript" src="{% staticfile 'js/sketch_custom.js' %}"></script>
+  <script type="text/javascript" src="{% staticfile 'js/assignment.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+  {{block.super}}
+  <div class="content assignment_feedback" id="assignment_student_feedback">
+    <h2> Student Response Review/Feedback </h2>
+    <div id="dashboard_header">
+      <div class="navigation">
+        {% with status=assignment.group.is_active|yesno:"active,inactive"%}
+          <h5 class="left"><a href="{% url 'ctstem:teacherDashboard' teacher_id status %}">
+            <i class="fas fa-chevron-left"></i><i class="fas fa-chevron-left"></i> Back to Teacher Dashboard</a>
+          </h5>
+          &nbsp; &nbsp;&nbsp; &nbsp;
+          <h5 class="left"><a href="{% url 'ctstem:teacherAssignmentDashboard' teacher_id status %}">
+            <i class="fas fa-chevron-left"></i><i class="fas fa-chevron-left"></i> Back to All Assignments </a>
+          </h5>
+           &nbsp; &nbsp;&nbsp; &nbsp;
+          <h5 class="left"><a href="{% url 'ctstem:assignmentProgressDashboard' teacher_id %}?group={{assignment.group.id}}&assignment={{assignment.curriculum.id}}">
+            <i class="fas fa-chevron-left"></i><i class="fas fa-chevron-left"></i> Back to Assignment Progress Dashboard </a>
+          </h5>
+        {% endwith %}
+      </div>
+    </div>
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      {{ form.management_form }}
+      {{form.id}}
+      <div class="search_filter">
+        <div class="form-group">
+          <label>{{filter_form.group.label|title}}</label>
+          <div>{{filter_form.group}}</div>
+          <div class="error">{{ filter_form.group.errors }}</div>
+        </div>
+        <div class="form-group">
+          <label>{{filter_form.assignment.label|title}}</label>
+          <div>{{filter_form.assignment}}</div>
+          <div class="error">{{ filter_form.assignment.errors }}</div>
+        </div>
+        <div class="form-group">
+          <label>{{filter_form.student.label|title}}</label>
+          <div>{{filter_form.student}}</div>
+          <div class="error">{{ filter_form.student.errors }}</div>
+        </div>
+      </div>
+
+      {% if student %}
+        <div class="form-group button-group-sticky">
+          {% if prevStudent %}
+            <a type="button" class="btn inbetween orange" id="prev" href="{% url 'ctstem:assignmentStudentFeedback' teacher_id %}?group={{assignment.group.id}}&assignment={{assignment.curriculum.id}}&student={{prevStudent.id}}"> Previous Student </a>
+          {% endif %}
+          {% if nextStudent %}
+            <a type="button" class="btn inbetween orange" id="prev" href="{% url 'ctstem:assignmentStudentFeedback' teacher_id %}?group={{assignment.group.id}}&assignment={{assignment.curriculum.id}}&student={{nextStudent.id}}"> Next Student </a>
+          {% endif %}
+          <input type="hidden" name="save_and_close" id="save_and_close" value="false" />
+          {% if assignment_instance.status == 'P' or assignment_instance.status == 'F' or assignment_instance.status == 'A' %}
+            <input type="submit" class="btn inbetween blue" id="save" value="Save"/>
+          {% elif assignment_instance.status == 'S' %}
+            <input type="submit" class="btn inbetween blue" id="save" value="Save"/>
+            <input type="button" class="btn inbetween green" id="close" value="Submit Feedback"/>
+          {% endif %}
+
+        </div>
+        <table class="table table-striped table-bordered table-condensed inner_table" id="feedback_header">
+          <thead>
+            <tr>
+              <th>Student/Teammates</th>
+              <th>Time Spent(hh:mm:ss)</th>
+              <th>Status</th>
+              <th>Assigned On</th>
+              <th>Last Modified</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                {% if user.researcher %}
+                  <b>{{student.user.id}}<b><br>
+                {% else %}
+                  {% if assignment.anonymize_student %}
+                    xxxxxxxxxxx <br>
+                  {% else %}
+                    <b>{{student}}<b><br>
+                  {% endif %}
+                {% endif %}
+                {% for teammate in assignment_instance.teammates.all %}
+                  {% if assignment.anonymize_student %}
+                    xxxxxxxxxxx (T) <br>
+                  {% else %}
+                    {% if user.researcher %}
+                      {{teammate.user.id}} (T) <br>
+                    {% else %}
+                      {{teammate}} (T) <br>
+                    {% endif %}
+                  {% endif %}
+                {% endfor %}
+              </td>
+              <td>{{assignment_instance.time_spent|format_time}}</td>
+              <td>{{assignment_instance.get_status_display|default:'New'}}</td>
+              <td>{{assignment.assigned_date|date}}</td>
+              <td>{{assignment_instance.modified_date|date}}</td>
+            </tr>
+          </tbody>
+        </table>
+      {% endif %}
+
+      {% if formset %}
+        {{ formset.management_form }}
+        <table class="table table-striped table-bordered table-condensed inner_table" id="feedback">
+          <thead>
+            <tr>
+              <th width="5%">Q#</th>
+              <th>Research Category</th>
+              <th>Question</th>
+              <th>Student Response</th>
+              <th width="25%">Feedback</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for step in formset %}
+            {{step.id}}
+            {{step.nested.management_form}}
+            {% for question in step.nested %}
+            <tr>
+              <td class="question_no">
+                {{question.id}}
+                {{question.instance.response.curriculum_question.step.order}}.{{question.instance.response.curriculum_question.order}}
+                {% if question.instance.response.curriculum_question.optional %}
+                  <span class="optional">(optional)</span>
+                {% else %}
+                  <span class="mandatory">*</span>
+                {% endif %}
+              </td>
+              <td class="research_category">{% include 'ctstem_app/QuestionCategoryDisplay.html' with question=question.instance.response.curriculum_question.question %}
+              </td>
+              <td class="question_text">{{question.instance.response.curriculum_question.question|safe}}</td>
+              <td class="response">
+                {% if question.instance.response.response %}
+                  {% if question.instance.response.curriculum_question.question.answer_field_type == 'MI' %}
+                    <img src="{{question.instance.response.response}}" class="image_option"/>
+                  {% elif question.instance.response.curriculum_question.question.answer_field_type == 'SK' %}
+                    <canvas id="{{question.instance.id}}_sketch" width="900" height="500" class="assignment_sketch" style="{% if question.instance.response.curriculum_question.question.sketch_background %} background: url({{question.instance.response.curriculum_question.question.sketch_background.url}}) no-repeat;{% endif %}"></canvas>
+                      <input type="hidden" name="{{question.instance.id}}_sketch_response" id="{{question.instance.id}}_sketch_response" value="{{question.instance.response.response}}"/>
+                  {% elif question.instance.response.curriculum_question.question.answer_field_type == 'DT' %}
+                    <div class="dt_input" id="dt_input_{{forloop.parentloop.counter}}_{{forloop.counter}}">
+                      <input type="hidden" name="{{question.instance.id}}_dt_response" id="{{question.instance.id}}_dt_response" value='{{question.instance.response.response}}'/>
+                      <input type="hidden" name="column_headers" id="dt_col_headers_{{forloop.parentloop.counter}}_{{forloop.counter}}" value="{{question.instance.response.curriculum_question.question.options}}"/>
+                      <table class="table table-condensed table-bordered inner_table" id="dt_table_{{forloop.parentloop.counter}}_{{forloop.counter}}">
+                          <thead>
+                          </thead>
+                          <tbody>
+                          </tbody>
+                        </table>
+                      </div>
+                  {% elif question.instance.response.curriculum_question.question.answer_field_type == 'TA' %}
+                    {{question.instance.response.response|safe}}
+                  {% else %}
+                    {{question.instance.response.response}}
+                  {% endif %}
+                {% elif question.instance.response.response_file.all %}
+                    Uploaded file(s):
+                    <ul>
+                    {% for response_file in question.instance.response.response_file.all %}
+                      <li><a href="{{response_file.file.url}}" target="_blank">Click here to view file {{forloop.counter}}</a></li>
+                    {% endfor %}
+                    </ul>
+                  {% else %}
+                    <span style="font-style: italic;">No response yet</span>
+                  {% endif %}
+              </td>
+              <td class="feedback">
+                {% if form.instance.instance.status == 'P' or form.instance.instance.status == 'S' or form.instance.instance.status == 'F' or form.instance.instance.status == 'A'%}
+                  {% if question.instance.response.response or question.instance.response.response_file.all %}
+                    {{question.feedback}}
+                    <a data-toggle="modal" data-target="#emojis" class="emoji-modal" href="#" data-id="{{question.feedback.auto_id}}">
+                      <i class="fa fa-smile-o" aria-hidden="true"></i>
+                    </a>
+                  {% endif %}
+                {% endif %}
+              </td>
+              </tr>
+            {% endfor %}
+          {% endfor %}
+        </tbody>
+      </table>
+      {% endif %}
+
+    </form>
+    {% include "ctstem_app/EmojiModal.html" %}
+
+  </div>
+  <script type="text/javascript">
+    $(function(){
+      $('#close').click(function(){
+        $("input#save_and_close").val('true');
+        this.form.submit();
+      });
+      $('.search_filter select, \
+         .search_filter input[type=radio], \
+         .search_filter input[type=checkbox]').on('change', function(){
+
+        if($(this).attr('id') == 'id_group'){
+          var group_id = $(this).val();
+          window.location = "/assignment/student/feedback/{{teacher_id}}/?group="+group_id;
+        }
+        if($(this).attr('id') == 'id_assignment'){
+          var group_id = $('#id_group').val();
+          var assignment_id = $(this).val();
+          window.location = "/assignment/student/feedback/{{teacher_id}}/?group="+group_id+"&assignment="+assignment_id;
+        }
+        if($(this).attr('id') == 'id_student'){
+          var group_id = $('#id_group').val();
+          var assignment_id = $('#id_assignment').val();
+          var student_id = $(this).val();
+          window.location = "/assignment/student/feedback/{{teacher_id}}/?group="+group_id+"&assignment="+assignment_id+"&student="+student_id;
+        }
+      });
+
+      loadCanvasData();
+      loadDataTable(false);
+
+    });
+
+  </script>
+{% endblock %}
