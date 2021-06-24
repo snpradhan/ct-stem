@@ -125,14 +125,14 @@
         <table class="table table-striped table-bordered table-condensed inner_table">
           <thead>
             <tr>
-              <th width="15%">
+              <th width="10%">
                 <div>Student/Teammates</div>
                 {% if not user.researcher %}
                   {% include "ctstem_app/AnonymizeStudentSwitch.html" with anonymize_student=assignment.anonymize_student assignment_id=assignment.id is_class_active=assignment.group.is_active %}
                 {% endif %}
               </th>
               <th>Response</th>
-              <th width="30%">Feedback</th>
+              <th width="27%">Feedback</th>
             </tr>
           </thead>
           <tbody>
@@ -166,11 +166,11 @@
                           <img src="{{question_response.response}}" class="image_option"/>
                         {% elif curriculum_question.question.answer_field_type == 'SK' %}
                           <canvas id="{{question_response.id}}_sketch" width="900" height="500" class="assignment_sketch" style="{% if curriculum_question.question.sketch_background %} background: url({{curriculum_question.question.sketch_background.url}}) no-repeat;{% endif %}"></canvas>
-                          <input type="hidden" name="{{question_response.id}}_sketch_response" id="{{question_response.id}}_sketch_response" value="{{question_response.response}}"/>
+                          <input type="hidden" name="{{question_response.id}}_sketch_response" id="{{question_response.id}}_sketch_response" value="{{question_response.response}}" disabled/>
                         {% elif curriculum_question.question.answer_field_type == 'DT' %}
                           <div class="dt_input" id="dt_input_{{forloop.counter}}">
-                            <input type="hidden" name="{{question_response.id}}_dt_response" id="{{question_response.id}}_dt_response" value='{{question_response.response}}'/>
-                            <input type="hidden" name="column_headers" id="dt_col_headers_{{question_response.id}}" value="{{curriculum_question.question.options}}"/>
+                            <input type="hidden" name="{{question_response.id}}_dt_response" id="{{question_response.id}}_dt_response" value='{{question_response.response}}' disabled/>
+                            <input type="hidden" name="column_headers" id="dt_col_headers_{{question_response.id}}" value="{{curriculum_question.question.options}}" disabled/>
                             <table class="table table-condensed table-bordered inner_table" id="dt_table_{{question_response.id}}">
                               <thead>
                               </thead>

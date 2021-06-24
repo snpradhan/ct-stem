@@ -181,11 +181,11 @@
                         </a><br>
                       {% elif field_type == 'SK' %}
                         <canvas id="{{response.id}}_sketch" width="900" height="500" class="assignment_sketch" style="{% if question.sketch_background %} background: url({{question.sketch_background.url}}) no-repeat;{% endif %}"></canvas>
-                        <input type="hidden" name="{{response.id}}_sketch_input" id="{{response.id}}_sketch_input" value='{{response.response}}'/>
+                        <input type="hidden" name="{{response.id}}_sketch_input" id="{{response.id}}_sketch_input" value='{{response.response}}' disabled/>
                       {% elif field_type == 'DT' %}
                         <div class="assignment_input dt_input closed" id="re_dt_input_{{forloop.counter}}">
-                          <input type="hidden" name="{{response.id}}_dt_input" id="re_{{response.id}}_dt_input" value='{{response.response}}'/>
-                          <input type="hidden" name="column_headers" id="re_dt_col_headers_{{forloop.counter}}" value="{{question.options}}"/>
+                          <input type="hidden" name="{{response.id}}_dt_input" id="re_{{response.id}}_dt_input" value='{{response.response}}' disabled/>
+                          <input type="hidden" name="column_headers" id="re_dt_col_headers_{{forloop.counter}}" value="{{question.options}}" disabled/>
                           <table class="table table-condensed table-bordered inner_table" id="re_dt_table_{{forloop.counter}}">
                             <thead>
                             </thead>
@@ -259,11 +259,11 @@
                               </a><br>
                             {% elif field_type == 'SK' %}
                               <canvas id="{{questionForm.response.auto_id}}_sketch" width="900" height="500" class="assignment_sketch" style="{% if questionObj.sketch_background %} background: url({{questionObj.sketch_background.url}}) no-repeat;{% endif %}"></canvas>
-                              <input type="hidden" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value='{{questionForm.response.value}}'/>
+                              <input type="hidden" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value='{{questionForm.response.value}}' disabled/>
                             {% elif field_type == 'DT' %}
                               <div class="assignment_input dt_input" id="dt_input_{{forloop.counter}}">
-                                <input type="hidden" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value='{{questionForm.response.value}}'/>
-                                <input type="hidden" name="column_headers" id="dt_col_headers_{{forloop.counter}}" value="{{questionObj.options}}"/>
+                                <input type="hidden" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value='{{questionForm.response.value}}' disabled/>
+                                <input type="hidden" name="column_headers" id="dt_col_headers_{{forloop.counter}}" value="{{questionObj.options}}" disabled/>
                                 <table class="table table-condensed table-bordered inner_table" id="dt_table_{{forloop.counter}}">
                                   <thead>
                                   </thead>
@@ -286,7 +286,6 @@
                           <div class="text">
                           {% if field_type == 'TA' %}
                             {{questionForm.response}}
-                            <!--textarea placeholder="Enter your response" class="form-control assignment_textarea assignment_input" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" >{{questionForm.response.value}}</textarea-->
                           {% elif field_type == 'TF' %}
                             <input type="text" placeholder="Enter your response" class="form-control assignment_input" name="{{questionForm.response.html_name}}" id="{{questionForm.response.auto_id}}" value="{{questionForm.response.value}}" />
                           {% elif field_type == 'DD' %}
