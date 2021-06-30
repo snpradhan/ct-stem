@@ -11,7 +11,6 @@ from django.forms.models import inlineformset_factory, modelformset_factory
 from nested_formset import nestedformset_factory
 from slugify import slugify
 import json
-from django_xhtml2pdf.utils import render_to_pdf_response
 from django.template.loader import render_to_string, get_template
 from django.template import Context
 import io as StringIO
@@ -738,8 +737,6 @@ def pdfCurriculum(request, id='', pdf='0'):
       attachments = models.Attachment.objects.all().filter(curriculum=curriculum)
 
       context = {'curriculum': curriculum, 'attachments': attachments, 'steps':steps}
-      #print settings.STATIC_ROOT
-      #return render_to_pdf_response('ctstem_app/CurriculumPDF.html', context, u'%s.%s'%(curriculum.slug, 'pdf') )
       return render_to_pdf('ctstem_app/CurriculumPDF.html', context, request)
 
 
@@ -1106,8 +1103,8 @@ def copyCurriculumMeta(request, id=''):
     curriculum.parent = original_curriculum
     curriculum.status = 'D'
     curriculum.version = int(original_curriculum.version) + 1
-    curriculum.subject = original_curriculum.subject.all()
-    curriculum.taxonomy = original_curriculum.taxonomy.all()
+    curriculum.subject.add(*original_curriculum.subject.all())
+    curriculum.taxonomy.add(*original_curriculum.taxonomy.all())
     curriculum.feature_rank = None
 
     if original_curriculum.icon:
@@ -5399,8 +5396,8 @@ def user_upload(request):
   added_students = {}
   msg = {'error': [], 'success': []}
   if request.method == 'POST':
-    form = forms.UploadFileForm(request.POST, request.FILES, user=request.user)
     data = request.POST.copy()
+    form = forms.UploadFileForm(data, request.FILES, user=request.user)
 
     if form.is_valid():
       group = models.UserGroup.objects.get(id=data['group'])

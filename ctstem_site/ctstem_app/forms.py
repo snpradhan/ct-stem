@@ -984,7 +984,7 @@ class CurriculaSearchForm(forms.Form):
     user = kwargs.pop('user')
     super(CurriculaSearchForm, self).__init__(*args, **kwargs)
 
-    if user.is_anonymous() or hasattr(user, 'student') or hasattr(user, 'school_administrator'):
+    if user.is_anonymous or hasattr(user, 'student') or hasattr(user, 'school_administrator'):
       self.fields.pop('status')
       self.fields.pop('buckets')
     elif hasattr(user, 'teacher'):
@@ -1315,9 +1315,9 @@ class UploadFileForm(forms.Form):
     print('user', user)
     if user.is_authenticated:
       if hasattr(user, 'school_administrator'):
-        self.fields['group'].queryset = models.UserGroup.objects.all().filter(teacher__school=user.school_administrator.school, is_active=True)
+        self.fields['group'].queryset = models.UserGroup.objects.all().filter(teacher__school=user.school_administrator.school, is_active=True).distinct()
       elif hasattr(user, 'teacher'):
-        self.fields['group'].queryset = models.UserGroup.objects.all().filter(Q(is_active=True), Q(teacher=user.teacher)| Q(shared_with=user.teacher))
+        self.fields['group'].queryset = models.UserGroup.objects.all().filter(Q(is_active=True), Q(teacher=user.teacher)| Q(shared_with=user.teacher)).distinct()
     else:
       self.fields['group'].queryset = models.UserGroup.objects.none()
 

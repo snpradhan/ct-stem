@@ -15,27 +15,20 @@ Including another URLconf
 """
 from django.conf import settings
 from django.conf.urls import include, url
+from django.urls import path, re_path
 from django.contrib import admin
 from ckeditor_uploader import views
 from ctstem_app.views import SchoolAutocomplete
 from django.conf.urls.static import static
-from django.contrib.auth.views import logout
 
 urlpatterns = [
-    url(r'^admin/', admin.site.urls),
-    #url(r'^tinymce/', include('tinymce.urls')),
-    #url(r'^ckeditor/', include('ckeditor_uploader.urls')),
-    url(r'^password_reset/', include('password_reset.urls')),
-    url(r'^', include('ctstem_app.urls', namespace="ctstem")),
-    url(r'^ckeditor/upload/', views.upload, name='ckeditor_upload'),
-    url(r'^ckeditor/browse/', views.browse, name='ckeditor_browse'),
-    url(r'^chaining/', include('smart_selects.urls')),
-    url(r'^school-autocomplete/$', SchoolAutocomplete.as_view(), name='school-autocomplete',),
-    url(r'^auth/', include('social_django.urls', namespace='social')),
+    path('', include('ctstem_app.urls', namespace="ctstem")),
+    path('admin/', admin.site.urls),
+    path('password_reset/', include('password_reset.urls')),
+    path('ckeditor/upload/', views.upload, name='ckeditor_upload'),
+    path('ckeditor/browse/', views.browse, name='ckeditor_browse'),
+    path('chaining/', include('smart_selects.urls')),
+    path('school-autocomplete/', SchoolAutocomplete.as_view(), name='school-autocomplete',),
+    path('auth/', include('social_django.urls', namespace='social')),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
-'''urlpatterns += patterns('',
-    (r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT}),
-)'''
-
