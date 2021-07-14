@@ -23,12 +23,13 @@
   <div id="dashboard_classes">
     <div class="title">
       <h3 class="left">{{status|title}} Classes (<span class="class_count">{% if groups|length > 6 %}6{% else %} {{groups|length}} {% endif %}</span> of {{groups|length}})</h3>
-      <div>
+      <div class="controls">
         {% if status == 'active' %}
           <a type="button" class="btn normal yellow" href="{% url 'ctstem:teacherDashboard' teacher.id 'inactive' %}" title="View inactive classes"> View Inactive Classes</a>
         {% else %}
           <a type="button" class="btn normal yellow"href="{% url 'ctstem:teacherDashboard' teacher.id 'active' %}" title="View active classes"> View Active Classes</a>
         {% endif %}
+        &nbsp;&nbsp;
         <a type="button" class="btn normal yellow" href="/group/new/" title="Create new class"> Add New</a>
       </div>
     </div>
@@ -37,7 +38,7 @@
       {% for grp in groups %}
       {% with group=grp|get_item:'group' percent_complete=grp|get_item:'percent_complete' group_assignment_status=grp|get_item:'assignment_status' total=grp|get_item:'total' %}
       {% get_chart_config group_assignment_status 'stacked_bar' as group_assignment_chart_config %}
-      <div class="col tile {% if forloop.counter > 6%} extra {% endif %}">
+      <div class="col tile {% if forloop.counter > 6%} extra {% endif %}" {% if forloop.counter == 6%} id="last_tile" {% elif forloop.last %} id="last_tile" {% endif %}>
         <div class="class_icon">
           {% if group.icon %}
             <img src="{{group.icon.url}}" class="icon" alt="">
@@ -101,70 +102,116 @@
     {% endif %}
   </div>
   {% if status == 'active' %}
-  <div id="assignments_students">
     <div id="dashboard_assignments">
       <div class="title">
-        <h3 class="left">Assignments ({% if assignments|length > 4 %}4{% else %} {{assignments|length}} {% endif %} of {{assignment_count}})</h3>
-        <a type="button" class="btn normal yellow assignment-modal" href="#" data-toggle="modal" data-target="#assignment" title="Search and Add Assignments">Add New</a>
-      </div>
-      <hr>
-      <div id="assignments">
-        {% for key, assign in assignments.items %}
-          {% if forloop.counter < 5 %}
-          {% with assignment=assign|get_item:'assignment' awaiting_feedback_count=assign|get_item:'awaiting_feedback_count' last_updated=assign|get_item:'last_updated' %}
-          {% get_assignment_status_chart_config assignment.id 'stacked_bar' as assignment_status %}
-            <div class="assignment tile">
-              <h5 class="left"><a href="{% url 'ctstem:assignmentProgressDashboard' teacher.id %}?group={{assignment.group.id}}&assignment={{assignment.curriculum.id}}">
-                {{assignment.curriculum.title}}</a>
-              </h5>
-              <div class="assignment_info">
-                <div>Class: {{assignment.group.title}}</div>
-                <div>Last Updated: {{last_updated|date}}</div>
-                <div>{{awaiting_feedback_count}} Awaiting Feedback</div>
-              </div>
-              <div class="assignment_status_chart">
-                <div id="assignment_chart_{{assignment.id}}" class="stacked_bar_chart" name="{{assignment_status}}" data-total="{{assignment.group.members.count}}"></div>
+        <h3 class="left">Assignments ({{assignment_count}})</h3>
+        <div class="controls">
+          <form method="post" action="{% url 'ctstem:teacherDashboard' teacher.id status %}#last_tile" id="assignment_grouping">
+            {% csrf_token %}
+            <div class="assignment_filter">
+              <div class="form-group">
+                {{groupingForm.group_by}}
               </div>
             </div>
-          {% endwith %}
-          {% endif %}
-        {% endfor %}
-
+          </form>
+          &nbsp;&nbsp;&nbsp;&nbsp;
+          <a type="button" class="btn normal yellow assignment-modal" href="#" data-toggle="modal" data-target="#assignment" title="Search and Add Assignments">Add New</a>
+        </div>
       </div>
-      {% if assignments|length > 0 %}
+      <hr>
+      {% if group_by == 'C' %}
+        <div id="assignments">
+          {% for curriculum_key, assignment in assignments.items %}
+             {% with curriculum_id=assignment|get_item:'curriculum_id' curriculum_title=assignment|get_item:'curriculum_title' curriculum_type=assignment|get_item:'curriculum_type' curriculum_groups=assignment|get_item:'groups' %}
+
+              <div class="assignment tile">
+                <h5 class="left">
+                  {{curriculum_type|title}}: {{curriculum_title}}
+                </h5>
+                {% for group_key, curriculum_group in curriculum_groups.items %}
+                {% with curriculum_group_id=curriculum_group|get_item:'group_id' curriculum_group_assignment_status=curriculum_group|get_item:'assignment_status' %}
+                {% get_chart_config curriculum_group_assignment_status 'stacked_bar' as curriculum_group_chart_config %}
+                <div class="assignment_info">
+                  {% if curriculum_type == 'unit' %}
+                    <div class="assigned_class">
+                      <a href="{% url 'ctstem:unitProgressDashboard' teacher.id %}?group={{curriculum_group_id}}&assignment={{curriculum_id}}">
+                        Class: {{curriculum_group|get_item:'group_title'}}
+                      </a>
+                    </div>
+                  {% else %}
+                    <div class="assigned_class">
+                      <a href="{% url 'ctstem:assignmentProgressDashboard' teacher.id %}?group={{curriculum_group_id}}&assignment={{curriculum_id}}">
+                        Class: {{curriculum_group|get_item:'group_title'}}
+                      </a>
+                    </div>
+                  {% endif %}
+                  <div class="lesson_count">
+                    {% if curriculum_type == 'unit' %}
+                      {{curriculum_group|get_item:'assigned_lesson_count'}}/{{assignment|get_item:'underlying_lesson_count'}} Lessons Assigned
+                    {% endif %}
+                  </div>
+                  <div class="last_updated">Last Updated: {{curriculum_group|get_item:'last_updated'|date|default:'N/A'}}</div>
+                  <div class="awaiting_feedback_count">{{curriculum_group|get_item:'awaiting_feedback_count'}} Awaiting Feedback</div>
+                  <div class="assignment_status_chart">
+                    <div id="assignment_chart_{{curriculum_key}}_{{group_key}}" class="stacked_bar_chart" name="{{curriculum_group_chart_config}}" data-total="{{curriculum_group|get_item:'total'}}"></div>
+                  </div>
+                </div>
+                {% endwith %}
+                {% endfor %}
+              </div>
+            {% endwith %}
+
+          {% endfor %}
+
+        </div>
+      {% else %}
+        <div id="assignments">
+          {% for group_key, assignment in assignments_by_class.items %}
+             {% with group_id=assignment|get_item:'group_id' group_title=assignment|get_item:'group_title' curricula=assignment|get_item:'curricula' %}
+
+              <div class="assignment tile">
+                <h5 class="left">Class: {{group_title}}</h5>
+                {% for curriculum_key, curriculum in curricula.items %}
+                {% with curriculum_title=curriculum|get_item:'curriculum_title' assignment_status=curriculum|get_item:'assignment_status' curriculum_type=curriculum|get_item:'curriculum_type' curriculum_id=curriculum|get_item:'curriculum_id'%}
+                {% get_chart_config assignment_status 'stacked_bar' as curriculum_chart_config %}
+                <div class="assignment_info">
+                  {% if curriculum_type == 'unit' %}
+                    <div class="assigned_class">
+                      <a href="{% url 'ctstem:unitProgressDashboard' teacher.id %}?group={{group_id}}&assignment={{curriculum_id}}">
+                        Unit: {{curriculum_title}}
+                      </a>
+                    </div>
+                  {% else %}
+                    <div class="assigned_class">
+                      <a href="{% url 'ctstem:assignmentProgressDashboard' teacher.id %}?group={{group_id}}&assignment={{curriculum_id}}">
+                        Lesson: {{curriculum_title}}
+                      </a>
+                    </div>
+                  {% endif %}
+                  <div class="lesson_count">
+                    {% if curriculum_type == 'unit' %}
+                      {{curriculum|get_item:'assigned_lesson_count'}}/{{curriculum|get_item:'underlying_lesson_count'}} Lessons Assigned
+                    {% endif %}
+                  </div>
+                  <div class="last_updated">Last Updated: {{curriculum|get_item:'last_updated'|date|default:'N/A'}}</div>
+                  <div class="awaiting_feedback_count">{{curriculum|get_item:'awaiting_feedback_count'}} Awaiting Feedback</div>
+                  <div class="assignment_status_chart">
+                    <div id="assignment_chart_{{group_key}}_{{curriculum_key}}" class="stacked_bar_chart" name="{{curriculum_chart_config}}" data-total="{{curriculum|get_item:'total'}}"></div>
+                  </div>
+                </div>
+                {% endwith %}
+                {% endfor %}
+              </div>
+            {% endwith %}
+          {% endfor %}
+        </div>
+      {% endif %}
+      {% if assignment_count > 0 %}
         <div class="view_all">
-          <a type="button" class="btn inbetween darkblue" href="{% url 'ctstem:teacherAssignmentDashboard' teacher.id status %}">View All</a>
+          <a type="button" class="btn inbetween darkblue" href="{% url 'ctstem:teacherAssignmentDashboard' teacher.id status %}">View Assignment Dashboard</a>
         </div>
       {% endif %}
     </div>
-
-    <div id="dashboard_students">
-      <div class="title">
-        <h3 class="left">Students ({{students|length}} of {{student_count}})</h3>
-      </div>
-      <hr>
-      <div id="students">
-        {% for student in students %}
-          {% get_student_assignment_status_chart_config student.id teacher.id 'stacked_bar' as student_assignment_status %}
-          {% get_student_assignment_count student.id teacher.id as assignment_count %}
-          <div class="student tile">
-            <h5 class="left">{{student.user.last_name}}, {{student.user.first_name}}</h5>
-            <a class="btn small lightyellow" href="#" title="View Student Work" onClick="TODO">
-              <i class="fas fa-chart-bar"></i> View Work
-            </a>
-            <div class="assignment_status_chart">
-              <div id="assignment_chart_{{student.id}}" class="stacked_bar_chart" name="{{student_assignment_status}}" data-total="{{assignment_count}}"></div>
-            </div>
-          </div>
-        {% endfor %}
-      </div>
-      {% if students|length > 0 %}
-        <div class="view_all">
-          <a type="button" class="btn inbetween darkblue" href="{% url 'ctstem:teacherStudentDashboard' teacher.id status %}">View All</a>
-        </div>
-      {% endif %}
-    </div>
-  </div>
   {% endif %}
 </div>
 {% block assignment %}
@@ -191,6 +238,23 @@
       $('.class_count').html('{{groups|length}}');
       $(this).toggle();
     })
+
+    //add a class to checkbox and radio button in search form on Safari only
+    if (navigator.userAgent.search("Safari") >= 0 && navigator.userAgent.search("Chrome") < 0) {
+      $('#assignment_grouping :radio, #assignment_grouping :checkbox').addClass('safari');
+    }
+
+    var timeout = null;
+    $('#assignment_grouping select').on('change', function(){
+      auto_submit_search();
+    });
+
+    function auto_submit_search() {
+      clearTimeout(timeout);
+      timeout = setTimeout(function(){
+        $('#assignment_grouping').submit();
+      }, 800);
+    }
 
   });
 

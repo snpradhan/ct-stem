@@ -3685,14 +3685,242 @@ def teacherDashboard(request, id='', status='active'):
     ##########################
     # ASSIGNMENTS START
     ##########################
-    filtered_assignments = {}
+    groupingForm = forms.AssignmentGroupingForm()
+    group_by = 'C'
+    if request.method == 'POST':
+      data = request.POST.copy()
+      groupingForm = forms.AssignmentGroupingForm(data=data)
+      group_by = data['group_by']
+
+    grouped_assignments = {}
+    grouped_classes = {}
+
     for assignment in all_assignments:
+      curriculum = assignment.curriculum
       awaiting_feedback = models.AssignmentInstance.objects.all().filter(assignment=assignment, status='S')
       awaiting_feedback_count = awaiting_feedback.count()
       last_updated = awaiting_feedback.aggregate(Max('modified_date'))['modified_date__max']
-      filtered_assignments[assignment.id] = {'assignment': assignment, 'awaiting_feedback_count': awaiting_feedback_count, 'last_updated': last_updated}
 
-    filtered_assignments = {k: v for k, v in sorted(filtered_assignments.items(), key=lambda item: item[1]['awaiting_feedback_count'], reverse=True)}
+      assignment_status = {'N': 0, 'P': 0, 'S': 0, 'F': 0, 'A': 0}
+      students = assignment.group.members.all()
+      instances = models.AssignmentInstance.objects.all().filter(assignment=assignment)
+      for student in students:
+        try:
+          instance = instances.get(student=student)
+          assignment_status[instance.status] += 1
+        except models.AssignmentInstance.DoesNotExist:
+          assignment_status['N'] += 1
+
+      new = assignment_status['N']
+      in_progress = assignment_status['P']
+      submitted = assignment_status['S']
+      feedback_ready = assignment_status['F']
+      archived = assignment_status['A']
+      total = new + in_progress + submitted + feedback_ready + archived
+      complete = submitted + feedback_ready + archived
+      percent_complete = 0
+      if total > 0:
+        percent_complete = int(complete/total*100)
+
+      #########
+      # GROUPING ASSIGNMENTS BY CURRICULUM
+      #############
+      if group_by == 'C':
+        if curriculum.curriculum_type in ['L', 'A'] and curriculum.unit is not None:
+          curriculum_id = 'curriculum_'+str(curriculum.unit.id)
+          group_id = 'group_'+str(assignment.group.id)
+
+          if curriculum_id in grouped_assignments:
+            if group_id in grouped_assignments[curriculum_id]['groups']:
+
+              if last_updated is not None and grouped_assignments[curriculum_id]['groups'][group_id]['last_updated'] is not None:
+                grouped_assignments[curriculum_id]['groups'][group_id]['last_updated'] = max(grouped_assignments[curriculum_id]['groups'][group_id]['last_updated'], last_updated)
+              elif last_updated is not None and grouped_assignments[curriculum_id]['groups'][group_id]['last_updated'] is None:
+                grouped_assignments[curriculum_id]['groups'][group_id]['last_updated'] = last_updated
+
+              if grouped_assignments[curriculum_id]['groups'][group_id]['assigned_lesson_count'] is not None:
+                grouped_assignments[curriculum_id]['groups'][group_id]['assigned_lesson_count'] += 1
+              else:
+                grouped_assignments[curriculum_id]['groups'][group_id]['assigned_lesson_count'] = 1
+
+              if grouped_assignments[curriculum_id]['groups'][group_id]['awaiting_feedback_count'] is not None:
+                grouped_assignments[curriculum_id]['groups'][group_id]['awaiting_feedback_count'] += awaiting_feedback_count
+              else:
+                grouped_assignments[curriculum_id]['groups'][group_id]['awaiting_feedback_count'] = awaiting_feedback_count
+
+
+              grouped_assignments[curriculum_id]['groups'][group_id]['assignment_status'] = {'N': grouped_assignments[curriculum_id]['groups'][group_id]['assignment_status']['N'] + new,
+                                                                                               'P': grouped_assignments[curriculum_id]['groups'][group_id]['assignment_status']['P'] + in_progress,
+                                                                                               'S': grouped_assignments[curriculum_id]['groups'][group_id]['assignment_status']['S'] + submitted,
+                                                                                               'F': grouped_assignments[curriculum_id]['groups'][group_id]['assignment_status']['F'] + feedback_ready,
+                                                                                               'A': grouped_assignments[curriculum_id]['groups'][group_id]['assignment_status']['A'] + archived
+                                                                                              }
+
+              grouped_assignments[curriculum_id]['groups'][group_id]['total'] += total
+            else:
+              grouped_assignments[curriculum_id]['groups'][group_id] = { 'group_title': assignment.group.title,
+                                                                         'group_id': assignment.group.id,
+                                                                         'last_updated': last_updated,
+                                                                         'assigned_lesson_count': 1,
+                                                                         'awaiting_feedback_count': awaiting_feedback_count,
+                                                                         'assignment_status' : assignment_status,
+                                                                         'total': total,
+                                                                       }
+          else:
+            grouped_assignments[curriculum_id] = {'curriculum_title': curriculum.unit.title,
+                                                  'curriculum_id': curriculum.unit.id,
+                                                  'curriculum_type': 'unit',
+                                                  'underlying_lesson_count': models.Curriculum.objects.all().filter(unit__id=curriculum.unit.id).exclude(status='R').count(),
+                                                  'groups': { group_id: {
+                                                                          'group_title': assignment.group.title,
+                                                                          'group_id': assignment.group.id,
+                                                                          'last_updated': last_updated,
+                                                                          'assigned_lesson_count': 1,
+                                                                          'awaiting_feedback_count': awaiting_feedback_count,
+                                                                          'assignment_status': assignment_status,
+                                                                          'total': total,
+                                                                        }
+                                                            }
+                                                  }
+        else:
+          curriculum_id = 'curriculum_'+str(curriculum.id)
+          group_id = 'group_'+str(assignment.group.id)
+          if curriculum_id in grouped_assignments:
+            grouped_assignments[curriculum_id]['groups'][group_id] = { 'group_title': assignment.group.title,
+                                                                       'group_id': assignment.group.id,
+                                                                       'last_updated': last_updated,
+                                                                       'assigned_lesson_count': 1,
+                                                                       'awaiting_feedback_count': awaiting_feedback_count,
+                                                                       'assignment_status': assignment_status,
+                                                                       'total': total,
+                                                                      }
+          else:
+             grouped_assignments[curriculum_id] = {'curriculum_title': curriculum.title,
+                                                   'curriculum_id': curriculum.id,
+                                                   'curriculum_type': 'lesson',
+                                                   'groups': { group_id: {
+                                                                          'group_title': assignment.group.title,
+                                                                          'group_id': assignment.group.id,
+                                                                          'last_updated': last_updated,
+                                                                          'assigned_lesson_count': 1,
+                                                                          'awaiting_feedback_count': awaiting_feedback_count,
+                                                                          'assignment_status': assignment_status,
+                                                                          'total': total,
+                                                                        }
+                                                             }
+                                                  }
+        #########
+        # GROUPING ASSIGNMENTS BY CURRICULUM END
+        #############
+      else:
+        #########
+        # GROUPING ASSIGNMENTS BY CLASS
+        #############
+        if curriculum.curriculum_type in ['L', 'A'] and curriculum.unit is not None:
+          curriculum_id = 'curriculum_'+str(curriculum.unit.id)
+          group_id = 'group_'+str(assignment.group.id)
+
+          if group_id in grouped_classes:
+            if curriculum_id in grouped_classes[group_id]['curricula']:
+
+              if last_updated is not None and grouped_classes[group_id]['curricula'][curriculum_id]['last_updated'] is not None:
+                grouped_classes[group_id]['curricula'][curriculum_id]['last_updated'] = max(grouped_classes[group_id]['curricula'][curriculum_id]['last_updated'], last_updated)
+              elif last_updated is not None and grouped_classes[group_id]['curricula'][curriculum_id]['last_updated'] is None:
+                grouped_classes[group_id]['curricula'][curriculum_id]['last_updated'] = last_updated
+
+              if grouped_classes[group_id]['curricula'][curriculum_id]['assigned_lesson_count'] is not None:
+                grouped_classes[group_id]['curricula'][curriculum_id]['assigned_lesson_count'] += 1
+              else:
+                grouped_classes[group_id]['curricula'][curriculum_id]['assigned_lesson_count'] = 1
+
+              if grouped_classes[group_id]['curricula'][curriculum_id]['awaiting_feedback_count'] is not None:
+                grouped_classes[group_id]['curricula'][curriculum_id]['awaiting_feedback_count'] += awaiting_feedback_count
+              else:
+                grouped_classes[group_id]['curricula'][curriculum_id]['awaiting_feedback_count'] = awaiting_feedback_count
+
+
+              grouped_classes[group_id]['curricula'][curriculum_id]['assignment_status'] = {'N': grouped_classes[group_id]['curricula'][curriculum_id]['assignment_status']['N'] + new,
+                                                                                               'P': grouped_classes[group_id]['curricula'][curriculum_id]['assignment_status']['P'] + in_progress,
+                                                                                               'S': grouped_classes[group_id]['curricula'][curriculum_id]['assignment_status']['S'] + submitted,
+                                                                                               'F': grouped_classes[group_id]['curricula'][curriculum_id]['assignment_status']['F'] + feedback_ready,
+                                                                                               'A': grouped_classes[group_id]['curricula'][curriculum_id]['assignment_status']['A'] + archived
+                                                                                              }
+
+              grouped_classes[group_id]['curricula'][curriculum_id]['total'] += total
+            else:
+              grouped_classes[group_id]['curricula'][curriculum_id] = {'curriculum_title': curriculum.unit.title,
+                                                                          'curriculum_id': curriculum.unit.id,
+                                                                          'curriculum_type': 'unit',
+                                                                          'underlying_lesson_count': models.Curriculum.objects.all().filter(unit__id=curriculum.unit.id).exclude(status='R').count(),
+                                                                          'last_updated': last_updated,
+                                                                          'assigned_lesson_count': 1,
+                                                                          'awaiting_feedback_count': awaiting_feedback_count,
+                                                                          'assignment_status' : assignment_status,
+                                                                          'total': total,
+                                                                       }
+          else:
+            grouped_classes[group_id] = {'group_title': assignment.group.title,
+                                             'group_id': assignment.group.id,
+                                             'curricula': { curriculum_id: {'curriculum_title': curriculum.unit.title,
+                                                                            'curriculum_id': curriculum.unit.id,
+                                                                            'curriculum_type': 'unit',
+                                                                            'underlying_lesson_count': models.Curriculum.objects.all().filter(unit__id=curriculum.unit.id).exclude(status='R').count(),
+                                                                            'last_updated': last_updated,
+                                                                            'assigned_lesson_count': 1,
+                                                                            'awaiting_feedback_count': awaiting_feedback_count,
+                                                                            'assignment_status': assignment_status,
+                                                                            'total': total,
+                                                                          }
+                                                          }
+                                            }
+        else:
+          curriculum_id = 'curriculum_'+str(curriculum.id)
+          group_id = 'group_'+str(assignment.group.id)
+          if group_id in grouped_classes:
+            grouped_classes[group_id]['curricula'][curriculum_id] = {'curriculum_title': curriculum.title,
+                                                                         'curriculum_id': curriculum.id,
+                                                                         'curriculum_type': 'lesson',
+                                                                         'last_updated': last_updated,
+                                                                         'assigned_lesson_count': 1,
+                                                                         'awaiting_feedback_count': awaiting_feedback_count,
+                                                                         'assignment_status': assignment_status,
+                                                                         'total': total,
+                                                                      }
+          else:
+             grouped_classes[group_id] = {'group_title': assignment.group.title,
+                                             'group_id': assignment.group.id,
+                                             'curricula': { curriculum_id: {'curriculum_title': curriculum.title,
+                                                                   'curriculum_id': curriculum.id,
+                                                                   'curriculum_type': 'lesson',
+                                                                   'last_updated': last_updated,
+                                                                   'assigned_lesson_count': 1,
+                                                                   'awaiting_feedback_count': awaiting_feedback_count,
+                                                                   'assignment_status': assignment_status,
+                                                                   'total': total,
+                                                                  }
+                                                       }
+                                            }
+
+        #########
+        # GROUPING ASSIGNMENTS BY CLASS END
+        #############
+
+    assignment_count = len(all_assignments)
+    if group_by == 'C':
+      grouped_assignments = {k: v for k, v in sorted(grouped_assignments.items(), key=lambda item: item[1]['curriculum_title'].lower())}
+      grouped_assignments = {k: v for k, v in sorted(grouped_assignments.items(), key=lambda item: item[1]['curriculum_type'], reverse=True)}
+
+      for curriculum_key, assignment in grouped_assignments.items():
+        grouped_assignments[curriculum_key]['groups'] = {k: v for k, v in sorted(grouped_assignments[curriculum_key]['groups'].items(), key=lambda item: item[1]['group_title'].lower())}
+
+    else:
+      grouped_classes = {k: v for k, v in sorted(grouped_classes.items(), key=lambda item: item[1]['group_title'].lower())}
+
+      for group_key, assignment in grouped_classes.items():
+        grouped_classes[group_key]['curricula'] = {k: v for k, v in sorted(grouped_classes[group_key]['curricula'].items(), key=lambda item: item[1]['curriculum_title'].lower())}
+        grouped_classes[group_key]['curricula'] = {k: v for k, v in sorted(grouped_classes[group_key]['curricula'].items(), key=lambda item: item[1]['curriculum_type'], reverse=True)}
+
+
     ##########################
     # ASSIGNMENTS END
     ##########################
@@ -3702,8 +3930,8 @@ def teacherDashboard(request, id='', status='active'):
     assignmentForm = forms.AssignmentSearchForm(user=request.user)
 
     context = {'teacher': teacher, 'groups': groups, 'students': filtered_students,
-               'student_count': student_count, 'assignments': filtered_assignments, 'assignment_count':assignment_count,
-               'role':'groups', 'status': status, 'domain': domain, 'assignmentForm': assignmentForm
+               'student_count': student_count, 'assignments': grouped_assignments, 'assignments_by_class': grouped_classes,'assignment_count':assignment_count,
+               'role':'groups', 'status': status, 'domain': domain, 'assignmentForm': assignmentForm, 'groupingForm': groupingForm, 'group_by': group_by
                }
     return render(request, 'ctstem_app/TeacherDashboard.html', context)
 
@@ -3729,14 +3957,12 @@ def teacherAssignmentDashboard(request, id='', status='active'):
       is_active = False
 
     teacher = models.Teacher.objects.get(id=id)
-    search_criteria = None
     if request.method == 'POST':
       data = request.POST.copy()
       group_id = data['group']
       curriculum_id = data['assignment']
       sort_by = data['sort_by']
       searchForm = forms.TeacherAssignmentDashboardSearchForm(teacher=teacher, is_active=is_active, group_id=group_id, data=data)
-      search_criteria = eval(json.dumps(dict(data.lists())))
     else:
       group_id = request.GET.get('group', '')
       searchForm = forms.TeacherAssignmentDashboardSearchForm(teacher=teacher, is_active=is_active, group_id=group_id)
@@ -3882,7 +4108,6 @@ def teacherStudentDashboard(request, id='', status='active'):
       is_active = False
 
     teacher = models.Teacher.objects.get(id=id)
-    search_criteria = None
     if request.method == 'POST':
       data = request.POST.copy()
       group_id = data['group']

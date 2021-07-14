@@ -954,6 +954,23 @@ class AssignmentSearchForm(forms.Form):
         field.widget.attrs['placeholder'] = field.help_text
 
 
+####################################
+# Assignment Grouping Form
+####################################
+class AssignmentGroupingForm(forms.Form):
+
+  group_by = forms.ChoiceField(choices=(('C', 'Group by Curriculum'),('G', 'Group by Class'),), required=False)
+
+  def __init__(self, *args, **kwargs):
+
+    super(AssignmentGroupingForm, self).__init__(*args, **kwargs)
+
+    for field_name, field in list(self.fields.items()):
+      field.widget.attrs['class'] = 'form-control'
+      if field.help_text:
+        field.widget.attrs['placeholder'] = field.help_text
+
+
 ########################################################
 # Assignment Search Form on Teacher Assignment Dashboard
 ########################################################
