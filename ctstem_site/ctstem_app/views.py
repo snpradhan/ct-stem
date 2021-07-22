@@ -46,6 +46,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from dal import autocomplete
 from django.core.cache import cache
 import re
+import html
 
 logger = logging.getLogger('django')
 
@@ -5118,13 +5119,13 @@ def export_response(request, assignment_id='', student_id=''):
     if '' != student_id:
       student = models.Student.objects.get(id=student_id)
       instances = models.AssignmentInstance.objects.all().filter(assignment=assignment, student=student)
-      response['Content-Disposition'] = 'attachment; filename="%s-%s.xls"'% (assignment, student.user.id)
+      response['Content-Disposition'] = 'attachment; filename="assignment_%s-student_%s_response.xls"'% (assignment.id, student.user.id)
     else:
       instances = models.AssignmentInstance.objects.all().filter(assignment=assignment)
       #for researchers filter out students who have opted out
       if hasattr(request.user, 'researcher'):
         instances = instances.filter(student__consent='A')
-      response['Content-Disposition'] = 'attachment; filename="%s.xls"'%assignment
+      response['Content-Disposition'] = 'attachment; filename="assignment_%s_response.xls"'%assignment.id
 
 
     wb = xlwt.Workbook(encoding='utf-8')
@@ -5134,6 +5135,7 @@ def export_response(request, assignment_id='', student_id=''):
     bold_font_style = xlwt.XFStyle()
     bold_font_style.font.bold = True
     font_style = xlwt.XFStyle()
+    font_style.alignment.wrap = 1
     date_format = xlwt.XFStyle()
     date_format.num_format_str = 'mm/dd/yyyy'
     date_time_format = xlwt.XFStyle()
@@ -5185,11 +5187,11 @@ def export_response(request, assignment_id='', student_id=''):
                  stepResponse.step.order,
                  stepResponse.step.title,
                  questionResponse.curriculum_question.order,
-                 smart_str(questionResponse.curriculum_question.question),
+                 remove_html_tags(request, smart_str(questionResponse.curriculum_question.question)),
                  smart_str(",".join(str(research_category.category) for research_category in questionResponse.curriculum_question.question.research_category.all())) if questionResponse.curriculum_question.question.research_category.exists() else '',
                  smart_str(questionResponse.curriculum_question.question.options),
                  smart_str(questionResponse.curriculum_question.question.answer),
-                 response_text,
+                 remove_html_tags(request, response_text),
                  questionResponse.modified_date.replace(tzinfo=None)]
           row_num += 1
           for col_num in range(len(row)):
@@ -5217,11 +5219,12 @@ def export_all_response(request, curriculum_id=''):
 
     curriculum = models.Curriculum.objects.get(id=curriculum_id)
     response = http.HttpResponse(content_type='application/ms-excel')
-    response['Content-Disposition'] = 'attachment; filename="%s.xls"'%curriculum.title
+    response['Content-Disposition'] = 'attachment; filename="curriculum_%s_response.xls"'%curriculum.id
     wb = xlwt.Workbook(encoding='utf-8')
     bold_font_style = xlwt.XFStyle()
     bold_font_style.font.bold = True
     font_style = xlwt.XFStyle()
+    font_style.alignment.wrap = 1
     date_format = xlwt.XFStyle()
     date_format.num_format_str = 'mm/dd/yyyy'
     date_time_format = xlwt.XFStyle()
@@ -5299,11 +5302,11 @@ def export_all_response(request, curriculum_id=''):
                      stepResponse.step.order,
                      stepResponse.step.title,
                      questionResponse.curriculum_question.order,
-                     smart_str(questionResponse.curriculum_question.question),
+                     remove_html_tags(request, smart_str(questionResponse.curriculum_question.question)),
                      smart_str(",".join(str(research_category.category) for research_category in questionResponse.curriculum_question.question.research_category.all())) if questionResponse.curriculum_question.question.research_category.exists() else '',
                      smart_str(questionResponse.curriculum_question.question.options),
                      smart_str(questionResponse.curriculum_question.question.answer),
-                     response_text,
+                     remove_html_tags(request, response_text),
                      questionResponse.modified_date.replace(tzinfo=None)]
               if hasattr(request.user, 'administrator') == True or hasattr(request.user, 'researcher') == True or hasattr(request.user, 'school_administrator') == True:
                 row.insert(0, instance.assignment.group.teacher.user.get_full_name())
@@ -5345,7 +5348,7 @@ def export_question_response(request, question_id=''):
       return http.HttpResponseNotFound('<h1>You do not have the privilege to export student response for this question</h1>')
 
     response = http.HttpResponse(content_type='application/ms-excel')
-    response['Content-Disposition'] = 'attachment; filename="question_%s_responses.xls"'%question_id
+    response['Content-Disposition'] = 'attachment; filename="question_%s_response.xls"'%question_id
 
     wb = xlwt.Workbook(encoding='utf-8')
     ws = wb.add_sheet('Responses')
@@ -5354,13 +5357,14 @@ def export_question_response(request, question_id=''):
     bold_font_style = xlwt.XFStyle()
     bold_font_style.font.bold = True
     font_style = xlwt.XFStyle()
+    font_style.alignment.wrap = 1
     date_format = xlwt.XFStyle()
     date_format.num_format_str = 'mm/dd/yyyy'
     date_time_format = xlwt.XFStyle()
     date_time_format.num_format_str = 'mm/dd/yyyy hh:mm AM/PM'
 
     ws.write(row_num, 0, 'Question', bold_font_style)
-    ws.write(row_num, 1, smart_str(question.question_text), font_style)
+    ws.write(row_num, 1, remove_html_tags(request, smart_str(question.question_text)), font_style)
     row_num += 1
     ws.write(row_num, 0, 'Answer Field Type', bold_font_style)
     ws.write(row_num, 1, question.get_answer_field_type_display(), font_style)
@@ -5395,7 +5399,7 @@ def export_question_response(request, question_id=''):
       response_text = get_response_text(request, question_response.step_response.instance.id, question_response)
       row = [student,
              studentID,
-             response_text,
+             remove_html_tags(request, response_text),
              question_response.modified_date.replace(tzinfo=None)]
       row_num += 1
       for col_num in range(len(row)):
@@ -6365,6 +6369,16 @@ def clear_cache(request):
 def replace_iframe_tag(request, text):
   iframe_re = re.compile(r'<iframe.*</iframe>')
   return iframe_re.sub('<div class="iframe_replacement"><i class="far fa-file-code" title="iframe placeholder"></i></div>', text)
+
+####
+# Remove html tags from string
+####
+@login_required
+def remove_html_tags(request, text):
+  html_re = re.compile(r'<[^>]+>')
+  text_re = html_re.sub('', text)
+  plain_text = html.unescape(text_re)
+  return plain_text
 
 @login_required
 #check if a question is being deleted
