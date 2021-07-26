@@ -975,7 +975,7 @@ class AssignmentGroupingForm(forms.Form):
 # Assignment Search Form on Teacher Assignment Dashboard
 ########################################################
 class TeacherAssignmentDashboardSearchForm(forms.Form):
-  assignment = forms.ModelChoiceField(queryset=models.Curriculum.objects.all(), required=False, label="Filter by Assignment")
+  assignment = forms.ModelChoiceField(queryset=models.Curriculum.objects.all(), required=False, label="Filter by Assigned Curriculum")
   sort_by = forms.ChoiceField(choices=(('', '---------'),
                                        ('curriculum', 'Curriculum'),
                                        ('last_opened', 'Last Opened'),
@@ -1013,7 +1013,7 @@ class TeacherAssignmentDashboardSearchForm(forms.Form):
 ########################################################
 class TeacherStudentDashboardSearchForm(forms.Form):
   student = forms.ModelChoiceField(queryset=models.Student.objects.all(), required=False, label='Filter by Student')
-  assignment = forms.ModelChoiceField(queryset=models.Curriculum.objects.all(), required=False, label='Filter by Assignment')
+  assignment = forms.ModelChoiceField(queryset=models.Curriculum.objects.all(), required=False, label='Filter by Assigned Curriculum')
   group = forms.ModelChoiceField(queryset=models.UserGroup.objects.all(), required=False, label='Filter by Class')
 
   def __init__(self, *args, **kwargs):
@@ -1089,7 +1089,7 @@ class InboxFilterForm (forms.Form):
 ####################################
 class ProgressDashboardSearchForm(forms.Form):
   group = forms.ModelChoiceField(required=True, queryset=models.UserGroup.objects.all().order_by('title'), label='Class', empty_label=None)
-  assignment = forms.ChoiceField(required=True, choices=(('', '---------'),), label='Assignment', widget=widgets.SelectWithDisabled)
+  assignment = forms.ChoiceField(required=True, choices=(('', '---------'),), label='Assigned Curriculum', widget=widgets.SelectWithDisabled)
   sort_by = forms.ChoiceField(required=True, choices=models.PROGRESS_DASHBOARD_SORT, initial='title', label='Sort by')
 
   def __init__(self, *args, **kwargs):
@@ -1126,7 +1126,7 @@ class ProgressDashboardSearchForm(forms.Form):
 ####################################
 class StudentFeedbackSearchForm(forms.Form):
   group = forms.ModelChoiceField(required=True, queryset=models.UserGroup.objects.all().order_by('title'), label='Class', empty_label=None)
-  assignment = forms.ChoiceField(required=True, choices=(('', '---------'),), label='Assignment', widget=widgets.SelectWithDisabled)
+  assignment = forms.ChoiceField(required=True, choices=(('', '---------'),), label='Assigned Curriculum', widget=widgets.SelectWithDisabled)
   student = forms.ChoiceField(required=True, choices=(('', '---------'),), label='Filter by Student')
 
   def __init__(self, *args, **kwargs):
@@ -1184,7 +1184,7 @@ class StudentFeedbackSearchForm(forms.Form):
 ####################################
 class QuestionFeedbackSearchForm(forms.Form):
   group = forms.ModelChoiceField(required=True, queryset=models.UserGroup.objects.all().order_by('title'), label='Class', empty_label=None)
-  assignment = forms.ChoiceField(required=True, choices=(('', '---------'),), label='Assignment', widget=widgets.SelectWithDisabled)
+  assignment = forms.ChoiceField(required=True, choices=(('', '---------'),), label='Assigned Curriculum', widget=widgets.SelectWithDisabled)
   question = forms.ChoiceField(required=True, choices=(('', '---------'),), label='Filter by Question')
 
   def __init__(self, *args, **kwargs):

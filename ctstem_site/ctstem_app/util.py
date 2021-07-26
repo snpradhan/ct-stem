@@ -21,7 +21,7 @@ def group_assignment_dropdown_list(groups, for_student_inbox=True, disable_unit=
   if for_student_inbox:
     assignment_choices = [('', '---------')]
   else:
-    assignment_choices = [('', 'Select an Assignment')]
+    assignment_choices = [('', 'Select an Assigned Curriculum')]
   for curriculum_id, details in assignment_list.items():
     if 'lessons' in details.keys():
       if for_student_inbox or not disable_unit:
