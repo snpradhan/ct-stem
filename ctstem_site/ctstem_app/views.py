@@ -4422,7 +4422,7 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
                           'formset errors': str(formset.errors),
                           'formset non form errors': str(formset.non_form_errors)})
 
-            message = 'Your responses could not be saved. Please correct the errors below and click '
+            message = 'You might have missed a question or there was an issue with the uploaded file. Please check the specific errors below and click  '
             if save_only == 1:
               message = message + 'Save again.'
             else:

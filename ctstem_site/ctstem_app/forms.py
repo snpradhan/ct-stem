@@ -21,6 +21,7 @@ from PIL import Image
 import io
 import os
 from dal import autocomplete
+import ast
 
 
 ####################################
@@ -1395,6 +1396,14 @@ class QuestionResponseForm(ModelForm):
     if save == False and not response and uploaded_files == 0 and not curriculum_question.optional:
       self.add_error('response', 'Please answer this question')
       self.nested[0].add_error('file', 'Please upload at least one file')
+    if save == False and response and curriculum_question.question.answer_field_type in ('SK', 'DT') and not curriculum_question.optional:
+      resp_list = ast.literal_eval(response)
+      empty_response = util.is_list_empty(resp_list)
+      if empty_response:
+        if curriculum_question.question.answer_field_type == 'SK':
+           self.add_error('response', 'Please draw a sketch')
+        elif curriculum_question.question.answer_field_type == 'DT':
+           self.add_error('response', 'Please fillout the table')
 
     if curriculum_question.question.answer_field_type in ('TA', 'TF') and len(response) > 30000:
       self.add_error('response', 'Your response cannot be longer than 30,000 characters')

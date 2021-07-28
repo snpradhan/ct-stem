@@ -33,3 +33,18 @@ def group_dropdown_list(groups):
     group_choices.append((group.id, group.title))
 
   return group_choices
+
+
+def is_list_empty(arr):
+  if len(arr) == 0:
+    return True
+  else:
+    if isinstance(arr, list):
+      empty = True
+      for item in arr:
+        empty = empty and is_list_empty(item)
+        if not empty:
+          break
+      return empty
+    else:
+      return False
