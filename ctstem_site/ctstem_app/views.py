@@ -2963,24 +2963,28 @@ def searchCurriculaTiles(request, queryset, search_criteria):
       buckets = search_criteria['buckets']
       if 'teacher_authored' in buckets:
         #teacher authored units and standalone curricula
-        teacher_authored_filter = Q(curriculumcollaborator__user__teacher__isnull=False)
+        teacher_authored_units = models.Curriculum.objects.all().filter(curriculum_type='U', curriculumcollaborator__user__teacher__isnull=False)
+        teacher_authored_filter = (Q(curriculumcollaborator__user__teacher__isnull=False) | Q(unit__in=teacher_authored_units))
         teacher_authored_filter = base_filter & teacher_authored_filter
         query_filter = query_filter | teacher_authored_filter
 
       if 'my_curricula' in buckets:
         #my unit and standalone curricula
-        my_curricula_filter = (Q(curriculumcollaborator__user=request.user) & Q(curriculumcollaborator__privilege='E'))
+        my_units = models.Curriculum.objects.all().filter(curriculum_type='U', curriculumcollaborator__user=request.user, curriculumcollaborator__privilege='E')
+        my_curricula_filter = (Q(curriculumcollaborator__user=request.user) & Q(curriculumcollaborator__privilege='E') | Q(unit__in=my_units))
         my_curricula_filter = base_filter & my_curricula_filter
         query_filter = query_filter | my_curricula_filter
 
       if 'favorite_curricula' in buckets:
-        favorite_curricula_filter = (Q(bookmarked__teacher=request.user.teacher))
+        bookmarked_units = models.Curriculum.objects.all().filter(curriculum_type='U', bookmarked__teacher=request.user.teacher)
+        favorite_curricula_filter = (Q(bookmarked__teacher=request.user.teacher) | Q(unit__in=bookmarked_units))
         favorite_curricula_filter = base_filter & favorite_curricula_filter
         query_filter = query_filter | favorite_curricula_filter
 
       if 'shared_curricula' in buckets:
         #shared unit and standalone curricula
-        shared_curricula_filter = (Q(curriculumcollaborator__user=request.user) & Q(curriculumcollaborator__privilege='V'))
+        shared_units = models.Curriculum.objects.all().filter(curriculum_type='U', curriculumcollaborator__user=request.user, curriculumcollaborator__privilege='V')
+        shared_curricula_filter = (Q(curriculumcollaborator__user=request.user) & Q(curriculumcollaborator__privilege='V') | Q(unit__in=shared_units))
         shared_curricula_filter = base_filter & shared_curricula_filter
         query_filter = query_filter | shared_curricula_filter
 
@@ -2989,11 +2993,15 @@ def searchCurriculaTiles(request, queryset, search_criteria):
       if request.user.is_anonymous or hasattr(request.user, 'student') or hasattr(request.user, 'school_administrator'):
         query_filter = base_filter & Q(status='P')
       elif hasattr(request.user, 'teacher'):
+        collaborated_bookmarked_units = models.Curriculum.objects.all().filter(Q(curriculum_type='U'), Q(curriculumcollaborator__user=request.user) | Q(bookmarked__teacher=request.user.teacher))
         query_filter = Q(curriculumcollaborator__user=request.user) | Q(bookmarked__teacher=request.user.teacher)
         query_filter = query_filter | Q(status='P')
+        query_filter = (query_filter | Q(unit__in=collaborated_bookmarked_units))
         query_filter = base_filter & query_filter
       elif hasattr(request.user, 'researcher'):
+        collaborated_units = models.Curriculum.objects.all().filter(curriculum_type='U', curriculumcollaborator__user=request.user)
         query_filter = Q(curriculumcollaborator__user=request.user) | Q(status='P')
+        query_filter = (query_filter | Q(unit__in=collaborated_units))
         query_filter = base_filter & query_filter
       else:
         query_filter = base_filter
@@ -3003,11 +3011,15 @@ def searchCurriculaTiles(request, queryset, search_criteria):
     if request.user.is_anonymous or hasattr(request.user, 'student') or hasattr(request.user, 'school_administrator'):
         query_filter = Q(status='P')
     elif hasattr(request.user, 'teacher'):
+      collaborated_bookmarked_units = models.Curriculum.objects.all().filter(Q(curriculum_type='U'), Q(curriculumcollaborator__user=request.user) | Q(bookmarked__teacher=request.user.teacher))
       query_filter = Q(curriculumcollaborator__user=request.user) | Q(bookmarked__teacher=request.user.teacher)
       query_filter = query_filter | Q(status='P')
-
+      query_filter = (query_filter | Q(unit__in=collaborated_bookmarked_units))
     elif hasattr(request.user, 'researcher'):
+      collaborated_units = models.Curriculum.objects.all().filter(curriculum_type='U', curriculumcollaborator__user=request.user)
       query_filter = Q(curriculumcollaborator__user=request.user) | Q(status='P')
+      query_filter = (query_filter | Q(unit__in=collaborated_units))
+      query_filter = base_filter & query_filter
 
   raw_result = queryset.filter(query_filter)
   if search_units:
