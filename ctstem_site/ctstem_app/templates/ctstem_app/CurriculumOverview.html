@@ -275,7 +275,6 @@
         </div> <!-- end of curriculum form div-->
 
         <div>
-          <input type="hidden" name="preview" id="preview" value="0"/>
           <input type="hidden" name="next" id="next"/>
           <input type="hidden" name="save_and_continue" id="save_and_continue" value="0"/>
         </div>
@@ -450,13 +449,50 @@
       //on click of preview, first save the curriculum and then generate the preview
       $('.previewLesson').click(function(e){
         if('{{form.instance.id}}' != 'None'){
-          $('input#preview').val("1");
-          $('#submit').click();
+          for ( instance in CKEDITOR.instances ) {
+            CKEDITOR.instances[instance].updateElement();
+          }
+
+          $('#curriculumForm').ajaxSubmit({
+            dataType : 'json',
+            beforeSend: function() {
+              $('div#spinner').show();
+            },
+            complete: function() {
+              $('div#spinner').hide();
+            },
+            success: function(data){
+              window.open('/curriculum/preview/{{form.instance.id}}');
+              return false;
+            },
+            error: function() {
+              alert('An error occured ');
+              return false;
+            }
+          });
         }
       });
       $('.previewPage').click(function(e){
-        $('input#preview').val("2");
-        $('#submit').click();
+        for ( instance in CKEDITOR.instances ) {
+          CKEDITOR.instances[instance].updateElement();
+        }
+        $('#curriculumForm').ajaxSubmit({
+          dataType : 'json',
+          beforeSend: function() {
+            $('div#spinner').show();
+          },
+          complete: function() {
+            $('div#spinner').hide();
+          },
+          success: function(data){
+            window.open('/curriculum/preview/{{form.instance.id}}/page/0');
+            return false;
+          },
+          error: function() {
+            alert('An error occured ');
+            return false;
+          }
+        });
       });
 
       $("a.reorder_steps").click(function(e){
