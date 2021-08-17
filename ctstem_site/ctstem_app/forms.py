@@ -1592,7 +1592,6 @@ class UploadFileForm(forms.Form):
   def __init__(self, *args, **kwargs):
     user = kwargs.pop('user')
     super(UploadFileForm, self).__init__(*args, **kwargs)
-    print('user', user)
     if user.is_authenticated:
       if hasattr(user, 'school_administrator'):
         self.fields['group'].queryset = models.UserGroup.objects.all().filter(teacher__school=user.school_administrator.school, is_active=True).distinct()

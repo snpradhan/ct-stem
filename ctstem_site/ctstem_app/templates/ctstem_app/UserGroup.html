@@ -271,7 +271,6 @@
                     <button class="btn inbetween blue add_student" data-target="#addStudentModal" data-form="{% url 'ctstem:addStudentsToClass'  form.instance.id %}" title="Search and Add existing Students to this class">
                       <i class="fas fa-plus"></i>
                     </button>
-
                     {% if user.administrator %}
                       {% student_in_group_admin_actions %}
                     {% else %}
