@@ -17,16 +17,18 @@ from django.conf import settings
 from django.conf.urls import include, url
 from django.urls import path, re_path
 from django.contrib import admin
-from ckeditor_uploader import views
+from ckeditor_uploader import views as ckeditor_views
 from ctstem_app.views import SchoolAutocomplete
 from django.conf.urls.static import static
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.cache import never_cache
 
 urlpatterns = [
     path('', include('ctstem_app.urls', namespace="ctstem")),
     path('admin/', admin.site.urls),
     path('password_reset/', include('password_reset.urls')),
-    path('ckeditor/upload/', views.upload, name='ckeditor_upload'),
-    path('ckeditor/browse/', views.browse, name='ckeditor_browse'),
+    re_path(r"^ckeditor/upload/", login_required(ckeditor_views.upload), name="ckeditor_upload"),
+    re_path(r"^ckeditor/browse/", never_cache(login_required(ckeditor_views.browse)), name="ckeditor_browse"),
     path('chaining/', include('smart_selects.urls')),
     path('school-autocomplete/', SchoolAutocomplete.as_view(), name='school-autocomplete',),
     path('auth/', include('social_django.urls', namespace='social')),
