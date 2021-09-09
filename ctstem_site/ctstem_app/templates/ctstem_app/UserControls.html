@@ -1,11 +1,11 @@
 {% load ctstem_extras %}
 <div class="form-group">
-  {% if user.administrator or user.school_administrator%}
+  {% if user.administrator or user.researcher or user.school_administrator%}
     <a type="button" class="btn normal blue modal-open" data-toggle="modal" data-href="{% url 'ctstem:register' %}" data-target="#register" href="#" title="Add a new user">
       <i class="fas fa-user"></i> Create User
     </a>
   {% endif %}
-  {% if user.administrator or user.school_administrator %}
+  {% if user.administrator or user.researcher or user.school_administrator %}
     <a type="button" class="btn normal orange" href="{% url 'ctstem:newGroup' %}" title="Create new class"><i class="fa fa-sitemap"></i> Add Class</a>
     <a type="button" class="btn normal blue assignment-modal" href="#" data-toggle="modal" data-target="#assignment" title="Search and Add Assignments"><i class="fa fa-tasks"></i> Add Assignment</a>
   {% endif %}
@@ -15,6 +15,14 @@
     {% elif role == 'teachers' or role == 'school_administrators' %}
       {% teacher_actions %}
     {% elif tab == 'user' %}
+      {% user_actions %}
+    {% elif tab == 'group' %}
+      {% group_actions %}
+    {% endif %}
+  {% elif user.researcher %}
+    {% if role == 'teachers' or role == 'school_administrators' %}
+      {% teacher_actions %}
+    {% elif role != 'students' and tab == 'user' %}
       {% user_actions %}
     {% elif tab == 'group' %}
       {% group_actions %}

@@ -168,27 +168,25 @@
                   </td>
                   <td class="title">
                     {{group.title}}
-                    {% if not user.researcher %}
-                      <div class="controls">
-                        <a type="button" class="btn blue" aria-label="Edit Class" title="Edit Class" href="{% url 'ctstem:group' group.id %}">
-                            {% if group.is_active %}
-                              <i class="fas fa-pencil-alt" aria-hidden="true"></i>
-                            {% else %}
-                              <i class="far fa-eye" aria-hidden="true"></i>
-                            {% endif %}
-                        </a>
-                        {% if group.is_active %}
-                          <a type="button" class="btn purple" aria-label="Inactivate Class" title="Inactivate Class" href="{% url 'ctstem:inactivateGroup' group.id %}" onclick="return confirm('Are you sure you want to inactivate {{group.title}}?')">
-                              <i class="fa fa-archive"></i>
-                          </a>
-                          {% if user.administrator %}
-                            <a type="button" class="btn red" aria-label="Delete Class" title="Delete Class" href="{% url 'ctstem:deleteGroup' group.id %}" onclick="return confirm('Are you sure you want to delete {{group.title}}?')">
-                              <i class="fa fa-trash" aria-hidden="true"></i>
-                            </a>
+                    <div class="controls">
+                      <a type="button" class="btn blue" aria-label="Edit Class" title="Edit Class" href="{% url 'ctstem:group' group.id %}">
+                          {% if group.is_active %}
+                            <i class="fas fa-pencil-alt" aria-hidden="true"></i>
+                          {% else %}
+                            <i class="far fa-eye" aria-hidden="true"></i>
                           {% endif %}
+                      </a>
+                      {% if group.is_active %}
+                        <a type="button" class="btn purple" aria-label="Inactivate Class" title="Inactivate Class" href="{% url 'ctstem:inactivateGroup' group.id %}" onclick="return confirm('Are you sure you want to inactivate {{group.title}}?')">
+                            <i class="fa fa-archive"></i>
+                        </a>
+                        {% if user.administrator %}
+                          <a type="button" class="btn red" aria-label="Delete Class" title="Delete Class" href="{% url 'ctstem:deleteGroup' group.id %}" onclick="return confirm('Are you sure you want to delete {{group.title}}?')">
+                            <i class="fa fa-trash" aria-hidden="true"></i>
+                          </a>
                         {% endif %}
-                      </div>
-                    {% endif %}
+                      {% endif %}
+                    </div>
                   </td>
                   <td>{{group.subject}}</td>
                   <td>{{group.time}}</td>
@@ -233,7 +231,7 @@
                         <div>
                       {% endif %}
 
-                      {% if group.is_active and not user.researcher %}
+                      {% if group.is_active %}
                         <a type="button" class="btn blue assignment-modal" href="#" data-toggle="modal" data-target="#assignment" data-id="{{group.id}}" data-title="{{group.title}}" data-subject="{{group.subject.id}}" title="Search and Add Assignments">
                           <i class="fa fa-tasks"></i>
                         </a>

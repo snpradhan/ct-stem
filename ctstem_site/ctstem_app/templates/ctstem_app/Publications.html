@@ -16,7 +16,7 @@
 
     <div>
       <h3 class="left">Publications</h3>
-      {% if user.administrator %}
+      {% if user.administrator or user.researcher %}
         <div class="btn-group">
           <a class="btn normal blue" href="{% url 'ctstem:newPublication' %}" title="Create new publication">Create Publication</a>
         </div>
@@ -33,7 +33,7 @@
                 {% endif %}
               </td>
               <td class="action">
-                {% if user.administrator %}
+                {% if user.administrator or user.researcher %}
                   <a class="fa fa-pencil" title="Edit Publication" href="{% url 'ctstem:publication' pub.id %}"></a>
                   <a class="fa fa-trash" title="Delete Publication" href="{% url 'ctstem:deletePublication' pub.id %}" onclick="return confirm('Are you sure you want to delete {{pub.title}}?')"></a>
                 {% endif %}

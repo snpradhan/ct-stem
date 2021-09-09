@@ -99,7 +99,9 @@ class RegistrationForm (forms.Form):
     super(RegistrationForm, self).__init__(*args, **kwargs)
     if user.is_authenticated:
       self.fields.pop('confirm_email')
-      if hasattr(user, 'school_administrator'):
+      if hasattr(user, 'researcher'):
+        self.fields['account_type'].choices = models.USER_ROLE_CHOICES[3:5]
+      elif hasattr(user, 'school_administrator'):
         self.fields['account_type'].choices = models.USER_ROLE_CHOICES[4:]
         self.fields['school'].queryset = models.School.objects.filter(id=user.school_administrator.school.id)
       elif hasattr(user, 'teacher'):
@@ -532,7 +534,7 @@ class CurriculumForm(ModelForm):
       self.fields['order'].label = "Curriculum Order"
       self.fields['unit'].queryset = models.Curriculum.objects.filter(curriculum_type='U').order_by(Lower('title'), 'version')
       self.fields['unit'].label_from_instance = lambda obj: "%s - v%d." % (obj.title, obj.version)
-      if hasattr(usr, 'teacher') or hasattr(usr, 'researcher'):
+      if hasattr(usr, 'teacher'):
         self.fields['unit'].queryset = models.Curriculum.objects.filter(curriculum_type='U', curriculumcollaborator__user=usr, curriculumcollaborator__privilege='E').order_by(Lower('title'), 'version')
         self.fields.pop('feature_rank')
         if self.instance.id and self.instance.status == 'P':
@@ -977,9 +979,9 @@ class AssignmentGroupingForm(forms.Form):
 class TeacherAssignmentDashboardSearchForm(forms.Form):
   assignment = forms.ModelChoiceField(queryset=models.Curriculum.objects.all(), required=False, label="Filter by Assigned Curriculum")
   sort_by = forms.ChoiceField(choices=(('', '---------'),
-                                       ('curriculum', 'Curriculum'),
+                                       ('curriculum', 'Assigned Curriculum'),
                                        ('last_opened', 'Last Opened'),
-                                       ('assigned_date', 'Assigned On'),
+                                       ('assigned_date', 'Assigned Date'),
                                        ('class', 'Class')
                                        ), required=False)
   group = forms.ModelChoiceField(queryset=models.UserGroup.objects.all(), label="Filter by Class", required=False)
@@ -1018,6 +1020,7 @@ class TeacherStudentDashboardSearchForm(forms.Form):
 
   def __init__(self, *args, **kwargs):
     group_id = None
+    user = kwargs.pop('user')
     teacher = kwargs.pop('teacher')
     is_active = kwargs.pop('is_active')
     if 'group_id' in kwargs:
@@ -1030,8 +1033,15 @@ class TeacherStudentDashboardSearchForm(forms.Form):
       groups = models.UserGroup.objects.all().filter(id=group_id)
       self.fields['group'].initial = group_id
     #if group is selected, limit students and assignments from that group
-    students = models.Student.objects.all().filter(student_membership__group__in=groups).distinct().order_by(Lower('user__last_name'), Lower('user__first_name'))
-    self.fields['student'].queryset = students
+    if hasattr(user, 'researcher'):
+      students = models.Student.objects.all().filter(student_membership__group__in=groups).distinct().order_by('id')
+      student_choices = [('', '---------')]
+      for stud in students:
+        student_choices.append((stud.user.id, stud.user.id))
+      self.fields['student'].choices = tuple(student_choices)
+    else:
+      students = models.Student.objects.all().filter(student_membership__group__in=groups).distinct().order_by(Lower('user__last_name'), Lower('user__first_name'))
+      self.fields['student'].queryset = students
     curricula = models.Curriculum.objects.all().filter(Q(unit__isnull=True), Q(assignments__group__in=groups) | Q(underlying_curriculum__assignments__group__in=groups)).distinct().order_by(Lower('title'))
     self.fields['assignment'].queryset = curricula #models.Assignment.objects.all().filter(group__in=groups).distinct().order_by('curriculum__title')
     for field_name, field in list(self.fields.items()):
@@ -1093,7 +1103,9 @@ class ProgressDashboardSearchForm(forms.Form):
   sort_by = forms.ChoiceField(required=True, choices=models.PROGRESS_DASHBOARD_SORT, initial='title', label='Sort by')
 
   def __init__(self, *args, **kwargs):
-    teacher_id = group_id = curriculum_id = None
+    user = teacher_id = group_id = curriculum_id = None
+    if 'user' in kwargs:
+      user = kwargs.pop('user')
     if 'teacher_id' in kwargs:
       teacher_id = kwargs.pop('teacher_id')
     if 'group_id' in kwargs:
@@ -1121,6 +1133,11 @@ class ProgressDashboardSearchForm(forms.Form):
     else:
       self.fields['assignment'].widget.attrs['class'] += ' error'
 
+    if hasattr(user, 'researcher'):
+      self.fields['sort_by'].choices =  models.PROGRESS_DASHBOARD_SORT[:1] + models.PROGRESS_DASHBOARD_SORT[2:]
+    else:
+      self.fields['sort_by'].choices =  models.PROGRESS_DASHBOARD_SORT[1:]
+
 ####################################
 # Student Feedback Search Form
 ####################################
@@ -1130,7 +1147,9 @@ class StudentFeedbackSearchForm(forms.Form):
   student = forms.ChoiceField(required=True, choices=(('', '---------'),), label='Filter by Student')
 
   def __init__(self, *args, **kwargs):
-    teacher_id = group_id = curriculum_id = student_id = None
+    user = teacher_id = group_id = curriculum_id = student_id = None
+    if 'user' in kwargs:
+      user = kwargs.pop('user')
     if 'teacher_id' in kwargs:
       teacher_id = kwargs.pop('teacher_id')
     if 'group_id' in kwargs:
@@ -1150,7 +1169,11 @@ class StudentFeedbackSearchForm(forms.Form):
     teacher = models.Teacher.objects.get(id=teacher_id)
     selected_group = models.UserGroup.objects.all().filter(id=group_id)
     groups = models.UserGroup.objects.all().filter(Q(is_active=selected_group[0].is_active), Q(teacher=teacher) | Q(shared_with=teacher)).order_by(Lower('title'))
-    students = models.Student.objects.all().filter(student_membership__group__id=group_id).distinct().order_by(Lower('user__last_name'), Lower('user__first_name'))
+    students = models.Student.objects.all().filter(student_membership__group__id=group_id).distinct()
+    if hasattr(user, 'researcher'):
+      students = students.filter(consent='A').order_by('user__id')
+    else:
+      students = students.order_by(Lower('user__last_name'), Lower('user__first_name'))
 
     self.fields['group'].queryset = groups
 
@@ -1164,7 +1187,10 @@ class StudentFeedbackSearchForm(forms.Form):
     if curriculum_id:
       assignment = models.Assignment.objects.all().filter(group__id=group_id, curriculum__id=curriculum_id)[0]
       self.fields['assignment'].initial = curriculum_id
-      student_choices = util.student_dropdown_list(students, assignment.anonymize_student)
+      anonymize = False
+      if hasattr(user, 'researcher') or assignment.anonymize_student:
+        anonymize = True
+      student_choices = util.student_dropdown_list(students, anonymize)
       if student_id:
         self.fields['student'].initial = student_id
       else:
@@ -1272,7 +1298,7 @@ class CurriculaSearchForm(forms.Form):
       self.fields['buckets'].choices = models.CURRICULUM_BUCKET_CHOICES[1:]
     elif hasattr(user, 'researcher'):
       self.fields['status'].choices = models.CURRICULUM_STATUS_CHOICES[:3]
-      self.fields['buckets'].choices = models.CURRICULUM_BUCKET_CHOICES[1:3]
+      self.fields['buckets'].choices = models.CURRICULUM_BUCKET_CHOICES[:3]
     else:
       self.fields['buckets'].choices = models.CURRICULUM_BUCKET_CHOICES[:1]
       if not hasattr(user, 'administrator'):

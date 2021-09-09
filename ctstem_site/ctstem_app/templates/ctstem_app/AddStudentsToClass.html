@@ -11,9 +11,11 @@
     </div>
     <ul class="nav nav-tabs">
       <li class="add_tab" id="invite_tab"><a>Invite Link</a></li>
+      {% if not user.researcher %}
       <li class="add_tab" id="search_tab"><a href="#">Search Students</a></li>
       <li class="add_tab"id="upload_tab"><a href="#">Upload Students</a></li>
       <li class="add_tab" id="create_tab"><a href="#">Create New Student</a></li>
+      {% endif %}
     </ul>
 
     <div id="invite_student" class="add_option">
@@ -35,7 +37,7 @@
         </div>
       </div>
     </div>
-
+    {% if not user.researcher %}
     <div id="search_student" class="add_option">
       <form class="form" id="studentSearchForm" method="post" action="{% url 'ctstem:searchStudents' group.id %}">
         {% csrf_token %}
@@ -150,7 +152,7 @@
         </div>
       </form>
     </div>
-
+    {% endif %}
   </div>
 </div>
 <script>

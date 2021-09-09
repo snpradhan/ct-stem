@@ -57,10 +57,10 @@
       {% if student %}
         <div class="form-group button-group-sticky">
           {% if prevStudent %}
-            <a type="button" class="btn inbetween orange" id="prev" href="{% url 'ctstem:assignmentStudentFeedback' teacher_id %}?group={{assignment.group.id}}&assignment={{assignment.curriculum.id}}&student={{prevStudent.id}}"> Previous Student </a>
+            <a type="button" class="btn inbetween orange" id="prev" href="{% url 'ctstem:assignmentStudentFeedback' teacher_id %}?group={{assignment.group.id}}&assignment={{assignment.curriculum.id}}&student={{prevStudent.user.id}}"> Previous Student </a>
           {% endif %}
           {% if nextStudent %}
-            <a type="button" class="btn inbetween orange" id="prev" href="{% url 'ctstem:assignmentStudentFeedback' teacher_id %}?group={{assignment.group.id}}&assignment={{assignment.curriculum.id}}&student={{nextStudent.id}}"> Next Student </a>
+            <a type="button" class="btn inbetween orange" id="prev" href="{% url 'ctstem:assignmentStudentFeedback' teacher_id %}?group={{assignment.group.id}}&assignment={{assignment.curriculum.id}}&student={{nextStudent.user.id}}"> Next Student </a>
           {% endif %}
           <input type="hidden" name="save_and_close" id="save_and_close" value="false" />
           {% if assignment_instance.status == 'P' or assignment_instance.status == 'F' or assignment_instance.status == 'A' %}

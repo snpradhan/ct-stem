@@ -207,55 +207,56 @@ def curricula(request, bucket='unit', status='public'):
 def curriculatiles(request):
 
   if request.method == 'GET' or request.method == 'POST':
-    curricula = models.Curriculum.objects.extra(select={'modified_year': 'EXTRACT(YEAR FROM modified_date)',
-                          'modified_month': 'EXTRACT(MONTH FROM modified_date)',
-                          'modified_day': 'EXTRACT(DAY FROM modified_date)',
-                          'is_active': "status <> 'R' and status <> 'A'",
-                          'bookmark_count': 'SELECT COUNT(*) FROM ctstem_app_bookmarkedcurriculum WHERE ctstem_app_bookmarkedcurriculum.curriculum_id = ctstem_app_curriculum.id'})
 
-    search_criteria = None
     if request.method == 'GET':
       initial = None
       if 'bucket' in request.GET:
         initial = {'buckets': [request.GET['bucket']]}
       searchForm = forms.CurriculaSearchForm(user=request.user, initial=initial)
+      context = {'searchForm': searchForm }
+      template = 'ctstem_app/CurriculaTiles.html'
 
     elif request.method == 'POST':
+
+      curricula = models.Curriculum.objects.extra(select={'modified_year': 'EXTRACT(YEAR FROM modified_date)',
+                          'modified_month': 'EXTRACT(MONTH FROM modified_date)',
+                          'modified_day': 'EXTRACT(DAY FROM modified_date)',
+                          'is_active': "status <> 'R' and status <> 'A'",
+                          'bookmark_count': 'SELECT COUNT(*) FROM ctstem_app_bookmarkedcurriculum WHERE ctstem_app_bookmarkedcurriculum.curriculum_id = ctstem_app_curriculum.id'})
+
       data = request.POST.copy()
       searchForm = forms.CurriculaSearchForm(user=request.user, data=data)
       search_criteria = eval(json.dumps(dict(data.lists())))
 
-    curricula = searchCurriculaTiles(request, curricula, search_criteria)
+      curricula = searchCurriculaTiles(request, curricula, search_criteria)
 
-    sort_order = None
-    if search_criteria and 'sort_by' in search_criteria and search_criteria['sort_by'][0] != '':
-      #sort by modified date
-      if search_criteria['sort_by'][0] == 'D':
+      sort_order = None
+      if search_criteria and 'sort_by' in search_criteria and search_criteria['sort_by'][0] != '':
+        #sort by modified date
+        if search_criteria['sort_by'][0] == 'D':
+          sort_order = [{'order_by': 'is_active', 'direction': 'desc', 'ignorecase': 'false'},
+                        {'order_by': 'modified_year', 'direction': 'desc', 'ignorecase': 'false'},
+                        {'order_by': 'modified_month', 'direction': 'desc', 'ignorecase': 'false'},
+                        {'order_by': 'modified_day', 'direction': 'desc', 'ignorecase': 'false'}]
+        #sort by title alphabetically
+        elif search_criteria['sort_by'][0] == 'A':
+          sort_order = [{'order_by': 'is_active', 'direction': 'desc', 'ignorecase': 'false'},
+                        {'order_by': 'title', 'direction': 'asc', 'ignorecase': 'true'}]
+        #sort by popularity
+        elif search_criteria['sort_by'][0] == 'P':
+          sort_order = [{'order_by': 'is_active', 'direction': 'desc', 'ignorecase': 'false'},
+                        {'order_by': 'bookmark_count', 'direction': 'desc', 'ignorecase': 'false'}]
+      else:
         sort_order = [{'order_by': 'is_active', 'direction': 'desc', 'ignorecase': 'false'},
+                      {'order_by': 'feature_rank', 'direction': 'asc', 'ignorecase': 'false'},
                       {'order_by': 'modified_year', 'direction': 'desc', 'ignorecase': 'false'},
                       {'order_by': 'modified_month', 'direction': 'desc', 'ignorecase': 'false'},
-                      {'order_by': 'modified_day', 'direction': 'desc', 'ignorecase': 'false'}]
-      #sort by title alphabetically
-      elif search_criteria['sort_by'][0] == 'A':
-        sort_order = [{'order_by': 'is_active', 'direction': 'desc', 'ignorecase': 'false'},
+                      {'order_by': 'modified_day', 'direction': 'desc', 'ignorecase': 'false'},
                       {'order_by': 'title', 'direction': 'asc', 'ignorecase': 'true'}]
-      #sort by popularity
-      elif search_criteria['sort_by'][0] == 'P':
-        sort_order = [{'order_by': 'is_active', 'direction': 'desc', 'ignorecase': 'false'},
-                      {'order_by': 'bookmark_count', 'direction': 'desc', 'ignorecase': 'false'}]
-    else:
-      sort_order = [{'order_by': 'is_active', 'direction': 'desc', 'ignorecase': 'false'},
-                    {'order_by': 'feature_rank', 'direction': 'asc', 'ignorecase': 'false'},
-                    {'order_by': 'modified_year', 'direction': 'desc', 'ignorecase': 'false'},
-                    {'order_by': 'modified_month', 'direction': 'desc', 'ignorecase': 'false'},
-                    {'order_by': 'modified_day', 'direction': 'desc', 'ignorecase': 'false'},
-                    {'order_by': 'title', 'direction': 'asc', 'ignorecase': 'true'}]
 
-    curricula_list = paginate(request, curricula, sort_order, 12)
-    context = {'curricula': curricula_list, 'searchForm': searchForm }
+      curricula_list = paginate(request, curricula, sort_order, 12)
+      context = {'curricula': curricula_list, 'searchForm': searchForm }
 
-    template = 'ctstem_app/CurriculaTiles.html'
-    if request.is_ajax():
       template = 'ctstem_app/CurriculaTilesPaging.html'
       context['parent'] = 'curricula'
 
@@ -1330,7 +1331,7 @@ def assignCurriculum(request, id=''):
     if not has_permission:
       return http.HttpResponseRedirect(request.META.get('HTTP_REFERER'))
     # check if the user has permission to assign a curriculum
-    if hasattr(request.user, 'administrator'):
+    if hasattr(request.user, 'administrator') or hasattr(request.user, 'researcher'):
       groups = models.UserGroup.objects.all().filter(is_active=True)
     elif hasattr(request.user, 'school_administrator'):
       groups = models.UserGroup.objects.all().filter(teacher__school = request.user.school_administrator.school, is_active=True)
@@ -1638,7 +1639,7 @@ def register(request, group_code='', email=''):
   else:
     print(request.user)
 
-    if hasattr(request.user, 'researcher') or hasattr(request.user, 'author') or hasattr(request.user, 'student'):
+    if hasattr(request.user, 'author') or hasattr(request.user, 'student'):
       messages.error(request, 'You do not have the privilege to register any other user')
       return shortcuts.redirect('ctstem:home')
 
@@ -1805,8 +1806,11 @@ def userProfile(request, id=''):
     privilege = 0
     if hasattr(request.user, 'administrator'):
       privilege = 1
-    elif hasattr(request.user, 'researcher') and role == 'researcher' and request.user.id == researcher.user.id:
-      privilege = 1
+    elif hasattr(request.user, 'researcher'):
+      if role == 'researcher' and request.user.id == researcher.user.id:
+        privilege = 1
+      elif role == 'school_administrator' or role == 'teacher':
+        privilege = 1
     elif hasattr(request.user, 'school_administrator'):
       if role == 'school_administrator' and request.user.id == school_administrator.user.id:
         privilege = 1
@@ -1982,7 +1986,10 @@ def deleteUser(request, id='', validation_code=''):
         privilege = 1
       else:
         privilege = 0
-    elif hasattr(request.user, 'author') or hasattr(request.user, 'student') or hasattr(request.user, 'researcher'):
+    elif hasattr(request.user, 'researcher'):
+      if hasattr(user, 'administrator') or hasattr(user, 'researcher') or hasattr(user, 'author') or hasattr(user, 'student'):
+        privilege = 0
+    elif hasattr(request.user, 'author') or hasattr(request.user, 'student'):
       privilege = 0
     elif hasattr(request.user, 'school_administrator'):
       if hasattr(user, 'administrator') or hasattr(user, 'researcher') or hasattr(user, 'author'):
@@ -2763,6 +2770,7 @@ def searchCurriculaTiles(request, queryset, search_criteria):
 
     if 'buckets' in search_criteria:
       buckets = search_criteria['buckets']
+
       if 'teacher_authored' in buckets:
         #teacher authored units and standalone curricula
         teacher_authored_units = models.Curriculum.objects.all().filter(curriculum_type='U', curriculumcollaborator__user__teacher__isnull=False)
@@ -2792,6 +2800,7 @@ def searchCurriculaTiles(request, queryset, search_criteria):
 
     #no bucket/collection selected
     else:
+
       if request.user.is_anonymous or hasattr(request.user, 'student') or hasattr(request.user, 'school_administrator'):
         query_filter = base_filter & Q(status='P')
       elif hasattr(request.user, 'teacher'):
@@ -2800,36 +2809,44 @@ def searchCurriculaTiles(request, queryset, search_criteria):
         query_filter = query_filter | Q(status='P')
         query_filter = (query_filter | Q(unit__in=collaborated_bookmarked_units))
         query_filter = base_filter & query_filter
-      elif hasattr(request.user, 'researcher'):
-        collaborated_units = models.Curriculum.objects.all().filter(curriculum_type='U', curriculumcollaborator__user=request.user)
-        query_filter = Q(curriculumcollaborator__user=request.user) | Q(status='P')
-        query_filter = (query_filter | Q(unit__in=collaborated_units))
-        query_filter = base_filter & query_filter
+      # elif hasattr(request.user, 'researcher'):
+      #   collaborated_units = models.Curriculum.objects.all().filter(curriculum_type='U', curriculumcollaborator__user=request.user)
+      #   query_filter = Q(curriculumcollaborator__user=request.user) | Q(status='P')
+      #   query_filter = (query_filter | Q(unit__in=collaborated_units))
+      #   query_filter = base_filter & query_filter
       else:
         query_filter = base_filter
 
   #no filter provided
   else:
     if request.user.is_anonymous or hasattr(request.user, 'student') or hasattr(request.user, 'school_administrator'):
-        query_filter = Q(status='P')
+      query_filter = Q(status='P')
     elif hasattr(request.user, 'teacher'):
       collaborated_bookmarked_units = models.Curriculum.objects.all().filter(Q(curriculum_type='U'), Q(curriculumcollaborator__user=request.user) | Q(bookmarked__teacher=request.user.teacher))
       query_filter = Q(curriculumcollaborator__user=request.user) | Q(bookmarked__teacher=request.user.teacher)
       query_filter = query_filter | Q(status='P')
       query_filter = (query_filter | Q(unit__in=collaborated_bookmarked_units))
-    elif hasattr(request.user, 'researcher'):
-      collaborated_units = models.Curriculum.objects.all().filter(curriculum_type='U', curriculumcollaborator__user=request.user)
-      query_filter = Q(curriculumcollaborator__user=request.user) | Q(status='P')
-      query_filter = (query_filter | Q(unit__in=collaborated_units))
-      query_filter = base_filter & query_filter
+    # elif hasattr(request.user, 'researcher'):
+    #   collaborated_units = models.Curriculum.objects.all().filter(curriculum_type='U', curriculumcollaborator__user=request.user)
+    #   query_filter = Q(curriculumcollaborator__user=request.user) | Q(status='P')
+    #   query_filter = (query_filter | Q(unit__in=collaborated_units))
+    #   query_filter = base_filter & query_filter
+    else:
+      query_filter = base_filter
 
-  raw_result = queryset.filter(query_filter)
+
   if search_units:
+    raw_result = queryset.filter(query_filter)
     units = raw_result.values_list('unit', flat=True).distinct()
-    filtered_result = queryset.filter(Q(Q(unit__isnull=True), query_filter) | Q(id__in=units)).distinct()
+    unit_filter = Q(query_filter & Q(unit__isnull=True))
+    unit_filter = unit_filter | Q(id__in=units)
+    filtered_result = queryset.filter(unit_filter).distinct()
   else:
-    filtered_result = queryset.filter(Q(unit__isnull=True), query_filter).distinct()
+    unit_filter = query_filter & Q(unit__isnull=True)
+    filtered_result = queryset.filter(unit_filter).distinct()
+
   return filtered_result
+
 ####################################
 # BULK ACTION FOR ALL MODELS
 ####################################
@@ -3009,7 +3026,7 @@ def publications(request):
 def publication(request, id=''):
   try:
     # check if the user has permission to create or modify a lesson
-    if hasattr(request.user, 'administrator') == False:
+    if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'researcher') == False:
       return http.HttpResponseNotFound('<h1>You do not have the privilege to modify this publication</h1>')
     # check if the lesson exists
     if '' != id:
@@ -3399,7 +3416,7 @@ def group(request, id=''):
       else:
         return http.HttpResponseNotFound('<h1>You do not have the privilege to view/modify this class</h1>')
     else:
-      if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'school_administrator') == False and hasattr(request.user, 'teacher') == False:
+      if hasattr(request.user, 'administrator') == False and hasattr(request.user, 'researcher') == False and hasattr(request.user, 'school_administrator') == False and hasattr(request.user, 'teacher') == False:
         return http.HttpResponseNotFound('<h1>You do not have the privilege to create/modify a class</h1>')
       else:
         group = models.UserGroup()
@@ -3498,7 +3515,7 @@ def getGroupAssignmentsByUnit(request, group_id=''):
 @login_required
 def searchAssignment(request):
   # check if the user has permission to search and assign curriculum
-  if hasattr(request.user, 'school_administrator') == False and hasattr(request.user, 'teacher') == False and  hasattr(request.user, 'administrator') == False:
+  if hasattr(request.user, 'school_administrator') == False and hasattr(request.user, 'teacher') == False and hasattr(request.user, 'researcher') == False and  hasattr(request.user, 'administrator') == False:
     return http.HttpResponseNotFound('<h1>You do not have the privilege search assignments</h1>')
 
   if 'POST' == request.method:
@@ -3567,7 +3584,6 @@ def searchAssignment(request):
 # Get underlying lessons when assigning or previewing
 ####################################
 def underlyingCurriculum(request, action, id='', pem_code=''):
-
   if request.method == 'GET' or request.method == 'POST':
     curriculum = models.Curriculum.objects.get(id=id)
     underlying_curriculum =  curriculum.underlying_curriculum.all().order_by('order').distinct()
@@ -3577,7 +3593,6 @@ def underlyingCurriculum(request, action, id='', pem_code=''):
       if has_permission:
         filtered_curriculum.append(curr)
 
-    #curriculum_list = [{'id': curr.id, 'title': curr.title} for curr in filtered_curriculum]
     return filtered_curriculum
   return http.HttpResponseNotAllowed(['GET', 'POST'])
 
@@ -3628,7 +3643,7 @@ def deleteGroup(request, id=''):
 @login_required
 def teacherDashboard(request, id='', status='active'):
 
-  if hasattr(request.user, 'administrator'):
+  if hasattr(request.user, 'administrator') or hasattr(request.user, 'researcher'):
     privilege = 1
   elif hasattr(request.user, 'teacher') and str(request.user.teacher.id) == str(id):
     privilege = 1
@@ -3941,7 +3956,7 @@ def teacherDashboard(request, id='', status='active'):
 
 @login_required
 def teacherAssignmentDashboard(request, id='', status='active'):
-  if hasattr(request.user, 'administrator'):
+  if hasattr(request.user, 'administrator') or hasattr(request.user, 'researcher'):
     privilege = 1
   elif hasattr(request.user, 'teacher') and str(request.user.teacher.id) == str(id):
     privilege = 1
@@ -4092,7 +4107,7 @@ def teacherAssignmentDashboard(request, id='', status='active'):
 
 @login_required
 def teacherStudentDashboard(request, id='', status='active'):
-  if hasattr(request.user, 'administrator'):
+  if hasattr(request.user, 'administrator') or hasattr(request.user, 'researcher'):
     privilege = 1
   elif hasattr(request.user, 'teacher') and str(request.user.teacher.id) == str(id):
     privilege = 1
@@ -4115,16 +4130,16 @@ def teacherStudentDashboard(request, id='', status='active'):
       group_id = data['group']
       curriculum_id = data['assignment']
       student_id = data['student']
-      searchForm = forms.TeacherStudentDashboardSearchForm(teacher=teacher, is_active=is_active, group_id=group_id, data=data)
+      searchForm = forms.TeacherStudentDashboardSearchForm(user=request.user, teacher=teacher, is_active=is_active, group_id=group_id, data=data)
     else:
       group_id = request.GET.get('group', '')
-      searchForm = forms.TeacherStudentDashboardSearchForm(teacher=teacher, is_active=is_active, group_id=group_id)
+      searchForm = forms.TeacherStudentDashboardSearchForm(user=request.user, teacher=teacher, is_active=is_active, group_id=group_id)
 
     groups = models.UserGroup.objects.all().filter(Q(is_active=is_active), Q(teacher=teacher) | Q(shared_with=teacher)).order_by(Lower('title'))
     all_assignments = models.Assignment.objects.all().filter(group__in=groups).distinct().order_by(Lower('curriculum__unit__title'), Lower('curriculum__title'))
 
     if student_id:
-      groups = groups.filter(group_members__student__id=student_id)
+      groups = groups.filter(group_members__student__user__id=student_id)
       all_assignments = all_assignments.filter(group__in=groups)
 
     if group_id:
@@ -4140,13 +4155,21 @@ def teacherStudentDashboard(request, id='', status='active'):
     if all_assignments.count() > 0:
 
       if student_id:
-        members = [student_id]
+        student = models.Student.objects.get(user__id=student_id)
+        members = [student.id]
       else:
         members = models.Membership.objects.all().filter(group__in=groups).values_list('student', flat=True)
-      for student in models.Student.objects.all().filter(id__in=members).order_by(Lower('user__last_name'), Lower('user__first_name')).distinct():
-        student_key = student.id
+
+      student_queryset = None
+      if hasattr(request.user, 'researcher'):
+        student_queryset = models.Student.objects.all().filter(id__in=members).order_by('id').distinct()
+      else:
+        student_queryset = models.Student.objects.all().filter(id__in=members).order_by(Lower('user__last_name'), Lower('user__first_name')).distinct()
+
+      for student in student_queryset:
+        student_key = student.user.id
         student_groups = groups.filter(group_members__student__id=student.id).order_by(Lower('title')).distinct()
-        students[student_key] = {'id': student.id,
+        students[student_key] = {'id': student.user.id,
                                'name': student.user.last_name.title() + ', ' + student.user.first_name.title(),
                                'assignment_status': {'N': 0, 'P': 0, 'S': 0, 'F': 0, 'A': 0},
                                'total': 0,
@@ -4265,18 +4288,15 @@ def assignmentProgressDashboard(request, teacher_id=''):
           assignment = models.Assignment.objects.all().filter(group__id=group_id, curriculum__id=curriculum_id)[0]
           assignment_id = assignment.id
 
-      if hasattr(request.user, 'researcher'):
-        has_permission = True
-      elif group_id:
-        has_permission = check_group_permission(request, group_id)
+      has_permission = check_group_permission(request, group_id)
 
       if not has_permission:
         return http.HttpResponseNotFound('<h1>You do not have the privilege to view this assignment</h1>')
 
       if data:
-        filter_form = forms.ProgressDashboardSearchForm(teacher_id=teacher_id, group_id=group_id, curriculum_id=curriculum_id, data=data)
+        filter_form = forms.ProgressDashboardSearchForm(user=request.user, teacher_id=teacher_id, group_id=group_id, curriculum_id=curriculum_id, data=data)
       else:
-        filter_form = forms.ProgressDashboardSearchForm(teacher_id=teacher_id, group_id=group_id, curriculum_id=curriculum_id)
+        filter_form = forms.ProgressDashboardSearchForm(user=request.user, teacher_id=teacher_id, group_id=group_id, curriculum_id=curriculum_id)
 
       if assignment:
         students = assignment.group.members.all().order_by(Lower('user__last_name'), Lower('user__first_name'))
@@ -4346,7 +4366,15 @@ def assignmentProgressDashboard(request, teacher_id=''):
 
           students_progress.append(student_progress)
 
-      if sort_by is None or sort_by == 'student':
+
+      if sort_by is None:
+        if hasattr(request.user, 'researcher'):
+          students_progress.sort(key=lambda item:item['student'].id)
+        else:
+          students_progress.sort(key=lambda item:(item['student'].user.last_name.lower(), item['student'].user.first_name.lower()))
+      elif sort_by == 'student_id':
+        students_progress.sort(key=lambda item:item['student'].id)
+      elif sort_by == 'student':
         students_progress.sort(key=lambda item:(item['student'].user.last_name.lower(), item['student'].user.first_name.lower()))
       elif sort_by == 'most_progress':
         students_progress.sort(key=lambda item:item['percent_complete'], reverse=True)
@@ -4398,18 +4426,15 @@ def unitProgressDashboard(request, teacher_id=''):
           return shortcuts.redirect('/dashboard/assignmentProgress/%s?group=%s&assignment=%s' % (teacher_id, group_id, curriculum_id))
 
 
-      if hasattr(request.user, 'researcher'):
-        has_permission = True
-      elif group_id:
-        has_permission = check_group_permission(request, group_id)
+      has_permission = check_group_permission(request, group_id)
 
       if not has_permission:
         return http.HttpResponseNotFound('<h1>You do not have the privilege to view this assignment</h1>')
 
       if data:
-        filter_form = forms.ProgressDashboardSearchForm(teacher_id=teacher_id, group_id=group_id, curriculum_id=curriculum_id, data=data)
+        filter_form = forms.ProgressDashboardSearchForm(user=request.user, teacher_id=teacher_id, group_id=group_id, curriculum_id=curriculum_id, data=data)
       else:
-        filter_form = forms.ProgressDashboardSearchForm(teacher_id=teacher_id, group_id=group_id, curriculum_id=curriculum_id)
+        filter_form = forms.ProgressDashboardSearchForm(user=request.user, teacher_id=teacher_id, group_id=group_id, curriculum_id=curriculum_id)
 
       student_assignment_details = {}
       assignment_header = {}
@@ -4885,7 +4910,7 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
 @login_required
 def assignmentStudentFeedback(request, teacher_id=''):
   try:
-    assignment = assignment_id = curriculum_id = group_id = student_id = student = instance = data = prevStudent = nextStudent = None
+    assignment = assignment_id = curriculum_id = group_id = student_id = student = students = instance = data = prevStudent = nextStudent = None
 
     if request.method == 'GET':
       group_id = request.GET.get('group', '')
@@ -4903,15 +4928,18 @@ def assignmentStudentFeedback(request, teacher_id=''):
       group = models.UserGroup.objects.get(id=group_id)
 
     if student_id:
-      student = models.Student.objects.get(id=student_id)
+      student = models.Student.objects.get(user__id=student_id)
       school = student.school
 
       if assignment_id:
-        instance_qryset = models.AssignmentInstance.objects.all().filter(assignment__id=assignment_id, student__id=student_id)
+        instance_qryset = models.AssignmentInstance.objects.all().filter(assignment__id=assignment_id, student__user__id=student_id)
         if instance_qryset.count() > 0:
           instance = instance_qryset[0]
       #get the previous and next student instances
-      students = assignment.group.members.all().order_by(Lower('user__last_name'), Lower('user__first_name'))
+      if hasattr(request.user, 'researcher'):
+        students = assignment.group.members.all().filter(consent='A').order_by('user__id')
+      else:
+        students = assignment.group.members.all().order_by(Lower('user__last_name'), Lower('user__first_name'))
       count = students.count()
       prevIdx = nextIdx = 0
       for idx, stud in enumerate(students):
@@ -4938,9 +4966,9 @@ def assignmentStudentFeedback(request, teacher_id=''):
       return http.HttpResponseNotFound('<h1>You do not have the privilege to provide feedback on this assignment</h1>')
 
     if data:
-      filter_form = forms.StudentFeedbackSearchForm(teacher_id=teacher_id, group_id=group_id, curriculum_id=curriculum_id, student_id=student_id, data=search_data)
+      filter_form = forms.StudentFeedbackSearchForm(user=request.user, teacher_id=teacher_id, group_id=group_id, curriculum_id=curriculum_id, student_id=student_id, data=search_data)
     else:
-      filter_form = forms.StudentFeedbackSearchForm(teacher_id=teacher_id, group_id=group_id, curriculum_id=curriculum_id, student_id=student_id)
+      filter_form = forms.StudentFeedbackSearchForm(user=request.user, teacher_id=teacher_id, group_id=group_id, curriculum_id=curriculum_id, student_id=student_id)
 
     filter_form.is_valid()
     context = None
@@ -5276,13 +5304,13 @@ def unlockAssignment(request, assignment_id='', instance_id=''):
 # Set lock_on_completion flag for the assignment
 ####################################
 @login_required
-def lock_on_completion(request, assignment_id='', flag='0'):
+def lock_on_completion(request, assignment_id='', flag=0):
   # check if the user has permission to do this operation
   has_permission = check_assignment_permission(request, assignment_id)
   response_data = {'success': False }
   if has_permission:
     assignment = models.Assignment.objects.get(id=assignment_id)
-    if flag == '0':
+    if flag == 0:
       assignment.lock_on_completion = False
     else:
       assignment.lock_on_completion = True
@@ -5294,13 +5322,13 @@ def lock_on_completion(request, assignment_id='', flag='0'):
 # Set realtime_feedback flag for the assignment
 ####################################
 @login_required
-def realtime_feedback(request, assignment_id='', flag='0'):
+def realtime_feedback(request, assignment_id='', flag=0):
   # check if the user has permission to do this operation
   has_permission = check_assignment_permission(request, assignment_id)
   response_data = {'success': False }
   if has_permission:
     assignment = models.Assignment.objects.get(id=assignment_id)
-    if flag == '0':
+    if flag == 0:
       assignment.realtime_feedback = False
     else:
       assignment.realtime_feedback = True
@@ -5312,14 +5340,14 @@ def realtime_feedback(request, assignment_id='', flag='0'):
 # Set anonymize flag for the assignment
 ####################################
 @login_required
-def anonymize_student(request, assignment_id='', flag='0'):
+def anonymize_student(request, assignment_id='', flag=0):
   # check if the user has permission to do this operation
 
   has_permission = check_assignment_permission(request, assignment_id)
   response_data = {'success': False }
   if has_permission:
     assignment = models.Assignment.objects.get(id=assignment_id)
-    if flag == '0':
+    if flag == 0:
       assignment.anonymize_student = False
     else:
       assignment.anonymize_student = True
@@ -5443,11 +5471,11 @@ def check_curriculum_permission(request, curriculum_id, action, pem_code=''):
       else:
         ############ COPY ############
         if action == 'copy':
-          # admin, author can copy any curriculum
-          if is_admin or is_author:
+          # admin, researcher and author can copy any curriculum
+          if is_admin or is_researcher or is_author:
             has_permission = True
-          # teacher and researcher can only copy units, stand alone lessons, assessments that are public or something that they own
-          elif is_teacher or is_researcher:
+          # teacher can only copy units, stand alone lessons, assessments that are public or something that they own
+          elif is_teacher:
             if curriculum.status == 'P' and curriculum.unit is None:
               has_permission = True
             elif has_view_privilege and curriculum.unit is None:
@@ -5461,28 +5489,20 @@ def check_curriculum_permission(request, curriculum_id, action, pem_code=''):
               has_permission = False
               messages.error(request, 'You do not have the privilege to copy this curriculum')
 
-        ############ EDIT/DELETE ############
-        elif action == 'modify' or action == 'delete':
-          #check if the curriculum is archived
-          if curriculum.status == 'A':
-            if is_admin or is_author:
+        ############ EDIT ############
+        elif action == 'modify':
+          #admin, author and researcher can edit any curriculum
+          if is_admin or is_author or is_researcher:
+            has_permission = True
+          #teacher can only edit curriculum with edit privilege
+          elif is_teacher:
+            if has_edit_privilege:
               has_permission = True
-            elif is_teacher or is_researcher:
-              if has_edit_privilege:
-                has_permission = True
             else:
               has_permission = False
-              messages.error(request, 'You do not have the privilege to %s this curriculum because it is archived' % (action))
-          else:
-            # admin and author can edit any other curriculum
-            if is_admin or is_author:
-              has_permission = True
-            # teacher and researcher can only edit curriculum with edit privilege
-            elif is_teacher or is_researcher:
-              if has_edit_privilege:
-                has_permission = True
+              if curriculum.status == 'A':
+                messages.error(request, 'You do not have the privilege to %s this curriculum because it is archived' % (action))
               else:
-                has_permission = False
                 messages.error(request, 'You do not have the privilege to %s this curriculum'% (action))
 
           # has permission so far
@@ -5498,24 +5518,49 @@ def check_curriculum_permission(request, curriculum_id, action, pem_code=''):
               is_assigned = is_curriculum_assigned(request, curriculum_id)
 
             if is_assigned:
-              if action == 'modify':
-                #admins can edit any curriculum that are assigned
-                # researchers and teachers can edit their curriculum that are assigned
-                if is_admin or is_researcher or is_teacher:
-                  has_permission = True
-                  messages.warning(request, 'This curriculum has already been assigned, please be careful with the modification')
-                else:
-                  has_permission = False
-                  messages.error(request, 'You do not have the privilege to modify this curriculum because it is already assigned')
+              #admins, authors and researchers can edit any curriculum that are assigned
+              #teachers can edit their curriculum that are assigned
+              if is_admin or is_researcher or is_teacher:
+                has_permission = True
+                messages.warning(request, 'This curriculum has already been assigned, please be careful with the modification')
+              else:
+                has_permission = False
+                messages.error(request, 'You do not have the privilege to modify this curriculum because it is already assigned')
 
-              elif action == 'delete':
-                #check if only assigned to test student accounts
-                assignment_count = models.Assignment.objects.all().filter(Q(curriculum=curriculum) | Q(curriculum__in=curriculum.underlying_curriculum.all()), Q(group__members__test_account=False)).count()
-                if assignment_count > 0:
-                  has_permission = False
-                  messages.error(request, 'You do not have the privilege to delete this curriculum because it is already assigned')
-                else:
-                  has_permission = True
+
+        ############ DELETE ############
+        elif action == 'delete':
+          # admin and author can delete any curriculum
+          if is_admin or is_author:
+            has_permission = True
+          # teacher and researcher can only delete curriculum with edit privilege
+          elif is_teacher or is_researcher:
+            if has_edit_privilege:
+              has_permission = True
+            else:
+              has_permission = False
+              messages.error(request, 'You do not have the privilege to %s this curriculum'% (action))
+
+          # has permission so far
+          if has_permission:
+            #check if the curriculum is assigned
+            is_assigned = False
+            if curriculum.curriculum_type == 'U':
+              for lesson in curriculum.underlying_curriculum.all():
+                is_assigned = is_curriculum_assigned(request, lesson.id)
+                if is_assigned:
+                  break
+            else:
+              is_assigned = is_curriculum_assigned(request, curriculum_id)
+
+            if is_assigned:
+              #check if only assigned to test student accounts
+              assignment_count = models.Assignment.objects.all().filter(Q(curriculum=curriculum) | Q(curriculum__in=curriculum.underlying_curriculum.all()), Q(group__members__test_account=False)).count()
+              if assignment_count > 0:
+                has_permission = False
+                messages.error(request, 'You do not have the privilege to delete this curriculum because it is already assigned')
+              else:
+                has_permission = True
 
         ############ PREVIEW ############
         elif action == 'preview':
@@ -5532,11 +5577,11 @@ def check_curriculum_permission(request, curriculum_id, action, pem_code=''):
           #allow everyone to preview public curricula
           elif curriculum.status == 'P':
             has_permission = True
-          # admin, author can preview any curricula
-          elif is_admin or is_author:
+          # admin, author and researcher can preview any curricula
+          elif is_admin or is_author or is_researcher:
             has_permission = True
           # teacher can only preview curriculum that are public, shared with them or that they own
-          elif is_teacher or is_researcher:
+          elif is_teacher:
             if has_edit_privilege or has_view_privilege:
               has_permission = True
             elif curriculum.curriculum_type == 'U':
@@ -5553,13 +5598,13 @@ def check_curriculum_permission(request, curriculum_id, action, pem_code=''):
         ############ ASSIGN ############
         elif action == 'assign':
           if curriculum.curriculum_type != 'U':
-            # if a non-unit curriculum is published, allow admin, school_admin and teacher to assign
+            # if a non-unit curriculum is published, allow admin, researcher, school_admin and teacher to assign
             if curriculum.status == 'P':
-              if is_admin or is_school_admin or is_teacher:
+              if is_admin or is_researcher or is_school_admin or is_teacher:
                 has_permission = True
-            #if a non-unit curriculum is private, allow all admins, and researchers/teachers who have edit/view privilege to assign the curriculum
+            #if a non-unit curriculum is private, allow all admins, researchers and teachers who have edit/view privilege to assign the curriculum
             elif curriculum.status == 'D':
-              if is_admin:
+              if is_admin or is_researcher:
                 has_permission = True
               elif is_teacher:
                 if has_edit_privilege or has_view_privilege:
@@ -5579,9 +5624,9 @@ def check_curriculum_permission(request, curriculum_id, action, pem_code=''):
               has_permission = True
           #only teachers and researchers can export student data of private curriculum that they own
           elif curriculum.status == 'D':
-            if is_admin:
+            if is_admin or is_researcher:
               has_permission = True
-            elif is_researcher or is_teacher:
+            elif is_teacher:
               if has_edit_privilege:
                 has_permission = True
 
@@ -5611,7 +5656,7 @@ def check_group_permission(request, group_id=''):
   has_permission = False
   try:
     group = models.UserGroup.objects.get(id=group_id)
-    if hasattr(request.user, 'administrator') == True:
+    if hasattr(request.user, 'administrator') == True or hasattr(request.user, 'researcher') == True:
       has_permission = True
     elif hasattr(request.user, 'school_administrator') and group.teacher.school == request.user.school_administrator.school:
       has_permission = True

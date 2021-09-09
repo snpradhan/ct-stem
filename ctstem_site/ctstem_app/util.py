@@ -60,9 +60,9 @@ def student_dropdown_list(students, anonymize=False):
   student_choices = [('', 'Select a Student')]
   for student in students:
     if anonymize:
-      student_choices.append((student.id, 'xxxxxxxxxxx'))
+      student_choices.append((student.user.id, student.user.id))
     else:
-      student_choices.append((student.id, student))
+      student_choices.append((student.user.id, student))
   return student_choices
 
 def question_dropdown_list(questions):

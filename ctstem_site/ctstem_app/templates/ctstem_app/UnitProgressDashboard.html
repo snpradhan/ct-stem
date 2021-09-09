@@ -130,13 +130,13 @@
                     {% if student_assignment.instance.status == 'P' %}
                       <div> In Progress </div>
                       <div>
-                         <a type="button" class="btn tiny green" href="{% url 'ctstem:assignmentStudentFeedback' teacher_id %}?group={{student_assignment.assignment.group.id}}&assignment={{student_assignment.assignment.curriculum.id}}&student={{student.id}}"
+                         <a type="button" class="btn tiny green" href="{% url 'ctstem:assignmentStudentFeedback' teacher_id %}?group={{student_assignment.assignment.group.id}}&assignment={{student_assignment.assignment.curriculum.id}}&student={{student.user.id}}"
                         title="Give Feedback"> <span class="far fa-comment-dots" aria-hidden="true"></span> </a>
                       </div>
                     {% elif student_assignment.instance.status == 'S' %}
                       <div> Submitted </div>
                       <div>
-                        <a type="button" class="btn tiny green" href="{% url 'ctstem:assignmentStudentFeedback' teacher_id %}?group={{student_assignment.assignment.group.id}}&assignment={{student_assignment.assignment.curriculum.id}}&student={{student.id}}" title="Give Feedback"> <span class="far fa-comment-dots" aria-hidden="true"></span> </a>
+                        <a type="button" class="btn tiny green" href="{% url 'ctstem:assignmentStudentFeedback' teacher_id %}?group={{student_assignment.assignment.group.id}}&assignment={{student_assignment.assignment.curriculum.id}}&student={{student.user.id}}" title="Give Feedback"> <span class="far fa-comment-dots" aria-hidden="true"></span> </a>
 
                         <a type="button" class="btn tiny blue" href="{% url 'ctstem:export_student_response' student_assignment.assignment.id  student.id %}" title="Download Student Response"> <i class="fas fa-file-download"></i> </a>
                         {% if student_assignment.instance.assignment.curriculum.curriculum_type == 'L' %}
@@ -146,14 +146,14 @@
                     {% elif student_assignment.instance.status == 'F' %}
                       <div> Feedback Completed </div>
                       <div>
-                        <a type="button" class="btn tiny green" href="{% url 'ctstem:assignmentStudentFeedback' teacher_id %}?group={{student_assignment.assignment.group.id}}&assignment={{student_assignment.assignment.curriculum.id}}&student={{student.id}}" title="View/Give Feedback"> <span class="far fa-comment-dots" aria-hidden="true"></span> </a>
+                        <a type="button" class="btn tiny green" href="{% url 'ctstem:assignmentStudentFeedback' teacher_id %}?group={{student_assignment.assignment.group.id}}&assignment={{student_assignment.assignment.curriculum.id}}&student={{student.user.id}}" title="View/Give Feedback"> <span class="far fa-comment-dots" aria-hidden="true"></span> </a>
 
                         <a type="button" class="btn tiny blue" href="{% url 'ctstem:export_student_response' student_assignment.assignment.id  student.id %}" title="Download Student Response"> <i class="fas fa-file-download"></i> </a>
                       </div>
                     {% elif student_assignment.instance.status == 'A' %}
                       <div> Archived </div>
                       <div>
-                        <a type="button" class="btn tiny green" href="{% url 'ctstem:assignmentStudentFeedback' teacher_id %}?group={{student_assignment.assignment.group.id}}&assignment={{student_assignment.assignment.curriculum.id}}&student={{student.id}}" title="View/Give Feedback"> <span class="far fa-comment-dots" aria-hidden="true"></span> </a>
+                        <a type="button" class="btn tiny green" href="{% url 'ctstem:assignmentStudentFeedback' teacher_id %}?group={{student_assignment.assignment.group.id}}&assignment={{student_assignment.assignment.curriculum.id}}&student={{student.user.id}}" title="View/Give Feedback"> <span class="far fa-comment-dots" aria-hidden="true"></span> </a>
 
                         <a type="button" class="btn tiny blue" href="{% url 'ctstem:export_student_response' student_assignment.assignment.id  student.id %}" title="Download Student Response"> <i class="fas fa-file-download"></i> </a>
                       </div>

@@ -11,7 +11,7 @@
   <div class="content">
     <h2> Public Questions </h2>
     <div class="btn-group">
-      {% if user.administrator %}
+      {% if user.administrator or user.researcher  %}
         <button class="btn blue normal edit_question" name="add_question" data-form="{% url 'ctstem:newQuestion' %}"
                 aria-label="Add New Question" title="Add New Question">
           Create Question
@@ -45,7 +45,7 @@
                 {{ revised_test|safe }}
 
                 <div class="controls">
-                  {% if user.administrator %}
+                  {% if user.administrator or user.researcher %}
                     <button type="button" class="btn green edit_question" name="edit_question"
                          aria-label="Edit Question" title="Edit Question" data-form="{% url 'ctstem:question' question.id %}" >
                       <i class="fas fa-pencil-alt" aria-hidden="true"></i>
