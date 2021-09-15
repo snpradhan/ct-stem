@@ -54,7 +54,7 @@
 }
 .btn.yellow, button[class*="yellow"] {
   background-color: var(--ctstem-color-yellow) !important;
-  color: black !important;
+  color: #ffffff !important;
 }
 .btn.yellow:hover, button[class*="yellow"]:hover, .btn.yellow.active, button[class*="yellow"][class="active"] {
   border: 1px solid var(--ctstem-color-yellow) !important;
