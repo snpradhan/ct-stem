@@ -842,7 +842,7 @@ div.content#teacher_dashboard hr {
   margin-bottom: 0;
 }
 div.content#teacher_dashboard .view_all {
-  padding: 1.5em 0;
+  padding: 2%;
   text-align: center;
 }
 div.content#teacher_dashboard div#dashboard_header,
@@ -887,7 +887,6 @@ div.content.teacher_detailed_dashboard .actions {
 div.content#teacher_dashboard .action,
 div.content.teacher_detailed_dashboard .action {
   font-size: 1.2em;
-  margin: 0.25em 0;
 }
 div.content#teacher_dashboard .action.new,
 div.content.teacher_detailed_dashboard .action.new {
@@ -934,7 +933,7 @@ div.content#teacher_dashboard div.title {
   justify-content: space-between;
   flex-wrap: wrap;
   align-items: center;
-  padding: 2em;
+  padding: 1% 2%;
 }
 div.content#teacher_dashboard div.title div.controls {
   display: flex;
@@ -953,34 +952,54 @@ div.content#teacher_dashboard div#dashboard_classes div#class_tiles {
 }
 
 div.content#teacher_dashboard div#dashboard_classes div#class_tiles div.tile {
-  flex: 0 1 47%;
+  flex: 0 0 47%;
   border: 1px solid var(--ctstem-color-dark-blue);
   display: flex;
-  justify-content: space-between;
-  align-items: stretch;
+  justify-content: flex-start !important;
+  align-items: flex-start !important;
+  margin-top: 2%;
+  margin-left: 2%;
+  margin-bottom: 0;
+  margin-right: 0;
+  gap: 2em;
+}
+
+div.content#teacher_dashboard div#dashboard_classes div#class_tiles div.tile:nth-of-type(even){
+  margin-right: 2%;
+}
+div.content#teacher_dashboard div#dashboard_classes div#class_tiles div.tile:last-child,
+div.content#teacher_dashboard div#dashboard_classes div#class_tiles div.tile:nth-last-child(2):nth-of-type(odd){
+  margin-bottom: 2%;
 }
 div.content#teacher_dashboard div#dashboard_classes div#class_tiles div.tile.extra {
   display: none !important;
 }
 div.content#teacher_dashboard div#dashboard_classes div#class_tiles div.tile div.class_icon {
-  flex: 0 0 20%;
-  align-self: center;
+  flex: 0 0 auto;
+  /*align-self: center;*/
+  /*margin-right: 2em;*/
+
 }
 div.content#teacher_dashboard div#dashboard_classes div#class_tiles div.tile div.class_details {
-  flex: 0 0 80%;
-  max-width: 80%;
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+
 }
 div.content#teacher_dashboard div#dashboard_classes div#class_tiles div.tile div.class_details > * {
   max-width: 100%;
-  margin-bottom: 12px;
+  margin-bottom: 12px !important;
+
+}
+div.content#teacher_dashboard div#dashboard_classes div#class_tiles div.tile div.class_details > *:last-child {
+  margin-bottom: 0 !important;
 }
 div.content#teacher_dashboard div#dashboard_classes div#class_tiles div.tile div.class_details div.class_detail{
   display: flex;
   justify-content: space-between;
   height: auto;
+  width: 100%;
 }
 div.content#teacher_dashboard div#dashboard_classes div#class_tiles div.tile div.class_details div.class_detail > * {
   flex: 0 1 50%;
@@ -994,8 +1013,8 @@ div.content#teacher_dashboard div#dashboard_classes div#class_tiles div.tile div
   text-align: left;
 }
 div.content#teacher_dashboard img.icon {
-  height: 7em;
-  width: 7em;
+  height: auto;
+  width: 15em;
 }
 div.content#teacher_dashboard i.icon {
   font-size: 5em;
@@ -1014,6 +1033,7 @@ div.content#teacher_dashboard div#dashboard_assignments div#assignments div.assi
   border-radius: unset;
   margin: 0;
   display: block !important;
+  padding: 2%;
 }
 div.content#teacher_dashboard div#dashboard_assignments div#assignments div.assignment div.assignment_info {
   display: flex;
@@ -1046,8 +1066,19 @@ div.content#teacher_dashboard div#dashboard_assignments div#assignments div.assi
 
 @media (max-width: 1024px) {
   div.content#teacher_dashboard div#dashboard_classes div#class_tiles div.tile {
-    flex: 0 1 100%;
-    max-width: 100%;
+    flex: 0 1 92%;
+    max-width: 92%;
+    margin-top: 4% !important;
+    margin-right: 4% !important;
+    margin-left: 4% !important;
+    margin-bottom: 0 !important;
+  }
+  div.content#teacher_dashboard div#dashboard_classes div#class_tiles div.tile:last-child {
+    margin-bottom: 4% !important;
+  }
+  div.content#teacher_dashboard div.title,
+  div.content#teacher_dashboard .view_all {
+    padding: 4%;
   }
   div.content#teacher_dashboard div#dashboard_assignments {
     flex: 0 1 100%;
@@ -1058,6 +1089,9 @@ div.content#teacher_dashboard div#dashboard_assignments div#assignments div.assi
     flex: 0 1 100%;
     max-width: 100%;
     margin-top: 40px;
+  }
+  div.content#teacher_dashboard div#dashboard_assignments div#assignments div.assignment {
+    padding: 4%;
   }
   div.content#teacher_dashboard div#dashboard_assignments div#assignments div.assignment div.assignment_info {
     flex-wrap: wrap;
@@ -1079,6 +1113,7 @@ div.content#teacher_dashboard div#dashboard_assignments div#assignments div.assi
     margin-left: 1em;
     max-width: 100%;
   }
+
 }
 /*******************TEACHER DASHBOARD END**************************/
 /*******************TEACHER ASSIGNMENT DASHBOARD START**************************/
@@ -1129,6 +1164,7 @@ div.content.teacher_detailed_dashboard .expanded_collapsed {
 }
 div.content.teacher_detailed_dashboard .expanded_collapsed .fa-chevron-right{
   float: right;
+  font-size:  1.25em;
 }
 div.content.teacher_detailed_dashboard  .expanded_collapsed.expanded .fa-chevron-right{
   transform: rotate(90deg);

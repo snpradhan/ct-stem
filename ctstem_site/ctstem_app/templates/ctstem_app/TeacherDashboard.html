@@ -235,7 +235,7 @@
     $('.view_all_class').click(function(){
       $('#class_tiles div.tile.extra').removeClass('extra');
       $('.class_count').html('{{groups|length}}');
-      $(this).toggle();
+      $(this).parent().toggle();
     })
 
     //add a class to checkbox and radio button in search form on Safari only
