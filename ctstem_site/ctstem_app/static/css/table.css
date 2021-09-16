@@ -1,6 +1,8 @@
 /***************************************
             *   TABLE VIEW   *
  ***************************************/
+ @import 'variables.css';
+
  table.table {
   margin: auto;
   border-collapse: separate;
@@ -25,7 +27,7 @@ table.table tbody {
 table.table th {
   vertical-align: middle !important;
   position: sticky;
-  top: 92px;
+  top: var(--ctstem-sticky-margin-top);
   z-index: 1000;
   background-color: #666666;
   color: #e5e5e5 !important;
