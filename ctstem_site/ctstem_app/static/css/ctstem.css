@@ -911,12 +911,14 @@ div.content.teacher_detailed_dashboard .action.archived {
 div.content#teacher_dashboard a,
 div.content.teacher_detailed_dashboard a,
 div.content.assignment_feedback a {
-  color: black;
+  color: #337ab7;
 }
 div.content#teacher_dashboard a:hover,
 div.content.teacher_detailed_dashboard a:hover,
 div.content.assignment_feedback a:hover {
-  color: var(--ctstem-color-blue);
+  cursor: pointer;
+  color: var(--ctstem-color-yellow);
+  text-decoration: underline;
 }
 
 div.content#teacher_dashboard div#dashboard_classes,
@@ -1005,7 +1007,7 @@ div.content#teacher_dashboard div#dashboard_classes div#class_tiles div.tile div
   flex: 0 1 50%;
 }
 div.content#teacher_dashboard div#dashboard_classes div#class_tiles div.tile div.class_details div.class_detail > h6 {
-  text-decoration: underline;
+  /*text-decoration: underline;*/
   margin-bottom: 0;
 }
 
