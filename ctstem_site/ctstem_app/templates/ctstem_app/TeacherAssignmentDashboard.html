@@ -88,14 +88,17 @@
                 <a href="{% url 'ctstem:unitProgressDashboard' teacher.id %}?group={{assignment_group.id}}&assignment={{curriculum_id}}" title="View Unit Progress Dashboard">
                   {{assignment|get_item:'title'}}
                 </a>
-                &nbsp;
-                <span class="expanded_collapsed collapsed" title="Expand underlying lessons">
-                  <i class="fas fa-chevron-right"></i>
-                </span>
               {% else %}
                 {{assignment|get_item:'title'}}
               {% endif %}
             </h5>
+            {% if assignment|get_item:'curriculum_type' == 'Unit' %}
+              <h5>
+                <span class="expanded_collapsed collapsed" title="Expand underlying lessons">
+                  <i class="fas fa-chevron-right"></i>
+                </span>
+              </h5>
+            {% endif %}
           </div>
           {% if not group %}
           <div class="assignment_class">

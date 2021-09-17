@@ -92,7 +92,8 @@
         {% else %}
           {{name}}
         {% endif %}
-        &nbsp;
+      </h5>
+      <h5 class="expanded_collapsed collapsed" title="Expand student assignments">
         <i class="fas fa-chevron-right"></i>
       </h5>
     </div>
@@ -121,18 +122,17 @@
                 <a href="{% url 'ctstem:assignmentStudentFeedback' teacher.id %}?group={{assignment_group.id}}&assignment={{curriculum_id}}&student={{instance.student.user.id}}" title="Review student response">
                   {{assignment|get_item:'title'}}
                 </a>
-              {% elif assignment|get_item:'curriculum_type' == 'Unit' %}
-                <span class="expanded_collapsed collapsed" title="Expand underlying lessons">
-                  {{assignment|get_item:'title'}}
-                  &nbsp;
-                  <i class="fas fa-chevron-right"></i>
-                </span>
               {% else %}
                <a onclick='alert("Student hasn&apos;t started this assignment");' title="Review student response">
                   {{assignment|get_item:'title'}}
                 </a>
               {% endif %}
             </h5>
+            {% if assignment|get_item:'curriculum_type' == 'Unit' %}
+              <h5 class="expanded_collapsed collapsed" title="Expand underlying lessons">
+                <i class="fas fa-chevron-right"></i>
+              </h5>
+            {% endif %}
           </div>
           {% if not group %}
           <div class="assignment_class">
@@ -161,7 +161,7 @@
           <div class="underlying_lesson_assignments">
             {% with lessons=assignment|get_item:'lessons'|sort %}
             {% for order, lesson in lessons.items %}
-              {% with percent_complete=lesson|get_item:'percent_complete' assignment_status=lesson|get_item:'assignment_status' assignment_id=lesson|get_item:'assignment_id' instance=lesson|get_item:'instance'%}
+              {% with assignment_status=lesson|get_item:'assignment_status' assignment_id=lesson|get_item:'assignment_id' instance=lesson|get_item:'instance'%}
                <div class="assignment tile">
                 <div class="assignment_title">
                   <h5 class="left">

@@ -1159,8 +1159,10 @@ div.content.teacher_detailed_dashboard div.header * {
   color: inherit;
 }
 div.content.teacher_detailed_dashboard div.dashboard_assignments div.assignment div.assignment_title {
-  flex: 0 0 30%;
+  flex: 0 0 35%;
   align-items: center;
+  display: flex;
+  justify-content: space-between;
 }
 div.content.teacher_detailed_dashboard div.dashboard_assignments div.assignment div.assignment_class {
   flex: 0 0 15%;
@@ -1173,7 +1175,7 @@ div.content.teacher_detailed_dashboard .expanded_collapsed {
 }
 div.content.teacher_detailed_dashboard .expanded_collapsed .fa-chevron-right{
   float: right;
-  font-size:  1.25em;
+  font-size:  1.5em;
 }
 div.content.teacher_detailed_dashboard  .expanded_collapsed.expanded .fa-chevron-right{
   transform: rotate(90deg);
@@ -1214,8 +1216,11 @@ div.content.teacher_detailed_dashboard div.student  {
   align-items: center;
 }
 div.content.teacher_detailed_dashboard div.student div.student_details {
-  flex: 0 0 30%;
+  flex: 0 0 35%;
   align-self: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 div.content.teacher_detailed_dashboard div.student div.assignment_class {
   flex: 0 0 15%;
