@@ -4167,9 +4167,10 @@ def teacherStudentDashboard(request, id='', status='active'):
         student_queryset = models.Student.objects.all().filter(id__in=members).order_by(Lower('user__last_name'), Lower('user__first_name')).distinct()
 
       for student in student_queryset:
-        student_key = student.user.id
+        student_key = student.id
         student_groups = groups.filter(group_members__student__id=student.id).order_by(Lower('title')).distinct()
-        students[student_key] = {'id': student.user.id,
+        students[student_key] = {'student_id': student.id,
+                                'user_id': student.user.id,
                                'name': student.user.last_name.title() + ', ' + student.user.first_name.title(),
                                'assignment_status': {'N': 0, 'P': 0, 'S': 0, 'F': 0, 'A': 0},
                                'total': 0,

@@ -1033,15 +1033,19 @@ class TeacherStudentDashboardSearchForm(forms.Form):
       groups = models.UserGroup.objects.all().filter(id=group_id)
       self.fields['group'].initial = group_id
     #if group is selected, limit students and assignments from that group
+    students = models.Student.objects.all().filter(student_membership__group__in=groups).distinct()
+    student_choices = [('', '---------')]
     if hasattr(user, 'researcher'):
-      students = models.Student.objects.all().filter(student_membership__group__in=groups).distinct().order_by('id')
-      student_choices = [('', '---------')]
+      students = students.order_by('id')
       for stud in students:
         student_choices.append((stud.user.id, stud.user.id))
-      self.fields['student'].choices = tuple(student_choices)
     else:
-      students = models.Student.objects.all().filter(student_membership__group__in=groups).distinct().order_by(Lower('user__last_name'), Lower('user__first_name'))
-      self.fields['student'].queryset = students
+      students = students.order_by(Lower('user__last_name'), Lower('user__first_name'))
+      for stud in students:
+        student_choices.append((stud.user.id, stud))
+
+    self.fields['student'].choices = tuple(student_choices)
+
     curricula = models.Curriculum.objects.all().filter(Q(unit__isnull=True), Q(assignments__group__in=groups) | Q(underlying_curriculum__assignments__group__in=groups)).distinct().order_by(Lower('title'))
     self.fields['assignment'].queryset = curricula #models.Assignment.objects.all().filter(group__in=groups).distinct().order_by('curriculum__title')
     for field_name, field in list(self.fields.items()):

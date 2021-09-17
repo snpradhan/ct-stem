@@ -82,13 +82,13 @@
     </div>
   </div>
   {% for id, student in students.items %}
-  {% with name=student|get_item:'name' assignments=student|get_item:'assignments' student_assignment_status=student|get_item:'assignment_status' student_groups=student|get_item:'student_groups' %}
+  {% with user_id=student|get_item:'user_id' student_id=student|get_item:'student_id' name=student|get_item:'name' assignments=student|get_item:'assignments' student_assignment_status=student|get_item:'assignment_status' student_groups=student|get_item:'student_groups' %}
   {% get_chart_config student_assignment_status 'stacked_bar' as student_chart_config %}
   <div class="student">
     <div class="student_details">
       <h5 class="left expanded_collapsed collapsed" title="Expand student assignments">
         {% if user.researcher %}
-          {{id}}
+          {{user_id}}
         {% else %}
           {{name}}
         {% endif %}
@@ -103,7 +103,7 @@
     </div>
     {% endif %}
     <div class="assignment_status_chart">
-      <div id="assignment_chart_student_{{id}}" class="stacked_bar_chart rendered" name="{{student_chart_config}}" data-total="{{student|get_item:'total'}}"></div>
+      <div id="assignment_chart_student_{{student_id}}" class="stacked_bar_chart rendered" name="{{student_chart_config}}" data-total="{{student|get_item:'total'}}"></div>
     </div>
     <div class="assignment_stats">
     </div>
@@ -142,10 +142,10 @@
           <div class="assignment_status_chart">
             {% if assignment|get_item:'curriculum_type' == 'Unit' %}
               {% get_chart_config assignment_status 'stacked_bar' as assignment_chart_config %}
-              <div id="assignment_chart_student_{{id}}_curriculum_{{key}}" class="stacked_bar_chart unrendered" name="{{assignment_chart_config}}" data-total="{{assignment|get_item:'total'}}"></div>
+              <div id="assignment_chart_student_{{student_id}}_curriculum_{{key}}" class="stacked_bar_chart unrendered" name="{{assignment_chart_config}}" data-total="{{assignment|get_item:'total'}}"></div>
             {% else %}
               {% get_chart_color assignment_status as color %}
-              <div id="assignment_chart_student_{{id}}_curriculum_{{key}}" class="progress_chart unrendered" data-percent-complete="" data-color="{{color}}" data-student-id="{{id}}" data-assignment-id="{{assignment_id}}"></div>
+              <div id="assignment_chart_student_{{student_id}}_curriculum_{{key}}" class="progress_chart unrendered" data-percent-complete="" data-color="{{color}}" data-student-id="{{student_id}}" data-assignment-id="{{assignment_id}}"></div>
             {% endif %}
           </div>
           <div class="assignment_stats">
@@ -178,7 +178,7 @@
                 {% endif %}
                 <div class="assignment_status_chart">
                   {% get_chart_color assignment_status as color %}
-                  <div id="assignment_chart_student_{{id}}_curriculum_{{key}}_lesson_{{order}}" class="progress_chart unrendered" data-percent-complete="" data-color="{{color}}" data-student-id="{{id}}" data-assignment-id="{{lesson|get_item:'assignment_id'}}"></div>
+                  <div id="assignment_chart_student_{{student_id}}_curriculum_{{key}}_lesson_{{order}}" class="progress_chart unrendered" data-percent-complete="" data-color="{{color}}" data-student-id="{{student_id}}" data-assignment-id="{{lesson|get_item:'assignment_id'}}"></div>
 
                 </div>
                 <div class="assignment_stats">
