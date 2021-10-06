@@ -45,6 +45,9 @@
               Search
             </button>
           </div>
+          <div id="spinner">
+            <img src="/static/img/page-loader.gif" class="icon"/>
+          </div>
         </div>
       </form>
       <div id="assignmentResults" style="display:none;" class="results">
@@ -81,6 +84,12 @@ $(function (){
         url: this.action,
         data: data,
         context: this,
+        beforeSend: function(){
+          $('#assignmentForm #spinner').show();
+        },
+        complete: function(){
+          $('#assignmentForm #spinner').hide();
+        },
         success: function(data, status, xhr){
           var ct = xhr.getResponseHeader("content-type") || "";
           if (ct.indexOf('html') > -1) {

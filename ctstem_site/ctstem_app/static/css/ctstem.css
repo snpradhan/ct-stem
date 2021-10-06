@@ -156,6 +156,7 @@ a {
   margin-left: 2em;
   padding-top: 15px;
   padding-bottom: 11px;
+  cursor: pointer;
 }
 
 .navbar-default .navbar-nav > li.active > a,
@@ -236,6 +237,9 @@ a {
   z-index: 1002;
 }
 
+.icon_preview {
+  margin-bottom: 1em;
+}
 .icon-size{
   font-size: 87px;
 }
@@ -374,10 +378,12 @@ div.curriculum_container, div.group_container {
   display: flex;
   justify-content: space-between;
 }
-div.curriculum_container div.left-navigation {
-  width: 14%;
+div.curriculum_container div.left-navigation,
+div.group_container div.left-navigation{
+  flex: 0 0 14%;
 }
-div.curriculum_container div.left-navigation ul {
+div.curriculum_container div.left-navigation ul,
+div.group_container div.left-navigation ul {
   padding-left: 2em;
 }
 div.curriculum_container div.left-navigation label.current_curriculum strong{
@@ -392,8 +398,10 @@ div.curriculum_container div.left-navigation label a:hover{
   color: var(--ctstem-color-yellow);
   text-decoration: underline;
 }
-div.curriculum_container div.curriculum_components {
-  width: 84%;
+div.curriculum_container div.curriculum_components,
+div.group_container div.group_components {
+  flex: 0 0 86%;
+  max-width: 86%;
 }
 div.curriculum_container div.curriculum_components a.dropdown-toggle .fas{
   vertical-align: middle;
@@ -405,8 +413,17 @@ div.curriculum_container div.curriculum_components a.dropdown-toggle .fas:hover{
   color: var(--ctstem-color-yellow);
 }
 
-div.curriculum_container div.curriculum_components .dropdown-menu {
-  font-size: 1.3em;
+div.curriculum_container div.curriculum_components .dropdown-menu,
+div.group_container div.group_components .dropdown-menu {
+  font-size: 1.3em !important;
+  right: 0;
+  left: auto;
+}
+
+div.curriculum_container div.curriculum_components img.icon,
+div.group_container div.group_components img.icon {
+  width: 10em;
+  height: auto;
 }
 
 div.curriculum_container div.curriculum_components .dropdown-menu li a:hover {
@@ -439,23 +456,44 @@ div.curriculum_container div.curriculum_components input[type='checkbox'].safari
   zoom: 1.05;
 }
 
-div.group_container div.group_components {
-  width: 90%;
-}
-div.curriculum_container div.button-container {
-  text-align: right;
-}
+div.curriculum_container div.button-container,
 div.group_container div.button-container {
-  width: 10%;
+  flex: 0 0 20%;
+  display: flex;
+  justify-content: flex-end;
+  gap: 1em;
+
 }
-div.group_container label.switch_label {
+div.group_container div#class_overview div.switch_container {
+  justify-content: flex-start;
+}
+div.group_container div#class_assignments label.switch_label,
+div.group_container div#class_roster label.switch_label {
   display: none;
 }
 
 div.table#curriculum, div.table#directions_attachments, div.table.step, div.table.addStep,
-div.table#curriculumQuestions, div.table.activity, div.table#group, div.table#standard {
+div.table#curriculumQuestions, div.table.activity, div.table#standard,
+div.table#class_overview, div.table#class_assignments, div.table#class_roster {
   width: 100%;
   padding: 3em 4em;
+}
+.select-checkbox {
+  cursor: pointer;
+  text-align: center;
+}
+div.table#class_overview, div.table#class_assignments, div.table#class_roster {
+  margin-bottom: 3em;
+}
+div.table#class_overview, div.table#class_assignments, div.table#class_roster div.section_header {
+  margin-bottom: 1.5em;
+}
+div.table#class_roster div.controls {
+  display: flex;
+  justify-content: space-between;
+}
+div.table#class_overview input#generate_code {
+  margin-left: 2px;
 }
 div.table#curriculum, div.table#directions_attachments, div.table.step, div.table.addStep {
   width: 100%;
@@ -769,6 +807,7 @@ div.table_container {
   max-height: 500px;
   overflow-y: scroll;
   width: 100%;
+  margin: 1.5em 0;
 }
 
 div#categories {
@@ -984,7 +1023,7 @@ div.content#teacher_dashboard div#dashboard_classes div#class_tiles div.tile.ext
   display: none !important;
 }
 div.content#teacher_dashboard div#dashboard_classes div#class_tiles div.tile div.class_icon {
-  flex: 0 0 auto;
+  flex: 0 0 20%;
   /*align-self: center;*/
   /*margin-right: 2em;*/
 
@@ -1023,10 +1062,7 @@ div.content#teacher_dashboard div#dashboard_classes div#class_tiles div.tile div
 }
 div.content#teacher_dashboard img.icon {
   height: auto;
-  width: 15em;
-}
-div.content#teacher_dashboard i.icon {
-  font-size: 5em;
+  width: 100%;
   background-color: white;
 }
 
@@ -1698,7 +1734,7 @@ div.content#preview p {
 div.content#preview div.row .col {
   display: block !important;
   width: auto !important;
-  margin: unset;
+  margin: 20px auto 0 auto;
 }
 div.content#preview div.row .col.meta {
   padding: 0 3em;
@@ -1797,6 +1833,16 @@ input[type="checkbox"] {
 /***************************************
             *   FORM GROUP   *
  ***************************************/
+div.section_header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+div.section_header h4 {
+  flex: 0 0 50%;
+  max-width: 50%;
+  overflow-wrap: break-word;
+}
 div.form-group {
   overflow: auto;
 }
@@ -1804,6 +1850,7 @@ div.form-group label{
   font-size: 1.5em;
   margin-bottom: 0.5em;
   margin-top: 0.25em;
+  color: inherit;
 }
 div.form-group label a {
   color: var(--ctstem-color-gray);
@@ -2036,7 +2083,8 @@ div.button-group-sticky {
   background-color: white;
   z-index: 1001;
 }
-div.unit-navigation {
+div.unit-navigation,
+div.group-navigation {
   margin-top: 6px;
   text-align: left;
   position: static;
@@ -2456,9 +2504,9 @@ h6 {
 .left {
   text-align: left;
 }
-.right {
+/*.right {
   text-align: right;
-}
+}*/
 .center {
   text-align: center;
 }
@@ -2800,17 +2848,13 @@ div.request_training {
   text-align: center;
 }
 
-span.bulk_actions {
-  float: right;
+div.bulk_actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
 }
-span.bulk_actions select#action{
-  display: inline-block;
-  vertical-align: middle;
-}
-
-span.bulk_actions select#subaction{
+div.bulk_actions select#subaction{
   display: none;
-  vertical-align: middle;
 }
 
 span.optional {

@@ -29,7 +29,7 @@ table.table th {
   position: sticky;
   top: var(--ctstem-sticky-margin-top);
   z-index: 1000;
-  background-color: #666666;
+  background-color: #666666 !important;
   color: #e5e5e5 !important;
 }
 div.response table.table th {
@@ -65,6 +65,9 @@ table.table.unit_lesson thead tr {
 }
 table.table.inner_table {
   margin-top: 1em;
+}
+div.table_container table.table.inner_table {
+  margin-top: 0 !important;
 }
 table.table.inner_table thead tr {
   font-size: 0.9em;

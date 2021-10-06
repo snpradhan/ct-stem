@@ -6,40 +6,40 @@
   <div>
     {% if form.instance.is_active %}
       <button class="btn inbetween blue search_users" data-target="#userSearch" data-form="{% url 'ctstem:searchTeachers' %}">
-        <i class="fas fa-plus"></i>
+        Add New
       </button>
     {% endif %}
   </div>
-  <div class="controls table_container">
-    <div style="display:none;">
-      {{form.shared_with}}
-    </div>
-    <table class="table table-striped table-bordered table-condensed inner_table" id="teachers">
-      <thead>
-        <tr>
-          <th> Username </th>
-          <th> Name </th>
-          <th> Email </th>
-          <th> Unshare </th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for x in form.shared_with.value %}
-          {% with teacher=x|getTeacherInfo %}
-          <tr id="{{teacher.id}}">
-            <td>{{teacher.user.username}}</td>
-            <td>{{teacher.user.get_full_name}}</td>
-            <td>{{teacher.user.email}}</td>
-            <td>
-              <button type="button" class="btn small red remove" aria-label="Unshare resource with this teacher" title="Unshare resource with this teacher" href="#">
-                <i class="fa fa-trash" aria-hidden="true"></i>
-              </button>
-            </td>
-          </tr>
-          {% endwith %}
-        {% endfor %}
-      </tbody>
-    </table>
+  <div style="display:none;">
+    {{form.shared_with}}
   </div>
-  <div class="help warning">{{form.shared_with.help_text|safe}}</div>
+
+  <table class="table table-striped table-bordered table-condensed inner_table" id="teachers">
+    <thead>
+      <tr>
+        <th> Username </th>
+        <th> Name </th>
+        <th> Email </th>
+        <th> Unshare </th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for x in form.shared_with.value %}
+        {% with teacher=x|getTeacherInfo %}
+        <tr id="{{teacher.id}}">
+          <td>{{teacher.user.username}}</td>
+          <td>{{teacher.user.get_full_name}}</td>
+          <td>{{teacher.user.email}}</td>
+          <td>
+            <button type="button" class="btn small red remove" aria-label="Unshare resource with this teacher" title="Unshare resource with this teacher" href="#"
+              {% if not form.instance.is_active %} disabled {% endif %}>
+              <i class="fa fa-trash" aria-hidden="true"></i>
+            </button>
+          </td>
+        </tr>
+        {% endwith %}
+      {% endfor %}
+    </tbody>
+  </table>
+
 </div>

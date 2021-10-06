@@ -1,0 +1,67 @@
+{% load ctstem_extras %}
+<div class="button-container">
+  {% if form.instance.id and form.instance.is_active %}
+    <button type="submit" class="btn inbetween yellow" id="submit">Save Class</button>
+    <div class="dropdown">
+      <button type="button"class="btn inbetween yellow dropdown-toggle" data-toggle="dropdown">More...</i></button>
+      <ul class="dropdown-menu">
+        <li>
+          <a class="dropdown-item search_users" data-target="#userSearch" data-form="{% url 'ctstem:searchTeachers' %}">
+            Share Class
+          </a>
+        </li>
+        <li>
+          <a class="dropdown-item assignment-modal" href="#" data-toggle="modal" data-target="#assignment" data-id="{{form.instance.id}}" data-title="{{form.instance.title}}" data-subject="{{form.instance.subject.id}}" title="Search and Add Assignments">
+            Add Assignments
+          </a>
+        </li>
+        <li>
+          <a class="dropdown-item add_student" data-target="#addStudentModal" data-form="{% url 'ctstem:addStudentsToClass'  form.instance.id %}" title="Search and Add existing Students to this class">
+            Add Students
+          </a>
+        </li>
+        <li class="divider"></li>
+        {% if assignments|length > 0 %}
+          {% with status=form.instance.is_active|yesno:"active,inactive"%}
+            {% if user.teacher %}
+              <li>
+                <a class="dropdown-item" href="{% url 'ctstem:teacherAssignmentDashboard' user.teacher.id status %}?group={{form.instance.id}}">
+                  View Assignment Dashboard
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="{% url 'ctstem:teacherStudentDashboard' user.teacher.id status %}?group={{form.instance.id}}">
+                  View Student Dashboard
+                </a>
+              </li>
+            {% else %}
+              <li>
+                <a class="dropdown-item" href="{% url 'ctstem:teacherAssignmentDashboard' form.teacher.value status %}?group={{form.instance.id}}">
+                  View Assignment Dashboard
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="{% url 'ctstem:teacherStudentDashboard' form.teacher.value status %}?group={{form.instance.id}}">
+                  View Student Dashboard
+                </a>
+              </li>
+            {% endif %}
+          {% endwith %}
+          <li class="divider"></li>
+        {% endif %}
+        <li>
+          <a class="dropdown-item" href="{% url 'ctstem:inactivateGroup' form.instance.id %}" onclick="return confirm('Are you sure you want to inactivate {{form.instance.title}}?')">
+              Inactivate Class
+          </a>
+        </li>
+        {% if user.administrator %}
+          <li>
+            <a class="dropdown-item" href="{% url 'ctstem:deleteGroup' form.instance.id %}" onclick="return confirm('Are you sure you want to delete {{form.instance.title}}?')">
+              Delete Class
+            </a>
+          </li>
+        {% endif %}
+      </ul>
+    </div>
+  {% endif %}
+</div>

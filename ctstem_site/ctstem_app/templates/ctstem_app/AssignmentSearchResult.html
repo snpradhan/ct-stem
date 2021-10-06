@@ -84,9 +84,11 @@ $(function (){
 
   $("button.select_assignment").click(function(){
     //if assigning a Unit get and assign all the underlying published lessons
+    var selected_assignment = $(this);
     var curriculum_name = $(this).attr('name');
     var group_class_id = "{{group_id}}";
     var curr_id = $(this).attr('id');
+    var unit_id = null;
     $('input#assign_id').val();
     var keep_open_id = null;
     if($(this).hasClass('lesson')){
@@ -95,6 +97,7 @@ $(function (){
     }
     else if($(this).hasClass('unit')){
       keep_open_id = $(this).closest('tr.unit').attr('id');
+      unit_id = $(this).attr('id');
     }
     data = {}
     data['csrfmiddlewaretoken'] = $('#assignmentForm').find('input:hidden').eq(0).val();;
@@ -110,7 +113,12 @@ $(function (){
           if(keep_open_id){
             $('input#assign_id').val(keep_open_id);
           }
-          $("#assignmentForm").submit();
+          $(selected_assignment).attr('disabled', 'disabled');
+          if(unit_id){
+            $('tr.lesson.unit_'+unit_id+' button.select_assignment').attr('disabled', 'disabled');
+          }
+
+          //$("#assignmentForm").submit();
         },
         error: function(xhr, ajaxOptions, thrownError){
           $('#assignmentMsg .errorlist li').removeClass('success').addClass('error').html("Something went wrong...");

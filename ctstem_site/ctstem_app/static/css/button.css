@@ -15,7 +15,7 @@
 }
 .btn.inbetween, button[class*="inbetween"] {
   font-size: 1.2em !important;
-  padding: 0.7em 1.2em !important;
+  padding: 0.9em 1.2em !important;
 }
 .btn.small, button[class*="small"] {
   font-size: 1em !important;

@@ -22,7 +22,7 @@
           <thead>
             <tr>
               {% if not user.researcher or role != 'students' %}
-                <th width="1%" class="no-sort">Select All<br><input id="select-all" type="checkbox" value="0" name="select-all"/></th>
+                <th width="1%" class="no-sort select-checkbox">Select All<br><input id="select-all" type="checkbox" value="0" name="select-all"/></th>
               {% endif %}
               {% if user.administrator or user.researcher %}
                 {% if role == 'students' %}
@@ -77,7 +77,7 @@
             {% for userProfile in users %}
               <tr>
                 {% if not user.researcher or role != 'students' %}
-                  <td>
+                  <td class="select-checkbox">
                     <input id="user_{{userProfile.user.id}}" type="checkbox" class="action-select" value="{{userProfile.user.id}}" name="user_{{userProfile.user.id}}" />
                   </td>
                 {% endif %}

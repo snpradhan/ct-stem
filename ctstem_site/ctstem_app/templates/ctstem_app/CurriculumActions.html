@@ -1,15 +1,9 @@
 {% load ctstem_extras %}
 <div class="button-container">
-  <span>
-    <button type="submit" class="btn inbetween yellow" id="submit">Save</button>
-  </span>
-  &nbsp;
-  <span>
-    <button type="button" class="btn inbetween yellow" id="save_continue">Save & Continue </button>
-  </span>
-  &nbsp;
+  <button type="submit" class="btn inbetween yellow" id="submit">Save</button>
+  <button type="button" class="btn inbetween yellow" id="save_continue">Save & Continue </button>
   {% if curriculum.id %}
-    <span class="dropdown">
+    <div class="dropdown">
       <button type="button"class="btn inbetween yellow dropdown-toggle" data-toggle="dropdown">More...</i></button>
       <ul class="dropdown-menu">
         {% if page >= 0 %}
@@ -46,7 +40,7 @@
           </li>
         {% endif %}
       </ul>
-    </span>
+    </div>
   {% endif %}
 </div>
 

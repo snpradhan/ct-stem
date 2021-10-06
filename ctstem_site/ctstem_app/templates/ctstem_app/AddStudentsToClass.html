@@ -1,3 +1,4 @@
+{% load base_extras %}
 <div class="modal-dialog modal-lg">
   <div class="modal-content">
     <div class="modal-header">
@@ -91,17 +92,18 @@
         <div class="modal-body">
           {% for field in studentCreateForm %}
             <div class="form-group">
-              <label for="id_{{field.name}}">
+              <label for="id_{{field.name}}"
+                      {% if field.name == 'username' %}
+                        id="username_info" class="info" rel="popover" data-content="" data-trigger="hover"
+                      {% elif field.name == 'test_account' %}
+                        id="test_account_info" class="info" rel="popover" data-content="" data-trigger="hover"
+                      {% endif %}>
                 {{ field.label|title }}
                 {% if field.field.required %}
                   (<span class="required">*</span>)
                 {% endif %}
-                {% if field.name == 'username' %}
-                  <span data-toggle="tooltip" data-placement="top" title="Please enter the username in lowercase.">
-                    <i class="fa fa-info-circle" aria-hidden="true"></i>
-                  </span>
-                {% elif field.name == 'test_account' %}
-                  <span data-toggle="tooltip" data-placement="top" title="Curriculum exclusively assigned to Test Student accounts can be deleted without any restriction.">
+                {% if field.name == 'username' or field.name == 'test_account'%}
+                  <span>
                     <i class="fa fa-info-circle" aria-hidden="true"></i>
                   </span>
                 {% endif %}
@@ -420,7 +422,22 @@
         $.ajax(options);
       }
     });
-
+    $("#username_info").popover({
+      placement: 'right',
+      title: 'Username',
+      html: true ,
+      content: function(){
+        return 'Please enter the username in lowercase.';
+      }
+    });
+    $("#test_account_info").popover({
+      placement: 'right',
+      title: 'Test Account',
+      html: true ,
+      content: function(){
+        return 'Curriculum exclusively assigned to Test Student accounts can be deleted without any restriction.';
+      }
+    });
 
   });
 

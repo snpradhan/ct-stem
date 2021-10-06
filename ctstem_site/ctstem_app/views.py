@@ -3448,7 +3448,6 @@ def group(request, id=''):
       if request.method == 'GET':
         form = forms.UserGroupForm(user=request.user, instance=group, prefix='group')
         context = {'form': form, 'role': 'group', 'assignmentForm': assignmentForm, 'assignments': assignments, 'keys': keys, 'domain': domain}
-
         return render(request, 'ctstem_app/UserGroup.html', context)
 
       elif request.method == 'POST':

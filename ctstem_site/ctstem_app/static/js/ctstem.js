@@ -210,7 +210,7 @@ $(function () {
   });
 
   /* Search Collaborators and Teachers */
-  $("button.search_users").click(function(e){
+  $("button.search_users, a.search_users").click(function(e){
     e.preventDefault();
     var url = $(this).data("form");
     var modal = $(this).data("target");
@@ -221,7 +221,7 @@ $(function () {
   });
 
   /* trigger AddStudentsToClass Modal */
-  $("button.add_student").click(function(e){
+  $("button.add_student, a.add_student").click(function(e){
     e.preventDefault();
     var url = $(this).data("form");
     var modal = $(this).data("target");
@@ -261,6 +261,9 @@ $(function () {
 
   if($('div.unit-navigation').length > 0) {
     stick_div_to_top($('div.unit-navigation'), false);
+  }
+  if($('div.group-navigation').length > 0) {
+    stick_div_to_top($('div.group-navigation'), false);
   }
 
   $('a.emoji-modal').click(function(){
@@ -382,6 +385,64 @@ $(function () {
     changeYear: true,
     /*yearRange: "1900:2100",*/
     // You can put more options here.
+  });
+
+  $(".info").click(function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+  });
+
+  $(document).click(function (e) {
+    if (($('.popover').has(e.target).length == 0) || $(e.target).is('.close')) {
+      $(".info").popover('hide');
+    }
+  });
+  $("#username_info").popover({
+    placement: 'right',
+    title: 'Username',
+    html: true ,
+    content: function(){
+      return 'Please enter the username in lowercase.';
+    }
+  });
+  $("#test_account_info").popover({
+    placement: 'right',
+    title: 'Test Account',
+    html: true ,
+    content: function(){
+      return 'Curriculum exclusively assigned to Test Student accounts can be deleted without any restriction.';
+    }
+  });
+  $('div.unit-navigation a:not(.delete_curriculum)').click(function(e){
+    var link = $(this);
+    e.preventDefault();
+    bootbox.confirm({ title: 'Confirm',
+                      message: "<p>If you haven't saved the current curriculum, click <strong>Close</strong> to dismiss this popup and then <strong>Save</strong> the curriculum before proceeding. Otherwise, click <strong>Proceed</strong> to proceed.</p>",
+                      buttons: {
+                        confirm: {
+                            label: 'Proceed',
+                            className: 'btn-normal-yellow'
+                        },
+                        cancel: {
+                            label: 'Close',
+                            className: 'btn-normal-red'
+                        }
+                      },
+                      callback: function(result){
+                        if (result == true) {
+                          if($(link).hasClass('fa-files-o')) {
+                            $('div#spinner').show();
+                          }
+                          window.location = $(link).attr("href");
+                        }
+                      },
+                    });
+  });
+
+  //selecting all or selecting a row in a table
+  $(".select-checkbox").on('click', function(e){
+    cb = $(e.target).children(":checkbox");
+    cb.trigger('click');
   });
 
   bind_user_removal();

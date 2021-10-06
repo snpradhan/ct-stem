@@ -10,35 +10,65 @@
 {% block content %}
   {{block.super}}
   <div class="content">
-    {% if form.instance.id %}
-      <h2>
-        Edit Class
-        {% if user.teacher and user.teacher.id != form.teacher.value and user.teacher in form.instance.shared_with.all %}
-          <i class="fa fa-share-alt" title="Shared by {{form.instance.teacher}}"></i>
-        {% endif %}
-      </h2>
-    {% else %}
-      <h2>Add New Class</h2>
-    {% endif %}
-    <div id="dashboard_header">
-      <div class="navigation">
-        {% if user.teacher %}
-          <h5 class="left"><a href="{% url 'ctstem:teacherDashboard' user.teacher.id 'active' %}">
-            <i class="fas fa-chevron-left"></i><i class="fas fa-chevron-left"></i> Back to Teacher Dashboard</a>
-          </h5>
-        {% elif form.instance.id %}
-          <h5 class="left"><a href="{% url 'ctstem:teacherDashboard' form.teacher.value 'active' %}">
-            <i class="fas fa-chevron-left"></i><i class="fas fa-chevron-left"></i> Back to Teacher Dashboard</a>
-          </h5>
-        {% endif %}
-      </div>
-    </div>
     <form method="post" id="userGroupForm" enctype="multipart/form-data">
       {% csrf_token %}
       <div class="group_container">
+        <div class="left-navigation">
+          <div class="form-group group-navigation">
+            <ul>
+            {% if user.teacher %}
+              <li>
+                <h5 class="left">
+                  <a href="{% url 'ctstem:teacherDashboard' user.teacher.id 'active' %}">
+                    Teacher Dashboard
+                  </a>
+                </h5>
+              </li>
+            {% elif form.instance.id %}
+              <li>
+                <h5 class="left">
+                  <a href="{% url 'ctstem:teacherDashboard' form.teacher.value 'active' %}">
+                    Teacher Dashboard
+                  </a>
+                </h5>
+              </li>
+            {% endif %}
+              <li>
+                <h5 class="left">
+                  <a href="#class_overview" class="page-scroll">
+                    Class Overview
+                  </a>
+                </h5>
+              </li>
+            {% if form.instance.id %}
+              <li>
+                <h5 class="left">
+                  <a href="#class_assignments" class="page-scroll">
+                    Class Assignments
+                  </a>
+                </h5>
+              </li>
+              <li>
+                <h5 class="left">
+                  <a href="#class_roster" class="page-scroll">
+                    Class Roster
+                  </a>
+                </h5>
+              </li>
+            {% endif %}
+          </div>
+        </div>
+
         <div class="group_components">
-          <div class="table" id="group">
+          <div class="table" id="class_overview">
             {{form.management_form}}
+            <div class="section_header">
+              <div class="button-container"></div>
+              <h4 style="text-decoration: underline;">
+                Class Overview
+              </h4>
+              {% include "ctstem_app/UserGroupActions.html" %}
+            </div>
             <div class="form-group">
               <label for="id_group-title">{{ form.title.label }} {% if form.title.field.required %}(<span class="required">*</span>){% endif %} </label>
               <div class="controls">{{form.title}}</div>
@@ -53,6 +83,11 @@
 
             <div class="form-group">
               <label for="id_group-icon">{{ form.icon.label }} {% if form.icon.field.required %}(<span class="required">*</span>){% endif %} </label>
+              {% if form.instance.id and form.instance.icon.url %}
+                <div class="icon_preview">
+                  <img src="{{form.instance.icon.url}}" class="icon" alt="">
+                </div>
+              {% endif %}
               <div class="controls">{{form.icon}}</div>
               <div class="help warning">{{form.icon.help_text|safe}}</div>
               <div class="error">{{ form.icon.errors }}</div>
@@ -98,16 +133,26 @@
               <div class="input-group">
                 {{form.group_code}}
                 <span class="input-group-btn">
-                  <input type="button" class="btn blue" id="generate_code" value="Generate"/>
+                  <input type="button" class="btn blue" id="generate_code" value="Generate" {% if not form.is_active.value %} disabled {% endif %}/>
                 </span>
               </div>
               <div class="error">{{ form.group_code.errors }}</div>
             </div>
 
+
             <div class="form-group">
               <label for="id_group-is_active">{{ form.is_active.label|title }} {% if form.is_active.field.required %}(<span class="required">*</span>){% endif %} </label>
-              <div class="controls">{{form.is_active}}</div>
-              <div class="error">{{ form.is_active.errors }}</div>
+              {{form.is_active.as_hidden}}
+              <div class="switch_container {% if not form.is_active.value %} inactive {% endif %}">
+                <label class="switch">
+                  <input class="switch-input" type="checkbox" id="id_is_active"
+                         {% if form.is_active.value %} checked {% else %} disabled  {% endif %}/>
+                  <span class="switch-label" data-on="" data-off=""></span>
+                  <span class="switch-handle"></span>
+                </label>
+                &nbsp;
+                <label class="switch_label">Active</label>
+              </div>
             </div>
 
             {% if form.instance.id %}
@@ -131,272 +176,278 @@
               </div>
             </div>
             {% endif %}
-            {% if form.instance.id %}
-              <div class="form-group assignment_table">
-                {{formset.management_form}}
-                {{formset.id}}
-                <div>
-                  <label for="id_assignment_table">Assignments (<span id="assignment_count">{{assignments|length}}</span>)</label>
-                </div>
-                 <div>
-                {% if form.instance.is_active %}
-                  <a type="button" class="btn inbetween blue assignment-modal" href="#" data-toggle="modal" data-target="#assignment" data-id="{{form.instance.id}}" data-title="{{form.instance.title}}" data-subject="{{form.instance.subject.id}}" title="Search and Add Assignments">
-                      <i class="fas fa-plus"></i>
-                  </a>
-                {% endif %}
+          </div>
 
-                {% if assignments|length > 0 %}
-                  {% with status=form.instance.is_active|yesno:"active,inactive"%}
-                    {% if user.teacher %}
-                      <a type="button" class="btn inbetween orange" href="{% url 'ctstem:teacherAssignmentDashboard' user.teacher.id status %}?group={{form.instance.id}}">
-                        <i class="fas fa-tachometer-alt"></i>
-                      </a>
-                    {% else %}
-                      <a type="button" class="btn inbetween orange" href="{% url 'ctstem:teacherAssignmentDashboard' form.teacher.value status %}?group={{form.instance.id}}">
-                        <i class="fas fa-tachometer-alt"></i>
-                      </a>
-                    {% endif %}
-                  {% endwith %}
-                {% endif %}
+          {% if form.instance.id %}
+            <div class="table assignment_table" id="class_assignments">
+              {{formset.management_form}}
+              {{formset.id}}
+              <div class="section_header">
+                <div class="button-container"></div>
+                <h4 style="text-decoration: underline;">
+                  Class Assignments ({{assignments|length}})
+                </h4>
+                <div class="button-container">
+                  {% if form.instance.is_active %}
+                    <a type="button" class="btn inbetween blue assignment-modal" href="#" data-toggle="modal" data-target="#assignment" data-id="{{form.instance.id}}" data-title="{{form.instance.title}}" data-subject="{{form.instance.subject.id}}" title="Search and Add Assignments">
+                        Add New
+                    </a>
+                  {% endif %}
+                  {% if assignments|length > 0 %}
+                    {% with status=form.instance.is_active|yesno:"active,inactive"%}
+                      {% if user.teacher %}
+                        <a type="button" class="btn inbetween orange" href="{% url 'ctstem:teacherAssignmentDashboard' user.teacher.id status %}?group={{form.instance.id}}">
+                          View Dashboard
+                        </a>
+                      {% else %}
+                        <a type="button" class="btn inbetween orange" href="{% url 'ctstem:teacherAssignmentDashboard' form.teacher.value status %}?group={{form.instance.id}}">
+                          View Dashboard
+                        </a>
+                      {% endif %}
+                    {% endwith %}
+                  {% endif %}
                 </div>
-                <div class="table_container">
-                  <table class="table table-striped table-condensed table-bordered inner_table">
-                    <thead>
-                      <tr>
-                        <th style="width:50%;" colspan="2">Assigned Curriculum</th>
-                        <th style="width:10%;">Direct Student Link</th>
-                        <th style="width:10%;">Assigned On</th>
-                        <th style="width:10%;">Hide Student Name <i class="fa fa-info-circle" aria-hidden="true" title="When checked, sudent names will be anonymized on the dashboard"></i></th>
-                        <th style="width:10%;">Lock on Completion <i class="fa fa-info-circle" aria-hidden="true" title="When locked, students will be unable to open and view the assignment once they submit"></i></th>
-                        <th style="width:10%;">Realtime Feedback <i class="fa fa-info-circle" aria-hidden="true" title="When checked, sudents will be given correctness feedback for Drop down and Multiple choice questions on Save"></i></th>
-                        <th style="width:10%;">Delete</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {% for curriculum in keys %}
-                      {% with assignment_list=assignments|get_item:curriculum %}
-                        {% if curriculum.curriculum_type == 'U' %}
-                          <tr class="{% if forloop.counter|divisibleby:2 %}  even {% else %} odd {% endif %}">
-                            <td rowspan="{{assignment_list|length}}">
-                              <div><b>Unit:</b>&nbsp;{{curriculum.title}}</div>
-                            </td>
-                        {% endif %}
-                        {% for order, assignment in assignment_list.items|sort %}
-                          {% if curriculum.curriculum_type == 'U'  %}
-                            {% if forloop.counter > 1 %}
-                            <tr class="{% if forloop.parentloop.counter|divisibleby:2 %}  even {% else %} odd {% endif %}">
-                            {% endif %}
-                            <td>
+              </div>
+              <div class="table_container">
+                <table class="table table-striped table-condensed table-bordered inner_table">
+                  <thead>
+                    <tr>
+                      <th style="width:50%;" colspan="2">Assigned Curriculum</th>
+                      <th style="width:10%;">Direct Student Link</th>
+                      <th style="width:10%;">Assigned On</th>
+                      <th style="width:10%;" id="lock_info" class="info" rel="popover" data-content="" data-trigger="hover">
+                        Lock on Completion <i class="fa fa-info-circle" aria-hidden="true"></i>
+                      </th>
+                      <th style="width:10%;" id="feedback_info" class="info" rel="popover" data-content="" data-trigger="hover">
+                        Realtime Feedback <i class="fa fa-info-circle" aria-hidden="true"></i>
+                      </th>
+                      <th style="width:10%;">Delete</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for curriculum in keys %}
+                    {% with assignment_list=assignments|get_item:curriculum %}
+                      {% if curriculum.curriculum_type == 'U' %}
+                        <tr class="{% if forloop.counter|divisibleby:2 %}  even {% else %} odd {% endif %}">
+                          <td rowspan="{{assignment_list|length}}">
+                            <div><b>Unit:</b>&nbsp;{{curriculum.title}}</div>
+                          </td>
+                      {% endif %}
+                      {% for order, assignment in assignment_list.items|sort %}
+                        {% if curriculum.curriculum_type == 'U'  %}
+                          {% if forloop.counter > 1 %}
+                          <tr class="{% if forloop.parentloop.counter|divisibleby:2 %}  even {% else %} odd {% endif %}">
+                          {% endif %}
+                          <td>
+                            <div>
+                              <b>
+                              {% if assignment.curriculum.curriculum_type == 'L' %}
+                                Lesson:
+                              {% elif assignment.curriculum.curriculum_type == 'A' %}
+                                Assessment:
+                              {% endif %}
+                              </b>
+                              &nbsp;{{assignment.curriculum.title}}
+
+                            </div>
+                          </td>
+                        {% else %}
+                          <tr class="{% if forloop.parentloop.counter|divisibleby:2 %}  even {% else %} odd {% endif %}">
+                            <td colspan="2">
                               <div>
                                 <b>
-                                {% if assignment.curriculum.curriculum_type == 'L' %}
+                                {% if curriculum.curriculum_type == 'L' %}
                                   Lesson:
-                                {% elif assignment.curriculum.curriculum_type == 'A' %}
+                                {% elif curriculum.curriculum_type == 'A' %}
                                   Assessment:
                                 {% endif %}
                                 </b>
-                                &nbsp;{{assignment.curriculum.title}}
-
+                              &nbsp;{{curriculum.title}}
                               </div>
                             </td>
-                          {% else %}
-                            <tr class="{% if forloop.parentloop.counter|divisibleby:2 %}  even {% else %} odd {% endif %}">
-                              <td colspan="2">
-                                <div>
-                                  <b>
-                                  {% if curriculum.curriculum_type == 'L' %}
-                                    Lesson:
-                                  {% elif curriculum.curriculum_type == 'A' %}
-                                    Assessment:
-                                  {% endif %}
-                                  </b>
-                                &nbsp;{{curriculum.title}}
-                                </div>
-                              </td>
-                          {% endif %}
-                              <td style="text-align:center;">
-                                {% if form.instance.is_active %}
-                                  <a class="btn yellow assignment_link" href="#" data-toggle="modal" data-target="#assignmentLinkModal" data-invite-link="https://{{domain}}/?next=/login?next=/assignments?assignment={{assignment.id}}" data-title="Direct Student Assignment Link" title="Direct Assignment Link">
-                                    <i class="fa fa-link"></i>
-                                  </a>
-                                {% endif %}
-                              </td>
-                              <td style="vertical-align:middle;">
-                                {{assignment.assigned_date|date }}
-                              </td>
-                              <td class="anonymize_student_name" style="text-align:center;">
-                                <!--input type="checkbox" class="anonymize_student" {% if assignment.anonymize_student %} checked {% endif %} data-id="{{assignment.id}}" data-title="{{assignment.curriculum.title}}" {% if not form.instance.is_active %} disabled {% endif %}/-->
-                                {% include "ctstem_app/AnonymizeStudentSwitch.html" with anonymize_student=assignment.anonymize_student assignment_id=assignment.id is_class_active=form.instance.is_active %}
-                              </td>
-                              <td class="lock_on_completion" style="text-align:center;">
-                                <!--input type="checkbox" class="lock_assignment" {% if assignment.lock_on_completion %} checked {% endif %} data-id="{{assignment.id}}" data-title="{{assignment.curriculum.title}}" {% if not form.instance.is_active %} disabled {% endif %}/-->
-                                {% include "ctstem_app/LockOnCompletionSwitch.html" with lock_on_completion=assignment.lock_on_completion assignment_id=assignment.id is_class_active=form.instance.is_active %}
-                              </td>
-                              <td class="realtime_feedback" style="text-align:center;">
-                                <!--input type="checkbox" class="feedback_assignment" {% if assignment.realtime_feedback %} checked {% endif %} data-id="{{assignment.id}}" data-title="{{assignment.curriculum.title}}" {% if not form.instance.is_active %} disabled {% endif %}/-->
-                                {% include "ctstem_app/RealtimeFeedbackSwitch.html" with realtime_feedback=assignment.realtime_feedback assignment_id=assignment.id is_class_active=form.instance.is_active %}
-                              </td>
-
-                              <td style="text-align:center;">
-                                <!-- only allow assignments to be deleted if the class is active and the assignment in question is still New -->
-                                {% if form.instance.is_active %}
-                                  {% with assignment_status=assignment.id|get_class_assignment_status %}
-                                  {% all_test_accounts_in_class form.instance as all_test_account %}
-                                    {% if all_test_account or assignment_status == 'N' %}
-                                      <a type="button" class="btn small red delete_assignment" name="delete_assignment" aria-label="Delete Assignment" title="Delete this Assignment" href="{% url 'ctstem:deleteAssignment' assignment.id %}" onclick="return confirm('Are you sure you want to delete this assignment?')">
-                                        <i class="fa fa-trash"></i>
-                                      </a>
-                                    {% else %}
-                                      <div class="assignment_status">Assignment In Progress</div>
-                                    {% endif %}
-                                  {% endwith %}
-                                {% endif %}
-
-                              </td>
-                            </tr>
-                        {% endfor %}
-                      {% endwith %}
-                      {% endfor %}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
-              <div class="form-group">
-                <div>
-                  <label for="id_{{title}}"> Students (<span id="student_count">{{form.members.value|length}}</span>) </label>
-                </div>
-                <div>
-                  {% if form.instance.is_active %}
-                    <button class="btn inbetween blue add_student" data-target="#addStudentModal" data-form="{% url 'ctstem:addStudentsToClass'  form.instance.id %}" title="Search and Add existing Students to this class">
-                      <i class="fas fa-plus"></i>
-                    </button>
-                    {% if user.administrator %}
-                      {% student_in_group_admin_actions %}
-                    {% elif not user.researcher %}
-                      {% student_in_group_teacher_actions %}
-                    {% endif %}
-                  {% endif %}
-                </div>
-                <div class="controls table_container">
-                  {{form.members.as_hidden}}
-                  <table class="table table-striped table-bordered table-condensed inner_table" id="members">
-                    <thead>
-                      <tr>
-                        {% if not user.researcher %}
-                        <th width="3%" class="no-sort">
-                          {% if form.instance.is_active %}
-                            <input id="select-all" type="checkbox" value="0" name="select-all"/>
-                          {% endif %}
-                        </th>
                         {% endif %}
-                        {% if not user.researcher %}
-                          <th> Username </th>
-                        {% else %}
-                          <th> Student ID </th>
-                        {% endif %}
-                        <th> Name </th>
-                        <th> Email </th>
-                        <th> Status </th>
-                        <th> Student Consent </th>
-                        <th> Test Account? </th>
-                        <th> Member Since</th>
-                        <th> Last Login </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {% with online_users=request.online_now_ids %}
-                      {% for x in form.members.value %}
-                        {% with student=x|getStudentInfo %}
-                        <tr id="{{student.id}}">
-                          {% if not user.researcher %}
-                            <td>
+                            <td style="text-align:center;">
                               {% if form.instance.is_active %}
-                                <input id="student_{{student.id}}" type="checkbox" class="action-select" value="{{student.id}}" name="student_{{student.id}}" />
+                                <a class="btn yellow assignment_link" href="#" data-toggle="modal" data-target="#assignmentLinkModal" data-invite-link="https://{{domain}}/?next=/login?next=/assignments?assignment={{assignment.id}}" data-title="Direct Student Assignment Link" title="Direct Assignment Link">
+                                  <i class="fa fa-link"></i>
+                                </a>
                               {% endif %}
                             </td>
-                          {% endif %}
-                          <td>
-                            {% if not user.researcher %}
-                              {{student.user.username}}
+                            <td style="vertical-align:middle;">
+                              {{assignment.assigned_date|date }}
+                            </td>
+                            <td class="lock_on_completion" style="text-align:center;">
+                              {% include "ctstem_app/LockOnCompletionSwitch.html" with lock_on_completion=assignment.lock_on_completion assignment_id=assignment.id is_class_active=form.instance.is_active %}
+                            </td>
+                            <td class="realtime_feedback" style="text-align:center;">
+                              {% include "ctstem_app/RealtimeFeedbackSwitch.html" with realtime_feedback=assignment.realtime_feedback assignment_id=assignment.id is_class_active=form.instance.is_active %}
+                            </td>
+
+                            <td style="text-align:center;">
+                              <!-- only allow assignments to be deleted if the class is active and the assignment in question is still New -->
                               {% if form.instance.is_active %}
-                                <div class="controls">
-                                  <a type="button" class="btn small green edit" aria-label="Edit Student profile" title="Edit Student profile" href="{% url 'ctstem:userProfile' student.user.id %}">
-                                    <i class="fas fa-pencil-alt"></i>
-                                  </a>
-                                  <a type="button" class="btn small red removeUser" aria-label="Remove Student from this group" title="Remove Student from this group" href="{% url 'ctstem:removeStudent' form.instance.id student.id  %}" data-id="{{forloop.counter0}}">
-                                    <i class="fa fa-trash"></i>
-                                  </a>
-                                  <button type="button" class="btn small blue reset_email" aria-label="Send password reset email" title="Send password reset email" onclick="this.disabled=true; return send_password_reset_email('{{student.user.username}}','{{csrf_token}}')">
-                                    <i class="fas fa-paper-plane"></i>
-                                  </button>
-                                  {% if user.administrator or user.teacher %}
-                                    <button type="button" class="btn small gray reset" aria-label="Reset Student Password" title="Reset Student Password" onclick="return reset_password('{{student.user.get_full_name}}','{{student.user.id}}','{{csrf_token}}')">
-                                      <i class="fas fa-sync-alt"></i>
-                                    </button>
+                                {% with assignment_status=assignment.id|get_class_assignment_status %}
+                                {% all_test_accounts_in_class form.instance as all_test_account %}
+                                  {% if all_test_account or assignment_status == 'N' %}
+                                    <a type="button" class="btn small red delete_assignment" name="delete_assignment" aria-label="Delete Assignment" title="Delete this Assignment" href="{% url 'ctstem:deleteAssignment' assignment.id %}" onclick="return confirm('Are you sure you want to delete this assignment?')">
+                                      <i class="fa fa-trash"></i>
+                                    </a>
+                                  {% else %}
+                                    <div class="assignment_status">Assignment In Progress</div>
                                   {% endif %}
-                                </div>
+                                {% endwith %}
                               {% endif %}
-                            {% else %}
-                              {{student.user.id}}
-                            {% endif %}
-                          </td>
-                          <td>
-                            {% if not user.researcher %}
-                              {{student.user.get_full_name}}
-                            {% else %}
-                              xxxxxxxxxxxxx
-                            {% endif %}
-                          </td>
-                          <td>
-                            {% if not user.researcher %}
-                              {{student.user.email}}
-                            {% else %}
-                              xxxxxxxxxxxxx
-                            {% endif %}
-                          </td>
-                          <td>{{student.user.is_active|yesno:"Active,Inactive"}}</td>
-                          <td>
-                            {% if student.consent == 'A' %}
-                              Agree
-                            {% elif student.consent == 'D' %}
-                              Disagree
-                            {% else %}
-                              Unknown
-                            {% endif %}
-                          </td>
-                          <td>{{student.test_account|yesno:"Yes,No"}}</td>
-                          <td>{{student.user.date_joined|date}} </td>
-                          <td>
-                            {% if student.user.id in online_users %}
-                              <div class="success">Online</div>
-                            {% else %}
-                              {{student.user.last_login|date}}
-                            {% endif %}
-                          </td>
-                        </tr>
-                        {% endwith %}
+
+                            </td>
+                          </tr>
                       {% endfor %}
-                      {% endwith %}
-                    </tbody>
-                  </table>
-                </div>
-                <div class="error">{{ form.members.errors }}</div>
+                    {% endwith %}
+                    {% endfor %}
+                  </tbody>
+                </table>
               </div>
-            {% else %}
-              <h4 class="warning"> Save the Class and then add Assignments and Students </h4>
-              {{formset.management_form}}
-              {{formset.id}}
-              {{formset.as_hidden}}
-            {% endif %}
-          </div>
-        </div>
-        <div class="button-container">
-          <div class="form-group button-group-fixed">
-            {% if form.instance.is_active %}
-              <input type="submit" class="btn inbetween green" id="submit" value="Save Class"/>
-            {% endif %}
-          </div>
+            </div>
+
+            <div class="table" id="class_roster">
+              <div class="section_header">
+                <div class="button-container"></div>
+                <h4 style="text-decoration: underline;">
+                  Class Roster ({{form.members.value|length}})
+                </h4>
+                <div class="button-container">
+                  {% if form.instance.is_active %}
+                    <button class="btn inbetween blue add_student" data-target="#addStudentModal" data-form="{% url 'ctstem:addStudentsToClass'  form.instance.id %}" title="Search and Add existing Students to this class">
+                      Add New
+                    </button>
+                  {% endif %}
+                </div>
+              </div>
+
+              {% if form.instance.is_active %}
+                {% if user.administrator %}
+                  {% student_in_group_admin_actions %}
+                {% elif not user.researcher %}
+                  {% student_in_group_teacher_actions %}
+                {% endif %}
+              {% endif %}
+
+              <div class="controls table_container">
+                {{form.members.as_hidden}}
+                <table class="table table-striped table-bordered table-condensed inner_table" id="members">
+                  <thead>
+                    <tr>
+                      {% if not user.researcher %}
+                      <th width="3%" class="no-sort select-checkbox">
+                        {% if form.instance.is_active %}
+                          Select All<br>
+                          <input id="select-all" type="checkbox" value="0" name="select-all"/>
+                        {% endif %}
+                      </th>
+                      {% endif %}
+                      {% if not user.researcher %}
+                        <th> Username </th>
+                      {% else %}
+                        <th> Student ID </th>
+                      {% endif %}
+                      <th> Name </th>
+                      <th> Email </th>
+                      <th> Last Login </th>
+                      <th> Member Since</th>
+                      <th> Status </th>
+                      <th> Student Consent </th>
+                      <th> Test Account? </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% with online_users=request.online_now_ids %}
+                    {% for x in form.members.value %}
+                      {% with student=x|getStudentInfo %}
+                      <tr id="{{student.id}}">
+                        {% if not user.researcher %}
+                          <td class="select-checkbox">
+                            {% if form.instance.is_active %}
+                              <input id="student_{{student.id}}" type="checkbox" class="action-select" value="{{student.id}}" name="student_{{student.id}}" />
+                            {% endif %}
+                          </td>
+                        {% endif %}
+                        <td>
+                          {% if not user.researcher %}
+                            {{student.user.username}}
+                            {% if form.instance.is_active %}
+                              <div class="controls">
+                                {% if user.administrator or user.teacher %}
+                                  <button type="button" class="btn small gray reset" aria-label="Reset Student Password" title="Reset Student Password" onclick="return reset_password('{{student.user.get_full_name}}','{{student.user.id}}','{{csrf_token}}')">
+                                    <i class="fas fa-sync-alt"></i>
+                                  </button>
+                                {% endif %}
+                                <button type="button" class="btn small blue reset_email" aria-label="Send password reset email" title="Send password reset email" onclick="this.disabled=true; return send_password_reset_email('{{student.user.username}}','{{csrf_token}}')">
+                                  <i class="fas fa-paper-plane"></i>
+                                </button>
+                                <a type="button" class="btn small green edit" aria-label="Edit Student profile" title="Edit Student profile" href="{% url 'ctstem:userProfile' student.user.id %}">
+                                  <i class="fas fa-pencil-alt"></i>
+                                </a>
+                                <a type="button" class="btn small red removeUser" aria-label="Remove Student from this group" title="Remove Student from this group" href="{% url 'ctstem:removeStudent' form.instance.id student.id  %}" data-id="{{forloop.counter0}}">
+                                  <i class="fa fa-trash"></i>
+                                </a>
+
+
+                              </div>
+                            {% endif %}
+                          {% else %}
+                            {{student.user.id}}
+                          {% endif %}
+                        </td>
+                        <td>
+                          {% if not user.researcher %}
+                            {{student.user.get_full_name}}
+                          {% else %}
+                            xxxxxxxxxxxxx
+                          {% endif %}
+                        </td>
+                        <td>
+                          {% if not user.researcher %}
+                            {{student.user.email}}
+                          {% else %}
+                            xxxxxxxxxxxxx
+                          {% endif %}
+                        </td>
+                        <td>
+                          {% if student.user.id in online_users %}
+                            <div class="success">Online</div>
+                          {% else %}
+                            {{student.user.last_login|date}}
+                          {% endif %}
+                        </td>
+                        <td>{{student.user.date_joined|date}} </td>
+                        <td>{{student.user.is_active|yesno:"Active,Inactive"}}</td>
+                        <td>
+                          {% if student.consent == 'A' %}
+                            Agree
+                          {% elif student.consent == 'D' %}
+                            Disagree
+                          {% else %}
+                            Unknown
+                          {% endif %}
+                        </td>
+                        <td>{{student.test_account|yesno:"Yes,No"}}</td>
+
+                      </tr>
+                      {% endwith %}
+                    {% endfor %}
+                    {% endwith %}
+                  </tbody>
+                </table>
+              </div>
+              <div class="error">{{ form.members.errors }}</div>
+
+              {% include "ctstem_app/UserGroupActions.html" %}
+            </div>
+          {% else %}
+            <h4 class="warning"> Save the Class and then add Assignments and Students </h4>
+            {{formset.management_form}}
+            {{formset.id}}
+            {{formset.as_hidden}}
+          {% endif %}
         </div>
       </div>
     </form>
@@ -426,6 +477,14 @@
         location.reload();
       });
 
+      $('#id_is_active').on('click', function(){
+        if($(this).is(':checked')){
+          $('#id_group-is_active').val(true);
+        }
+        else{
+          $('#id_group-is_active').val(false);
+        }
+      });
       $('.lock_assignment').on('click', function(){
         var flag = 0;
         var assignment_id = $(this).data('id');
@@ -478,6 +537,31 @@
           }
         });
       });
+      $('.page-scroll').click(function(){
+        $('html, body').animate({
+          scrollTop: $($(this).attr('href')).offset().top - 100,
+        }, 1000,'swing');
+      });
+
+      $("#lock_info").popover({
+        placement: 'top',
+        title: 'Lock on Completion',
+        html: false ,
+        container: 'body',
+        content: function(){
+          return 'When locked, students will be unable to open and view the assignment once they submit';
+        }
+      });
+      $("#feedback_info").popover({
+        placement: 'top',
+        title: 'Realtime Feedback',
+        html: false ,
+        container: 'body',
+        content: function(){
+          return 'When checked, students will be given correctness feedback for Drop down and Multiple choice questions on Save';
+        }
+      });
+
     });
   </script>
 {% endblock %}

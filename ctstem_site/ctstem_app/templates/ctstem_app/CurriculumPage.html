@@ -17,14 +17,16 @@
           </div>
           <div class="table step">
             {{form.management_form}}
-
-            {% include "ctstem_app/CurriculumActions.html" with page=form.order.value %}
-            <h4>
-              <span>&nbsp;</span>
-              <span class="step_title" style="font-weight: bold; text-decoration: underline;">{{form.title.value|default_if_none:"  "}}</span>
-              <span class="page_number">{% if form.order.value %}(Page {{form.order.value}}) {% endif %}</span>
-              <span>&nbsp;</span>
-            </h4>
+            <div class="section_header">
+              <div class="button-container"></div>
+              <h4>
+                <span>&nbsp;</span>
+                <span class="step_title" style="font-weight: bold; text-decoration: underline; max-width: 100%; overflow-wrap: break-word;">{{form.title.value|default_if_none:"  "}}</span>
+                <span class="page_number">{% if form.order.value %}(Page {{form.order.value}}) {% endif %}</span>
+                <span>&nbsp;</span>
+              </h4>
+              {% include "ctstem_app/CurriculumActions.html" with page=form.order.value %}
+            </div>
             <div class="curriculum_content collapsible_content">
               <div class="form-group order">
                 <label for="id_{{form.ORDER.name}}"> Page #.</label>
@@ -58,11 +60,9 @@
                       <th class="order">Q No.</th>
                       <th class="question_text">Question</th>
                       <th> Research Categories</th>
-                      <th class="referenced_by">
+                      <th class="referenced_by" class="info" id="reference_info" rel="popover" data-content="" data-trigger="hover">
                         Referenced By
-                        <span data-toggle="tooltip" data-placement="top" title="Provide a comma separated list of Page Numbers that will reference this question. This question will be available on those steps as readonly.">
-                          <i class="fa fa-info-circle" aria-hidden="true"></i>
-                        </span>
+                        <i class="fa fa-info-circle" aria-hidden="true"></i>
                       </th>
                       <th class="optional">Optional?</th>
                       <th class="question_edit">Delete/Edit</th>
@@ -330,6 +330,15 @@
         var error_length = $.trim($(this).text()).length;
         if(error_length > 0) {
           $(this).closest('.form-group').find('label, .curriculum_input .form-control:input, .curriculum_input .django-ckeditor-widget').addClass('input_error');
+        }
+      });
+      $("#reference_info").popover({
+        placement: 'top',
+        title: 'Referenced By',
+        html: false ,
+        container: 'body',
+        content: function(){
+          return 'Provide a comma separated list of Page Numbers that will reference this question. This question will be available on those steps as readonly.';
         }
       });
 

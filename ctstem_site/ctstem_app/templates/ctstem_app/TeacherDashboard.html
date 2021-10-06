@@ -45,18 +45,14 @@
           {% elif group.subject and group.subject.icon %}
             <img src="{{group.subject.icon.url}}" class="icon" alt="">
           {% else %}
-            <i class="fa fa-sitemap icon" aria-hidden="true"></i>
+            <img src="/static/img/class.png" class="icon" alt="">
           {% endif %}
         </div>
         <div class="class_details">
           <h5 class="left class_title">
-            {% if group.is_active %}
             <a href="{% url 'ctstem:group' group.id %}">
               {{group.title}}
             </a>
-            {% else %}
-              {{group.title}}
-            {% endif %}
           </h5>
           <div class="assignment_status_chart">
             <div id="assignment_chart_group_{{group.id}}" class="progress_chart" data-percent-complete="{{percent_complete}}"></div>

@@ -19,12 +19,16 @@
             {{field.as_hidden}}
           {% else %}
             <div class="form-group">
-              <label for="id_{{field.name}}">{{ field.label|title }} (<span class="required">*</span>)
-              {% if field.name == 'username' %}
-                <span data-toggle="tooltip" data-placement="top" title="Please enter your username in lowercase.">
-                  <i class="fa fa-info-circle" aria-hidden="true"></i>
-                </span>
-              {% endif %}
+              <label for="id_{{field.name}}"
+                      {% if field.name == 'username' %}
+                        id="username_info" class="info" rel="popover" data-content="" data-trigger="hover"
+                      {% endif %}>
+                {{ field.label|title }} (<span class="required">*</span>)
+                {% if field.name == 'username' %}
+                  <span>
+                    <i class="fa fa-info-circle" aria-hidden="true"></i>
+                  </span>
+                {% endif %}
               </label>
               {{field}}
               <div class="error">{{ field.errors }}</div>
@@ -33,7 +37,10 @@
         {% endfor %}
         {% for field in profileform %}
           <div class="form-group">
-            <label for="id_{{field.name}}">
+            <label for="id_{{field.name}}"
+                      {% if field.name == 'test_account' %}
+                        id="test_account_info" class="info" rel="popover" data-content="" data-trigger="hover"
+                      {% endif %}>
               {% if field.name == 'consent' %}
                 <a data-toggle="modal" data-target="#consent" href="#">{{ field.label }}</a>
               {% else %}
@@ -43,7 +50,7 @@
                 (<span class="required">*</span>)
               {% endif %}
               {% if field.name == 'test_account' %}
-                <span data-toggle="tooltip" data-placement="top" title="Curriculum exclusively assigned to Test Student accounts can be deleted without any restriction.">
+                <span>
                   <i class="fa fa-info-circle" aria-hidden="true"></i>
                 </span>
               {% endif %}

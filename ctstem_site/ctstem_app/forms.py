@@ -504,6 +504,7 @@ class CurriculumForm(ModelForm):
       'subject': forms.CheckboxSelectMultiple(),
       'acknowledgement': forms.Textarea(attrs={'rows':0, 'cols':60}),
       'credits': forms.Textarea(attrs={'rows':0, 'cols':60}),
+      'icon': widgets.FileInput,
     }
 
   def __init__(self, *args, **kwargs):
@@ -1477,6 +1478,9 @@ class UserGroupForm(ModelForm):
   class Meta:
     model = models.UserGroup
     exclude = ('id',)
+    widgets = {
+      'icon': widgets.FileInput,
+    }
 
   def __init__(self, *args, **kwargs):
     user = kwargs.pop('user')
@@ -1484,7 +1488,9 @@ class UserGroupForm(ModelForm):
 
     self.fields['title'].label = 'Class Name/Title'
     self.fields['time'].label = 'Time/Period'
+    self.fields['shared_with'].label = 'Shared Teachers'
     self.fields['group_code'].label = 'Class Code'
+    self.fields['is_active'].label = 'Class Status'
     self.fields['group_code'].widget.attrs['readonly'] = True
     if hasattr(user, 'teacher'):
       self.fields['members'].queryset = self.fields['members'].queryset.filter(school=user.teacher.school).order_by('user__first_name', 'user__last_name')

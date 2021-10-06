@@ -12,22 +12,28 @@
       <div class="curriculum_container">
         {% include "ctstem_app/CurriculumUnitNavigation.html" with flag="overview"%}
         <div class="curriculum_components">
+          {% if form.curriculum_type.value != 'U' %}
           <div class="form-group page-navigation">
             {% include "ctstem_app/CurriculumPageNavigation.html" with flag="overview" page=page %}
           </div>
+          {% endif %}
           {% if page < 0 %}
             <div class="table" id="curriculum">
-              {% include "ctstem_app/CurriculumActions.html" with page=page %}
-              <h4>
-                <span>&nbsp;</span>
-                <span class="curriculum_title" style="font-weight: bold; text-decoration: underline;">{{form.title.value|default_if_none:" "}}</span>
-                <span style="font-weight: bold;">(Overview)</span>
-                <span>&nbsp;</span>
-              </h4>
+              <div class="section_header">
+                <div class="button-container"></div>
+                <h4>
+                  <span>&nbsp;</span>
+                  <span class="curriculum_title" style="font-weight: bold; text-decoration: underline; max-width: 100%; overflow-wrap: break-word;">{{form.title.value|default_if_none:" "}}</span>
+                  <span style="font-weight: bold;">(Overview)</span>
+                  <span>&nbsp;</span>
+                </h4>
+                {% include "ctstem_app/CurriculumActions.html" with page=page %}
+              </div>
 
               <div class="curriculum_content collapsible_content">
 
                 {{form.management_form}}
+
                 <!-- CURRICULUM TYPE -->
                 <div class="form-group">
                   <label for="id_{{form.curriculum_type.name}}">{{ form.curriculum_type.label|title }} {% if form.curriculum_type.field.required %}(<span class="required">*</span>) {% endif %}</label>
@@ -112,6 +118,11 @@
                 <!-- ICON -->
                 <div class="form-group">
                   <label for="id_{{form.icon.name}}">{{ form.icon.label|title }} {% if form.icon.field.required %}(<span class="required">*</span>) {% endif %}</label>
+                  {% if form.instance.id and form.instance.icon.url %}
+                    <div class="icon_preview">
+                      <img src="{{form.instance.icon.url}}" class="icon" alt="">
+                    </div>
+                  {% endif %}
                   <div class="curriculum_input">
                     {{form.icon}}
                   </div>
@@ -248,13 +259,16 @@
             <!-- Student directions and attachments -->
             <!-- Page 0 of Student view -->
             <div class="table" id="directions_attachments">
-              {% include "ctstem_app/CurriculumActions.html" with page=page %}
-              <h4>
-                <span>&nbsp;</span>
-                <span class="step_title" style="font-weight: bold; text-decoration: underline;">Student Directions and Attachments</span>
-                <span>(Page 0)</span>
-                <span>&nbsp;</span>
-              </h4>
+              <div class="section_header">
+                <div class="button-container"></div>
+                <h4>
+                  <span>&nbsp;</span>
+                  <span class="step_title" style="font-weight: bold; text-decoration: underline;">Student Directions and Attachments</span>
+                  <span>(Page 0)</span>
+                  <span>&nbsp;</span>
+                </h4>
+                {% include "ctstem_app/CurriculumActions.html" with page=page %}
+              </div>
               <div class="curriculum_content collapsible_content">
                 <!-- STUDENT OVERVIEW -->
                 <div class="form-group">

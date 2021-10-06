@@ -29,15 +29,15 @@
             <label for="id_{{field.name}}">
               {{ field.label|title }} <span class="required_or_optional">{% if field.field.required or field.name == 'research_category' %} (<span class="required">*</span>) {% endif %}</span>
               {% if field.name == 'options' %}
-                <a href="#" class="info" id="options_info" rel="popover" data-content="">
+                <a href="#" class="info" id="options_info" rel="popover" data-content="" data-trigger="hover">
                   <i class="fa fa-info-circle" aria-hidden="true" />
                 </a>
               {% elif field.name == 'display_other_option' %}
-                <a href="#" class="info" id="other_info" rel="popover" data-content="">
+                <a href="#" class="info" id="other_info" rel="popover" data-content="" data-trigger="hover">
                   <i class="fa fa-info-circle" aria-hidden="true" />
                 </a>
               {% elif field.name == 'answer' %}
-                <a href="#" class="info" id="answer_info" rel="popover" data-content="">
+                <a href="#" class="info" id="answer_info" rel="popover" data-content="" data-trigger="hover">
                   <i class="fa fa-info-circle" aria-hidden="true" />
                 </a>
               {% endif %}
@@ -129,16 +129,6 @@ $(function (){
     }
   });
 
-  $(".info").click(function (e) {
-    e.preventDefault();
-    e.stopPropagation();
-  });
-
-  $(document).click(function (e) {
-    if (($('.popover').has(e.target).length == 0) || $(e.target).is('.close')) {
-      $(".info").popover('hide');
-    }
-  });
   //hide sketch background field and other option field by default
   $('div.form-group.sketch').hide();
   $('div.form-group.other').hide();
