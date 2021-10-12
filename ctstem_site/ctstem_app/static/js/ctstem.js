@@ -187,7 +187,7 @@ $(function () {
   });*/
 
   /* handler for search and assign curriculum modal trigger */
-  $('a.assignment-modal').click(function(){
+  $('.assignment-modal').click(function(){
     $("div.modal#assignment select#id_group_class option:selected").prop('selected', false);
     $("div.modal#assignment select#id_group_class option[value='"+$(this).data('id')+"']").prop('selected', true);
     var title = 'to Class';

@@ -38,7 +38,7 @@
       {% for grp in groups %}
       {% with group=grp|get_item:'group' percent_complete=grp|get_item:'percent_complete' group_assignment_status=grp|get_item:'assignment_status' total=grp|get_item:'total' %}
       {% get_chart_config group_assignment_status 'stacked_bar' as group_assignment_chart_config %}
-      <div class="col tile {% if forloop.counter > 6%} extra {% endif %}" {% if forloop.counter == 6%} id="last_tile" {% elif forloop.last %} id="last_tile" {% endif %}>
+      <div class="col tile {% if forloop.counter > 6%} extra {% endif %}" {% if forloop.counter == 6%} id="last_tile" {% elif forloop.last %} id="last_tile" {% endif %} data-href="{% url 'ctstem:group' group.id %}">
         <div class="class_icon">
           {% if group.icon %}
             <img src="{{group.icon.url}}" class="icon" alt="">
@@ -49,23 +49,19 @@
           {% endif %}
         </div>
         <div class="class_details">
-          <h5 class="left class_title">
-            <a href="{% url 'ctstem:group' group.id %}">
-              {{group.title}}
-            </a>
-          </h5>
-          <div class="assignment_status_chart">
+          <h5 class="left class_title">{{group.title}}</h5>
+          <!--div class="assignment_status_chart">
             <div id="assignment_chart_group_{{group.id}}" class="progress_chart" data-percent-complete="{{percent_complete}}"></div>
-          </div>
+          </div-->
           <div class="class_detail">
             <h6 class="left">
-              <a href="{% url 'ctstem:teacherStudentDashboard' teacher.id status %}?group={{group.id}}">
-                {{group.members.count}} Student{% if group.members.count > 1 %}s{% endif %}
+              <a class="student_dashboard" href="{% url 'ctstem:teacherStudentDashboard' teacher.id status %}?group={{group.id}}">
+                View Student Progress ({{group.members.count}})
               </a>
             </h6>
             <h6 class="left">
-              <a href="{% url 'ctstem:teacherAssignmentDashboard' teacher.id status %}?group={{group.id}}">
-                {{group.assignments.count}} Assignment{% if group.assignments.count > 1 %}s{% endif %}
+              <a class="assignment_dashboard" href="{% url 'ctstem:teacherAssignmentDashboard' teacher.id status %}?group={{group.id}}">
+                View Assignment Progress ({{group.assignments.count}})
               </a>
             </h6>
           </div>
@@ -79,9 +75,9 @@
             </div>
             <div class="class_actions">
               {% if group.is_active %}
-                <a class="assignment-modal action btn small lightyellow" href="#" data-toggle="modal" data-target="#assignment" data-id="{{group.id}}" data-title="{{group.title}}" data-subject="{{group.subject.id}}" title="Search and Add Assignments">
+                <button class="assignment-modal action btn small lightyellow assign" href="#" data-toggle="modal" data-target="#assignment" data-id="{{group.id}}" data-title="{{group.title}}" data-subject="{{group.subject.id}}" title="Search and Add Assignments">
                   <i class="fa fa-tasks"></i> Assign
-                </a>
+                </button>
               {% endif %}
             </div>
           </div>
@@ -215,6 +211,19 @@
 
 <script type="text/javascript">
   $(function(){
+
+    $("#class_tiles .tile").click(function(e){
+      if($(e.target).hasClass('student_dashboard') ||
+         $(e.target).hasClass('assignment_dashboard') ||
+         $(e.target).hasClass('add_student') ||
+         $(e.target).hasClass('assign')) {
+
+      }
+      else{
+        href = $(this).data("href");
+        window.location = href;
+      }
+    });
     $(".expand_collapse2").click(function(){
       $(this).next().toggle();
       $(this).children().each(function(){

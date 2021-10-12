@@ -1037,7 +1037,7 @@ div.content#teacher_dashboard div#dashboard_classes div#class_tiles div.tile div
 }
 div.content#teacher_dashboard div#dashboard_classes div#class_tiles div.tile div.class_details > * {
   max-width: 100%;
-  margin-bottom: 12px !important;
+  margin-bottom: 20px !important;
 
 }
 div.content#teacher_dashboard div#dashboard_classes div#class_tiles div.tile div.class_details > *:last-child {
@@ -1479,7 +1479,8 @@ div.row#standard_tiles .col .tile{
 div.row#curricula_tiles .col .tile:hover,
 div.row#class_tiles .col .tile:hover,
 div.row#standard_tiles .col .tile:hover,
-div.row#assignment_tiles .col .tile:hover {
+div.row#assignment_tiles .col .tile:hover,
+div.content#teacher_dashboard div#dashboard_classes div#class_tiles .tile:hover {
   z-index: 2;
   -webkit-transition: all 200ms ease-in;
   -webkit-transform: scale(1.05);
@@ -1489,6 +1490,9 @@ div.row#assignment_tiles .col .tile:hover {
   -moz-transform: scale(1.05);
   transition: all 200ms ease-in;
   transform: scale(1.05);
+}
+div.content#teacher_dashboard div#dashboard_classes div#class_tiles .tile:hover {
+  cursor:  pointer;
 }
 div.row#curricula_tiles .col .tile .detail,
 div.row#class_tiles .col .tile .detail,
