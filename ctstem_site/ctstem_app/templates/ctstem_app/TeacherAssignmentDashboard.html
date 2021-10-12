@@ -79,6 +79,12 @@
         {% get_chart_config assignment_status 'stacked_bar' as assignment_status_chart_config %}
         <div class="assignment tile">
           <div class="assignment_title">
+            <h5 class="expanded_collapsed collapsed" title="Expand underlying lessons">
+              {% if assignment|get_item:'curriculum_type' == 'Unit' %}
+                <i class="fas fa-plus-circle"></i>
+                <i class="fas fa-minus-circle"></i>
+              {% endif %}
+            </h5>
             <h5 class="left">
               {% if assignment_id %}
                 <a href="{% url 'ctstem:assignmentProgressDashboard' teacher.id %}?group={{assignment_group.id}}&assignment={{curriculum_id}}" title="View Assignment Progress Dashboard">
@@ -92,13 +98,7 @@
                 {{assignment|get_item:'title'}}
               {% endif %}
             </h5>
-            {% if assignment|get_item:'curriculum_type' == 'Unit' %}
-              <h5>
-                <span class="expanded_collapsed collapsed" title="Expand underlying lessons">
-                  <i class="fas fa-chevron-right"></i>
-                </span>
-              </h5>
-            {% endif %}
+
           </div>
           {% if not group %}
           <div class="assignment_class">

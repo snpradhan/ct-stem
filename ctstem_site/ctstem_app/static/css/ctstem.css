@@ -1198,7 +1198,8 @@ div.content.teacher_detailed_dashboard div.dashboard_assignments div.assignment 
   flex: 0 0 35%;
   align-items: center;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
+  gap: 1em;
 }
 div.content.teacher_detailed_dashboard div.dashboard_assignments div.assignment div.assignment_class {
   flex: 0 0 15%;
@@ -1208,6 +1209,7 @@ div.content.teacher_detailed_dashboard .actions {
 }
 div.content.teacher_detailed_dashboard .expanded_collapsed {
   cursor: pointer;
+  flex: 0 0 5%;
 }
 div.content.teacher_detailed_dashboard .expanded_collapsed .fa-chevron-right{
   float: right;
@@ -1216,6 +1218,13 @@ div.content.teacher_detailed_dashboard .expanded_collapsed .fa-chevron-right{
 div.content.teacher_detailed_dashboard  .expanded_collapsed.expanded .fa-chevron-right{
   transform: rotate(90deg);
 }
+div.content.teacher_detailed_dashboard .expanded_collapsed.collapsed .fa-minus-circle{
+  display: none;
+}
+div.content.teacher_detailed_dashboard  .expanded_collapsed.expanded .fa-plus-circle{
+  display: none;
+}
+
 div.content.teacher_detailed_dashboard div.dashboard_assignments div.assignment div.assignment_status_chart {
   flex: 0 0 20%;
   align-self: center;
@@ -1233,7 +1242,7 @@ div.content.teacher_detailed_dashboard div.dashboard_assignments div.underlying_
   display: none;
 }
 div.content#teacher_assignment_dashboard div.dashboard_assignments div.underlying_lesson_assignments div.assignment_title {
-  padding-left: 2em;
+  padding-left: 6em;
 }
 
 
@@ -1255,8 +1264,9 @@ div.content.teacher_detailed_dashboard div.student div.student_details {
   flex: 0 0 35%;
   align-self: center;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
+  gap: 1em;
 }
 div.content.teacher_detailed_dashboard div.student div.assignment_class {
   flex: 0 0 15%;
@@ -1284,7 +1294,7 @@ div.content#teacher_student_dashboard div.dashboard_assignments div.assignment_t
   padding-left: 2em;
 }
 div.content#teacher_student_dashboard div.dashboard_assignments div.underlying_lesson_assignments div.assignment_title {
-  padding-left: 4em;
+  padding-left: 8em;
 }
 
 /*******************TEACHER STUDENT DASHBOARD END**************************/

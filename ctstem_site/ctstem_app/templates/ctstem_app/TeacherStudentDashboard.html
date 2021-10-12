@@ -86,15 +86,16 @@
   {% get_chart_config student_assignment_status 'stacked_bar' as student_chart_config %}
   <div class="student">
     <div class="student_details">
-      <h5 class="left expanded_collapsed collapsed" title="Expand student assignments">
+      <h5 class="expanded_collapsed collapsed" title="Expand student assignments">
+        <i class="fas fa-plus-circle"></i>
+        <i class="fas fa-minus-circle"></i>
+      </h5>
+      <h5 class="left">
         {% if user.researcher %}
           {{user_id}}
         {% else %}
           {{name}}
         {% endif %}
-      </h5>
-      <h5 class="expanded_collapsed collapsed" title="Expand student assignments">
-        <i class="fas fa-chevron-right"></i>
       </h5>
     </div>
     {% if not group %}
@@ -117,6 +118,12 @@
         {% with assignment_id=assignment|get_item:'assignment_id' curriculum_id=assignment|get_item:'curriculum_id' assignment_group=assignment|get_item:'group' assignment_status=assignment|get_item:'assignment_status' instance=assignment|get_item:'instance' %}
         <div class="assignment tile standalone">
           <div class="assignment_title">
+            <h5 class="expanded_collapsed collapsed" title="Expand underlying lessons">
+              {% if assignment|get_item:'curriculum_type' == 'Unit' %}
+                <i class="fas fa-plus-circle"></i>
+                <i class="fas fa-minus-circle"></i>
+              {% endif %}
+            </h5>
             <h5 class="left">
               {% if assignment_id and instance %}
                 <a href="{% url 'ctstem:assignmentStudentFeedback' teacher.id %}?group={{assignment_group.id}}&assignment={{curriculum_id}}&student={{instance.student.user.id}}" title="Review student response">
@@ -128,11 +135,6 @@
                 </a>
               {% endif %}
             </h5>
-            {% if assignment|get_item:'curriculum_type' == 'Unit' %}
-              <h5 class="expanded_collapsed collapsed" title="Expand underlying lessons">
-                <i class="fas fa-chevron-right"></i>
-              </h5>
-            {% endif %}
           </div>
           {% if not group %}
           <div class="assignment_class">
