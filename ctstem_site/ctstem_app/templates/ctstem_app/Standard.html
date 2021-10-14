@@ -5,16 +5,54 @@
 {% block content %}
   {{block.super}}
   <div class="content">
-    <h2>Standard</h2>
     <form method="post" enctype="multipart/form-data">
       {% csrf_token %}
-      <div class="row">
-        <div class="col-md-10">
+      <div class="standard_container">
+        <div class="left-navigation">
+          <div class="form-group group-navigation">
+            <ul>
+              <li>
+                <h5 class="left">
+                  <a href="#standard_overview" class="page-scroll">
+                    Standard Overview
+                  </a>
+                </h5>
+              </li>
+              {% for category in formset %}
+                {% if forloop.last == False %}
+                  <li>
+                    <h5 class="left">
+                      <a href="#category_{{forloop.counter}}" class="page-scroll">
+                        Category {{forloop.counter}}
+                      </a>
+                    </h5>
+                  </li>
+                {% endif%}
+              {% endfor %}
+              <li>
+                <h5 class="left">
+                  <a href="#" class="page-scroll addCategory">
+                    Add New Category
+                  </a>
+                </h5>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="standard_components">
           <div class="table" id="standard">
             {{form.management_form}}
+            <div class="section_header" id="standard_overview">
+              <div class="button-container"></div>
+              <h4 class="standard_name" style="font-weight: bold; text-decoration: underline;">{{form.name.value|default_if_none:"  "}}</h4>
+              <div class="button-container">
+                <input type="submit" class="btn yellow inbetween" id="submit" value="Save"/>
+                <input type="button" class="btn yellow inbetween addCategory" id="addCategory" value="Add New Category"/>
+              </div>
+            </div>
             <div class="form-group">
-              <label for="id_name">Standard/Practice Name {% if form.name.field.required %} (<span class="required">*</span>) {% endif %}</label>
-              <div>{{form.name}}</div>
+              <label for="id_standard_name">Standard/Practice Name {% if form.name.field.required %} (<span class="required">*</span>) {% endif %}</label>
+              <div id="id_standard_name">{{form.name}}</div>
               <div class="error">{{ form.name.errors }}</div>
             </div>
             <div class="form-group">
@@ -32,28 +70,17 @@
             {{formset.management_form}}
             {% for category in formset %}
               <div class="table step" style="{% if forloop.last %} display:none; {% endif %}">
-                <h4>
-                  <span>&nbsp;</span>
-                  <span class="subcategory_title" style="font-weight: bold; text-decoration: underline;">{{category.name.value|default_if_none:"  "}}</span>
-                  <span>&nbsp;</span>
-                  <span class="controls">
-                    <span>
-                      <button type="button" class="btn red delete_category" name="delete_category" aria-label="Delete Category" title="Delete Category">
-                        <i class="fa fa-trash" aria-hidden="true"></i>
-                      </button>
-                      {{category.DELETE.as_hidden}}
-                    </span>
-                    <span class="expand_collapse">
-                      <button type="button" class="btn green" style="display:none;" name="collapse_category" aria-label="Collapse Category" title="Collapse Category">
-                        <span class="glyphicon glyphicon-collapse-up" aria-hidden="true"></span>
-                      </button>
-                      <button type="button" class="btn green" name="expand_category" aria-label="Expand Category" title="Expand Category">
-                        <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                      </button>
-                    </span>
-                  </span>
-                </h4>
-                <div class="collapsible_content">
+                <div class="section_header" id="category_{{forloop.counter}}">
+                  <div class="button-container"></div>
+                  <h4 class="subcategory_title" style="font-weight: bold; text-decoration: underline;">{{category.name.value|default_if_none:"  "}}</h4>
+                  <div class="button-container">
+                    <button type="button" class="btn red delete_category" name="delete_category" aria-label="Delete Category" title="Delete Category">
+                      <i class="fa fa-trash" aria-hidden="true"></i>
+                    </button>
+                    {{category.DELETE.as_hidden}}
+                  </div>
+                </div>
+                <div>
                   {{category.management_form}}
                   {{category.id}}
                   <div class="form-group">
@@ -81,7 +108,7 @@
                     {{category.nested.management_form}}
                     {{category.nested.id}}
                     <label for="id_question_table">Subcategories</label>
-                    <button class="btn blue inbetween add_subcategory" name="add_subcategory" aria-label="Add Subcategory" title="Add Subcategory">
+                    <button class="btn blue add_subcategory" name="add_subcategory" aria-label="Add Subcategory" title="Add Subcategory">
                       <i class="fas fa-plus" aria-hidden="true"></i>
                     </button>
 
@@ -139,13 +166,15 @@
 
                             </td>
                             <td class="subcategory_edit">
-                              <button type="button" class="btn red delete_subcategory" name="delete_subcategory" aria-label="Delete Subcategory" title="Delete Subcategory">
-                                <i class="fa fa-trash" aria-hidden="true"></i>
-                              </button>
-                              {{subcategoryForm.DELETE.as_hidden}}
-                              <button type="button" class="btn green edit_subcategory" name="edit_subcategory" aria-label="Edit Subcategory" title="Edit Subcategory">
-                                  <i class="fas fa-pencil-alt" aria-hidden="true"></i>
-                              </button>
+                              <div class="controls">
+                                <button type="button" class="btn blue edit_subcategory" name="edit_subcategory" aria-label="Edit Subcategory" title="Edit Subcategory">
+                                    <i class="fas fa-pencil-alt" aria-hidden="true"></i>
+                                </button>
+                                <button type="button" class="btn red delete_subcategory" name="delete_subcategory" aria-label="Delete Subcategory" title="Delete Subcategory">
+                                  <i class="fa fa-trash" aria-hidden="true"></i>
+                                </button>
+                                {{subcategoryForm.DELETE.as_hidden}}
+                              </div>
                             </td>
                           </tr>
                         {% endfor %}
@@ -156,11 +185,6 @@
               </div>
             {% endfor %}
           </div>
-        </div>
-        <div class="form-group button-group-fixed col-md-2">
-          <input type="submit" class="btn green inbetween" id="submit" value="Save"/>
-          <br><br>
-          <input type="button" class="btn blue inbetween" id="addCategory" value="Add Category"/>
         </div>
       </div>
     </form>
@@ -195,8 +219,8 @@
             </div>
             <div class="modal-footer">
               <div class="form-group button-row">
-                <button type="submit" id="saveSubcategory" class="btn green normal">
-                  Save
+                <button type="submit" id="saveSubcategory" class="btn yellow normal">
+                  Save Subcategory
                 </button>
               </div>
             </div>
@@ -278,17 +302,22 @@
 
       });
 
-      $('#addCategory').click(function() {
+      $('.addCategory').click(function() {
         cloneMore('div.table:last', 'form');
         var new_category_div = $('div.table:last').prev();
         $(new_category_div).toggle();
-        $(new_category_div).find('.expand_collapse').children().toggle();
-        /*$(new_category_div).find('.collapsible_content').toggle();*/
+        $('html, body').animate({
+          scrollTop: $(new_category_div).offset().top - 110,
+        }, 1000,'swing');
 
       });
 
       $('div#id_name input').on('input', function(){
         $(this).closest('div.table.step').find('h4 span.subcategory_title').html($(this).val());
+      });
+
+      $('div#id_standard_name input').on('input', function(){
+        $(this).closest('div.table').find('h4.standard_name').html($(this).val());
       });
 
       $('button.delete_subcategory').click(function(){
@@ -306,7 +335,11 @@
           $(this).closest('div.table.step').hide();
         }
       });
-
+      $('.page-scroll').click(function(){
+        $('html, body').animate({
+          scrollTop: $($(this).attr('href')).offset().top - 110,
+        }, 1000,'swing');
+      });
 
     });
   </script>

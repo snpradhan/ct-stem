@@ -303,11 +303,11 @@
                       <li>
                         <div class="col-container">
                           <div class="col">
-                            <a type="button" href="{% url 'ctstem:userProfile' user.id %}" class="btn normal white">Edit Profile</a>
+                            <a type="button" href="{% url 'ctstem:userProfile' user.id %}" class="btn normal blue">Edit Profile</a>
                           </div>
 
                           <div class="col">
-                            <a type="button" href="{% url 'ctstem:logout' %}" class="btn normal red">Logout</a>
+                            <a type="button" href="{% url 'ctstem:logout' %}" class="btn normal gray">Logout</a>
                           </div>
                         </div>
 
@@ -319,7 +319,7 @@
                     <a type="button" class="btn normal blue modal-open" data-toggle="modal" data-target="#register" data-dismiss="modal" data-href="{% url 'ctstem:register' %}" href="#">Register</a>
                   </li>
                   <li>
-                    <a type="button" class="btn normal white login modal-open" data-toggle="modal" data-target="#login" data-dismiss="modal" data-href="{% url 'ctstem:login' %}" href="#">Login</a>
+                    <a type="button" class="btn normal yellow login modal-open" data-toggle="modal" data-target="#login" data-dismiss="modal" data-href="{% url 'ctstem:login' %}" href="#">Login</a>
                   </li>
                 {% endif %}
               {% endblock %}
@@ -363,10 +363,10 @@
               </div>
               <div class="modal-footer">
                 <div class="form-group button-row">
-                  <button type="submit" id="btnSession" class="btn green normal">
+                  <button type="submit" id="btnSession" class="btn blue normal">
                     Keep Session
                   </button>
-                  <a type="button" href="{% url 'ctstem:logout' %}" class="btn red normal">Logout</a>
+                  <a type="button" href="{% url 'ctstem:logout' %}" class="btn gray normal">Logout</a>
                 </div>
               </div>
             </form>
@@ -386,7 +386,7 @@
             </div>
             <div class="modal-footer">
               <div class="form-group button-row">
-                <button type="button" class="btn red" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>
+                <button type="button" class="btn gray" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>
               </div>
             </div>
           </div>
@@ -405,7 +405,7 @@
             </div>
             <div class="modal-footer">
               <div class="form-group button-row">
-                <button type="button" class="btn red normal" data-dismiss="modal">Close</button>
+                <button type="button" class="btn gray normal" data-dismiss="modal">Close</button>
               </div>
             </div>
           </div>
@@ -424,7 +424,7 @@
             </div>
             <div class="modal-footer">
               <div class="form-group button-row">
-                <button type="button" class="btn red normal" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>
+                <button type="button" class="btn gray normal" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>
               </div>
             </div>
           </div>

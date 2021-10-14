@@ -17,7 +17,7 @@
     <div class="form-group">
       <a class="btn normal blue" href="{% url 'ctstem:newReleaseNote' %}" title="Create new release note">Create Release Note</a>
       <span id="release_notes_view">
-        <a type="button" class="btn yellow small" href="#">
+        <a type="button" class="btn gray small" href="#">
           Switch to <span>Table</span><span style="display:none;">List</span> View
         </a>
       </span>
@@ -31,15 +31,23 @@
           <th style="width:15%;">Version</th>
           <th style="width:15%;">Release Date</th>
           <th>Release Details</th>
-          {% if user.administrator %}
-            <th style="width:10%;">Edit/Delete</th>
-          {% endif %}
         </tr>
       </thead>
       <tbody>
         {% for release_note in release_notes %}
           <tr>
-            <td>v{{release_note.version}} </td>
+            <td>v{{release_note.version}}
+              {% if user.administrator %}
+                <div class="controls">
+                  <a type="button" class="btn blue edit" title="Edit Release Note" href="{% url 'ctstem:releaseNote' release_note.id %}">
+                    <i class="fas fa-pencil-alt" aria-hidden="true"></i>
+                  </a>
+                  <a type="button" class="btn red delete" title="Delete Release Note" href="{% url 'ctstem:deleteReleaseNote' release_note.id %}" onclick="return confirm('Are you sure you want to delete release note v{{release_note.version}}?')">
+                    <i class="fa fa-trash" aria-hidden="true"></i>
+                  </a>
+                </div>
+              {% endif %}
+            </td>
             <td>{{release_note.release_date}}</td>
             <td>
               {% for change_type, changes in release_note.changes.items %}
@@ -53,16 +61,6 @@
                 {% endif %}
               {% endfor %}
             </td>
-            {% if user.administrator %}
-            <td style="width:10%;">
-              <a type="button" class="btn green edit" title="Edit Release Note" href="{% url 'ctstem:releaseNote' release_note.id %}">
-                <i class="fas fa-pencil-alt" aria-hidden="true"></i>
-              </a>
-              <a type="button" class="btn red delete" title="Delete Release Note" href="{% url 'ctstem:deleteReleaseNote' release_note.id %}" onclick="return confirm('Are you sure you want to delete release note v{{release_note.version}}?')">
-                <i class="fa fa-trash" aria-hidden="true"></i>
-              </a>
-            </td>
-            {% endif %}
           </tr>
         {% endfor %}
       </tbody>
@@ -76,7 +74,7 @@
               {% if user.administrator %}
               <td class="action">
                 <a class="fas fa-pencil-alt edit" title="Edit Release Note" href="{% url 'ctstem:releaseNote' release_note.id %}"></a>
-                <a class="delete fa fa-trash" title="Delete Release Note" href="{% url 'ctstem:deleteReleaseNote' release_note.id %}" onclick="return confirm('Are you sure you want to delete release note v{{release_note.version}}?')"></a>
+                <a class="delete fa fa-trash red" title="Delete Release Note" href="{% url 'ctstem:deleteReleaseNote' release_note.id %}" onclick="return confirm('Are you sure you want to delete release note v{{release_note.version}}?')"></a>
               </td>
               {% endif %}
             </tr>

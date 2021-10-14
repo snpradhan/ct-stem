@@ -12,6 +12,9 @@
       <div class="table" id="metadata">
         {{form.management_form}}
         {{form.media}}
+        <div class="form-group button-group">
+          <input type="submit" class="btn yellow inbetween" id="submit1" value="Save Release Note"/>
+        </div>
         <div class="row">
           <div class="form-group col-md-6">
             <label for="id_{{form.version.name}}">{{ form.version.label|title }} {% if form.version.field.required %}(<span class="required">*</span>){% endif %} </label>
@@ -65,8 +68,8 @@
           </table>
         </div>
 
-        <div class="form-group">
-          <input type="submit" class="btn green inbetween" id="submit" value="Save"/>
+        <div class="form-group button-group">
+          <input type="submit" class="btn yellow inbetween" id="submit2" value="Save Release Note"/>
         </div>
       </div>
     </form>

@@ -77,11 +77,11 @@
           <div class="button_row">
             {% if assignment_details.instance %}
               {% if assignment_details.instance.status == 'N' %}
-                <a type="button" class="btn green inbetween" aria-label="Start Assignment" title="Start Assignment" href="{% url 'ctstem:resumeAssignment' assignment_details.assignment.id assignment_details.instance.id assignment_details.instance.last_step %}">
+                <a type="button" class="btn blue inbetween" aria-label="Start Assignment" title="Start Assignment" href="{% url 'ctstem:resumeAssignment' assignment_details.assignment.id assignment_details.instance.id assignment_details.instance.last_step %}">
                   Start <i class="fas fa-play"></i>
                 </a>
               {% elif assignment_details.instance.status == 'P' %}
-                <a type="button" class="btn orange inbetween" aria-label="Resume Assignment" title="Resume Assignment" href="{% url 'ctstem:resumeAssignment' assignment_details.assignment.id assignment_details.instance.id assignment_details.instance.last_step|add:'1' %}">
+                <a type="button" class="btn blue inbetween" aria-label="Resume Assignment" title="Resume Assignment" href="{% url 'ctstem:resumeAssignment' assignment_details.assignment.id assignment_details.instance.id assignment_details.instance.last_step|add:'1' %}">
                   Resume <i class="fas fa-arrow-right"></i>
                 </a>
               {% else %}
@@ -97,12 +97,12 @@
                 {% endif %}
               {% endif %}
               {% if assignment_details.instance.status == 'F' %}
-                <a type="button" class="btn orange inbetween" aria-label="Archive Assignment" title="Archive Assignment" href="{% url 'ctstem:archiveAssignment' assignment_details.instance.id %}">
+                <a type="button" class="btn blue inbetween" aria-label="Archive Assignment" title="Archive Assignment" href="{% url 'ctstem:archiveAssignment' assignment_details.instance.id %}">
                   Archive <i class="fas fa-archive"></i>
                 </a>
               {% endif %}
             {% else %}
-              <a type="button" class="btn green inbetween" aria-label="Start Assignment" title="Start Assignment" href="{% url 'ctstem:startAssignment' assignment_details.assignment.id %}">
+              <a type="button" class="btn blue inbetween" aria-label="Start Assignment" title="Start Assignment" href="{% url 'ctstem:startAssignment' assignment_details.assignment.id %}">
                   Start <i class="fas fa-play"></i>
               </a>
             {% endif %}

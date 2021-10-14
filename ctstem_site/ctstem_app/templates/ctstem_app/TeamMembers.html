@@ -49,7 +49,7 @@
               <td>{{member.order}}</td>
               <td class="title">{{member.name}}
                 <div class="controls">
-                  <a type="button" class="btn green" aria-label="Edit Member" title="Edit Member" href="{% url 'ctstem:teamMember' member.id %}">
+                  <a type="button" class="btn blue" aria-label="Edit Member" title="Edit Member" href="{% url 'ctstem:teamMember' member.id %}">
                     <i class="fas fa-pencil-alt" aria-hidden="true"></i>
                   </a>
                   <a type="button" class="btn red delete" aria-label="Delete Member" title="Delete Member" href="{% url 'ctstem:deleteMember' member.id %}" onclick="return confirm('Are you sure you want to delete {{member.name}}?')">

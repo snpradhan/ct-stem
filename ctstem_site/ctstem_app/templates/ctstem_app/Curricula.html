@@ -8,35 +8,37 @@
 {% block content %}
   {{block.super}}
   <div class="content">
-    <div class="page-blurb">
-      {% include "ctstem_app/CurriculaSwitch.html" with on='true' %}
 
-      {% if bucket == 'lesson' or bucket == 'unit' %}
-        {% if bucket == 'lesson' %}
-          <h2> Lessons </h2>
-        {% else %}
-          <h2> Units </h2>
-        {% endif %}
+    {% include "ctstem_app/CurriculaSwitch.html" with on='true' %}
+
+    {% if bucket == 'lesson' or bucket == 'unit' %}
+      {% if bucket == 'lesson' %}
+        <h2> Lessons </h2>
+      {% else %}
+        <h2> Units </h2>
+      {% endif %}
+      <div class="page-blurb">
         <p>
           Our curricular units are developed and tested with high school teachers to bring authentic CT practices with disciplinary content to your classroom. Find or create curriculum below.
         </p>
-      {% elif bucket == 'assessment' %}
-        <h2> Assessments </h2>
-      {% elif bucket == 'teacher_authored' %}
-        <h2> Teacher Authored Curricula </h2>
-      {% elif bucket == 'my' %}
-        <h2> My Curricula </h2>
-      {% elif bucket == 'shared' %}
-        <h2> Shared Curricula </h2>
-      {% elif bucket == 'favorite' %}
-        <h2> Favorite Curricula </h2>
-      {% elif bucket == 'deleted' %}
-        <h2> Deleted Curricula </h2>
-      {% endif %}
-    </div>
-    <div class="btn-group">
+      </div>
+    {% elif bucket == 'assessment' %}
+      <h2> Assessments </h2>
+    {% elif bucket == 'teacher_authored' %}
+      <h2> Teacher Authored Curricula </h2>
+    {% elif bucket == 'my' %}
+      <h2> My Curricula </h2>
+    {% elif bucket == 'shared' %}
+      <h2> Shared Curricula </h2>
+    {% elif bucket == 'favorite' %}
+      <h2> Favorite Curricula </h2>
+    {% elif bucket == 'deleted' %}
+      <h2> Deleted Curricula </h2>
+    {% endif %}
+
+    <div class="btn-group center">
       {% if user.administrator or user.researcher or user.author or user.teacher %}
-        <a type="button" class="btn normal green" href="{% url 'ctstem:newCurriculumOverview' %}" title="Create new curriculum">Create Curriculum</a>
+        <a type="button" class="btn normal blue" href="{% url 'ctstem:newCurriculumOverview' %}" title="Create new curriculum">Create Curriculum</a>
       {% endif %}
     </div>
     <form method="post">

@@ -30,7 +30,7 @@
                 {% include "ctstem_app/CurriculumActions.html" with page=page %}
               </div>
 
-              <div class="curriculum_content collapsible_content">
+              <div class="curriculum_content">
 
                 {{form.management_form}}
 
@@ -189,14 +189,6 @@
                   <button class="btn blue search_taxonomy" name="search_taxonomy" data-form="{% url 'ctstem:searchTaxonomy' %}">
                     <i class="fas fa-plus" aria-hidden="true"></i>
                   </button>
-                  <span class="expand_collapse_other">
-                    <button type="button" class="btn orange" name="collapse_standards" aria-label="Collapse Standards" title="Collapse Standards">
-                      <span class="glyphicon glyphicon-collapse-up" aria-hidden="true"></span>
-                    </button>
-                    <button type="button" class="btn green" style="display:none;" name="expand_standards" aria-label="Expand Standards" title="Expand Standards">
-                      <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    </button>
-                  </span>
                   <div id="taxonomy_div" class="curriculum_input">
                     <table class="table table-bordered table-striped table-condensed inner_table" id="taxonomy">
                       <thead>
@@ -234,15 +226,7 @@
                 <!-- TEACHER NOTES -->
                 <div class="form-group">
                   <label for="id_{{form.teacher_notes.name}}">{{ form.teacher_notes.label|title }} {% if form.teacher_notes.field.required %}(<span class="required">*</span>) {% endif %}</label>
-                  <span class="expand_collapse_other">
-                    <button type="button" class="btn orange" style="display:none;" name="collapse_notes" aria-label="Collapse Notes" title="Collapse Notes">
-                      <span class="glyphicon glyphicon-collapse-up" aria-hidden="true"></span>
-                    </button>
-                    <button type="button" class="btn green"  name="expand_notes" aria-label="Expand Notes" title="Expand Notes">
-                      <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                    </button>
-                  </span>
-                  <div style="display:none;" class="curriculum_input">
+                  <div class="curriculum_input">
                     {{form.teacher_notes}}
                   </div>
                   <div class="help warning">{{form.teacher_notes.help_text|safe}}</div>

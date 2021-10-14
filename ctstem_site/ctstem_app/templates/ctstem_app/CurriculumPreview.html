@@ -170,7 +170,7 @@
         {% endif %}
         <div class="row buttons">
           <div class="col">
-            <a type="button" class="btn normal darkblue" aria-hidden="true" href="{% if pem_code %}
+            <a type="button" class="btn normal blue" aria-hidden="true" href="{% if pem_code %}
                                                                                     {% url 'ctstem:previewCurriculum' curriculum.unit.id pem_code %}
                                                                                   {% else %}
                                                                                     {% url 'ctstem:previewCurriculum' curriculum.unit.id %}
@@ -179,7 +179,7 @@
           </div>
           <div class="col">
             {% if previous_curriculum %}
-              <a type="button" class="btn normal darkblue" aria-hidden="true" href="{% if pem_code %}
+              <a type="button" class="btn normal blue" aria-hidden="true" href="{% if pem_code %}
                                                                                       {% url 'ctstem:previewCurriculum' previous_curriculum.id pem_code %}
                                                                                     {% else %}
                                                                                       {% url 'ctstem:previewCurriculum' previous_curriculum.id %}
@@ -188,7 +188,7 @@
           </div>
           <div class="col">
             {% if next_curriculum %}
-              <a type="button" class="btn normal darkblue" aria-hidden="true" href="{% if pem_code %}
+              <a type="button" class="btn normal blue" aria-hidden="true" href="{% if pem_code %}
                                                                                       {% url 'ctstem:previewCurriculum' next_curriculum.id pem_code %}
                                                                                     {% else %}
                                                                                       {% url 'ctstem:previewCurriculum' next_curriculum.id %}

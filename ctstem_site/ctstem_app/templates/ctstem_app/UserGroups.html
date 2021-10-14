@@ -46,212 +46,135 @@
       {% include "ctstem_app/UserControls.html" with tab='group' %}
       {% include "ctstem_app/Tabs.html" with tab='group'%}
 
-      {% if user.teacher %}
-        <div class="row_container">
-          <div class="row" id="class_tiles">
+      {% if groups %}
+        <table class="table table-striped table-bordered table-condensed paginate_sort sticky" id="groups">
+          <thead>
+            <tr>
+              <th width="1%" class="no-sort select-checkbox">Select All <br> <input id="select-all" type="checkbox" value="0" name="select-all"/></th>
+              <th width="18%" id="title" class="ignorecase"> Class Name </th>
+              <th width="7%" id="subject__name" class="ignorecase"> Subject </th>
+              <th width="10%" id="time" class="ignorecase"> Time </th>
+              <th width="5%" id="is_active"> Status </th>
+              {% if not user.teacher %}
+                <th width="10%" id="teacher__user__first_name" class="ignorecase"> Teacher </th>
+              {% endif %}
+              <th width="10%">Co-teachers</th>
+              {% if not user.teacher and not user.school_administrator %}
+                <th width="15%" id="teacher__school__name" class="ignorecase"> School </th>
+              {% endif %}
+              <th width="8%"> Students </th>
+              <th width="8%"> Assignments </th>
+              <th width="12%"> Created <br> Modified <br> Last Login</th>
+            </tr>
+            <!--tr id="filterrow">
+              <th class="no-sort"></th>
+              <th> Class Name </th>
+              <th> Subject </th>
+              <th> Time </th>
+              <th> Status </th>
+              {% if not user.teacher %}
+                <th> Teacher </th>
+              {% endif %}
+              <th>Co-teachers</th>
+              {% if not user.teacher and not user.school_administrator %}
+                <th width="15%"> School </th>
+              {% endif %}
+              <th> Students </th>
+              <th> Assignments </th>
+              <th> Created <br> Modified <br> Last Login</th>
+            </tr-->
+          </thead>
+          <tbody>
             {% for group in groups %}
-              <div class="col col-{{forloop.counter}}">
-                <div class="tile {{group_status}}">
-                  <a href="{% url 'ctstem:group' group.id %}">
-                    <div class="icon">
-                      {% if group.icon %}
-                        <img src="{{group.icon.url}}" class="img-responsive" alt="">
-                      {% elif group.subject and group.subject.icon %}
-                        <img src="{{group.subject.icon.url}}" class="img-responsive" alt="">
-                      {% else %}
-                        <img src="/static/img/class.png" class="img-responsive group_icon_stock" alt="">
-                      {% endif %}
-                    </div>
-                  </a>
-
-                  <div class="detail">
-                    <input id="group_{{group.id}}" type="checkbox" class="action-select" value="{{group.id}}" name="group_{{group.id}}"/>
-                    <div class="title">
-                      {{group.title}}
-                      {% if user.teacher != group.teacher and user.teacher in group.shared_with.all %}
-                        <i class="fa fa-share-alt" title="Shared by {{group.teacher}}"></i>
-                      {% endif %}
-                    </div>
-                    <div class="stat_and_button">
-                      <div class="student_stat_button">
-                        <div class="title">{{group.members.count}} Student(s)</div>
-                        <div class="buttons">
-                          {% if group.is_active %}
-                            <a type="button" class="btn inbetween yellow invite-modal" href="#" data-toggle="modal" data-target="#invite" data-invite-link="https://{{domain}}/?next=/preregister/group/{{group.group_code}}/" data-title="{{group.title}} Invitation Link" title="Student Invitation Link">
-                                <i class="fa fa-link"></i>
-                            </a>
-
-                            <a type="button" class="btn inbetween green upload-modal" href="#" data-toggle="modal" data-target="#upload" data-id="{{group.id}}" data-title="{{group.title}}" title="Add Students">
-                                <i class="fa fa-user-plus"></i>
-                            </a>
-                          {% endif %}
-                        </div>
-                      </div>
-                      <div class="assignment_stat_button">
-                        <div class="title">{{group.assignments.count}} Assignment(s)</div>
-                        <div class="buttons">
-                          <a type="button" class="btn inbetween orange" aria-label="Class Dashboard" title="Class Dashboard" href="{% url 'ctstem:groupDashboard' group.id 'active' %}">
-                                <i class="fas fa-tachometer-alt"></i>
-                          </a>
-                          {% if group.is_active %}
-                            <a type="button" class="btn inbetween blue assignment-modal" href="#" data-toggle="modal" data-target="#assignment" data-id="{{group.id}}" title="Search and Add Assignments" data-title="{{group.title}}">
-                                <i class="fa fa-tasks"></i>
-                            </a>
-                          {% endif %}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            {% endfor %}
-            {% if group_status == 'active' %}
-            <div class="col">
-              <div class="tile">
-                <a href="{% url 'ctstem:newGroup' %}">
-                  <div class="icon">
-                    <img src="/static/img/new_class.png" class="img-responsive group_icon_stock" alt="">
-                  </div>
-                </a>
-                <div class="detail">
-                   <div class="class_title"><h3>ADD NEW CLASS</h3></div>
-                </div>
-              </div>
-            </div>
-            {% endif %}
-          </div>
-        </div>
-      {% else %}
-        {% if groups %}
-          <table class="table table-striped table-bordered table-condensed paginate_sort sticky" id="groups">
-            <thead>
               <tr>
-                <th width="1%" class="no-sort select-checkbox">Select All <br> <input id="select-all" type="checkbox" value="0" name="select-all"/></th>
-                <th width="18%" id="title" class="ignorecase"> Class Name </th>
-                <th width="7%" id="subject__name" class="ignorecase"> Subject </th>
-                <th width="10%" id="time" class="ignorecase"> Time </th>
-                <th width="5%" id="is_active"> Status </th>
-                {% if not user.teacher %}
-                  <th width="10%" id="teacher__user__first_name" class="ignorecase"> Teacher </th>
-                {% endif %}
-                <th width="10%">Co-teachers</th>
-                {% if not user.teacher and not user.school_administrator %}
-                  <th width="15%" id="teacher__school__name" class="ignorecase"> School </th>
-                {% endif %}
-                <th width="8%"> Students </th>
-                <th width="8%"> Assignments </th>
-                <th width="12%"> Created <br> Modified <br> Last Login</th>
-              </tr>
-              <!--tr id="filterrow">
-                <th class="no-sort"></th>
-                <th> Class Name </th>
-                <th> Subject </th>
-                <th> Time </th>
-                <th> Status </th>
-                {% if not user.teacher %}
-                  <th> Teacher </th>
-                {% endif %}
-                <th>Co-teachers</th>
-                {% if not user.teacher and not user.school_administrator %}
-                  <th width="15%"> School </th>
-                {% endif %}
-                <th> Students </th>
-                <th> Assignments </th>
-                <th> Created <br> Modified <br> Last Login</th>
-              </tr-->
-            </thead>
-            <tbody>
-              {% for group in groups %}
-                <tr>
-                  <td class="select-checkbox">
-                    <input id="group_{{group.id}}" type="checkbox" class="action-select" value="{{group.id}}" name="group_{{group.id}}" />
-                  </td>
-                  <td class="title">
-                    {{group.title}}
-                    <div class="controls">
-                      <a type="button" class="btn blue" aria-label="Edit Class" title="Edit Class" href="{% url 'ctstem:group' group.id %}">
-                          {% if group.is_active %}
-                            <i class="fas fa-pencil-alt" aria-hidden="true"></i>
-                          {% else %}
-                            <i class="far fa-eye" aria-hidden="true"></i>
-                          {% endif %}
-                      </a>
-                      {% if group.is_active %}
-                        <a type="button" class="btn purple" aria-label="Inactivate Class" title="Inactivate Class" href="{% url 'ctstem:inactivateGroup' group.id %}" onclick="return confirm('Are you sure you want to inactivate {{group.title}}?')">
-                            <i class="fa fa-archive"></i>
-                        </a>
-                        {% if user.administrator %}
-                          <a type="button" class="btn red" aria-label="Delete Class" title="Delete Class" href="{% url 'ctstem:deleteGroup' group.id %}" onclick="return confirm('Are you sure you want to delete {{group.title}}?')">
-                            <i class="fa fa-trash" aria-hidden="true"></i>
-                          </a>
+                <td class="select-checkbox">
+                  <input id="group_{{group.id}}" type="checkbox" class="action-select" value="{{group.id}}" name="group_{{group.id}}" />
+                </td>
+                <td class="title">
+                  {{group.title}}
+                  <div class="controls">
+                    <a type="button" class="btn blue" aria-label="Edit Class" title="Edit Class" href="{% url 'ctstem:group' group.id %}">
+                        {% if group.is_active %}
+                          <i class="fas fa-pencil-alt" aria-hidden="true"></i>
+                        {% else %}
+                          <i class="far fa-eye" aria-hidden="true"></i>
                         {% endif %}
+                    </a>
+                    {% if group.is_active %}
+                      <a type="button" class="btn blue" aria-label="Inactivate Class" title="Inactivate Class" href="{% url 'ctstem:inactivateGroup' group.id %}" onclick="return confirm('Are you sure you want to inactivate {{group.title}}?')">
+                          <i class="fa fa-archive"></i>
+                      </a>
+                      {% if user.administrator %}
+                        <a type="button" class="btn red" aria-label="Delete Class" title="Delete Class" href="{% url 'ctstem:deleteGroup' group.id %}" onclick="return confirm('Are you sure you want to delete {{group.title}}?')">
+                          <i class="fa fa-trash" aria-hidden="true"></i>
+                        </a>
                       {% endif %}
-                    </div>
-                  </td>
-                  <td>{{group.subject}}</td>
-                  <td>{{group.time}}</td>
-                  <td>{{group.is_active|yesno:"Active,Inactive"}}</td>
-                  {% if not user.teacher %}
-                    <td>{{group.teacher}}</td>
-                  {% endif %}
-                  <td>
-                    {% for coteacher in group.shared_with.all %}
-                      <div>{{coteacher}}</div>
-                    {% endfor %}
-                  </td>
-                  {% if not user.teacher and not user.school_administrator %}
-                    <td> {{group.teacher.school}} </td>
-                  {% endif %}
-                  <td>
-                    {% if group.members.count > 0 %}
-                      {{group.members.count}} Student(s)
-                    {% else %}
-                      No Students
                     {% endif %}
-                    <div>
-                      {% if group.is_active %}
-                        <button class="btn yellow add_student" data-target="#addStudentModal" data-form="{% url 'ctstem:addStudentsToClass'  group.id %}" title="Search and Add existing Students to this class">
-                          <i class="fa fa-user-plus"></i>
-                        </button>
-                      {% endif %}
-                    </div>
-                  </td>
-                  <td>
-                    <div>
-                      {% if group.assignments.count > 0 %}
-                        {{group.assignments.count}} Assignment(s)
-                        <div>
-                          {% with status=group.is_active|yesno:"active,inactive"%}
-                          <a type="button" class="btn orange" href="{% url 'ctstem:teacherAssignmentDashboard' group.teacher.id status %}?group={{group.id}}">
-                            <i class="fas fa-tachometer-alt"></i>
-                          </a>
-                          {% endwith %}
-                      {% else %}
-                        No Assignment
-                        <div>
-                      {% endif %}
+                  </div>
+                </td>
+                <td>{{group.subject}}</td>
+                <td>{{group.time}}</td>
+                <td>{{group.is_active|yesno:"Active,Inactive"}}</td>
+                {% if not user.teacher %}
+                  <td>{{group.teacher}}</td>
+                {% endif %}
+                <td>
+                  {% for coteacher in group.shared_with.all %}
+                    <div>{{coteacher}}</div>
+                  {% endfor %}
+                </td>
+                {% if not user.teacher and not user.school_administrator %}
+                  <td> {{group.teacher.school}} </td>
+                {% endif %}
+                <td>
+                  {% if group.members.count > 0 %}
+                    {{group.members.count}} Student(s)
+                  {% else %}
+                    No Students
+                  {% endif %}
+                  <div class="controls">
+                    {% if group.is_active %}
+                      <button class="btn blue add_student" data-target="#addStudentModal" data-form="{% url 'ctstem:addStudentsToClass'  group.id %}" title="Search and Add existing Students to this class">
+                        <i class="fa fa-user-plus"></i>
+                      </button>
+                    {% endif %}
+                  </div>
+                </td>
+                <td>
+                  <div>
+                    {% if group.assignments.count > 0 %}
+                      {{group.assignments.count}} Assignment(s)
+                    {% else %}
+                      No Assignment
+                    {% endif %}
+                  </div>
+                  <div class="controls">
+                    {% with status=group.is_active|yesno:"active,inactive"%}
+                      <a type="button" class="btn blue" href="{% url 'ctstem:teacherAssignmentDashboard' group.teacher.id status %}?group={{group.id}}">
+                          <i class="fas fa-tachometer-alt"></i>
+                      </a>
 
-                      {% if group.is_active %}
+                      {% if status == "active" %}
                         <a type="button" class="btn blue assignment-modal" href="#" data-toggle="modal" data-target="#assignment" data-id="{{group.id}}" data-title="{{group.title}}" data-subject="{{group.subject.id}}" title="Search and Add Assignments">
                           <i class="fa fa-tasks"></i>
                         </a>
                       {% endif %}
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <div>Cr: {{group.created_date|date}}</div>
-                    <div>Mo: {{group.modified_date|date}}</div>
-                    <div>LL: {{group|class_last_login|date}}</div>
-                  </td>
-                </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-          {% include "ctstem_app/Pagination.html" with model=groups %}
-        {% else %}
-          <p>No classes available.</p>
-        {% endif %}
+                    {% endwith %}
+                  </div>
+
+                </td>
+                <td>
+                  <div>Cr: {{group.created_date|date}}</div>
+                  <div>Mo: {{group.modified_date|date}}</div>
+                  <div>LL: {{group|class_last_login|date}}</div>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% include "ctstem_app/Pagination.html" with model=groups %}
+      {% else %}
+        <p>No classes available.</p>
       {% endif %}
     </form>
   </div>

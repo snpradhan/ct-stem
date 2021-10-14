@@ -60,7 +60,7 @@
   {% check_curriculum_permission curriculum.id 'delete' as has_delete_permission %}
   {% if has_delete_permission == True %}
     <div class="col">
-      <a type="button" class="btn normal blue delete_curriculum" aria-hidden="true" aria-label="Delete Curriculum" title="Delete Curriculum" href="{% url 'ctstem:deleteCurriculum' curriculum.id %}">
+      <a type="button" class="btn normal red delete_curriculum" aria-hidden="true" aria-label="Delete Curriculum" title="Delete Curriculum" href="{% url 'ctstem:deleteCurriculum' curriculum.id %}">
         Delete
       </a>
      </div>

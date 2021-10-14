@@ -196,11 +196,11 @@
                   {% if assignments|length > 0 %}
                     {% with status=form.instance.is_active|yesno:"active,inactive"%}
                       {% if user.teacher %}
-                        <a type="button" class="btn inbetween orange" href="{% url 'ctstem:teacherAssignmentDashboard' user.teacher.id status %}?group={{form.instance.id}}">
+                        <a type="button" class="btn inbetween blue" href="{% url 'ctstem:teacherAssignmentDashboard' user.teacher.id status %}?group={{form.instance.id}}">
                           View Dashboard
                         </a>
                       {% else %}
-                        <a type="button" class="btn inbetween orange" href="{% url 'ctstem:teacherAssignmentDashboard' form.teacher.value status %}?group={{form.instance.id}}">
+                        <a type="button" class="btn inbetween blue" href="{% url 'ctstem:teacherAssignmentDashboard' form.teacher.value status %}?group={{form.instance.id}}">
                           View Dashboard
                         </a>
                       {% endif %}
@@ -268,7 +268,7 @@
                         {% endif %}
                             <td style="text-align:center;">
                               {% if form.instance.is_active %}
-                                <a class="btn yellow assignment_link" href="#" data-toggle="modal" data-target="#assignmentLinkModal" data-invite-link="https://{{domain}}/?next=/login?next=/assignments?assignment={{assignment.id}}" data-title="Direct Student Assignment Link" title="Direct Assignment Link">
+                                <a class="btn blue assignment_link" href="#" data-toggle="modal" data-target="#assignmentLinkModal" data-invite-link="https://{{domain}}/?next=/login?next=/assignments?assignment={{assignment.id}}" data-title="Direct Student Assignment Link" title="Direct Assignment Link">
                                   <i class="fa fa-link"></i>
                                 </a>
                               {% endif %}
@@ -372,25 +372,23 @@
                         {% endif %}
                         <td>
                           {% if not user.researcher %}
-                            {{student.user.username}}
+                            <div>{{student.user.username}}</div>
                             {% if form.instance.is_active %}
                               <div class="controls">
                                 {% if user.administrator or user.teacher %}
-                                  <button type="button" class="btn small gray reset" aria-label="Reset Student Password" title="Reset Student Password" onclick="return reset_password('{{student.user.get_full_name}}','{{student.user.id}}','{{csrf_token}}')">
+                                  <button type="button" class="btn small blue reset" aria-label="Reset Student Password" title="Reset Student Password" onclick="return reset_password('{{student.user.get_full_name}}','{{student.user.id}}','{{csrf_token}}')">
                                     <i class="fas fa-sync-alt"></i>
                                   </button>
                                 {% endif %}
                                 <button type="button" class="btn small blue reset_email" aria-label="Send password reset email" title="Send password reset email" onclick="this.disabled=true; return send_password_reset_email('{{student.user.username}}','{{csrf_token}}')">
                                   <i class="fas fa-paper-plane"></i>
                                 </button>
-                                <a type="button" class="btn small green edit" aria-label="Edit Student profile" title="Edit Student profile" href="{% url 'ctstem:userProfile' student.user.id %}">
+                                <a type="button" class="btn small blue edit" aria-label="Edit Student profile" title="Edit Student profile" href="{% url 'ctstem:userProfile' student.user.id %}">
                                   <i class="fas fa-pencil-alt"></i>
                                 </a>
                                 <a type="button" class="btn small red removeUser" aria-label="Remove Student from this group" title="Remove Student from this group" href="{% url 'ctstem:removeStudent' form.instance.id student.id  %}" data-id="{{forloop.counter0}}">
                                   <i class="fa fa-trash"></i>
                                 </a>
-
-
                               </div>
                             {% endif %}
                           {% else %}

@@ -46,15 +46,18 @@
 
                 <div class="controls">
                   {% if user.administrator or user.researcher %}
-                    <button type="button" class="btn green edit_question" name="edit_question"
+                    <button type="button" class="btn blue edit_question" name="edit_question"
                          aria-label="Edit Question" title="Edit Question" data-form="{% url 'ctstem:question' question.id %}" >
                       <i class="fas fa-pencil-alt" aria-hidden="true"></i>
                     </button>
+                  {% endif %}
+                  <a type="button" class="btn blue export" href="{% url 'ctstem:export_question_response' question.id %}" title="Download Question Response"> <i class="fas fa-file-download"></i> </a>
+                  {% if user.administrator or user.researcher %}
                     <a type="button" class="btn red delete" aria-label="Delete Question" title="Delete Question" href="{% url 'ctstem:deleteQuestion' question.id %}" onclick="return confirm('Are you sure you want to delete this question?')">
                       <i class="fa fa-trash" aria-hidden="true"></i>
                     </a>
                   {% endif %}
-                  <a type="button" class="btn blue export" href="{% url 'ctstem:export_question_response' question.id %}" title="Download Question Response"> <i class="fas fa-file-download"></i> </a>
+
                 </div>
               </td>
               <td>{{ question.research_category.all|join:"<br>"}}</td>

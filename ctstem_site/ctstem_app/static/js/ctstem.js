@@ -421,11 +421,11 @@ $(function () {
                       buttons: {
                         confirm: {
                             label: 'Proceed',
-                            className: 'btn-normal-yellow'
+                            className: 'btn-normal-blue'
                         },
                         cancel: {
                             label: 'Close',
-                            className: 'btn-normal-red'
+                            className: 'btn-normal-gray'
                         }
                       },
                       callback: function(result){

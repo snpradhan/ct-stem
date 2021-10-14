@@ -215,12 +215,12 @@
 /**************************/
 
 #home .block#three {
-  background-color: var(--ctstem-color-blue);
+  background-color: var(--ctstem-color-pale-blue);
   text-align: center;
   padding: 9.6em 6%;
 }
 #home .block#three h2 {
-  color: white;
+  /*color: white;*/
   margin-bottom: 1.25em;
 }
 #home .block#three .col-container {

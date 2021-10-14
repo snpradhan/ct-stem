@@ -33,7 +33,7 @@
                 <td class="title">{{standard.name}}
                   <div class="controls">
                     {% if user.administrator or user.researcher or user.author %}
-                      <a type="button" class="btn green" aria-label="Edit Standard" title="Edit Standard" href="{% url 'ctstem:standard' standard.id %}">
+                      <a type="button" class="btn blue" aria-label="Edit Standard" title="Edit Standard" href="{% url 'ctstem:standard' standard.id %}">
                         <i class="fas fa-pencil-alt" aria-hidden="true"></i>
                       </a>
                       <a type="button" class="btn red delete" aria-label="Delete Standard" title="Delete Standard" href="{% url 'ctstem:deleteStandard' standard.id %}" onclick="return confirm('Are you sure you want to delete {{standard.name}}?')">

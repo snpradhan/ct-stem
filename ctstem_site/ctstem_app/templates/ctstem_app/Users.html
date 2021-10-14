@@ -96,19 +96,24 @@
 
                   <div class="controls">
                     {% if not user.researcher or role != 'students' %}
-                      <a type="button" class="btn green edit" aria-label="Edit User" title="Edit User" href="{% url 'ctstem:userProfile' userProfile.user.id %}">
+                      {% if role == 'students' %}
+                      <button type="button" class="btn blue reset" aria-label="Reset User Password" title="Reset Student Password" onclick="return reset_password('{{userProfile.user.get_full_name}}','{{userProfile.user.id}}','{{csrf_token}}')">
+                        <i class="fas fa-sync-alt"></i>
+                      </button>
+                      {% endif %}
+                      <button type="button" class="btn blue reset_email" aria-label="Send password reset email" title="Send password reset email" onclick="this.disabled=true; return send_password_reset_email('{{userProfile.user.username}}','{{csrf_token}}')">
+                        <i class="fas fa-paper-plane"></i>
+                      </button>
+                      <a type="button" class="btn blue edit" aria-label="Edit User" title="Edit User" href="{% url 'ctstem:userProfile' userProfile.user.id %}">
                         <i class="fas fa-pencil-alt" aria-hidden="true"></i>
                       </a>
                       <a type="button" class="btn red delete" aria-label="Delete User" title="Delete User" href="{% url 'ctstem:deleteUser' userProfile.user.id %}" onclick="return confirm('Are you sure you want to delete user {{userProfile.user.username}}?')">
                         <i class="fa fa-trash" aria-hidden="true"></i>
                       </a>
-                      <button type="button" class="btn blue reset_email" aria-label="Send password reset email" title="Send password reset email" onclick="this.disabled=true; return send_password_reset_email('{{userProfile.user.username}}','{{csrf_token}}')">
-                        <i class="fas fa-paper-plane"></i>
-                      </button>
                     {% endif %}
                     {% if user.administrator or user.researcher %}
                       {% if role == 'teachers' %}
-                        <a type="button" class="btn orange" aria-label="Teacher Dashboard" title="Teacher Dashboard" href="{% url 'ctstem:teacherDashboard' userProfile.user.teacher.id 'active' %}">
+                        <a type="button" class="btn blue" aria-label="Teacher Dashboard" title="Teacher Dashboard" href="{% url 'ctstem:teacherDashboard' userProfile.user.teacher.id 'active' %}">
                                 <i class="fas fa-tachometer-alt"></i>
                           </a>
                       {% endif %}

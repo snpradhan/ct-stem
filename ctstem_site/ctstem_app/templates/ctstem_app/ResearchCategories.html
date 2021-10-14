@@ -36,7 +36,7 @@
             <tr>
               <td class="title">{{category.category}}
                 <div class="controls">
-                  <a type="button" class="btn green" aria-label="Edit Category" title="Edit Category" href="{% url 'ctstem:research_category' category.id %}">
+                  <a type="button" class="btn blue" aria-label="Edit Category" title="Edit Category" href="{% url 'ctstem:research_category' category.id %}">
                       <i class="fas fa-pencil-alt" aria-hidden="true"></i>
                   </a>
                   <a type="button" class="btn red delete" aria-label="Delete Category" title="Delete Category" href="{% url 'ctstem:deleteCategory' category.id %}" onclick="return confirm('Are you sure you want to delete {{category.category}}? This category is used in {{category.questions.all|length}} questions.')">

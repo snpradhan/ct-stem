@@ -34,7 +34,7 @@
             <tr>
               <td class="title">{{subject.name}}
                 <div class="controls">
-                  <a type="button" class="btn green" aria-label="Edit Subject" title="Edit Subject" href="{% url 'ctstem:subject' subject.id %}">
+                  <a type="button" class="btn blue" aria-label="Edit Subject" title="Edit Subject" href="{% url 'ctstem:subject' subject.id %}">
                     <i class="fas fa-pencil-alt" aria-hidden="true"></i>
                   </a>
                   <a type="button" class="btn red delete" aria-label="Delete Subject" title="Delete Subject" href="{% url 'ctstem:deleteSubject' subject.id %}" onclick="return confirm('Are you sure you want to delete {{subject.name}}?')">

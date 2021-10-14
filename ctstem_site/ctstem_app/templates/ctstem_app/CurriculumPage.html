@@ -99,13 +99,15 @@
                         <td class="referenced_by">{{questionForm.referenced_by}}</td>
                         <td class="optional">{{questionForm.optional}}</td>
                         <td class="question_edit">
-                          <button type="button" class="btn red delete_question" name="delete_question" aria-label="Delete Question" title="Delete Question">
-                            <i class="fa fa-trash" aria-hidden="true"></i>
-                          </button>
-                          {{questionForm.DELETE.as_hidden}}
-                          <button type="button" class="btn green edit_question" name="edit_question" aria-label="Edit Question" title="Edit Question" data-form="{% url 'ctstem:question' questionForm.question.value|default:0 %}" >
-                            <i class="fas fa-pencil-alt" aria-hidden="true"></i>
-                          </button>
+                          <div class="controls">
+                            <button type="button" class="btn blue edit_question" name="edit_question" aria-label="Edit Question" title="Edit Question" data-form="{% url 'ctstem:question' questionForm.question.value|default:0 %}" >
+                              <i class="fas fa-pencil-alt" aria-hidden="true"></i>
+                            </button>
+                            <button type="button" class="btn red delete_question" name="delete_question" aria-label="Delete Question" title="Delete Question">
+                              <i class="fa fa-trash" aria-hidden="true"></i>
+                            </button>
+                            {{questionForm.DELETE.as_hidden}}
+                          </div>
                         </td>
                       </tr>
                     {% endfor %}
@@ -238,7 +240,7 @@
                           buttons: {
                             ok: {
                               label: 'Ok',
-                              className: 'btn-normal-yellow'
+                              className: 'btn-normal-blue'
                             }
                           },
                         });
@@ -249,11 +251,11 @@
                             buttons: {
                               confirm: {
                                   label: 'Yes',
-                                  className: 'btn-normal-yellow'
+                                  className: 'btn-normal-red'
                               },
                               cancel: {
                                   label: 'No',
-                                  className: 'btn-normal-red'
+                                  className: 'btn-normal-gray'
                               }
                             },
                             callback: function(result){

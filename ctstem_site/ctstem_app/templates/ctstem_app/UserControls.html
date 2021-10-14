@@ -6,7 +6,7 @@
     </a>
   {% endif %}
   {% if user.administrator or user.researcher or user.school_administrator %}
-    <a type="button" class="btn normal orange" href="{% url 'ctstem:newGroup' %}" title="Create new class"><i class="fa fa-sitemap"></i> Add Class</a>
+    <a type="button" class="btn normal blue" href="{% url 'ctstem:newGroup' %}" title="Create new class"><i class="fa fa-sitemap"></i> Add Class</a>
     <a type="button" class="btn normal blue assignment-modal" href="#" data-toggle="modal" data-target="#assignment" title="Search and Add Assignments"><i class="fa fa-tasks"></i> Add Assignment</a>
   {% endif %}
   {% if user.administrator %}

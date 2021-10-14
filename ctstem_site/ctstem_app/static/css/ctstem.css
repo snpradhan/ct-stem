@@ -193,6 +193,16 @@ a {
   color: var(--ctstem-color-blue) !important;
 }
 
+.navbar-default .navbar-nav > li a.btn.yellow {
+  background-color: var(--ctstem-color-yellow) !important;
+  color: white !important;
+}
+.navbar-default .navbar-nav > li a.btn.yellow:hover {
+  border: 1px solid var(--ctstem-color-yellow) !important;
+  background-color: #ffffff !important;
+  color: var(--ctstem-color-yellow) !important;
+}
+
 .navbar-default .navbar-nav > li > a:hover,
 .dropdown-menu > li > a:hover,
 .navbar-default .navbar-nav > .open > a {
@@ -374,16 +384,18 @@ div#div_conditions {
   width: 30px !important;
 }
 
-div.curriculum_container, div.group_container {
+div.curriculum_container, div.group_container, div.standard_container {
   display: flex;
   justify-content: space-between;
 }
 div.curriculum_container div.left-navigation,
-div.group_container div.left-navigation{
+div.group_container div.left-navigation,
+div.standard_container div.left-navigation {
   flex: 0 0 14%;
 }
 div.curriculum_container div.left-navigation ul,
-div.group_container div.left-navigation ul {
+div.group_container div.left-navigation ul,
+div.standard_container div.left-navigation ul {
   padding-left: 2em;
 }
 div.curriculum_container div.left-navigation label.current_curriculum strong{
@@ -393,13 +405,17 @@ div.curriculum_container div.left-navigation label.current_curriculum strong{
 div.curriculum_container div.left-navigation label a {
   color: var(--ctstem-color-blue);
 }
+div.curriculum_container div.left-navigation label a.delete_curriculum {
+  color: var(--ctstem-color-red);
+}
 div.curriculum_container div.left-navigation label a:hover{
   cursor: pointer;
   color: var(--ctstem-color-yellow);
   text-decoration: underline;
 }
 div.curriculum_container div.curriculum_components,
-div.group_container div.group_components {
+div.group_container div.group_components,
+div.standard_container div.standard_components {
   flex: 0 0 86%;
   max-width: 86%;
 }
@@ -457,7 +473,8 @@ div.curriculum_container div.curriculum_components input[type='checkbox'].safari
 }
 
 div.curriculum_container div.button-container,
-div.group_container div.button-container {
+div.group_container div.button-container,
+div.standard_container div.button-container {
   flex: 0 0 20%;
   display: flex;
   justify-content: flex-end;
@@ -488,11 +505,7 @@ div.table#class_overview, div.table#class_assignments, div.table#class_roster {
 div.table#class_overview, div.table#class_assignments, div.table#class_roster div.section_header {
   margin-bottom: 1.5em;
 }
-div.table#class_roster div.controls {
-  display: flex;
-  justify-content: space-between;
-}
-div.table#class_overview input#generate_code {
+input#generate_code {
   margin-left: 2px;
 }
 div.table#curriculum, div.table#directions_attachments, div.table.step, div.table.addStep {
@@ -508,7 +521,7 @@ div.table.addStep > * {
   color: inherit;
 }
 div.table.step, div.table.addStep, div.table.activity, div.table.ngss, div.table.taxonomy, div.table#curriculumQuestions {
-  margin-top: 1em;
+  margin-bottom: 1.5em;
 }
 div.table#curriculumPreview, div.table.stepPreview, div.table#assignment{
   width: 80%;
@@ -840,21 +853,19 @@ div.content#question_review .dataTables_wrapper {
 div.content#curricula {
   width: 100%;
   margin-bottom: 0;
-  background-color: var(--ctstem-color-blue);
+  background-color: var(--ctstem-color-pale-blue);
   padding-left:  0;
   padding-right: 0;
 }
 div.content#curricula > * {
   padding-left: 5%;
   padding-right: 5%;
-  color: white;
 }
 div.content#curricula .page-blurb {
   /*padding-top: 40px;*/
 }
 
 div.content#curricula .page-blurb > * {
-  color: inherit !important;
   text-align: center !important;
   margin-top: 0 !important;
 }
@@ -1519,7 +1530,6 @@ div.content#curricula div.row#curricula_filters {
 }
 div.content#curricula div.row#curricula_filters,
 div.content#curricula div#curricula_filters_toggle {
-  color: white;
   padding-top: 1em;
 }
 div.content#curricula div#curricula_filters_toggle {
@@ -2002,7 +2012,7 @@ div.content#assignments div.inbox_filter,
 div.content#assignment_progress_dashboard div.progress_filter,
 div.content.teacher_detailed_dashboard div#dashboard_search div.assignment_filter,
 div.content.assignment_feedback div.search_filter {
-  background-color: var(--ctstem-color-blue);
+  background-color: var(--ctstem-color-pale-blue);
   padding: 1em 2%;
   display: flex;
   justify-content: space-between;
@@ -2021,7 +2031,7 @@ div.content#assignments div.inbox_filter .form-group label,
 div.content#assignment_progress_dashboard div.progress_filter .form-group label,
 div.content.teacher_detailed_dashboard div#dashboard_search div.assignment_filter .form-group label,
 div.content.assignment_feedback div.search_filter .form-group label {
-  color: white;
+  /*color: white;*/
 }
 
 div.content#assignments div.inbox_filter .form-group select,
@@ -2080,6 +2090,9 @@ div.btn-group.center a {
 }
 a.btn.pdf img {
   height: 20px;
+}
+div.button-group {
+  text-align: right;
 }
 
 div.button-group-fixed {
@@ -2583,8 +2596,8 @@ a.selector-chooseall, a.selector-clearall {
   position: relative;
   display: inline-block;
   vertical-align: top;
-  width: 3em;
-  height: 1em;
+  width: 30px;
+  height: 15px;
   border-radius: 18px;
 
   cursor: pointer;
@@ -2599,16 +2612,16 @@ a.selector-chooseall, a.selector-clearall {
   position: relative;
   display: block;
   height: inherit;
-  font-size: 10px;
+  font-size: 15px;
   text-transform: uppercase;
-  background: var(--ctstem-color-dark-red);
+  background: var(--ctstem-color-pale-gray);
   border-radius: inherit;
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.12), inset 0 0 2px rgba(0, 0, 0, 0.15);
 }
 .switch-label:before, .switch-label:after {
   position: absolute;
   top: 50%;
-  margin-top: -.5em;
+  margin-top: -.6px;
   line-height: 1;
   -webkit-transition: inherit;
   -moz-transition: inherit;
@@ -2629,7 +2642,7 @@ a.selector-chooseall, a.selector-clearall {
   opacity: 0;
 }
 .switch-input:checked ~ .switch-label {
-  background: var(--ctstem-color-dark-green);;
+  background: var(--ctstem-color-blue);;
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.15), inset 0 0 3px rgba(0, 0, 0, 0.2);
 }
 .switch-input:checked ~ .switch-label:before {
@@ -2641,9 +2654,8 @@ a.selector-chooseall, a.selector-clearall {
 .switch-handle {
   position: absolute;
   top: 0px;
-  left: 0px;
-  width: 1em;
-  height: 1em;
+  left: 0.6px;
+  height: 12px;
   background: linear-gradient(to bottom, #FFFFFF 40%, #f0f0f0);
   background-image: -webkit-linear-gradient(top, #FFFFFF 40%, #f0f0f0);
   border-radius: 100%;
@@ -2652,8 +2664,8 @@ a.selector-chooseall, a.selector-clearall {
 .switch-handle:before {
   content: "";
   position: absolute;
-  top: 50%;
-  left: 50%;
+  top: 7px;
+  left: 7px;
   margin: -6px 0 0 -6px;
   width: 12px;
   height: 12px;
@@ -2663,7 +2675,7 @@ a.selector-chooseall, a.selector-clearall {
   box-shadow: inset 0 1px rgba(0, 0, 0, 0.02);
 }
 .switch-input:checked ~ .switch-handle {
-  left: 2em;
+  left: 15px;
   box-shadow: -1px 1px 5px rgba(0, 0, 0, 0.2);
 }
 

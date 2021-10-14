@@ -32,12 +32,12 @@
         <h5 class="left">Legends</h5>
         <div class="legends">
           <div class="legend">
-            <a type="button" class="btn tiny green"> <i class="far fa-comment-dots"></i> </a>
+            <a type="button" class="btn tiny blue"> <i class="fas fa-comment-dots"></i> </a>
             &nbsp;
             <label>Feedback Given</label>
           </div>
           <div class="legend">
-            <a type="button" class="btn tiny yellow"> <i class="far fa-comment-dots"></i> </a>
+            <a type="button" class="btn tiny blue"> <i class="far fa-comment-dots"></i> </a>
             &nbsp;
             <label>Feedback Pending</label>
           </div>
@@ -109,7 +109,7 @@
                     <th>
                       Q{{step.order}}.{{question.order}}
                       <br>
-                      <a class="btn tiny white" href="{% url 'ctstem:assignmentQuestionFeedback' teacher_id %}?group={{assignment.group.id}}&assignment={{assignment.curriculum.id}}&question={{question.id}}" title="Review student responses for question {{step.order}}.{{question.order}}"> <span class="far fa-comment-dots" aria-hidden="true"></span> </a>
+                      <a class="btn tiny blue" href="{% url 'ctstem:assignmentQuestionFeedback' teacher_id %}?group={{assignment.group.id}}&assignment={{assignment.curriculum.id}}&question={{question.id}}" title="Review student responses for question {{step.order}}.{{question.order}}"> <span class="far fa-comment-dots" aria-hidden="true"></span> </a>
                     </th>
                   {% endfor %}
                 {% else %}
@@ -142,7 +142,7 @@
               </div>
 
               {% if instance %}
-                <a class="btn tiny white" href="{% url 'ctstem:assignmentStudentFeedback' teacher_id %}?group={{assignment.group.id}}&assignment={{assignment.curriculum.id}}&student={{student.user.id}}" title="Review student's response"> <span class="far fa-comment-dots" aria-hidden="true"></span> </a>
+                <a class="btn tiny blue" href="{% url 'ctstem:assignmentStudentFeedback' teacher_id %}?group={{assignment.group.id}}&assignment={{assignment.curriculum.id}}&student={{student.user.id}}" title="Review student's response"> <span class="far fa-comment-dots" aria-hidden="true"></span> </a>
               {% endif %}
             </td>
             {% for question_progress in progress %}
@@ -154,7 +154,14 @@
                 {% else %}
                   {% with response=question_progress|get_item:'response' feedback=question_progress|get_item:'feedback' %}
                     {% if response %}
-                      <a type="button" class="btn tiny add_feedback {% if feedback and feedback.feedback %} green {% else %} yellow {% endif %}" data-form="{% url 'ctstem:assignmentStudentQuestionFeedback' response.id %}" title="{% if feedback and feedback.feedback %} Review response and feedback {% else %} Review response and give feedback {% endif %}"> <span class="far fa-comment-dots" aria-hidden="true"></span> </a>
+                      <a type="button" class="btn tiny add_feedback blue" data-form="{% url 'ctstem:assignmentStudentQuestionFeedback' response.id %}" title="{% if feedback and feedback.feedback %} Review response and feedback {% else %} Review response and give feedback {% endif %}">
+                        {% if feedback and feedback.feedback %}
+                          <span class="fas fa-comment-dots" aria-hidden="true"></span>
+                        {% else %}
+                          <span class="far fa-comment-dots" aria-hidden="true"></span>
+                        {% endif %}
+
+                      </a>
                     {% endif %}
                   {% endwith %}
                 {% endif %}

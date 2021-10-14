@@ -20,15 +20,15 @@
         <div class="btn-group center">
           {% if user.is_authenticated %}
             {% if user.administrator or user.researcher or user.author or user.teacher %}
-              <a type="button" class="btn normal darkblue" href="{% url 'ctstem:newCurriculumOverview' %}" title="Create new curriculum">Create Curriculum</a>
+              <a type="button" class="btn normal blue" href="{% url 'ctstem:newCurriculumOverview' %}" title="Create new curriculum">Create Curriculum</a>
             {% else %}
               {% with msg="Please login as a teacher to create a curriculum" %}
-                <a type="button" class="btn normal darkblue" onclick="alert('{{msg}}');" title="Create new curriculum">Create Curriculum</a>
+                <a type="button" class="btn normal blue" onclick="alert('{{msg}}');" title="Create new curriculum">Create Curriculum</a>
               {% endwith %}
             {% endif %}
           {% else %}
             {% with msg="Please login to create a curriculum" %}
-              <a type="button" class="btn normal darkblue" onclick="alert('{{msg}}');" title="Create new curriculum">Create Curriculum</a>
+              <a type="button" class="btn normal blue" onclick="alert('{{msg}}');" title="Create new curriculum">Create Curriculum</a>
             {% endwith %}
           {% endif %}
         </div>
@@ -90,8 +90,7 @@
 
             <div class="col form-group">
               <div class="search">
-                <!--input type="submit" class="btn normal darkblue" id="submit" value="Search"/-->
-                <input type="button" class="btn normal yellow" id="clear" value="Clear Filter"/>
+                <input type="button" class="btn normal gray" id="clear" value="Clear Filter"/>
               </div>
             </div>
           </div>

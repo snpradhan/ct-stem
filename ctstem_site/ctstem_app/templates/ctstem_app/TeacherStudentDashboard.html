@@ -47,7 +47,7 @@
         </div>
 
         <div class="form-group">
-          <button type="button" id="reset" class="btn yellow normal">
+          <button type="button" id="reset" class="btn gray normal">
             Clear Filter
           </button>
         </div>
@@ -115,17 +115,19 @@
   <div class="dashboard_assignments">
     <div class="assignments">
       {% for key, assignment in assignments.items %}
-        {% with assignment_id=assignment|get_item:'assignment_id' curriculum_id=assignment|get_item:'curriculum_id' assignment_group=assignment|get_item:'group' assignment_status=assignment|get_item:'assignment_status' instance=assignment|get_item:'instance' %}
+        {% with assignment_id=assignment|get_item:'assignment_id' curriculum_id=assignment|get_item:'curriculum_id' assignment_group=assignment|get_item:'group' assignment_status=assignment|get_item:'assignment_status' instance=assignment|get_item:'instance' curriculum_type=assignment|get_item:'curriculum_type' %}
         <div class="assignment tile standalone">
           <div class="assignment_title">
             <h5 class="expanded_collapsed collapsed" title="Expand underlying lessons">
-              {% if assignment|get_item:'curriculum_type' == 'Unit' %}
+              {% if curriculum_type == 'Unit' %}
                 <i class="fas fa-plus-circle"></i>
                 <i class="fas fa-minus-circle"></i>
               {% endif %}
             </h5>
             <h5 class="left">
-              {% if assignment_id and instance %}
+              {% if curriculum_type == 'Unit' %}
+                {{assignment|get_item:'title'}}
+              {% elif assignment_id and instance %}
                 <a href="{% url 'ctstem:assignmentStudentFeedback' teacher.id %}?group={{assignment_group.id}}&assignment={{curriculum_id}}&student={{instance.student.user.id}}" title="Review student response">
                   {{assignment|get_item:'title'}}
                 </a>
@@ -142,7 +144,7 @@
           </div>
           {% endif %}
           <div class="assignment_status_chart">
-            {% if assignment|get_item:'curriculum_type' == 'Unit' %}
+            {% if curriculum_type == 'Unit' %}
               {% get_chart_config assignment_status 'stacked_bar' as assignment_chart_config %}
               <div id="assignment_chart_student_{{student_id}}_curriculum_{{key}}" class="stacked_bar_chart unrendered" name="{{assignment_chart_config}}" data-total="{{assignment|get_item:'total'}}"></div>
             {% else %}

@@ -25,12 +25,12 @@
       <h3 class="left">{{status|title}} Classes (<span class="class_count">{% if groups|length > 6 %}6{% else %} {{groups|length}} {% endif %}</span> of {{groups|length}})</h3>
       <div class="controls">
         {% if status == 'active' %}
-          <a type="button" class="btn normal yellow" href="{% url 'ctstem:teacherDashboard' teacher.id 'inactive' %}" title="View inactive classes"> View Inactive Classes</a>
+          <a type="button" class="btn normal blue" href="{% url 'ctstem:teacherDashboard' teacher.id 'inactive' %}" title="View inactive classes"> View Inactive Classes</a>
         {% else %}
-          <a type="button" class="btn normal yellow"href="{% url 'ctstem:teacherDashboard' teacher.id 'active' %}" title="View active classes"> View Active Classes</a>
+          <a type="button" class="btn normal blue"href="{% url 'ctstem:teacherDashboard' teacher.id 'active' %}" title="View active classes"> View Active Classes</a>
         {% endif %}
         &nbsp;&nbsp;
-        <a type="button" class="btn normal yellow" href="/group/new/" title="Create new class"> Add New</a>
+        <a type="button" class="btn normal blue" href="/group/new/" title="Create new class"> Add New</a>
       </div>
     </div>
     <hr>
@@ -68,14 +68,14 @@
           <div class="class_detail">
             <div class="class_actions">
               {% if group.is_active %}
-                <button class="btn small lightyellow add_student" data-target="#addStudentModal" data-form="{% url 'ctstem:addStudentsToClass'  group.id %}" title="Search and Add existing Students to this class">
+                <button class="btn small blue add_student" data-target="#addStudentModal" data-form="{% url 'ctstem:addStudentsToClass'  group.id %}" title="Search and Add existing Students to this class">
                     <i class="fa fa-user-plus"></i> Add
                 </button>
               {% endif %}
             </div>
             <div class="class_actions">
               {% if group.is_active %}
-                <button class="assignment-modal action btn small lightyellow assign" href="#" data-toggle="modal" data-target="#assignment" data-id="{{group.id}}" data-title="{{group.title}}" data-subject="{{group.subject.id}}" title="Search and Add Assignments">
+                <button class="assignment-modal action btn small blue assign" href="#" data-toggle="modal" data-target="#assignment" data-id="{{group.id}}" data-title="{{group.title}}" data-subject="{{group.subject.id}}" title="Search and Add Assignments">
                   <i class="fa fa-tasks"></i> Assign
                 </button>
               {% endif %}
@@ -88,7 +88,7 @@
     </div>
     {% if groups|length > 6 %}
       <div class="view_all">
-        <a type="button" class="view_all_class btn inbetween darkblue">View All</a>
+        <a type="button" class="view_all_class btn inbetween blue">View All</a>
       </div>
     {% endif %}
   </div>
@@ -106,7 +106,7 @@
             </div>
           </form>
           &nbsp;&nbsp;&nbsp;&nbsp;
-          <a type="button" class="btn normal yellow assignment-modal" href="#" data-toggle="modal" data-target="#assignment" title="Search and Add Assignments">Add New</a>
+          <a type="button" class="btn normal blue assignment-modal" href="#" data-toggle="modal" data-target="#assignment" title="Search and Add Assignments">Add New</a>
         </div>
       </div>
       <hr>
@@ -199,7 +199,7 @@
       {% endif %}
       {% if assignment_count > 0 %}
         <div class="view_all">
-          <a type="button" class="btn inbetween darkblue" href="{% url 'ctstem:teacherAssignmentDashboard' teacher.id status %}">View Assignment Dashboard</a>
+          <a type="button" class="btn inbetween blue" href="{% url 'ctstem:teacherAssignmentDashboard' teacher.id status %}">View Assignment Dashboard</a>
         </div>
       {% endif %}
     </div>
