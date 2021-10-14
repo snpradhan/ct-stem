@@ -149,7 +149,15 @@
               <div id="assignment_chart_student_{{student_id}}_curriculum_{{key}}" class="stacked_bar_chart unrendered" name="{{assignment_chart_config}}" data-total="{{assignment|get_item:'total'}}"></div>
             {% else %}
               {% get_chart_color assignment_status as color %}
-              <div id="assignment_chart_student_{{student_id}}_curriculum_{{key}}" class="progress_chart unrendered" data-percent-complete="" data-color="{{color}}" data-student-id="{{student_id}}" data-assignment-id="{{assignment_id}}"></div>
+              {% if assignment_id and instance %}
+                <a href="{% url 'ctstem:assignmentStudentFeedback' teacher.id %}?group={{assignment_group.id}}&assignment={{curriculum_id}}&student={{instance.student.user.id}}" title="Review student response">
+                  <div id="assignment_chart_student_{{student_id}}_curriculum_{{key}}" class="progress_chart unrendered" data-percent-complete="" data-color="{{color}}" data-student-id="{{student_id}}" data-assignment-id="{{assignment_id}}"></div>
+                </a>
+              {% else %}
+               <a onclick='alert("Student hasn&apos;t started this assignment");' title="Review student response">
+                  <div id="assignment_chart_student_{{student_id}}_curriculum_{{key}}" class="progress_chart unrendered" data-percent-complete="" data-color="{{color}}" data-student-id="{{student_id}}" data-assignment-id="{{assignment_id}}"></div>
+                </a>
+              {% endif %}
             {% endif %}
           </div>
           <div class="assignment_stats">
@@ -182,7 +190,9 @@
                 {% endif %}
                 <div class="assignment_status_chart">
                   {% get_chart_color assignment_status as color %}
-                  <div id="assignment_chart_student_{{student_id}}_curriculum_{{key}}_lesson_{{order}}" class="progress_chart unrendered" data-percent-complete="" data-color="{{color}}" data-student-id="{{student_id}}" data-assignment-id="{{lesson|get_item:'assignment_id'}}"></div>
+                  <a href="{% url 'ctstem:assignmentStudentFeedback' teacher.id %}?group={{instance.assignment.group.id}}&assignment={{instance.assignment.curriculum.id}}&student={{instance.student.user.id}}" title="Review student response">
+                    <div id="assignment_chart_student_{{student_id}}_curriculum_{{key}}_lesson_{{order}}" class="progress_chart unrendered" data-percent-complete="" data-color="{{color}}" data-student-id="{{student_id}}" data-assignment-id="{{lesson|get_item:'assignment_id'}}"></div>
+                  </a>
 
                 </div>
                 <div class="assignment_stats">

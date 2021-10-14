@@ -25,12 +25,11 @@
       <h3 class="left">{{status|title}} Classes (<span class="class_count">{% if groups|length > 6 %}6{% else %} {{groups|length}} {% endif %}</span> of {{groups|length}})</h3>
       <div class="controls">
         {% if status == 'active' %}
-          <a type="button" class="btn normal blue" href="{% url 'ctstem:teacherDashboard' teacher.id 'inactive' %}" title="View inactive classes"> View Inactive Classes</a>
+          <a type="button" class="btn inbetween blue" href="{% url 'ctstem:teacherDashboard' teacher.id 'inactive' %}" title="View inactive classes"> View Inactive Classes</a>
         {% else %}
-          <a type="button" class="btn normal blue"href="{% url 'ctstem:teacherDashboard' teacher.id 'active' %}" title="View active classes"> View Active Classes</a>
+          <a type="button" class="btn inbetween blue"href="{% url 'ctstem:teacherDashboard' teacher.id 'active' %}" title="View active classes"> View Active Classes</a>
         {% endif %}
-        &nbsp;&nbsp;
-        <a type="button" class="btn normal blue" href="/group/new/" title="Create new class"> Add New</a>
+        <a type="button" class="btn inbetween blue" href="/group/new/" title="Create new class">Add New</a>
       </div>
     </div>
     <hr>
@@ -87,7 +86,7 @@
       {% endfor %}
     </div>
     {% if groups|length > 6 %}
-      <div class="view_all">
+      <div class="view_all center">
         <a type="button" class="view_all_class btn inbetween blue">View All</a>
       </div>
     {% endif %}
@@ -105,8 +104,10 @@
               </div>
             </div>
           </form>
-          &nbsp;&nbsp;&nbsp;&nbsp;
-          <a type="button" class="btn normal blue assignment-modal" href="#" data-toggle="modal" data-target="#assignment" title="Search and Add Assignments">Add New</a>
+          <a type="button" class="btn inbetween blue assignment-modal" href="#" data-toggle="modal" data-target="#assignment" title="Search and Add Assignments">Add New</a>
+          {% if assignment_count > 0 %}
+           <a type="button" class="btn inbetween blue" href="{% url 'ctstem:teacherAssignmentDashboard' teacher.id status %}">View Assignment Dashboard</a>
+          {% endif %}
         </div>
       </div>
       <hr>
@@ -144,7 +145,15 @@
                   <div class="last_updated">Last Updated: {{curriculum_group|get_item:'last_updated'|date|default:'N/A'}}</div>
                   <div class="awaiting_feedback_count">{{curriculum_group|get_item:'awaiting_feedback_count'}} Awaiting Feedback</div>
                   <div class="assignment_status_chart">
-                    <div id="assignment_chart_{{curriculum_key}}_{{group_key}}" class="stacked_bar_chart" name="{{curriculum_group_chart_config}}" data-total="{{curriculum_group|get_item:'total'}}"></div>
+                    {% if curriculum_type == 'unit' %}
+                      <a href="{% url 'ctstem:unitProgressDashboard' teacher.id %}?group={{curriculum_group_id}}&assignment={{curriculum_id}}">
+                        <div id="assignment_chart_{{curriculum_key}}_{{group_key}}" class="stacked_bar_chart" name="{{curriculum_group_chart_config}}" data-total="{{curriculum_group|get_item:'total'}}"></div>
+                      </a>
+                    {% else %}
+                      <a href="{% url 'ctstem:assignmentProgressDashboard' teacher.id %}?group={{curriculum_group_id}}&assignment={{curriculum_id}}">
+                        <div id="assignment_chart_{{curriculum_key}}_{{group_key}}" class="stacked_bar_chart" name="{{curriculum_group_chart_config}}" data-total="{{curriculum_group|get_item:'total'}}"></div>
+                      </a>
+                    {% endif %}
                   </div>
                 </div>
                 {% endwith %}
@@ -187,7 +196,15 @@
                   <div class="last_updated">Last Updated: {{curriculum|get_item:'last_updated'|date|default:'N/A'}}</div>
                   <div class="awaiting_feedback_count">{{curriculum|get_item:'awaiting_feedback_count'}} Awaiting Feedback</div>
                   <div class="assignment_status_chart">
-                    <div id="assignment_chart_{{group_key}}_{{curriculum_key}}" class="stacked_bar_chart" name="{{curriculum_chart_config}}" data-total="{{curriculum|get_item:'total'}}"></div>
+                    {% if curriculum_type == 'unit' %}
+                      <a href="{% url 'ctstem:unitProgressDashboard' teacher.id %}?group={{group_id}}&assignment={{curriculum_id}}">
+                        <div id="assignment_chart_{{group_key}}_{{curriculum_key}}" class="stacked_bar_chart" name="{{curriculum_chart_config}}" data-total="{{curriculum|get_item:'total'}}"></div>
+                      </a>
+                    {% else %}
+                       <a href="{% url 'ctstem:assignmentProgressDashboard' teacher.id %}?group={{group_id}}&assignment={{curriculum_id}}">
+                        <div id="assignment_chart_{{group_key}}_{{curriculum_key}}" class="stacked_bar_chart" name="{{curriculum_chart_config}}" data-total="{{curriculum|get_item:'total'}}"></div>
+                      </a>
+                    {% endif %}
                   </div>
                 </div>
                 {% endwith %}
@@ -197,11 +214,11 @@
           {% endfor %}
         </div>
       {% endif %}
-      {% if assignment_count > 0 %}
-        <div class="view_all">
+      <div class="view_all right">
+        {% if assignment_count > 0 %}
           <a type="button" class="btn inbetween blue" href="{% url 'ctstem:teacherAssignmentDashboard' teacher.id status %}">View Assignment Dashboard</a>
-        </div>
-      {% endif %}
+        {% endif %}
+      </div>
     </div>
   {% endif %}
 </div>

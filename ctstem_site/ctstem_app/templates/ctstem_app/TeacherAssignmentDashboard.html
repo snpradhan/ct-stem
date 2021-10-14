@@ -106,25 +106,18 @@
           </div>
           {% endif %}
 
-            <!--div class="actions">
-              {% for status in assignment_status_chart_config %}
-                {% if status.name == 'New' %}
-                  <div class="action new"><i class="far fa-user"></i> {{status.data.0}} {{status.name}}</div>
-                {% elif status.name == 'In Progress' %}
-                  <div class="action in_progress"><i class="far fa-clock"></i> {{status.data.0}} {{status.name}}</div>
-                {% elif status.name == 'Submitted' %}
-                  <div class="action submitted"><i class="fas fa-check"></i> {{status.data.0}} {{status.name}}</div>
-                {% elif status.name == 'Feedback Ready' %}
-                  <div class="action feedback_ready"><i class="far fa-comment-dots"></i> {{status.data.0}} {{status.name}}</div>
-                {% elif status.name == 'Archived' %}
-                  <div class="action archived"><i class="fa fa-archive"></i> {{status.data.0}} {{status.name}}</div>
-                {% endif %}
-                &nbsp;&nbsp;&nbsp;&nbsp;
-              {% endfor %}
-            </div-->
-
           <div class="assignment_status_chart">
-            <div id="assignment_chart_{{key}}" class="stacked_bar_chart rendered" name="{{assignment_status_chart_config}}" data-total="{{assignment|get_item:'total'}}"></div>
+            {% if assignment_id %}
+              <a href="{% url 'ctstem:assignmentProgressDashboard' teacher.id %}?group={{assignment_group.id}}&assignment={{curriculum_id}}" title="View Assignment Progress Dashboard">
+                <div id="assignment_chart_{{key}}" class="stacked_bar_chart rendered" name="{{assignment_status_chart_config}}" data-total="{{assignment|get_item:'total'}}"></div>
+              </a>
+            {% elif assignment|get_item:'curriculum_type' == 'Unit' %}
+              <a href="{% url 'ctstem:unitProgressDashboard' teacher.id %}?group={{assignment_group.id}}&assignment={{curriculum_id}}" title="View Unit Progress Dashboard">
+                <div id="assignment_chart_{{key}}" class="stacked_bar_chart rendered" name="{{assignment_status_chart_config}}" data-total="{{assignment|get_item:'total'}}"></div>
+              </a>
+            {% else %}
+              <div id="assignment_chart_{{key}}" class="stacked_bar_chart rendered" name="{{assignment_status_chart_config}}" data-total="{{assignment|get_item:'total'}}"></div>
+            {% endif %}
           </div>
           <div class="assignment_stats">
             <h6 class="left last_opened">{{assignment|get_item:'last_opened'|date:'M j, Y'|default_if_none:''}}</h6>
@@ -144,29 +137,15 @@
                     <h5 class="left">
                       <a href="{% url 'ctstem:assignmentProgressDashboard' teacher.id %}?group={{assignment_group.id}}&assignment={{lesson|get_item:'curriculum_id'}}" title="View Assignment Progress Dashboard">{{order}}. {{lesson|get_item:'title'}}</a>
                     </h5>
-                    <!--div class="actions">
-                      {% for status in lesson_chart_config %}
-                        {% if status.name == 'New' %}
-                          <div class="action new"><i class="far fa-user"></i> {{status.data.0}} {{status.name}}</div>
-                        {% elif status.name == 'In Progress' %}
-                          <div class="action in_progress"><i class="far fa-clock"></i> {{status.data.0}} {{status.name}}</div>
-                        {% elif status.name == 'Submitted' %}
-                          <div class="action submitted"><i class="fas fa-check"></i> {{status.data.0}} {{status.name}}</div>
-                        {% elif status.name == 'Feedback Ready' %}
-                          <div class="action feedback_ready"><i class="far fa-comment-dots"></i> {{status.data.0}} {{status.name}}</div>
-                        {% elif status.name == 'Archived' %}
-                          <div class="action archived"><i class="fa fa-archive"></i> {{status.data.0}} {{status.name}}</div>
-                        {% endif %}
-                        &nbsp;&nbsp;&nbsp;&nbsp;
-                      {% endfor %}
-                    </div-->
                   </div>
                   {% if not group %}
                   <div class="assignment_class">
                   </div>
                   {% endif %}
                   <div class="assignment_status_chart">
-                    <div id="assignment_chart_{{key}}_{{order}}" class="stacked_bar_chart unrendered" name="{{lesson_chart_config}}" data-total="{{lesson|get_item:'total'}}"></div>
+                    <a href="{% url 'ctstem:assignmentProgressDashboard' teacher.id %}?group={{assignment_group.id}}&assignment={{lesson|get_item:'curriculum_id'}}" title="View Assignment Progress Dashboard">
+                      <div id="assignment_chart_{{key}}_{{order}}" class="stacked_bar_chart unrendered" name="{{lesson_chart_config}}" data-total="{{lesson|get_item:'total'}}"></div>
+                    </a>
                   </div>
                   <div class="assignment_stats">
                     <h6 class="left last_opened">{{lesson|get_item:'last_opened'|date:'M j, Y'|default_if_none:''}}</h6>

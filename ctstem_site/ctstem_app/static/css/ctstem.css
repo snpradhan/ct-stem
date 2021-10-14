@@ -898,10 +898,6 @@ div.content#teacher_dashboard hr {
   margin-top: 0;
   margin-bottom: 0;
 }
-div.content#teacher_dashboard .view_all {
-  padding: 2%;
-  text-align: center;
-}
 div.content#teacher_dashboard div#dashboard_header,
 div.content.teacher_detailed_dashboard div#dashboard_header,
 div.content.assignment_feedback div#dashboard_header {
@@ -965,6 +961,7 @@ div.content#teacher_dashboard .action.archived,
 div.content.teacher_detailed_dashboard .action.archived {
   color: var(--ctstem-color-dark-blue);
 }
+/*
 div.content#teacher_dashboard a,
 div.content.teacher_detailed_dashboard a,
 div.content.assignment_feedback a {
@@ -975,9 +972,8 @@ div.content.teacher_detailed_dashboard a:hover,
 div.content.assignment_feedback a:hover {
   cursor: pointer;
   color: var(--ctstem-color-yellow);
-  text-decoration: underline;
 }
-
+*/
 div.content#teacher_dashboard div#dashboard_classes,
 div.content#teacher_dashboard div#dashboard_assignments,
 div.content#teacher_dashboard div#dashboard_students{
@@ -987,17 +983,30 @@ div.content#teacher_dashboard div#dashboard_students{
 div.content#teacher_dashboard div#dashboard_assignments .form-group {
   margin-bottom: 0;
 }
-div.content#teacher_dashboard div.title {
+div.content#teacher_dashboard div.title{
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
   align-items: center;
   padding: 1% 2%;
 }
+div.content#teacher_dashboard div.view_all {
+  padding: 1% 2%;
+}
+div.content#teacher_dashboard div.view_all.left {
+  text-align: left;
+}
+div.content#teacher_dashboard div.view_all.center {
+  text-align: center;
+}
+div.content#teacher_dashboard div.view_all.right {
+  text-align: right;
+}
 div.content#teacher_dashboard div.title div.controls {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 1em;
 }
 
 div.content#teacher_dashboard div.title div.controls form {
@@ -1131,10 +1140,6 @@ div.content#teacher_dashboard div#dashboard_assignments div#assignments div.assi
   }
   div.content#teacher_dashboard div#dashboard_classes div#class_tiles div.tile:last-child {
     margin-bottom: 4% !important;
-  }
-  div.content#teacher_dashboard div.title,
-  div.content#teacher_dashboard .view_all {
-    padding: 4%;
   }
   div.content#teacher_dashboard div#dashboard_assignments {
     flex: 0 1 100%;
