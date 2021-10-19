@@ -55,21 +55,28 @@ function render_donut_chart(element) {
   $("#"+id).highcharts({
     chart: {
       type: 'pie',
-      height: 130,
-      width: 130,
+      height: 80,
+      width: 80,
       backgroundColor: 'rgba(0,0,0,0)',
+      marginLeft: 0,
+      marginTop: 0,
+      marginRight: 0,
+      marginBottom: 0,
+      spacingLeft: 0,
+      spacingRight: 0,
+      spacingTop: 0,
+      spacingBottom: 0
     },
     title: {
-      text: complete+'%',
+      text: complete+'% complete',
       align: 'center',
       verticalAlign: 'middle',
       y: 0,
       style: {
-        fontSize: '1.2em',
+        fontSize: '0.8em',
         color: 'black',
       },
     },
-    tooltip: false,
     plotOptions: {
       pie: {
         dataLabels: {
@@ -90,12 +97,12 @@ function render_donut_chart(element) {
         {
           name: 'Complete',
           y: complete,
-          color: 'green',
+          color: '#00adff',
         },
         {
           name: 'Remaining',
           y: remaining,
-          color: 'grey',
+          color: '#e5f7ff',
         },
       ]
     }]

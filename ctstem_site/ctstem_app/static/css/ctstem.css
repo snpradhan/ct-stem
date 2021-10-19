@@ -1326,19 +1326,21 @@ div.content#assignment_progress_dashboard .legends_container,
 div.content#assignment_progress_dashboard .settings_container {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
   flex: 0 0 40%;
   margin-top: 1em;
   margin-bottom: 1em;
   border: 1px solid black;
   border-radius: 10px;
   padding: 1em;
+  gap: 1em;
 }
 div.content#assignment_progress_dashboard .legends_container  .legends,
 div.content#assignment_progress_dashboard .settings_container .settings {
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
+  gap: 0.5em;
 }
 div.content#assignment_progress_dashboard .legends_container  .legends .legend,
 div.content#assignment_progress_dashboard .settings_container .settings .switch_container {
@@ -1369,25 +1371,35 @@ div.switch_container label {
   margin-bottom: 0 !important;
 }
 div.content#assignment_progress_dashboard td.student_col {
-  width: 12em;
+  width: 12em !important;
+}
+div.content#assignment_progress_dashboard td[class^='lesson'] {
+  width: 4em !important;
+}
+div.content#assignment_progress_dashboard td.percent_complete {
+  width: 3em !important;
+}
+
+div.content#assignment_progress_dashboard td[class^='lesson'] div.assignment_status_chart,
+div.content#assignment_progress_dashboard td.percent_complete div.assignment_status_chart {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 div.content#assignment_progress_dashboard td.question {
   text-align: center;
-  width: 2em;
+  width: 2em !important;
   padding: 0;
 }
-div.content#assignment_progress_dashboard td.percent_complete {
-  width: 5em;
-  text-align: center;
-}
 div.content#assignment_progress_dashboard td.time_spent {
-  width: 10em;
+  width: 10em !important;
   text-align: center;
 }
 div.content#assignment_progress_dashboard td.last_modified {
-  width: 10em;
+  width: 10em !important;
   text-align: center;
 }
+
 /*******************ASSIGNMENT PROGRESS DASHBOARD END**************************/
 
 #curricula_view, #release_notes_view {

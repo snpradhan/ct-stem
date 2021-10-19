@@ -42,6 +42,16 @@
             <label>Feedback Pending</label>
           </div>
           <div class="legend">
+            <a type="button" class="btn tiny blue"> <i class="fas fa-file-download"></i> </a>
+            &nbsp;
+            <label>Download Student Response</label>
+          </div>
+          <div class="legend">
+            <a type="button" class="btn tiny blue"> <i class="fa fa-unlock" aria-hidden="true"></i> </a>
+            &nbsp;
+            <label>Unlock Assignment</label>
+          </div>
+          <div class="legend">
             <i class="far fa-window-minimize"></i>
             &nbsp;
             <label>Not Yet Started</label>
@@ -142,7 +152,17 @@
               </div>
 
               {% if instance %}
+              <div class="controls">
                 <a class="btn tiny blue" href="{% url 'ctstem:assignmentStudentFeedback' teacher_id %}?group={{assignment.group.id}}&assignment={{assignment.curriculum.id}}&student={{student.user.id}}" title="Review student's response"> <span class="far fa-comment-dots" aria-hidden="true"></span> </a>
+
+                {% if instance.status == 'S' or instance.status == 'F' or instance.status == 'A' %}
+                  <a type="button" class="btn tiny blue" href="{% url 'ctstem:export_student_response' assignment.id  student.id %}" title="Download Student Response"> <i class="fas fa-file-download"></i> </a>
+                {% endif %}
+
+                {% if instance.status == 'S' and assignment.curriculum.curriculum_type == 'L' %}
+                  <a type="button" class="btn tiny blue" href="{% url 'ctstem:unlockAssignment' assignment.id  instance.id %}" title="Unlock Assignment" onclick="return confirm('Are you sure you want to unlock this assignment? Unlocking the assignment will allow the student to edit his/her responses and resubmit.');"> <i class="fa fa-unlock" aria-hidden="true"></i> </a>
+                {% endif %}
+              </div>
               {% endif %}
             </td>
             {% for question_progress in progress %}
@@ -168,7 +188,9 @@
               </td>
             {% endfor %}
             <td class="percent_complete">
-              {{percent_complete}}%
+              <div class="assignment_status_chart">
+                <div id="chart_{{student.id}}" class="donut_chart" name="{{percent_complete}}"></div>
+              </div>
             </td>
             <td class="time_spent">{{time_spent|format_time}}</td>
             <td class="last_modified">
@@ -188,7 +210,7 @@
   <script type="text/javascript">
 
     $(function() {
-      $(".chart").each(function(){
+      $(".donut_chart").each(function(){
         render_donut_chart($(this));
       });
 

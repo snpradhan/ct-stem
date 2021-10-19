@@ -339,9 +339,10 @@ table.table#page_reorder td.page_number, table.table#page_reorder td.action {
 
 table#assignment_progress div.crossed,
 table#unit_progress div.crossed {
-  height: 3.5em;
+  height: 7em;
   background-image: linear-gradient(to bottom right,  transparent calc(50% - 1px), var(--ctstem-color-pale-gray), transparent calc(50% + 1px));
 }
+
 
 table.table div.controls {
   display: flex;
