@@ -35,6 +35,9 @@ table.table th {
 div.response table.table th {
   position: unset;
 }
+table.table th > * {
+  color: white !important;
+}
 table.table th.top {
   vertical-align: top !important;
 }
@@ -294,7 +297,7 @@ div.dashboard_container {
   overflow-x: auto;
   overflow-y: auto;
   position: relative;
-  max-height: 80vh;
+  max-height: 90vh;
 }
 
 table#group_curriculum_dashboard td.assignment_status_chart {
@@ -349,3 +352,8 @@ table.table div.controls {
   justify-content: flex-start;
   gap: 1em;
 }
+
+table.table div.controls.center {
+  justify-content: center;
+}
+

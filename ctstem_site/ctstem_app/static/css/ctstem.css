@@ -2498,6 +2498,10 @@ ul#id_student-consent li {
 .popover-title {
     text-align: center;
 }
+.info[rel="popover"] {
+  cursor: pointer;
+  color: inherit;
+}
 /***********   FORM GROUP END   ************/
 
 /***************************************

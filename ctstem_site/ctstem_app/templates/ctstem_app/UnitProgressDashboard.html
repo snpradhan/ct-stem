@@ -12,13 +12,12 @@
   {{block.super}}
  <div class="content teacher_detailed_dashboard" id="assignment_progress_dashboard">
     <h2> Unit Progress </h2>
+    {% with class_status=group.is_active|yesno:"active,inactive"%}
     <div id="dashboard_header">
       <div class="navigation">
-        {% with status=group.is_active|yesno:"active,inactive"%}
-          <h5 class="left"><a href="{% url 'ctstem:teacherDashboard' teacher_id status %}"><i class="fas fa-chevron-left"></i><i class="fas fa-chevron-left"></i> Back to Teacher Dashboard</a></h5>
-          &nbsp; &nbsp;&nbsp; &nbsp;
-          <h5 class="left"><a href="{% url 'ctstem:teacherAssignmentDashboard' teacher_id status %}"><i class="fas fa-chevron-left"></i><i class="fas fa-chevron-left"></i> Back to All Assignments </a></h5>
-        {% endwith %}
+        <h5 class="left"><a href="{% url 'ctstem:teacherDashboard' teacher_id class_status %}"><i class="fas fa-chevron-left"></i><i class="fas fa-chevron-left"></i> Back to Teacher Dashboard</a></h5>
+        &nbsp; &nbsp;&nbsp; &nbsp;
+        <h5 class="left"><a href="{% url 'ctstem:teacherAssignmentDashboard' teacher_id class_status %}"><i class="fas fa-chevron-left"></i><i class="fas fa-chevron-left"></i> Back to All Assignments </a></h5>
       </div>
       <div class="quick_links">
           <h5><a href="{% url 'ctstem:help' %}"><i class="far fa-question-circle"></i> Help </a></h5>
@@ -56,6 +55,16 @@
             <label>Unlock Assignment</label>
           </div>
           <div class="legend">
+            <a type="button" class="btn tiny blue"> <i class="fa fa-link" aria-hidden="true"></i> </a>
+            &nbsp;
+            <label>Assignment Link</label>
+          </div>
+          <div class="legend">
+            <a type="button" class="btn tiny blue"> <i class="fa fa-eye" aria-hidden="true"></i> </a>
+            &nbsp;
+            <label>Lesson Preview</label>
+          </div>
+          <div class="legend">
             <i class="far fa-window-minimize"></i>
             &nbsp;
             <label>Not Yet Started</label>
@@ -65,6 +74,12 @@
             &nbsp;
             <label>Not Assigned</label>
           </div>
+        </div>
+      </div>
+      <div class="settings_container">
+        <h5 class="left">Assignment Settings</h5>
+        <div class="settings">
+          {% include "ctstem_app/AnonymizeStudentSwitch.html" with anonymize_student=anonymize_student assignment_ids=assignment_ids is_class_active=group.is_active %}
         </div>
       </div>
     </div>
@@ -91,24 +106,32 @@
         <thead>
           <tr>
             <th class="student_col">
-              Student <br>
-              {% if not user.researcher %}
-                {% include "ctstem_app/AnonymizeStudentSwitch.html" with anonymize_student=anonymize_student assignment_ids=assignment_ids is_class_active=group.is_active %}
-              {% endif %}
+              Student
             </th>
             {% for curr, assignment in assignment_header.items %}
               <th class="lesson_{{curr.id}} top">
                 {% if curr.order %}
-                  Lesson {{curr.order}}
-                  <a href="#" class="fa fa-info-circle info" rel="popover" data-title="Lesson {{curr.order}}" data-content="{{curr.title}}">
-                  </a>
+                  <div class="info" rel="popover" data-title="Lesson {{curr.order}}" data-content="{{curr.title}}" data-trigger="hover">
+                    Lesson {{curr.order}}
+                    <i class="fa fa-info-circle" aria-hidden="true"></i>
+                  </div>
                 {% endif %}
                 <br>
-                {% if assignment %}
-                  <a class="btn blue" href="{% url 'ctstem:assignmentProgressDashboard' teacher_id %}?group={{group.id}}&assignment={{curr.id}}" title="Assignment Progress Dashboard for Lesson {{curr.order}}">
-                    <i class="fas fa-tachometer-alt"></i>
+                <div class="controls center">
+                  {% if assignment %}
+                    <a class="btn blue" href="{% url 'ctstem:assignmentProgressDashboard' teacher_id %}?group={{group.id}}&assignment={{curr.id}}" title="Assignment Progress Dashboard for Lesson {{curr.order}}">
+                      <i class="fas fa-tachometer-alt"></i>
+                    </a>
+                    {% if class_status == 'active' %}
+                      <a class="btn blue assignment_link" href="#" data-toggle="modal" data-target="#assignmentLinkModal" data-invite-link="https://{{domain}}/?next=/login?next=/assignments?assignment={{assignment.id}}" data-title="Direct Student Assignment Link" title="Direct Assignment Link">
+                        <i class="fa fa-link"></i>
+                      </a>
+                    {% endif %}
+                  {% endif %}
+                  <a class="btn blue" href="{% url 'ctstem:previewCurriculum' curr.id %}" target="_blank" title="Preview Curriculum">
+                    <i class="fa fa-eye"></i>
                   </a>
-                {% endif %}
+                </div>
               </th>
             {% endfor %}
           </tr>
@@ -181,19 +204,10 @@
       </table>
     </div>
     {% endif %}
+    {% endwith %}
   </div>
 
   <script type="text/javascript">
-
-    $(window).resize(function(){
-      adjustDashboardSize();
-    });
-
-    function adjustDashboardSize() {
-      var minHeight = $(window).height() - $('.dashboard_container').offset().top;
-      $('.dashboard_container').height(minHeight + 40);
-    }
-    adjustDashboardSize();
 
     $('#progress_search_form select, \
        #progress_search_form input[type=radio], \

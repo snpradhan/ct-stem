@@ -4389,7 +4389,9 @@ def assignmentProgressDashboard(request, teacher_id=''):
       else:
         students_progress.sort(key=lambda item:item['modified_date'] if item['modified_date'] else epoch)
 
-      context = {'teacher_id': teacher_id, 'assignment': assignment, 'students_progress': students_progress, 'header': header, 'filter_form': filter_form}
+      current_site = Site.objects.get_current()
+      domain = current_site.domain
+      context = {'teacher_id': teacher_id, 'assignment': assignment, 'students_progress': students_progress, 'header': header, 'filter_form': filter_form, 'domain': domain}
       return render(request, 'ctstem_app/AssignmentProgressDashboard.html', context)
 
     return http.HttpResponseNotAllowed(['GET', 'POST'])
@@ -4497,7 +4499,9 @@ def unitProgressDashboard(request, teacher_id=''):
             else:
               student_assignment_details[student] = [student_assignment_status]
 
-      context = {'teacher_id': teacher_id, 'group': group, 'curriculum': curriculum, 'assignment_header': assignment_header, 'student_assignment_details': student_assignment_details, 'assignments_by_unit': assignments_by_unit, 'anonymize_student': anonymize_student, 'assignment_ids': assignment_ids, 'filter_form': filter_form}
+      current_site = Site.objects.get_current()
+      domain = current_site.domain
+      context = {'teacher_id': teacher_id, 'group': group, 'curriculum': curriculum, 'assignment_header': assignment_header, 'student_assignment_details': student_assignment_details, 'assignments_by_unit': assignments_by_unit, 'anonymize_student': anonymize_student, 'assignment_ids': assignment_ids, 'filter_form': filter_form, 'domain': domain}
       return render(request, 'ctstem_app/UnitProgressDashboard.html', context)
 
     return http.HttpResponseNotAllowed(['GET', 'POST'])

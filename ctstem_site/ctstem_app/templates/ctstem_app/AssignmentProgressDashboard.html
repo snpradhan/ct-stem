@@ -99,10 +99,9 @@
             <th class="student_col"></th>
             {% for step in header %}
               {% with questions=step|get_item:'questions' %}
-                <th colspan={{questions|length}}>
+                <th colspan={{questions|length}} class="info" rel="popover" data-title="Page {{step.order}}" data-content="{{step|get_item:'title'}}" data-trigger="hover">
                   P{{step|get_item:'order'}}:
-                  <a href="#" class="fa fa-info-circle info" rel="popover" data-title="Page {{step.order}}" data-content="{{step|get_item:'title'}}">
-                  </a>
+                  <i class="fa fa-info-circle" aria-hidden="true"></i>
                 </th>
               {% endwith %}
             {% endfor %}
@@ -117,8 +116,9 @@
                 {% if questions %}
                   {% for question in questions %}
                     <th>
-                      Q{{step.order}}.{{question.order}}
-                      <br>
+                      <div class="info" rel="popover" data-title="Question {{step.order}}.{{question.order}}" data-content="{{question.question.question_text}}" data-trigger="hover">
+                        Q{{step.order}}.{{question.order}}
+                      </div>
                       <a class="btn tiny blue" href="{% url 'ctstem:assignmentQuestionFeedback' teacher_id %}?group={{assignment.group.id}}&assignment={{assignment.curriculum.id}}&question={{question.id}}" title="Review student responses for question {{step.order}}.{{question.order}}"> <span class="far fa-comment-dots" aria-hidden="true"></span> </a>
                     </th>
                   {% endfor %}
