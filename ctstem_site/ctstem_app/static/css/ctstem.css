@@ -484,8 +484,8 @@ div.standard_container div.button-container {
 div.group_container div#class_overview div.switch_container {
   justify-content: flex-start;
 }
-div.group_container div#class_assignments label.switch_label,
-div.group_container div#class_roster label.switch_label {
+div.group_container div#class_assignments div.switch_label,
+div.group_container div#class_roster div.switch_label {
   display: none;
 }
 
@@ -1323,11 +1323,11 @@ div.content#assignment_progress_dashboard .legends_and_settings {
 }
 
 div.content#assignment_progress_dashboard .legends_container,
-div.content#assignment_progress_dashboard .settings_container {
+div.content#assignment_progress_dashboard .settings_container,
+div.content#assignment_progress_dashboard .shortcut_container {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  flex: 0 0 40%;
   margin-top: 1em;
   margin-bottom: 1em;
   border: 1px solid black;
@@ -1335,6 +1335,17 @@ div.content#assignment_progress_dashboard .settings_container {
   padding: 1em;
   gap: 1em;
 }
+
+div.content#assignment_progress_dashboard .legends_container {
+  flex: 0 0 45%;
+}
+div.content#assignment_progress_dashboard .settings_container {
+  flex: 0 0 20%;
+}
+div.content#assignment_progress_dashboard .shortcut_container {
+  flex: 0 0 25%;
+}
+
 div.content#assignment_progress_dashboard .legends_container  .legends,
 div.content#assignment_progress_dashboard .settings_container .settings {
   display: flex;
@@ -1342,21 +1353,38 @@ div.content#assignment_progress_dashboard .settings_container .settings {
   flex-wrap: wrap;
   gap: 0.5em;
 }
+div.content#assignment_progress_dashboard .shortcut_container .shortcuts {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
 div.content#assignment_progress_dashboard .legends_container  .legends .legend,
-div.content#assignment_progress_dashboard .settings_container .settings .switch_container {
+div.content#assignment_progress_dashboard .settings_container .settings .switch_container,
+div.content#assignment_progress_dashboard .shortcut_container .shortcuts .shortcut {
   display: flex;
   justify-content: center;
   align-items: center;
   font-size: 1.5em;
   margin-bottom: 1em;
+  gap: 0.5em;
 }
+div.content#assignment_progress_dashboard .shortcut_container .shortcuts .shortcut {
+  justify-content: space-between;
+}
+
 div.content#assignment_progress_dashboard .legends_container  .legends .legend .crossed {
   height: 1.5em;
   width: 1.5em;
   border: 1px solid var(--ctstem-color-pale-gray);
   background-image: linear-gradient(to bottom right,  transparent calc(50% - 1px), var(--ctstem-color-pale-gray), transparent calc(50% + 1px));
 }
-div.content#assignment_progress_dashboard .legends_container  .legends .legend label {
+div.content#assignment_progress_dashboard .legends_container  .legends .legend a {
+  opacity: unset;
+  pointer-events: none;
+}
+
+div.content#assignment_progress_dashboard .legends_container  .legends .legend label,
+div.content#assignment_progress_dashboard .shortcut_container .shortcuts .shortcut label {
   margin-bottom: 0;
 }
 div.switch_container {

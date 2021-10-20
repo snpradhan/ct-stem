@@ -31,48 +31,39 @@
         <div class="legends">
           <div class="legend">
             <a type="button" class="btn tiny blue"> <i class="fas fa-tachometer-alt"></i></a>
-            &nbsp;
-            <label>Lesson Progress Dashboard</label>
+            <div>Lesson Progress Dashboard</div>
           </div>
           <div class="legend">
             <a type="button" class="btn tiny blue"> <i class="fas fa-comment-dots"></i> </a>
-            &nbsp;
-            <label>Feedback Given</label>
+            <div>Feedback Given</div>
           </div>
           <div class="legend">
             <a type="button" class="btn tiny blue"> <i class="far fa-comment-dots"></i> </a>
-            &nbsp;
-            <label>Feedback Pending</label>
+            <div>Feedback Pending</div>
           </div>
           <div class="legend">
             <a type="button" class="btn tiny blue"> <i class="fas fa-file-download"></i> </a>
-            &nbsp;
-            <label>Download Student Response</label>
+            <div>Download Student Response</div>
           </div>
           <div class="legend">
             <a type="button" class="btn tiny blue"> <i class="fa fa-unlock" aria-hidden="true"></i> </a>
-            &nbsp;
-            <label>Unlock Assignment</label>
+            <div>Unlock Assignment</div>
           </div>
           <div class="legend">
             <a type="button" class="btn tiny blue"> <i class="fa fa-link" aria-hidden="true"></i> </a>
-            &nbsp;
-            <label>Assignment Link</label>
+            <div>Assignment Link</div>
           </div>
           <div class="legend">
             <a type="button" class="btn tiny blue"> <i class="fa fa-eye" aria-hidden="true"></i> </a>
-            &nbsp;
-            <label>Lesson Preview</label>
+            <div>Curriculum Preview</div>
           </div>
           <div class="legend">
             <i class="far fa-window-minimize"></i>
-            &nbsp;
-            <label>Not Yet Started</label>
+            <div>Not Yet Started</div>
           </div>
           <div class="legend">
             <div class="crossed"></div>
-            &nbsp;
-            <label>Not Assigned</label>
+            <div>Not Assigned</div>
           </div>
         </div>
       </div>
@@ -82,7 +73,31 @@
           {% include "ctstem_app/AnonymizeStudentSwitch.html" with anonymize_student=anonymize_student assignment_ids=assignment_ids is_class_active=group.is_active %}
         </div>
       </div>
+      <div class="shortcut_container">
+        <h5 class="left">Assignment Metadata</h5>
+        <div class="shortcuts">
+          <div class="shortcut">
+            <label>Class:</label>
+            <div class="title">
+              {{group.title}}
+              <a type="button" class="btn blue" href="{% url 'ctstem:group' group.id %}" title="Edit Class">
+                <i class="fas fa-pencil-alt" aria-hidden="true"></i>
+              </a>
+            </div>
+          </div>
+          <div class="shortcut">
+            <label>Unit:</label>
+            <div class="title">
+              {{curriculum.title}}
+              <a type="button" class="btn blue" href="{% url 'ctstem:previewCurriculum' curriculum.id %}" title="Preview Curriculum">
+                <i class="fas fa-eye" aria-hidden="true"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+
     <form method="post" action="{% url 'ctstem:unitProgressDashboard' teacher_id %}" id="progress_search_form">
       {% csrf_token %}
       <div class="progress_filter">
