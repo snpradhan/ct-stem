@@ -115,7 +115,9 @@
               $('#assignment_tiles').html(data['html']);
               $('select#id_group').html(data['groups_html'])
               $('select#id_assignment').html(data['assignments_html']);
-              renderChart()
+              $(".donut_chart").each(function(){
+                render_donut_chart($(this));
+              });
             }
             return false;
           },
@@ -143,61 +145,6 @@
       $('a.lock_on_completion').on('click', function(){
         alert("You cannot view this assignment after submission");
       });
-
-      function renderChart() {
-        $(".chart").each(function(){
-          var id = $(this).attr('id');
-          var complete = parseInt($(this).attr('name'));
-          var remaining = 100-complete;
-          Highcharts.chart(id, {
-            chart: {
-              type: 'pie',
-              height:100,
-              backgroundColor: 'rgba(0,0,0,0)',
-            },
-            title: {
-              text: complete+'%',
-              align: 'center',
-              verticalAlign: 'middle',
-              y: 10,
-              style: {
-                fontSize: '1.2em',
-                color: 'black',
-              },
-            },
-            //tooltip: false,
-            plotOptions: {
-              pie: {
-                dataLabels: {
-                  enabled: false,
-                },
-                startAngle: 0,
-                endAngle: 360,
-              }
-            },
-            credits: {
-              enabled: false
-            },
-            series: [{
-              type: 'pie',
-              name: 'Work',
-              innerSize: '80%',
-              data: [
-                {
-                  name: 'Complete',
-                  y: complete,
-                  color: 'green',
-                },
-                {
-                  name: 'Remaining',
-                  y: remaining,
-                  color: 'grey',
-                },
-              ]
-            }]
-          });
-        });
-      }
 
     });
   </script>

@@ -995,7 +995,7 @@ class TeacherAssignmentDashboardSearchForm(forms.Form):
       group_id = kwargs.pop('group_id')
 
     super(TeacherAssignmentDashboardSearchForm, self).__init__(*args, **kwargs)
-    groups = models.UserGroup.objects.all().filter(Q(is_active=is_active), Q(teacher=teacher) | Q(shared_with=teacher)).order_by(Lower('title'))
+    groups = models.UserGroup.objects.all().filter(Q(is_active=is_active), Q(teacher=teacher) | Q(shared_with=teacher)).distinct().order_by(Lower('title'))
     self.fields['group'].queryset = groups
 
     if group_id:
@@ -1028,7 +1028,7 @@ class TeacherStudentDashboardSearchForm(forms.Form):
       group_id = kwargs.pop('group_id')
 
     super(TeacherStudentDashboardSearchForm, self).__init__(*args, **kwargs)
-    groups = models.UserGroup.objects.all().filter(Q(is_active=is_active), Q(teacher=teacher) | Q(shared_with=teacher)).order_by(Lower('title'))
+    groups = models.UserGroup.objects.all().filter(Q(is_active=is_active), Q(teacher=teacher) | Q(shared_with=teacher)).distinct().order_by(Lower('title'))
     self.fields['group'].queryset = groups
     if group_id:
       groups = models.UserGroup.objects.all().filter(id=group_id)
@@ -1128,7 +1128,7 @@ class ProgressDashboardSearchForm(forms.Form):
     #expand underlying curricula under unit
     teacher = models.Teacher.objects.get(id=teacher_id)
     selected_group = models.UserGroup.objects.all().filter(id=group_id)
-    groups = models.UserGroup.objects.all().filter(Q(is_active=selected_group[0].is_active), Q(teacher=teacher) | Q(shared_with=teacher)).order_by(Lower('title'))
+    groups = models.UserGroup.objects.all().filter(Q(is_active=selected_group[0].is_active), Q(teacher=teacher) | Q(shared_with=teacher)).distinct().order_by(Lower('title'))
     self.fields['group'].queryset = groups
     self.fields['group'].initial = selected_group[0].id
     assignment_choices = util.group_assignment_dropdown_list(selected_group, False, False)

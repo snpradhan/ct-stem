@@ -48,8 +48,32 @@ import re
 import html
 import time
 import pytz
+from functools import wraps
 
 logger = logging.getLogger('django')
+
+####################################
+# helper function to estimate view execution time
+####################################
+def timer(func):
+
+  @wraps(func)  # used for copying func metadata
+  def wrapper(*args, **kwargs):
+    # record start time
+    start = time.time()
+
+    # func execution
+    result = func(*args, **kwargs)
+
+    duration = (time.time() - start) * 1000
+    # output execution time to console
+    print('view {} takes {:.2f} ms'.format(
+        func.__name__,
+        duration
+        ))
+    return result
+  return wrapper
+
 
 ####################################
 # HOME
@@ -3660,7 +3684,7 @@ def teacherDashboard(request, id='', status='active'):
       is_active = False
 
     teacher = models.Teacher.objects.get(id=id)
-    all_groups = models.UserGroup.objects.all().filter(Q(is_active=is_active), Q(teacher=teacher) | Q(shared_with=teacher)).order_by(Lower('title'))
+    all_groups = models.UserGroup.objects.all().filter(Q(is_active=is_active), Q(teacher=teacher) | Q(shared_with=teacher)).distinct().order_by(Lower('title'))
 
     filtered_groups = all_groups
     all_assignments = models.Assignment.objects.all().filter(group__in=all_groups).distinct()
@@ -4106,6 +4130,7 @@ def teacherAssignmentDashboard(request, id='', status='active'):
 
 @login_required
 def teacherStudentDashboard(request, id='', status='active'):
+
   if hasattr(request.user, 'administrator') or hasattr(request.user, 'researcher'):
     privilege = 1
   elif hasattr(request.user, 'teacher') and str(request.user.teacher.id) == str(id):
@@ -4174,7 +4199,8 @@ def teacherStudentDashboard(request, id='', status='active'):
                                'assignment_status': {'N': 0, 'P': 0, 'S': 0, 'F': 0, 'A': 0},
                                'total': 0,
                                'assignments': {},
-                               'student_groups': student_groups
+                               'student_groups': student_groups,
+                               'percent_complete': 0
                               }
         for assignment in all_assignments.filter(group__in=student_groups):
           curriculum = assignment.curriculum
@@ -4182,6 +4208,7 @@ def teacherStudentDashboard(request, id='', status='active'):
           instance = None
           last_opened = None
           status_key = None
+          percent_complete = get_student_assignment_instance_percent_complete(request, student.id, assignment.id)
           try:
             instance = models.AssignmentInstance.objects.get(assignment=assignment, student=student)
             status_key = instance.status
@@ -4191,12 +4218,17 @@ def teacherStudentDashboard(request, id='', status='active'):
             status_key = 'N'
 
           students[student_key]['assignment_status'][status_key] += 1
-          students[student_key]['total'] += 1
+          student_old_percent_complete = students[student_key]['percent_complete']
+          student_old_total = students[student_key]['total']
+          student_new_total = student_old_total + 1
+          student_new_percent_complete = ((student_old_percent_complete*student_old_total) + percent_complete)/student_new_total
+          students[student_key]['total'] = student_new_total
+          students[student_key]['percent_complete'] = student_new_percent_complete
 
           #underlying lesson
           if curriculum.curriculum_type in ['L', 'A'] and curriculum.unit is not None:
             assignment_key = str(curriculum.unit.id) + '_' + str(assignment.group.id)
-            lesson = {'curriculum_id': curriculum.id, 'assignment_id': assignment.id, 'title': curriculum.title, 'assigned_date': assignment_date, 'last_opened': last_opened, 'assignment_status': status_key, 'instance': instance}
+            lesson = {'curriculum_id': curriculum.id, 'assignment_id': assignment.id, 'title': curriculum.title, 'assigned_date': assignment_date, 'last_opened': last_opened, 'assignment_status': status_key, 'instance': instance, 'percent_complete': percent_complete}
 
             if assignment_key in students[student_key]['assignments']:
               if assignment_date is not None and students[student_key]['assignments'][assignment_key]['assigned_date'] is not None:
@@ -4210,11 +4242,20 @@ def teacherStudentDashboard(request, id='', status='active'):
 
               students[student_key]['assignments'][assignment_key]['assignment_status'][status_key] += 1
 
-              students[student_key]['assignments'][assignment_key]['total'] += 1
+              unit_old_percent_complete = students[student_key]['assignments'][assignment_key]['percent_complete']
+              unit_old_total = students[student_key]['assignments'][assignment_key]['total']
+              unit_new_total = unit_old_total + 1
+              unit_new_percent_complete = ((unit_old_percent_complete * unit_old_total) + percent_complete)/unit_new_total
+
+              students[student_key]['assignments'][assignment_key]['total'] = unit_new_total
+              students[student_key]['assignments'][assignment_key]['percent_complete'] = unit_new_percent_complete
+
               if status_key in ['S', 'F', 'A']:
                 students[student_key]['assignments'][assignment_key]['complete'] += 1
 
               students[student_key]['assignments'][assignment_key]['lessons'][curriculum.order] = lesson
+
+
             else:
               students[student_key]['assignments'][assignment_key] = {'curriculum_id': curriculum.unit.id,
                                                                       'curriculum_type': 'Unit',
@@ -4225,7 +4266,8 @@ def teacherStudentDashboard(request, id='', status='active'):
                                                                        'assignment_status': {'N': 0, 'P': 0, 'S': 0, 'F': 0, 'A': 0},
                                                                        'total': 1,
                                                                        'complete': 0,
-                                                                       'lessons': {curriculum.order: lesson}
+                                                                       'lessons': {curriculum.order: lesson},
+                                                                       'percent_complete': percent_complete
                                                                        }
               students[student_key]['assignments'][assignment_key]['assignment_status'][status_key] += 1
 
@@ -4244,6 +4286,7 @@ def teacherStudentDashboard(request, id='', status='active'):
                                                                     'last_opened': last_opened,
                                                                     'assignment_status': status_key,
                                                                     'instance': instance,
+                                                                    'percent_complete': percent_complete
                                                                     }
 
         students[student_key]['assignments'] = {k: v for k, v in sorted(students[student_key]['assignments'].items(), key=lambda item: item[1]['title'].lower())}
@@ -4392,6 +4435,7 @@ def assignmentProgressDashboard(request, teacher_id=''):
       current_site = Site.objects.get_current()
       domain = current_site.domain
       context = {'teacher_id': teacher_id, 'assignment': assignment, 'students_progress': students_progress, 'header': header, 'filter_form': filter_form, 'domain': domain}
+
       return render(request, 'ctstem_app/AssignmentProgressDashboard.html', context)
 
     return http.HttpResponseNotAllowed(['GET', 'POST'])
@@ -4576,6 +4620,7 @@ def assignmenttiles(request):
         try:
           instance = models.AssignmentInstance.objects.get(assignment=assignment, student=student)
           percent_complete = get_student_assignment_instance_percent_complete(request, student.id, assignment.id)
+          print(percent_complete)
           if instance.status in ['N', 'P', 'S', 'F']:
             active_list.append({'serial': serial, 'title': title, 'assignment': assignment, 'instance': instance, 'status': status_list[instance.status], 'percent_complete': percent_complete, 'modified_date': instance.modified_date})
           else:
@@ -7013,11 +7058,13 @@ def get_student_assignment_instance_percent_complete(request, student_id, assign
   except models.AssignmentInstance.DoesNotExist:
     percent_complete = 0
 
-  if request.is_ajax():
+  if request.is_ajax() and 'assignmenttiles' not in request.path:
     response_data = {'success': True, 'percent_complete': percent_complete}
     return http.HttpResponse(json.dumps(response_data), content_type = 'application/json')
   else:
     return percent_complete
+
+
 
 def get_total_questions_in_curriculum(curriculum_id):
   cache_key = 'curriculum_question_count_%s'%(curriculum_id)

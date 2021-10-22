@@ -50,7 +50,7 @@ function render_pie_chart(element) {
 function render_donut_chart(element) {
 
   var id = $(element).attr('id');
-  var complete = parseInt($(element).attr('name'));
+  var complete = parseInt($(element).data('percent-complete'));
   var remaining = 100-complete;
   $("#"+id).highcharts({
     chart: {

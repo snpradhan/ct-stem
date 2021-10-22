@@ -79,19 +79,23 @@
           <div class="shortcut">
             <label>Class:</label>
             <div class="title">
-              {{group.title}}
-              <a type="button" class="btn blue" href="{% url 'ctstem:group' group.id %}" title="Edit Class">
-                <i class="fas fa-pencil-alt" aria-hidden="true"></i>
-              </a>
+              {% if group %}
+                {{group.title}}
+                <a type="button" class="btn blue" href="{% url 'ctstem:group' group.id %}" title="Edit Class">
+                  <i class="fas fa-pencil-alt" aria-hidden="true"></i>
+                </a>
+              {% endif %}
             </div>
           </div>
           <div class="shortcut">
             <label>Unit:</label>
             <div class="title">
-              {{curriculum.title}}
-              <a type="button" class="btn blue" href="{% url 'ctstem:previewCurriculum' curriculum.id %}" title="Preview Curriculum">
-                <i class="fas fa-eye" aria-hidden="true"></i>
-              </a>
+              {% if curriculum %}
+                {{curriculum.title}}
+                <a type="button" class="btn blue" href="{% url 'ctstem:previewCurriculum' curriculum.id %}" title="Preview Curriculum">
+                  <i class="fas fa-eye" aria-hidden="true"></i>
+                </a>
+              {% endif %}
             </div>
           </div>
         </div>
@@ -174,7 +178,7 @@
                 {% else %}
                   <td class="lesson_{{student_assignment.curriculum_id}}" style="width: 10em;">
                     <div class="assignment_status_chart">
-                      <div id="chart_{{student_assignment.serial}}" class="donut_chart" name="{{student_assignment.percent_complete}}"></div>
+                      <div id="chart_{{student_assignment.serial}}" class="donut_chart" data-percent-complete="{{student_assignment.percent_complete}}"></div>
 
                       {% if student_assignment.instance.status == 'P' %}
                         <!--div> In Progress </div-->
