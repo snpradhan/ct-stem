@@ -95,6 +95,9 @@
                 <a type="button" class="btn blue" href="{% url 'ctstem:previewCurriculum' curriculum.id %}" title="Preview Curriculum">
                   <i class="fas fa-eye" aria-hidden="true"></i>
                 </a>
+                <a type="button" class="btn blue" href="{% url 'ctstem:export_all_response' curriculum.id %}" title="Export Student Response">
+                  <i class="fas fa-file-download"></i>
+                </a>
               {% endif %}
             </div>
           </div>
@@ -129,27 +132,37 @@
             </th>
             {% for curr, assignment in assignment_header.items %}
               <th class="lesson_{{curr.id}} top">
-                {% if curr.order %}
-                  <div class="info" rel="popover" data-title="Lesson {{curr.order}}" data-content="{{curr.title}}" data-trigger="hover">
-                    Lesson {{curr.order}}
-                    <i class="fa fa-info-circle" aria-hidden="true"></i>
-                  </div>
-                {% endif %}
-                <br>
-                <div class="controls center">
-                  {% if assignment %}
-                    <a class="btn blue" href="{% url 'ctstem:assignmentProgressDashboard' teacher_id %}?group={{group.id}}&assignment={{curr.id}}" title="Assignment Progress Dashboard for Lesson {{curr.order}}">
-                      <i class="fas fa-tachometer-alt"></i>
-                    </a>
-                    {% if class_status == 'active' %}
-                      <a class="btn blue assignment_link" href="#" data-toggle="modal" data-target="#assignmentLinkModal" data-invite-link="https://{{domain}}/?next=/login?next=/assignments?assignment={{assignment.id}}" data-title="Direct Student Assignment Link" title="Direct Assignment Link">
-                        <i class="fa fa-link"></i>
-                      </a>
-                    {% endif %}
+                <div>
+                  {% if curr.order %}
+                    <div class="info" rel="popover" data-title="Lesson {{curr.order}}" data-content="{{curr.title}}" data-trigger="hover">
+                      Lesson {{curr.order}}
+                      <i class="fa fa-info-circle" aria-hidden="true"></i>
+                    </div>
                   {% endif %}
-                  <a class="btn blue" href="{% url 'ctstem:previewCurriculum' curr.id %}" target="_blank" title="Preview Curriculum">
-                    <i class="fa fa-eye"></i>
-                  </a>
+                  <div class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fas fa-caret-down"></i></a>
+                    <ul class="dropdown-menu">
+                      {% if assignment %}
+                        <li>
+                          <a href="{% url 'ctstem:assignmentProgressDashboard' teacher_id %}?group={{group.id}}&assignment={{curr.id}}" title="Assignment Progress Dashboard for Lesson {{curr.order}}">
+                            View Lesson Progress
+                          </a>
+                        </li>
+                        {% if class_status == 'active' %}
+                          <li>
+                            <a class="assignment_link" href="#" data-toggle="modal" data-target="#assignmentLinkModal" data-invite-link="https://{{domain}}/?next=/login?next=/assignments?assignment={{assignment.id}}" data-title="Direct Student Assignment Link" title="Direct Assignment Link">
+                              View Assignment Link
+                            </a>
+                          </li>
+                        {% endif %}
+                      {% endif %}
+                      <li>
+                        <a href="{% url 'ctstem:previewCurriculum' curr.id %}" target="_blank" title="Preview Curriculum">
+                          Preview Curriculum
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
                 </div>
               </th>
             {% endfor %}
@@ -191,7 +204,6 @@
                         <div class="controls">
                           <a type="button" class="btn blue" href="{% url 'ctstem:assignmentStudentFeedback' teacher_id %}?group={{student_assignment.assignment.group.id}}&assignment={{student_assignment.assignment.curriculum.id}}&student={{student.user.id}}" title="Give Feedback"> <i class="far fa-comment-dots" aria-hidden="true"></i> </a>
 
-                          <a type="button" class="btn blue" href="{% url 'ctstem:export_student_response' student_assignment.assignment.id  student.id %}" title="Download Student Response"> <i class="fas fa-file-download"></i> </a>
                           {% if student_assignment.instance.assignment.curriculum.curriculum_type == 'L' %}
                             <a type="button" class="btn blue" href="{% url 'ctstem:unlockAssignment' student_assignment.assignment.id  student_assignment.instance.id %}" title="Unlock Assignment" onclick="return confirm('Are you sure you want to unlock this assignment? Unlocking the assignment will allow the student to edit his/her responses and resubmit.');"> <i class="fa fa-unlock" aria-hidden="true"></i> </a>
                           {% endif %}
@@ -200,15 +212,11 @@
                         <!--div> Feedback Completed </div-->
                         <div class="controls">
                           <a type="button" class="btn blue" href="{% url 'ctstem:assignmentStudentFeedback' teacher_id %}?group={{student_assignment.assignment.group.id}}&assignment={{student_assignment.assignment.curriculum.id}}&student={{student.user.id}}" title="View/Give Feedback"> <i class="fas fa-comment-dots" aria-hidden="true"></i> </a>
-
-                          <a type="button" class="btn blue" href="{% url 'ctstem:export_student_response' student_assignment.assignment.id  student.id %}" title="Download Student Response"> <i class="fas fa-file-download"></i> </a>
                         </div>
                       {% elif student_assignment.instance.status == 'A' %}
                         <!--div> Archived </div-->
                         <div class="controls">
                           <a type="button" class="btn blue" href="{% url 'ctstem:assignmentStudentFeedback' teacher_id %}?group={{student_assignment.assignment.group.id}}&assignment={{student_assignment.assignment.curriculum.id}}&student={{student.user.id}}" title="View/Give Feedback"> <i class="fas fa-comment-dots" aria-hidden="true"></i> </a>
-
-                          <a type="button" class="btn blue" href="{% url 'ctstem:export_student_response' student_assignment.assignment.id  student.id %}" title="Download Student Response"> <i class="fas fa-file-download"></i> </a>
                         </div>
                       {% else %}
                         <i class="far fa-window-minimize"></i>

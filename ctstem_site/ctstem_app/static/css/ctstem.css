@@ -1387,6 +1387,22 @@ div.content#assignment_progress_dashboard .legends_container  .legends .legend l
 div.content#assignment_progress_dashboard .shortcut_container .shortcuts .shortcut label {
   margin-bottom: 0;
 }
+
+div.content#assignment_progress_dashboard #unit_progress th.top > div{
+  display: flex;
+  justify-content: center;
+  gap: 1em;
+  align-items: center;
+}
+div.content#assignment_progress_dashboard #unit_progress th.top ul.dropdown-menu {
+  font-size: 0.9em;
+  right: 0 !important;
+  left: auto !important;
+  padding-left: 0!important;
+}
+div.content#assignment_progress_dashboard #unit_progress th.top ul.dropdown-menu a {
+  color: black !important;
+}
 div.switch_container {
   display: flex;
   justify-content: center;
