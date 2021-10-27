@@ -369,10 +369,10 @@ $(function () {
 
   $("#lessons_in_unit.checkbox-menu").on("change", "input[type='checkbox']", function() {
     if($(this).prop("checked")){
-      $('#group_curriculum_dashboard .'+$(this).val()).show();
+      $('#unit_progress .'+$(this).val()).show();
     }
     else{
-      $('#group_curriculum_dashboard .'+$(this).val()).hide();
+      $('#unit_progress .'+$(this).val()).hide();
     }
   });
 

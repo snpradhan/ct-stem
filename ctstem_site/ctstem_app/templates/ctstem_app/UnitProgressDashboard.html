@@ -112,9 +112,32 @@
           <label>{{filter_form.group.label|title}}</label>
           <div>{{filter_form.group}}</div>
         </div>
-        <div class="form-group">
-          <label>{{filter_form.assignment.label|title}}</label>
-          <div>{{filter_form.assignment}}</div>
+        <div class="form-group-horizontal">
+          <div class="form-group">
+            <label>{{filter_form.assignment.label|title}}</label>
+            <div>{{filter_form.assignment}}</div>
+          </div>
+          {% if curriculum %}
+          {% get_underlying_curriculum curriculum.id 'assign' as underlying_curriculum %}
+            <div class="form-group filter dropdown">
+              <div class="dropdown-toggle form-control"
+                    id="filter_assigned_lesson_columns" data-toggle="dropdown"
+                    aria-haspopup="true" aria-expanded="true">
+                Select Lessons in Unit To Display
+                <span class="caret"></span>
+              </div>
+              <ul class="dropdown-menu checkbox-menu allow-focus" aria-labelledby="filter_assigned_lesson_columns" id="lessons_in_unit">
+                <li>
+                  <label><a href="#" id="select_all_lessons"> Select All</a> </label>
+                </li>
+                {% for curr in underlying_curriculum %}
+                  <li class="active">
+                    <label ><input type="checkbox" name="lesson_in_unit" class="lesson_in_unit" value="lesson_{{curr.id}}" checked/> Lesson {{curr.order}} </label>
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
         </div>
         <div class="form-group">
           <label>{{filter_form.sort_by.label|title}}</label>
@@ -236,9 +259,7 @@
 
   <script type="text/javascript">
 
-    $('#progress_search_form select, \
-       #progress_search_form input[type=radio], \
-       #progress_search_form input[type=checkbox]').on('change', function(){
+    $('#progress_search_form select').on('change', function(){
 
       if($(this).attr('id') == 'id_group'){
         $('select#id_assignment').val('');

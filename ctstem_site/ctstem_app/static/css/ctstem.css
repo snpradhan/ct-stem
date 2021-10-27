@@ -1400,6 +1400,7 @@ div.content#assignment_progress_dashboard #unit_progress th.top ul.dropdown-menu
   left: auto !important;
   padding-left: 0!important;
 }
+
 div.content#assignment_progress_dashboard #unit_progress th.top ul.dropdown-menu a {
   color: black !important;
 }
@@ -2086,6 +2087,19 @@ div.content.teacher_detailed_dashboard div#dashboard_search div.assignment_filte
 div.content.assignment_feedback div.search_filter .form-group {
   margin-bottom: 1em !important;
   max-width: 30em;
+  overflow: unset;
+}
+div.content#assignment_progress_dashboard div.progress_filter .form-group-horizontal {
+  display: flex;
+  align-items: flex-end;
+  gap: 1em;
+}
+div.content#assignment_progress_dashboard div.progress_filter .form-group.filter.dropdown {
+  cursor: pointer;
+}
+
+div.content#assignment_progress_dashboard div.progress_filter .form-group.filter.dropdown > * {
+  background-image: linear-gradient(to bottom,#fff 0,#e0e0e0 100%);
 }
 
 div.content#assignments div.inbox_filter .form-group label,
