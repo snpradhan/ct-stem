@@ -3615,7 +3615,6 @@ def underlyingCurriculum(request, action, id='', pem_code=''):
       has_permission = check_curriculum_permission(request, curr.id, action, pem_code)
       if has_permission:
         filtered_curriculum.append(curr)
-
     return filtered_curriculum
   return http.HttpResponseNotAllowed(['GET', 'POST'])
 

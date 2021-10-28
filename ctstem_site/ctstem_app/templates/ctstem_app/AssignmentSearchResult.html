@@ -17,12 +17,12 @@
           <tr class="unit unit_{{curriculum.id}} {% if forloop.counter|divisibleby:2 %} even {% else %} odd {% endif %}" id="curr_{{curriculum.id}}">
             <td rowspan="{{curriculum.underlying_curriculum|length|add:1}}">Unit</td>
             <td>
-              {{curriculum.title}}
-              &nbsp;&nbsp;
               <span class="ec_lessons" id="unit_{{curriculum.id}}">
-                <span><a href="#">(Expand Underlying Lessons)</a></span>
-                <span style="display:none;"><a href="#">(Collapse Underlying Lessons)</a></span>
+                <span class="fa fa-plus-circle" title="Expand"></span>
+                <span class="fa fa-minus-circle" style="display:none;" title="Collapse"></span>
               </span>
+              &nbsp;
+              {{curriculum.title}}
             </td>
             <td style="text-align:center;">
               {% if curriculum.underlying_curriculum_assigned == curriculum.underlying_curriculum_count %}
@@ -71,17 +71,6 @@
 
 $(function (){
 
-  //expand/collapse the underlying lessons
-  $(".ec_lessons").click(function(){
-    var id = $(this).attr('id');
-    $(this).children().each(function(){
-      $(this).toggle();
-    });
-    $('tr.lesson.'+id).children('td').each(function(){
-      $(this).toggle();
-    });
-  });
-
   $("button.select_assignment").click(function(){
     //if assigning a Unit get and assign all the underlying published lessons
     var selected_assignment = $(this);
@@ -128,6 +117,16 @@ $(function (){
     else{
       alert('Select a class to assign this curriculum to');
     }
+  });
+  //expand/collapse the underlying lessons
+  $(".ec_lessons").click(function(){
+    var id = $(this).attr('id');
+    $(this).children().each(function(){
+      $(this).toggle();
+    });
+    $('tr.lesson.'+id).children('td').each(function(){
+      $(this).toggle();
+    });
   });
 });
 

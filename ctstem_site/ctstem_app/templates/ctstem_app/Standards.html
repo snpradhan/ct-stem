@@ -46,26 +46,18 @@
                   <ul class="standard">
                     {% for category in standard.category.all %}
                       <li>
-                        {{category.name}}
                         <span class="ec">
-                          <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                          <span class="glyphicon glyphicon-collapse-up" aria-hidden="true" style="display:none;"></span>
+                          <span class="fa fa-plus-circle" title="Expand"></span>
+                          <span class="fa fa-minus-circle" style="display:none;" title="Collapse"></span>
                         </span>
+                        &nbsp;
+                        {{category.name}}
                       </li>
                       <ul class="category" style="display:none;">
                         {% for subcategory in category.subcategory.all %}
                           <li>
                             {{subcategory.title}}
-                            <span class="ec">
-                              <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                              <span class="glyphicon glyphicon-collapse-up" aria-hidden="true" style="display:none;"></span>
-                            </span>
                           </li>
-                          {% if subcategory.description %}
-                            <ul class="taxonomy" style="display:none;">
-                              <li>{{subcategory.description}} </li>
-                            </ul>
-                          {% endif %}
                         {% endfor %}
                       </ul>
                     {% endfor %}

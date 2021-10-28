@@ -118,7 +118,7 @@
             <div>{{filter_form.assignment}}</div>
           </div>
           {% if curriculum %}
-          {% get_underlying_curriculum curriculum.id 'assign' as underlying_curriculum %}
+          {% get_underlying_curriculum curriculum.id 'preview' as underlying_curriculum %}
             <div class="form-group filter dropdown">
               <div class="dropdown-toggle form-control"
                     id="filter_assigned_lesson_columns" data-toggle="dropdown"

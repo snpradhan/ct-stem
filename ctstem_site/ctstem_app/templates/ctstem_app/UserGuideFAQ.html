@@ -37,11 +37,16 @@
         <div class="topic collapsed">
           <div class="topic_details">
             <div class="topic_name name">
-              <h3>{{topic.name}}</h3>
+              <h3 class="expand_collapse" >
+                <span class="fa fa-plus-circle"  title="Expand"></span>
+                <span class="fa fa-minus-circle" title="Collapse"></span>
+              </h3>
               <div>&nbsp;&nbsp;&nbsp;&nbsp;</div>
+              <h3>{{topic.name}}</h3>
+              <!--div>&nbsp;&nbsp;&nbsp;&nbsp;</div>
               <h3 class="expand_collapse">
                 <i class="fas fa-chevron-right"></i>
-              </h3>
+              </h3-->
             </div>
             <div class="topic_actions actions">
               <h4 class="right">
@@ -68,11 +73,16 @@
             {% for subtopic in topic.subtopics %}
               <div class="subtopic collapsed">
                 <div class="subtopic_name name">
-                  <h4> {{subtopic.name}} </h4>
+                  <h4 class="expand_collapse" >
+                    <span class="fa fa-plus-circle"  title="Expand"></span>
+                    <span class="fa fa-minus-circle" title="Collapse"></span>
+                  </h4>
                   <div>&nbsp;&nbsp;&nbsp;&nbsp;</div>
+                  <h4> {{subtopic.name}} </h4>
+                  <!--div>&nbsp;&nbsp;&nbsp;&nbsp;</div>
                   <h4 class="expand_collapse">
                     <i class="fas fa-chevron-right"></i>
-                  </h4>
+                  </h4-->
                 </div>
                 <div class="subtopic_actions actions">
                   {% if user.administrator %}

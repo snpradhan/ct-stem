@@ -201,6 +201,18 @@ table.table#curricula td.information div.title {
   font-weight: bold;
 }
 
+table.table#curricula ul.standard {
+  list-style-type: none;
+  padding-left: 0;
+}
+table.table#curricula ul.standard ul.category{
+  list-style-type: none;
+  padding-left: 2em;
+}
+table.table#curricula ul.standard ul.category ul.taxonomy{
+  padding-left: 3em;
+}
+
 table.table#team img.icon {
   max-width: 100px;
   height: auto;
@@ -357,3 +369,10 @@ table.table div.controls.center {
   justify-content: center;
 }
 
+table.table#standards_table ul.standard {
+  list-style-type: none;
+  padding-left: 1em;
+}
+table.table#standards_table ul.standard ul.category {
+  padding-left: 3em;
+}

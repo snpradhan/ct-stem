@@ -99,19 +99,23 @@
                       <div class="col-md-10">
                         <ul class="standard">
                           {% for standard, categories in curriculum.taxonomy.all|taxonomyHelper %}
-                            <li>{{standard}}
+                            <li>
                               <span class="ec">
-                                <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                                <span class="glyphicon glyphicon-collapse-up" aria-hidden="true" style="display:none;"></span>
+                                <span class="fa fa-plus-circle" title="Expand"></span>
+                                <span class="fa fa-minus-circle" style="display:none;" title="Collapse"></span>
                               </span>
+                              &nbsp;
+                              {{standard}}
                             </li>
                             <ul class="category" style="display:none;">
                               {% for category, taxonomies in categories.items %}
-                                <li>{{category}}
+                                <li>
                                   <span class="ec">
-                                    <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                                    <span class="glyphicon glyphicon-collapse-up" aria-hidden="true" style="display:none;"></span>
+                                    <span class="fa fa-plus-circle"></span>
+                                    <span class="fa fa-minus-circle" style="display:none;"></span>
                                   </span>
+                                  &nbsp;
+                                  {{category}}
                                 </li>
                                 <ul class="taxonomy" style="display:none;">
                                 {% for taxonomy in taxonomies %}
@@ -138,8 +142,8 @@
                       <div class="col-md-2 title">Underlying Curricula:</div>
                       <div class="col-md-10">
                         <span class="ec unit_lesson" data-unit-id="{{curriculum.id}}">
-                          <span class="glyphicon glyphicon-collapse-down" aria-hidden="true"></span>
-                          <span class="glyphicon glyphicon-collapse-up" aria-hidden="true" style="display:none;"></span>
+                          <span class="fa fa-plus-circle"></span>
+                          <span class="fa fa-minus-circle" style="display:none;"></span>
                         </span>
                         <div id="underlying_curricula" style="display:none;">
                           <table></table>

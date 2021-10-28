@@ -241,12 +241,6 @@
         window.location = href;
       }
     });
-    $(".expand_collapse2").click(function(){
-      $(this).next().toggle();
-      $(this).children().each(function(){
-        $(this).toggle();
-      })
-    });
 
     $('.stacked_bar_chart').each(function(){
       render_stacked_bar_chart($(this));

@@ -1857,9 +1857,14 @@ div.content#preview div#standards div.row .col {
 div.content#preview div#standards div.row .col > ul {
   font-size: 1.5em;
   line-height: 1.5em;
+  list-style-type: none;
+  padding-left: 1em;
 }
 div.content#preview div#standards div.row .col > ul * {
   font-size: 1em;
+}
+div.content#preview div#standards div.row .col > ul > ul {
+  padding-left: 3em;
 }
 div.content#preview ul.page_links  {
   list-style-type: none;
@@ -2834,6 +2839,9 @@ span.ec .glyphicon-collapse-down, span.ec_lessons .fa-caret-square-o-down {
 span.ec .glyphicon-collapse-up, span.ec_lessons .fa-caret-square-o-up{
   color: #e38d13;
 }
+span.ec, span.ec_lessons, span.ec_questions {
+  cursor: pointer;
+}
 
 .order input[type='number'], input[type='number'].order {
   width: 5em;
@@ -3093,9 +3101,9 @@ span.cke_top.focus, span.cke_bottom.focus {
     flex: 0 0 auto;
     padding-right: 2em;
   }
-   .topic .actions a {
+  .topic .actions a {
     cursor: pointer;
-   }
+  }
   .topic .subtopic {
     display: flex;
     background-color: var(--ctstem-color-pale-blue);
@@ -3109,13 +3117,22 @@ span.cke_top.focus, span.cke_bottom.focus {
   .topic.expanded .subtopic_details div {
     margin: 2em 4em;
   }
-  .topic .fa-chevron-right {
+  /*.topic .fa-chevron-right, .topic .expand_collapse > * {
     display: inline-block !important;
-  }
+  }*/
   .topic.expanded .topic_details .fa-chevron-right,
   .topic.expanded .subtopics .subtopic.expanded .fa-chevron-right{
     transform: rotate(90deg);
   }
+  .topic.collapsed .topic_details .expand_collapse .fa-minus-circle,
+  .topic.expanded .subtopics .subtopic.collapsed .expand_collapse .fa-minus-circle {
+    display: none !important;
+  }
+  .topic.expanded .topic_details .expand_collapse .fa-plus-circle,
+  .topic.expanded .subtopics .subtopic.expanded .expand_collapse .fa-plus-circle {
+    display: none !important;
+  }
+
   .topic .subtopics,
   .topic .subtopic_details {
    opacity: 0;

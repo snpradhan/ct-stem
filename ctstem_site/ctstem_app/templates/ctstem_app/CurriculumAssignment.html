@@ -1,5 +1,7 @@
 {% load ctstem_extras %}
-
+{% block media %}
+  {{ form.media }}
+{% endblock %}
 <div class="modal-dialog {% if curriculum.curriculum_type|slugify == 'U'|slugify %} modal-xlg {% else %} modal-lg {% endif %}">
   <div class="modal-content">
     <div class="modal-header">
@@ -48,12 +50,12 @@
                   {% endif %}
                   {% if curriculum.curriculum_type|slugify == 'U'|slugify %}
                     <td>
-                      {{curriculum.title}}
-                      &nbsp;&nbsp;
                       <span class="ec_lessons" id="group_{{group.id}}">
-                        <span><a href="#">(Expand Underlying Lessons)</a></span>
-                        <span style="display:none;"><a href="#">(Collapse Underlying Lessons)</a></span>
+                        <span class="fa fa-plus-circle" title="Expand"></span>
+                        <span class="fa fa-minus-circle" style="display:none;" title="Collapse"></span>
                       </span>
+                      &nbsp;
+                      {{curriculum.title}}
                     </td>
                   {% endif %}
                   <td style="text-align:center;">
@@ -101,8 +103,8 @@
       </div>
       <div class="modal-footer">
         <div class="form-group">
-          <a type="button" class="btn normal red" data-dismiss="modal">Cancel</a>
-          <button type="submit" id="saveAssignment" class="btn normal yellow">
+          <a type="button" class="btn normal gray" data-dismiss="modal">Cancel</a>
+          <button type="submit" id="saveAssignment" class="btn normal blue">
             Save
           </button>
         </div>

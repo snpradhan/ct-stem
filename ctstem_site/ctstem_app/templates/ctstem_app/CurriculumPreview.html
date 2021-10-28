@@ -206,7 +206,14 @@
               <h5 class="left">{{standard}}</h5>
               <ul>
                 {% for category, taxonomies in categories.items %}
-                  <li>{{category}} <span class="fa fa-plus-circle"></span><span class="fa fa-minus-circle" style="display:none;"></span></li>
+                  <li>
+                    <span class="ec">
+                      <span class="fa fa-plus-circle" title="Expand"></span>
+                      <span class="fa fa-minus-circle" style="display:none;" title="Collapse"></span>
+                    </span>
+                    &nbsp;
+                    {{category}}
+                  </li>
                   <ul style="display:none;">
                     {% for taxonomy in taxonomies %}
                       <li>{% if taxonomy.code %}<a href="#">[{{taxonomy.code}}]</a>{% endif %} {{taxonomy}}</li>
@@ -280,12 +287,6 @@
   </div>
   <script type="text/javascript">
     $(function(){
-      $('#standards span.fa').click(function(){
-        var li = $(this).closest('li');
-        var next = $(li).next();
-        $(li).find('span.fa').toggle();
-        $(next).toggle();
-      });
 
       $('#teacher_notes_link').click(function(){
         $('html, body').animate({
