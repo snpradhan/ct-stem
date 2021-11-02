@@ -156,6 +156,7 @@
                   <div class="student_mask">
                     xxxxxxxxxxx
                   </div>
+                  <a class="btn blue" href="{% url 'ctstem:assignmentStudentFeedback' teacher_id %}?group={{assignment.group.id}}&assignment={{assignment.curriculum.id}}&student={{resp_feed.student.user.id}}" title="Review all the responses of this student in this assignment"> <span class="far fa-comment-dots" aria-hidden="true"></span> </a>
                 </td>
                 <td>
                   <div class="response">

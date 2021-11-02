@@ -4797,17 +4797,13 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
     if 'GET' == request.method or 'POST' == request.method:
       steps = models.Step.objects.all().filter(curriculum=curriculum)
       total_steps = steps.count()
-      if int(step_order) == 0:
-        attachments = models.Attachment.objects.all().filter(Q(curriculum=curriculum) | Q(curriculum=curriculum.unit), teacher_only=False)
-        context = {'curriculum': curriculum, 'instance': instance, 'total_steps': total_steps, 'step_order': step_order, 'attachments': attachments}
-        return render(request, 'ctstem_app/AssignmentStep.html', context)
-      else:
-        step = steps.get(order=step_order)
+      #create notes object
+      notes, created = models.AssignmentNotes.objects.get_or_create(instance=instance)
+      #create empty responses for all questions if a response does not already exist
+      for step in steps:
         #create step response object
         assignmentStepResponse, created = models.AssignmentStepResponse.objects.get_or_create(instance=instance, step=step)
         curriculumQuestions = models.CurriculumQuestion.objects.all().filter(step=step).order_by('order')
-        #create notes object
-        notes, created = models.AssignmentNotes.objects.get_or_create(instance=instance)
 
         #create empty question responses if one does not exist
         for curriculumQuestion in curriculumQuestions:
@@ -4815,6 +4811,15 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
           if questionResponse.response is None:
             questionResponse.response = ''
             questionResponse.save()
+
+      if int(step_order) == 0:
+        attachments = models.Attachment.objects.all().filter(Q(curriculum=curriculum) | Q(curriculum=curriculum.unit), teacher_only=False)
+        context = {'curriculum': curriculum, 'instance': instance, 'total_steps': total_steps, 'step_order': step_order, 'attachments': attachments}
+        return render(request, 'ctstem_app/AssignmentStep.html', context)
+      else:
+        step = steps.get(order=step_order)
+        #create step response object
+        assignmentStepResponse = models.AssignmentStepResponse.objects.get(instance=instance, step=step)
 
         if 'GET' == request.method:
           #get the assignment step
