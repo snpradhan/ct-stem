@@ -2450,6 +2450,7 @@ div.modal#questionModal div.modal-content form#questionSearchForm div.form-inlin
   display: flex;
   flex-wrap: wrap;
 }
+
 div.modal .form-group {
   margin-bottom: 1.5em;
 }
@@ -2565,6 +2566,41 @@ ul#id_student-consent li {
   cursor: pointer;
   color: inherit;
 }
+
+/***** FEEDBACK MODAL *****/
+#feedbackModal .emoji_container {
+  display: none;
+}
+#emojiModal .emojis,
+#feedbackModal .emojis {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1.5em;
+  padding-top: 1em;
+}
+#feedbackModal .emojis {
+  height: 15em;
+  overflow-y: scroll;
+}
+.emojis .emoji {
+  font-size: 3rem;
+  height: auto;
+  cursor: pointer;
+  padding: 0.5em 0.25em;
+}
+.emojis .emoji:hover {
+  background-color: var(--ctstem-color-light-gray) !important;
+}
+#feedbackModal .emoji_link {
+  text-align: right;
+}
+a.emoji-modal {
+  float: right;
+  font-size: 1.5em;
+  margin-top:.5em;
+}
+
 /***********   FORM GROUP END   ************/
 
 /***************************************
@@ -2934,27 +2970,6 @@ img.page-blurb-image {
 
 #practices .portfolio-caption {
   min-height: 75px;
-}
-
-div.emoji {
-  font-size: 3rem;
-  height: 1.5em;
-  cursor: pointer;
-}
-div.emoji span {
-  padding: 0.2em;
-}
-div.emoji span:hover {
-  background-color: var(--ctstem-color-light-gray) !important;;
-}
-div.emoji span:active {
-  background-color: var(--ctstem-color-gray) !important;;
-}
-
-a.emoji-modal {
-  float: right;
-  font-size: 1.5em;
-  margin-top:.5em;
 }
 
 div.request_training {

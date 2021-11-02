@@ -3,7 +3,7 @@
   <div class="modal-content">
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal">&times;</button>
-      <h3 class="modal-title">Feedback for Question {{curriculum_question.step.order}}.{{curriculum_question.order}}</h3>
+      <h3 class="modal-title left">Feedback for Question {{curriculum_question.step.order}}.{{curriculum_question.order}}</h3>
     </div>
     <div id="questionFeedbackMsg" class="msg">
       <ul class="errorlist">
@@ -73,6 +73,15 @@
             {{form.feedback}}
           </div>
         </div>
+        <div class="form-group">
+          <a class="emoji-modal" href="#">
+            <i class="fa fa-smile-o" aria-hidden="true"></i>
+          </a>
+        </div>
+
+        <div class="form-group emoji_container">
+           {% include "ctstem_app/Emojis.html" %}
+        </div>
 
         <div id="spinner">
           <img src="/static/img/page-loader.gif" class="icon"/>
@@ -113,10 +122,10 @@ $(function (){
       success: function(data, status){
         if(data['success'] == true){
           $("#questionFeedbackForm")[0].reset();
-          $("#questionModal").modal('toggle');
+          $("#feedbackModal").modal('toggle');
         }
         else{
-          $('#questionModal').html(data['html']);
+          $('#feedbackModal').html(data['html']);
           $('#questionFeedbackMsg .errorlist li:first-child').addClass('error').html(data['error']);
         }
         return false;
@@ -134,6 +143,15 @@ $(function (){
     if(error_length > 0) {
       $(this).closest('.form-group').find('label, .question_input .form-control:input, .question_input .django-ckeditor-widget').addClass('input_error');
     }
+  });
+
+  $('a.emoji-modal').click(function(){
+    $('.form-group.emoji_container').toggle();
+  })
+  $('div.emoji').click(function(){
+    var id = $('.feedback textarea').attr('id');
+    var val = $('.feedback textarea').val();
+    $('.feedback textarea').val(val + $(this).html());
   });
 
 });

@@ -189,7 +189,7 @@
                 {% if form.instance.instance.status == 'P' or form.instance.instance.status == 'S' or form.instance.instance.status == 'F' or form.instance.instance.status == 'A'%}
                   {% if question.instance.response.response or question.instance.response.response_file.all %}
                     {{question.feedback}}
-                    <a data-toggle="modal" data-target="#emojis" class="emoji-modal" href="#" data-id="{{question.feedback.auto_id}}">
+                    <a data-toggle="modal" data-target="#emojiModal" class="emoji-modal" href="#" data-id="{{question.feedback.auto_id}}">
                       <i class="fa fa-smile-o" aria-hidden="true"></i>
                     </a>
                   {% endif %}

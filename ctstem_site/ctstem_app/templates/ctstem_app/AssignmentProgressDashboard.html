@@ -251,7 +251,7 @@
       $(".add_feedback").click(function(e){
         e.preventDefault();
         var url = $(this).data("form");
-        $("#questionModal").load(url, function() {
+        $("#feedbackModal").load(url, function() {
           $(this).modal('show');
         });
 

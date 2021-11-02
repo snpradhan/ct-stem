@@ -1,107 +1,14 @@
-<div class="modal fade" id="emojis" role="dialog">
+<div class="modal fade" id="emojiModal" role="dialog">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h3 class="modal-title">Emojis</h3>
+        <h3 class="modal-title left">Emojis</h3>
       </div>
       <form>
         <div class="modal-body">
           <input type="hidden" id="emoji_feedback_area"/>
-          <div class="row">
-            <div class="col-sm-1 emoji"><span>🙅</span></div>
-            <div class="col-sm-1 emoji"><span>💁</span></div>
-            <div class="col-sm-1 emoji"><span>🔥</span></div>
-            <div class="col-sm-1 emoji"><span>💥</span></div>
-            <div class="col-sm-1 emoji"><span>🌟</span></div>
-            <div class="col-sm-1 emoji"><span>✨</span></div>
-            <div class="col-sm-1 emoji"><span>🌠</span></div>
-            <div class="col-sm-1 emoji"><span>🎇</span></div>
-            <div class="col-sm-1 emoji"><span>🎆</span></div>
-            <div class="col-sm-1 emoji"><span>🎉</span></div>
-            <div class="col-sm-1 emoji"><span>👌</span></div>
-            <div class="col-sm-1 emoji"><span>👍</span></div>
-            <div class="col-sm-1 emoji"><span>🙌</span></div>
-            <div class="col-sm-1 emoji"><span>👏</span></div>
-            <div class="col-sm-1 emoji"><span>👎</span></div>
-            <div class="col-sm-1 emoji"><span>😢</span></div>
-            <div class="col-sm-1 emoji"><span>😱</span></div>
-            <div class="col-sm-1 emoji"><span>😀</span></div>
-            <div class="col-sm-1 emoji"><span>😬</span></div>
-            <div class="col-sm-1 emoji"><span>😁</span></div>
-            <div class="col-sm-1 emoji"><span>😂</span></div>
-            <div class="col-sm-1 emoji"><span>😃</span></div>
-            <div class="col-sm-1 emoji"><span>😄</span></div>
-            <div class="col-sm-1 emoji"><span>😅</span></div>
-            <div class="col-sm-1 emoji"><span>😆</span></div>
-            <div class="col-sm-1 emoji"><span>😇</span></div>
-            <div class="col-sm-1 emoji"><span>😉</span></div>
-            <div class="col-sm-1 emoji"><span>😊</span></div>
-            <div class="col-sm-1 emoji"><span>🙂</span></div>
-            <div class="col-sm-1 emoji"><span>🙃</span></div>
-            <div class="col-sm-1 emoji"><span>😋</span></div>
-            <div class="col-sm-1 emoji"><span>😌</span></div>
-            <div class="col-sm-1 emoji"><span>😍</span></div>
-            <div class="col-sm-1 emoji"><span>😘</span></div>
-            <div class="col-sm-1 emoji"><span>😗</span></div>
-            <div class="col-sm-1 emoji"><span>😙</span></div>
-            <div class="col-sm-1 emoji"><span>😚</span></div>
-            <div class="col-sm-1 emoji"><span>😜</span></div>
-            <div class="col-sm-1 emoji"><span>😝</span></div>
-            <div class="col-sm-1 emoji"><span>😛</span></div>
-            <div class="col-sm-1 emoji"><span>🤑</span></div>
-            <div class="col-sm-1 emoji"><span>🤓</span></div>
-            <div class="col-sm-1 emoji"><span>😎</span></div>
-            <div class="col-sm-1 emoji"><span>🤗</span></div>
-            <div class="col-sm-1 emoji"><span>😏</span></div>
-            <div class="col-sm-1 emoji"><span>😶</span></div>
-            <div class="col-sm-1 emoji"><span>😐</span></div>
-            <div class="col-sm-1 emoji"><span>😑</span></div>
-            <div class="col-sm-1 emoji"><span>😒</span></div>
-            <div class="col-sm-1 emoji"><span>🙄</span></div>
-            <div class="col-sm-1 emoji"><span>🤔</span></div>
-            <div class="col-sm-1 emoji"><span>😳</span></div>
-            <div class="col-sm-1 emoji"><span>😞</span></div>
-            <div class="col-sm-1 emoji"><span>😟</span></div>
-            <div class="col-sm-1 emoji"><span>😠</span></div>
-            <div class="col-sm-1 emoji"><span>😡</span></div>
-            <div class="col-sm-1 emoji"><span>😔</span></div>
-            <div class="col-sm-1 emoji"><span>😕</span></div>
-            <div class="col-sm-1 emoji"><span>🙁</span></div>
-            <div class="col-sm-1 emoji"><span>😣</span></div>
-            <div class="col-sm-1 emoji"><span>😖</span></div>
-            <div class="col-sm-1 emoji"><span>😫</span></div>
-            <div class="col-sm-1 emoji"><span>😩</span></div>
-            <div class="col-sm-1 emoji"><span>😤</span></div>
-            <div class="col-sm-1 emoji"><span>😮</span></div>
-            <div class="col-sm-1 emoji"><span>😨</span></div>
-            <div class="col-sm-1 emoji"><span>😰</span></div>
-            <div class="col-sm-1 emoji"><span>😯</span></div>
-            <div class="col-sm-1 emoji"><span>😦</span></div>
-            <div class="col-sm-1 emoji"><span>😧</span></div>
-            <div class="col-sm-1 emoji"><span>😥</span></div>
-            <div class="col-sm-1 emoji"><span>😪</span></div>
-            <div class="col-sm-1 emoji"><span>😓</span></div>
-            <div class="col-sm-1 emoji"><span>😭</span></div>
-            <div class="col-sm-1 emoji"><span>😵</span></div>
-            <div class="col-sm-1 emoji"><span>😲</span></div>
-            <div class="col-sm-1 emoji"><span>🤐</span></div>
-            <div class="col-sm-1 emoji"><span>😷</span></div>
-            <div class="col-sm-1 emoji"><span>🤒</span></div>
-            <div class="col-sm-1 emoji"><span>🤕</span></div>
-            <div class="col-sm-1 emoji"><span>😴</span></div>
-            <div class="col-sm-1 emoji"><span>😺</span></div>
-            <div class="col-sm-1 emoji"><span>😸</span></div>
-            <div class="col-sm-1 emoji"><span>😹</span></div>
-            <div class="col-sm-1 emoji"><span>😻</span></div>
-            <div class="col-sm-1 emoji"><span>😼</span></div>
-            <div class="col-sm-1 emoji"><span>😽</span></div>
-            <div class="col-sm-1 emoji"><span>🙀</span></div>
-            <div class="col-sm-1 emoji"><span>😿</span></div>
-            <div class="col-sm-1 emoji"><span>😾</span></div>
-            <div class="col-sm-1 emoji"><span>✍</span></div>
-
-          </div>
+          {% include "ctstem_app/Emojis.html" %}
         </div>
       </form>
       <div class="modal-footer">
