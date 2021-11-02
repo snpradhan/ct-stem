@@ -13,6 +13,15 @@ table.table thead {
   /*font-family: 'Montserrat, sans-serif';*/ /*'QuaTrocento Regular';*/
   font-size: 1.5em;
   font-weight: 400;
+  position: sticky;
+  top: var(--ctstem-sticky-margin-top);
+  z-index: 1000;
+}
+
+table.table#assignment_progress thead,
+table.table#unit_progress thead,
+table.table.inner_table thead {
+  top: 0;
 }
 table.table thead tr#filterrow th{
   font-size: 1em;
@@ -26,9 +35,6 @@ table.table tbody {
 }
 table.table th {
   vertical-align: middle !important;
-  position: sticky;
-  top: var(--ctstem-sticky-margin-top);
-  z-index: 1000;
   background-color: #666666 !important;
   color: #e5e5e5 !important;
 }
@@ -307,9 +313,10 @@ table#publications td.action {
 div.dashboard_container {
   max-width: 100%;
   overflow-x: auto;
-  overflow-y: auto;
+  overflow-y: scroll;
   position: relative;
   max-height: 90vh;
+
 }
 
 table#group_curriculum_dashboard td.assignment_status_chart {
@@ -332,7 +339,7 @@ div.dashboard_container .student_col {
   left: 0;
   background-color: #666666 !important;
   color: white;
-  width: 12em;
+  width: 7em !important;
 }
 div.dashboard_container thead th {
   top: 0;
@@ -342,6 +349,10 @@ div.dashboard_container thead th.student_col {
 }
 div.dashboard_container tbody th.student_col {
   z-index: 999;
+}
+div.dashboard_container thead th[class^="lesson"] {
+  width: 10em !important;
+  vertical-align: middle !important;
 }
 
 table.table#page_reorder tr.current {

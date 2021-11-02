@@ -101,7 +101,8 @@ ASSIGNMENT_SORT = (
 
 PROGRESS_DASHBOARD_SORT = (
   ('student_id', 'Student ID'),
-  ('student', 'Student Name (Last, First)'),
+  ('student_last_first', 'Student Name (Last, First)'),
+  ('student_first_last', 'Student Name (First, Last)'),
   ('most_progress', 'Most Progress'),
   ('least_progress', 'Least Progress'),
   ('most_time', 'Most Time Spent'),

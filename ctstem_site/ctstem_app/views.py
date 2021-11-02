@@ -4416,8 +4416,10 @@ def assignmentProgressDashboard(request, teacher_id=''):
           students_progress.sort(key=lambda item:(item['student'].user.last_name.lower(), item['student'].user.first_name.lower()))
       elif sort_by == 'student_id':
         students_progress.sort(key=lambda item:item['student'].id)
-      elif sort_by == 'student':
+      elif sort_by == 'student_last_first':
         students_progress.sort(key=lambda item:(item['student'].user.last_name.lower(), item['student'].user.first_name.lower()))
+      elif sort_by == 'student_first_last':
+        students_progress.sort(key=lambda item:(item['student'].user.first_name.lower(), item['student'].user.last_name.lower()))
       elif sort_by == 'most_progress':
         students_progress.sort(key=lambda item:item['percent_complete'], reverse=True)
       elif sort_by == 'least_progress':
@@ -4486,6 +4488,8 @@ def unitProgressDashboard(request, teacher_id=''):
       anonymize_student = False
       assignment_ids = []
       assignments_by_unit = None
+      timezone = pytz.timezone(settings.TIME_ZONE)
+      epoch = datetime.datetime(1970, 1, 1, 0, 0, 0, 0, timezone)
 
       if group_id and curriculum_id:
         group = models.UserGroup.objects.get(id=group_id)
@@ -4538,10 +4542,47 @@ def unitProgressDashboard(request, teacher_id=''):
               'percent_complete': percent_complete,
             }
             if student in student_assignment_details:
-              student_assignment_details[student].append(student_assignment_status)
+              if assignment:
+                old_percent_complete = student_assignment_details[student]['percent_complete']
+                old_total_assigned = student_assignment_details[student]['total_assigned']
+                student_assignment_details[student]['percent_complete'] = (old_percent_complete*old_total_assigned + percent_complete)/(old_total_assigned+1)
+                student_assignment_details[student]['total_assigned'] += 1
+                if instance:
+                  student_assignment_details[student]['time_spent'] += instance.time_spent
+                  student_assignment_details[student]['modified_date'] = max(student_assignment_details[student]['modified_date'], instance.modified_date)
+              student_assignment_details[student]['student_progress'].append(student_assignment_status)
             else:
-              student_assignment_details[student] = [student_assignment_status]
+              student_assignment_details[student] = {'student': student,
+                                                     'percent_complete': percent_complete,
+                                                     'total_assigned': 1 if assignment else 0,
+                                                     'time_spent': instance.time_spent if instance else 0,
+                                                     'modified_date': instance.modified_date if instance else None,
+                                                     'student_progress': [student_assignment_status]}
 
+      student_assignment_details = list(student_assignment_details.values())
+      if sort_by is None:
+        if hasattr(request.user, 'researcher'):
+          student_assignment_details.sort(key=lambda item:item['student'].id)
+        else:
+          student_assignment_details.sort(key=lambda item:(item['student'].user.last_name.lower(), item['student'].user.first_name.lower()))
+      elif sort_by == 'student_id':
+        student_assignment_details.sort(key=lambda item:item['student'].id)
+      elif sort_by == 'student_last_first':
+        student_assignment_details.sort(key=lambda item:(item['student'].user.last_name.lower(), item['student'].user.first_name.lower()))
+      elif sort_by == 'student_first_last':
+        student_assignment_details.sort(key=lambda item:(item['student'].user.first_name.lower(), item['student'].user.last_name.lower()))
+      elif sort_by == 'most_progress':
+        student_assignment_details.sort(key=lambda item:item['percent_complete'], reverse=True)
+      elif sort_by == 'least_progress':
+        student_assignment_details.sort(key=lambda item:item['percent_complete'])
+      elif sort_by == 'most_time':
+        student_assignment_details.sort(key=lambda item:item['time_spent'], reverse=True)
+      elif sort_by == 'least_time':
+        student_assignment_details.sort(key=lambda item:item['time_spent'])
+      elif sort_by == 'newest_update':
+        student_assignment_details.sort(key=lambda item:item['modified_date'] if item['modified_date'] else epoch, reverse=True)
+      else:
+        student_assignment_details.sort(key=lambda item:item['modified_date'] if item['modified_date'] else epoch)
       current_site = Site.objects.get_current()
       domain = current_site.domain
       context = {'teacher_id': teacher_id, 'group': group, 'curriculum': curriculum, 'assignment_header': assignment_header, 'student_assignment_details': student_assignment_details, 'assignments_by_unit': assignments_by_unit, 'anonymize_student': anonymize_student, 'assignment_ids': assignment_ids, 'filter_form': filter_form, 'domain': domain}

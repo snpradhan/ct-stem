@@ -1397,7 +1397,7 @@ div.content#assignment_progress_dashboard #unit_progress th.top > div{
 div.content#assignment_progress_dashboard #unit_progress th.top ul.dropdown-menu {
   font-size: 0.9em;
   right: 0 !important;
-  left: auto !important;
+  left: -5em !important;
   padding-left: 0!important;
 }
 
@@ -1438,11 +1438,11 @@ div.content#assignment_progress_dashboard td.question {
   padding: 0;
 }
 div.content#assignment_progress_dashboard td.time_spent {
-  width: 10em !important;
+  width: 5em !important;
   text-align: center;
 }
 div.content#assignment_progress_dashboard td.last_modified {
-  width: 10em !important;
+  width: 5em !important;
   text-align: center;
 }
 
@@ -2081,7 +2081,7 @@ div.content#assignment_progress_dashboard div.progress_filter,
 div.content.teacher_detailed_dashboard div#dashboard_search div.assignment_filter,
 div.content.assignment_feedback div.search_filter {
   background-color: var(--ctstem-color-pale-blue);
-  padding: 1em 2%;
+  padding: 1.5em 2%;
   display: flex;
   justify-content: space-between;
   align-items: flex-end;

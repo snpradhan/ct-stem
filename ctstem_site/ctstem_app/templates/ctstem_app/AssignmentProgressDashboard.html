@@ -134,7 +134,9 @@
       <table class="table table-striped table-bordered table-condensed" id="assignment_progress">
         <thead>
           <tr>
-            <th class="student_col"></th>
+            <th class="student_col" rowspan="2">
+              Student
+            </th>
             {% for step in header %}
               {% with questions=step|get_item:'questions' %}
                 <th colspan={{questions|length}} class="info" rel="popover" data-title="Page {{step.order}}" data-content="{{step|get_item:'title'}}" data-trigger="hover">
@@ -143,12 +145,11 @@
                 </th>
               {% endwith %}
             {% endfor %}
-            <th colspan="3">
-            </th>
+            <th rowspan="2">Lesson % Complete</th>
+            <th rowspan="2">Time Spent <br> hh:mm:ss</th>
+            <th rowspan="2">Last Worked On</th>
           </tr>
           <tr>
-            <th class="student_col">
-            </th>
             {% for step in header %}
               {% with questions=step|get_item:'questions' %}
                 {% if questions %}
@@ -168,9 +169,7 @@
                 {% endif %}
               {% endwith %}
             {% endfor %}
-            <th>% Complete</th>
-            <th>Time Spent <br> hh:mm:ss</th>
-            <th>Last Worked On</th>
+
           </tr>
         </thead>
         <tbody>
@@ -182,7 +181,11 @@
                 {% if user.researcher %}
                   <b>{{student.user.id}}</b><br>
                 {% else %}
-                  <b>{{student}}</b><br>
+                  {% if filter_form.sort_by.value == 'student_first_last' %}
+                    <b>{{student.user.get_full_name}}</b><br>
+                  {% else %}
+                    <b>{{student}}</b><br>
+                  {% endif %}
                 {% endif %}
               </div>
               <div class="student_mask">

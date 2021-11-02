@@ -189,24 +189,32 @@
                 </div>
               </th>
             {% endfor %}
+            <th>Unit % Complete</th>
+            <th>Time Spent<br> hh:mm:ss</th>
+            <th>Last Worked On</th>
           </tr>
         </thead>
         <tbody>
-          {% for student, assignment_details in student_assignment_details.items %}
+          {% for details in student_assignment_details %}
+            {% with student=details|get_item:'student' student_progress=details|get_item:'student_progress' percent_complete=details|get_item:'percent_complete' time_spent=details|get_item:'time_spent' modified_date=details|get_item:'modified_date' %}
             <tr style="background-color: {% if forloop.counter|divisibleby:2 %}  white; {% else %} #f9f9f9; {% endif %}">
               <td class="student_col">
                 <div class="student_name">
                   {% if user.researcher %}
                     <b>{{student.user.id}}</b><br>
                   {% else %}
-                    <b>{{student}}</b><br>
+                    {% if filter_form.sort_by.value == 'student_first_last' %}
+                      <b>{{student.user.get_full_name}}</b><br>
+                    {% else %}
+                      <b>{{student}}</b><br>
+                    {% endif %}
                   {% endif %}
                 </div>
                 <div class="student_mask">
                   xxxxxxxxxxx
                 </div>
               </td>
-              {% for student_assignment in assignment_details %}
+              {% for student_assignment in student_progress %}
                 {% if student_assignment.assignment is None %}
                   <td class="lesson_{{student_assignment.curriculum_id}}" style="width: 10em;">
                     <div class="crossed"></div>
@@ -216,31 +224,35 @@
                     <div class="assignment_status_chart">
                       <div id="chart_{{student_assignment.serial}}" class="donut_chart" data-percent-complete="{{student_assignment.percent_complete}}"></div>
 
-                      {% if student_assignment.instance.status == 'P' %}
-                        <!--div> In Progress </div-->
-                        <div class="controls">
-                           <a type="button" class="btn blue" href="{% url 'ctstem:assignmentStudentFeedback' teacher_id %}?group={{student_assignment.assignment.group.id}}&assignment={{student_assignment.assignment.curriculum.id}}&student={{student.user.id}}"
-                          title="Give Feedback"> <i class="far fa-comment-dots" aria-hidden="true"></i> </a>
-                        </div>
-                      {% elif student_assignment.instance.status == 'S' %}
-                        <!--div> Submitted </div-->
-                        <div class="controls">
-                          <a type="button" class="btn blue" href="{% url 'ctstem:assignmentStudentFeedback' teacher_id %}?group={{student_assignment.assignment.group.id}}&assignment={{student_assignment.assignment.curriculum.id}}&student={{student.user.id}}" title="Give Feedback"> <i class="far fa-comment-dots" aria-hidden="true"></i> </a>
+                      {% if student_assignment.instance is not None %}
+                        {% if student_assignment.instance.status == 'P' %}
+                          <!--div> In Progress </div-->
+                          <div class="controls">
+                             <a type="button" class="btn blue" href="{% url 'ctstem:assignmentStudentFeedback' teacher_id %}?group={{student_assignment.assignment.group.id}}&assignment={{student_assignment.assignment.curriculum.id}}&student={{student.user.id}}"
+                            title="Give Feedback"> <i class="far fa-comment-dots" aria-hidden="true"></i> </a>
+                          </div>
+                        {% elif student_assignment.instance.status == 'S' %}
+                          <!--div> Submitted </div-->
+                          <div class="controls">
+                            <a type="button" class="btn blue" href="{% url 'ctstem:assignmentStudentFeedback' teacher_id %}?group={{student_assignment.assignment.group.id}}&assignment={{student_assignment.assignment.curriculum.id}}&student={{student.user.id}}" title="Give Feedback"> <i class="far fa-comment-dots" aria-hidden="true"></i> </a>
 
-                          {% if student_assignment.instance.assignment.curriculum.curriculum_type == 'L' %}
-                            <a type="button" class="btn blue" href="{% url 'ctstem:unlockAssignment' student_assignment.assignment.id  student_assignment.instance.id %}" title="Unlock Assignment" onclick="return confirm('Are you sure you want to unlock this assignment? Unlocking the assignment will allow the student to edit his/her responses and resubmit.');"> <i class="fa fa-unlock" aria-hidden="true"></i> </a>
-                          {% endif %}
-                        </div>
-                      {% elif student_assignment.instance.status == 'F' %}
-                        <!--div> Feedback Completed </div-->
-                        <div class="controls">
-                          <a type="button" class="btn blue" href="{% url 'ctstem:assignmentStudentFeedback' teacher_id %}?group={{student_assignment.assignment.group.id}}&assignment={{student_assignment.assignment.curriculum.id}}&student={{student.user.id}}" title="View/Give Feedback"> <i class="fas fa-comment-dots" aria-hidden="true"></i> </a>
-                        </div>
-                      {% elif student_assignment.instance.status == 'A' %}
-                        <!--div> Archived </div-->
-                        <div class="controls">
-                          <a type="button" class="btn blue" href="{% url 'ctstem:assignmentStudentFeedback' teacher_id %}?group={{student_assignment.assignment.group.id}}&assignment={{student_assignment.assignment.curriculum.id}}&student={{student.user.id}}" title="View/Give Feedback"> <i class="fas fa-comment-dots" aria-hidden="true"></i> </a>
-                        </div>
+                            {% if student_assignment.instance.assignment.curriculum.curriculum_type == 'L' %}
+                              <a type="button" class="btn blue" href="{% url 'ctstem:unlockAssignment' student_assignment.assignment.id  student_assignment.instance.id %}" title="Unlock Assignment" onclick="return confirm('Are you sure you want to unlock this assignment? Unlocking the assignment will allow the student to edit his/her responses and resubmit.');"> <i class="fa fa-unlock" aria-hidden="true"></i> </a>
+                            {% endif %}
+                          </div>
+                        {% elif student_assignment.instance.status == 'F' %}
+                          <!--div> Feedback Completed </div-->
+                          <div class="controls">
+                            <a type="button" class="btn blue" href="{% url 'ctstem:assignmentStudentFeedback' teacher_id %}?group={{student_assignment.assignment.group.id}}&assignment={{student_assignment.assignment.curriculum.id}}&student={{student.user.id}}" title="View/Give Feedback"> <i class="fas fa-comment-dots" aria-hidden="true"></i> </a>
+                          </div>
+                        {% elif student_assignment.instance.status == 'A' %}
+                          <!--div> Archived </div-->
+                          <div class="controls">
+                            <a type="button" class="btn blue" href="{% url 'ctstem:assignmentStudentFeedback' teacher_id %}?group={{student_assignment.assignment.group.id}}&assignment={{student_assignment.assignment.curriculum.id}}&student={{student.user.id}}" title="View/Give Feedback"> <i class="fas fa-comment-dots" aria-hidden="true"></i> </a>
+                          </div>
+                        {% else %}
+                          <i class="far fa-window-minimize"></i>
+                        {% endif %}
                       {% else %}
                         <i class="far fa-window-minimize"></i>
                       {% endif %}
@@ -248,7 +260,19 @@
                   </td>
                 {% endif %}
               {% endfor %}
+              <td class="percent_complete">
+                <div class="assignment_status_chart">
+                  <div id="unit_progress_chart_{{student.id}}" class="donut_chart" data-percent-complete="{{percent_complete}}"></div>
+                </div>
+              </td>
+              <td class="time_spent">{{time_spent|format_time}}</td>
+              <td class="last_modified">
+                {% if modified_date %}
+                  {{modified_date|date}}
+                {% endif %}
+              </td>
             </tr>
+          {% endwith %}
           {% endfor %}
         </tbody>
       </table>
