@@ -50,13 +50,13 @@
                 {% elif curriculum_question.question.answer_field_type == 'TA' %}
                   {{question_response.response|safe}}
                 {% else %}
-                  {{question_response.response}}
+                  <p>{{question_response.response}}</p>
                 {% endif %}
               {% elif question_response.response_file.all %}
-                Uploaded file(s):
+                <p>Uploaded file(s):</p>
                 <ul>
                 {% for response_file in question_response.response_file.all %}
-                  <li><a href="{{response_file.file.url}}" target="_blank">Click here to view file {{forloop.counter}}</a></li>
+                  <li><a href="{{response_file.file.url}}" target="_blank"><p>Click here to view file {{forloop.counter}}</p></a></li>
                 {% endfor %}
                 </ul>
               {% else %}
