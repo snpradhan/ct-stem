@@ -110,6 +110,16 @@ PROGRESS_DASHBOARD_SORT = (
   ('newest_update', 'Most Recent Update'),
   ('oldest_update', 'Least Recent Update')
 )
+STUDENT_DASHBOARD_SORT = (
+  ('student_id', 'Student ID'),
+  ('student_last_first', 'Student Name (Last, First)'),
+  ('student_first_last', 'Student Name (First, Last)'),
+  ('most_recent_login', 'Most Recent Login'),
+  ('least_recent_login', 'Least Recent Login'),
+  ('most_progress', 'Most Progress'),
+  ('least_progress', 'Least Progress'),
+)
+
 REQUESTER_ROLE = (
   ('', 'I am:'),
   ('T', 'Teacher'),

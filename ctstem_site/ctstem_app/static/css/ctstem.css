@@ -1211,14 +1211,14 @@ div.content.teacher_detailed_dashboard div.header * {
   color: inherit;
 }
 div.content.teacher_detailed_dashboard div.dashboard_assignments div.assignment div.assignment_title {
-  flex: 0 0 35%;
+  flex: 0 0 45%;
   align-items: center;
   display: flex;
   justify-content: flex-start;
   gap: 1em;
 }
 div.content.teacher_detailed_dashboard div.dashboard_assignments div.assignment div.assignment_class {
-  flex: 0 0 15%;
+  flex: 0 0 10%;
 }
 div.content.teacher_detailed_dashboard .actions {
   max-width: 50em;
@@ -1241,11 +1241,6 @@ div.content.teacher_detailed_dashboard  .expanded_collapsed.expanded .fa-plus-ci
   display: none;
 }
 
-div.content.teacher_detailed_dashboard div.dashboard_assignments div.assignment div.assignment_status_chart {
-  flex: 0 0 20%;
-  align-self: center;
-  max-width: 20%;
-}
 div.content.teacher_detailed_dashboard div.dashboard_assignments div.assignment div.assignment_stats {
   flex: 0 0 10%;
   align-self: center;
@@ -1257,9 +1252,21 @@ div.content.teacher_detailed_dashboard div.dashboard_assignments div.assignment 
 div.content.teacher_detailed_dashboard div.dashboard_assignments div.underlying_lesson_assignments {
   display: none;
 }
-div.content#teacher_assignment_dashboard div.dashboard_assignments div.underlying_lesson_assignments div.assignment_title {
+
+div.content.teacher_detailed_dashboard#teacher_assignment_dashboard div.dashboard_assignments div.assignment div.assignment_status_chart {
+  flex: 0 0 20%;
+  align-self: center;
+  max-width: 20%;
+}
+div.content.teacher_detailed_dashboard#teacher_assignment_dashboard div.dashboard_assignments div.underlying_lesson_assignments div.assignment_title {
   padding-left: 6em;
 }
+div.content.teacher_detailed_dashboard#teacher_student_dashboard div.dashboard_assignments div.assignment div.assignment_status_chart {
+  flex: 0 0 10%;
+  align-self: center;
+  max-width: 10%;
+}
+
 
 
 /*******************TEACHER ASSIGNMENT DASHBOARD END**************************/
@@ -1277,21 +1284,37 @@ div.content.teacher_detailed_dashboard div.student  {
   align-items: center;
 }
 div.content.teacher_detailed_dashboard div.student div.student_details {
-  flex: 0 0 35%;
+  flex: 0 0 45%;
   align-self: center;
   display: flex;
   justify-content: flex-start;
   align-items: center;
   gap: 1em;
 }
+div.content.teacher_detailed_dashboard div.student div.student_details .expand_collapse {
+  flex: 0 0 5%;
+}
+div.content.teacher_detailed_dashboard div.student div.student_details .name {
+  flex: 0 0 30%;
+}
+div.content.teacher_detailed_dashboard div.student div.student_details .reset_password {
+  flex: 0 0 5%;
+}
+div.content.teacher_detailed_dashboard div.student div.student_details .email {
+  flex: 0 0 45%;
+  font-weigth: bold;
+}
+div.content.teacher_detailed_dashboard div.student div.student_details .login {
+  flex: 0 0 20%;
+}
 div.content.teacher_detailed_dashboard div.student div.assignment_class {
-  flex: 0 0 15%;
+  flex: 0 0 10%;
   align-self: center;
 }
 div.content.teacher_detailed_dashboard div.student  div.assignment_status_chart {
-  flex: 0 0 20%;
+  flex: 0 0 10%;
   align-self: center;
-  max-width: 20%;
+  max-width: 10%;
 }
 div.content.teacher_detailed_dashboard div.student  div.assignment_stats {
   flex: 0 0 10%;

@@ -45,6 +45,10 @@
           <label>{{searchForm.assignment.label|title}}</label>
           <div>{{searchForm.assignment}}</div>
         </div>
+        <div class="form-group">
+          <label>{{searchForm.sort_by.label|title}}</label>
+          <div>{{searchForm.sort_by}}</div>
+        </div>
 
         <div class="form-group">
           <button type="button" id="reset" class="btn gray normal">
@@ -58,14 +62,21 @@
   </div>
   <div class="student header">
     <div class="student_details">
-      <h5 class="left">
+      <h5 class="expanded_collapsed"></h5>
+      <h5 class="left name">
         {% if user.researcher %}
-          Student ID/Assigned Curriculum
+          Student ID
         {% else %}
-          Student/Assigned Curriculum
+          Student
         {% endif %}
       </h5>
+      {% if not user.researcher %}
+        <div class="reset_password"></div>
+        <h5 class="left email">Email</h5>
+        <h5 class="left login">Last Login</h5>
+      {% endif %}
     </div>
+
     {% if not group %}
     <div class="assignment_class">
       <h5 class="left">Class</h5>
@@ -74,29 +85,43 @@
     <div class="assignment_status_chart">
       <h5 class="left">Status</h5>
     </div>
-    <div class="assignment_stats">
-      <h5 class="left">Last Opened</h5>
-    </div>
+
     <div class="assignment_stats">
       <h5 class="left">Assigned Date</h5>
     </div>
+    <div class="assignment_stats">
+      <h5 class="left">Last Opened</h5>
+    </div>
+
+
   </div>
   {% for id, student in students.items %}
-  {% with user_id=student|get_item:'user_id' student_id=student|get_item:'student_id' name=student|get_item:'name' assignments=student|get_item:'assignments' student_assignment_status=student|get_item:'assignment_status' student_groups=student|get_item:'student_groups' student_percent_complete=student|get_item:'percent_complete' %}
+  {% with student_obj=student|get_item:'student' user_id=student|get_item:'user_id' student_id=student|get_item:'student_id' name=student|get_item:'name' assignments=student|get_item:'assignments' student_assignment_status=student|get_item:'assignment_status' student_groups=student|get_item:'student_groups' student_percent_complete=student|get_item:'percent_complete' %}
   {% get_chart_config student_assignment_status 'stacked_bar' as student_chart_config %}
   <div class="student">
     <div class="student_details">
-      <h5 class="expanded_collapsed collapsed" title="Expand student assignments">
+      <h6 class="expanded_collapsed collapsed" title="Expand student assignments">
         <i class="fas fa-plus-circle"></i>
         <i class="fas fa-minus-circle"></i>
-      </h5>
-      <h5 class="left">
+      </h6>
+      <h6 class="left name">
         {% if user.researcher %}
           {{user_id}}
         {% else %}
-          {{name}}
+          {% if searchForm.sort_by.value == 'student_first_last' %}
+            <b>{{student_obj.user.get_full_name}}</b><br>
+          {% else %}
+            <b>{{student_obj}}</b><br>
+          {% endif %}
         {% endif %}
-      </h5>
+      </h6>
+      {% if not user.researcher %}
+        <button type="button" class="btn blue small reset_email reset_password" aria-label="Send password reset email" title="Send password reset email" onclick="this.disabled=true; return send_password_reset_email('{{student_obj.user.username}}','{{csrf_token}}')">
+          <i class="fas fa-paper-plane"></i>
+        </button>
+        <h6 class="left email">{{student_obj.user.email}}</h6>
+        <h6 class="left login">{{student_obj.user.last_login|date:'M j, Y'|default_if_none:''}}</h6>
+      {% endif %}
     </div>
     {% if not group %}
     <div class="assignment_class">
@@ -104,8 +129,6 @@
     </div>
     {% endif %}
     <div class="assignment_status_chart">
-      <!--div id="assignment_chart_student_{{student_id}}" class="stacked_bar_chart rendered" name="{{student_chart_config}}" data-total="{{student|get_item:'total'}}"></div-->
-
       <div id="chart_{{student_id}}" class="donut_chart" data-percent-complete="{{student_percent_complete}}"></div>
     </div>
     <div class="assignment_stats">
@@ -120,13 +143,13 @@
         {% with assignment_id=assignment|get_item:'assignment_id' curriculum_id=assignment|get_item:'curriculum_id' assignment_group=assignment|get_item:'group' assignment_status=assignment|get_item:'assignment_status' instance=assignment|get_item:'instance' curriculum_type=assignment|get_item:'curriculum_type' assignment_percent_complete=assignment|get_item:'percent_complete' %}
         <div class="assignment tile standalone">
           <div class="assignment_title">
-            <h5 class="expanded_collapsed collapsed" title="Expand underlying lessons">
+            <h6 class="expanded_collapsed collapsed" title="Expand underlying lessons">
               {% if curriculum_type == 'Unit' %}
                 <i class="fas fa-plus-circle"></i>
                 <i class="fas fa-minus-circle"></i>
               {% endif %}
-            </h5>
-            <h5 class="left">
+            </h6>
+            <h6 class="left">
               {% if curriculum_type == 'Unit' %}
                 {{assignment|get_item:'title'}}
               {% elif assignment_id and instance %}
@@ -138,13 +161,15 @@
                   {{assignment|get_item:'title'}}
                 </a>
               {% endif %}
-            </h5>
+            </h6>
           </div>
           {% if not group %}
           <div class="assignment_class">
             <h6 class="left">{{assignment_group.title}}</h6>
           </div>
           {% endif %}
+
+
           <div class="assignment_status_chart">
             {% if curriculum_type == 'Unit' %}
               {% get_chart_config assignment_status 'stacked_bar' as assignment_chart_config %}
@@ -172,11 +197,12 @@
             {% endif %}
           </div>
           <div class="assignment_stats">
-            <h6 class="left last_opened">{{assignment|get_item:'last_opened'|date:'M j, Y'|default_if_none:''}}</h6>
-          </div>
-          <div class="assignment_stats">
             <h6 class="left assigned_date">{{assignment|get_item:'assigned_date'|date:'M j, Y'|default_if_none:''}}</h6>
           </div>
+          <div class="assignment_stats">
+            <h6 class="left last_opened">{{assignment|get_item:'last_opened'|date:'M j, Y'|default_if_none:''}}</h6>
+          </div>
+
         </div>
         {% endwith %}
 
@@ -187,18 +213,20 @@
               {% with assignment_status=lesson|get_item:'assignment_status' assignment_id=lesson|get_item:'assignment_id' instance=lesson|get_item:'instance'  lesson_percent_complete=lesson|get_item:'percent_complete' %}
                <div class="assignment tile">
                 <div class="assignment_title">
-                  <h5 class="left">
+                  <h6 class="left">
                     {% if instance %}
                       <a href="{% url 'ctstem:assignmentStudentFeedback' teacher.id %}?group={{instance.assignment.group.id}}&assignment={{instance.assignment.curriculum.id}}&student={{instance.student.user.id}}" title="Review student response">{{order}}. {{lesson|get_item:'title'}}</a>
                     {% else %}
                       <a onclick='alert("Student hasn&apos;t started this assignment");' title="Review student response">{{order}}. {{lesson|get_item:'title'}}</a>
                     {% endif %}
-                  </h5>
+                  </h6>
                 </div>
+
                 {% if not group %}
                 <div class="assignment_class">
                 </div>
                 {% endif %}
+
                 <div class="assignment_status_chart">
                   {% get_chart_color assignment_status as color %}
                   {% if instance %}
@@ -214,14 +242,14 @@
 
                     </a>
                   {% endif %}
-
-                </div>
-                <div class="assignment_stats">
-                  <h6 class="left last_opened">{{lesson|get_item:'last_opened'|date:'M j, Y'|default_if_none:''}}</h6>
                 </div>
                 <div class="assignment_stats">
                   <h6 class="left assigned_date">{{lesson|get_item:'assigned_date'|date:'M j, Y'|default_if_none:''}}</h6>
                 </div>
+                <div class="assignment_stats">
+                  <h6 class="left last_opened">{{lesson|get_item:'last_opened'|date:'M j, Y'|default_if_none:''}}</h6>
+                </div>
+
               </div>
               {% endwith %}
             {% endfor %}

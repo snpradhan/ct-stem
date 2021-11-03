@@ -68,24 +68,26 @@
           <h5 class="left">Status</h5>
         </div>
         <div class="assignment_stats">
-          <h5 class="left">Last Opened</h5>
-        </div>
-        <div class="assignment_stats">
           <h5 class="left">Assigned Date</h5>
         </div>
+        <div class="assignment_stats">
+          <h5 class="left">Last Opened</h5>
+        </div>
+
+
       </div>
       {% for key, assignment in assignments.items %}
         {% with assignment_id=assignment|get_item:'assignment_id' curriculum_id=assignment|get_item:'curriculum_id' assignment_group=assignment|get_item:'group' assignment_status=assignment|get_item:'assignment_status'%}
         {% get_chart_config assignment_status 'stacked_bar' as assignment_status_chart_config %}
         <div class="assignment tile">
           <div class="assignment_title">
-            <h5 class="expanded_collapsed collapsed" title="Expand underlying lessons">
+            <h6 class="expanded_collapsed collapsed" title="Expand underlying lessons">
               {% if assignment|get_item:'curriculum_type' == 'Unit' %}
                 <i class="fas fa-plus-circle"></i>
                 <i class="fas fa-minus-circle"></i>
               {% endif %}
-            </h5>
-            <h5 class="left">
+            </h6>
+            <h6 class="left">
               {% if assignment_id %}
                 <a href="{% url 'ctstem:assignmentProgressDashboard' teacher.id %}?group={{assignment_group.id}}&assignment={{curriculum_id}}" title="View Assignment Progress Dashboard">
                   {{assignment|get_item:'title'}}
@@ -97,7 +99,7 @@
               {% else %}
                 {{assignment|get_item:'title'}}
               {% endif %}
-            </h5>
+            </h6>
 
           </div>
           {% if not group %}
@@ -120,10 +122,10 @@
             {% endif %}
           </div>
           <div class="assignment_stats">
-            <h6 class="left last_opened">{{assignment|get_item:'last_opened'|date:'M j, Y'|default_if_none:''}}</h6>
+            <h6 class="left assigned_date">{{assignment|get_item:'assigned_date'|date:'M j, Y'|default_if_none:''}}</h6>
           </div>
           <div class="assignment_stats">
-            <h6 class="left assigned_date">{{assignment|get_item:'assigned_date'|date:'M j, Y'|default_if_none:''}}</h6>
+            <h6 class="left last_opened">{{assignment|get_item:'last_opened'|date:'M j, Y'|default_if_none:''}}</h6>
           </div>
         </div>
         {% if assignment|get_item:'lessons' %}
@@ -148,10 +150,10 @@
                     </a>
                   </div>
                   <div class="assignment_stats">
-                    <h6 class="left last_opened">{{lesson|get_item:'last_opened'|date:'M j, Y'|default_if_none:''}}</h6>
+                    <h6 class="left assigned_date">{{lesson|get_item:'assigned_date'|date:'M j, Y'|default_if_none:''}}</h6>
                   </div>
                   <div class="assignment_stats">
-                    <h6 class="left assigned_date">{{lesson|get_item:'assigned_date'|date:'M j, Y'|default_if_none:''}}</h6>
+                    <h6 class="left last_opened">{{lesson|get_item:'last_opened'|date:'M j, Y'|default_if_none:''}}</h6>
                   </div>
                 </div>
                 {% endwith %}

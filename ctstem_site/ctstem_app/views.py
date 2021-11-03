@@ -4143,7 +4143,7 @@ def teacherStudentDashboard(request, id='', status='active'):
   if request.method == 'GET' or request.method == 'POST':
     is_active = True
     assignment_count = 0
-    curriculum_id = group_id = student_id = group = data = None
+    curriculum_id = group_id = student_id = sort_by = group = data = None
     if status == 'inactive':
       is_active = False
 
@@ -4153,6 +4153,7 @@ def teacherStudentDashboard(request, id='', status='active'):
       group_id = data['group']
       curriculum_id = data['assignment']
       student_id = data['student']
+      sort_by = data['sort_by']
       searchForm = forms.TeacherStudentDashboardSearchForm(user=request.user, teacher=teacher, is_active=is_active, group_id=group_id, data=data)
     else:
       group_id = request.GET.get('group', '')
@@ -4192,7 +4193,8 @@ def teacherStudentDashboard(request, id='', status='active'):
       for student in student_queryset:
         student_key = student.id
         student_groups = groups.filter(group_members__student__id=student.id).order_by(Lower('title')).distinct()
-        students[student_key] = {'student_id': student.id,
+        students[student_key] = {'student': student,
+                                'student_id': student.id,
                                 'user_id': student.user.id,
                                'name': student.user.last_name.title() + ', ' + student.user.first_name.title(),
                                'assignment_status': {'N': 0, 'P': 0, 'S': 0, 'F': 0, 'A': 0},
@@ -4291,6 +4293,25 @@ def teacherStudentDashboard(request, id='', status='active'):
         students[student_key]['assignments'] = {k: v for k, v in sorted(students[student_key]['assignments'].items(), key=lambda item: item[1]['title'].lower())}
 
     #students = {k: v for k, v in sorted(students.items(), key=lambda item: item[1]['name'])}
+    if sort_by is None:
+      if hasattr(request.user, 'researcher'):
+        students = {k: v for k, v in sorted(students.items(), key=lambda item: item[1]['student'].id)}
+      else:
+        students = {k: v for k, v in sorted(students.items(), key=lambda item:(item[1]['student'].user.last_name.lower(), item[1]['student'].user.first_name.lower()))}
+    elif sort_by == 'student_id':
+      students = {k: v for k, v in sorted(students.items(), key=lambda item: item[1]['student'].id)}
+    elif sort_by == 'student_last_first':
+      students = {k: v for k, v in sorted(students.items(), key=lambda item:(item[1]['student'].user.last_name.lower(), item[1]['student'].user.first_name.lower()))}
+    elif sort_by == 'student_first_last':
+      students = {k: v for k, v in sorted(students.items(), key=lambda item:(item[1]['student'].user.first_name.lower(), item[1]['student'].user.last_name.lower()))}
+    elif sort_by == 'most_progress':
+      students = {k: v for k, v in sorted(students.items(), key=lambda item: item[1]['percent_complete'], reverse=True)}
+    elif sort_by == 'least_progress':
+      students = {k: v for k, v in sorted(students.items(), key=lambda item: item[1]['percent_complete'])}
+    elif sort_by == 'most_recent_login':
+      students = {k: v for k, v in sorted(students.items(), key=lambda item: item[1]['student'].user.last_login, reverse=True)}
+    elif sort_by == 'least_recent_login':
+      students = {k: v for k, v in sorted(students.items(), key=lambda item: item[1]['student'].user.last_login)}
 
     current_site = Site.objects.get_current()
     domain = current_site.domain

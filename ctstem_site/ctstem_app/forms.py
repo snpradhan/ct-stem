@@ -1018,6 +1018,7 @@ class TeacherStudentDashboardSearchForm(forms.Form):
   student = forms.ModelChoiceField(queryset=models.Student.objects.all(), required=False, label='Filter by Student')
   assignment = forms.ModelChoiceField(queryset=models.Curriculum.objects.all(), required=False, label='Filter by Assigned Curriculum')
   group = forms.ModelChoiceField(queryset=models.UserGroup.objects.all(), required=False, label='Filter by Class')
+  sort_by = forms.ChoiceField(choices=(('', '---------'),)+models.STUDENT_DASHBOARD_SORT, required=True,  initial='student_last_first', label='Sort by')
 
   def __init__(self, *args, **kwargs):
     group_id = None
@@ -1053,6 +1054,11 @@ class TeacherStudentDashboardSearchForm(forms.Form):
       field.widget.attrs['class'] = 'form-control'
       if field.help_text:
         field.widget.attrs['placeholder'] = field.help_text
+
+    if hasattr(user, 'researcher'):
+      self.fields['sort_by'].choices =  (('', '---------'),) + models.STUDENT_DASHBOARD_SORT[:1] + models.STUDENT_DASHBOARD_SORT[5:]
+    else:
+      self.fields['sort_by'].choices =  (('', '---------'),) + models.STUDENT_DASHBOARD_SORT[1:]
 
 
 ####################################
@@ -1139,7 +1145,7 @@ class ProgressDashboardSearchForm(forms.Form):
       self.fields['assignment'].widget.attrs['class'] += ' error'
 
     if hasattr(user, 'researcher'):
-      self.fields['sort_by'].choices =  models.PROGRESS_DASHBOARD_SORT[:1] + models.PROGRESS_DASHBOARD_SORT[2:]
+      self.fields['sort_by'].choices =  models.PROGRESS_DASHBOARD_SORT[:1] + models.PROGRESS_DASHBOARD_SORT[3:]
     else:
       self.fields['sort_by'].choices =  models.PROGRESS_DASHBOARD_SORT[1:]
 
