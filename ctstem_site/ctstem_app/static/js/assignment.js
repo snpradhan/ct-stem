@@ -119,13 +119,13 @@ function dtmBuildHtmlTable(parentId, tableId, colHeaders, rowHeaders, rowInput, 
     // last action cell
     if (editFlag && rowHeaders.length == 0) {
       var buttons$ = $('<td class="add_delete_buttons" />');
-      buttons$.append($('<button type="button" class="btn green small" title="Add Row" onclick="dtmInsertRow(\''+ tableId +'\', this)">+</button>'));
+      buttons$.append($('<button type="button" class="btn blue" title="Add Row" onclick="dtmInsertRow(\''+ tableId +'\', this)">+</button>'));
       //do not allow the first row to be deleted
       if (i > 0) {
-        buttons$.append($('<button type="button" class="btn red small" title="Delete Row" onclick="dtmDeleteRow(\''+ tableId +'\', this)">-</button>'));
+        buttons$.append($('<button type="button" class="btn red" title="Delete Row" onclick="dtmDeleteRow(\''+ tableId +'\', this)">-</button>'));
       }
       else{
-        buttons$.append($('<button type="button" class="btn red small" style="display:none;" title="Delete Row" onclick="dtmDeleteRow(\''+ tableId +'\', this)">-</button>'));
+        buttons$.append($('<button type="button" class="btn red" style="display:none;" title="Delete Row" onclick="dtmDeleteRow(\''+ tableId +'\', this)">-</button>'));
       }
       row$.append(buttons$);
     }

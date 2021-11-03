@@ -279,7 +279,6 @@ table.table td.donotwrap {
   white-space: nowrap;
 }
 table caption {
-  font-size: 1.5em;
   font-weight: bold;
   color: black;
   position: sticky;

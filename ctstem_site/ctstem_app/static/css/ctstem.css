@@ -2474,6 +2474,10 @@ div.modal#questionModal div.modal-content form#questionSearchForm div.form-inlin
   display: flex;
   flex-wrap: wrap;
 }
+div#publicQuestionResults caption,
+div#privateQuestionResults caption {
+  font-size: 1.5em;
+}
 
 div.modal .form-group {
   margin-bottom: 1.5em;
