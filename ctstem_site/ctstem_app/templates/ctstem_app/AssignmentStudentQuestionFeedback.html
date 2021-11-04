@@ -1,4 +1,10 @@
-
+{% load base_extras %}
+{% block custom_media %}
+  <link rel="stylesheet" href="{% staticfile 'css/sketch.css' %}">
+  <script type="text/javascript" src="{% staticfile 'js/sketch.js' %}"></script>
+  <script type="text/javascript" src="{% staticfile 'js/sketch_custom.js' %}"></script>
+  <script type="text/javascript" src="{% staticfile 'js/assignment.js' %}"></script>
+{% endblock %}
 <div class="modal-dialog modal-lg">
   <div class="modal-content">
     <div class="modal-header">
@@ -101,8 +107,8 @@
 <script type="text/javascript">
 $(function (){
 
-  //loadCanvasData();
-  //loadDataTable(false);
+  loadCanvasData();
+  loadDataTable(false);
 
   $("#questionFeedbackForm").submit(function(e) {
 
