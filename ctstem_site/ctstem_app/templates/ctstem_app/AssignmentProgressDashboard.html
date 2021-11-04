@@ -82,20 +82,25 @@
         <div class="shortcuts">
           <div class="shortcut">
             <label>Class:</label>
-            <div class="title">
-              {% if assignment %}
+            {% if assignment %}
+              <div class="title">
                 {{assignment.group.title}}
+              </div>
+              <div class="buttons">
                 <a type="button" class="btn blue" href="{% url 'ctstem:group' assignment.group.id %}" title="Edit Class">
                   <i class="fas fa-pencil-alt" aria-hidden="true"></i>
                 </a>
-              {% endif %}
-            </div>
+              </div>
+            {% endif %}
           </div>
           <div class="shortcut">
             <label>Lesson:</label>
-            <div class="title">
-              {% if assignment %}
+
+            {% if assignment %}
+              <div class="title">
                 {{assignment.curriculum.title}}
+              </div>
+              <div class="buttons">
                 <a type="button" class="btn blue" href="{% url 'ctstem:previewCurriculum' assignment.curriculum.id %}" title="Preview Curriculum">
                   <i class="fas fa-eye" aria-hidden="true"></i>
                 </a>
@@ -105,8 +110,8 @@
                 <a type="button" class="btn blue" href="{% url 'ctstem:export_all_response' assignment.curriculum.id %}" title="Export Student Response">
                   <i class="fas fa-file-download"></i>
                 </a>
-              {% endif %}
-            </div>
+              </div>
+            {% endif %}
           </div>
         </div>
       </div>
@@ -140,8 +145,7 @@
             {% for step in header %}
               {% with questions=step|get_item:'questions' %}
                 <th colspan={{questions|length}} class="info" rel="popover" data-title="Page {{step.order}}" data-content="{{step|get_item:'title'}}" data-trigger="hover">
-                  P{{step|get_item:'order'}}:
-                  <i class="fa fa-info-circle" aria-hidden="true"></i>
+                  P{{step|get_item:'order'}}
                 </th>
               {% endwith %}
             {% endfor %}

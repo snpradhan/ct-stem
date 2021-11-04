@@ -73,8 +73,6 @@
         <div class="assignment_stats">
           <h5 class="left">Last Opened</h5>
         </div>
-
-
       </div>
       {% for key, assignment in assignments.items %}
         {% with assignment_id=assignment|get_item:'assignment_id' curriculum_id=assignment|get_item:'curriculum_id' assignment_group=assignment|get_item:'group' assignment_status=assignment|get_item:'assignment_status'%}
@@ -136,9 +134,9 @@
                 {% get_chart_config lesson_assignment_status 'stacked_bar' as lesson_chart_config %}
                  <div class="assignment tile">
                   <div class="assignment_title">
-                    <h5 class="left">
+                    <h6 class="left">
                       <a href="{% url 'ctstem:assignmentProgressDashboard' teacher.id %}?group={{assignment_group.id}}&assignment={{lesson|get_item:'curriculum_id'}}" title="View Assignment Progress Dashboard">{{order}}. {{lesson|get_item:'title'}}</a>
-                    </h5>
+                    </h6>
                   </div>
                   {% if not group %}
                   <div class="assignment_class">
