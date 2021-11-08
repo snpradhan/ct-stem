@@ -627,23 +627,30 @@
         }
         */
       }
+      /* iframes that require the embedded models to log student data will need to have a css class "logger"
+       * if assignment isn't closed yet then reload the iframe with ?userId="+userId+"&lessonId="+lessonId+"&pageNum="+pageNum appended
+       * to the source url.  This will allow the model to load the parameters before reloading on the page
+       */
+      if(!closed) {
+        //iterate each iframe that has css class "logger"
+        $('iframe.logger').each(function(){
+          var iframe = $(this);
+          var iframe_url = $(iframe).attr('src');
+          var userId = "{{form.instance.instance.student.user.id}}";
+          var lessonId = "{{form.instance.instance.assignment.curriculum.id}}";
+          var pageNum = "{{step_order}}"
+          var url = iframe_url+"?userId="+userId+"&lessonId="+lessonId+"&pageNum="+pageNum;
+          console.log('changing iframe url');
+          $(this).attr('src', url);
+        });
+      }
 
-      /*
+    /*
      * iframe save/restore functions
      * iframes that implement save/restore state must have a unique id across the page and also have class receiver
      */
       window.onload = function() {
-        //var myStorage = window.localStorage;
-        // Get the window displayed in the iframe.
-        //display iframe after page is fully loaded
-
-        /*$('iframe').each(function(){
-          $(this).css('position', 'static');
-          $(this).css('visibility', 'visible');
-        });*/
-
-
-        //iterate for each iframe
+        //iterate for each iframe that has css class "receiver"
         //iframe state can be restored regardless of the assignment status
         $('iframe.receiver').each(function(){
           var iframe = $(this);
