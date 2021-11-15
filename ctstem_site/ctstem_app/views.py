@@ -4570,7 +4570,7 @@ def unitProgressDashboard(request, teacher_id=''):
                 student_assignment_details[student]['total_assigned'] += 1
                 if instance:
                   student_assignment_details[student]['time_spent'] += instance.time_spent
-                  student_assignment_details[student]['modified_date'] = max(student_assignment_details[student]['modified_date'], instance.modified_date)
+                  student_assignment_details[student]['modified_date'] = max(student_assignment_details[student]['modified_date'], instance.modified_date) if student_assignment_details[student]['modified_date'] else instance.modified_date
               student_assignment_details[student]['student_progress'].append(student_assignment_status)
             else:
               student_assignment_details[student] = {'student': student,
