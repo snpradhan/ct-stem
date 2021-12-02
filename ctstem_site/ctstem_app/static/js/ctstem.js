@@ -274,6 +274,7 @@ $(function () {
     var id = $('input#emoji_feedback_area').val();
     var val = $('textarea#'+id).val();
     $('textarea#'+id).val(val + $(this).html());
+    $(this).closest('div.modal#emojiModal').find('div#emojiMsg ul.errorlist').html('<li class="success">'+$(this).html()+' selected</li>')
   });
 
   $('input#clear[type="submit"]').click(function(e){
