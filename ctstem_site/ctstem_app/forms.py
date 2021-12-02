@@ -1511,7 +1511,10 @@ class UserGroupForm(ModelForm):
     #if group is inactive, disable all fields
     if self.instance.is_active == False:
       for field_name, field in list(self.fields.items()):
-        field.widget.attrs['disabled'] = True
+        if field_name == 'subject' or field_name == 'teacher':
+          field.widget.attrs['disabled'] = True
+        elif field_name != 'is_active':
+          field.widget.attrs['readonly'] = True
 
   def is_valid(self):
     valid = super(UserGroupForm, self).is_valid()

@@ -3471,6 +3471,8 @@ def group(request, id=''):
 
       if request.method == 'GET':
         form = forms.UserGroupForm(user=request.user, instance=group, prefix='group')
+        if group.is_active == False:
+          messages.warning(request, "This class is inactive.  If you would like to reactive this class, set the class status to Active and save the class.")
         context = {'form': form, 'role': 'group', 'assignmentForm': assignmentForm, 'assignments': assignments, 'keys': keys, 'domain': domain}
         return render(request, 'ctstem_app/UserGroup.html', context)
 

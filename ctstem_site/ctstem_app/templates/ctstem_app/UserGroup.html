@@ -78,6 +78,9 @@
             <div class="form-group">
               <label for="id_group-subject">{{ form.subject.label }} {% if form.subject.field.required %}(<span class="required">*</span>){% endif %} </label>
               <div class="controls">{{form.subject}}</div>
+              {% if form.instance.id and not form.instance.is_active %}
+                {{form.subject.as_hidden}}
+              {% endif %}
               <div class="error">{{ form.subject.errors }}</div>
             </div>
 
@@ -88,8 +91,10 @@
                   <img src="{{form.instance.icon.url}}" class="icon" alt="">
                 </div>
               {% endif %}
-              <div class="controls">{{form.icon}}</div>
-              <div class="help warning">{{form.icon.help_text|safe}}</div>
+              {% if not form.instance.id or form.instance.is_active %}
+                <div class="controls">{{form.icon}}</div>
+                <div class="help warning">{{form.icon.help_text|safe}}</div>
+              {% endif %}
               <div class="error">{{ form.icon.errors }}</div>
             </div>
 
@@ -114,6 +119,9 @@
               <div class="form-group">
                 <label for="id_group-coteachers">{{ form.teacher.label }} {% if form.teacher.field.required %}(<span class="required">*</span>){% endif %} </label>
                 <div class="controls">{{form.teacher}}</div>
+                {% if form.instance.id and not form.instance.is_active %}
+                  {{form.teacher.as_hidden}}
+                {% endif %}
                 <div class="error">{{ form.teacher.errors }}</div>
               </div>
             {% endif %}
@@ -143,10 +151,10 @@
             <div class="form-group">
               <label for="id_group-is_active">{{ form.is_active.label|title }} {% if form.is_active.field.required %}(<span class="required">*</span>){% endif %} </label>
               {{form.is_active.as_hidden}}
-              <div class="switch_container {% if not form.is_active.value %} inactive {% endif %}">
+              <div class="switch_container">
                 <label class="switch">
                   <input class="switch-input" type="checkbox" id="id_is_active"
-                         {% if form.is_active.value %} checked {% else %} disabled  {% endif %}/>
+                         {% if form.is_active.value %} checked {% endif %}/>
                   <span class="switch-label" data-on="" data-off=""></span>
                   <span class="switch-handle"></span>
                 </label>
