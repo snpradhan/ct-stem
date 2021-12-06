@@ -5027,7 +5027,7 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
 @login_required
 def assignmentStudentFeedback(request, teacher_id=''):
   try:
-    assignment = assignment_id = curriculum_id = group_id = student_id = student = students = instance = data = prevStudent = nextStudent = None
+    assignment = assignment_id = curriculum_id = group_id = student_id = student = students = instance = data = prevStudent = nextStudent = feedback = None
 
     if request.method == 'GET':
       group_id = request.GET.get('group', '')
@@ -5089,73 +5089,76 @@ def assignmentStudentFeedback(request, teacher_id=''):
 
     filter_form.is_valid()
     context = None
+    if student_id:
+      response_feedback = []
+      if instance:
+        feedback = create_feedback_hierarchy(request, instance)
+
+      curriculum_questions = models.CurriculumQuestion.objects.all().filter(step__curriculum__id=curriculum_id).order_by('step__order', 'order')
+      for curriculum_question in curriculum_questions:
+        if instance:
+          status = instance.status
+          try:
+            question_response = models.QuestionResponse.objects.get(step_response__instance=instance, curriculum_question=curriculum_question)
+            step_feedback = models.StepFeedback.objects.get(assignment_feedback=feedback, step_response=question_response.step_response)
+            question_feedback = models.QuestionFeedback.objects.get(step_feedback=step_feedback, response=question_response)
+            if status in ['P', 'S', 'F', 'A']:
+              if question_response.response or question_response.response_file.all():
+                question_feedback_form = forms.QuestionFeedbackForm(instance=question_feedback, prefix=question_feedback.id)
+                #if feedback hasn't been provided, try autocorrecting
+                if question_feedback.feedback is None:
+                  correct = autocomment_question_response(request, question_response.id)
+                  if correct is not None:
+                    if correct:
+                      question_feedback_form.initial = {'feedback': 'Correct'}
+                    else:
+                      question_feedback_form.initial = {'feedback': 'Incorrect'}
+              else:
+                #question left blank
+                question_response = None
+                question_feedback_form = None
+            else:
+              question_feedback_form = None
+
+          except models.QuestionResponse.DoesNotExist:
+            #question not attempted
+            question_response = None
+            question_feedback_form = None
+        else:
+          #assignment not started
+          question_response = None
+          question_feedback_form = None
+          status = 'N'
+
+        response_feedback.append({'curriculum_question': curriculum_question, 'question_response': question_response, 'question_feedback_form': question_feedback_form, 'status': status})
+
     if instance:
-      feedback, created = models.AssignmentFeedback.objects.get_or_create(instance=instance)
-      stepResponses = models.AssignmentStepResponse.objects.all().filter(instance=instance).order_by('step__order')
-      for stepResponse in stepResponses:
-        stepFeeback, created = models.StepFeedback.objects.get_or_create(assignment_feedback=feedback, step_response=stepResponse)
-
-        questionResponses = models.QuestionResponse.objects.all().filter(step_response=stepResponse).order_by('curriculum_question__order')
-        for questionResponse in questionResponses:
-          questionFeedback, created = models.QuestionFeedback.objects.get_or_create(step_feedback=stepFeeback, response=questionResponse)
-
       if 'GET' == request.method:
-        form = forms.FeedbackForm(instance=feedback, prefix='feedback')
-        #AssessmentStepFormSet = inlineformset_factory(models.Assessment, models.AssessmentStep, form=forms.AssessmentStepForm,can_delete=True, can_order=True, extra=1)
-
-        StepFeedbackFormSet = nestedformset_factory(models.AssignmentFeedback, models.StepFeedback, form=forms.StepFeedbackForm,
-                                                      nested_formset=inlineformset_factory(models.StepFeedback, models.QuestionFeedback, form=forms.QuestionFeedbackForm, can_delete=False, can_order=False, extra=0),
-                                                      can_delete=False, can_order=False, extra=0)
-
-
-        formset = StepFeedbackFormSet(instance=feedback, prefix='form')
-
-        for stepFeedbackForm in formset.forms:
-          for questionFeedbackForm in stepFeedbackForm.nested:
-            if questionFeedbackForm.instance.feedback is None:
-              correct = autocomment_question_response(request, questionFeedbackForm.instance.response.id)
-              if correct is not None:
-                if correct:
-                  questionFeedbackForm.initial = {'feedback': 'Correct'}
-                else:
-                  questionFeedbackForm.initial = {'feedback': 'Incorrect'}
-
-        context = {'assignment': assignment, 'student': student, 'assignment_instance': instance, 'form': form, 'formset': formset, 'nextStudent': nextStudent, 'prevStudent': prevStudent, 'teacher_id': teacher_id, 'filter_form': filter_form}
+        context = {'assignment': assignment, 'student': student, 'assignment_instance': instance, 'response_feedback':response_feedback, 'nextStudent': nextStudent, 'prevStudent': prevStudent, 'teacher_id': teacher_id, 'filter_form': filter_form}
 
       elif 'POST' == request.method:
         data = request.POST.copy()
-        form = forms.FeedbackForm(data, instance=feedback, prefix='feedback')
-        #AssessmentStepFormSet = inlineformset_factory(models.Assessment, models.AssessmentStep, form=forms.AssessmentStepForm,can_delete=True, can_order=True, extra=1)
 
-        StepFeedbackFormSet = nestedformset_factory(models.AssignmentFeedback, models.StepFeedback, form=forms.StepFeedbackForm,
-                                                      nested_formset=inlineformset_factory(models.StepFeedback, models.QuestionFeedback, form=forms.QuestionFeedbackForm, can_delete=False, can_order=False, extra=0),
-                                                      can_delete=False, can_order=False, extra=0)
+        for k, v in data.lists():
+          if 'feedback' in k:
+            feedback_id = int(k[:k.index('-')])
+            question_feedback = models.QuestionFeedback.objects.get(id=feedback_id)
+            question_feedback.feedback = v[0]
+            question_feedback.save()
 
-
-        formset = StepFeedbackFormSet(data, instance=feedback, prefix='form')
-        if form.is_valid() and formset.is_valid():
-          form.save()
-          formset.save()
-
-          if data['save_and_close'] == 'true':
-            instance.status = 'F'
-            instance.save()
-            messages.success(request, 'Your feedback has been saved and sent to the student')
-            #notify student via email that feedback is ready
-            send_feedback_ready_email(instance.student.user.email, instance.assignment.curriculum)
-            #return shortcuts.redirect('ctstem:assignmentDashboard', id=assignment_id)
-          else:
-            messages.success(request, 'Your feedback has been saved')
-
-          return shortcuts.redirect('/assignment/student/feedback/%s?group=%s&assignment=%s&student=%s' % (teacher_id, group_id, curriculum_id, student_id))
+        if data['save_and_close'] == 'true':
+          instance.status = 'F'
+          instance.save()
+          messages.success(request, 'Your feedback has been saved and sent to the student')
+          #notify student via email that feedback is ready
+          send_feedback_ready_email(instance.student.user.email, instance.assignment.curriculum)
         else:
-          print(form.errors)
-          print(formset.errors)
-          messages.error(request, 'Your feedback could not be saved')
-          context = {'assignment': assignment, 'student': student, 'assignment_instance': instance, 'form': form, 'formset': formset, 'nextStudent': nextStudent, 'prevStudent': prevStudent, 'teacher_id': teacher_id, 'filter_form': filter_form}
+          messages.success(request, 'Your feedback has been saved')
+
+        return shortcuts.redirect('/assignment/student/feedback/%s?group=%s&assignment=%s&student=%s' % (teacher_id, group_id, curriculum_id, student_id))
 
     else:
-      context = {'assignment': assignment, 'student': student, 'assignment_instance': None, 'nextStudent': nextStudent, 'prevStudent': prevStudent, 'teacher_id': teacher_id, 'filter_form': filter_form}
+      context = {'assignment': assignment, 'student': student, 'assignment_instance': None, 'response_feedback':response_feedback, 'nextStudent': nextStudent, 'prevStudent': prevStudent, 'teacher_id': teacher_id, 'filter_form': filter_form}
 
     return render(request, 'ctstem_app/AssignmentStudentFeedback.html', context)
 

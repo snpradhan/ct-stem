@@ -244,9 +244,7 @@
                               {% else %}
                                 <i class="far fa-comment-dots" aria-hidden="true"></i>
                               {% endif %}
-
                             </a>
-
                             {% if student_assignment.instance.assignment.curriculum.curriculum_type == 'L' %}
                               <a type="button" class="btn blue" href="{% url 'ctstem:unlockAssignment' student_assignment.assignment.id  student_assignment.instance.id %}" title="Unlock Assignment" onclick="return confirm('Are you sure you want to unlock this assignment? Unlocking the assignment will allow the student to edit his/her responses and resubmit.');"> <i class="fa fa-unlock" aria-hidden="true"></i> </a>
                             {% endif %}
@@ -254,12 +252,26 @@
                         {% elif student_assignment.instance.status == 'F' %}
                           <!--div> Feedback Completed </div-->
                           <div class="controls">
-                            <a type="button" class="btn blue" href="{% url 'ctstem:assignmentStudentFeedback' teacher_id %}?group={{student_assignment.assignment.group.id}}&assignment={{student_assignment.assignment.curriculum.id}}&student={{student.user.id}}" title="View/Give Feedback"> <i class="fas fa-comment-dots" aria-hidden="true"></i> </a>
+                            <a type="button" class="btn blue" href="{% url 'ctstem:assignmentStudentFeedback' teacher_id %}?group={{student_assignment.assignment.group.id}}&assignment={{student_assignment.assignment.curriculum.id}}&student={{student.user.id}}" title="View/Give Feedback">
+                              {% is_student_assignment_feedback_complete student_assignment.assignment.id student.id as student_feedback_complete %}
+                              {% if student_feedback_complete %}
+                                <i class="fas fa-comment-dots" aria-hidden="true"></i>
+                              {% else %}
+                                <i class="far fa-comment-dots" aria-hidden="true"></i>
+                              {% endif %}
+                            </a>
                           </div>
                         {% elif student_assignment.instance.status == 'A' %}
                           <!--div> Archived </div-->
                           <div class="controls">
-                            <a type="button" class="btn blue" href="{% url 'ctstem:assignmentStudentFeedback' teacher_id %}?group={{student_assignment.assignment.group.id}}&assignment={{student_assignment.assignment.curriculum.id}}&student={{student.user.id}}" title="View/Give Feedback"> <i class="fas fa-comment-dots" aria-hidden="true"></i> </a>
+                            <a type="button" class="btn blue" href="{% url 'ctstem:assignmentStudentFeedback' teacher_id %}?group={{student_assignment.assignment.group.id}}&assignment={{student_assignment.assignment.curriculum.id}}&student={{student.user.id}}" title="View/Give Feedback">
+                              {% is_student_assignment_feedback_complete student_assignment.assignment.id student.id as student_feedback_complete %}
+                              {% if student_feedback_complete %}
+                                <i class="fas fa-comment-dots" aria-hidden="true"></i>
+                              {% else %}
+                                <i class="far fa-comment-dots" aria-hidden="true"></i>
+                              {% endif %}
+                            </a>
                           </div>
                         {% else %}
                           <i class="far fa-window-minimize"></i>
