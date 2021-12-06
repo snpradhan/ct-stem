@@ -140,7 +140,12 @@
                   <span class="mandatory">*</span>
                 {% endif %}
                 <a class="btn blue" href="{% url 'ctstem:assignmentQuestionFeedback' teacher_id %}?group={{assignment.group.id}}&assignment={{assignment.curriculum.id}}&question={{question.instance.response.curriculum_question.id}}" title="Review all student responses for question {{question.instance.response.curriculum_question.step.order}}.{{question.instance.response.curriculum_question.order}} in this assignment">
-                  <span class="far fa-comment-dots" aria-hidden="true"></span>
+                  {% is_question_assignment_feedback_complete assignment.id question.instance.response.curriculum_question.id as question_feedback_complete %}
+                  {% if question_feedback_complete %}
+                    <span class="fas fa-comment-dots" aria-hidden="true"></span>
+                  {% else %}
+                    <span class="far fa-comment-dots" aria-hidden="true"></span>
+                  {% endif %}
                 </a>
               </td>
               <td class="research_category">{% include 'ctstem_app/QuestionCategoryDisplay.html' with question=question.instance.response.curriculum_question.question %}

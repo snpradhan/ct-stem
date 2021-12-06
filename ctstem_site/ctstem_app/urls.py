@@ -107,6 +107,10 @@ urlpatterns = [
     path('assignment_percent_complete/<int:student_id>/<int:assignment_id>/', views.get_student_assignment_instance_percent_complete, name='get_student_assignment_instance_percent_complete'),
     path('assignment/student/feedback/<int:teacher_id>/', views.assignmentStudentFeedback, name='assignmentStudentFeedback'),
     path('assignment/question/feedback/<int:teacher_id>/', views.assignmentQuestionFeedback, name='assignmentQuestionFeedback'),
+
+    path('assignment/student/feedback/complete/<int:assignment_id>/<int:student_id>/', views.is_student_assignment_feedback_complete, name='is_student_assignment_feedback_complete'),
+    path('assignment/question/feedback/complete/<int:assignment_id>/<int:question_id>/', views.is_question_assignment_feedback_complete, name='is_question_assignment_feedback_complete'),
+
     path('assignment/student/question/feedback/<int:response_id>/', views.assignmentStudentQuestionFeedback, name='assignmentStudentQuestionFeedback'),
     path('export_response/<int:assignment_id>/', views.export_response, name='export_group_response'),
     path('export_response/<int:assignment_id>/<int:student_id>/', views.export_response, name='export_student_response'),

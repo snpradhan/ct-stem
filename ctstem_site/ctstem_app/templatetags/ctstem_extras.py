@@ -597,3 +597,13 @@ def is_curriculum_assigned_by_me(context, curriculum):
 @register.filter(name='fromunix')
 def fromunix(value):
     return datetime.datetime.fromtimestamp(int(value))
+
+@register.simple_tag(takes_context=True)
+def is_student_assignment_feedback_complete(context, assignment_id, student_id):
+  request = context.get('request')
+  return views.is_student_assignment_feedback_complete(request, assignment_id, student_id)
+
+@register.simple_tag(takes_context=True)
+def is_question_assignment_feedback_complete(context, assignment_id, question_id):
+  request = context.get('request')
+  return views.is_question_assignment_feedback_complete(request, assignment_id, question_id)

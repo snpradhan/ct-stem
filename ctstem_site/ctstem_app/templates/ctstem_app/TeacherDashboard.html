@@ -22,7 +22,7 @@
 
   <div id="dashboard_classes">
     <div class="title">
-      <h3 class="left">{{status|title}} Classes (<span class="class_count">{% if groups|length > 6 %}6{% else %} {{groups|length}} {% endif %}</span> of {{groups|length}})</h3>
+      <h3 class="left">{{status|title}} Classes (<span class="class_count">{% if groups|length > 6 %}6{% else %}{{groups|length}} {% endif %}</span> of {{groups|length}})</h3>
       <div class="controls">
         {% if status == 'active' %}
           <a type="button" class="btn inbetween blue" href="{% url 'ctstem:teacherDashboard' teacher.id 'inactive' %}" title="View inactive classes"> View Inactive Classes</a>

@@ -162,7 +162,14 @@
                       <div class="info" rel="popover" data-title="Question {{step.order}}.{{question.order}}" data-content="{{question.question.question_text}}" data-trigger="hover">
                         Q{{step.order}}.{{question.order}}
                       </div>
-                      <a class="btn blue" href="{% url 'ctstem:assignmentQuestionFeedback' teacher_id %}?group={{assignment.group.id}}&assignment={{assignment.curriculum.id}}&question={{question.id}}" title="Review student responses for question {{step.order}}.{{question.order}}"> <span class="far fa-comment-dots" aria-hidden="true"></span> </a>
+                      <a class="btn blue question_feedback_{{question.id}}" href="{% url 'ctstem:assignmentQuestionFeedback' teacher_id %}?group={{assignment.group.id}}&assignment={{assignment.curriculum.id}}&question={{question.id}}" title="Review student responses for question {{step.order}}.{{question.order}}">
+                        {% is_question_assignment_feedback_complete assignment.id question.id as question_feedback_complete %}
+                        {% if question_feedback_complete %}
+                          <span class="fas fa-comment-dots" aria-hidden="true"></span>
+                        {% else %}
+                          <span class="far fa-comment-dots" aria-hidden="true"></span>
+                        {% endif %}
+                      </a>
                     </th>
                   {% endfor %}
                 {% else %}
@@ -198,7 +205,15 @@
 
               {% if instance %}
               <div class="controls">
-                <a class="btn blue" href="{% url 'ctstem:assignmentStudentFeedback' teacher_id %}?group={{assignment.group.id}}&assignment={{assignment.curriculum.id}}&student={{student.user.id}}" title="Review student's response"> <span class="far fa-comment-dots" aria-hidden="true"></span> </a>
+                <a class="btn blue student_feedback_{{student.id}}" href="{% url 'ctstem:assignmentStudentFeedback' teacher_id %}?group={{assignment.group.id}}&assignment={{assignment.curriculum.id}}&student={{student.user.id}}" title="Review student's response">
+
+                  {% is_student_assignment_feedback_complete assignment.id student.id as student_feedback_complete %}
+                  {% if student_feedback_complete %}
+                    <span class="fas fa-comment-dots" aria-hidden="true"></span>
+                  {% else %}
+                    <span class="far fa-comment-dots" aria-hidden="true"></span>
+                  {% endif %}
+                </a>
 
                 {% if instance.status == 'S' and assignment.curriculum.curriculum_type == 'L' %}
                   <a type="button" class="btn blue" href="{% url 'ctstem:unlockAssignment' assignment.id  instance.id %}" title="Unlock Assignment" onclick="return confirm('Are you sure you want to unlock this assignment? Unlocking the assignment will allow the student to edit his/her responses and resubmit.');"> <i class="fa fa-unlock" aria-hidden="true"></i> </a>
@@ -215,13 +230,12 @@
                 {% else %}
                   {% with response=question_progress|get_item:'response' feedback=question_progress|get_item:'feedback' %}
                     {% if response %}
-                      <a type="button" class="btn add_feedback blue" data-form="{% url 'ctstem:assignmentStudentQuestionFeedback' response.id %}" title="{% if feedback and feedback.feedback %} Review response and feedback {% else %} Review response and give feedback {% endif %}">
+                      <a type="button" class="btn add_feedback blue" data-form="{% url 'ctstem:assignmentStudentQuestionFeedback' response.id %}" title="{% if feedback and feedback.feedback %} Review response and feedback {% else %} Review response and give feedback {% endif %}" id="feedback_for_response_{{response.id}}">
                         {% if feedback and feedback.feedback %}
                           <span class="fas fa-comment-dots" aria-hidden="true"></span>
                         {% else %}
                           <span class="far fa-comment-dots" aria-hidden="true"></span>
                         {% endif %}
-
                       </a>
                     {% endif %}
                   {% endwith %}

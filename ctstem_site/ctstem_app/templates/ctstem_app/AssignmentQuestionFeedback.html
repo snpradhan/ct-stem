@@ -156,7 +156,14 @@
                   <div class="student_mask">
                     xxxxxxxxxxx
                   </div>
-                  <a class="btn blue" href="{% url 'ctstem:assignmentStudentFeedback' teacher_id %}?group={{assignment.group.id}}&assignment={{assignment.curriculum.id}}&student={{resp_feed.student.user.id}}" title="Review all the responses of this student in this assignment"> <span class="far fa-comment-dots" aria-hidden="true"></span> </a>
+                  <a class="btn blue" href="{% url 'ctstem:assignmentStudentFeedback' teacher_id %}?group={{assignment.group.id}}&assignment={{assignment.curriculum.id}}&student={{resp_feed.student.user.id}}" title="Review all the responses of this student in this assignment">
+                    {% is_student_assignment_feedback_complete assignment.id resp_feed.student.id as student_feedback_complete %}
+                    {% if student_feedback_complete %}
+                      <span class="fas fa-comment-dots" aria-hidden="true"></span>
+                    {% else %}
+                      <span class="far fa-comment-dots" aria-hidden="true"></span>
+                    {% endif %}
+                  </a>
                 </td>
                 <td>
                   <div class="response">

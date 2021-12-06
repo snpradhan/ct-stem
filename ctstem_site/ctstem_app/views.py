@@ -7152,3 +7152,45 @@ def get_total_steps_in_curriculum(curriculum_id):
 
   return step_count
 
+def is_student_assignment_feedback_complete(request, assignment_id, student_id):
+  assignment = models.Assignment.objects.get(id=assignment_id)
+  question_count = get_total_questions_in_curriculum(assignment.curriculum.id)
+  feedbacks = models.QuestionFeedback.objects.all().filter(step_feedback__assignment_feedback__instance__student__id=student_id, step_feedback__assignment_feedback__instance__assignment__id=assignment_id)
+  feedback_count = 0
+  for feedback in feedbacks:
+    if feedback.feedback is not None and feedback.feedback.strip() != '':
+      feedback_count += 1
+  if request.is_ajax():
+    response_data = {'success': True, 'feedback_complete': False}
+    if question_count == feedback_count:
+      response_data['feedback_complete'] = True
+
+    return http.HttpResponse(json.dumps(response_data), content_type = 'application/json')
+  else:
+    feedback_complete = False
+    if question_count == feedback_count:
+      feedback_complete = True
+    return feedback_complete
+
+def is_question_assignment_feedback_complete(request, assignment_id, question_id):
+  assignment = models.Assignment.objects.get(id=assignment_id)
+  group = assignment.group
+  student_count = models.Membership.objects.all().filter(group=group).count()
+  feedbacks = models.QuestionFeedback.objects.all().filter(response__curriculum_question__id=question_id, step_feedback__assignment_feedback__instance__assignment__id=assignment_id)
+  feedback_count = 0
+  for feedback in feedbacks:
+    if feedback.feedback is not None and feedback.feedback.strip() != '':
+      feedback_count += 1
+
+  if request.is_ajax():
+    response_data = {'success': True, 'feedback_complete': False}
+    if student_count == feedback_count:
+      response_data['feedback_complete'] = True
+
+    return http.HttpResponse(json.dumps(response_data), content_type = 'application/json')
+  else:
+    feedback_complete = False
+    if student_count == feedback_count:
+      feedback_complete = True
+    return feedback_complete
+
