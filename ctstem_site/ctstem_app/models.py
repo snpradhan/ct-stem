@@ -863,8 +863,8 @@ def check_curriculum_collaborators_change(sender, instance, **kwargs):
       subject = 'CT-STEM - Curriculum Shared'
     else:
       body =  '<div>You have been given edit privilege on a curriculum titled <b> %s</b>. </div><br> \
-               <div>If you are logged in, you may click https://%s/curriculum/%s/ to edit this curriculum.</div> \
-               <div>If you are not logged in, you may click https://%s/?next=/login/?next=curriculum/%s/ to login and be redirected to the curriculum edit page. </div> \
+               <div>If you are logged in, you may click https://%s/curriculum/%s/overview/ to edit this curriculum.</div> \
+               <div>If you are not logged in, you may click https://%s/?next=/login/?next=curriculum/%s/overview/ to login and be redirected to the curriculum edit page. </div> \
                <div>You can also find this curriculum in your <b>My Curricula</b> collection on the Curricula page. </div><br><br> \
                <div><b>CT-STEM Admin</b></div>' % (instance.curriculum.title, domain, instance.curriculum.id, domain, instance.curriculum.id)
       subject = 'CT-STEM - Curriculum Authoring Privilege'
