@@ -37,7 +37,7 @@ def backup_db():
   #remove old backups from the file system
   cmd = 'rm %s/*'% settings.DBBACKUP_STORAGE_OPTIONS['location']
   subprocess.call(cmd, shell=True)
-  management.call_command('dbbackup')
+  management.call_command('dbbackup', '--compress')
   cmd = 's3cmd --access_key=%s --secret_key=%s -s put %s/default-* s3://%s' % (settings.AWS_ACCESS_KEY_ID,
                                                                                settings.AWS_SECRET_ACCESS_KEY,
                                                                                settings.DBBACKUP_STORAGE_OPTIONS['location'],
