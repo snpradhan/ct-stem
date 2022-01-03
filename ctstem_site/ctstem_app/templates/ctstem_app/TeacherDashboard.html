@@ -14,7 +14,7 @@
   <div id="dashboard_header">
     <h3 class="left welcome">Howdy, {{teacher.user.get_full_name}}</h3>
     <div class="quick_links">
-        <h5><a href="{% url 'ctstem:help' %}"><i class="far fa-question-circle"></i> Help </a></h5>
+        <h5><a href="{% url 'ctstem:topics' 'faq' %}"><i class="far fa-question-circle"></i> Help </a></h5>
         <h5><a href="{% url 'ctstem:curriculatiles' %}?bucket=my_curricula">My Curricula</a></h5>
         <h5><a href="{% url 'ctstem:curriculatiles' %}?bucket=favorite_curricula"><i class="far fa-star"></i> Favorites</a></h5>
     </div>

@@ -1743,7 +1743,7 @@ def user_login(request, user_name=''):
           response_data['redirect_url'] = redirect_url
 
         elif hasattr(user, 'teacher'):
-          messages.success(request, "Welcome to the CT-STEM website. If you need help with using the site, you can go to the <a href='/help'>Help and FAQ</a> page.", extra_tags='safe')
+          messages.success(request, "Welcome to the CT-STEM website. If you need help with using the site, you can go to the <a href='/topics/faq'>Help and FAQ</a> page.", extra_tags='safe')
           response_data['success'] = True
           response_data['redirect_url'] = '/dashboard/teacher/%s/active' % user.teacher.id
 

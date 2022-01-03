@@ -217,6 +217,7 @@ table.table#curricula ul.standard ul.category{
 }
 table.table#curricula ul.standard ul.category ul.taxonomy{
   padding-left: 3em;
+  list-style-type: circle;
 }
 
 table.table#team img.icon {
