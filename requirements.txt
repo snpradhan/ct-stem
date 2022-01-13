@@ -45,7 +45,7 @@ oauthlib==3.1.0
 packaging==20.9
 pathspec==0.5.9
 pbr==5.4.4
-Pillow==8.3.2
+Pillow==9.0.0
 pipdeptree==2.0.0
 psycopg2-binary==2.8.6
 pyaml==19.4.1
