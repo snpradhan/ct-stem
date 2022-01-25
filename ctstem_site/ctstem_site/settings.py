@@ -158,8 +158,8 @@ CKEDITOR_CONFIGS = {
                  ['Styles', 'Format', 'Font', 'FontSize', 'TextColor',
                  'BGColor', 'Maximize', 'ShowBlocks', '-','Source','-','RemoveFormat']
         ],
-        'height': 100,
-        'width': '98%',
+        'height': 200,
+        'width': '99%',
         'allowedContent': True,
         'mathJaxLib': '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_HTMLorMML',
         'extraPlugins': ','.join(
