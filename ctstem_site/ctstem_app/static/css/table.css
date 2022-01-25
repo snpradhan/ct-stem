@@ -291,22 +291,22 @@ table caption {
 /*
  * PUBLICATION LISTS
  */
-table#publications {
+table.publications {
   color: #777;
   width: 100%;
 }
-table#publications td {
+table.publications td {
   padding: 0.5em 0;
 }
-table#publications td.description {
+table.publications td.description {
   width: 93%;
   line-height: 1.5em;
   padding-right: 0.5em;
 }
-table#publications td.description p {
+table.publications td.description p {
   display: inline;
 }
-table#publications td.action {
+table.publications td.action {
   width: 7%;
 }
 

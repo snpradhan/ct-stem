@@ -3039,8 +3039,17 @@ def deleteCategory(request, id=''):
 # PUBLICATIONS TABLE VIEW
 ####################################
 def publications(request):
-  publications = models.Publication.objects.all().order_by('order')
-  context = {'publications': publications}
+  publications = models.Publication.objects.all()
+  publication_list = {}
+  publication_tags = {}
+  for tag_key, tag_value in models.PUBLICATION_TAG_CHOICES:
+    publication_list[tag_value] = []
+    publication_tags[tag_key] = tag_value
+
+  for pub in publications:
+    publication_list[publication_tags[pub.tag]].append(pub)
+
+  context = {'publication_list': publication_list}
   return render(request, 'ctstem_app/Publications.html', context)
 
 ####################################
@@ -3070,7 +3079,6 @@ def publication(request, id=''):
         savedPublication = form.save(commit=False)
         savedPublication.save()
         form.save()
-        reorder_publications(request)
         messages.success(request, "Publication Saved.")
         return shortcuts.redirect('ctstem:publications',)
       else:
@@ -7034,17 +7042,6 @@ def reorder_curriculum_pages(request, id):
     if step.order != order:
       step.order = order
       step.save()
-    order = order + 1
-
-@login_required
-def reorder_publications(request):
-  publications = models.Publication.objects.all().order_by('order', '-modified_date')
-  order = 1
-  for publication in publications:
-    #fix publication order if it is out of order
-    if publication.order != order:
-      publication.order = order
-      publication.save()
     order = order + 1
 
 def terms(request):

@@ -154,6 +154,13 @@ TOPIC_TYPE_CHOICES = (
   ('faq', 'Help and FAQ'),
 )
 
+PUBLICATION_TAG_CHOICES = (
+  ('01', 'Teachers'),
+  ('02', 'Students'),
+  ('03', 'Methodology'),
+  ('04', 'CT-Integration'),
+)
+
 class IsNull(Func):
   template = "%(expressions)s IS NULL or %(expressions)s = ''"
 
@@ -562,11 +569,18 @@ class SchoolAdministrator(models.Model):
 # Publication model
 #######################################################
 class Publication(models.Model):
-  order = models.IntegerField(null=True, blank=True)
   description = RichTextField(null=False, blank=False, default="Enter publication", help_text="Enter publication details")
+  tag = models.CharField(null=False, max_length=2, choices=PUBLICATION_TAG_CHOICES)
+  authors = models.CharField(null=False, max_length=512)
+  year = models.IntegerField(null=False)
+  title = models.CharField(null=False, max_length=512)
+  publisher = models.CharField(null=False, max_length=512)
   web_link = models.URLField(blank=True)
   created_date = models.DateTimeField(auto_now_add=True)
   modified_date = models.DateTimeField(auto_now=True)
+
+  class Meta:
+    ordering = ['tag', 'year', 'authors']
 
 #######################################################
 # Group model
