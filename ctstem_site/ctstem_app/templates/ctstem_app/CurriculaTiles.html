@@ -149,6 +149,12 @@
         $('#curricula_filters_toggle label').toggle();
         $('#curricula_filters').toggle();
       })
+      //disable Enter key press
+      $("form").bind("keypress", function(e) {
+        if (e.keyCode == 13) {
+          return false;
+        }
+      });
 
       function bind_paging() {
         $('a.page').on('click', function(e){
