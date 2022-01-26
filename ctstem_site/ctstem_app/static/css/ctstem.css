@@ -357,7 +357,7 @@ div#div_conditions {
   top: var(--ctstem-sticky-margin-top);
   padding-bottom: 2em;
   background-color: white;
-  z-index: 999;
+  z-index: 1001;
 }
 
 .page-navigation > div#page_numbers nav#numbers {

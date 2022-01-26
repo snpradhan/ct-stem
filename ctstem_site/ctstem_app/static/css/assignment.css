@@ -28,7 +28,7 @@ header {
   padding: 0 15px 0 50px;
   vertical-align: middle;
   font-size: 1.1rem;
-  z-index: 5;  /* Make sure it's above the side bar */
+  z-index: 9999;  /* Make sure it's above the side bar */
   font-family: 'Roboto Condensed', sans-serif;
   justify-content: flex-start;
   flex-wrap: wrap;
