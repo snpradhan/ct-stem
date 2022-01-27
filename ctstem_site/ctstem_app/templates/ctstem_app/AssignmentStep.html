@@ -552,11 +552,11 @@
       {% endif %}
     </div>
     <div class="modal fade" id="imageModal" role="dialog">
-      <div class="modal-dialog modal-lg">
+      <div class="modal-dialog modal-sm">
         <div class="modal-content">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal">&times;</button>
-            <h3 class="modal-title"></h3>
+            <h3 class="modal-title left"></h3>
           </div>
           <div class="modal-body">
             <img src="" class="popup_image"/>
@@ -565,19 +565,19 @@
       </div>
     </div>
     <div class="modal fade" id="confirmModal" role="dialog">
-      <div class="modal-dialog modal-md">
+      <div class="modal-dialog modal-sm">
         <div class="modal-content">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal">&times;</button>
-            <h3 class="modal-title">Submit Assignment</h3>
+            <h3 class="modal-title left">Submit Assignment</h3>
           </div>
           <div class="modal-body">
             <p>You are about to submit this assignment.  After submission, you will not be able to change/update your answers.</p>
           </div>
           <div class="modal-footer">
             <div class="form-group button-row">
-              <button type="button" class="btn gray inbetween" id="modal_exit" data-dismiss="modal">Cancel</button>
-              <button type="button" class="btn yellow inbetween" id="modal_submit" data-dismiss="modal">Submit</button>
+              <button type="button" class="btn gray normal" id="modal_exit" data-dismiss="modal">Cancel</button>
+              <button type="button" class="btn yellow normal" id="modal_submit" data-dismiss="modal">Submit</button>
             </div>
           </div>
         </div>
@@ -815,7 +815,7 @@
         var url = $(this).data("href");
         var option = $(this).data("option");
         $('#imageModal').find('img.popup_image').attr('src', url);
-        $('#imageModal').find('h3.modal-title').html(option);
+        $('#imageModal').find('.modal-title').html(option);
         $('#imageModal').modal('show');
         return false;
       });

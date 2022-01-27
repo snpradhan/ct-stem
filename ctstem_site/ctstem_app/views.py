@@ -4990,7 +4990,7 @@ def assignment(request, assignment_id='', instance_id='', step_order=''):
                   messages.success(request, 'Your responses have been saved')
                 next_step = step.order
               else:
-                messages.success(request, 'Your previous steps have been saved')
+                messages.success(request, 'Your previous pages have been saved')
                 next_step = step.order + 1
 
               if request.is_ajax():
