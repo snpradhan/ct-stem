@@ -446,6 +446,12 @@ $(function () {
     cb.trigger('click');
   });
 
+  //when clicking Register or Login from the expanded hamburger menu,
+  //collapse the hamburger menu so the modal is fully visible
+  $('.navbar-collapse .navbar-right .modal-open').on('click', function(e){
+    $(this).closest('.navbar-collapse').removeClass('in');
+  });
+
   bind_user_removal();
   bind_curriculum_delete_confirmation();
   bind_curriculum_share_action();

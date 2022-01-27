@@ -102,6 +102,9 @@ a {
     .navbar-collapse.collapse {
         display: none!important;
     }
+    .navbar-collapse .navbar-right li {
+      margin-bottom: 1em;
+    }
     .navbar-nav {
         float: none!important;
         margin-top: 7.5px;
@@ -231,10 +234,10 @@ a {
   font-size: 0.85em !important;
 }
 .dropdown-menu .col-container {
-  margin: 0.75em 0;
+  margin: 0.5em;
 }
 .dropdown-menu .col-container .col {
-  margin: 0 0.5em;
+  margin: 0.5em;
 }
 .dropdown-menu .col-container .col .icon {
   font-size: 2.5em;
