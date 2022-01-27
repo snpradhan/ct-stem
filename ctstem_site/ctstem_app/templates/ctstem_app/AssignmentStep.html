@@ -24,8 +24,6 @@
 {% endblock %}
 
 {% block custom_media %}
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css?family=Maitree:400,700|Roboto+Condensed:300,400,700italic" rel="stylesheet">
   <!--script src="http://ajax.googleapis.com/ajax/libs/jquery/3.0.0/jquery.min.js"></script-->
   <link rel="stylesheet" href="{% staticfile 'css/table.css' %}">
   <link rel="stylesheet" href="{% staticfile 'css/messages.css' %}">
@@ -459,7 +457,7 @@
                   <!-- SURVEY SECTION -->
                     <table class="likert">
                       <tbody>
-                        <tr class="likert-item" tabindex="-1">
+                        <tr class="likert-item assignment_input"  tabindex="-1">
                           <td class="likert-number">
                             {{questionForm.id}}
                             {{questionForm.nested.management_form}}
@@ -617,14 +615,6 @@
             allowPrompt = true;
           }
         };
-        /* Disable Auto Save
-        //auto saving on ckeditor focusout
-        for ( instance in CKEDITOR.instances ) {
-          CKEDITOR.instances[instance].on('blur', function(e){
-            autoSave();
-          });
-        }
-        */
       }
       /* iframes that require the embedded models to log student data will need to have a css class "logger"
        * if assignment isn't closed yet then reload the iframe with ?userId="+userId+"&lessonId="+lessonId+"&pageNum="+pageNum appended
@@ -728,13 +718,15 @@
         // Setup an event listener that calls receiveMessage() when the window
         // receives a new MessageEvent.
         window.addEventListener('message', receiveMessage);
+
+        bindFocusOutSave(!closed);
+
       };
       /***** End of  window.onload = function() { ****/
 
       loadCanvasData();
       loadDataTable(!closed);
-      //Disable Auto Save
-      //bindFocusOutSave(!closed);
+
 
       $("#assignmentForm input:checkbox").change(function(){
         var selectedValues = $("input[id="+$(this).attr('id')+"]:checked").map(function() {return this.value;}).get().join(',')
@@ -783,17 +775,15 @@
       });
 
       $('input[type="file"][id="selectedFile"]').change(function(){
-        $("ul.messages li").remove();
-        $("ul.messages").html('<li class="warning">Click the Save button below to Save the uploaded files</li>');
-      })
+        display_messages('Click the Save button below to Save the uploaded files.', 'warning');
+      });
 
       $('button.delete_attachment').click(function(){
         var r = confirm("Are you sure you want to delete this attachment?");
         if (r == true) {
           $(this).next('input').val('on');
           $(this).closest('tr').hide();
-          $("ul.messages li").remove();
-          $("ul.messages").html('<li class="warning">Click the Save button below to Delete the uploaded files</li>');
+          display_messages('Click the Save button below to Delete the uploaded files.', 'warning');
         }
       });
 
@@ -830,8 +820,6 @@
         return false;
       });
 
-      $('ul.messages').delay(5000).fadeOut('slow');
-
       //for each error message highlight the field causing the error
       $('div.error').each(function(){
         var error_length = $.trim($(this).text()).length;
@@ -847,10 +835,28 @@
         page_numbers_position();
       });
 
-      $('html, body').animate({
-        scrollTop: $('.response_error:visible:first').offset().top - 75
-      }, 2000);
+      if($('.response_error').length){
+        $('html, body').animate({
+          scrollTop: $('.response_error:visible:first').offset().top - 75
+        }, 2000);
+      }
+
+      hide_messages();
+
     });
+
+    function display_messages(message, className){
+      $("ul.messages").html(' <i class="far fa-times-circle"></i><li class="'+className+'">'+message+'</li>');
+      $("ul.messages").show();
+      hide_messages();
+    }
+
+    function hide_messages() {
+      $('ul.messages').delay(10000).fadeOut('slow');
+      $('ul.messages i').click(function(){
+        $('ul.messages').hide();
+      });
+    }
 
     //manual save on clicking Save or Save and Continue
     function submit_assignment(save){
@@ -889,12 +895,12 @@
       }
       return true;
     }
-    /* Disable Auto Save
-    //auto saving on focusout of form elements other than ckeditor
+
+    //auto saving on focusout of form elements
     function bindFocusOutSave(status) {
       if (status) {
         $('.assignment_input').focusout(function(e){
-          if(evt.target.id == 'sv' ||  evt.target.id == 'sc' || evt.target.id == 'bk'){
+          if(e.target.id == 'sv' ||  e.target.id == 'sc' || e.target.id == 'bk'){
             console.log('manual save');
             return false;
           }
@@ -902,6 +908,12 @@
             autoSave();
           }
         });
+        //auto saving on ckeditor focusout
+        for ( instance in CKEDITOR.instances ) {
+          CKEDITOR.instances[instance].on('blur', function(e){
+            autoSave();
+          });
+        }
       }
       else {
         $('canvas').each(function(){
@@ -909,8 +921,7 @@
         });
       }
     }
-    */
-    /* Disable Auto Save
+
     // ajax submit assignment step form
     function autoSave(){
       $('input:hidden[id="save"]').val(1);
@@ -924,8 +935,7 @@
         dataType : 'json',
         success: function(data){
           //message at the top of the page stating responses auto saved
-          $("ul.messages li").remove();
-          $("ul.messages").html('<li class="success">'+data.message+'</li>');
+          display_messages(data.message, "success");
           //change the url in the browser if new assignment
           if (history.pushState) {
             var newurl = document.location.protocol +'//'+ document.location.host + data.url;
@@ -942,15 +952,12 @@
 
         },
         error: function(data) {
-          $("ul.messages li").remove();
-          $("ul.messages").html('<li class="error">The responses could not auto saved. Please click the Save or Save and Continue button at the bottom of the page.</li>');
+          display_messages('The responses could not auto saved. Please click the Save or Save and Continue button at the bottom of the page.', 'error');
         }
       });
-      $('ul.messages').show();
-      $('ul.messages').delay(30000).fadeOut('slow');
       return false;
     }
-    */
+
   </script>
 
 {% endblock %}
