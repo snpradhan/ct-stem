@@ -1857,7 +1857,15 @@ div.content#preview div.row.underlying_curricula {
 div.content#preview div.section {
   margin-bottom: 5em;
 }
-div.content#preview p {
+div.content#preview p,
+div.content#preview #overview ul,
+div.content#preview #overview ol,
+div.content#preview #credits ul,
+div.content#preview #credits ol,
+div.content#preview #acknowledgement ul,
+div.content#preview #acknowledgement ol
+div.content#preview #teacher_notes ul,
+div.content#preview #teacher_notes ol {
   font-size: 1.5em;
   line-height: 1.5em;
 }
