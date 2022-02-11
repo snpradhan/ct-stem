@@ -254,17 +254,6 @@ $(function () {
       rowAddorRemove($(this));
     }
   });
-  //fixed buttons
-  if($('div.button-group-fixed').length > 0) {
-    stick_div_to_top($('div.button-group-fixed'), true);
-  }
-
-  if($('div.unit-navigation').length > 0) {
-    stick_div_to_top($('div.unit-navigation'), false);
-  }
-  if($('div.group-navigation').length > 0) {
-    stick_div_to_top($('div.group-navigation'), false);
-  }
 
   $('a.emoji-modal').click(function(){
     $("div.modal#emojiModal input#emoji_feedback_area").val($(this).data('id'));

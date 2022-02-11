@@ -2244,9 +2244,9 @@ div.button-group-sticky {
 }
 div.unit-navigation,
 div.group-navigation {
-  margin-top: 6px;
   text-align: left;
-  position: static;
+  position: sticky;
+  top: var(--ctstem-sticky-margin-top);
 }
 
 .fixed-top-right {
