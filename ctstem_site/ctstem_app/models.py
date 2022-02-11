@@ -155,10 +155,10 @@ TOPIC_TYPE_CHOICES = (
 )
 
 PUBLICATION_TAG_CHOICES = (
-  ('01', 'Teachers'),
-  ('02', 'Students'),
-  ('03', 'Methodology'),
-  ('04', 'CT-Integration'),
+  ('01', 'CT-Integration'),
+  ('02', 'Teachers'),
+  ('03', 'Students'),
+  ('04', 'Methodology'),
 )
 
 class IsNull(Func):
