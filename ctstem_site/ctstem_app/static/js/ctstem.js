@@ -441,6 +441,12 @@ $(function () {
     $(this).closest('.navbar-collapse').removeClass('in');
   });
 
+  $('.page-scroll').click(function(){
+    $('html, body').animate({
+      scrollTop: $($(this).attr('href')).offset().top - 100,
+    }, 1000,'swing');
+  });
+
   bind_user_removal();
   bind_curriculum_delete_confirmation();
   bind_curriculum_share_action();

@@ -691,6 +691,63 @@ def previewCurriculum(request, id='', pem_code=''):
 
 
 ####################################
+# Print Curriculum Preview
+####################################
+def printCurriculum(request, id='', pem_code=''):
+  try:
+    # check curriculum permission
+    has_permission = check_curriculum_permission(request, id, 'preview', pem_code)
+    curriculum = models.Curriculum.objects.get(id=id)
+
+    if not has_permission:
+      if curriculum.status != 'P' and request.user.is_anonymous:
+        list(messages.get_messages(request))
+        return http.HttpResponseRedirect('/?next=login/?next=/curriculum/preview/%s' % id)
+      else:
+        return shortcuts.redirect('ctstem:home')
+
+    if request.method == 'GET':
+      systems = models.System.objects.all()
+      pages = models.Step.objects.all().filter(curriculum=curriculum).order_by('order')
+      teacher_attachments = None
+      student_attachments = models.Attachment.objects.all().filter(Q(curriculum=curriculum) | Q(curriculum=curriculum.unit), teacher_only=False)
+      if request.user.is_authenticated or not hasattr(request.user, 'student'):
+        teacher_attachments = models.Attachment.objects.all().filter(Q(curriculum=curriculum) | Q(curriculum=curriculum.unit), teacher_only=True)
+
+      teacher_resource_message = None
+      if curriculum.teacher_notes and teacher_attachments:
+        teacher_resource_message = 'Teacher Notes and Attached Resources'
+      elif curriculum.teacher_notes:
+        teacher_resource_message = 'Teacher Notes'
+      elif teacher_attachments:
+        teacher_resource_message = 'Attached Teacher Resources'
+
+
+      if curriculum.icon:
+        icon = curriculum.icon.url
+      elif curriculum.unit and curriculum.unit.icon:
+        icon = curriculum.unit.icon.url
+      elif curriculum.curriculum_type == 'U':
+        icon = '/static/img/unit.png'
+      elif curriculum.curriculum_type == 'L':
+        icon = '/static/img/lesson.png'
+      else:
+        icon = '/static/img/assessment.png'
+
+
+      page_context = {'curriculum': curriculum, 'attachments': student_attachments, 'steps': pages}
+      pages_html = render_to_string('ctstem_app/CurriculumActivityPrint.html', page_context, request)
+
+      context = {'curriculum': curriculum, 'pages_html': pages_html, 'page_count': range(len(pages)), 'systems': systems, 'icon': icon, 'student_attachments': student_attachments, 'teacher_attachments': teacher_attachments, 'teacher_resource_message': teacher_resource_message, 'pem_code': pem_code}
+
+      return render(request, 'ctstem_app/CurriculumPreviewPrint.html', context)
+
+    return http.HttpResponseNotAllowed(['GET'])
+
+  except models.Curriculum.DoesNotExist:
+    return http.HttpResponseNotFound('<h1>Requested curriculum not found</h1>')
+
+####################################
 # Generate a link to share private curriculum
 ####################################
 def shareCurriculum(request, id=''):

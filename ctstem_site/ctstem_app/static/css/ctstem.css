@@ -1815,13 +1815,13 @@ div.row#standard_tiles .col .tile .detail {
 }
 /******* standards tiles end *******/
 
-
-
-
 div.content#preview {
   width: 80%;
 }
 
+div.content.single_page_preview#preview {
+  width: unset;
+}
 
 @media only screen and (min-width: 320px) and (max-width: 1024px) {
   body div.content#preview div.row#preview_head {
@@ -1865,14 +1865,16 @@ div.content#preview #credits ol,
 div.content#preview #acknowledgement ul,
 div.content#preview #acknowledgement ol
 div.content#preview #teacher_notes ul,
-div.content#preview #teacher_notes ol {
+div.content#preview #teacher_notes ol,
+div.content#preview .step_content ul,
+div.content#preview .step_content ol {
   font-size: 1.5em;
   line-height: 1.5em;
 }
 div.content#preview div.row .col {
   display: block !important;
   width: auto !important;
-  margin: 20px auto 0 auto;
+  /*margin: 20px auto 0 auto;*/
 }
 div.content#preview div.row .col.meta {
   padding: 0 3em;
@@ -1912,6 +1914,11 @@ div.content#preview div#standards div.row .col > ul {
   list-style-type: none;
   padding-left: 1em;
 }
+
+div.content.single_page_preview#preview div#standards div.row .col > ul {
+  list-style-type: inherit;
+}
+
 div.content#preview div#standards div.row .col > ul * {
   font-size: 1em;
 }
@@ -2249,6 +2256,10 @@ div.group-navigation {
   top: var(--ctstem-sticky-margin-top);
 }
 
+div.preview-navigation {
+  position: sticky;
+  top: 92px;
+}
 .fixed-top-right {
   position: fixed !important;
   top: 6em !important;

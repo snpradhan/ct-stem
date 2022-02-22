@@ -1,0 +1,20 @@
+@media print {
+  body {
+    margin: 2cm;
+  }
+  footer {
+    display: none;
+  }
+  div.content.single_page_preview#preview .row {
+    margin: unset !important;
+  }
+  div.content.single_page_preview#preview .row.buttons {
+    display: none;
+  }
+  div.content.single_page_preview#preview .left-navigation {
+    display: none;
+  }
+
+}
+
+
