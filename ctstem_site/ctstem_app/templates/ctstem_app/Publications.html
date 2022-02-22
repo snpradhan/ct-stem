@@ -35,12 +35,26 @@
                       <span class="year">({{pub.year}}).</span>
                       <span class="title">
                         {% if pub.web_link %}
-                          <a href="{{pub.web_link}}" target="_blank">{{pub.title}}.</a>
+                          <a href="{{pub.web_link}}" target="_blank">{{pub.title.strip}}.</a>
                         {% else %}
                           {{pub.title}}.
                         {% endif %}
                       </span>
-                      <span class="journal">{{pub.publisher}}</span>
+                      <span class="journal"><i>{{pub.journal.strip}}</i>,</span>
+                      <span class="volume">
+                        {% if pub.volume and pub.issue %}
+                          <i>{{pub.volume.strip}}</i>({{pub.issue.strip}}),
+                        {% elif pub.volume %}
+                          <i>{{pub.volume.strip}}</i>
+                        {% endif %}
+                      </span>
+                      <span class="page">
+                        {% if pub.from_page and pub.to_page %}
+                          {{pub.from_page.strip}}-{{pub.to_page.strip}}
+                        {% elif pub.from_page %}
+                          {{pub.from_page.strip}}
+                        {% endif %}
+                      </span>
                     </p>
                   </td>
                   <td class="action">

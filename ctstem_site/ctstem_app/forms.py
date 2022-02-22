@@ -1390,12 +1390,14 @@ class PublicationForm(ModelForm):
   def __init__(self, *args, **kwargs):
     super(PublicationForm, self).__init__(*args, **kwargs)
 
+    self.fields['journal'].label = 'Journal/Conference'
+
     for field_name, field in list(self.fields.items()):
       if field_name == 'order':
         field.widget.attrs['class'] = 'form-control order'
       else:
         field.widget.attrs['class'] = 'form-control'
-      field.widget.attrs['placeholder'] = field.help_text
+
 
 ####################################
 # Release Note Form

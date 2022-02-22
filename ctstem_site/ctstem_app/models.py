@@ -571,11 +571,15 @@ class SchoolAdministrator(models.Model):
 class Publication(models.Model):
   description = RichTextField(null=False, blank=False, default="Enter publication", help_text="Enter publication details")
   tag = models.CharField(null=False, max_length=2, choices=PUBLICATION_TAG_CHOICES)
-  authors = models.CharField(null=False, max_length=512)
+  authors = models.CharField(null=False, max_length=512, help_text="Enter comma separated list of authors: Last name, First initial.,")
   year = models.IntegerField(null=False)
   title = models.CharField(null=False, max_length=512)
-  publisher = models.CharField(null=False, max_length=512)
-  web_link = models.URLField(blank=True)
+  journal = models.CharField(null=False, max_length=512)
+  volume = models.CharField(null=True, blank=True, max_length=50)
+  issue = models.CharField(null=True, blank=True, max_length=50)
+  from_page = models.CharField(null=True, blank=True, max_length=50)
+  to_page = models.CharField(null=True, blank=True, max_length=50)
+  web_link = models.URLField(null=True, blank=True, help_text="Start with http:// or https://")
   created_date = models.DateTimeField(auto_now_add=True)
   modified_date = models.DateTimeField(auto_now=True)
 
