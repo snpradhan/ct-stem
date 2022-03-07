@@ -238,7 +238,11 @@
                       {% if curriculum.curriculum_type == 'U' %}
                         <tr class="{% if forloop.counter|divisibleby:2 %}  even {% else %} odd {% endif %}">
                           <td rowspan="{{assignment_list|length}}">
-                            <div><b>Unit:</b>&nbsp;{{curriculum.title}}</div>
+                            <div>
+                              <b>Unit:</b>
+                              &nbsp;
+                              <a href="{% url 'ctstem:previewCurriculum' curriculum.id %}" target="_blank" title="Preview Unit">{{curriculum.title}}</a>
+                            </div>
                           </td>
                       {% endif %}
                       {% for order, assignment in assignment_list.items|sort %}
@@ -249,14 +253,16 @@
                           <td>
                             <div>
                               <b>
-                              {% if assignment.curriculum.curriculum_type == 'L' %}
-                                Lesson:
-                              {% elif assignment.curriculum.curriculum_type == 'A' %}
-                                Assessment:
-                              {% endif %}
+                                {% if assignment.curriculum.curriculum_type == 'L' %}
+                                  Lesson:
+                                {% elif assignment.curriculum.curriculum_type == 'A' %}
+                                  Assessment:
+                                {% endif %}
                               </b>
-                              &nbsp;{{assignment.curriculum.title}}
-
+                              &nbsp;
+                              <a href="{% url 'ctstem:previewCurriculum' assignment.curriculum.id %}" target="_blank" title="Preview {{assignment.curriculum.get_curriculum_type_display}}">
+                                {{assignment.curriculum.title}}
+                              </a>
                             </div>
                           </td>
                         {% else %}
@@ -270,7 +276,10 @@
                                   Assessment:
                                 {% endif %}
                                 </b>
-                              &nbsp;{{curriculum.title}}
+                                &nbsp;
+                                <a href="{% url 'ctstem:previewCurriculum' curriculum.id %}" target="_blank" title="Preview {{curriculum.get_curriculum_type_display}}">
+                                  {{curriculum.title}}
+                                </a>
                               </div>
                             </td>
                         {% endif %}
