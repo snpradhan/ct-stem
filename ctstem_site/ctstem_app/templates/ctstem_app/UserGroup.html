@@ -18,42 +18,42 @@
             <ul>
             {% if user.teacher %}
               <li>
-                <h5 class="left">
+                <label>
                   <a href="{% url 'ctstem:teacherDashboard' user.teacher.id 'active' %}">
-                    Teacher Dashboard
+                    <strong>Teacher Dashboard</strong>
                   </a>
-                </h5>
+                </label>
               </li>
             {% elif form.instance.id %}
               <li>
-                <h5 class="left">
+                <label>
                   <a href="{% url 'ctstem:teacherDashboard' form.teacher.value 'active' %}">
-                    Teacher Dashboard
+                    <strong>Teacher Dashboard</strong>
                   </a>
-                </h5>
+                </label>
               </li>
             {% endif %}
               <li>
-                <h5 class="left">
+                <label>
                   <a href="#class_overview" class="page-scroll">
-                    Class Overview
+                    <strong>Class Overview</strong>
                   </a>
-                </h5>
+                </label>
               </li>
             {% if form.instance.id %}
               <li>
-                <h5 class="left">
+                <label>
                   <a href="#class_assignments" class="page-scroll">
-                    Class Assignments
+                    <strong>Class Assignments</strong>
                   </a>
-                </h5>
+                </label>
               </li>
               <li>
-                <h5 class="left">
+                <label>
                   <a href="#class_roster" class="page-scroll">
-                    Class Roster
+                    <strong>Class Roster</strong>
                   </a>
-                </h5>
+                </label>
               </li>
             {% endif %}
           </div>

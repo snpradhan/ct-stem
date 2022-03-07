@@ -2,11 +2,13 @@
 <div class="left-navigation">
   <div class="form-group unit-navigation">
     {% if unit_id %}
-      <label class="{% if flag == 'overview' and form.instance.id == unit_id %} current_curriculum {% endif %}">
+      <label class="{% if flag == 'overview' and form.instance.id == unit_id %}current_curriculum{% endif %}">
         {% if flag == "overview" and form.instance.id == unit_id %}
           <strong>Unit</strong>
         {% else %}
-          <a href="{% url 'ctstem:curriculumOverview' unit_id %}">Unit</a>
+          <a href="{% url 'ctstem:curriculumOverview' unit_id %}">
+            <strong>Unit</strong>
+          </a>
         {% endif %}
         &nbsp;
         <a class="fa fa-files-o copy_curriculum" href="{% url 'ctstem:copyCurriculum' unit_id %}" title="Copy Unit"></a>

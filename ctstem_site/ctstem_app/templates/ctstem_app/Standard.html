@@ -12,29 +12,29 @@
           <div class="form-group group-navigation">
             <ul>
               <li>
-                <h5 class="left">
+                <label>
                   <a href="#standard_overview" class="page-scroll">
-                    Standard Overview
+                    <strong>Standard Overview</strong>
                   </a>
-                </h5>
+                </label>
               </li>
               {% for category in formset %}
                 {% if forloop.last == False %}
                   <li>
-                    <h5 class="left">
+                    <label>
                       <a href="#category_{{forloop.counter}}" class="page-scroll">
-                        Category {{forloop.counter}}
+                        <strong>Category {{forloop.counter}}</strong>
                       </a>
                     </h5>
-                  </li>
+                  </label>
                 {% endif%}
               {% endfor %}
               <li>
-                <h5 class="left">
+                <label>
                   <a href="#" class="page-scroll addCategory">
-                    Add New Category
+                    <strong>Add New Category</strong>
                   </a>
-                </h5>
+                </label>
               </li>
             </ul>
           </div>
