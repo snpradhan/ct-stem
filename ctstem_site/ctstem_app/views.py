@@ -738,7 +738,7 @@ def printCurriculum(request, id='', pem_code=''):
       page_context = {'curriculum': curriculum, 'attachments': student_attachments, 'steps': pages}
       pages_html = render_to_string('ctstem_app/CurriculumActivityPrint.html', page_context, request)
 
-      context = {'curriculum': curriculum, 'pages_html': pages_html, 'page_count': range(len(pages)), 'systems': systems, 'icon': icon, 'student_attachments': student_attachments, 'teacher_attachments': teacher_attachments, 'teacher_resource_message': teacher_resource_message, 'pem_code': pem_code}
+      context = {'curriculum': curriculum, 'pages_html': pages_html, 'pages': pages, 'systems': systems, 'icon': icon, 'student_attachments': student_attachments, 'teacher_attachments': teacher_attachments, 'teacher_resource_message': teacher_resource_message, 'pem_code': pem_code}
 
       return render(request, 'ctstem_app/CurriculumPreviewPrint.html', context)
 

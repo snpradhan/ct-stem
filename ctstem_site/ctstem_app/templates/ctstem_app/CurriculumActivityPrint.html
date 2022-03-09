@@ -7,7 +7,7 @@
   <div>
     <hr>
     <activity id="page0">
-      <h3 class="left">Page 0</h3>
+      <h3 class="left">Student Directions and Resources</h3>
       <br>
       <div class="step_content">
         {% if curriculum.curriculum_type == 'A' %}
@@ -24,11 +24,20 @@
           {% endif %}
         {% endif %}
         {% if attachments %}
-          <div>You will need the following resources to complete this assignment.  Please download them all from this link <a href="{% url 'ctstem:downloadAttachments' curriculum.id 'S' %}" target="_blank">"{% url 'ctstem:downloadAttachments' curriculum.id 'S' %}"</a> or individually from the links below.</div>
+          <p>
+            You will need the following resources to complete this assignment.  Please download them all from this link
+            <a class="for_screen" href="{% url 'ctstem:downloadAttachments' curriculum.id 'S' %}" target="_blank">Download All <i class="fas fa-file-download"></i></a>
+            <span class="for_print link">{{ request.scheme }}://{{ request.META.HTTP_HOST }}{% url 'ctstem:downloadAttachments' curriculum.id 'S' %}</span>
+            or individually from the links below.
+          </p>
 
           <ul>
             {% for attachment in attachments %}
-              <li>{{attachment.title}} - <a href="{{attachment.file_object.url}}"  download="{{attachment.title.split|join:'_'}}.{{attachment.extension}}" target="_blank"> {{attachment.file_object.url}} </a></li>
+              <li>
+                 {{attachment.title}} -
+                 <a class="for_screen" href="{{attachment.file_object.url}}"  download="{{attachment.title.split|join:'_'}}.{{attachment.extension}}" target="_blank"> Download <i class="fas fa-file-download"></i> </a>
+                <span class="for_print link">{{attachment.file_object.url}}</span>
+              </li>
             {% endfor %}
           </ul>
         {% endif %}
@@ -37,7 +46,7 @@
     <hr>
     {% for step in steps %}
       <activity id="page{{forloop.counter}}">
-        <h3 class="left">Page {{forloop.counter}}. {{step.title}}</h3>
+        <h3 class="left">{{forloop.counter}}. {{step.title}}</h3>
         <br>
         <div class="step_content">
           {% if step.content %}
@@ -68,39 +77,65 @@
                         {% elif field_type == 'TF' %}
                           <input type="text" class="form-control" name="{{forloop.counter}}" id="{{forloop.counter}}"/>
                         {% elif field_type == 'DD' %}
-                          <select class="form-control assignment_input" name="{{forloop.counter}}" id="{{forloop.counter}}">
-                            <option value="">--------</option>
+                          <div class="for_screen">
+                            <select class="form-control assignment_input" name="{{forloop.counter}}" id="{{forloop.counter}}">
+                              <option value="">--------</option>
+                              {% for option in question.options|splitlines%}
+                              <option value="{{option}}">{{option}}</option>
+                              {% endfor %}
+                              {% if question.display_other_option %}
+                                <option value="{{option}}" class="other">Other</option>
+                                <input type="text" placeholder="Enter your response" class="form-control assignment_input other" disabled/>
+                              {% endif %}
+                            </select>
+                          </div>
+                          <div class="for_print">
                             {% for option in question.options|splitlines%}
-                            <option value="{{option}}">{{option}}</option>
+                              <input type="radio" name="{{question.id}}_mc" id="{{question.id}}_mc" value="{{option}}" />
+                              &nbsp;
+                              <span class="response_label">{{option}}</span>
+                              <br>
                             {% endfor %}
                             {% if question.display_other_option %}
-                              <option value="{{option}}" class="other">Other</option>
-                              <input type="text" class="form-control assignment_input other" disabled/>
+                              <input type="radio" name="{{question.id}}_mc" id="{{question.id}}_mc" value="{{option}}" class="other" />
+                              &nbsp;
+                              <span class="response_label">Other</span>
+                              <input type="text" class="form-control assignment_input other_response for_print" name="{{question.id}}_mc" id="{{question.id}}_mc" disabled/>
                             {% endif %}
-                          </select>
+                          </div>
                         {% elif field_type == 'MC' %}
                           {% for option in question.options|splitlines%}
-                            <input type="radio" name="{{question.id}}_mc" id="{{question.id}}_mc" value="{{option}}" />  {{option}}<br>
+                            <input type="radio" name="{{question.id}}_mc" id="{{question.id}}_mc" value="{{option}}" />
+                            &nbsp;
+                            <span class="response_label">{{option}}</span>
+                            <br>
                           {% endfor %}
                           {% if question.display_other_option %}
-                            <input type="radio" name="{{question.id}}_mc" id="{{question.id}}_mc" value="{{option}}" class="other" />  Other<br>
-                            <input type="text" class="form-control assignment_input" name="{{question.id}}_mc" id="{{question.id}}_mc" disabled/>
+                            <input type="radio" name="{{question.id}}_mc" id="{{question.id}}_mc" value="{{option}}" class="other" />
+                            &nbsp;
+                            <span class="response_label">Other</span>
+                            <input type="text" class="form-control assignment_input other_response for_print" name="{{question.id}}_mc" id="{{question.id}}_mc" disabled/>
                           {% endif %}
                         {% elif field_type == 'MI' %}
                           <div class="help warning">You may click the images below to view a larger version</div>
                           {% for option in question.options|splitlines%}
                             <input type="radio" name="{{question.id}}_mi" id="{{question.id}}_mi" value="{{option}}"/>
-                            <span>{{forloop.counter0|get_ascii_char}}.</span>
-                            <a data-toggle="modal" data-target="#imageModal" data-href="{{option}}" class="image_option"><img src="{{option}}" class="image_option"/></a><br><br>
+                            &nbsp;
+                            <span class="response_label">{{forloop.counter0|get_ascii_char}}.</span>
+                            <a data-toggle="modal" data-target="#imageModal" data-href="{{option}}" class="image_option"><img src="{{option}}" class="image_option"/></a>
+                            <br>
                           {% endfor %}
                         {% elif field_type == 'MS' %}
                           {% for option in question.options|splitlines%}
-                            <input type="checkbox" name="{{question.id}}_cb" id="{{question.id}}_cb" value="{{option}}"/>  {{option}}<br>
+                            <input type="checkbox" name="{{question.id}}_cb" id="{{question.id}}_cb" value="{{option}}"/>
+                            &nbsp;
+                            <span class="response_label">{{option}}</span>
+                            <br>
                           {% endfor %}
                         {% elif field_type == 'FI' %}
-                          <div>
+                          <div class="for_screen">
+                            <span class="response_label">Upload files that are less than 5MB in size.</span>
                             <table class="table table-striped table-condensed table-bordered inner_table collapsible_content">
-                              <caption>Upload files that are less than 5MB in size.</caption>
                               <thead>
                                 <tr>
                                   <th>File</th>
@@ -124,15 +159,22 @@
                               Upload more
                             </button>
                           </div>
+                          <div class="for_print">
+                            <span class="response_label">Upload files to the space allocated by your teacher.</span>
+                          </div>
                         {% elif field_type == 'SK' %}
-                          <div class="note"> Note: Draw your sketch in the sketchpad below </div>
-                          <div id="{{question.id}}_sketch_tools" class="sketch_tools"></div>
-                          <canvas id="{{question.id}}_sketch" width="900" height="500" class="assignment_sketch" style="{% if question.sketch_background %} background: url({{question.sketch_background.url}}) no-repeat;{% endif %}"></canvas>
+                          <span class="response_label"> Note: Draw your sketch in the sketchpad below </span>
+                          <div id="{{question.id}}_sketch_tools" class="sketch_tools for_screen"></div>
+                          <canvas id="{{question.id}}_sketch" width="900" height="500" class="assignment_sketch {% if question.sketch_background %} for_screen {% endif %}" style="{% if question.sketch_background %} background: url({{question.sketch_background.url}}) no-repeat;{% endif %}">
+                          </canvas>
+                          {% if question.sketch_background %}
+                            <img src="{{question.sketch_background.url}}" class="for_print"/>
+                          {% endif %}
                         {% elif field_type == 'DT' %}
-                          <div class="assignment_input dt_input" id="dt_input_{{forloop.counter}}">
-                            <input type="hidden" name="dt_response_{{forloop.counter}}" id="dt_response_{{forloop.counter}}" value=''/>
-                            <input type="hidden" name="column_headers" id="dt_col_headers_{{forloop.counter}}" value="{{question.options}}"/>
-                            <table class="table table-condensed table-bordered inner_table" id="dt_table_{{forloop.counter}}">
+                          <div class="assignment_input dt_input" id="dt_input_{{question.id}}_{{forloop.counter}}">
+                            <input type="hidden" name="dt_response_{{question.id}}_{{forloop.counter}}" id="dt_response_{{question.id}}_{{forloop.counter}}" value=''/>
+                            <input type="hidden" name="column_headers" id="dt_col_headers_{{question.id}}_{{forloop.counter}}" value="{{question.options}}"/>
+                            <table class="table table-condensed table-bordered inner_table" id="dt_table_{{question.id}}_{{forloop.counter}}">
                               <thead>
                               </thead>
                               <tbody>
@@ -149,7 +191,7 @@
                     <tbody>
                       <tr class="likert-item">
                         <td class="likert-number">
-                          {{forloop.counter}}.
+                          <span class="response_label">{{forloop.counter}}.</span>
                         </td>
                         <td class="likert-prompt">
                           {{question.question_text|inline_style|safe}}
@@ -189,6 +231,7 @@
 
   <script type="text/javascript">
     $(function(){
+      loadCanvasData();
       loadDataTable(true);
 
       //hide disabled Other text field
@@ -221,30 +264,27 @@
         $('#imageModal').modal('show');
         return false;
       });
-
-      $('textarea.assignment_textarea').each(function(){
-        var id = $(this).attr('id');
-        CKEDITOR.replace(id, {
-            'removePlugins': 'stylesheetparser',
-            'toolbar': [['Bold', 'Italic', 'Underline', 'Strike', 'Subscript','Superscript','-','SpellChecker', 'Scayt']],
-            'height': '100',
-            'extraPlugins': 'scayt',
-            'scayt_autoStartup': true,
-            'scayt_sLang': 'en_US',
-            'disableNativeSpellChecker': false,
+      window.onload = function() {
+        $('iframe, video').each(function(e){
+          var src = $(this).attr('src');
+          if(src) {
+            var static_content = '<div class="embedded_url for_print">The embedded resource from above can be accessed via this link: <span class="link">'+src+'</span></div>';
+            $(this).after(static_content);
+          }
         });
-      });
-
-      page_numbers_position();
-
-      $(window).on('resize', function(){
-        page_numbers_position();
-      });
-      $('#menu-button').mousedown(function() {
-        $('#side-nav').toggleClass('activated');
-        //$('header nav').toggleClass('activated');
-        //$('#side-nav').css('right', '0px');
-      });
+        $('video').each(function(e){
+          var video_element = $(this);
+          var video_links = '';
+          $(this).find('source').each(function(){
+            var src = $(this).attr('src');
+            video_links = video_links + '<div class="link">'+src+'</div>';
+          });
+          if(video_links != '') {
+            var static_content = '<div class="embedded_url for_print">The embedded resource from above can be accessed via these links: '+video_links+'</div>';
+            $(video_element).after(static_content);
+          }
+        });
+      };
 
     });
   </script>

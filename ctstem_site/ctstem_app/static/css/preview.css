@@ -1,0 +1,25 @@
+div.content.single_page_preview#preview input[type="text"]:disabled {
+    display: none;
+}
+div.content.single_page_preview#preview input.other_response {
+    width: 50% !important;
+}
+div.content.single_page_preview#preview span.response_label {
+    font-size: 1.5em;
+    font-weight: 600;
+}
+div.content.single_page_preview#preview img.sketch_background {
+    display: none;
+}
+div.content.single_page_preview#preview div.embedded_url {
+    display: none;
+}
+
+.for_print {
+    display: none;
+}
+
+div.content.single_page_preview#preview ul ul,
+div.content.single_page_preview#preview ol ol {
+    font-size: 1em;
+}

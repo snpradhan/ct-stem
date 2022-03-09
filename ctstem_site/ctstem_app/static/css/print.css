@@ -1,18 +1,45 @@
 @media print {
   body {
     margin: 2cm;
+    font-family: "proxima-nova", sans-serif;
   }
-  footer {
-    display: none;
+  .for_screen {
+    display: none !important;
+  }
+  .for_print {
+    display: block !important;
   }
   div.content.single_page_preview#preview .row {
     margin: unset !important;
   }
-  div.content.single_page_preview#preview .row.buttons {
-    display: none;
+  div.content.single_page_preview#preview span.response_label {
+    font-size: unset;
+    font-weight: unset;
   }
-  div.content.single_page_preview#preview .left-navigation {
-    display: none;
+  div.content.single_page_preview#preview span.other_response {
+    display: inline-block;
+}
+  div.content.single_page_preview#preview table.table th {
+    vertical-align: middle !important;
+    background-color: #666666 !important;
+    color: #e5e5e5 !important;
+  }
+
+  div.content.single_page_preview#preview img.for_print {
+    width: 900px;
+    height: auto;
+  }
+  div.content.single_page_preview#preview iframe,
+  div.content.single_page_preview#preview video {
+    max-width: 600px !important;
+    max-height: 400px !important;
+  }
+  div.content.single_page_preview#preview div.embedded_url {
+    display: inline-block;
+  }
+  div.content.single_page_preview#preview .link {
+    text-decoration: underline;
+    color: #00ADFF !important;
   }
 
 }

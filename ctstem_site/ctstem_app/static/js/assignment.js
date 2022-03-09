@@ -110,7 +110,7 @@ function dtmBuildHtmlTable(parentId, tableId, colHeaders, rowHeaders, rowInput, 
         cellValue = "";
       }
       if (editFlag){
-        row$.append($('<td><input type="text" value="'+cellValue+'"/> </td>'));
+        row$.append($('<td><input type="text" class="form-control" value="'+cellValue+'"/> </td>'));
       }
       else{
         row$.append($('<td>'+cellValue+'</td>'));
@@ -118,7 +118,7 @@ function dtmBuildHtmlTable(parentId, tableId, colHeaders, rowHeaders, rowInput, 
     }
     // last action cell
     if (editFlag && rowHeaders.length == 0) {
-      var buttons$ = $('<td class="add_delete_buttons" />');
+      var buttons$ = $('<td class="add_delete_buttons for_screen" />');
       buttons$.append($('<button type="button" class="btn blue" title="Add Row" onclick="dtmInsertRow(\''+ tableId +'\', this)">+</button>'));
       //do not allow the first row to be deleted
       if (i > 0) {
@@ -148,7 +148,7 @@ function dtmAddColumnAllHeaders(selector, colHeaders, rowHeaders, editFlag) {
     headerTr$.append($('<th class="eachHdr"/>').html(key));
   }
   if (editFlag && rowHeaders.length == 0){
-    headerTr$.append($('<th class="eachHdr"/>'));
+    headerTr$.append($('<th class="eachHdr for_screen"/>'));
   }
   $(selector).append(headerTr$);
 }

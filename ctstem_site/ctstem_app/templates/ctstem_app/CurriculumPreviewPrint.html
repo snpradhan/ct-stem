@@ -3,7 +3,15 @@
 {% load base_extras %}
 {% block media %}
   {{ block.super }}
+
+  <script type="text/javascript" src="{% staticfile 'js/assignment.js' %}"></script>
+  <link rel="stylesheet" href="{% staticfile 'css/preview.css' %}">
+  <link rel="stylesheet" href="{% staticfile 'css/sketch.css' %}">
+  <script type="text/javascript" src="{% staticfile 'js/sketch.js' %}"></script>
+  <script type="text/javascript" src="{% staticfile 'js/sketch_custom.js' %}"></script>
+  <script type="text/javascript" src="{% staticfile 'js/assignment.js' %}"></script>
   <link rel="stylesheet" href="{% staticfile 'css/print.css' %}" media="print"/>
+
   {{ form.media }}
 {% endblock %}
 
@@ -14,109 +22,109 @@
   <div class="content single_page_preview" id="preview">
 
     <div class="curriculum_container">
-      <div class="left-navigation">
-        <div class="preview-navigation">
+      <div class="left-navigation for_screen">
+        <div class="preview-navigation form-group">
           <ul>
             <li>
-              <h5 class="left">
+              <label>
                 <a href="#preview_head" class="page-scroll">
-                  Curriculum Details
+                  <strong>Curriculum Details</strong>
                 </a>
-              </h5>
+              </label>
             </li>
             <li>
-              <h5 class="left">
+              <label>
                 <a href="#overview" class="page-scroll">
-                  Curriculum Overview
+                  <strong>Curriculum Overview</strong>
                 </a>
-              </h5>
+              </label>
             </li>
             <li>
-              <h5 class="left">
+              <label>
                 <a href="#standards" class="page-scroll">
-                  Standards
+                  <strong>Standards</strong>
                 </a>
-              </h5>
+              </label>
             </li>
             {% if curriculum.credits %}
               <li>
-                <h5 class="left">
+                <label>
                   <a href="#credits" class="page-scroll">
-                    Credits
+                    <strong>Credits</strong>
                   </a>
-                </h5>
+                </label>
               </li>
             {% endif %}
             {% if curriculum.acknowledgement %}
               <li>
-                <h5 class="left">
+                <label>
                   <a href="#acknowledgement" class="page-scroll">
-                    Acknowledgement
+                    <strong>Acknowledgement</strong>
                   </a>
-                </h5>
+                </label>
               </li>
             {% endif %}
             {% if user.administrator or user.researcher or user.school_administrator or user.teacher or user.author %}
               {% if curriculum.teacher_notes %}
                 <li>
-                  <h5 class="left">
+                  <label>
                     <a href="#teacher_notes" class="page-scroll">
-                      Teacher Notes
+                     <strong>Teacher Notes</strong>
                     </a>
-                  </h5>
+                  </label>
                 </li>
               {% endif %}
               {% if teacher_attachments %}
                 <li>
-                  <h5 class="left">
+                  <label>
                     <a href="#teacher_attachments" class="page-scroll">
-                      Teacher Attachments
+                      <strong>Teacher Attachments</strong>
                     </a>
-                  </h5>
+                  </label>
                 </li>
               {% endif %}
               {% if student_attachments %}
                 <li>
-                  <h5 class="left">
+                  <label>
                     <a href="#student_attachments" class="page-scroll">
-                      Student Attachments
+                      <strong>Student Attachments</strong>
                     </a>
-                  </h5>
+                  </label>
                 </li>
               {% endif %}
             {% endif %}
             {% if underlying_curriculum %}
               <li>
-                <h5 class="left">
+                <label>
                   <a href="#underlying_curriculum" class="page-scroll">
-                    Underlying Curriculum
+                    <strong>Underlying Curriculum</strong>
                   </a>
-                </h5>
+                </label>
               </li>
             {% endif %}
-            {% if page_count %}
+            {% if pages %}
               <li>
-                <h5 class="left">
+                <label>
                   <a href="#page0" class="page-scroll">
-                    Activities
+                    <strong>Activities</strong>
                   </a>
-                </h5>
+                </label>
               </li>
               <ul>
                 <li>
-                  <h5 class="left">
+                  <label>
                     <a href="#page0" class="page-scroll">
-                      Page 0
+                     <strong>Page 0</strong>
                     </a>
-                  </h5>
+                  </label>
                 </li>
-                {% for i in page_count %}
+                {% for page in pages %}
                   <li>
-                    <h5 class="left">
+                    <label>
                       <a href="#page{{forloop.counter}}" class="page-scroll">
-                        Page {{forloop.counter}}
+                        <strong>Page {{forloop.counter}}</strong>
                       </a>
-                    </h5>
+                    </label>
                   </li>
                 {% endfor %}
               </ul>
@@ -161,16 +169,18 @@
                 {{curriculum.order}}.
               {% endif %}
               {{curriculum.title}}
-              {% if curriculum.unit|slugify == 'None'|slugify %}
-                {% check_curriculum_permission curriculum.id 'favorite' as has_favorite_permission %}
-                &nbsp;&nbsp;
-                {% if has_favorite_permission == True %}
-                  <a class="bookmark util-button fa fa-star" href="{% url 'ctstem:removeBookmark' curriculum.id %}" style="{% if curriculum|is_bookmarked:user.teacher %} display: inline-block; {% else %} display: none; {% endif %}" title="Remove from Favorites"></a>
-                  <a class="bookmark util-button fa fa-star-o" href="{% url 'ctstem:bookmarkCurriculum' curriculum.id %}" style="{% if curriculum|is_bookmarked:user.teacher %} display: none; {% else %} display: inline-block; {% endif %}" title="Add to Favorites"></a>
-                {% else %}
-                  <a class="bookmark util-button fa fa-star-o warning" data-message="You need to be logged in as a teacher to favorite this curriculum"></a>
+              <span class="for_screen">
+                {% if curriculum.unit|slugify == 'None'|slugify %}
+                  {% check_curriculum_permission curriculum.id 'favorite' as has_favorite_permission %}
+                  &nbsp;&nbsp;
+                  {% if has_favorite_permission == True %}
+                    <a class="bookmark util-button fa fa-star" href="{% url 'ctstem:removeBookmark' curriculum.id %}" style="{% if curriculum|is_bookmarked:user.teacher %} display: inline-block; {% else %} display: none; {% endif %}" title="Remove from Favorites"></a>
+                    <a class="bookmark util-button fa fa-star-o" href="{% url 'ctstem:bookmarkCurriculum' curriculum.id %}" style="{% if curriculum|is_bookmarked:user.teacher %} display: none; {% else %} display: inline-block; {% endif %}" title="Add to Favorites"></a>
+                  {% else %}
+                    <a class="bookmark util-button fa fa-star-o warning" data-message="You need to be logged in as a teacher to favorite this curriculum"></a>
+                  {% endif %}
                 {% endif %}
-              {% endif %}
+              </span>
             </h3>
 
             <div>
@@ -208,7 +218,7 @@
           </div>
         </div>
 
-        <div class="row buttons">
+        <div class="row buttons for_screen">
           <div class="col">
             <a type="button" class="btn normal blue" aria-hidden="true" href="{% url 'ctstem:previewCurriculum' curriculum.id %}" aria-label="Back" title="Back">Back</a>
           </div>
@@ -278,10 +288,19 @@
             {% if user.administrator or user.researcher or user.school_administrator or user.teacher or user.author %}
               <div class="section" id="teacher_attachments">
                 <h3 class="left inline">Attached Teacher Resources  <i class="fa fa-paperclip"></i> - </h3>
-                <h6 class="left inline"><a href="{% url 'ctstem:downloadAttachments' curriculum.id 'R' %}"> Download All <i class="fas fa-file-download"></i> </a></h6>
+                <h6 class="left inline">
+                  <a class="for_screen" href="{% url 'ctstem:downloadAttachments' curriculum.id 'R' %}"> Download All <i class="fas fa-file-download"></i> </a>
+                  <span class="for_print link">{{ request.scheme }}://{{ request.META.HTTP_HOST }}{% url 'ctstem:downloadAttachments' curriculum.id 'R' %}</span>
+                </h6>
                 <ul>
                 {% for attachment in teacher_attachments %}
-                  <li><h5 class="left inline">{{attachment.title}} -  </h5> <h6 class="left inline"><a href="{{attachment.file_object.url}}" download="{{attachment.title.split|join:'_'}}.{{attachment.extension}}" target="_blank"> Download <i class="fas fa-file-download"></i></a></h6></li>
+                  <li>
+                    <h5 class="left inline">{{attachment.title}} -  </h5>
+                    <h6 class="left inline">
+                      <a class="for_screen" href="{{attachment.file_object.url}}" download="{{attachment.title.split|join:'_'}}.{{attachment.extension}}" target="_blank"> Download <i class="fas fa-file-download"></i></a>
+                      <span class="for_print link">{{attachment.file_object.url}}</span>
+                    </h6>
+                  </li>
                 {% endfor %}
                 </ul>
               </div>
@@ -293,10 +312,19 @@
           {% if user.administrator or user.researcher or user.school_administrator or user.teacher or user.author %}
             <div class="section" id="student_attachments">
               <h3 class="left inline">Attached Student Resources  <i class="fa fa-paperclip"></i> - </h3>
-              <h6 class="left inline"><a href="{% url 'ctstem:downloadAttachments' curriculum.id 'S' %}"> Download All <i class="fas fa-file-download"></i> </a></h6>
+              <h6 class="left inline">
+                <a class="for_screen" href="{% url 'ctstem:downloadAttachments' curriculum.id 'S' %}"> Download All <i class="fas fa-file-download"></i> </a>
+                <span class="for_print link">{{ request.scheme }}://{{ request.META.HTTP_HOST }}{% url 'ctstem:downloadAttachments' curriculum.id 'S' %}</span>
+              </h6>
               <ul>
               {% for attachment in student_attachments %}
-                <li><h5 class="left inline">{{attachment.title}} -  </h5> <h6 class="left inline"><a href="{{attachment.file_object.url}}"  download="{{attachment.title.split|join:'_'}}.{{attachment.extension}}" target="_blank"> Download <i class="fas fa-file-download"></i></a></h6></li>
+                <li>
+                  <h5 class="left inline">{{attachment.title}} -  </h5>
+                  <h6 class="left inline">
+                    <a class="for_screen" href="{{attachment.file_object.url}}"  download="{{attachment.title.split|join:'_'}}.{{attachment.extension}}" target="_blank"> Download <i class="fas fa-file-download"></i></a>
+                    <span class="for_print link">{{attachment.file_object.url}}</span>
+                  </h6>
+                </li>
               {% endfor %}
               </ul>
             </div>
@@ -331,4 +359,9 @@
       bind_bookmark();
     });
   </script>
+{% endblock %}
+
+{% block footer %}
+  {{block.super}}
+  {% include 'ctstem_app/CurriculumFooter.html' %}
 {% endblock %}
