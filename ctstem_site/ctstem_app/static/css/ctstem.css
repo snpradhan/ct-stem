@@ -1841,11 +1841,13 @@ div.content#preview #overview ol,
 div.content#preview #credits ul,
 div.content#preview #credits ol,
 div.content#preview #acknowledgement ul,
-div.content#preview #acknowledgement ol
+div.content#preview #acknowledgement ol,
 div.content#preview #teacher_notes ul,
 div.content#preview #teacher_notes ol,
 div.content#preview .step_content ul,
-div.content#preview .step_content ol {
+div.content#preview .step_content ol,
+div.content#preview .question ul,
+div.content#preview .question ol {
   font-size: 1.5em;
   line-height: 1.5em;
 }

@@ -46,7 +46,7 @@
                 </a>
               </label>
             </li>
-            {% if curriculum.credits %}
+            {% if curriculum.credits or curriculum.unit and curriculum.unit.credits %}
               <li>
                 <label>
                   <a href="#credits" class="page-scroll">
@@ -55,7 +55,7 @@
                 </label>
               </li>
             {% endif %}
-            {% if curriculum.acknowledgement %}
+            {% if curriculum.acknowledgement or curriculum.unit and curriculum.unit.acknowledgement %}
               <li>
                 <label>
                   <a href="#acknowledgement" class="page-scroll">
@@ -259,18 +259,30 @@
             </div>
           </div>
 
-          {% if curriculum.credits %}
+          {% if curriculum.credits or curriculum.unit and curriculum.unit.credits %}
             <div class="section" id="credits">
               <h3 class="left">Credits</h3>
-              <div>{{curriculum.credits|safe}}</div>
+              <div>
+                {% if curriculum.credits %}
+                  {{curriculum.credits|safe}}
+                {% else %}
+                  {{curriculum.unit.credits|safe}}
+                {% endif %}
+              </div>
             </div>
           {% endif %}
 
           <!-- ACKNOWLEDGEMENT -->
-          {% if curriculum.acknowledgement %}
+          {% if curriculum.acknowledgement or curriculum.unit and curriculum.unit.acknowledgement %}
             <div class="section" id="acknowledgement">
               <h3 class="left">Acknowledgement</h3>
-              <div>{{curriculum.acknowledgement|safe}}</div>
+              <div>
+                {% if curriculum.acknowledgement %}
+                  {{curriculum.acknowledgement|safe}}
+                {% else %}
+                  {{curriculum.unit.acknowledgement|safe}}
+                {% endif %}
+              </div>
             </div>
           {% endif %}
 
@@ -330,7 +342,7 @@
             </div>
           {% endif %}
         {% endif %}
-
+        <div class="page-break"></div>
         {% if curriculum.curriculum_type == 'U' %}
           {% if pem_code %}
             {% get_underlying_curriculum curriculum.id 'preview' pem_code as underlying_curriculum %}

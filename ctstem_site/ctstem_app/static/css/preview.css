@@ -23,3 +23,63 @@ div.content.single_page_preview#preview ul ul,
 div.content.single_page_preview#preview ol ol {
     font-size: 1em;
 }
+
+/* LIKERT ITEM SET */
+
+table.likert {
+  border-collapse: collapse;
+  width: 100%;
+  margin-bottom: 0.5em;
+}
+table.likert:nth-of-type(odd){
+  background-color: #eee !important;
+}
+
+table.likert th {
+  background-color: #666666 !important;
+  color: #e5e5e5 !important;
+}
+
+table.likert tr:nth-child(even) {
+  background-color: #eee !important;
+}
+
+td.likert-prompt {
+  padding: 0.5em 1em;
+  vertical-align: middle;
+  width: auto !important/*53%*/;
+}
+td.likert-prompt p {
+  margin-bottom: 0;
+}
+
+td.likert-number {
+  vertical-align: middle;
+  text-align: left;
+  padding: 0.5em 1em;
+  width: 3% !important;
+}
+
+table.likert .likert-option {
+  font-weight: 600;
+  font-size: 1.5em;
+  vertical-align: middle;
+  width: 9% !important;
+  text-align: center;
+  padding: 0.5em;
+  word-break: break-all;
+}
+
+td.likert-option input[type="radio"] {
+  cursor: pointer;
+}
+
+th.likert-instructions {
+  font-weight: 700;
+  font-size: 1.5em;
+  font-style: italic;
+  text-align: left;
+  vertical-align: top;
+  padding: 1em;
+  width: auto !important/*58%*/;
+}

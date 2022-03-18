@@ -5,7 +5,6 @@
 {% with curr_unit=curriculum.unit|default:curriculum %}
 <!--if curriculum is a unit or a lesson inside a unit then curr_unit is the unit otherwise it is the curriculum  -->
   <div>
-    <hr>
     <activity id="page0">
       <h3 class="left">Student Directions and Resources</h3>
       <br>
@@ -191,7 +190,7 @@
                     <tbody>
                       <tr class="likert-item">
                         <td class="likert-number">
-                          <span class="response_label">{{forloop.counter}}.</span>
+                          <h5 class="left">{{step.order}}.{{forloop.counter}}</h5>
                         </td>
                         <td class="likert-prompt">
                           {{question.question_text|inline_style|safe}}
@@ -268,6 +267,7 @@
         $('iframe, video').each(function(e){
           var src = $(this).attr('src');
           if(src) {
+
             var static_content = '<div class="embedded_url for_print">The embedded resource from above can be accessed via this link: <span class="link">'+src+'</span></div>';
             $(this).after(static_content);
           }

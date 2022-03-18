@@ -18,7 +18,7 @@
   }
   div.content.single_page_preview#preview span.other_response {
     display: inline-block;
-}
+  }
   div.content.single_page_preview#preview table.table th {
     vertical-align: middle !important;
     background-color: #666666 !important;
@@ -29,10 +29,15 @@
     width: 900px;
     height: auto;
   }
+  div.content.single_page_preview#preview img.image_option {
+    width: 300px;
+    height: auto;
+  }
+
   div.content.single_page_preview#preview iframe,
   div.content.single_page_preview#preview video {
-    max-width: 600px !important;
-    max-height: 400px !important;
+    max-width: 300px !important;
+    max-height: 200px !important;
   }
   div.content.single_page_preview#preview div.embedded_url {
     display: inline-block;
@@ -40,6 +45,19 @@
   div.content.single_page_preview#preview .link {
     text-decoration: underline;
     color: #00ADFF !important;
+  }
+
+  div.content.single_page_preview#preview .page-break {
+    page-break-after: always;
+  }
+
+  /* LIKERT ITEM SET */
+  table.likert .likert-option {
+    font-size: 0.7em !important;
+    word-break: break-all;
+  }
+  th.likert-instructions {
+    font-size: 0.7em !important;
   }
 
 }
