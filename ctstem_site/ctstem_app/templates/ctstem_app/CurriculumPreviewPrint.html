@@ -1,27 +1,41 @@
+
 {% extends "ctstem_app/base.html" %}
+
 {% load ctstem_extras %}
 {% load base_extras %}
+
+
 {% block media %}
-  {{ block.super }}
+  {% if not is_underlying_lesson %}
+    {{ block.super }}
 
-  <script type="text/javascript" src="{% staticfile 'js/assignment.js' %}"></script>
-  <link rel="stylesheet" href="{% staticfile 'css/preview.css' %}">
-  <link rel="stylesheet" href="{% staticfile 'css/sketch.css' %}">
-  <script type="text/javascript" src="{% staticfile 'js/sketch.js' %}"></script>
-  <script type="text/javascript" src="{% staticfile 'js/sketch_custom.js' %}"></script>
-  <script type="text/javascript" src="{% staticfile 'js/assignment.js' %}"></script>
-  <link rel="stylesheet" href="{% staticfile 'css/print.css' %}" media="print"/>
+    <script type="text/javascript" src="{% staticfile 'js/assignment.js' %}"></script>
+    <link rel="stylesheet" href="{% staticfile 'css/preview.css' %}">
+    <link rel="stylesheet" href="{% staticfile 'css/sketch.css' %}">
+    <script type="text/javascript" src="{% staticfile 'js/sketch.js' %}"></script>
+    <script type="text/javascript" src="{% staticfile 'js/sketch_custom.js' %}"></script>
+    <script type="text/javascript" src="{% staticfile 'js/assignment.js' %}"></script>
+    <link rel="stylesheet" href="{% staticfile 'css/print.css' %}" media="print"/>
 
-  {{ form.media }}
+    {{ form.media }}
+  {% endif %}
 {% endblock %}
+
+{% block header %}
+  {% if not is_underlying_lesson %}
+    {{ block.super }}
+  {% endif %}
+{% endblock %}
+
+
 
 {% block content %}
   {{block.super}}
-  {% is_my_curriculum curriculum as my_curriculum %}
-  {% is_curriculum_shared_with_me curriculum as shared_curriculum %}
+  {% if not is_underlying_lesson %}
   <div class="content single_page_preview" id="preview">
-
+  {% endif %}
     <div class="curriculum_container">
+      {% if not is_underlying_lesson %}
       <div class="left-navigation for_screen">
         <div class="preview-navigation form-group">
           <ul>
@@ -93,7 +107,7 @@
                 </li>
               {% endif %}
             {% endif %}
-            {% if underlying_curriculum %}
+            {% if lessons %}
               <li>
                 <label>
                   <a href="#underlying_curriculum" class="page-scroll">
@@ -101,8 +115,18 @@
                   </a>
                 </label>
               </li>
-            {% endif %}
-            {% if pages %}
+              <ul>
+                {% for lesson in lessons %}
+                  <li>
+                    <label>
+                      <a href="#lesson{{lesson.order}}" class="page-scroll">
+                        <strong>Lesson {{lesson.order}}</strong>
+                      </a>
+                    </label>
+                  </li>
+                {% endfor %}
+              </ul>
+            {% elif pages %}
               <li>
                 <label>
                   <a href="#page0" class="page-scroll">
@@ -133,8 +157,9 @@
           </ul>
         </div>
       </div>
+      {% endif %}
 
-      <div class="curriculum_components">
+      <div class="curriculum_components" id="{% if is_underlying_lesson %}lesson{{curriculum.order}}{% endif %}">
 
         <div id="preview_head" class="row section
                 {% if curriculum.curriculum_type == 'U' %}
@@ -217,7 +242,7 @@
             </div>
           </div>
         </div>
-
+        {% if not is_underlying_lesson %}
         <div class="row buttons for_screen">
           <div class="col">
             <a type="button" class="btn normal blue" aria-hidden="true" href="{% url 'ctstem:previewCurriculum' curriculum.id %}" aria-label="Back" title="Back">Back</a>
@@ -226,99 +251,106 @@
             <a type="button" class="btn normal blue" aria-hidden="true" href="#" aria-label="Print" title="Print" onclick="window.print(); return false;">Print</a>
           </div>
         </div>
+        {% endif %}
 
-
-
-          <div class="section" id="overview">
-            <h3 class="left">Overview</h3>
-            <div>{{curriculum.overview|safe}}</div>
-          </div>
-
-          <div class="section" id="standards">
-            <h3 class="left">Standards</h3>
-            <div class="row">
-              {% with curr_unit=curriculum.unit|default:curriculum %}
-              {% for standard, categories in curr_unit.taxonomy.all|taxonomyHelper %}
-                <div class="col">
-                  <h5 class="left">{{standard}}</h5>
-                  <ul>
-                    {% for category, taxonomies in categories.items %}
-                      <li>
-                        {{category}}
-                      </li>
-                      <ul>
-                        {% for taxonomy in taxonomies %}
-                          <li>{% if taxonomy.code %}<a href="#">[{{taxonomy.code}}]</a>{% endif %} {{taxonomy}}</li>
-                        {% endfor %}
-                      </ul>
-                    {% endfor %}
-                  </ul>
-                </div>
-              {% endfor %}
-              {% endwith %}
-            </div>
-          </div>
-
-          {% if curriculum.credits or curriculum.unit and curriculum.unit.credits %}
-            <div class="section" id="credits">
-              <h3 class="left">Credits</h3>
-              <div>
-                {% if curriculum.credits %}
-                  {{curriculum.credits|safe}}
-                {% else %}
-                  {{curriculum.unit.credits|safe}}
-                {% endif %}
-              </div>
-            </div>
-          {% endif %}
-
-          <!-- ACKNOWLEDGEMENT -->
-          {% if curriculum.acknowledgement or curriculum.unit and curriculum.unit.acknowledgement %}
-            <div class="section" id="acknowledgement">
-              <h3 class="left">Acknowledgement</h3>
-              <div>
-                {% if curriculum.acknowledgement %}
-                  {{curriculum.acknowledgement|safe}}
-                {% else %}
-                  {{curriculum.unit.acknowledgement|safe}}
-                {% endif %}
-              </div>
-            </div>
-          {% endif %}
-
-        <!-- TEACHER NOTES AND ATTACHMENTS -->
-        {% if curriculum.teacher_notes or teacher_attachments %}
-          {% if curriculum.teacher_notes %}
-            {% if user.administrator or user.researcher or user.school_administrator or user.teacher or user.author %}
-              <div class="section" id="teacher_notes">
-                <h3 class="left">Teacher Notes</h3>
-                <div>{{curriculum.teacher_notes|safe}}</div>
-              </div>
+        <div class="section" id="overview">
+          <h3 class="left">
+            {% if curriculum.curriculum_type == 'U' %}
+              Unit
+            {% elif is_underlying_lesson %}
+              Lesson {{curriculum.order}}
             {% endif %}
-          {% endif %}
-          {% if teacher_attachments %}
-            {% if user.administrator or user.researcher or user.school_administrator or user.teacher or user.author %}
-              <div class="section" id="teacher_attachments">
-                <h3 class="left inline">Attached Teacher Resources  <i class="fa fa-paperclip"></i> - </h3>
-                <h6 class="left inline">
-                  <a class="for_screen" href="{% url 'ctstem:downloadAttachments' curriculum.id 'R' %}"> Download All <i class="fas fa-file-download"></i> </a>
-                  <span class="for_print link">{{ request.scheme }}://{{ request.META.HTTP_HOST }}{% url 'ctstem:downloadAttachments' curriculum.id 'R' %}</span>
-                </h6>
+            Overview
+          </h3>
+          <div>{{curriculum.overview|safe}}</div>
+        </div>
+        {% if not is_underlying_lesson %}
+        <div class="section" id="standards">
+          <h3 class="left">Standards</h3>
+          <div class="row">
+            {% with curr_unit=curriculum.unit|default:curriculum %}
+            {% for standard, categories in curr_unit.taxonomy.all|taxonomyHelper %}
+              <div class="col">
+                <h5 class="left">{{standard}}</h5>
                 <ul>
-                {% for attachment in teacher_attachments %}
-                  <li>
-                    <h5 class="left inline">{{attachment.title}} -  </h5>
-                    <h6 class="left inline">
-                      <a class="for_screen" href="{{attachment.file_object.url}}" download="{{attachment.title.split|join:'_'}}.{{attachment.extension}}" target="_blank"> Download <i class="fas fa-file-download"></i></a>
-                      <span class="for_print link">{{attachment.file_object.url}}</span>
-                    </h6>
-                  </li>
-                {% endfor %}
+                  {% for category, taxonomies in categories.items %}
+                    <li>
+                      {{category}}
+                    </li>
+                    <ul>
+                      {% for taxonomy in taxonomies %}
+                        <li>{% if taxonomy.code %}<a href="#">[{{taxonomy.code}}]</a>{% endif %} {{taxonomy}}</li>
+                      {% endfor %}
+                    </ul>
+                  {% endfor %}
                 </ul>
               </div>
-            {% endif %}
+            {% endfor %}
+            {% endwith %}
+          </div>
+        </div>
+        {% endif %}
+
+        {% if curriculum.credits %}
+          <div class="section" id="credits">
+            <h3 class="left">Credits</h3>
+            <div>{{curriculum.credits|safe}}</div>
+          </div>
+        {% elif not is_underlying_lesson and curriculum.unit and curriculum.unit.credits %}
+          <div class="section" id="credits">
+            <h3 class="left">Credits</h3>
+            <div>{{curriculum.unit.credits|safe}}</div>
+          </div>
+        {% endif %}
+
+        <!-- ACKNOWLEDGEMENT -->
+        {% if curriculum.acknowledgement %}
+          <div class="section" id="acknowledgement">
+            <h3 class="left">Acknowledgement</h3>
+            <div>{{curriculum.acknowledgement|safe}}</div>
+          </div>
+        {% elif not is_underlying_lesson and curriculum.unit and curriculum.unit.acknowledgement %}
+          <div class="section" id="acknowledgement">
+            <h3 class="left">Acknowledgement</h3>
+            <div>{{curriculum.unit.acknowledgement|safe}}</div>
+          </div>
+        {% endif %}
+
+        <!-- TEACHER NOTES -->
+
+        {% if curriculum.teacher_notes %}
+          {% if user.administrator or user.researcher or user.school_administrator or user.teacher or user.author %}
+            <div class="section" id="teacher_notes">
+              <h3 class="left">Teacher Notes</h3>
+              <div>{{curriculum.teacher_notes|safe}}</div>
+            </div>
           {% endif %}
         {% endif %}
+
+        <!-- TEACHER ATTACHMENTS -->
+        {% if teacher_attachments %}
+          {% if user.administrator or user.researcher or user.school_administrator or user.teacher or user.author %}
+            <div class="section" id="teacher_attachments">
+              <h3 class="left inline">Attached Teacher Resources  <i class="fa fa-paperclip"></i> - </h3>
+              <h6 class="left inline">
+                <a class="for_screen" href="{% url 'ctstem:downloadAttachments' curriculum.id 'R' %}"> Download All <i class="fas fa-file-download"></i> </a>
+                <span class="for_print link">{{ request.scheme }}://{{ request.META.HTTP_HOST }}{% url 'ctstem:downloadAttachments' curriculum.id 'R' %}</span>
+              </h6>
+              <ul>
+              {% for attachment in teacher_attachments %}
+                <li>
+                  <h5 class="left inline">{{attachment.title}} -  </h5>
+                  <h6 class="left inline">
+                    <a class="for_screen" href="{{attachment.file_object.url}}" download="{{attachment.title.split|join:'_'}}.{{attachment.extension}}" target="_blank"> Download <i class="fas fa-file-download"></i></a>
+                    <span class="for_print link">{{attachment.file_object.url}}</span>
+                  </h6>
+                </li>
+              {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+        {% endif %}
+
         <!-- STUDENT ATTACHMENTS -->
         {% if student_attachments %}
           {% if user.administrator or user.researcher or user.school_administrator or user.teacher or user.author %}
@@ -344,18 +376,13 @@
         {% endif %}
         <div class="page-break"></div>
         {% if curriculum.curriculum_type == 'U' %}
-          {% if pem_code %}
-            {% get_underlying_curriculum curriculum.id 'preview' pem_code as underlying_curriculum %}
-          {% else %}
-            {% get_underlying_curriculum curriculum.id 'preview' as underlying_curriculum %}
-          {% endif %}
+          <hr>
           <div class="section" id="underlying_curriculum">
-            {% if underlying_curriculum %}
-              <h3 class="left">Underlying Lessons</h3>
-              <div class="row underlying_curricula" id="curricula_tiles">
-                {% include "ctstem_app/CurriculaTilesPaging.html" with curricula=underlying_curriculum parent='preview' pem_code=pem_code %}
-              </div>
-            {% endif %}
+            {% for lesson_html in lessons_html %}
+              {{lesson_html|safe}}
+              <hr>
+              <div class="page-break"></div>
+            {% endfor %}
           </div>
         {% else %}
         <!-- get underlying pages -->
@@ -365,15 +392,91 @@
         {% endif %}
       </div>
     </div>
+  {% if not is_underlying_lesson %}
   </div>
-  <script type="text/javascript">
-    $(function(){
-      bind_bookmark();
-    });
-  </script>
+  {% endif %}
+  {% if not is_underlying_lesson %}
+  <div class="modal fade" id="imageModal" role="dialog">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <img src="" class="popup_image"/>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  {% if not is_underlying_lesson %}
+    <script type="text/javascript">
+      $(function(){
+        bind_bookmark();
+        loadCanvasData();
+        loadDataTable(true);
+
+        //hide disabled Other text field
+        $('input[type="radio"]').on('change', function(){
+          if($(this).is(':checked')){
+            if($(this).hasClass('other')){
+              $(this).siblings('input[type="text"]').prop('disabled', false);
+            }
+            else{
+              $(this).siblings('input[type="text"]').prop('disabled', true);
+              $(this).siblings('input[type="text"]').val('');
+            }
+          }
+        });
+
+        $('select.assignment_input').on('change', function(){
+          var selected = $(this).find('option:selected');
+          if($(selected).hasClass('other')){
+            $(this).siblings('input[type="text"]').prop('disabled', false);
+          }
+          else{
+            $(this).siblings('input[type="text"]').prop('disabled', true);
+            $(this).siblings('input[type="text"]').val('');
+          }
+        });
+
+        $('a.image_option').click(function(){
+          var url = $(this).data("href");
+          $('#imageModal').find('img.popup_image').attr('src', url);
+          $('#imageModal').modal('show');
+          return false;
+        });
+        window.onload = function() {
+          $('iframe, video').each(function(e){
+            var src = $(this).attr('src');
+            if(src) {
+
+              var static_content = '<div class="embedded_url for_print">The embedded resource from above can be accessed via this link: <span class="link">'+src+'</span></div>';
+              $(this).after(static_content);
+            }
+          });
+          $('video').each(function(e){
+            var video_element = $(this);
+            var video_links = '';
+            $(this).find('source').each(function(){
+              var src = $(this).attr('src');
+              video_links = video_links + '<div class="link">'+src+'</div>';
+            });
+            if(video_links != '') {
+              var static_content = '<div class="embedded_url for_print">The embedded resource from above can be accessed via these links: '+video_links+'</div>';
+              $(video_element).after(static_content);
+            }
+          });
+        };
+
+      });
+    </script>
+  {% endif %}
 {% endblock %}
 
 {% block footer %}
-  {{block.super}}
-  {% include 'ctstem_app/CurriculumFooter.html' %}
+  {% if not is_underlying_lesson %}
+    {{block.super}}
+    {% include 'ctstem_app/CurriculumFooter.html' %}
+  {% endif %}
 {% endblock %}
+

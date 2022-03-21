@@ -6,7 +6,12 @@
 <!--if curriculum is a unit or a lesson inside a unit then curr_unit is the unit otherwise it is the curriculum  -->
   <div>
     <activity id="page0">
-      <h3 class="left">Student Directions and Resources</h3>
+      <h3 class="left">
+        {% if is_underlying_lesson %}
+        {{curriculum.order}}.0.
+        {% endif %}
+        Student Directions and Resources</h3>
+
       <br>
       <div class="step_content">
         {% if curriculum.curriculum_type == 'A' %}
@@ -42,10 +47,11 @@
         {% endif %}
       </div>
     </activity>
-    <hr>
     {% for step in steps %}
       <activity id="page{{forloop.counter}}">
-        <h3 class="left">{{forloop.counter}}. {{step.title}}</h3>
+        <h3 class="left">
+          {% if is_underlying_lesson %}{{curriculum.order}}.{% endif %}{{forloop.counter}}. {{step.title}}
+        </h3>
         <br>
         <div class="step_content">
           {% if step.content %}
@@ -63,7 +69,8 @@
                   <div class="question_response_feedback {% if forloop.counter|divisibleby:2 %} even {% else %} odd {% endif %}">
                     <div class="question">
                       <h5 class="left">
-                        Question {{step.order}}.{{forloop.counter}}
+                        Question
+                        {% if is_underlying_lesson %}{{curriculum.order}}.{% endif %}{{step.order}}.{{forloop.counter}}
                       </h5>
                       <div class="text">
                         {{question|safe}}
@@ -190,7 +197,12 @@
                     <tbody>
                       <tr class="likert-item">
                         <td class="likert-number">
-                          <h5 class="left">{{step.order}}.{{forloop.counter}}</h5>
+                          <h5 class="left">
+                            {% if is_underlying_lesson %}
+                              {{curriculum.order}}.
+                            {% endif %}
+                            {{step.order}}.{{forloop.counter}}
+                          </h5>
                         </td>
                         <td class="likert-prompt">
                           {{question.question_text|inline_style|safe}}
@@ -211,82 +223,7 @@
           {% endif %}
         </div>
       </activity>
-      <hr>
     {% endfor %}
   </div>
-
-  <div>
-    <div class="modal fade" id="imageModal" role="dialog">
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
-          </div>
-          <img src="" class="popup_image"/>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script type="text/javascript">
-    $(function(){
-      loadCanvasData();
-      loadDataTable(true);
-
-      //hide disabled Other text field
-      $('input[type="radio"]').on('change', function(){
-        if($(this).is(':checked')){
-          if($(this).hasClass('other')){
-            $(this).siblings('input[type="text"]').prop('disabled', false);
-          }
-          else{
-            $(this).siblings('input[type="text"]').prop('disabled', true);
-            $(this).siblings('input[type="text"]').val('');
-          }
-        }
-      });
-
-      $('select.assignment_input').on('change', function(){
-        var selected = $(this).find('option:selected');
-        if($(selected).hasClass('other')){
-          $(this).siblings('input[type="text"]').prop('disabled', false);
-        }
-        else{
-          $(this).siblings('input[type="text"]').prop('disabled', true);
-          $(this).siblings('input[type="text"]').val('');
-        }
-      });
-
-      $('a.image_option').click(function(){
-        var url = $(this).data("href");
-        $('#imageModal').find('img.popup_image').attr('src', url);
-        $('#imageModal').modal('show');
-        return false;
-      });
-      window.onload = function() {
-        $('iframe, video').each(function(e){
-          var src = $(this).attr('src');
-          if(src) {
-
-            var static_content = '<div class="embedded_url for_print">The embedded resource from above can be accessed via this link: <span class="link">'+src+'</span></div>';
-            $(this).after(static_content);
-          }
-        });
-        $('video').each(function(e){
-          var video_element = $(this);
-          var video_links = '';
-          $(this).find('source').each(function(){
-            var src = $(this).attr('src');
-            video_links = video_links + '<div class="link">'+src+'</div>';
-          });
-          if(video_links != '') {
-            var static_content = '<div class="embedded_url for_print">The embedded resource from above can be accessed via these links: '+video_links+'</div>';
-            $(video_element).after(static_content);
-          }
-        });
-      };
-
-    });
-  </script>
 {% endwith %}
 {% endblock %}
