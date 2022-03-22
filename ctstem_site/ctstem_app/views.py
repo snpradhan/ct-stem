@@ -730,28 +730,46 @@ def printCurriculum(request, id='', pem_code=''):
         page_context = {'curriculum': curriculum, 'attachments': student_attachments, 'steps': pages}
         pages_html = render_to_string('ctstem_app/CurriculumActivityPrint.html', page_context, request)
 
-        context = {'curriculum': curriculum, 'pages_html': pages_html, 'pages': pages, 'systems': systems, 'icon': icon, 'student_attachments': student_attachments, 'teacher_attachments': teacher_attachments, 'is_underlying_lesson': False}
+        lesson_context = {'curriculum': curriculum, 'pages_html': pages_html, 'pages': pages, 'icon': icon, 'student_attachments': student_attachments, 'teacher_attachments': teacher_attachments, 'is_underlying_lesson': False}
+        lesson_html = render_to_string('ctstem_app/CurriculumComponentsPrint.html', lesson_context, request)
+        lessons_html = []
+        lessons_html.append(lesson_html)
+
+        context = {'curriculum': curriculum, 'lessons_html': lessons_html, 'pages': pages, 'student_attachments': student_attachments, 'teacher_attachments': teacher_attachments, 'is_underlying_lesson': False}
 
         return render(request, 'ctstem_app/CurriculumPreviewPrint.html', context)
       else:
         lessons = models.Curriculum.objects.all().filter(unit=curriculum).exclude(status='R').order_by('order')
         lessons_html = []
+        unit_context = {'curriculum': curriculum, 'lessons': lessons, 'icon': icon, 'is_underlying_lesson': False}
+        unit_html = render_to_string('ctstem_app/CurriculumComponentsPrint.html', unit_context, request)
+        lessons_html.append(unit_html)
+
         for lesson in lessons:
+          lesson_icon = None
           teacher_attachments = None
           student_attachments = models.Attachment.objects.all().filter(curriculum=lesson, teacher_only=False)
           if request.user.is_authenticated or not hasattr(request.user, 'student'):
             teacher_attachments = models.Attachment.objects.all().filter(curriculum=lesson, teacher_only=True)
 
+          if lesson.icon:
+            lesson_icon = lesson.icon.url
+          elif lesson.unit and lesson.unit.icon:
+            lesson_icon = lesson.unit.icon.url
+          elif lesson.curriculum_type == 'L':
+            lesson_icon = '/static/img/lesson.png'
+          else:
+            lesson_icon = '/static/img/assessment.png'
+
           lesson_pages = models.Step.objects.all().filter(curriculum=lesson).order_by('order')
           lesson_page_context = {'curriculum': lesson, 'attachments': student_attachments, 'steps': lesson_pages, 'is_underlying_lesson': True}
           lesson_pages_html = render_to_string('ctstem_app/CurriculumActivityPrint.html', lesson_page_context, request)
 
-          lesson_context = {'curriculum': lesson, 'pages_html': lesson_pages_html, 'pages': lesson_pages, 'systems': systems, 'icon': icon, 'student_attachments': student_attachments, 'teacher_attachments': teacher_attachments, 'is_underlying_lesson': True}
-
-          lesson_html = render_to_string('ctstem_app/CurriculumPreviewPrint.html', lesson_context, request)
+          lesson_context = {'curriculum': lesson, 'pages_html': lesson_pages_html, 'pages': lesson_pages, 'icon': lesson_icon, 'student_attachments': student_attachments, 'teacher_attachments': teacher_attachments, 'is_underlying_lesson': True}
+          lesson_html = render_to_string('ctstem_app/CurriculumComponentsPrint.html', lesson_context, request)
           lessons_html.append(lesson_html)
 
-        context = {'curriculum': curriculum, 'lessons_html': lessons_html, 'lessons': lessons, 'systems': systems, 'icon': icon, 'student_attachments': student_attachments, 'teacher_attachments': teacher_attachments, 'is_underlying_lesson': False}
+        context = {'curriculum': curriculum, 'lessons_html': lessons_html, 'lessons': lessons, 'is_underlying_lesson': False}
 
         return render(request, 'ctstem_app/CurriculumPreviewPrint.html', context)
 

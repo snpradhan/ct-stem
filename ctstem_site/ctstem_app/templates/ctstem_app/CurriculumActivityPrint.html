@@ -1,7 +1,6 @@
 {% load ctstem_extras %}
 {% load base_extras %}
 
-{% block content %}
 {% with curr_unit=curriculum.unit|default:curriculum %}
 <!--if curriculum is a unit or a lesson inside a unit then curr_unit is the unit otherwise it is the curriculum  -->
   <div>
@@ -226,4 +225,3 @@
     {% endfor %}
   </div>
 {% endwith %}
-{% endblock %}
