@@ -1847,9 +1847,16 @@ div.content#preview #teacher_notes ol,
 div.content#preview .step_content ul,
 div.content#preview .step_content ol,
 div.content#preview .question ul,
-div.content#preview .question ol {
+div.content#preview .question ol,
+div.content#preview #toc ul,
+div.content#preview #toc ol  {
   font-size: 1.5em;
   line-height: 1.5em;
+}
+div.content#preview #toc ul,
+div.content#preview #toc ol {
+  list-style-type: none;
+  padding-left: 0;
 }
 div.content#preview div.row .col {
   display: block !important;

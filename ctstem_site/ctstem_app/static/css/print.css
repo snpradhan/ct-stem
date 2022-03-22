@@ -51,6 +51,11 @@
     page-break-after: always;
   }
 
+  div.content.single_page_preview#preview #toc ul,
+  div.content.single_page_preview#preview ol {
+    list-style-type: none;
+    padding-left: 0;
+  }
   /* LIKERT ITEM SET */
   table.likert .likert-option {
     font-size: 0.7em !important;

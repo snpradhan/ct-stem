@@ -191,21 +191,9 @@
           <div class="col meta">
             <h3 class="left">
               {% if curriculum.unit %}
-                {{curriculum.order}}.
+                Lesson {{curriculum.order}}.
               {% endif %}
               {{curriculum.title}}
-              <span class="for_screen">
-                {% if curriculum.unit|slugify == 'None'|slugify %}
-                  {% check_curriculum_permission curriculum.id 'favorite' as has_favorite_permission %}
-                  &nbsp;&nbsp;
-                  {% if has_favorite_permission == True %}
-                    <a class="bookmark util-button fa fa-star" href="{% url 'ctstem:removeBookmark' curriculum.id %}" style="{% if curriculum|is_bookmarked:user.teacher %} display: inline-block; {% else %} display: none; {% endif %}" title="Remove from Favorites"></a>
-                    <a class="bookmark util-button fa fa-star-o" href="{% url 'ctstem:bookmarkCurriculum' curriculum.id %}" style="{% if curriculum|is_bookmarked:user.teacher %} display: none; {% else %} display: inline-block; {% endif %}" title="Add to Favorites"></a>
-                  {% else %}
-                    <a class="bookmark util-button fa fa-star-o warning" data-message="You need to be logged in as a teacher to favorite this curriculum"></a>
-                  {% endif %}
-                {% endif %}
-              </span>
             </h3>
 
             <div>
@@ -374,6 +362,37 @@
             </div>
           {% endif %}
         {% endif %}
+        <!-- Underlying Lessons/Pages -->
+        <div class="section" id="toc">
+          {% if curriculum.curriculum_type == 'U' %}
+            <h3 class="left inline">Underlying Lessons</h3>
+            <ul>
+              {% for lesson in lessons %}
+                <li>Lesson {{lesson.order}}. {{lesson.title}}</li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <h3 class="left inline">
+              {% if is_underlying_lesson %}
+                Lesson {{curriculum.order}} Activities
+              {% else %}
+                Activities
+              {% endif %}
+            </h3>
+            <ul>
+              {% for page in pages %}
+                <li>
+                  {% if is_underlying_lesson %}
+                    {{curriculum.order}}.{{page.order}}.
+                  {% else %}
+                    {{page.order}}.
+                  {% endif %}
+                  {{page.title}}
+                </li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </div>
         <div class="page-break"></div>
         {% if curriculum.curriculum_type == 'U' %}
           <hr>
