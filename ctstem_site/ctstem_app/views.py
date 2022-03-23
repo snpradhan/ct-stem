@@ -737,7 +737,6 @@ def printCurriculum(request, id='', pem_code=''):
 
         context = {'curriculum': curriculum, 'lessons_html': lessons_html, 'pages': pages, 'student_attachments': student_attachments, 'teacher_attachments': teacher_attachments, 'is_underlying_lesson': False}
 
-        return render(request, 'ctstem_app/CurriculumPreviewPrint.html', context)
       else:
         lessons = models.Curriculum.objects.all().filter(unit=curriculum).exclude(status='R').order_by('order')
         lessons_html = []
@@ -771,7 +770,9 @@ def printCurriculum(request, id='', pem_code=''):
 
         context = {'curriculum': curriculum, 'lessons_html': lessons_html, 'lessons': lessons, 'is_underlying_lesson': False}
 
-        return render(request, 'ctstem_app/CurriculumPreviewPrint.html', context)
+      messages.warning(request, "This page is still loading. Please wait for this message to disappear before printing this page.")
+
+      return render(request, 'ctstem_app/CurriculumPreviewPrint.html', context)
 
     return http.HttpResponseNotAllowed(['GET'])
 

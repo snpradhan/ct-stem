@@ -198,12 +198,18 @@
         return false;
       });
 
+      $('ul.messages').clearQueue();
+
       window.onload = function() {
-        $('div.warning').hide();
+        $('ul.messages').hide();
+        $('a.print').attr('disabled', false);
+        $('a.print').click(function(){
+          window.print();
+          return false;
+        })
         $('iframe, video').each(function(e){
           var src = $(this).attr('src');
           if(src) {
-
             var static_content = '<div class="embedded_url for_print">The embedded resource from above can be accessed via this link: <span class="link">'+src+'</span></div>';
             $(this).after(static_content);
           }

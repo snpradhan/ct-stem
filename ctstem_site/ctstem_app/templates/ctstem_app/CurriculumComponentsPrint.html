@@ -73,16 +73,12 @@
   </div>
 
   {% if not is_underlying_lesson %}
-    <div class="warning center for_screen">
-      <p>This page is still loading. Please wait for this message to disappear before printing this page.</p>
-    </div>
-
     <div class="row buttons for_screen">
       <div class="col">
         <a type="button" class="btn normal blue" aria-hidden="true" href="{% url 'ctstem:previewCurriculum' curriculum.id %}" aria-label="Back" title="Back">Back</a>
       </div>
       <div class="col">
-        <a type="button" class="btn normal blue print" aria-hidden="true" href="#" aria-label="Print" title="Print" onclick="window.print(); return false;">Print</a>
+        <a type="button" class="btn normal blue print" aria-hidden="true" href="#" aria-label="Print" title="Print" disabled>Print</a>
       </div>
     </div>
   {% endif %}

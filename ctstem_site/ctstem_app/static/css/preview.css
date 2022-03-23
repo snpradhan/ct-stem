@@ -83,3 +83,6 @@ th.likert-instructions {
   padding: 1em;
   width: auto !important/*58%*/;
 }
+ul.messages i {
+    display: none;
+}
