@@ -161,19 +161,12 @@
   {% if teacher_attachments %}
     {% if user.administrator or user.researcher or user.school_administrator or user.teacher or user.author %}
       <div class="section" id="teacher_attachments">
-        <h3 class="left inline">Attached Teacher Resources  <i class="fa fa-paperclip"></i> - </h3>
-        <h6 class="left inline">
-          <a class="for_screen" href="{% url 'ctstem:downloadAttachments' curriculum.id 'R' %}"> Download All <i class="fas fa-file-download"></i> </a>
-          <span class="for_print link">{{ request.scheme }}://{{ request.META.HTTP_HOST }}{% url 'ctstem:downloadAttachments' curriculum.id 'R' %}</span>
-        </h6>
+        <h3 class="left inline">Attached Teacher Resources  <i class="fa fa-paperclip"></i></h3>
         <ul>
         {% for attachment in teacher_attachments %}
           <li>
-            <h5 class="left inline">{{attachment.title}} -  </h5>
-            <h6 class="left inline">
-              <a class="for_screen" href="{{attachment.file_object.url}}" download="{{attachment.title.split|join:'_'}}.{{attachment.extension}}" target="_blank"> Download <i class="fas fa-file-download"></i></a>
-              <span class="for_print link">{{attachment.file_object.url}}</span>
-            </h6>
+            <p>
+              <a class="link" href="{{attachment.file_object.url}}" download="{{attachment.title.split|join:'_'}}.{{attachment.extension}}" target="_blank"> {{attachment.title}}></a></p>
           </li>
         {% endfor %}
         </ul>
@@ -185,19 +178,12 @@
   {% if student_attachments %}
     {% if user.administrator or user.researcher or user.school_administrator or user.teacher or user.author %}
       <div class="section" id="student_attachments">
-        <h3 class="left inline">Attached Student Resources  <i class="fa fa-paperclip"></i> - </h3>
-        <h6 class="left inline">
-          <a class="for_screen" href="{% url 'ctstem:downloadAttachments' curriculum.id 'S' %}"> Download All <i class="fas fa-file-download"></i> </a>
-          <span class="for_print link">{{ request.scheme }}://{{ request.META.HTTP_HOST }}{% url 'ctstem:downloadAttachments' curriculum.id 'S' %}</span>
-        </h6>
+        <h3 class="left inline">Attached Student Resources  <i class="fa fa-paperclip"></i></h3>
         <ul>
         {% for attachment in student_attachments %}
           <li>
-            <h5 class="left inline">{{attachment.title}} -  </h5>
-            <h6 class="left inline">
-              <a class="for_screen" href="{{attachment.file_object.url}}"  download="{{attachment.title.split|join:'_'}}.{{attachment.extension}}" target="_blank"> Download <i class="fas fa-file-download"></i></a>
-              <span class="for_print link">{{attachment.file_object.url}}</span>
-            </h6>
+            <p>
+              <a class="link" href="{{attachment.file_object.url}}"  download="{{attachment.title.split|join:'_'}}.{{attachment.extension}}" target="_blank"> {{attachment.title}} </a></p>
           </li>
         {% endfor %}
         </ul>

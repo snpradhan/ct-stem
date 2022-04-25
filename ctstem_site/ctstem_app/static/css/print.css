@@ -2,7 +2,26 @@
   body {
     margin: 2cm;
     font-family: "proxima-nova", sans-serif;
+    font-size: 14pt !important;
   }
+  p {
+    font-size: 14pt !important;
+  }
+  /* curriculum title and page headers */
+  h3 {
+    font-size: 17pt;
+  }
+  h4{
+    font-size: 16pt;
+  }
+  /* question headers*/
+  h5{
+    font-size: 15pt;
+  }
+  h6{
+    font-size: 14pt;
+  }
+
   .for_screen {
     display: none !important;
   }
@@ -25,10 +44,6 @@
     color: #e5e5e5 !important;
   }
 
-  div.content.single_page_preview#preview img.for_print {
-    width: 900px;
-    height: auto;
-  }
   div.content.single_page_preview#preview img.image_option {
     width: 300px;
     height: auto;
@@ -39,9 +54,7 @@
     max-width: 300px !important;
     max-height: 200px !important;
   }
-  div.content.single_page_preview#preview div.embedded_url {
-    display: inline-block;
-  }
+
   div.content.single_page_preview#preview .link {
     text-decoration: underline;
     color: #00ADFF !important;

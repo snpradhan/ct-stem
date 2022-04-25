@@ -210,19 +210,20 @@
         $('iframe, video').each(function(e){
           var src = $(this).attr('src');
           if(src) {
-            var static_content = '<div class="embedded_url for_print">The embedded resource from above can be accessed via this link: <span class="link">'+src+'</span></div>';
+            var static_content = '<br><div class="for_print left">The embedded resource from above can be accessed via this link </div><a class="for_print link left" href="'+src+'"></a>';
             $(this).after(static_content);
           }
         });
         $('video').each(function(e){
           var video_element = $(this);
-          var video_links = '';
+          var video_links = '<br><ul>';
           $(this).find('source').each(function(){
             var src = $(this).attr('src');
-            video_links = video_links + '<div class="link">'+src+'</div>';
+            video_links = video_links + '<li><a class="for_print link left" href="'+src+'">Video</a></li>';
           });
+          video_links = video_links + '</ul>';
           if(video_links != '') {
-            var static_content = '<div class="embedded_url for_print">The embedded resource from above can be accessed via these links: '+video_links+'</div>';
+            var static_content = '<br><div class="for_print left">The embedded resource from above can be accessed via these links:</div>'+video_links;
             $(video_element).after(static_content);
           }
         });

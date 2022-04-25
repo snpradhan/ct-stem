@@ -11,10 +11,6 @@ div.content.single_page_preview#preview span.response_label {
 div.content.single_page_preview#preview img.sketch_background {
     display: none;
 }
-div.content.single_page_preview#preview div.embedded_url {
-    display: none;
-}
-
 .for_print {
     display: none;
 }
