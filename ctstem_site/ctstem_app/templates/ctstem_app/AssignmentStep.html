@@ -719,7 +719,8 @@
         // receives a new MessageEvent.
         window.addEventListener('message', receiveMessage);
 
-        bindFocusOutSave(!closed);
+        //disable autosave
+        //bindFocusOutSave(!closed);
 
       };
       /***** End of  window.onload = function() { ****/
@@ -897,6 +898,7 @@
     }
 
     //auto saving on focusout of form elements
+    /* Disable autosave
     function bindFocusOutSave(status) {
       if (status) {
         $('.assignment_input').focusout(function(e){
@@ -921,8 +923,10 @@
         });
       }
     }
+    */
 
     // ajax submit assignment step form
+    /* Disable autosave
     function autoSave(){
       $('input:hidden[id="save"]').val(1);
       $('input:hidden[id*="save"][id*="form"]').val('on');
@@ -957,7 +961,7 @@
       });
       return false;
     }
-
+    */
   </script>
 
 {% endblock %}
