@@ -52,7 +52,7 @@ pyaml==19.4.1
 pycodestyle==2.6.0
 pycparser==2.20
 pyflakes==2.2.0
-PyJWT==1.7.1
+PyJWT==2.4.0
 pyOpenSSL==20.0.1
 pyparsing==2.4.7
 PyPDF2==1.26.0
